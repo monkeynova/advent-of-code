@@ -1,0 +1,2 @@
+# file_based_test_driver requires C++ 17 idioms.
+build --cxxopt=-std=c++1z
