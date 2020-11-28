@@ -4,7 +4,7 @@
 #include "absl/strings/str_cat.h"
 
 absl::StatusOr<std::vector<std::string>> Day1_2019::Part1(
-    const std::vector<absl::string_view>& input) {
+    const std::vector<absl::string_view>& input) const {
   int total_fuel = 0;
 
   for (const auto& module_str : input) {
@@ -21,7 +21,7 @@ absl::StatusOr<std::vector<std::string>> Day1_2019::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day1_2019::Part2(
-    const std::vector<absl::string_view>& input) {
+    const std::vector<absl::string_view>& input) const {
   int total_fuel = 0;
 
   for (const auto& module_str : input) {

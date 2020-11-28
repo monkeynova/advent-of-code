@@ -8,13 +8,38 @@
 #include "run_test_case_result.h"
 #include "test_case_options.h"
 
-using RunCase = std::function<absl::StatusOr<std::vector<std::string>>(
-    const std::vector<absl::string_view>&)>;
+constexpr char kPartOption[] = "part";
 
-void TestCase(absl::string_view test_case, RunCase run_case,
+void TestCase(const AdventDay* advent_day,
+              absl::string_view test_case_with_options,
               file_based_test_driver::RunTestCaseResult* test_result) {
+  file_based_test_driver::TestCaseOptions options;
+  options.RegisterInt64(kPartOption, 0);
+
+  std::string test_case = std::string(test_case_with_options);
+  if (absl::Status st = options.ParseTestCaseOptions(&test_case); !st.ok()) {
+    test_result->AddTestOutput(
+        absl::StrCat("ERROR: Could not parse options: ", st.message()));
+    return;
+  }
+
   std::vector<absl::string_view> test_lines = absl::StrSplit(test_case, "\n");
-  absl::StatusOr<std::vector<std::string>> output = run_case(test_lines);
+  absl::StatusOr<std::vector<std::string>> output;
+  switch (options.GetInt64(kPartOption)) {
+    case 1: {
+      output = advent_day->Part1(test_lines);
+      break;
+    }
+    case 2: {
+      output = advent_day->Part2(test_lines);
+      break;
+    }
+    default: {
+      test_result->AddTestOutput(absl::StrCat(
+          "ERROR: Bad part (must be 1 or 2): ", options.GetInt64(kPartOption)));
+      return;
+    }
+  }
   if (!output.ok()) {
     test_result->AddTestOutput(
         absl::StrCat("ERROR: Could not run test: ", output.status().message()));
@@ -25,26 +50,9 @@ void TestCase(absl::string_view test_case, RunCase run_case,
   }
 }
 
-void TestPart1(absl::string_view test_case,
-               file_based_test_driver::RunTestCaseResult* test_result) {
+TEST(Day1, FileBasedTest) {
   Day1_2019 solver;
-  TestCase(test_case, absl::bind_front(&Day1_2019::Part1, &solver),
-           test_result);
-}
-
-void TestPart2(absl::string_view test_case,
-               file_based_test_driver::RunTestCaseResult* test_result) {
-  Day1_2019 solver;
-  TestCase(test_case, absl::bind_front(&Day1_2019::Part2, &solver),
-           test_result);
-}
-
-TEST(Part1, FileBasedTest) {
   EXPECT_TRUE(file_based_test_driver::RunTestCasesFromFiles(
-      "advent_of_code/2019/day1/part1.test", TestPart1));
-}
-
-TEST(Part2, FileBasedTest) {
-  EXPECT_TRUE(file_based_test_driver::RunTestCasesFromFiles(
-      "advent_of_code/2019/day1/part2.test", TestPart2));
+      "advent_of_code/2019/day1/day1.test",
+      absl::bind_front(&TestCase, &solver)));
 }

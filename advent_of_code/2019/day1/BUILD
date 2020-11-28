@@ -12,8 +12,7 @@ cc_test(
     name = "day1_test",
     srcs = ["day1_test.cc"],
     data = [
-        "part1.test",
-        "part2.test",
+        "day1.test",
     ],
     deps = [
         ":day1",
