@@ -45,7 +45,7 @@ absl::Status RunIntcode(std::vector<int>* codes) {
           absl::StrCat("Attempt to read from pos=", code_pos));
     }
     switch ((*codes)[code_pos]) {
-      LOG(INFO) << "@" << code_pos;
+      VLOG(2) << "@" << code_pos;
       case 1: {
         if (code_pos + 4 >= codes->size()) {
           return absl::InvalidArgumentError(
@@ -54,8 +54,9 @@ absl::Status RunIntcode(std::vector<int>* codes) {
         int in1_pos = (*codes)[code_pos + 1];
         int in2_pos = (*codes)[code_pos + 2];
         int out_pos = (*codes)[code_pos + 3];
-        LOG(INFO) << "Add(" << in1_pos << ", " << in2_pos << ") => " << out_pos;
+        VLOG(2) << "Add(" << in1_pos << ", " << in2_pos << ") => " << out_pos;
         (*codes)[out_pos] = (*codes)[in1_pos] + (*codes)[in2_pos];
+        code_pos += 4;
         break;
       }
       case 2: {
@@ -66,13 +67,15 @@ absl::Status RunIntcode(std::vector<int>* codes) {
         int in1_pos = (*codes)[code_pos + 1];
         int in2_pos = (*codes)[code_pos + 2];
         int out_pos = (*codes)[code_pos + 3];
-        LOG(INFO) << "Mult(" << in1_pos << ", " << in2_pos << ") => "
+        VLOG(2) << "Mult(" << in1_pos << ", " << in2_pos << ") => "
                   << out_pos;
         (*codes)[out_pos] = (*codes)[in1_pos] * (*codes)[in2_pos];
+        code_pos += 4;
         break;
       }
       case 99: {
-        LOG(INFO) << "Term";
+        VLOG(2) << "Term";
+        ++code_pos;
         return absl::OkStatus();
       }
       default: {
@@ -80,7 +83,6 @@ absl::Status RunIntcode(std::vector<int>* codes) {
             "Invalid instruction (@", code_pos, "): ", (*codes)[code_pos]));
       }
     }
-    code_pos += 4;
   }
 }
 
