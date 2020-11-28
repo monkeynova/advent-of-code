@@ -8,3 +8,23 @@ cc_library(
         "@com_google_absl//absl/status:statusor",
     ],
 )
+
+cc_library(
+    name = "file_test",
+    testonly = 1,
+    srcs = ["file_test.cc"],
+    hdrs = ["file_test.h"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        ":advent_day",
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/functional:bind_front",
+        "@com_google_absl//absl/strings",
+        "@com_google_file_based_test_driver//:file_based_test_driver",
+        "@com_google_file_based_test_driver//:run_test_case_result",
+        "@com_google_file_based_test_driver//:test_case_options",
+        "@com_monkeynova_gunit_main//:main_lib",
+    ],
+)

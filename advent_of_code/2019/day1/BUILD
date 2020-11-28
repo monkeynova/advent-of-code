@@ -17,12 +17,6 @@ cc_test(
     ],
     deps = [
         ":day1",
-        "@com_google_absl//absl/flags:flag",
-        "@com_google_absl//absl/functional:bind_front",
-        "@com_google_absl//absl/strings",
-        "@com_google_file_based_test_driver//:file_based_test_driver",
-        "@com_google_file_based_test_driver//:run_test_case_result",
-        "@com_google_file_based_test_driver//:test_case_options",
-        "@com_monkeynova_gunit_main//:main_lib",
+        "//advent_of_code:file_test",
     ],
 )
