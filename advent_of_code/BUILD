@@ -25,6 +25,7 @@ cc_library(
         "@com_google_file_based_test_driver//:file_based_test_driver",
         "@com_google_file_based_test_driver//:run_test_case_result",
         "@com_google_file_based_test_driver//:test_case_options",
+        "@com_googlesource_code_re2//:re2",
         "@com_monkeynova_gunit_main//:main_lib",
     ],
 )

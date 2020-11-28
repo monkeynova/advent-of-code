@@ -14,6 +14,7 @@ cc_test(
     args = ["--test_file=advent_of_code/2019/day1/day1.test"],
     data = [
         "day1.test",
+        "input.txt",
     ],
     deps = [
         ":day1",
