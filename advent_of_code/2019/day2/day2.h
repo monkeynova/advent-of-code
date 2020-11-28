@@ -1,9 +1,9 @@
-#ifndef ADVENT_OF_CODE_NEW_DAY_H
-#define ADVENT_OF_CODE_NEW_DAY_H
+#ifndef ADVENT_OF_CODE_2019_DAY2_H
+#define ADVENT_OF_CODE_2019_DAY2_H
 
 #include "advent_of_code/advent_day.h"
 
-class NewDay : public AdventDay {
+class Day2_2019 : public AdventDay {
  public:
   absl::StatusOr<std::vector<std::string>> Part1(
       const std::vector<absl::string_view>& input) const override;
@@ -11,4 +11,4 @@ class NewDay : public AdventDay {
       const std::vector<absl::string_view>& input) const override;
 };
 
-#endif  // ADVENT_OF_CODE_NEW_DAY_H
+#endif  // ADVENT_OF_CODE_2019_DAY2_H
