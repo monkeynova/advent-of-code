@@ -31,9 +31,9 @@ absl::StatusOr<std::vector<int>> ParseIntcode(
   return codes;
 }
 
-void Part1CorrectBoard(std::vector<int>* codes) {
-  (*codes)[1] = 12;
-  (*codes)[2] = 2;
+void CorrectBoard(std::vector<int>* codes, int noun, int verb) {
+  (*codes)[1] = noun;
+  (*codes)[2] = verb;
 }
 
 absl::Status RunIntcode(std::vector<int>* codes) {
@@ -89,7 +89,7 @@ absl::StatusOr<std::vector<std::string>> Day2_2019::Part1(
   absl::StatusOr<std::vector<int>> codes = ParseIntcode(input);
   if (!codes.ok()) return codes.status();
 
-  Part1CorrectBoard(&*codes);
+  CorrectBoard(&*codes, 12, 2);
   if (absl::Status st = RunIntcode(&*codes); !st.ok()) return st;
 
   return std::vector<std::string>{absl::StrCat((*codes)[0])};
@@ -97,5 +97,18 @@ absl::StatusOr<std::vector<std::string>> Day2_2019::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day2_2019::Part2(
     const std::vector<absl::string_view>& input) const {
+  absl::StatusOr<std::vector<int>> start_codes = ParseIntcode(input);
+  if (!start_codes.ok()) return start_codes.status();
+
+  for (int noun = 0; noun < 100; ++noun) {
+    for (int verb = 0; verb < 100; ++verb) {
+      std::vector<int> codes = *start_codes;
+      CorrectBoard(&codes, noun, verb);
+      if (absl::Status st = RunIntcode(&codes); !st.ok()) break;
+      if (codes[0] == 19690720) {
+        return std::vector<std::string>{absl::StrCat(100 * noun + verb)};
+      }
+    }
+  }
   return std::vector<std::string>{""};
 }
