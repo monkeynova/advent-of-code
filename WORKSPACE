@@ -22,6 +22,12 @@ git_repository(
 )
 
 git_repository(
+    name = "com_google_benchmark",
+    remote = "git://github.com/google/benchmark.git",
+    commit = "af72911f2fe6b8114564614d2db17a449f8c4af0",
+)
+
+git_repository(
     name = "com_google_glog",
     remote = "git://github.com/google/glog.git",
     commit = "c8f8135a5720aee7de8328b42e4c43f8aa2e60aa",

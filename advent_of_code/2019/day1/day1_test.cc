@@ -1,12 +1,17 @@
 #include "advent_of_code/2019/day1/day1.h"
 
+#include "absl/flags/flag.h"
 #include "absl/functional/bind_front.h"
 #include "absl/strings/str_split.h"
 #include "file_based_test_driver.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
+#include "main_lib.h"
 #include "run_test_case_result.h"
 #include "test_case_options.h"
+
+ABSL_FLAG(std::string, test_file, "",
+          "The file which contains the file based test driver tests");
 
 constexpr char kPartOption[] = "part";
 
@@ -51,8 +56,8 @@ void TestCase(const AdventDay* advent_day,
 }
 
 TEST(Day1, FileBasedTest) {
+  InitializeAbslFlagsFromGtest();
   Day1_2019 solver;
   EXPECT_TRUE(file_based_test_driver::RunTestCasesFromFiles(
-      "advent_of_code/2019/day1/day1.test",
-      absl::bind_front(&TestCase, &solver)));
+      absl::GetFlag(FLAGS_test_file), absl::bind_front(&TestCase, &solver)));
 }
