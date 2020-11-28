@@ -1,0 +1,9 @@
+[part=1]
+@include{advent_of_code/2019/day1/input.txt}
+--
+==
+
+[part=2]
+@include{advent_of_code/2019/day1/input.txt}
+--
+
