@@ -137,6 +137,64 @@ absl::Status RunIntcode(std::vector<int>* codes, const std::vector<int>& input, 
         code_pos += 2;
         break;
       }
+      case 5: {
+        if (code_pos + 3 >= codes->size()) {
+          return absl::InvalidArgumentError(
+              absl::StrCat("Attempt to read from pos=", code_pos));
+        }
+        absl::StatusOr<int> in1 = LoadParameter(codes, code_pos, parameter_modes, 1);
+        if (!in1.ok()) return in1.status();
+        if (*in1 != 0) {
+          absl::StatusOr<int> in2 = LoadParameter(codes, code_pos, parameter_modes, 2);
+          if (!in2.ok()) return in2.status();
+          code_pos = *in2;
+        } else {
+          code_pos += 3;
+        }
+        break;
+      }
+      case 6: {
+        if (code_pos + 3 >= codes->size()) {
+          return absl::InvalidArgumentError(
+              absl::StrCat("Attempt to read from pos=", code_pos));
+        }
+        absl::StatusOr<int> in1 = LoadParameter(codes, code_pos, parameter_modes, 1);
+        if (!in1.ok()) return in1.status();
+        if (*in1 == 0) {
+          absl::StatusOr<int> in2 = LoadParameter(codes, code_pos, parameter_modes, 2);
+          if (!in2.ok()) return in2.status();
+          code_pos = *in2;
+        } else {
+          code_pos += 3;
+        }
+        break;
+      }
+      case 7: {
+        if (code_pos + 4 >= codes->size()) {
+          return absl::InvalidArgumentError(
+              absl::StrCat("Attempt to read from pos=", code_pos));
+        }
+        absl::StatusOr<int> in1 = LoadParameter(codes, code_pos, parameter_modes, 1);
+        if (!in1.ok()) return in1.status();
+        absl::StatusOr<int> in2 = LoadParameter(codes, code_pos, parameter_modes, 2);
+        if (!in2.ok()) return in2.status();
+        if (absl::Status st = SaveParameter(codes, code_pos, parameter_modes, 3, *in1 < *in2); !st.ok()) return st;
+        code_pos += 4;
+        break;
+      }
+      case 8: {
+        if (code_pos + 4 >= codes->size()) {
+          return absl::InvalidArgumentError(
+              absl::StrCat("Attempt to read from pos=", code_pos));
+        }
+        absl::StatusOr<int> in1 = LoadParameter(codes, code_pos, parameter_modes, 1);
+        if (!in1.ok()) return in1.status();
+        absl::StatusOr<int> in2 = LoadParameter(codes, code_pos, parameter_modes, 2);
+        if (!in2.ok()) return in2.status();
+        if (absl::Status st = SaveParameter(codes, code_pos, parameter_modes, 3, *in1 == *in2); !st.ok()) return st;
+        code_pos += 4;
+        break;
+      }
       case 99: {
         ++code_pos;
         return absl::OkStatus();
@@ -168,6 +226,19 @@ absl::StatusOr<std::vector<std::string>> Day5_2019::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day5_2019::Part2(
-    const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+    const std::vector<absl::string_view>& input_text) const {
+  absl::StatusOr<std::vector<int>> codes = ParseIntcode(input_text);
+  if (!codes.ok()) return codes.status();
+
+  std::vector<int> input = {5};
+  std::vector<int> output;
+  if (absl::Status st = RunIntcode(&*codes, input, &output); !st.ok()) return st;
+
+  for (int i = 0; i < output.size() - 1; ++i) {
+    if (output[i] != 0) {
+      return absl::InvalidArgumentError("Bad diagnostic!");
+    }
+  }
+
+  return std::vector<std::string>{absl::StrCat(output.back())};
 }
