@@ -67,8 +67,7 @@ absl::Status RunIntcode(std::vector<int>* codes) {
         int in1_pos = (*codes)[code_pos + 1];
         int in2_pos = (*codes)[code_pos + 2];
         int out_pos = (*codes)[code_pos + 3];
-        VLOG(2) << "Mult(" << in1_pos << ", " << in2_pos << ") => "
-                  << out_pos;
+        VLOG(2) << "Mult(" << in1_pos << ", " << in2_pos << ") => " << out_pos;
         (*codes)[out_pos] = (*codes)[in1_pos] * (*codes)[in2_pos];
         code_pos += 4;
         break;
