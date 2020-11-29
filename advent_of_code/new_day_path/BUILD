@@ -5,6 +5,7 @@ cc_library(
     deps = [
         "//advent_of_code:advent_day",
         "@com_google_absl//absl/strings",
+        "@com_google_glog//:glog",
     ],
 )
 
