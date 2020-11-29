@@ -6,7 +6,7 @@
     ],
     "settings": {
         "files.exclude": {
-            "bazel*": true,         // this is a default value
+            "bazel*": true,
         }
         "files.associations": {
             "iosfwd": "cpp",
