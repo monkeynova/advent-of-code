@@ -5,6 +5,9 @@
         }
     ],
     "settings": {
+        "files.exclude": {
+            "bazel*": true,         // this is a default value
+        }
         "files.associations": {
             "iosfwd": "cpp",
             "__bit_reference": "cpp",
