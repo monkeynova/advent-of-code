@@ -4,6 +4,9 @@
 1019
 ==
 
+# 214 (low)
+# 400 (low)
 [part=2]
 @include{advent_of_code/2019/day4/input.txt}
 --
+660
