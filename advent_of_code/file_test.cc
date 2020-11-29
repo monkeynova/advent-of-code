@@ -48,6 +48,9 @@ void RunTestCase(const AdventDay* advent_day,
   }
 
   std::vector<absl::string_view> test_lines = absl::StrSplit(test_case, "\n");
+  while (test_lines.back().empty()) {
+    test_lines.pop_back();
+  }
   absl::StatusOr<std::vector<std::string>> output;
   switch (options.GetInt64(kPartOption)) {
     case 1: {

@@ -7,18 +7,10 @@
 
 absl::StatusOr<std::vector<int>> ParseIntcode(
     const std::vector<absl::string_view>& input) {
-  if (input.empty()) {
+  if (input.size() != 1) {
     return absl::InvalidArgumentError("input is empty");
   }
   std::vector<absl::string_view> code_strs = absl::StrSplit(input[0], ",");
-  if (input.size() > 1) {
-    for (int i = 1; i < input.size(); ++i) {
-      if (!input[i].empty()) {
-        return absl::InvalidArgumentError(
-            absl::StrCat("input contains second non-empty line: ", input[i]));
-      }
-    }
-  }
   std::vector<int> codes;
   codes.reserve(code_strs.size());
   for (absl::string_view str : code_strs) {

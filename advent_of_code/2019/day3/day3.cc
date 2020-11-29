@@ -151,18 +151,13 @@ absl::StatusOr<std::vector<Line::Point>> Intersect(std::vector<Line> wire1,
 
 absl::StatusOr<std::vector<std::string>> Day3_2019::Part1(
     const std::vector<absl::string_view>& input) const {
-  if (input.size() < 2) {
+  if (input.size() != 2) {
     return absl::InvalidArgumentError("input does not contain 2 lines");
   }
   absl::StatusOr<std::vector<Line>> wire1 = Parse(input[0]);
   if (!wire1.ok()) return wire1.status();
   absl::StatusOr<std::vector<Line>> wire2 = Parse(input[1]);
   if (!wire2.ok()) return wire2.status();
-  for (int i = 2; i < input.size(); ++i) {
-    if (!input[i].empty()) {
-      return absl::InvalidArgumentError("Input contains a 3rd non-empty line");
-    }
-  }
 
   absl::StatusOr<std::vector<Line::Point>> overlap = Intersect(*wire1, *wire2);
   if (!overlap.ok()) return overlap.status();
@@ -207,18 +202,13 @@ absl::StatusOr<int> CostToOverlap(Line::Point intersect,
 
 absl::StatusOr<std::vector<std::string>> Day3_2019::Part2(
     const std::vector<absl::string_view>& input) const {
-  if (input.size() < 2) {
+  if (input.size() != 2) {
     return absl::InvalidArgumentError("input does not contain 2 lines");
   }
   absl::StatusOr<std::vector<Line>> wire1 = Parse(input[0]);
   if (!wire1.ok()) return wire1.status();
   absl::StatusOr<std::vector<Line>> wire2 = Parse(input[1]);
   if (!wire2.ok()) return wire2.status();
-  for (int i = 2; i < input.size(); ++i) {
-    if (!input[i].empty()) {
-      return absl::InvalidArgumentError("Input contains a 3rd non-empty line");
-    }
-  }
 
   absl::StatusOr<std::vector<Line::Point>> overlap = Intersect(*wire1, *wire2);
   if (!overlap.ok()) return overlap.status();

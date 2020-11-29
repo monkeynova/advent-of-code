@@ -2,6 +2,7 @@
 
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
+#include "absl/strings/str_split.h"
 #include "glog/logging.h"
 
 absl::StatusOr<std::vector<std::string>> NewDay::Part1(
