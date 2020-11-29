@@ -7,7 +7,7 @@
     "settings": {
         "files.exclude": {
             "bazel*": true,
-        }
+        },
         "files.associations": {
             "iosfwd": "cpp",
             "__bit_reference": "cpp",

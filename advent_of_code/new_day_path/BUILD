@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
 cc_library(
     name = "new_day",
     srcs = ["new_day.cc"],
