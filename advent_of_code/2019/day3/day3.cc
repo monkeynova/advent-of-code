@@ -1,8 +1,11 @@
 #include "advent_of_code/2019/day3/day3.h"
 
+#include <limits>
+
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
+#include "glog/logging.h"
 
 struct Line {
   struct Point {
@@ -10,6 +13,7 @@ struct Line {
     int y;
 
     int dist() const { return abs(x) + abs(y); }
+    int dist(Point o) const { return abs(x - o.x) + abs(y - o.y); }
   };
 
   Point from;
@@ -176,7 +180,68 @@ absl::StatusOr<std::vector<std::string>> Day3_2019::Part1(
   return std::vector<std::string>{absl::StrCat(min->dist())};
 }
 
+absl::StatusOr<bool> PointOnLine(Line::Point point, Line line) {
+  if (line.from.x == line.to.x) {
+    return point.x == line.from.x && Between(point.y, line.from.y, line.to.y);
+  } else if (line.from.y == line.to.y) {
+    return point.y == line.from.y && Between(point.x, line.from.x, line.to.x);
+  }
+  return absl::InvalidArgumentError("line isn't axis aligned");
+}
+
+absl::StatusOr<int> CostToOverlap(Line::Point intersect,
+                                  const std::vector<Line>& wire) {
+  std::vector<int> cost_to_start(wire.size() + 1, 0);
+  for (int i = 0; i < wire.size(); ++i) {
+    absl::StatusOr<bool> on_line = PointOnLine(intersect, wire[i]);
+    if (!on_line.ok()) return on_line.status();
+
+    if (*on_line) {
+      return cost_to_start[i] + wire[i].from.dist(intersect);
+    }
+    cost_to_start[i + 1] = cost_to_start[i] + wire[i].from.dist(wire[i].to);
+  }
+
+  return absl::InvalidArgumentError("Point not found on wire");
+}
+
 absl::StatusOr<std::vector<std::string>> Day3_2019::Part2(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  if (input.size() < 2) {
+    return absl::InvalidArgumentError("input does not contain 2 lines");
+  }
+  absl::StatusOr<std::vector<Line>> wire1 = Parse(input[0]);
+  if (!wire1.ok()) return wire1.status();
+  absl::StatusOr<std::vector<Line>> wire2 = Parse(input[1]);
+  if (!wire2.ok()) return wire2.status();
+  for (int i = 2; i < input.size(); ++i) {
+    if (!input[i].empty()) {
+      return absl::InvalidArgumentError("Input contains a 3rd non-empty line");
+    }
+  }
+
+  absl::StatusOr<std::vector<Line::Point>> overlap = Intersect(*wire1, *wire2);
+  if (!overlap.ok()) return overlap.status();
+  absl::optional<Line::Point> min;
+  int min_score = std::numeric_limits<int>::max();
+  for (const auto& point : *overlap) {
+    if (point.dist() > 0) {
+      absl::StatusOr<int> wire1_score = CostToOverlap(point, *wire1);
+      if (!wire1_score.ok()) return wire1_score.status();
+      absl::StatusOr<int> wire2_score = CostToOverlap(point, *wire2);
+      if (!wire2_score.ok()) return wire2_score.status();
+
+      int score = *wire1_score + *wire2_score;
+      if (score < min_score) {
+        min = point;
+        min_score = score;
+      }
+    }
+  }
+
+  if (!min) {
+    return absl::InvalidArgumentError("No intersect found");
+  }
+
+  return std::vector<std::string>{absl::StrCat(min_score)};
 }
