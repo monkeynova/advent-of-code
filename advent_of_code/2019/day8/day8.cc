@@ -67,7 +67,6 @@ absl::StatusOr<std::vector<std::string>> Day8_2019::Part2(
     for (int j = 0; j < kLayerSize; ++j) {
       if (render[j] == '2') render[j] = layer[j];
     }
-    LOG(INFO) << render;
   }
   std::vector<std::string> ret;
   for (int i = 0; i < kHeight; ++i) {
