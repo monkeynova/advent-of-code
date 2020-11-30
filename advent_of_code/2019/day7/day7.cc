@@ -7,11 +7,11 @@
 #include "advent_of_code/2019/int_code.h"
 #include "glog/logging.h"
 
-absl::StatusOr<int> AllCombinations(const std::vector<int>& base_codes,
-                                    int input_value,
-                                    int index = 0,
-                                    // Copt since we're going to mutate.
-                                    absl::flat_hash_set<int> used = {}) {
+absl::StatusOr<int> FindBestThrust(const std::vector<int>& base_codes,
+                                  int input_value,
+                                  int index = 0,
+                                  // Copy since we're going to mutate.
+                                  absl::flat_hash_set<int> used = {}) {
   if (used.size() == 5) return input_value;
 
   int best_thrust = 0;
@@ -27,7 +27,7 @@ absl::StatusOr<int> AllCombinations(const std::vector<int>& base_codes,
       return absl::InvalidArgumentError("Didn't return a single output");
     }
 
-    absl::StatusOr<int> sub_best_thrust = AllCombinations(base_codes, output[0], index + 1, used);
+    absl::StatusOr<int> sub_best_thrust = FindBestThrust(base_codes, output[0], index + 1, used);
     if (!sub_best_thrust.ok()) return sub_best_thrust.status();
     best_thrust = std::max(best_thrust, *sub_best_thrust);
     used.erase(i);
@@ -40,7 +40,7 @@ absl::StatusOr<std::vector<std::string>> Day7_2019::Part1(
   absl::StatusOr<std::vector<int>> codes = ParseIntcode(input);
   if (!codes.ok()) return codes.status();
 
-  absl::StatusOr<int> best_result = AllCombinations(*codes, 0);
+  absl::StatusOr<int> best_result = FindBestThrust(*codes, 0);
   if (!best_result.ok()) return best_result.status();
 
   return std::vector<std::string>{absl::StrCat(*best_result)};
