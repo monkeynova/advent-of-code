@@ -1,6 +1,7 @@
 #include "advent_of_code/file_test.h"
 
 #include "absl/flags/flag.h"
+#include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "base/file_util.h"
 #include "re2/re2.h"
@@ -72,7 +73,5 @@ void RunTestCase(const AdventDay* advent_day,
         absl::StrCat("ERROR: Could not run test: ", output.status().message()));
     return;
   }
-  for (const auto& str : *output) {
-    test_result->AddTestOutput(str);
-  }
+  test_result->AddTestOutput(absl::StrJoin(*output, "\n"));
 }

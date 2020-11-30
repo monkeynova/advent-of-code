@@ -46,5 +46,33 @@ absl::StatusOr<std::vector<std::string>> Day8_2019::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day8_2019::Part2(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  const int kWidth = 25;
+  const int kHeight = 6;
+  const int kLayerSize = kWidth * kHeight;
+  if (input.size() != 1) {
+    return absl::InvalidArgumentError("Not exactly one image");
+  }
+  if (input[0].size() % kLayerSize != 0){
+    return absl::InvalidArgumentError("Image isn't 25x6");
+  }
+  const int layer_count = input[0].size() / kLayerSize;
+  if (layer_count <= 0){
+    return absl::InvalidArgumentError("Image is empty");
+  }
+  std::string render;
+  render.resize(kLayerSize);
+  for (int i = 0; i < kLayerSize; ++i) render[i] = '2';
+  for (int i = 0; i < layer_count; ++i) {
+    const char* layer = input[0].data() + i * kLayerSize;
+    for (int j = 0; j < kLayerSize; ++j) {
+      if (render[j] == '2') render[j] = layer[j];
+    }
+    LOG(INFO) << render;
+  }
+  std::vector<std::string> ret;
+  for (int i = 0; i < kHeight; ++i) {
+    ret.push_back(std::string(render.substr(i * kWidth, kWidth)));
+  }
+
+  return ret;
 }
