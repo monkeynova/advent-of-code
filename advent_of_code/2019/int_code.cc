@@ -75,36 +75,27 @@ absl::Status IntCode::SaveParameter(int parameter_modes, int parameter,
   }
 }
 
-absl::Status IntCode::Run(const std::vector<int>& input,
-                          std::vector<int>* output) {
-  // Run program.
-  int input_pos = 0;
+absl::Status IntCode::Run(InputSource* input, OutputSink* output) {
   while (!terminated_) {
-    if (absl::Status st = RunSingleOpcode(input, input_pos, output); !st.ok())
-      return st;
-  }
-  if (input_pos != input.size()) {
-    return absl::InvalidArgumentError("Extraneous input provided");
+    if (absl::Status st = RunSingleOpcode(input, output); !st.ok()) return st;
   }
   return absl::OkStatus();
 }
 
 absl::StatusOr<absl::optional<int>> IntCode::RunToNextOutput(
-    const std::vector<int>& input) {
-  // Run program.
-  int input_pos = 0;
+    InputSource* input) {
   std::vector<int> output;
+  VectorOutput output_sink(&output);
   while (!terminated_) {
-    if (absl::Status st = RunSingleOpcode(input, input_pos, &output); !st.ok())
+    if (absl::Status st = RunSingleOpcode(input, &output_sink); !st.ok()) {
       return st;
+    }
     if (!output.empty()) return output[0];
   }
   return absl::nullopt;
 }
 
-absl::Status IntCode::RunSingleOpcode(const std::vector<int>& input,
-                                      int& input_pos,
-                                      std::vector<int>* output) {
+absl::Status IntCode::RunSingleOpcode(InputSource* input, OutputSink* output) {
   if (code_pos_ < 0 || code_pos_ >= codes_.size()) {
     return absl::InvalidArgumentError(
         absl::StrCat("Attempt to read from pos=", code_pos_));
@@ -148,14 +139,14 @@ absl::Status IntCode::RunSingleOpcode(const std::vector<int>& input,
         return absl::InvalidArgumentError(
             absl::StrCat("Attempt to read from pos=", code_pos_));
       }
-      if (input_pos >= input.size()) {
-        return absl::InvalidArgumentError(
-            absl::StrCat("Attempt to read past end of input"));
+      if (input == nullptr) {
+        return absl::InvalidArgumentError("No input specified");
       }
-      if (absl::Status st = SaveParameter(parameter_modes, 1, input[input_pos]);
+      absl::StatusOr<int> input_val = input->Fetch();
+      if (!input_val.ok()) return input_val.status();
+      if (absl::Status st = SaveParameter(parameter_modes, 1, *input_val);
           !st.ok())
         return st;
-      ++input_pos;
       code_pos_ += 2;
       break;
     }
@@ -167,9 +158,9 @@ absl::Status IntCode::RunSingleOpcode(const std::vector<int>& input,
       absl::StatusOr<int> in = LoadParameter(parameter_modes, 1);
       if (!in.ok()) return in.status();
       if (output == nullptr) {
-        return absl::InvalidArgumentError("Nowhere to output");
+        return absl::InvalidArgumentError("No output specified");
       }
-      output->push_back(*in);
+      if (absl::Status st = output->Put(*in); !st.ok()) return st;
       code_pos_ += 2;
       break;
     }
