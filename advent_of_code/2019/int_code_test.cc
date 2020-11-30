@@ -40,7 +40,7 @@ void RunTestCase(absl::string_view test_case_with_options,
   }
   std::vector<absl::string_view> input_str =
       absl::StrSplit(options.GetString(kInputOption), ",");
-  std::vector<int> input;
+  std::vector<int64_t> input;
   input.reserve(input_str.size());
   for (absl::string_view str : input_str) {
     input.push_back(0);
@@ -50,7 +50,7 @@ void RunTestCase(absl::string_view test_case_with_options,
       return;
     }
   }
-  std::vector<int> output;
+  std::vector<int64_t> output;
   if (absl::Status st = codes->Run(input, &output); !st.ok()) {
     test_result->AddTestOutput(
         absl::StrCat("ERROR: Could not run code: ", st.message()));

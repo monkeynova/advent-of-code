@@ -21,8 +21,8 @@ absl::StatusOr<int> FindBestThrust(const IntCode& base_codes, int input_value,
     if (used.contains(i)) continue;
     used.insert(i);
     IntCode clean_codes = base_codes.Clone();
-    std::vector<int> input = {i, input_value};
-    std::vector<int> output;
+    std::vector<int64_t> input = {i, input_value};
+    std::vector<int64_t> output;
     absl::Status st = clean_codes.Run(input, &output);
     if (!st.ok()) return st;
     if (output.size() != 1) {
@@ -53,7 +53,7 @@ absl::StatusOr<int> RunAssembly(const IntCode& base_codes,
                                 std::vector<int> phases) {
   struct PartialState {
     IntCode code;
-    std::vector<int> input;
+    std::vector<int64_t> input;
   };
 
   // Initialize.
@@ -62,16 +62,16 @@ absl::StatusOr<int> RunAssembly(const IntCode& base_codes,
     assembly.push_back({.code = base_codes.Clone(), .input = {phases[i]}});
   }
 
-  absl::optional<int> next_input = 0;
+  absl::optional<int64_t> next_input = 0;
   bool running = true;
-  int last_output = -1;
+  int64_t last_output = -1;
   while (running) {
     for (int i = 0; i < 5; ++i) {
       PartialState& unit = assembly[i];
       if (next_input) {
         unit.input.push_back(*next_input);
       }
-      absl::StatusOr<absl::optional<int>> output =
+      absl::StatusOr<absl::optional<int64_t>> output =
           unit.code.RunToNextOutput(unit.input);
       if (!output.ok()) return output.status();
       unit.input.clear();
