@@ -76,135 +76,143 @@ absl::Status IntCode::SaveParameter(int parameter_modes, int parameter, int valu
 absl::Status IntCode::Run(const std::vector<int>& input, std::vector<int>* output) {
   // Run program.
   int input_pos = 0;
-  while (true) {
-    if (code_pos_ < 0 || code_pos_ >= codes_.size()) {
-      return absl::InvalidArgumentError(
-          absl::StrCat("Attempt to read from pos=", code_pos_));
+  while (!terminated_) {
+    if (absl::Status st = RunSingleOpcode(input, input_pos, output); !st.ok()) return st;
+  }
+  return absl::OkStatus();
+}
+
+absl::Status IntCode::RunSingleOpcode(const std::vector<int>& input, int& input_pos, std::vector<int>* output) {
+  if (code_pos_ < 0 || code_pos_ >= codes_.size()) {
+    return absl::InvalidArgumentError(
+        absl::StrCat("Attempt to read from pos=", code_pos_));
+  }
+  const int opcode = codes_[code_pos_] % 100;
+  const int parameter_modes = codes_[code_pos_] / 100;
+  switch (opcode) {
+    VLOG(2) << "@" << code_pos_;
+    case 1: {
+      if (code_pos_ + 4 >= codes_.size()) {
+        return absl::InvalidArgumentError(
+            absl::StrCat("Attempt to read from pos=", code_pos_));
+      }
+      absl::StatusOr<int> in1 = LoadParameter(parameter_modes, 1);
+      if (!in1.ok()) return in1.status();
+      absl::StatusOr<int> in2 = LoadParameter(parameter_modes, 2);
+      if (!in2.ok()) return in2.status();
+      if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 + *in2); !st.ok()) return st;
+      code_pos_ += 4;
+      break;
     }
-    const int opcode = codes_[code_pos_] % 100;
-    const int parameter_modes = codes_[code_pos_] / 100;
-    switch (opcode) {
-      VLOG(2) << "@" << code_pos_;
-      case 1: {
-        if (code_pos_ + 4 >= codes_.size()) {
-          return absl::InvalidArgumentError(
-              absl::StrCat("Attempt to read from pos=", code_pos_));
-        }
-        absl::StatusOr<int> in1 = LoadParameter(parameter_modes, 1);
-        if (!in1.ok()) return in1.status();
+    case 2: {
+      if (code_pos_ + 4 >= codes_.size()) {
+        return absl::InvalidArgumentError(
+            absl::StrCat("Attempt to read from pos=", code_pos_));
+      }
+      absl::StatusOr<int> in1 = LoadParameter(parameter_modes, 1);
+      if (!in1.ok()) return in1.status();
+      absl::StatusOr<int> in2 = LoadParameter(parameter_modes, 2);
+      if (!in2.ok()) return in2.status();
+      if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 * *in2); !st.ok()) return st;
+      code_pos_ += 4;
+      break;
+    }
+    case 3: {
+      if (code_pos_ + 2 >= codes_.size()) {
+        return absl::InvalidArgumentError(
+            absl::StrCat("Attempt to read from pos=", code_pos_));
+      }
+      if (input_pos >= input.size()) {
+        return absl::InvalidArgumentError(
+            absl::StrCat("Attempt to read past end of input"));
+      }
+      if (absl::Status st = SaveParameter(parameter_modes, 1, input[input_pos]); !st.ok()) return st;
+      ++input_pos;
+      code_pos_ += 2;
+      break;
+    }
+    case 4: {
+      if (code_pos_ + 2 >= codes_.size()) {
+        return absl::InvalidArgumentError(
+            absl::StrCat("Attempt to read from pos=", code_pos_));
+      }
+      absl::StatusOr<int> in = LoadParameter(parameter_modes, 1);
+      if (!in.ok()) return in.status();
+      if (output == nullptr) {
+        return absl::InvalidArgumentError("Nowhere to output");
+      }
+      output->push_back(*in);
+      code_pos_ += 2;
+      break;
+    }
+    case 5: {
+      if (code_pos_ + 3 >= codes_.size()) {
+        return absl::InvalidArgumentError(
+            absl::StrCat("Attempt to read from pos=", code_pos_));
+      }
+      absl::StatusOr<int> in1 = LoadParameter(parameter_modes, 1);
+      if (!in1.ok()) return in1.status();
+      if (*in1 != 0) {
         absl::StatusOr<int> in2 = LoadParameter(parameter_modes, 2);
         if (!in2.ok()) return in2.status();
-        if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 + *in2); !st.ok()) return st;
-        code_pos_ += 4;
-        break;
+        code_pos_ = *in2;
+      } else {
+        code_pos_ += 3;
       }
-      case 2: {
-        if (code_pos_ + 4 >= codes_.size()) {
-          return absl::InvalidArgumentError(
-              absl::StrCat("Attempt to read from pos=", code_pos_));
-        }
-        absl::StatusOr<int> in1 = LoadParameter(parameter_modes, 1);
-        if (!in1.ok()) return in1.status();
+      break;
+    }
+    case 6: {
+      if (code_pos_ + 3 >= codes_.size()) {
+        return absl::InvalidArgumentError(
+            absl::StrCat("Attempt to read from pos=", code_pos_));
+      }
+      absl::StatusOr<int> in1 = LoadParameter(parameter_modes, 1);
+      if (!in1.ok()) return in1.status();
+      if (*in1 == 0) {
         absl::StatusOr<int> in2 = LoadParameter(parameter_modes, 2);
         if (!in2.ok()) return in2.status();
-        if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 * *in2); !st.ok()) return st;
-        code_pos_ += 4;
-        break;
+        code_pos_ = *in2;
+      } else {
+        code_pos_ += 3;
       }
-      case 3: {
-        if (code_pos_ + 2 >= codes_.size()) {
-          return absl::InvalidArgumentError(
-              absl::StrCat("Attempt to read from pos=", code_pos_));
-        }
-        if (input_pos >= input.size()) {
-          return absl::InvalidArgumentError(
-              absl::StrCat("Attempt to read past end of input"));
-        }
-        if (absl::Status st = SaveParameter(parameter_modes, 1, input[input_pos]); !st.ok()) return st;
-        ++input_pos;
-        code_pos_ += 2;
-        break;
+      break;
+    }
+    case 7: {
+      if (code_pos_ + 4 >= codes_.size()) {
+        return absl::InvalidArgumentError(
+            absl::StrCat("Attempt to read from pos=", code_pos_));
       }
-      case 4: {
-        if (code_pos_ + 2 >= codes_.size()) {
-          return absl::InvalidArgumentError(
-              absl::StrCat("Attempt to read from pos=", code_pos_));
-        }
-        absl::StatusOr<int> in = LoadParameter(parameter_modes, 1);
-        if (!in.ok()) return in.status();
-        if (output == nullptr) {
-          return absl::InvalidArgumentError("Nowhere to output");
-        }
-        output->push_back(*in);
-        code_pos_ += 2;
-        break;
+      absl::StatusOr<int> in1 = LoadParameter(parameter_modes, 1);
+      if (!in1.ok()) return in1.status();
+      absl::StatusOr<int> in2 = LoadParameter(parameter_modes, 2);
+      if (!in2.ok()) return in2.status();
+      if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 < *in2); !st.ok()) return st;
+      code_pos_ += 4;
+      break;
+    }
+    case 8: {
+      if (code_pos_ + 4 >= codes_.size()) {
+        return absl::InvalidArgumentError(
+            absl::StrCat("Attempt to read from pos=", code_pos_));
       }
-      case 5: {
-        if (code_pos_ + 3 >= codes_.size()) {
-          return absl::InvalidArgumentError(
-              absl::StrCat("Attempt to read from pos=", code_pos_));
-        }
-        absl::StatusOr<int> in1 = LoadParameter(parameter_modes, 1);
-        if (!in1.ok()) return in1.status();
-        if (*in1 != 0) {
-          absl::StatusOr<int> in2 = LoadParameter(parameter_modes, 2);
-          if (!in2.ok()) return in2.status();
-          code_pos_ = *in2;
-        } else {
-          code_pos_ += 3;
-        }
-        break;
-      }
-      case 6: {
-        if (code_pos_ + 3 >= codes_.size()) {
-          return absl::InvalidArgumentError(
-              absl::StrCat("Attempt to read from pos=", code_pos_));
-        }
-        absl::StatusOr<int> in1 = LoadParameter(parameter_modes, 1);
-        if (!in1.ok()) return in1.status();
-        if (*in1 == 0) {
-          absl::StatusOr<int> in2 = LoadParameter(parameter_modes, 2);
-          if (!in2.ok()) return in2.status();
-          code_pos_ = *in2;
-        } else {
-          code_pos_ += 3;
-        }
-        break;
-      }
-      case 7: {
-        if (code_pos_ + 4 >= codes_.size()) {
-          return absl::InvalidArgumentError(
-              absl::StrCat("Attempt to read from pos=", code_pos_));
-        }
-        absl::StatusOr<int> in1 = LoadParameter(parameter_modes, 1);
-        if (!in1.ok()) return in1.status();
-        absl::StatusOr<int> in2 = LoadParameter(parameter_modes, 2);
-        if (!in2.ok()) return in2.status();
-        if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 < *in2); !st.ok()) return st;
-        code_pos_ += 4;
-        break;
-      }
-      case 8: {
-        if (code_pos_ + 4 >= codes_.size()) {
-          return absl::InvalidArgumentError(
-              absl::StrCat("Attempt to read from pos=", code_pos_));
-        }
-        absl::StatusOr<int> in1 = LoadParameter(parameter_modes, 1);
-        if (!in1.ok()) return in1.status();
-        absl::StatusOr<int> in2 = LoadParameter(parameter_modes, 2);
-        if (!in2.ok()) return in2.status();
-        if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 == *in2); !st.ok()) return st;
-        code_pos_ += 4;
-        break;
-      }
-      case 99: {
-        ++code_pos_;
-        return absl::OkStatus();
-      }
-      default: {
-        return absl::InvalidArgumentError(absl::StrCat(
-            "Invalid instruction (@", code_pos_, "): ", codes_[code_pos_]));
-      }
+      absl::StatusOr<int> in1 = LoadParameter(parameter_modes, 1);
+      if (!in1.ok()) return in1.status();
+      absl::StatusOr<int> in2 = LoadParameter(parameter_modes, 2);
+      if (!in2.ok()) return in2.status();
+      if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 == *in2); !st.ok()) return st;
+      code_pos_ += 4;
+      break;
+    }
+    case 99: {
+      terminated_ = true;
+      ++code_pos_;
+      break;
+    }
+    default: {
+      return absl::InvalidArgumentError(absl::StrCat(
+          "Invalid instruction (@", code_pos_, "): ", codes_[code_pos_]));
     }
   }
+
+  return absl::OkStatus();
 }

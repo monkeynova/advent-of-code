@@ -12,12 +12,10 @@ class IntCode {
   static absl::StatusOr<IntCode> Parse(
     const std::vector<absl::string_view>& input);
 
-  IntCode(const IntCode&) = delete;
-  IntCode& operator=(const IntCode&) = delete;
   IntCode(IntCode&&) = default;
   IntCode& operator=(IntCode&&) = default;
 
-  IntCode Clone() const { return IntCode(codes_, code_pos_); }
+  IntCode Clone() const { return *this; }
 
   absl::Status Poke(int address, int value) {
      if (address < 0 || address >= codes_.size()) {
@@ -37,15 +35,22 @@ class IntCode {
   absl::Status Run(const std::vector<int>& input = {}, std::vector<int>* output = nullptr);
 
  private:
-  IntCode(std::vector<int> codes, int code_pos = 0)
+  IntCode(std::vector<int> codes, int code_pos = 0, bool terminated = false)
    : codes_(std::move(codes)),
-     code_pos_(code_pos) {}
+     code_pos_(code_pos),
+     terminated_(terminated) {}
+
+  IntCode(const IntCode&) = default;
+  IntCode& operator=(const IntCode&) = default;
+
+  absl::Status RunSingleOpcode(const std::vector<int>& input, int& input_pos, std::vector<int>* output);
 
   absl::StatusOr<int> LoadParameter(int parameter_modes, int parameter) const;
   absl::Status SaveParameter(int parameter_modes, int parameter, int value);
 
   std::vector<int> codes_;
   int code_pos_;
+  bool terminated_;
 };
 
 #endif  // ADVENT_OF_CODE_2019_INT_CODE_H
