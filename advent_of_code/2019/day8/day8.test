@@ -1,6 +1,9 @@
+
+# 1755 (high)
 [part=1]
 @include{advent_of_code/2019/day8/input.txt}
 --
+1742
 ==
 
 [part=2]
