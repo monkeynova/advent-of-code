@@ -1,0 +1,73 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Bazel test ...",
+            "type": "shell",
+            "command": "bazel",
+            "args": ["test", "..."],
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true,
+            },
+        },
+        {
+            "label": "cleanup",
+            "type": "shell",
+            "command": "sh cleanup.sh",
+        },
+        {
+            "label": "New Day",
+            "type": "shell",
+            "command": "perl",
+            "args": ["new_day.pl", "${input:year}", "${input:day}"],
+        },
+    ],
+    "inputs": [
+        {
+          "type": "pickString",
+          "id": "year",
+          "description": "Which year ?",
+          "options": [
+            "2019",
+            "2020",
+          ],
+          "default": "2019"
+        },
+        {
+            "type": "pickString",
+            "id": "day",
+            "description": "Which day?",
+            "options": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9",
+              "10",
+              "11",
+              "12",
+              "13",
+              "14",
+              "15",
+              "16",
+              "17",
+              "18",
+              "19",
+              "20",
+              "21",
+              "22",
+              "23",
+              "24",
+              "25",
+            ],
+          },
+        ],
+    }
