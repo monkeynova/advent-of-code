@@ -32,7 +32,7 @@ void RunTestCase(absl::string_view test_case_with_options,
   while (test_lines.back().empty()) {
     test_lines.pop_back();
   }
-  absl::StatusOr<std::vector<int>> codes = ParseIntcode(test_lines);
+  absl::StatusOr<IntCode> codes = IntCode::Parse(test_lines);
   if (!codes.ok()) {
       test_result->AddTestOutput(absl::StrCat(
           "ERROR: Cannot parse Intcode: ", codes.status().message()));
@@ -50,7 +50,7 @@ void RunTestCase(absl::string_view test_case_with_options,
     }
   }
   std::vector<int> output;
-  if (absl::Status st = RunIntcode(&*codes, input, &output); !st.ok()) {
+  if (absl::Status st = codes->Run(input, &output); !st.ok()) {
       test_result->AddTestOutput(absl::StrCat(
           "ERROR: Could not run code: ", st.message()));
       return;

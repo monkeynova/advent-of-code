@@ -7,7 +7,7 @@
 #include "advent_of_code/2019/int_code.h"
 #include "glog/logging.h"
 
-absl::StatusOr<int> FindBestThrust(const std::vector<int>& base_codes,
+absl::StatusOr<int> FindBestThrust(const IntCode& base_codes,
                                   int input_value,
                                   int index = 0,
                                   // Copy since we're going to mutate.
@@ -18,10 +18,10 @@ absl::StatusOr<int> FindBestThrust(const std::vector<int>& base_codes,
   for (int i = 0; i < 5; ++i) {
     if (used.contains(i)) continue;
     used.insert(i);
-    std::vector<int> clean_codes = base_codes;
+    IntCode clean_codes = base_codes.Clone();
     std::vector<int> input = {i, input_value};
     std::vector<int> output;
-    absl::Status st = RunIntcode(&clean_codes, input, &output);
+    absl::Status st = clean_codes.Run(input, &output);
     if (!st.ok()) return st;
     if (output.size() != 1) {
       return absl::InvalidArgumentError("Didn't return a single output");
@@ -37,7 +37,7 @@ absl::StatusOr<int> FindBestThrust(const std::vector<int>& base_codes,
 
 absl::StatusOr<std::vector<std::string>> Day7_2019::Part1(
     const std::vector<absl::string_view>& input) const {
-  absl::StatusOr<std::vector<int>> codes = ParseIntcode(input);
+  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
 
   absl::StatusOr<int> best_result = FindBestThrust(*codes, 0);

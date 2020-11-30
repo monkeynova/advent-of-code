@@ -6,33 +6,39 @@
 #include "advent_of_code/2019/int_code.h"
 #include "glog/logging.h"
 
-void CorrectBoard(std::vector<int>* codes, int noun, int verb) {
-  (*codes)[1] = noun;
-  (*codes)[2] = verb;
+absl::Status CorrectBoard(IntCode* codes, int noun, int verb) {
+  if (absl::Status st = codes->Poke(1, noun); !st.ok()) return st;
+  if (absl::Status st = codes->Poke(2, verb); !st.ok()) return st;
+  return absl::OkStatus();
 }
 
 absl::StatusOr<std::vector<std::string>> Day2_2019::Part1(
     const std::vector<absl::string_view>& input) const {
-  absl::StatusOr<std::vector<int>> codes = ParseIntcode(input);
+  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
 
-  CorrectBoard(&*codes, 12, 2);
-  if (absl::Status st = RunIntcode(&*codes); !st.ok()) return st;
+  if (absl::Status st = CorrectBoard(&*codes, 12, 2); !st.ok()) return st;
+  if (absl::Status st = codes->Run(); !st.ok()) return st;
 
-  return std::vector<std::string>{absl::StrCat((*codes)[0])};
+  absl::StatusOr<int> val = codes->Peek(0);
+  if (!val.ok()) return val.status();
+
+  return std::vector<std::string>{absl::StrCat(*val)};
 }
 
 absl::StatusOr<std::vector<std::string>> Day2_2019::Part2(
     const std::vector<absl::string_view>& input) const {
-  absl::StatusOr<std::vector<int>> start_codes = ParseIntcode(input);
+  absl::StatusOr<IntCode> start_codes = IntCode::Parse(input);
   if (!start_codes.ok()) return start_codes.status();
 
   for (int noun = 0; noun < 100; ++noun) {
     for (int verb = 0; verb < 100; ++verb) {
-      std::vector<int> codes = *start_codes;
-      CorrectBoard(&codes, noun, verb);
-      if (absl::Status st = RunIntcode(&codes); !st.ok()) break;
-      if (codes[0] == 19690720) {
+      IntCode codes = start_codes->Clone();
+      if (absl::Status st = CorrectBoard(&codes, noun, verb); !st.ok()) return st;
+      if (absl::Status st = codes.Run(); !st.ok()) break;
+      absl::StatusOr<int> val = codes.Peek(0);
+      if (!val.ok()) return val.status();
+      if (*val == 19690720) {
         return std::vector<std::string>{absl::StrCat(100 * noun + verb)};
       }
     }

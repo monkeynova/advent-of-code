@@ -8,12 +8,12 @@
 
 absl::StatusOr<std::vector<std::string>> Day5_2019::Part1(
     const std::vector<absl::string_view>& input_text) const {
-  absl::StatusOr<std::vector<int>> codes = ParseIntcode(input_text);
+  absl::StatusOr<IntCode> codes = IntCode::Parse(input_text);
   if (!codes.ok()) return codes.status();
 
   std::vector<int> input = {1};
   std::vector<int> output;
-  if (absl::Status st = RunIntcode(&*codes, input, &output); !st.ok()) return st;
+  if (absl::Status st = codes->Run(input, &output); !st.ok()) return st;
 
   for (int i = 0; i < output.size() - 1; ++i) {
     if (output[i] != 0) {
@@ -26,12 +26,12 @@ absl::StatusOr<std::vector<std::string>> Day5_2019::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day5_2019::Part2(
     const std::vector<absl::string_view>& input_text) const {
-  absl::StatusOr<std::vector<int>> codes = ParseIntcode(input_text);
+  absl::StatusOr<IntCode> codes = IntCode::Parse(input_text);
   if (!codes.ok()) return codes.status();
 
   std::vector<int> input = {5};
   std::vector<int> output;
-  if (absl::Status st = RunIntcode(&*codes, input, &output); !st.ok()) return st;
+  if (absl::Status st = codes->Run(input, &output); !st.ok()) return st;
 
   for (int i = 0; i < output.size() - 1; ++i) {
     if (output[i] != 0) {
