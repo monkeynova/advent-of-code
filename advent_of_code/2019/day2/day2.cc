@@ -34,7 +34,8 @@ absl::StatusOr<std::vector<std::string>> Day2_2019::Part2(
   for (int noun = 0; noun < 100; ++noun) {
     for (int verb = 0; verb < 100; ++verb) {
       IntCode codes = start_codes->Clone();
-      if (absl::Status st = CorrectBoard(&codes, noun, verb); !st.ok()) return st;
+      if (absl::Status st = CorrectBoard(&codes, noun, verb); !st.ok())
+        return st;
       if (absl::Status st = codes.Run(); !st.ok()) break;
       absl::StatusOr<int> val = codes.Peek(0);
       if (!val.ok()) return val.status();

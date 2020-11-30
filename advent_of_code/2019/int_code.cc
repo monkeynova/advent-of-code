@@ -33,7 +33,8 @@ static int GetParameterMode(int parameter_modes, int parameter_number) {
   return parameter_modes % 10;
 }
 
-absl::StatusOr<int> IntCode::LoadParameter(int parameter_modes, int parameter) const {
+absl::StatusOr<int> IntCode::LoadParameter(int parameter_modes,
+                                           int parameter) const {
   const int parameter_mode = GetParameterMode(parameter_modes, parameter);
   switch (parameter_mode) {
     case 0: {
@@ -52,7 +53,8 @@ absl::StatusOr<int> IntCode::LoadParameter(int parameter_modes, int parameter) c
   }
 }
 
-absl::Status IntCode::SaveParameter(int parameter_modes, int parameter, int value) {
+absl::Status IntCode::SaveParameter(int parameter_modes, int parameter,
+                                    int value) {
   const int parameter_mode = GetParameterMode(parameter_modes, parameter);
   switch (parameter_mode) {
     case 0: {
@@ -73,11 +75,13 @@ absl::Status IntCode::SaveParameter(int parameter_modes, int parameter, int valu
   }
 }
 
-absl::Status IntCode::Run(const std::vector<int>& input, std::vector<int>* output) {
+absl::Status IntCode::Run(const std::vector<int>& input,
+                          std::vector<int>* output) {
   // Run program.
   int input_pos = 0;
   while (!terminated_) {
-    if (absl::Status st = RunSingleOpcode(input, input_pos, output); !st.ok()) return st;
+    if (absl::Status st = RunSingleOpcode(input, input_pos, output); !st.ok())
+      return st;
   }
   if (input_pos != input.size()) {
     return absl::InvalidArgumentError("Extraneous input provided");
@@ -85,18 +89,22 @@ absl::Status IntCode::Run(const std::vector<int>& input, std::vector<int>* outpu
   return absl::OkStatus();
 }
 
-absl::StatusOr<absl::optional<int>> IntCode::RunToNextOutput(const std::vector<int>& input) {
+absl::StatusOr<absl::optional<int>> IntCode::RunToNextOutput(
+    const std::vector<int>& input) {
   // Run program.
   int input_pos = 0;
   std::vector<int> output;
   while (!terminated_) {
-    if (absl::Status st = RunSingleOpcode(input, input_pos, &output); !st.ok()) return st;
+    if (absl::Status st = RunSingleOpcode(input, input_pos, &output); !st.ok())
+      return st;
     if (!output.empty()) return output[0];
   }
   return absl::nullopt;
 }
 
-absl::Status IntCode::RunSingleOpcode(const std::vector<int>& input, int& input_pos, std::vector<int>* output) {
+absl::Status IntCode::RunSingleOpcode(const std::vector<int>& input,
+                                      int& input_pos,
+                                      std::vector<int>* output) {
   if (code_pos_ < 0 || code_pos_ >= codes_.size()) {
     return absl::InvalidArgumentError(
         absl::StrCat("Attempt to read from pos=", code_pos_));
@@ -114,7 +122,9 @@ absl::Status IntCode::RunSingleOpcode(const std::vector<int>& input, int& input_
       if (!in1.ok()) return in1.status();
       absl::StatusOr<int> in2 = LoadParameter(parameter_modes, 2);
       if (!in2.ok()) return in2.status();
-      if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 + *in2); !st.ok()) return st;
+      if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 + *in2);
+          !st.ok())
+        return st;
       code_pos_ += 4;
       break;
     }
@@ -127,7 +137,9 @@ absl::Status IntCode::RunSingleOpcode(const std::vector<int>& input, int& input_
       if (!in1.ok()) return in1.status();
       absl::StatusOr<int> in2 = LoadParameter(parameter_modes, 2);
       if (!in2.ok()) return in2.status();
-      if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 * *in2); !st.ok()) return st;
+      if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 * *in2);
+          !st.ok())
+        return st;
       code_pos_ += 4;
       break;
     }
@@ -140,7 +152,9 @@ absl::Status IntCode::RunSingleOpcode(const std::vector<int>& input, int& input_
         return absl::InvalidArgumentError(
             absl::StrCat("Attempt to read past end of input"));
       }
-      if (absl::Status st = SaveParameter(parameter_modes, 1, input[input_pos]); !st.ok()) return st;
+      if (absl::Status st = SaveParameter(parameter_modes, 1, input[input_pos]);
+          !st.ok())
+        return st;
       ++input_pos;
       code_pos_ += 2;
       break;
@@ -200,7 +214,9 @@ absl::Status IntCode::RunSingleOpcode(const std::vector<int>& input, int& input_
       if (!in1.ok()) return in1.status();
       absl::StatusOr<int> in2 = LoadParameter(parameter_modes, 2);
       if (!in2.ok()) return in2.status();
-      if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 < *in2); !st.ok()) return st;
+      if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 < *in2);
+          !st.ok())
+        return st;
       code_pos_ += 4;
       break;
     }
@@ -213,7 +229,9 @@ absl::Status IntCode::RunSingleOpcode(const std::vector<int>& input, int& input_
       if (!in1.ok()) return in1.status();
       absl::StatusOr<int> in2 = LoadParameter(parameter_modes, 2);
       if (!in2.ok()) return in2.status();
-      if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 == *in2); !st.ok()) return st;
+      if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 == *in2);
+          !st.ok())
+        return st;
       code_pos_ += 4;
       break;
     }

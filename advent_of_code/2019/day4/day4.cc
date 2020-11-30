@@ -17,8 +17,8 @@ bool IsValidPassword(absl::string_view password) {
   if (password.size() != 6) return false;
   bool has_pair = false;
   for (int i = 0; i < 5; ++i) {
-    if (password[i+1] < password[i]) return false;
-    if (password[i+1] == password[i]) has_pair = true;
+    if (password[i + 1] < password[i]) return false;
+    if (password[i + 1] == password[i]) has_pair = true;
   }
   return has_pair;
 }
@@ -28,27 +28,27 @@ bool IsValidPassword2(absl::string_view password) {
 
   bool has_pair = false;
   for (int i = 0; i < 5; ++i) {
-    if (password[i+1] < password[i]) return false;
-    if (password[i+1] == password[i] &&
-        (i == 4 || password[i] != password[i+2]) &&
-        (i == 0 || password[i] != password[i-1])) {
+    if (password[i + 1] < password[i]) return false;
+    if (password[i + 1] == password[i] &&
+        (i == 4 || password[i] != password[i + 2]) &&
+        (i == 0 || password[i] != password[i - 1])) {
       has_pair = true;
     }
   }
   return has_pair;
 }
 
-
 absl::StatusOr<std::vector<std::string>> Day4_2019::Part1(
     const std::vector<absl::string_view>& input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Empty input");
   std::vector<absl::string_view> range = absl::StrSplit(input[0], "-");
   if (range.size() != 2) return absl::InvalidArgumentError("Bad range");
-  if (range[0].size() != 6) return absl::InvalidArgumentError("Bad min"); 
-  if (range[1].size() != 6) return absl::InvalidArgumentError("Bad max"); 
+  if (range[0].size() != 6) return absl::InvalidArgumentError("Bad min");
+  if (range[1].size() != 6) return absl::InvalidArgumentError("Bad max");
 
   int valid = 0;
-  for (std::string password = std::string(range[0]); password <= range[1]; AdvancePassword(password)) {
+  for (std::string password = std::string(range[0]); password <= range[1];
+       AdvancePassword(password)) {
     if (IsValidPassword(password)) ++valid;
   }
 
@@ -60,11 +60,12 @@ absl::StatusOr<std::vector<std::string>> Day4_2019::Part2(
   if (input.size() != 1) return absl::InvalidArgumentError("Empty input");
   std::vector<absl::string_view> range = absl::StrSplit(input[0], "-");
   if (range.size() != 2) return absl::InvalidArgumentError("Bad range");
-  if (range[0].size() != 6) return absl::InvalidArgumentError("Bad min"); 
-  if (range[1].size() != 6) return absl::InvalidArgumentError("Bad max"); 
+  if (range[0].size() != 6) return absl::InvalidArgumentError("Bad min");
+  if (range[1].size() != 6) return absl::InvalidArgumentError("Bad max");
 
   int valid = 0;
-  for (std::string password = std::string(range[0]); password <= range[1]; AdvancePassword(password)) {
+  for (std::string password = std::string(range[0]); password <= range[1];
+       AdvancePassword(password)) {
     if (IsValidPassword2(password)) ++valid;
   }
 

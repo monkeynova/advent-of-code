@@ -10,11 +10,10 @@
 #include "advent_of_code/2019/int_code.h"
 #include "glog/logging.h"
 
-absl::StatusOr<int> FindBestThrust(const IntCode& base_codes,
-                                  int input_value,
-                                  int index = 0,
-                                  // Copy since we're going to mutate.
-                                  absl::flat_hash_set<int> used = {}) {
+absl::StatusOr<int> FindBestThrust(const IntCode& base_codes, int input_value,
+                                   int index = 0,
+                                   // Copy since we're going to mutate.
+                                   absl::flat_hash_set<int> used = {}) {
   if (used.size() == 5) return input_value;
 
   int best_thrust = 0;
@@ -30,7 +29,8 @@ absl::StatusOr<int> FindBestThrust(const IntCode& base_codes,
       return absl::InvalidArgumentError("Didn't return a single output");
     }
 
-    absl::StatusOr<int> sub_best_thrust = FindBestThrust(base_codes, output[0], index + 1, used);
+    absl::StatusOr<int> sub_best_thrust =
+        FindBestThrust(base_codes, output[0], index + 1, used);
     if (!sub_best_thrust.ok()) return sub_best_thrust.status();
     best_thrust = std::max(best_thrust, *sub_best_thrust);
     used.erase(i);
@@ -49,7 +49,8 @@ absl::StatusOr<std::vector<std::string>> Day7_2019::Part1(
   return std::vector<std::string>{absl::StrCat(*best_result)};
 }
 
-absl::StatusOr<int> RunAssembly(const IntCode& base_codes, std::vector<int> phases) {
+absl::StatusOr<int> RunAssembly(const IntCode& base_codes,
+                                std::vector<int> phases) {
   struct PartialState {
     IntCode code;
     std::vector<int> input;
@@ -70,7 +71,8 @@ absl::StatusOr<int> RunAssembly(const IntCode& base_codes, std::vector<int> phas
       if (next_input) {
         unit.input.push_back(*next_input);
       }
-      absl::StatusOr<absl::optional<int>> output = unit.code.RunToNextOutput(unit.input);
+      absl::StatusOr<absl::optional<int>> output =
+          unit.code.RunToNextOutput(unit.input);
       if (!output.ok()) return output.status();
       unit.input.clear();
       if (*output) {
@@ -93,19 +95,21 @@ absl::StatusOr<int> RunAssembly(const IntCode& base_codes, std::vector<int> phas
   return last_output;
 }
 
-absl::StatusOr<int> FindBestThrustFeedback(
-  const IntCode& base_codes,
-  // Copy since we're going to mutate.
-  std::vector<int> phases = {}) {
+absl::StatusOr<int> FindBestThrustFeedback(const IntCode& base_codes,
+                                           // Copy since we're going to mutate.
+                                           std::vector<int> phases = {}) {
   if (phases.size() == 5) {
     return RunAssembly(base_codes, phases);
   }
 
   int best_thrust = 0;
   for (int i = 5; i < 10; ++i) {
-    if (std::any_of(phases.begin(), phases.end(), [i](int p) { return i == p; })) continue;
+    if (std::any_of(phases.begin(), phases.end(),
+                    [i](int p) { return i == p; }))
+      continue;
     phases.push_back(i);
-    absl::StatusOr<int> sub_best_thrust = FindBestThrustFeedback(base_codes, phases);
+    absl::StatusOr<int> sub_best_thrust =
+        FindBestThrustFeedback(base_codes, phases);
     if (!sub_best_thrust.ok()) return sub_best_thrust.status();
     best_thrust = std::max(best_thrust, *sub_best_thrust);
     phases.pop_back();

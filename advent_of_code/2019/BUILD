@@ -18,8 +18,8 @@ cc_library(
 cc_test(
     name = "int_code_test",
     srcs = ["int_code_test.cc"],
-    data = ["int_code.test"],
     args = ["--test_file=advent_of_code/2019/int_code.test"],
+    data = ["int_code.test"],
     deps = [
         ":int_code",
         "@com_google_file_based_test_driver//:file_based_test_driver",

@@ -34,26 +34,27 @@ void RunTestCase(absl::string_view test_case_with_options,
   }
   absl::StatusOr<IntCode> codes = IntCode::Parse(test_lines);
   if (!codes.ok()) {
-      test_result->AddTestOutput(absl::StrCat(
-          "ERROR: Cannot parse Intcode: ", codes.status().message()));
-      return;
+    test_result->AddTestOutput(absl::StrCat("ERROR: Cannot parse Intcode: ",
+                                            codes.status().message()));
+    return;
   }
-  std::vector<absl::string_view> input_str = absl::StrSplit(options.GetString(kInputOption), ",");
+  std::vector<absl::string_view> input_str =
+      absl::StrSplit(options.GetString(kInputOption), ",");
   std::vector<int> input;
   input.reserve(input_str.size());
   for (absl::string_view str : input_str) {
     input.push_back(0);
     if (!absl::SimpleAtoi(str, &input.back())) {
-      test_result->AddTestOutput(absl::StrCat(
-          "ERROR: Cannot parse input as int: ", str));
+      test_result->AddTestOutput(
+          absl::StrCat("ERROR: Cannot parse input as int: ", str));
       return;
     }
   }
   std::vector<int> output;
   if (absl::Status st = codes->Run(input, &output); !st.ok()) {
-      test_result->AddTestOutput(absl::StrCat(
-          "ERROR: Could not run code: ", st.message()));
-      return;
+    test_result->AddTestOutput(
+        absl::StrCat("ERROR: Could not run code: ", st.message()));
+    return;
   }
   for (int outvar : output) {
     test_result->AddTestOutput(absl::StrCat(outvar));
