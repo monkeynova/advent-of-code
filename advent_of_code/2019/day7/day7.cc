@@ -1,8 +1,11 @@
 #include "advent_of_code/2019/day7/day7.h"
 
+#include <algorithm>
+
 #include "absl/container/flat_hash_set.h"
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/2019/int_code.h"
 #include "glog/logging.h"
@@ -46,7 +49,77 @@ absl::StatusOr<std::vector<std::string>> Day7_2019::Part1(
   return std::vector<std::string>{absl::StrCat(*best_result)};
 }
 
+absl::StatusOr<int> RunAssembly(const IntCode& base_codes, std::vector<int> phases) {
+  struct PartialState {
+    IntCode code;
+    std::vector<int> input;
+  };
+
+  // Initialize.
+  std::vector<PartialState> assembly;
+  for (int i = 0; i < 5; ++i) {
+    assembly.push_back({.code = base_codes.Clone(), .input = {phases[i]}});
+  }
+
+  absl::optional<int> next_input = 0;
+  bool running = true;
+  int last_output = -1;
+  while (running) {
+    for (int i = 0; i < 5; ++i) {
+      PartialState& unit = assembly[i];
+      if (next_input) {
+        unit.input.push_back(*next_input);
+      }
+      absl::StatusOr<absl::optional<int>> output = unit.code.RunToNextOutput(unit.input);
+      if (!output.ok()) return output.status();
+      unit.input.clear();
+      if (*output) {
+        next_input = **output;
+      } else {
+        next_input = absl::nullopt;
+        running = false;
+      }
+    }
+    if (next_input) {
+      last_output = *next_input;
+    }
+  }
+
+  // Wait for termination on assembly.
+  for (auto& unit : assembly) {
+    if (absl::Status st = unit.code.Run(); !st.ok()) return st;
+  }
+
+  return last_output;
+}
+
+absl::StatusOr<int> FindBestThrustFeedback(
+  const IntCode& base_codes,
+  // Copy since we're going to mutate.
+  std::vector<int> phases = {}) {
+  if (phases.size() == 5) {
+    return RunAssembly(base_codes, phases);
+  }
+
+  int best_thrust = 0;
+  for (int i = 5; i < 10; ++i) {
+    if (std::any_of(phases.begin(), phases.end(), [i](int p) { return i == p; })) continue;
+    phases.push_back(i);
+    absl::StatusOr<int> sub_best_thrust = FindBestThrustFeedback(base_codes, phases);
+    if (!sub_best_thrust.ok()) return sub_best_thrust.status();
+    best_thrust = std::max(best_thrust, *sub_best_thrust);
+    phases.pop_back();
+  }
+  return best_thrust;
+}
+
 absl::StatusOr<std::vector<std::string>> Day7_2019::Part2(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
+  if (!codes.ok()) return codes.status();
+
+  absl::StatusOr<int> best_result = FindBestThrustFeedback(*codes);
+  if (!best_result.ok()) return best_result.status();
+
+  return std::vector<std::string>{absl::StrCat(*best_result)};
 }

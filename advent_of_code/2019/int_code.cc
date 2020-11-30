@@ -79,7 +79,21 @@ absl::Status IntCode::Run(const std::vector<int>& input, std::vector<int>* outpu
   while (!terminated_) {
     if (absl::Status st = RunSingleOpcode(input, input_pos, output); !st.ok()) return st;
   }
+  if (input_pos != input.size()) {
+    return absl::InvalidArgumentError("Extraneous input provided");
+  }
   return absl::OkStatus();
+}
+
+absl::StatusOr<absl::optional<int>> IntCode::RunToNextOutput(const std::vector<int>& input) {
+  // Run program.
+  int input_pos = 0;
+  std::vector<int> output;
+  while (!terminated_) {
+    if (absl::Status st = RunSingleOpcode(input, input_pos, &output); !st.ok()) return st;
+    if (!output.empty()) return output[0];
+  }
+  return absl::nullopt;
 }
 
 absl::Status IntCode::RunSingleOpcode(const std::vector<int>& input, int& input_pos, std::vector<int>* output) {

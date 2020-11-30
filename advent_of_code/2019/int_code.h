@@ -17,6 +17,8 @@ class IntCode {
 
   IntCode Clone() const { return *this; }
 
+  bool terminated() const { return terminated_; }
+
   absl::Status Poke(int address, int value) {
      if (address < 0 || address >= codes_.size()) {
         return absl::InvalidArgumentError("Bad address");
@@ -25,7 +27,7 @@ class IntCode {
      return absl::OkStatus();
   }
 
-  absl::StatusOr<int> Peek(int address) {
+  absl::StatusOr<int> Peek(int address) const {
      if (address < 0 || address >= codes_.size()) {
         return absl::InvalidArgumentError("Bad address");
      }
@@ -33,6 +35,10 @@ class IntCode {
   }
 
   absl::Status Run(const std::vector<int>& input = {}, std::vector<int>* output = nullptr);
+  
+  // Runs the program until an output is produced (in which case the output value is returned)
+  // or the program terminates (in which case nullopt is returned).
+  absl::StatusOr<absl::optional<int>> RunToNextOutput(const std::vector<int>& input = {});
 
  private:
   IntCode(std::vector<int> codes, int code_pos = 0, bool terminated = false)
