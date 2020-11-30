@@ -109,7 +109,7 @@ class IntCode {
 
   absl::Status RunSingleOpcode(InputSource* input, OutputSink* output);
 
-  absl::StatusOr<int64_t> LoadParameter(int64_t parameter_modes, int64_t parameter) const;
+  absl::StatusOr<int64_t> LoadParameter(int64_t parameter_modes, int64_t parameter);
   absl::Status SaveParameter(int64_t parameter_modes, int64_t parameter, int64_t value);
 
   std::vector<int64_t> codes_;

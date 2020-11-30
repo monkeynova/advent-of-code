@@ -23,6 +23,17 @@ absl::StatusOr<std::vector<std::string>> Day9_2019::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day9_2019::Part2(
-    const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+    const std::vector<absl::string_view>& input_text) const {
+  absl::StatusOr<IntCode> codes = IntCode::Parse(input_text);
+  if (!codes.ok()) return codes.status();
+
+  std::vector<int64_t> input = {2};
+  std::vector<int64_t> output;
+  if (absl::Status st = codes->Run(input, &output); !st.ok()) return st;
+
+  if (output.size() != 1) {
+    return absl::InvalidArgumentError(absl::StrCat("Bad output: {", absl::StrJoin(output, ","), "}"));
+  }
+
+  return std::vector<std::string>{absl::StrCat(output[0])};
 }

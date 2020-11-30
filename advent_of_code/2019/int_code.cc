@@ -34,12 +34,19 @@ static int64_t GetParameterMode(int64_t parameter_modes, int64_t parameter_numbe
 }
 
 absl::StatusOr<int64_t> IntCode::LoadParameter(int64_t parameter_modes,
-                                           int64_t parameter) const {
+                                               int64_t parameter) {
   const int64_t parameter_mode = GetParameterMode(parameter_modes, parameter);
   switch (parameter_mode) {
     case 0: {
       // Address.
       const int64_t address = codes_[code_pos_ + parameter];
+      if (address < 0) {
+        return absl::InvalidArgumentError(
+            absl::StrCat("Save to negative address"));
+      }
+      if (address >= codes_.size()) {
+        codes_.resize(address + 1);
+      }
       return codes_[address];
     }
     case 1: {
@@ -48,8 +55,15 @@ absl::StatusOr<int64_t> IntCode::LoadParameter(int64_t parameter_modes,
     }
     case 2: {
       // Relative address.
-      const int64_t address = codes_[code_pos_ + parameter];
-      return codes_[relative_base_ + address];
+      const int64_t address = relative_base_ + codes_[code_pos_ + parameter];
+      if (address < 0) {
+        return absl::InvalidArgumentError(
+            absl::StrCat("Save to negative address"));
+      }
+      if (address >= codes_.size()) {
+        codes_.resize(address + 1);
+      }
+      return codes_[address];
     }
     default: {
       return absl::InvalidArgumentError(
@@ -65,6 +79,13 @@ absl::Status IntCode::SaveParameter(int64_t parameter_modes, int64_t parameter,
     case 0: {
       // Address.
       const int64_t address = codes_[code_pos_ + parameter];
+      if (address < 0) {
+        return absl::InvalidArgumentError(
+            absl::StrCat("Save to negative address"));
+      }
+      if (address >= codes_.size()) {
+        codes_.resize(address + 1);
+      }
       codes_[address] = value;
       return absl::OkStatus();
     }
@@ -75,8 +96,15 @@ absl::Status IntCode::SaveParameter(int64_t parameter_modes, int64_t parameter,
     }
     case 2: {
       // Relative address.
-      const int64_t address = codes_[code_pos_ + parameter];
-      codes_[relative_base_ + address] = value;
+      const int64_t address = relative_base_ + codes_[code_pos_ + parameter];
+      if (address < 0) {
+        return absl::InvalidArgumentError(
+            absl::StrCat("Save to negative address"));
+      }
+      if (address >= codes_.size()) {
+        codes_.resize(address + 1);
+      }
+      codes_[address] = value;
       return absl::OkStatus();
     }
     default: {
