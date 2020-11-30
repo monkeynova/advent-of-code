@@ -95,7 +95,8 @@
             "variant": "cpp",
             "vector": "cpp",
             "hash_map": "cpp",
-            "hash_set": "cpp"
+            "hash_set": "cpp",
+            "filesystem": "cpp"
         }
     }
 }

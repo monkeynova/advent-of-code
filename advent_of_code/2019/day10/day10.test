@@ -85,6 +85,11 @@ XXX.XX.XXXX.XX.X..XX
 284
 ==
 
+# 1912 (high)
+# 1608 (high)
+# 14 (wrong)
+# 202 (wrong)
 [part=2]
 @include{advent_of_code/2019/day10/input.txt}
 --
+404
