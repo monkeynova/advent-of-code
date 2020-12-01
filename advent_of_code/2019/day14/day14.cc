@@ -104,7 +104,8 @@ absl::StatusOr<RuleSet> ParseRuleSet(
   return DagSort(std::move(rule_set));
 }
 
-absl::StatusOr<int64_t> ComputeOreNeedForFuel(const RuleSet& rule_set, int64_t fuel_needed = 1) {
+absl::StatusOr<int64_t> ComputeOreNeedForFuel(const RuleSet& rule_set,
+                                              int64_t fuel_needed = 1) {
   absl::flat_hash_map<absl::string_view, int64_t> needs;
   needs.emplace("FUEL", fuel_needed);
   for (const Rule& rule : rule_set) {
