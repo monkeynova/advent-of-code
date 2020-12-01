@@ -16,7 +16,8 @@ absl::StatusOr<std::vector<std::string>> Day9_2019::Part1(
   if (absl::Status st = codes->Run(input, &output); !st.ok()) return st;
 
   if (output.size() != 1) {
-    return absl::InvalidArgumentError(absl::StrCat("Bad output: {", absl::StrJoin(output, ","), "}"));
+    return absl::InvalidArgumentError(
+        absl::StrCat("Bad output: {", absl::StrJoin(output, ","), "}"));
   }
 
   return std::vector<std::string>{absl::StrCat(output[0])};
@@ -32,7 +33,8 @@ absl::StatusOr<std::vector<std::string>> Day9_2019::Part2(
   if (absl::Status st = codes->Run(input, &output); !st.ok()) return st;
 
   if (output.size() != 1) {
-    return absl::InvalidArgumentError(absl::StrCat("Bad output: {", absl::StrJoin(output, ","), "}"));
+    return absl::InvalidArgumentError(
+        absl::StrCat("Bad output: {", absl::StrJoin(output, ","), "}"));
   }
 
   return std::vector<std::string>{absl::StrCat(output[0])};

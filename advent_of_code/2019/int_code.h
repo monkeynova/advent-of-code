@@ -99,7 +99,8 @@ class IntCode {
       InputSource* input = nullptr);
 
  private:
-  IntCode(std::vector<int64_t> codes, int64_t code_pos = 0, bool terminated = false)
+  IntCode(std::vector<int64_t> codes, int64_t code_pos = 0,
+          bool terminated = false)
       : codes_(std::move(codes)),
         code_pos_(code_pos),
         terminated_(terminated) {}
@@ -109,8 +110,10 @@ class IntCode {
 
   absl::Status RunSingleOpcode(InputSource* input, OutputSink* output);
 
-  absl::StatusOr<int64_t> LoadParameter(int64_t parameter_modes, int64_t parameter);
-  absl::Status SaveParameter(int64_t parameter_modes, int64_t parameter, int64_t value);
+  absl::StatusOr<int64_t> LoadParameter(int64_t parameter_modes,
+                                        int64_t parameter);
+  absl::Status SaveParameter(int64_t parameter_modes, int64_t parameter,
+                             int64_t value);
 
   std::vector<int64_t> codes_;
   int64_t code_pos_;

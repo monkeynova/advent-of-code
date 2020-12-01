@@ -13,11 +13,11 @@ absl::StatusOr<std::vector<std::string>> Day8_2019::Part1(
   if (input.size() != 1) {
     return absl::InvalidArgumentError("Not exactly one image");
   }
-  if (input[0].size() % kLayerSize != 0){
+  if (input[0].size() % kLayerSize != 0) {
     return absl::InvalidArgumentError("Image isn't 25x6");
   }
   const int layer_count = input[0].size() / kLayerSize;
-  if (layer_count <= 0){
+  if (layer_count <= 0) {
     return absl::InvalidArgumentError("Image is empty");
   }
 
@@ -52,11 +52,11 @@ absl::StatusOr<std::vector<std::string>> Day8_2019::Part2(
   if (input.size() != 1) {
     return absl::InvalidArgumentError("Not exactly one image");
   }
-  if (input[0].size() % kLayerSize != 0){
+  if (input[0].size() % kLayerSize != 0) {
     return absl::InvalidArgumentError("Image isn't 25x6");
   }
   const int layer_count = input[0].size() / kLayerSize;
-  if (layer_count <= 0){
+  if (layer_count <= 0) {
     return absl::InvalidArgumentError("Image is empty");
   }
   std::string render;

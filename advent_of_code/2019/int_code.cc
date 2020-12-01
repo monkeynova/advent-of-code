@@ -24,7 +24,8 @@ absl::StatusOr<IntCode> IntCode::Parse(
 }
 
 // `parameter_number` is 1-indexed to make code easier to read in accessors`.
-static int64_t GetParameterMode(int64_t parameter_modes, int64_t parameter_number) {
+static int64_t GetParameterMode(int64_t parameter_modes,
+                                int64_t parameter_number) {
   --parameter_number;
   while (parameter_number) {
     parameter_modes /= 10;
