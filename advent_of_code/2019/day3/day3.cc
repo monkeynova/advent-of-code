@@ -5,17 +5,10 @@
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/2019/point.h"
 #include "glog/logging.h"
 
 struct Line {
-  struct Point {
-    int x;
-    int y;
-
-    int dist() const { return abs(x) + abs(y); }
-    int dist(Point o) const { return abs(x - o.x) + abs(y - o.y); }
-  };
-
   Point from;
   Point to;
 };
@@ -25,7 +18,7 @@ absl::StatusOr<std::vector<Line>> Parse(absl::string_view input) {
 
   std::vector<Line> ret;
   ret.reserve(runs.size());
-  Line::Point cur{0, 0};
+  Point cur{0, 0};
   for (absl::string_view run : runs) {
     Line next;
     next.from = cur;
@@ -88,13 +81,13 @@ bool Overlap(int bound11, int bound12, int bound21, int bound22, int* out) {
   return false;
 }
 
-absl::StatusOr<absl::optional<Line::Point>> Intersect(Line l1, Line l2) {
+absl::StatusOr<absl::optional<Point>> Intersect(Line l1, Line l2) {
   if (l1.from.x == l1.to.x) {
     if (l2.from.x == l2.to.x) {
       if (l1.from.x == l2.from.x) {
         int miny;
         if (Overlap(l1.from.y, l1.to.y, l2.from.y, l2.to.y, &miny)) {
-          return Line::Point{l1.from.x, miny};
+          return Point{l1.from.x, miny};
         }
         // No intersect.
       }
@@ -102,7 +95,7 @@ absl::StatusOr<absl::optional<Line::Point>> Intersect(Line l1, Line l2) {
     } else if (l2.from.y == l2.to.y) {
       if (Between(l1.from.x, l2.from.x, l2.to.x) &&
           Between(l2.from.y, l1.from.y, l1.to.y)) {
-        return Line::Point{l1.from.x, l2.from.y};
+        return Point{l1.from.x, l2.from.y};
       }
       // No intersect.
     } else {
@@ -112,14 +105,14 @@ absl::StatusOr<absl::optional<Line::Point>> Intersect(Line l1, Line l2) {
     if (l2.from.x == l2.to.x) {
       if (Between(l2.from.x, l1.from.x, l1.to.x) &&
           Between(l1.from.y, l2.from.y, l2.to.y)) {
-        return Line::Point{l2.from.x, l1.from.y};
+        return Point{l2.from.x, l1.from.y};
       }
       // No intersect.
     } else if (l2.from.y == l2.to.y) {
       if (l1.from.y == l2.from.y) {
         int minx;
         if (Overlap(l1.from.x, l1.to.x, l2.from.x, l2.to.x, &minx)) {
-          return Line::Point{minx, l1.from.y};
+          return Point{minx, l1.from.y};
         }
         // No intersect.
       }
@@ -133,12 +126,12 @@ absl::StatusOr<absl::optional<Line::Point>> Intersect(Line l1, Line l2) {
   return absl::nullopt;
 }
 
-absl::StatusOr<std::vector<Line::Point>> Intersect(std::vector<Line> wire1,
+absl::StatusOr<std::vector<Point>> Intersect(std::vector<Line> wire1,
                                                    std::vector<Line> wire2) {
-  std::vector<Line::Point> ret;
+  std::vector<Point> ret;
   for (const auto& l1 : wire1) {
     for (const auto& l2 : wire2) {
-      absl::StatusOr<absl::optional<Line::Point>> intersect = Intersect(l1, l2);
+      absl::StatusOr<absl::optional<Point>> intersect = Intersect(l1, l2);
       if (!intersect.ok()) return intersect.status();
       if (*intersect) {
         ret.push_back(**intersect);
@@ -159,9 +152,9 @@ absl::StatusOr<std::vector<std::string>> Day3_2019::Part1(
   absl::StatusOr<std::vector<Line>> wire2 = Parse(input[1]);
   if (!wire2.ok()) return wire2.status();
 
-  absl::StatusOr<std::vector<Line::Point>> overlap = Intersect(*wire1, *wire2);
+  absl::StatusOr<std::vector<Point>> overlap = Intersect(*wire1, *wire2);
   if (!overlap.ok()) return overlap.status();
-  absl::optional<Line::Point> min;
+  absl::optional<Point> min;
   for (const auto& point : *overlap) {
     if (point.dist() > 0 && (!min || min->dist() > point.dist())) {
       min = point;
@@ -175,7 +168,7 @@ absl::StatusOr<std::vector<std::string>> Day3_2019::Part1(
   return std::vector<std::string>{absl::StrCat(min->dist())};
 }
 
-absl::StatusOr<bool> PointOnLine(Line::Point point, Line line) {
+absl::StatusOr<bool> PointOnLine(Point point, Line line) {
   if (line.from.x == line.to.x) {
     return point.x == line.from.x && Between(point.y, line.from.y, line.to.y);
   } else if (line.from.y == line.to.y) {
@@ -184,7 +177,7 @@ absl::StatusOr<bool> PointOnLine(Line::Point point, Line line) {
   return absl::InvalidArgumentError("line isn't axis aligned");
 }
 
-absl::StatusOr<int> CostToOverlap(Line::Point intersect,
+absl::StatusOr<int> CostToOverlap(Point intersect,
                                   const std::vector<Line>& wire) {
   std::vector<int> cost_to_start(wire.size() + 1, 0);
   for (int i = 0; i < wire.size(); ++i) {
@@ -210,9 +203,9 @@ absl::StatusOr<std::vector<std::string>> Day3_2019::Part2(
   absl::StatusOr<std::vector<Line>> wire2 = Parse(input[1]);
   if (!wire2.ok()) return wire2.status();
 
-  absl::StatusOr<std::vector<Line::Point>> overlap = Intersect(*wire1, *wire2);
+  absl::StatusOr<std::vector<Point>> overlap = Intersect(*wire1, *wire2);
   if (!overlap.ok()) return overlap.status();
-  absl::optional<Line::Point> min;
+  absl::optional<Point> min;
   int min_score = std::numeric_limits<int>::max();
   for (const auto& point : *overlap) {
     if (point.dist() > 0) {
