@@ -20,7 +20,8 @@
       {
         "label": "cleanup",
         "type": "shell",
-        "command": "sh cleanup.sh"
+        "command": "sh cleanup.sh",
+        "problemMatcher": []
       },
       {
         "label": "New Day",

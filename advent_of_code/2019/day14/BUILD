@@ -6,6 +6,8 @@ cc_library(
     hdrs = ["day14.h"],
     deps = [
         "//advent_of_code:advent_day",
+        "@com_google_absl//absl/container:flat_hash_map",
+        "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/strings",
         "@com_google_glog//:glog",
     ],
@@ -16,8 +18,8 @@ cc_test(
     srcs = ["day14_test.cc"],
     args = ["--test_file=advent_of_code/2019/day14/day14.test"],
     data = [
-        "input.txt",
         "day14.test",
+        "input.txt",
     ],
     deps = [
         ":day14",
