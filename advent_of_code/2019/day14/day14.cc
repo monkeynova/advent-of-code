@@ -104,20 +104,20 @@ absl::StatusOr<RuleSet> ParseRuleSet(
   return DagSort(std::move(rule_set));
 }
 
-absl::StatusOr<int> ComputeOreNeedForFuel(const RuleSet& rule_set) {
-  absl::flat_hash_map<absl::string_view, int> needs;
-  needs.emplace("FUEL", 1);
+absl::StatusOr<int64_t> ComputeOreNeedForFuel(const RuleSet& rule_set, int64_t fuel_needed = 1) {
+  absl::flat_hash_map<absl::string_view, int64_t> needs;
+  needs.emplace("FUEL", fuel_needed);
   for (const Rule& rule : rule_set) {
     VLOG(1) << absl::StrJoin(
         needs, ", ",
         [](std::string* out, const std::pair<absl::string_view, int>& need) {
           absl::StrAppend(out, need.first, ":", need.second);
         });
-    int needed = needs[rule.name];
+    int64_t needed = needs[rule.name];
     if (needed <= 0) continue;
     needs.erase(rule.name);
 
-    int mult = (needed + rule.quantity_out - 1) / rule.quantity_out;
+    int64_t mult = (needed + rule.quantity_out - 1) / rule.quantity_out;
     for (const Ingredient& in : rule.in) {
       needs[in.name] += mult * in.quantity;
     }
@@ -129,6 +129,36 @@ absl::StatusOr<int> ComputeOreNeedForFuel(const RuleSet& rule_set) {
     return absl::InvalidArgumentError("Didn't resolve to ORE");
   }
   return needs.begin()->second;
+}
+
+absl::StatusOr<int> FuelFromOre(const RuleSet& rule_set, uint64_t ore_supply) {
+  int64_t guess = 1;
+  absl::StatusOr<int64_t> ore_needed = 0;
+  while (*ore_needed < ore_supply) {
+    ore_needed = ComputeOreNeedForFuel(rule_set, guess);
+    if (!ore_needed.ok()) return ore_needed.status();
+    VLOG(1) << guess << " => " << *ore_needed;
+    guess <<= 1;
+  }
+  int64_t min = guess >> 2;
+  int64_t max = guess >> 1;
+  while (min < max) {
+    guess = (min + max) / 2;
+    ore_needed = ComputeOreNeedForFuel(rule_set, guess);
+    if (!ore_needed.ok()) return ore_needed.status();
+    VLOG(1) << guess << " => " << *ore_needed;
+    if (*ore_needed == ore_supply) {
+      min = max = guess;
+    } else if (*ore_needed < ore_supply) {
+      if (min == guess) break;
+      min = guess;
+    } else {
+      max = guess;
+    }
+  }
+  ore_needed = ComputeOreNeedForFuel(rule_set, guess);
+  if (*ore_needed > ore_supply) return guess - 1;
+  return guess;
 }
 
 absl::StatusOr<std::vector<std::string>> Day14_2019::Part1(
@@ -148,5 +178,15 @@ absl::StatusOr<std::vector<std::string>> Day14_2019::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day14_2019::Part2(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  absl::StatusOr<RuleSet> rule_set = ParseRuleSet(input);
+  if (!rule_set.ok()) return rule_set.status();
+
+  if ((*rule_set)[0].name != "FUEL") {
+    return absl::InvalidArgumentError("Rules aren't a DAG rooted with FUEL");
+  }
+
+  absl::StatusOr<int> fuel_made = FuelFromOre(*rule_set, 1000000000000);
+  if (!fuel_made.ok()) return fuel_made.status();
+
+  return std::vector<std::string>{absl::StrCat(*fuel_made)};
 }
