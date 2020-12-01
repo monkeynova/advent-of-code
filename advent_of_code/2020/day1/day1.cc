@@ -26,5 +26,21 @@ absl::StatusOr<std::vector<std::string>> Day1_2020::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day1_2020::Part2(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  std::vector<int> list;
+  for (absl::string_view str : input) {
+    list.push_back(0);
+    if (!absl::SimpleAtoi(str, &list.back())) return absl::InvalidArgumentError("bad int");
+  }
+  int res = -1;
+  for (int a : list) {
+    for (int b : list) {
+      for (int c : list) {
+      if (a+b+c == 2020) {
+        res = a*b*c;
+      }
+      }
+    }
+  }
+  if (res == -1) return absl::InvalidArgumentError("nothing found");
+  return std::vector<std::string>{absl::StrCat(res)};
 }
