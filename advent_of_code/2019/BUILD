@@ -36,6 +36,6 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
-        "@com_google_absl//absl/hash:hash",
+        "@com_google_absl//absl/hash",
     ],
 )

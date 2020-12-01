@@ -127,7 +127,7 @@ absl::StatusOr<absl::optional<Point>> Intersect(Line l1, Line l2) {
 }
 
 absl::StatusOr<std::vector<Point>> Intersect(std::vector<Line> wire1,
-                                                   std::vector<Line> wire2) {
+                                             std::vector<Line> wire2) {
   std::vector<Point> ret;
   for (const auto& l1 : wire1) {
     for (const auto& l2 : wire2) {

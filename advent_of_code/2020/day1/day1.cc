@@ -10,13 +10,14 @@ absl::StatusOr<std::vector<std::string>> Day1_2020::Part1(
   std::vector<int> list;
   for (absl::string_view str : input) {
     list.push_back(0);
-    if (!absl::SimpleAtoi(str, &list.back())) return absl::InvalidArgumentError("bad int");
+    if (!absl::SimpleAtoi(str, &list.back()))
+      return absl::InvalidArgumentError("bad int");
   }
   int res = -1;
   for (int a : list) {
     for (int b : list) {
-      if (a+b == 2020) {
-        res = a*b;
+      if (a + b == 2020) {
+        res = a * b;
       }
     }
   }
@@ -29,15 +30,17 @@ absl::StatusOr<std::vector<std::string>> Day1_2020::Part2(
   std::vector<int> list;
   for (absl::string_view str : input) {
     list.push_back(0);
-    if (!absl::SimpleAtoi(str, &list.back())) return absl::InvalidArgumentError("bad int");
+    if (!absl::SimpleAtoi(str, &list.back())) {
+      return absl::InvalidArgumentError("bad int");
+    }
   }
   int res = -1;
   for (int a : list) {
     for (int b : list) {
       for (int c : list) {
-      if (a+b+c == 2020) {
-        res = a*b*c;
-      }
+        if (a + b + c == 2020) {
+          res = a * b * c;
+        }
       }
     }
   }

@@ -18,7 +18,7 @@ struct Vector {
     return *this;
   }
   bool operator==(const Vector& other) const {
-    return x == other.x && y == other.y && z == other.z; 
+    return x == other.x && y == other.y && z == other.z;
   }
   bool operator!=(const Vector& other) const { return !operator==(other); }
   int norm() const { return abs(x) + abs(y) + abs(z); }
@@ -30,14 +30,14 @@ H AbslHashValue(H h, const Vector& v) {
 }
 
 std::ostream& operator<<(std::ostream& out, const Vector& v) {
-  return out << "{" << v.x << "," << v.y << "," << v.z <<"}";
+  return out << "{" << v.x << "," << v.y << "," << v.z << "}";
 }
 
 struct Moon {
   Vector position;
   Vector velocity;
   bool operator==(const Moon& other) const {
-    return position == other.position && velocity == other.velocity; 
+    return position == other.position && velocity == other.velocity;
   }
   bool operator!=(const Moon& other) const { return !operator==(other); }
   int energy() const { return position.norm() * velocity.norm(); }
@@ -49,23 +49,26 @@ H AbslHashValue(H h, const Moon& m) {
 }
 
 std::ostream& operator<<(std::ostream& out, const Moon& m) {
-  return out << "{" << m.position << "," << m.velocity <<"}";
+  return out << "{" << m.position << "," << m.velocity << "}";
 }
 
 void ApplyGravity(int pos1, int pos2, int* vel1, int* vel2) {
   if (pos1 < pos2) {
     ++*vel1;
     --*vel2;
-  } else  if (pos1 > pos2) {
+  } else if (pos1 > pos2) {
     --*vel1;
     ++*vel2;
   }
 }
 
 void ApplyGravity(Moon* m1, Moon* m2) {
-  ApplyGravity(m1->position.x, m2->position.x, &m1->velocity.x, &m2->velocity.x);
-  ApplyGravity(m1->position.y, m2->position.y, &m1->velocity.y, &m2->velocity.y);
-  ApplyGravity(m1->position.z, m2->position.z, &m1->velocity.z, &m2->velocity.z);
+  ApplyGravity(m1->position.x, m2->position.x, &m1->velocity.x,
+               &m2->velocity.x);
+  ApplyGravity(m1->position.y, m2->position.y, &m1->velocity.y,
+               &m2->velocity.y);
+  ApplyGravity(m1->position.z, m2->position.z, &m1->velocity.z,
+               &m2->velocity.z);
 }
 
 int TotalEnergy(const std::vector<Moon>& moons) {
@@ -82,11 +85,12 @@ absl::StatusOr<std::vector<std::string>> Day12_2019::Part1(
   std::vector<Moon> moons;
   for (absl::string_view str : input) {
     Moon moon;
-    if (!RE2::FullMatch(str, pattern, &moon.position.x, &moon.position.y, &moon.position.z)) {
+    if (!RE2::FullMatch(str, pattern, &moon.position.x, &moon.position.y,
+                        &moon.position.z)) {
       return absl::InvalidArgumentError("Could not parse moon");
     }
     moons.push_back(moon);
-  }  
+  }
   for (int i = 0; i < 1000; ++i) {
     for (int i = 0; i < moons.size(); ++i) {
       for (int j = 0; j < i; ++j) {
@@ -107,12 +111,14 @@ absl::StatusOr<std::vector<std::string>> Day12_2019::Part2(
   std::vector<Moon> moons;
   for (absl::string_view str : input) {
     Moon moon;
-    if (!RE2::FullMatch(str, pattern, &moon.position.x, &moon.position.y, &moon.position.z)) {
+    if (!RE2::FullMatch(str, pattern, &moon.position.x, &moon.position.y,
+                        &moon.position.z)) {
       return absl::InvalidArgumentError("Could not parse moon");
     }
     moons.push_back(moon);
   }
-  // Simulate on dimension at a time, look for loops then multiply for when they align.
+  // Simulate on dimension at a time, look for loops then multiply for when they
+  // align.
   std::vector<Moon> start = moons;
   int64_t steps = 0;
   absl::optional<int> x_cycle_size;
@@ -122,7 +128,7 @@ absl::StatusOr<std::vector<std::string>> Day12_2019::Part2(
   bool done = false;
   while (!done) {
     ++steps;
-    if (steps % 77777777 == 0) { 
+    if (steps % 77777777 == 0) {
       LOG(WARNING) << steps;
     }
     for (int i = 0; i < moons.size(); ++i) {
@@ -137,17 +143,17 @@ absl::StatusOr<std::vector<std::string>> Day12_2019::Part2(
     bool y_same = true;
     bool z_same = true;
     for (int i = 0; i < start.size(); ++i) {
-      if (start[i].position.x != moons[i].position.x || 
+      if (start[i].position.x != moons[i].position.x ||
           start[i].velocity.x != moons[i].velocity.x) {
-          x_same = false;
+        x_same = false;
       }
-      if (start[i].position.y != moons[i].position.y || 
+      if (start[i].position.y != moons[i].position.y ||
           start[i].velocity.y != moons[i].velocity.y) {
-          y_same = false;
+        y_same = false;
       }
-      if (start[i].position.z != moons[i].position.z || 
+      if (start[i].position.z != moons[i].position.z ||
           start[i].velocity.z != moons[i].velocity.z) {
-          z_same = false;
+        z_same = false;
       }
     }
     if (!x_cycle_size && x_same) {

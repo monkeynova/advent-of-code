@@ -34,7 +34,7 @@ class DrawBoard : public IntCode::InputSource, public IntCode::OutputSink {
         break;
       }
       case 2: {
-        if (cur_point_ == Point{.x = -1, .y = 0}){
+        if (cur_point_ == Point{.x = -1, .y = 0}) {
           VLOG(1) << "Score: " << score_;
           score_ = val;
         } else {
@@ -54,7 +54,8 @@ class DrawBoard : public IntCode::InputSource, public IntCode::OutputSink {
         }
         break;
       }
-      default: return absl::InternalError("Bad put_mode");
+      default:
+        return absl::InternalError("Bad put_mode");
     }
     put_mode = (put_mode + 1) % 3;
     return absl::OkStatus();
@@ -64,7 +65,7 @@ class DrawBoard : public IntCode::InputSource, public IntCode::OutputSink {
 
   int CountBlockTiles() const {
     int block_tiles = 0;
-    for (const auto& point_and_tile : board_ ) {
+    for (const auto& point_and_tile : board_) {
       if (point_and_tile.second == 2) {
         ++block_tiles;
       }
@@ -94,8 +95,10 @@ class DrawBoard : public IntCode::InputSource, public IntCode::OutputSink {
   Point ball_position_;
   int score_ = 0;
 
-  Point min_ = {.x = std::numeric_limits<int>::max(), .y = std::numeric_limits<int>::max()};
-  Point max_ = {.x = std::numeric_limits<int>::min(), .y = std::numeric_limits<int>::min()};
+  Point min_ = {.x = std::numeric_limits<int>::max(),
+                .y = std::numeric_limits<int>::max()};
+  Point max_ = {.x = std::numeric_limits<int>::min(),
+                .y = std::numeric_limits<int>::min()};
   absl::flat_hash_map<Point, int> board_;
 };
 
@@ -105,7 +108,8 @@ absl::StatusOr<std::vector<std::string>> Day13_2019::Part1(
   if (!codes.ok()) return codes.status();
 
   DrawBoard draw_board;
-  if (absl::Status st = codes->Run(&draw_board, &draw_board); !st.ok()) return st;
+  if (absl::Status st = codes->Run(&draw_board, &draw_board); !st.ok())
+    return st;
 
   return std::vector<std::string>{absl::StrCat(draw_board.CountBlockTiles())};
 }
@@ -117,7 +121,8 @@ absl::StatusOr<std::vector<std::string>> Day13_2019::Part2(
 
   if (absl::Status st = codes->Poke(0, 2); !st.ok()) return st;
   DrawBoard draw_board;
-  if (absl::Status st = codes->Run(&draw_board, &draw_board); !st.ok()) return st;
+  if (absl::Status st = codes->Run(&draw_board, &draw_board); !st.ok())
+    return st;
 
   return std::vector<std::string>{absl::StrCat(draw_board.score())};
 }
