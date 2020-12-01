@@ -1,6 +1,7 @@
 [part=1]
 @include{advent_of_code/2019/day11/input.txt}
 --
+1934
 ==
 
 [part=2]
