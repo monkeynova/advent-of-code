@@ -1,6 +1,18 @@
 [part=1]
+1721
+979
+366
+299
+675
+1456
+--
+514579
+==
+
+[part=1]
 @include{advent_of_code/2020/day1/input.txt}
 --
+ERROR: Could not run test: nothing found
 ==
 
 [part=2]
