@@ -123,19 +123,6 @@ absl::Status IntCode::Run(InputSource* input, OutputSink* output,
   return absl::OkStatus();
 }
 
-absl::StatusOr<absl::optional<int64_t>> IntCode::RunToNextOutput(
-    InputSource* input) {
-  std::vector<int64_t> output;
-  VectorOutput output_sink(&output);
-  while (!terminated_) {
-    if (absl::Status st = RunSingleOpcode(input, &output_sink); !st.ok()) {
-      return st;
-    }
-    if (!output.empty()) return output[0];
-  }
-  return absl::nullopt;
-}
-
 absl::Status IntCode::RunSingleOpcode(InputSource* input, OutputSink* output) {
   if (code_pos_ < 0 || code_pos_ >= codes_.size()) {
     return absl::InvalidArgumentError(

@@ -100,17 +100,6 @@ class IntCode {
   absl::Status Run(InputSource* input, OutputSink* output,
                    PauseCondition* pause_condition);
 
-  // Runs the program until an output is produced (in which case the output
-  // value is returned) or the program terminates (in which case nullopt is
-  // returned).
-  absl::StatusOr<absl::optional<int64_t>> RunToNextOutput(
-      const std::vector<int64_t>& input) {
-    VectorInput input_source(input);
-    return RunToNextOutput(&input_source);
-  }
-  absl::StatusOr<absl::optional<int64_t>> RunToNextOutput(
-      InputSource* input = nullptr);
-
  private:
   IntCode(std::vector<int64_t> codes, int64_t code_pos = 0,
           bool terminated = false)

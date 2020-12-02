@@ -49,6 +49,23 @@ absl::StatusOr<std::vector<std::string>> Day7_2019::Part1(
   return std::vector<std::string>{absl::StrCat(*best_result)};
 }
 
+class CollectOutputAndPause : public IntCode::OutputSink, public IntCode::PauseCondition {
+ public:
+  bool PauseIntCode() override { return output_.has_value(); }
+
+  absl::Status Put(int64_t val) override {
+    output_ = val;
+    return absl::OkStatus();
+  }
+
+  absl::optional<int64_t> output() {
+    return output_;
+  }
+
+ private:
+  absl::optional<int64_t> output_;
+};
+
 absl::StatusOr<int> RunAssembly(const IntCode& base_codes,
                                 std::vector<int> phases) {
   struct PartialState {
@@ -71,12 +88,14 @@ absl::StatusOr<int> RunAssembly(const IntCode& base_codes,
       if (next_input) {
         unit.input.push_back(*next_input);
       }
-      absl::StatusOr<absl::optional<int64_t>> output =
-          unit.code.RunToNextOutput(unit.input);
-      if (!output.ok()) return output.status();
+      IntCode::VectorInput input(unit.input);
+      CollectOutputAndPause out_and_pause;
+      if (absl::Status st = unit.code.Run(&input, &out_and_pause, &out_and_pause); !st.ok()) {
+        return st;
+      }
       unit.input.clear();
-      if (*output) {
-        next_input = **output;
+      if (out_and_pause.output()) {
+        next_input = *out_and_pause.output();
       } else {
         next_input = absl::nullopt;
         running = false;
