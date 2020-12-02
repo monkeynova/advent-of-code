@@ -3,8 +3,8 @@
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
-#include "re2/re2.h"
 #include "glog/logging.h"
+#include "re2/re2.h"
 
 absl::StatusOr<std::vector<std::string>> Day2_2020::Part1(
     const std::vector<absl::string_view>& input) const {
@@ -41,7 +41,7 @@ absl::StatusOr<std::vector<std::string>> Day2_2020::Part2(
     if (!RE2::FullMatch(str, pattern, &min, &max, &c, &password)) {
       return absl::InternalError("");
     }
-    if (password[min-1] == c[0] ^ password[max-1] == c[0]) {
+    if (password[min - 1] == c[0] ^ password[max - 1] == c[0]) {
       ++valid;
     }
   }
