@@ -35,7 +35,7 @@ git_repository(
 git_repository(
     name = "com_monkeynova_gunit_main",
     remote = "git://github.com/monkeynova/gunit-main.git",
-    commit = "9614aad52ec336f344f719b02d057ee3b133b73c",
+    commit = "0123eef05b595cf41eb180f826304d9825789088",
 )
 
 git_repository(
