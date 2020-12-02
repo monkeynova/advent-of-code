@@ -31,5 +31,19 @@ absl::StatusOr<std::vector<std::string>> Day2_2020::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day2_2020::Part2(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  RE2 pattern{"(\\d+)-(\\d+) (.): (.*)"};
+  int valid = 0;
+  for (absl::string_view str : input) {
+    int min;
+    int max;
+    std::string c;
+    std::string password;
+    if (!RE2::FullMatch(str, pattern, &min, &max, &c, &password)) {
+      return absl::InternalError("");
+    }
+    if (password[min-1] == c[0] ^ password[max-1] == c[0]) {
+      ++valid;
+    }
+  }
+  return std::vector<std::string>{absl::StrCat(valid)};
 }
