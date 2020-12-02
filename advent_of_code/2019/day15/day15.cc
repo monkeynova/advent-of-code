@@ -10,7 +10,9 @@
 #include "advent_of_code/2019/point.h"
 #include "glog/logging.h"
 
-class Droid : public IntCode::InputSource, public IntCode::OutputSink, public IntCode::PauseCondition {
+class Droid : public IntCode::InputSource,
+              public IntCode::OutputSink,
+              public IntCode::PauseCondition {
  public:
   Droid() {
     SetBoard(pos_, 1);
@@ -40,7 +42,7 @@ class Droid : public IntCode::InputSource, public IntCode::OutputSink, public In
     InputDirection dir = current_path_.front();
     current_path_.pop_front();
     return dir;
-    //return static_cast<InputDirection>(absl::Uniform(bitgen_, 1, 5));
+    // return static_cast<InputDirection>(absl::Uniform(bitgen_, 1, 5));
   }
 
   absl::Status ComputePathToNearestUnknown() {
@@ -53,12 +55,17 @@ class Droid : public IntCode::InputSource, public IntCode::OutputSink, public In
     paths.push_back({.location = pos_});
     for (int depth = 1; !paths.empty(); ++depth) {
       const Path& to_extend = paths.front();
-      for (InputDirection dir : {InputDirection::kNorthInput, InputDirection::kSouthInput, InputDirection::kWestInput, InputDirection::kEastInput}) {
-        Point new_location = to_extend.location + kInputDirectionMap[static_cast<int>(dir)];
+      for (InputDirection dir :
+           {InputDirection::kNorthInput, InputDirection::kSouthInput,
+            InputDirection::kWestInput, InputDirection::kEastInput}) {
+        Point new_location =
+            to_extend.location + kInputDirectionMap[static_cast<int>(dir)];
         if (computed_path.contains(new_location)) continue;
         if (!board_.contains(new_location)) {
           // Hit an unknown. Head here.
-          current_path_.insert(current_path_.end(), to_extend.directions.begin(), to_extend.directions.end());
+          current_path_.insert(current_path_.end(),
+                               to_extend.directions.begin(),
+                               to_extend.directions.end());
           current_path_.push_back(dir);
           return absl::OkStatus();
         }
@@ -66,7 +73,8 @@ class Droid : public IntCode::InputSource, public IntCode::OutputSink, public In
           // Wall.
           continue;
         }
-        paths.push_back({.location = new_location, .directions = to_extend.directions});
+        paths.push_back(
+            {.location = new_location, .directions = to_extend.directions});
         paths.back().directions.push_back(dir);
         computed_path.insert(new_location);
       }
@@ -88,25 +96,33 @@ class Droid : public IntCode::InputSource, public IntCode::OutputSink, public In
     paths.push_back({.location = Point{.x = 0, .y = 0}});
     for (int depth = 1; !paths.empty(); ++depth) {
       const Path& to_extend = paths.front();
-      for (InputDirection dir : {InputDirection::kNorthInput, InputDirection::kSouthInput, InputDirection::kWestInput, InputDirection::kEastInput}) {
-        Point new_location = to_extend.location + kInputDirectionMap[static_cast<int>(dir)];
+      for (InputDirection dir :
+           {InputDirection::kNorthInput, InputDirection::kSouthInput,
+            InputDirection::kWestInput, InputDirection::kEastInput}) {
+        Point new_location =
+            to_extend.location + kInputDirectionMap[static_cast<int>(dir)];
         if (computed_path.contains(new_location)) continue;
         if (!board_.contains(new_location)) {
-          return absl::InternalError("Path to unknown location finding O2 distaince");
+          return absl::InternalError(
+              "Path to unknown location finding O2 distaince");
         }
         if (board_[new_location] == 0) {
           // Wall.
           continue;
         }
         if (board_[new_location] == 2) {
-          VLOG(1) << "Path = " << absl::StrJoin(to_extend.directions, "",
-          [](std::string* out, InputDirection dir) {
-            constexpr absl::string_view rec[] = {"", "^", "\\/", "<", ">"};
-            absl::StrAppend(out, rec[static_cast<int>(dir)]);
-          });
+          VLOG(1) << "Path = "
+                  << absl::StrJoin(to_extend.directions, "",
+                                   [](std::string* out, InputDirection dir) {
+                                     constexpr absl::string_view rec[] = {
+                                         "", "^", "\\/", "<", ">"};
+                                     absl::StrAppend(
+                                         out, rec[static_cast<int>(dir)]);
+                                   });
           return to_extend.directions.size() + 1;
         }
-        paths.push_back({.location = new_location, .directions = to_extend.directions});
+        paths.push_back(
+            {.location = new_location, .directions = to_extend.directions});
         paths.back().directions.push_back(dir);
         computed_path.insert(new_location);
       }
@@ -193,7 +209,8 @@ class Droid : public IntCode::InputSource, public IntCode::OutputSink, public In
   static constexpr Point kSouthDir = {.x = 0, .y = 1};
   static constexpr Point kWestDir = {.x = -1, .y = 0};
   static constexpr Point kEastDir = {.x = 1, .y = 0};
-  static constexpr Point kInputDirectionMap[] = {Point{}, kNorthDir, kSouthDir, kWestDir, kEastDir};
+  static constexpr Point kInputDirectionMap[] = {Point{}, kNorthDir, kSouthDir,
+                                                 kWestDir, kEastDir};
 
   Point min_ = {.x = std::numeric_limits<int>::max(),
                 .y = std::numeric_limits<int>::max()};

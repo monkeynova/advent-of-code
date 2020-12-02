@@ -97,7 +97,8 @@ class IntCode {
     NeverPause never_pause;
     return Run(input, output, &never_pause);
   }
-  absl::Status Run(InputSource* input, OutputSink* output, PauseCondition* pause_condition);
+  absl::Status Run(InputSource* input, OutputSink* output,
+                   PauseCondition* pause_condition);
 
   // Runs the program until an output is produced (in which case the output
   // value is returned) or the program terminates (in which case nullopt is

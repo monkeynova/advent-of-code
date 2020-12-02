@@ -115,7 +115,8 @@ absl::Status IntCode::SaveParameter(int64_t parameter_modes, int64_t parameter,
   }
 }
 
-absl::Status IntCode::Run(InputSource* input, OutputSink* output, PauseCondition* pause_condition) {
+absl::Status IntCode::Run(InputSource* input, OutputSink* output,
+                          PauseCondition* pause_condition) {
   while (!terminated_ && !pause_condition->PauseIntCode()) {
     if (absl::Status st = RunSingleOpcode(input, output); !st.ok()) return st;
   }
