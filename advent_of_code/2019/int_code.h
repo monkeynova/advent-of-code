@@ -52,6 +52,14 @@ class IntCode {
    private:
     std::vector<int64_t>* output_;
   };
+  class PauseCondition {
+   public:
+    virtual ~PauseCondition() = default;
+    virtual bool PauseIntCode() = 0;
+  };
+  class NeverPause : public PauseCondition {
+    bool PauseIntCode() override { return false; }
+  };
 
   static absl::StatusOr<IntCode> Parse(
       const std::vector<absl::string_view>& input);
@@ -85,7 +93,11 @@ class IntCode {
     return Run(&input_source, &output_sink);
   }
 
-  absl::Status Run(InputSource* input = nullptr, OutputSink* output = nullptr);
+  absl::Status Run(InputSource* input = nullptr, OutputSink* output = nullptr) {
+    NeverPause never_pause;
+    return Run(input, output, &never_pause);
+  }
+  absl::Status Run(InputSource* input, OutputSink* output, PauseCondition* pause_condition);
 
   // Runs the program until an output is produced (in which case the output
   // value is returned) or the program terminates (in which case nullopt is

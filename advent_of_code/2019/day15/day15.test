@@ -1,6 +1,8 @@
+# 272 (low)
 [part=1]
 @include{advent_of_code/2019/day15/input.txt}
 --
+280
 ==
 
 [part=2]
