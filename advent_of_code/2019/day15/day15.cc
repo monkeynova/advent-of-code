@@ -131,6 +131,42 @@ class Droid : public IntCode::InputSource,
     return absl::InternalError("Ran out of paths");
   }
 
+  absl::StatusOr<int> GreatestDistanceFromO2() {
+    struct Path {
+      Point location;
+      std::vector<InputDirection> directions;
+    };
+    absl::flat_hash_set<Point> computed_path = {o2_pos_};
+    std::deque<Path> paths;
+    paths.push_back({.location = o2_pos_});
+    int max_path = 0;
+    for (int depth = 0; !paths.empty(); ++depth) {
+      const Path& to_extend = paths.front();
+      max_path = std::max<int>(max_path, to_extend.directions.size());
+      for (InputDirection dir :
+           {InputDirection::kNorthInput, InputDirection::kSouthInput,
+            InputDirection::kWestInput, InputDirection::kEastInput}) {
+        Point new_location =
+            to_extend.location + kInputDirectionMap[static_cast<int>(dir)];
+        if (computed_path.contains(new_location)) continue;
+        if (!board_.contains(new_location)) {
+          return absl::InternalError(
+              "Path to unknown location finding O2 distaince");
+        }
+        if (board_[new_location] == 0) {
+          // Wall.
+          continue;
+        }
+        paths.push_back(
+            {.location = new_location, .directions = to_extend.directions});
+        paths.back().directions.push_back(dir);
+        computed_path.insert(new_location);
+      }
+      paths.pop_front();
+    }
+    return max_path;
+  }
+
   enum class OutputStatus {
     kHitWall = 0,
     kMovedOneStep = 1,
@@ -139,6 +175,9 @@ class Droid : public IntCode::InputSource,
 
   void SetBoard(Point p, int val) {
     board_.emplace(p, val);
+    if (val == 2) {
+      o2_pos_ = p;
+    }
     min_.x = std::min(min_.x, p.x);
     min_.y = std::min(min_.y, p.y);
     max_.x = std::max(max_.x, p.x);
@@ -193,8 +232,6 @@ class Droid : public IntCode::InputSource,
     return ret;
   }
 
-  int Part1() { return 0; }
-
   Point min() const { return min_; }
   Point max() const { return max_; }
 
@@ -203,6 +240,7 @@ class Droid : public IntCode::InputSource,
   std::deque<InputDirection> current_path_;
   Point pos_{0, 0};
   Point dir_;
+  Point o2_pos_;
   bool done_ = false;
 
   static constexpr Point kNorthDir = {.x = 0, .y = -1};
@@ -238,5 +276,17 @@ absl::StatusOr<std::vector<std::string>> Day15_2019::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day15_2019::Part2(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
+  if (!codes.ok()) return codes.status();
+
+  Droid droid;
+  if (absl::Status st = codes->Run(&droid, &droid, &droid); !st.ok()) {
+    return st;
+  }
+  LOG(WARNING) << droid.min() << "-" << droid.max();
+  LOG(WARNING) << droid.DebugBoard();
+  absl::StatusOr<int> distance = droid.GreatestDistanceFromO2();
+  if (!distance.ok()) return distance.status();
+
+  return std::vector<std::string>{absl::StrCat(*distance)};
 }
