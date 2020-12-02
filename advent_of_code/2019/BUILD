@@ -22,9 +22,9 @@ cc_test(
     data = ["int_code.test"],
     deps = [
         ":int_code",
-        "@com_google_file_based_test_driver//:file_based_test_driver",
-        "@com_google_file_based_test_driver//:run_test_case_result",
-        "@com_google_file_based_test_driver//:test_case_options",
+        "@com_google_file_based_test_driver//file_based_test_driver:file_based_test_driver",
+        "@com_google_file_based_test_driver//file_based_test_driver:run_test_case_result",
+        "@com_google_file_based_test_driver//file_based_test_driver:test_case_options",
         "@com_monkeynova_gunit_main//:main_lib",
     ],
 )

@@ -3,7 +3,7 @@
 
 #include "absl/functional/bind_front.h"
 #include "advent_of_code/advent_day.h"
-#include "file_based_test_driver.h"
+#include "file_based_test_driver/file_based_test_driver.h"
 #include "glog/logging.h"
 #include "gtest/gtest.h"
 #include "main_lib.h"

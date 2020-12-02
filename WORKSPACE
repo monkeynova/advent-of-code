@@ -48,5 +48,5 @@ git_repository(
 git_repository(
     name = "com_google_file_based_test_driver",
     remote = "git://github.com/google/file-based-test-driver.git",
-    commit = "d0561d4d24117c2f3893e6fa947f1bde8c0719af",
+    commit = "2f80560ea1264349cf2fab5ebc002d44b104afad",
 )
