@@ -3,11 +3,30 @@
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
+#include "re2/re2.h"
 #include "glog/logging.h"
 
 absl::StatusOr<std::vector<std::string>> Day2_2020::Part1(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  RE2 pattern{"(\\d+)-(\\d+) (.): (.*)"};
+  int valid = 0;
+  for (absl::string_view str : input) {
+    int min;
+    int max;
+    std::string c;
+    std::string password;
+    if (!RE2::FullMatch(str, pattern, &min, &max, &c, &password)) {
+      return absl::InternalError("");
+    }
+    int count = 0;
+    for (int i = 0; i < password.size(); ++i) {
+      if (password[i] == c[0]) ++count;
+    }
+    if (count >= min && count <= max) {
+      ++valid;
+    }
+  }
+  return std::vector<std::string>{absl::StrCat(valid)};
 }
 
 absl::StatusOr<std::vector<std::string>> Day2_2020::Part2(
