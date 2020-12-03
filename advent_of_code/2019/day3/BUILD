@@ -6,7 +6,7 @@ cc_library(
     hdrs = ["day3.h"],
     deps = [
         "//advent_of_code:advent_day",
-        "//advent_of_code/2019:point",
+        "//advent_of_code:point",
         "@com_google_absl//absl/strings",
         "@com_google_glog//:glog",
     ],

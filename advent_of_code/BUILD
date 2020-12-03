@@ -48,3 +48,14 @@ cc_library(
         "@com_monkeynova_gunit_main//:main_lib",
     ],
 )
+
+cc_library(
+    name = "point",
+    hdrs = ["point.h"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "@com_google_absl//absl/hash",
+    ],
+)
