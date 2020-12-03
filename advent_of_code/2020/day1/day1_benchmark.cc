@@ -1,7 +1,6 @@
-#include "advent_of_code/2020/day1/day1.h"
-
 #include "absl/flags/flag.h"
 #include "absl/strings/str_join.h"
+#include "advent_of_code/2020/day1/day1.h"
 #include "advent_of_code/file_util.h"
 #include "benchmark/benchmark.h"
 #include "glog/logging.h"
@@ -21,7 +20,8 @@ void BM_Day(benchmark::State& state) {
     state.SkipWithError("Bad test");
   }
   const DirtyTestParseResult& test = global_tests[state.range(0)];
-  state.SetLabel(absl::StrCat("Test #", state.range(0), " (Part", test.part, ")"));
+  state.SetLabel(
+      absl::StrCat("Test #", state.range(0), " (Part", test.part, ")"));
   switch (test.part) {
     case 1: {
       for (auto _ : state) {
@@ -56,5 +56,3 @@ int main(int argc, char** argv) {
   benchmark::RunSpecifiedBenchmarks();
   return 0;
 }
-
-

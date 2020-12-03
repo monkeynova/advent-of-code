@@ -49,7 +49,8 @@ absl::StatusOr<std::vector<std::string>> Day7_2019::Part1(
   return std::vector<std::string>{absl::StrCat(*best_result)};
 }
 
-class CollectOutputAndPause : public IntCode::OutputSink, public IntCode::PauseCondition {
+class CollectOutputAndPause : public IntCode::OutputSink,
+                              public IntCode::PauseCondition {
  public:
   bool PauseIntCode() override { return output_.has_value(); }
 
@@ -58,9 +59,7 @@ class CollectOutputAndPause : public IntCode::OutputSink, public IntCode::PauseC
     return absl::OkStatus();
   }
 
-  absl::optional<int64_t> output() {
-    return output_;
-  }
+  absl::optional<int64_t> output() { return output_; }
 
  private:
   absl::optional<int64_t> output_;
@@ -90,7 +89,9 @@ absl::StatusOr<int> RunAssembly(const IntCode& base_codes,
       }
       IntCode::VectorInput input(unit.input);
       CollectOutputAndPause out_and_pause;
-      if (absl::Status st = unit.code.Run(&input, &out_and_pause, &out_and_pause); !st.ok()) {
+      if (absl::Status st =
+              unit.code.Run(&input, &out_and_pause, &out_and_pause);
+          !st.ok()) {
         return st;
       }
       unit.input.clear();

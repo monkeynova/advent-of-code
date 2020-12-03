@@ -17,9 +17,9 @@ constexpr char kPartOption[] = "part";
 
 std::string TestCaseFileName() { return absl::GetFlag(FLAGS_test_file); }
 
-static void CollectLines(std::vector<int>* lines,
-                         absl::string_view test_case_with_options,
-                         file_based_test_driver::RunTestCaseResult* test_result) {
+static void CollectLines(
+    std::vector<int>* lines, absl::string_view test_case_with_options,
+    file_based_test_driver::RunTestCaseResult* test_result) {
   lines->push_back(test_result->line());
 }
 
@@ -76,10 +76,10 @@ void RunTestCase(const AdventDay* advent_day,
   test_result->AddTestOutput(absl::StrJoin(*output, "\n"));
 }
 
-void RunTestCaseBenchmark(const AdventDay* advent_day,
-                  benchmark::State& state,
-                  absl::string_view test_case_with_options,
-                  file_based_test_driver::RunTestCaseResult* test_result) {
+void RunTestCaseBenchmark(
+    const AdventDay* advent_day, benchmark::State& state,
+    absl::string_view test_case_with_options,
+    file_based_test_driver::RunTestCaseResult* test_result) {
   if (state.range(0) != test_result->line()) return;
 
   file_based_test_driver::TestCaseOptions options;

@@ -1,8 +1,9 @@
 #include "advent_of_code/file_util.h"
 
+#include <sys/stat.h>
+
 #include <fstream>
 #include <iostream>
-#include <sys/stat.h>
 
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
@@ -62,7 +63,8 @@ absl::Status HandleTestIncludes(std::string* test_case) {
     // ::internal namespace (though we're using the same fetching code as
     // the rest of FBTD this way) as well as the need for the ./ without
     // which the load fails.
-    if (absl::Status st = GetContents(absl::StrCat("./", include_fname), &contents);
+    if (absl::Status st =
+            GetContents(absl::StrCat("./", include_fname), &contents);
         !st.ok()) {
       return absl::InvalidArgumentError(absl::StrCat(
           "Unable to include file \"", include_fname, "\": ", st.message()));
@@ -77,22 +79,25 @@ absl::Status HandleTestIncludes(std::string* test_case) {
 std::vector<DirtyTestParseResult> DirtyTestParse(absl::string_view contents) {
   std::vector<DirtyTestParseResult> ret;
   for (absl::string_view test : absl::StrSplit(contents, "\n==\n")) {
-      std::vector<absl::string_view> lines = absl::StrSplit(test, "\n");
-      int start = 0;
-      int part = 0;
-      // Skip comments.
-      while (start < lines.size() && (lines[start].empty() || lines[start][0] == '#')) ++start;
-      // Skip options.
-      while (start < lines.size() && (lines[start].empty() || lines[start][0] == '[')) {
-          (void)RE2::PartialMatch(lines[start], "\\[part=(\\d+)\\]", &part);
-          ++start;
-      }
-      if (start < lines.size()) {
-        ret.push_back(DirtyTestParseResult{
-            .part = part,
-            .lines = std::vector<absl::string_view>(lines.begin() + start, lines.end())});
-      }
+    std::vector<absl::string_view> lines = absl::StrSplit(test, "\n");
+    int start = 0;
+    int part = 0;
+    // Skip comments.
+    while (start < lines.size() &&
+           (lines[start].empty() || lines[start][0] == '#'))
+      ++start;
+    // Skip options.
+    while (start < lines.size() &&
+           (lines[start].empty() || lines[start][0] == '[')) {
+      (void)RE2::PartialMatch(lines[start], "\\[part=(\\d+)\\]", &part);
+      ++start;
+    }
+    if (start < lines.size()) {
+      ret.push_back(
+          DirtyTestParseResult{.part = part,
+                               .lines = std::vector<absl::string_view>(
+                                   lines.begin() + start, lines.end())});
+    }
   }
   return ret;
 }
-
