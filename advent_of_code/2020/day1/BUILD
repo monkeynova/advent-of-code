@@ -35,11 +35,7 @@ cc_test(
     ],
     deps = [
         ":day1",
-        "//advent_of_code:file_util",
-        "@com_google_absl//absl/flags:flag",
-        "@com_google_absl//absl/strings",
-        "@com_google_benchmark//:benchmark",
-        "@com_google_glog//:glog",
+        "//advent_of_code:file_benchmark",
         "@com_monkeynova_gunit_main//:test_main",
     ],
 )

@@ -59,3 +59,20 @@ cc_library(
         "@com_google_absl//absl/hash",
     ],
 )
+
+cc_library(
+    name = "file_benchmark",
+    testonly = 1,
+    srcs = ["file_benchmark.cc"],
+    hdrs = ["file_benchmark.h"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        ":file_util",
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/status:statusor",
+        "@com_google_absl//absl/strings",
+        "@com_google_benchmark//:benchmark",
+    ],
+)
