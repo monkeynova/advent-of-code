@@ -20,6 +20,7 @@ cc_test(
     srcs = ["day3_test.cc"],
     args = ["--test_file=advent_of_code/2020/day3/day3.test"],
     data = [
+        "example.txt",
         "input.txt",
         "day3.test",
     ],

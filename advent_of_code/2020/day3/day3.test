@@ -1,7 +1,19 @@
 [part=1]
+@include{advent_of_code/2020/day3/example.txt}
+--
+7
+==
+
+[part=1]
 @include{advent_of_code/2020/day3/input.txt}
 --
 195
+==
+
+[part=2]
+@include{advent_of_code/2020/day3/example.txt}
+--
+336
 ==
 
 [part=2]
