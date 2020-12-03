@@ -13,19 +13,35 @@ ABSL_FLAG(std::string, test_file, "",
 
 std::vector<DirtyTestParseResult> global_tests;
 
+constexpr int kMaxTestCount = 10;
+
 void BM_Day(benchmark::State& state) {
   Day1_2020 solver;
-  for (auto _ : state) {
-    for (const DirtyTestParseResult& test : global_tests) {
-      switch (test.part) {
-        case 1: (void)solver.Part1(global_tests[state.range(0)].lines); break;
-        case 2: (void)solver.Part2(global_tests[state.range(0)].lines); break;
+  if (state.range(0) >= global_tests.size()) {
+    state.SkipWithError("Bad test");
+  }
+  const DirtyTestParseResult& test = global_tests[state.range(0)];
+  state.SetLabel(absl::StrCat("Test #", state.range(0), " (Part", test.part, ")"));
+  switch (test.part) {
+    case 1: {
+      for (auto _ : state) {
+        (void)solver.Part1(test.lines);
       }
+      break;
+    }
+    case 2: {
+      for (auto _ : state) {
+        (void)solver.Part2(test.lines);
+      }
+      break;
+    }
+    default: {
+      state.SkipWithError("Bad part");
     }
   }
 }
 
-BENCHMARK(BM_Day);
+BENCHMARK(BM_Day)->DenseRange(0, kMaxTestCount);
 
 int main(int argc, char** argv) {
   std::vector<char*> non_flag_args = InitMain(argc, argv);
@@ -36,11 +52,9 @@ int main(int argc, char** argv) {
   std::string file_contents;
   CHECK(GetContents(absl::GetFlag(FLAGS_test_file), &file_contents).ok());
   global_tests = DirtyTestParse(file_contents);
+  CHECK(global_tests.size() < kMaxTestCount);
   benchmark::RunSpecifiedBenchmarks();
   return 0;
 }
-
-
-
 
 

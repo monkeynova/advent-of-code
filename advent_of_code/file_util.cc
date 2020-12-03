@@ -53,6 +53,27 @@ absl::Status GetContents(absl::string_view filename,
   return absl::OkStatus();
 }
 
+absl::Status HandleTestIncludes(std::string* test_case) {
+  absl::string_view include_fname;
+  RE2 include_pattern{"@include{([^}]*)}"};
+  while (RE2::PartialMatch(*test_case, include_pattern, &include_fname)) {
+    std::string contents;
+    // TODO(@monkeynova): This is terrible. Both in terms of using the
+    // ::internal namespace (though we're using the same fetching code as
+    // the rest of FBTD this way) as well as the need for the ./ without
+    // which the load fails.
+    if (absl::Status st = GetContents(absl::StrCat("./", include_fname), &contents);
+        !st.ok()) {
+      return absl::InvalidArgumentError(absl::StrCat(
+          "Unable to include file \"", include_fname, "\": ", st.message()));
+      return st;
+    }
+    RE2::Replace(test_case, absl::StrCat("@include{", include_fname, "}"),
+                 contents);
+  }
+  return absl::OkStatus();
+}
+
 std::vector<DirtyTestParseResult> DirtyTestParse(absl::string_view contents) {
   std::vector<DirtyTestParseResult> ret;
   for (absl::string_view test : absl::StrSplit(contents, "\n==\n")) {
@@ -60,13 +81,10 @@ std::vector<DirtyTestParseResult> DirtyTestParse(absl::string_view contents) {
       int start = 0;
       int part = 0;
       // Skip comments.
-      while (start < lines.size() && (lines.empty() || lines[start][0] == '#')) ++start;
+      while (start < lines.size() && (lines[start].empty() || lines[start][0] == '#')) ++start;
       // Skip options.
-      while (start < lines.size() && (lines.empty() || lines[start][0] == '[')) {
-          LOG(WARNING) << lines[start];
-          LOG(WARNING) << part;
-          RE2::PartialMatch(lines[start], "[part=(\\d+)]", &part);
-          LOG(WARNING) << part;
+      while (start < lines.size() && (lines[start].empty() || lines[start][0] == '[')) {
+          (void)RE2::PartialMatch(lines[start], "\\[part=(\\d+)\\]", &part);
           ++start;
       }
       if (start < lines.size()) {

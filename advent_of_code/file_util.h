@@ -8,6 +8,8 @@
 absl::Status GetContents(absl::string_view filename,
                          std::string* file_contents);
 
+absl::Status HandleTestIncludes(std::string* test_case);
+
 struct DirtyTestParseResult {
   int part;
   std::vector<absl::string_view> lines;
