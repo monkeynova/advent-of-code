@@ -24,3 +24,18 @@ cc_test(
         "//advent_of_code:file_test",
     ],
 )
+
+cc_test(
+    name = "day4_benchmark",
+    srcs = ["day4_benchmark.cc"],
+    args = ["--test_file=advent_of_code/2019/day4/day4.test"],
+    data = [
+        "day4.test",
+        "input.txt",
+    ],
+    deps = [
+        ":day4",
+        "//advent_of_code:file_benchmark",
+        "@com_monkeynova_gunit_main//:test_main",
+    ],
+)

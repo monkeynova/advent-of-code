@@ -19,11 +19,26 @@ cc_test(
     srcs = ["day16_test.cc"],
     args = ["--test_file=advent_of_code/2019/day16/day16.test"],
     data = [
+        "input.txt",
+        "day16.test",
+    ],
+    deps = [
+        ":day16",
+        "//advent_of_code:file_test",
+    ],
+)
+
+cc_test(
+    name = "day16_benchmark",
+    srcs = ["day16_benchmark.cc"],
+    args = ["--test_file=advent_of_code/2019/day16/day16.test"],
+    data = [
         "day16.test",
         "input.txt",
     ],
     deps = [
         ":day16",
-        "//advent_of_code:file_test",
+        "//advent_of_code:file_benchmark",
+        "@com_monkeynova_gunit_main//:test_main",
     ],
 )
