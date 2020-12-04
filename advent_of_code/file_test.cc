@@ -13,8 +13,12 @@
 ABSL_FLAG(std::string, test_file, "",
           "The file which contains the file based test driver tests");
 
+ABSL_FLAG(bool, run_long_tests, false,
+          "Unless true, tests marked [long=$reason] will be ignored");
+
 constexpr char kPartOption[] = "part";
-constexpr char kIgnoreOptions[] = "ignore";
+constexpr char kIgnoreOption[] = "ignore";
+constexpr char kLongOption[] = "long";
 
 std::string TestCaseFileName() { return absl::GetFlag(FLAGS_test_file); }
 
@@ -36,7 +40,8 @@ void RunTestCase(const AdventDay* advent_day,
                  file_based_test_driver::RunTestCaseResult* test_result) {
   file_based_test_driver::TestCaseOptions options;
   options.RegisterInt64(kPartOption, 0);
-  options.RegisterBool(kIgnoreOptions, false);
+  options.RegisterBool(kIgnoreOption, false);
+  options.RegisterString(kLongOption, "");
 
   std::string test_case = std::string(test_case_with_options);
   if (absl::Status st = HandleTestIncludes(&test_case); !st.ok()) {
@@ -50,10 +55,24 @@ void RunTestCase(const AdventDay* advent_day,
     return;
   }
 
-  if (options.GetBool(kIgnoreOptions)) {
+  if (options.GetBool(kIgnoreOption)) {
     test_result->set_ignore_test_output(true);
     return;
   }
+
+  if (std::string reason = options.GetString(kLongOption); !reason.empty()) {
+    RE2 valid_reason{"\\d+[sm] \\d+\\.\\d+\\.\\d+"};
+    if (!RE2::FullMatch(reason, valid_reason)) {
+      test_result->AddTestOutput(
+          absl::StrCat("ERROR: Bad Reason: ", reason, "; must match ", valid_reason.pattern()));
+      return;
+    }
+    if (!absl::GetFlag(FLAGS_run_long_tests)) {
+      test_result->set_ignore_test_output(true);
+      return;
+    }
+  }
+
 
   std::vector<absl::string_view> test_lines = absl::StrSplit(test_case, "\n");
   while (!test_lines.empty() && test_lines.back().empty()) {
