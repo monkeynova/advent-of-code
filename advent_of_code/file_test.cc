@@ -14,6 +14,7 @@ ABSL_FLAG(std::string, test_file, "",
           "The file which contains the file based test driver tests");
 
 constexpr char kPartOption[] = "part";
+constexpr char kIgnoreOptions[] = "ignore";
 
 std::string TestCaseFileName() { return absl::GetFlag(FLAGS_test_file); }
 
@@ -35,6 +36,7 @@ void RunTestCase(const AdventDay* advent_day,
                  file_based_test_driver::RunTestCaseResult* test_result) {
   file_based_test_driver::TestCaseOptions options;
   options.RegisterInt64(kPartOption, 0);
+  options.RegisterBool(kIgnoreOptions, false);
 
   std::string test_case = std::string(test_case_with_options);
   if (absl::Status st = HandleTestIncludes(&test_case); !st.ok()) {
@@ -45,6 +47,11 @@ void RunTestCase(const AdventDay* advent_day,
   if (absl::Status st = options.ParseTestCaseOptions(&test_case); !st.ok()) {
     test_result->AddTestOutput(
         absl::StrCat("ERROR: Could not parse options: ", st.message()));
+    return;
+  }
+
+  if (options.GetBool(kIgnoreOptions)) {
+    test_result->set_ignore_test_output(true);
     return;
   }
 
