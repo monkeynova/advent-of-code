@@ -9,41 +9,65 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
-bool Valid(const absl::flat_hash_map<std::string, std::string>& passport) {
+absl::Status Valid(
+    const absl::flat_hash_map<std::string, std::string>& passport) {
   for (absl::string_view test :
        {"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"}) {
-    if (!passport.contains(test)) return false;
+    if (!passport.contains(test)) {
+      return absl::InvalidArgumentError(absl::StrCat("Missing field: ", test));
+    }
   }
-  return true;
+  return absl::OkStatus();
+  ;
 }
 
-std::string Valid2(absl::flat_hash_map<std::string, std::string> passport) {
-  for (absl::string_view test :
-       {"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"}) {
-    if (!passport.contains(test)) return "contains";
-  }
+absl::Status Valid2(absl::flat_hash_map<std::string, std::string> passport) {
+  if (absl::Status st = Valid(passport); !st.ok()) return st;
   int year;
-  if (!absl::SimpleAtoi(passport["byr"], &year)) return passport["byr"];
-  if (year < 1920 || year > 2002) return "byr";
-  if (!absl::SimpleAtoi(passport["iyr"], &year)) return "iyr atoi";
-  if (year < 2010 || year > 2020) return "iyr";
-  if (!absl::SimpleAtoi(passport["eyr"], &year)) return "eyr atoi";
-  if (year < 2020 || year > 2030) return "eyr";
+  if (!absl::SimpleAtoi(passport["byr"], &year)) {
+    return absl::InvalidArgumentError("byr isn't numeric");
+  }
+  if (year < 1920 || year > 2002) {
+    return absl::InvalidArgumentError("byr is out of range");
+  }
+  if (!absl::SimpleAtoi(passport["iyr"], &year)) {
+    return absl::InvalidArgumentError("iyr isn't numeric");
+  }
+  if (year < 2010 || year > 2020) {
+    return absl::InvalidArgumentError("iyr is out of range");
+  }
+  if (!absl::SimpleAtoi(passport["eyr"], &year)) {
+    return absl::InvalidArgumentError("eyr isn't numeric");
+  }
+  if (year < 2020 || year > 2030) {
+    return absl::InvalidArgumentError("eyr is out of range");
+  }
   int val;
   if (RE2::FullMatch(passport["hgt"], "(\\d+)cm", &val)) {
-    if (val < 150 || val > 193) return "hgt";
+    if (val < 150 || val > 193) {
+      return absl::InvalidArgumentError("hgt(cm) is out of range");
+    }
   } else if (RE2::FullMatch(passport["hgt"], "(\\d+)in", &val)) {
-    if (val < 59 || val > 76) return "hgt";
+    if (val < 59 || val > 76) {
+      return absl::InvalidArgumentError("hgt(in) is out of range");
+    }
   } else {
-    return "hgt";
+    return absl::InvalidArgumentError("hgt isn't cm or in");
   }
-  if (!RE2::FullMatch(passport["hcl"], "#[0-9a-f]{6}")) return "hcl";
+  if (!RE2::FullMatch(passport["hcl"], "#[0-9a-f]{6}")) {
+    return absl::InvalidArgumentError("hcl format");
+  }
   absl::flat_hash_set<std::string> valid_ecl = {"amb", "blu", "brn", "gry",
                                                 "grn", "hzl", "oth"};
-  if (!valid_ecl.contains(passport["ecl"])) return "ecl";
-  if (!RE2::FullMatch(passport["pid"], "\\d{9}")) return "pid";
+  if (!valid_ecl.contains(passport["ecl"])) {
+    return absl::InvalidArgumentError("ecl ins't in allowlist");
+  }
+  if (!RE2::FullMatch(passport["pid"], "\\d{9}")) {
+    return absl::InvalidArgumentError("pid isn't numeric");
+  }
 
-  return "";
+  return absl::OkStatus();
+  ;
 }
 
 absl::StatusOr<std::vector<std::string>> Day4_2020::Part1(
@@ -52,7 +76,7 @@ absl::StatusOr<std::vector<std::string>> Day4_2020::Part1(
   int valid = 0;
   for (absl::string_view line : input) {
     if (line.empty()) {
-      if (Valid(passport)) {
+      if (Valid(passport).ok()) {
         ++valid;
       }
       passport.clear();
@@ -61,12 +85,13 @@ absl::StatusOr<std::vector<std::string>> Day4_2020::Part1(
     for (absl::string_view r : records) {
       if (r.empty()) continue;
       std::vector<absl::string_view> kv = absl::StrSplit(r, ":");
-      if (kv.size() != 2)
+      if (kv.size() != 2) {
         return absl::InvalidArgumentError(absl::StrCat("bad k/v: ", r));
+      }
       passport[kv[0]] = kv[1];
     }
   }
-  if (Valid(passport)) {
+  if (Valid(passport).ok()) {
     ++valid;
   }
   return std::vector<std::string>{absl::StrCat(valid)};
@@ -78,16 +103,7 @@ absl::StatusOr<std::vector<std::string>> Day4_2020::Part2(
   int valid = 0;
   for (absl::string_view line : input) {
     if (line.empty()) {
-      std::string str = Valid2(passport);
-      LOG(WARNING) << str;
-      LOG(WARNING) << "{"
-                   << absl::StrJoin(
-                          passport, ",",
-                          [](std::string* out,
-                             const std::pair<std::string, std::string>& kv) {
-                            absl::StrAppend(out, kv.first, ": ", kv.second);
-                          });
-      if (str.empty()) {
+      if (Valid2(passport).ok()) {
         ++valid;
       }
       passport.clear();
@@ -96,21 +112,13 @@ absl::StatusOr<std::vector<std::string>> Day4_2020::Part2(
     for (absl::string_view r : records) {
       if (r.empty()) continue;
       std::vector<absl::string_view> kv = absl::StrSplit(r, ":");
-      if (kv.size() != 2)
+      if (kv.size() != 2) {
         return absl::InvalidArgumentError(absl::StrCat("bad k/v: ", r));
+      }
       passport[kv[0]] = kv[1];
     }
   }
-  std::string str = Valid2(passport);
-  LOG(WARNING) << str;
-  LOG(WARNING) << "{"
-               << absl::StrJoin(
-                      passport, ",",
-                      [](std::string* out,
-                         const std::pair<std::string, std::string>& kv) {
-                        absl::StrAppend(out, kv.first, ": ", kv.second);
-                      });
-  if (str.empty()) {
+  if (Valid2(passport).ok()) {
     ++valid;
   }
   return std::vector<std::string>{absl::StrCat(valid)};
