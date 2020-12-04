@@ -2,7 +2,7 @@
 #include "advent_of_code/file_benchmark.h"
 #include "gmock/gmock.h"
 
-constexpr int kMaxTestCount = 2;
+constexpr int kMaxTestCount = 3;
 
 TEST(DayBenchmarkTest, Consistency) {
   absl::StatusOr<std::vector<DirtyTestParseResult>> tests = FileBenchmarkTests();
