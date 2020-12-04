@@ -11,11 +11,12 @@ absl::StatusOr<std::vector<DirtyTestParseResult>> FileBenchmarkTests();
 template <typename AdventType>
 void BM_Day(benchmark::State& state) {
   AdventType day;
-  absl::StatusOr<std::vector<DirtyTestParseResult>> tests = FileBenchmarkTests();
+  absl::StatusOr<std::vector<DirtyTestParseResult>> tests =
+      FileBenchmarkTests();
   if (!tests.ok()) {
-     std::string load_error = std::string(tests.status().message());
-     state.SkipWithError(load_error.c_str());
-     return;
+    std::string load_error = std::string(tests.status().message());
+    state.SkipWithError(load_error.c_str());
+    return;
   }
   if (state.range(0) >= tests->size()) {
     state.SkipWithError("Bad test");

@@ -10,14 +10,16 @@
 #include "re2/re2.h"
 
 bool Valid(const absl::flat_hash_map<std::string, std::string>& passport) {
-  for(absl::string_view test : {"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"}) {
+  for (absl::string_view test :
+       {"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"}) {
     if (!passport.contains(test)) return false;
   }
   return true;
 }
 
 std::string Valid2(absl::flat_hash_map<std::string, std::string> passport) {
-  for(absl::string_view test : {"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"}) {
+  for (absl::string_view test :
+       {"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"}) {
     if (!passport.contains(test)) return "contains";
   }
   int year;
@@ -36,7 +38,8 @@ std::string Valid2(absl::flat_hash_map<std::string, std::string> passport) {
     return "hgt";
   }
   if (!RE2::FullMatch(passport["hcl"], "#[0-9a-f]{6}")) return "hcl";
-  absl::flat_hash_set<std::string> valid_ecl = {"amb", "blu", "brn", "gry", "grn", "hzl", "oth"};
+  absl::flat_hash_set<std::string> valid_ecl = {"amb", "blu", "brn", "gry",
+                                                "grn", "hzl", "oth"};
   if (!valid_ecl.contains(passport["ecl"])) return "ecl";
   if (!RE2::FullMatch(passport["pid"], "\\d{9}")) return "pid";
 
@@ -58,13 +61,14 @@ absl::StatusOr<std::vector<std::string>> Day4_2020::Part1(
     for (absl::string_view r : records) {
       if (r.empty()) continue;
       std::vector<absl::string_view> kv = absl::StrSplit(r, ":");
-      if (kv.size() != 2) return absl::InvalidArgumentError(absl::StrCat("bad k/v: ", r));
+      if (kv.size() != 2)
+        return absl::InvalidArgumentError(absl::StrCat("bad k/v: ", r));
       passport[kv[0]] = kv[1];
     }
   }
-      if (Valid(passport)) {
-        ++valid;
-      }
+  if (Valid(passport)) {
+    ++valid;
+  }
   return std::vector<std::string>{absl::StrCat(valid)};
 }
 
@@ -76,10 +80,13 @@ absl::StatusOr<std::vector<std::string>> Day4_2020::Part2(
     if (line.empty()) {
       std::string str = Valid2(passport);
       LOG(WARNING) << str;
-      LOG(WARNING) << "{" << absl::StrJoin(passport, ",",
-      [](std::string* out, const std::pair<std::string, std::string>& kv) {
-        absl::StrAppend(out, kv.first, ": ", kv.second);
-      });
+      LOG(WARNING) << "{"
+                   << absl::StrJoin(
+                          passport, ",",
+                          [](std::string* out,
+                             const std::pair<std::string, std::string>& kv) {
+                            absl::StrAppend(out, kv.first, ": ", kv.second);
+                          });
       if (str.empty()) {
         ++valid;
       }
@@ -89,18 +96,22 @@ absl::StatusOr<std::vector<std::string>> Day4_2020::Part2(
     for (absl::string_view r : records) {
       if (r.empty()) continue;
       std::vector<absl::string_view> kv = absl::StrSplit(r, ":");
-      if (kv.size() != 2) return absl::InvalidArgumentError(absl::StrCat("bad k/v: ", r));
+      if (kv.size() != 2)
+        return absl::InvalidArgumentError(absl::StrCat("bad k/v: ", r));
       passport[kv[0]] = kv[1];
     }
   }
-      std::string str = Valid2(passport);
-      LOG(WARNING) << str;
-      LOG(WARNING) << "{" << absl::StrJoin(passport, ",",
-      [](std::string* out, const std::pair<std::string, std::string>& kv) {
-        absl::StrAppend(out, kv.first, ": ", kv.second);
-      });
-      if (str.empty()) {
-        ++valid;
-      }
+  std::string str = Valid2(passport);
+  LOG(WARNING) << str;
+  LOG(WARNING) << "{"
+               << absl::StrJoin(
+                      passport, ",",
+                      [](std::string* out,
+                         const std::pair<std::string, std::string>& kv) {
+                        absl::StrAppend(out, kv.first, ": ", kv.second);
+                      });
+  if (str.empty()) {
+    ++valid;
+  }
   return std::vector<std::string>{absl::StrCat(valid)};
 }

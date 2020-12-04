@@ -33,8 +33,8 @@ cc_test(
     srcs = ["new_day_benchmark.cc"],
     args = ["--test_file=advent_of_code/new_day_path/new_day.test"],
     data = [
-        "new_day.test",
         "input.txt",
+        "new_day.test",
     ],
     deps = [
         ":new_day",

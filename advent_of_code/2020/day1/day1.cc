@@ -17,7 +17,7 @@ absl::StatusOr<std::vector<std::string>> Day1_2020::Part1(
   int res = -1;
   absl::flat_hash_set<int> hist;
   for (int a : list) {
-    if (hist.contains(2020-a)) {
+    if (hist.contains(2020 - a)) {
       res = a * (2020 - a);
       break;
     }
