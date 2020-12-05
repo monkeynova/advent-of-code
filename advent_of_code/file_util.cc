@@ -75,3 +75,10 @@ absl::Status HandleTestIncludes(std::string* test_case) {
   }
   return absl::OkStatus();
 }
+
+void SetupTestCaseOptions(file_based_test_driver::TestCaseOptions* options) {
+  options->RegisterInt64(kPartOption, 0);
+  options->RegisterBool(kIgnoreOption, false);
+  options->RegisterString(kLongOption, "");
+}
+

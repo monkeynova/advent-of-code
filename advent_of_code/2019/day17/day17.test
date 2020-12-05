@@ -5,6 +5,7 @@
 3336
 ==
 
+[long=30s 2020.12.05]
 [part=2]
 @include{advent_of_code/2019/day17/input.txt}
 --

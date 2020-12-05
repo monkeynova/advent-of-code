@@ -16,10 +16,6 @@ ABSL_FLAG(std::string, test_file, "",
 ABSL_FLAG(bool, run_long_tests, false,
           "Unless true, tests marked [long=$reason] will be ignored");
 
-constexpr char kPartOption[] = "part";
-constexpr char kIgnoreOption[] = "ignore";
-constexpr char kLongOption[] = "long";
-
 std::string TestCaseFileName() { return absl::GetFlag(FLAGS_test_file); }
 
 static void CollectLines(
@@ -39,9 +35,7 @@ void RunTestCase(const AdventDay* advent_day,
                  absl::string_view test_case_with_options,
                  file_based_test_driver::RunTestCaseResult* test_result) {
   file_based_test_driver::TestCaseOptions options;
-  options.RegisterInt64(kPartOption, 0);
-  options.RegisterBool(kIgnoreOption, false);
-  options.RegisterString(kLongOption, "");
+  SetupTestCaseOptions(&options);
 
   std::string test_case = std::string(test_case_with_options);
   if (absl::Status st = HandleTestIncludes(&test_case); !st.ok()) {
