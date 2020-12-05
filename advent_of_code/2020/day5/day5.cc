@@ -8,33 +8,43 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+struct Seat {
+  int col;
+  int row;
+  int id() const { return col * 8 + row; }
+};
+
+absl::StatusOr<Seat> ParseSeat(absl::string_view seat_str) {
+  Seat seat{0, 0};
+  if (seat_str.size() != 10) return absl::InvalidArgumentError("");
+  for (int i = 0; i < 7; ++i) {
+    if (seat_str[i] == 'F') {
+      seat.col <<= 1;
+    } else if (seat_str[i] == 'B') {
+      seat.col = (seat.col << 1) | 1;
+    } else {
+      return absl::InvalidArgumentError("");
+    }
+  }
+  for (int i = 7; i < 10; ++i) {
+    if (seat_str[i] == 'L') {
+      seat.row <<= 1;
+    } else if (seat_str[i] == 'R') {
+      seat.row = (seat.row << 1) | 1;
+    } else {
+      return absl::InvalidArgumentError("");
+    }
+  }
+  return seat;
+}
+
 absl::StatusOr<std::vector<std::string>> Day5_2020::Part1(
     const std::vector<absl::string_view>& input) const {
   int maxid = 0;
   for (absl::string_view rec : input) {
-    int col = 0;
-    if (rec.size() != 10) return absl::InvalidArgumentError("");
-    for (int i = 0; i < 7; ++i) {
-      if (rec[i] == 'F') {
-        col <<= 1;
-      } else if (rec[i] == 'B') {
-        col = (col << 1) | 1;
-      } else {
-        return absl::InvalidArgumentError("");
-      }
-    }
-    int row = 0;
-    for (int i = 7; i < 10; ++i) {
-      if (rec[i] == 'L') {
-        row <<= 1;
-      } else if (rec[i] == 'R') {
-        row = (row << 1) | 1;
-      } else {
-        return absl::InvalidArgumentError("");
-      }
-    }
-    int id = col * 8 + row;
-    maxid = std::max(maxid, id);
+    absl::StatusOr<Seat> seat = ParseSeat(rec);
+    if (!seat.ok()) return seat.status();
+    maxid = std::max(maxid, seat->id());
   }
   return std::vector<std::string>{absl::StrCat(maxid)};
 }
@@ -44,29 +54,9 @@ absl::StatusOr<std::vector<std::string>> Day5_2020::Part2(
   std::vector<bool> present;
   present.resize(1 << 10);
   for (absl::string_view rec : input) {
-    int col = 0;
-    if (rec.size() != 10) return absl::InvalidArgumentError("");
-    for (int i = 0; i < 7; ++i) {
-      if (rec[i] == 'F') {
-        col <<= 1;
-      } else if (rec[i] == 'B') {
-        col = (col << 1) | 1;
-      } else {
-        return absl::InvalidArgumentError("");
-      }
-    }
-    int row = 0;
-    for (int i = 7; i < 10; ++i) {
-      if (rec[i] == 'L') {
-        row <<= 1;
-      } else if (rec[i] == 'R') {
-        row = (row << 1) | 1;
-      } else {
-        return absl::InvalidArgumentError("");
-      }
-    }
-    int id = col * 8 + row;
-    present[id] = true;
+    absl::StatusOr<Seat> seat = ParseSeat(rec);
+    if (!seat.ok()) return seat.status();
+    present[seat->id()] = true;
   }
   int missingid = -1;
   for (int id = 1; id < present.size() - 1; ++id) {
