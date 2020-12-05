@@ -10,7 +10,33 @@
 
 absl::StatusOr<std::vector<std::string>> Day5_2020::Part1(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  int maxid = 0;
+  for (absl::string_view rec : input) {
+    int col = 0;
+    if (rec.size() != 10) return absl::InvalidArgumentError("");
+    for (int i = 0; i < 7; ++i) {
+      if (rec[i] == 'F') {
+        col <<= 1;
+      } else if (rec[i] == 'B') {
+        col = (col << 1) | 1;
+      } else {
+        return absl::InvalidArgumentError("");
+      }
+    }
+    int row = 0;
+    for (int i = 7; i < 10; ++i) {
+      if (rec[i] == 'L') {
+        row <<= 1;
+      } else if (rec[i] == 'R') {
+        row = (row << 1) | 1;
+      } else {
+        return absl::InvalidArgumentError("");
+      }
+    }
+    int id = col * 8 + row;
+    maxid = std::max(maxid, id);
+  }
+  return std::vector<std::string>{absl::StrCat(maxid)};
 }
 
 absl::StatusOr<std::vector<std::string>> Day5_2020::Part2(
