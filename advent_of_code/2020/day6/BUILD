@@ -1,0 +1,44 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
+cc_library(
+    name = "day6",
+    srcs = ["day6.cc"],
+    hdrs = ["day6.h"],
+    deps = [
+        "//advent_of_code:advent_day",
+        "@com_google_absl//absl/container:flat_hash_map",
+        "@com_google_absl//absl/container:flat_hash_set",
+        "@com_google_absl//absl/strings",
+        "@com_google_glog//:glog",
+        "@com_googlesource_code_re2//:re2",
+    ],
+)
+
+cc_test(
+    name = "day6_test",
+    srcs = ["day6_test.cc"],
+    args = ["--test_file=advent_of_code/2020/day6/day6.test"],
+    data = [
+        "input.txt",
+        "day6.test",
+    ],
+    deps = [
+        ":day6",
+        "//advent_of_code:file_test",
+    ],
+)
+
+cc_test(
+    name = "day6_benchmark",
+    srcs = ["day6_benchmark.cc"],
+    args = ["--test_file=advent_of_code/2020/day6/day6.test"],
+    data = [
+        "input.txt",
+        "day6.test",
+    ],
+    deps = [
+        ":day6",
+        "//advent_of_code:file_benchmark",
+        "@com_monkeynova_gunit_main//:test_main",
+    ],
+)
