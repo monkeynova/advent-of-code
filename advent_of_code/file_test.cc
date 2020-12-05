@@ -55,7 +55,7 @@ void RunTestCase(const AdventDay* advent_day,
   }
 
   if (std::string reason = options.GetString(kLongOption); !reason.empty()) {
-    RE2 valid_reason{"\\d+[sm] \\d+\\.\\d+\\.\\d+"};
+    RE2 valid_reason{"\\d+[sm] (\\(\\d+[sm] opt\\) )?\\d+\\.\\d+\\.\\d+"};
     if (!RE2::FullMatch(reason, valid_reason)) {
       test_result->AddTestOutput(absl::StrCat("ERROR: Bad Reason: ", reason,
                                               "; must match ",
