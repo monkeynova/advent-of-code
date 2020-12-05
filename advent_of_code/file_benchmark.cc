@@ -3,9 +3,9 @@
 #include "absl/flags/flag.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
+#include "file_based_test_driver/test_case_options.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
-#include "file_based_test_driver/test_case_options.h"
 
 ABSL_FLAG(std::string, test_file, "",
           "The file which contains the file based test driver tests");
@@ -21,13 +21,15 @@ struct DirtyTestParseResult {
 
 absl::Status FinishTest(DirtyTestParseResult* result) {
   SetupTestCaseOptions(&result->options);
-  if (absl::Status st = result->options.ParseTestCaseOptions(&result->test); !st.ok()) return st;
+  if (absl::Status st = result->options.ParseTestCaseOptions(&result->test);
+      !st.ok())
+    return st;
   if (absl::Status st = HandleTestIncludes(&result->test); !st.ok()) return st;
   return absl::OkStatus();
 }
 
-absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>> DirtyTestParse(
-    absl::string_view contents) {
+absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>>
+DirtyTestParse(absl::string_view contents) {
   std::vector<std::unique_ptr<DirtyTestParseResult>> ret;
   auto next = absl::make_unique<DirtyTestParseResult>();
   bool in_answer = false;
@@ -54,7 +56,8 @@ absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>> DirtyTestPars
   return ret;
 }
 
-absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>> FileBenchmarkTests() {
+absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>>
+FileBenchmarkTests() {
   std::string file_contents;
   if (absl::Status st =
           GetContents(absl::GetFlag(FLAGS_test_file), &file_contents);
@@ -65,7 +68,8 @@ absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>> FileBenchmark
 }
 
 absl::StatusOr<int> FileBenchmarkTestCount() {
-  absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>> tests = FileBenchmarkTests();
+  absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>> tests =
+      FileBenchmarkTests();
   if (!tests.ok()) return tests.status();
   return tests->size();
 }
@@ -82,9 +86,11 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
   const DirtyTestParseResult* test = (*tests)[state.range(0)].get();
   std::vector<absl::string_view> lines = absl::StrSplit(test->test, "\n");
   while (!lines.empty() && lines.back().empty()) lines.pop_back();
-  if (test->options.GetString(kLongOption) != "" && !absl::GetFlag(FLAGS_run_long_tests)) {
+  if (test->options.GetString(kLongOption) != "" &&
+      !absl::GetFlag(FLAGS_run_long_tests)) {
     state.SetLabel("*** SKIPPED (long) ****");
-    for (auto _ : state) {}
+    for (auto _ : state) {
+    }
     return;
   }
   switch (test->options.GetInt64(kPartOption)) {
@@ -111,4 +117,3 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
     }
   }
 }
-

@@ -81,4 +81,3 @@ void SetupTestCaseOptions(file_based_test_driver::TestCaseOptions* options) {
   options->RegisterBool(kIgnoreOption, false);
   options->RegisterString(kLongOption, "");
 }
-
