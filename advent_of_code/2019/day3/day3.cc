@@ -18,7 +18,7 @@ absl::StatusOr<std::vector<Line>> Parse(absl::string_view input) {
 
   std::vector<Line> ret;
   ret.reserve(runs.size());
-  Point cur{0, 0};
+  Point cur = Cardinal::kOrigin;
   for (absl::string_view run : runs) {
     Line next;
     next.from = cur;

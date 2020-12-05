@@ -78,8 +78,8 @@ class Painter : public IntCode::IOModule {
 
  private:
   bool paint = true;
-  Point cur_ = {0, 0};
-  Point dir_ = {0, -1};
+  Point cur_ = Cardinal::kOrigin;
+  Point dir_ = Cardinal::kNorth;
   absl::flat_hash_map<Point, int> panel_to_painted_color_;
 };
 

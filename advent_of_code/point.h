@@ -38,6 +38,15 @@ struct Point {
   int dist(Point o) const { return abs(x - o.x) + abs(y - o.y); }
 };
 
+struct Cardinal {
+  static constexpr Point kOrigin{0, 0};
+  static constexpr Point kNorth{0, -1};
+  static constexpr Point kSouth{0, 1};
+  static constexpr Point kWest{-1, 0};
+  static constexpr Point kEast{1, 0};
+  static constexpr Point kAll[] = {kNorth, kSouth, kWest, kEast};
+};
+
 template <typename H>
 H AbslHashValue(H h, const Point& p) {
   return H::combine(std::move(h), p.x, p.y);

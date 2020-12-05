@@ -14,7 +14,7 @@ class Droid : public IntCode::IOModule {
  public:
   Droid() {
     SetBoard(pos_, 1);
-    dir_ = kNorthDir;
+    dir_ = Cardinal::kNorth;
   }
 
   enum class InputDirection {
@@ -236,17 +236,14 @@ class Droid : public IntCode::IOModule {
  private:
   absl::BitGen bitgen_;
   std::deque<InputDirection> current_path_;
-  Point pos_{0, 0};
+  Point pos_ = Cardinal::kOrigin;
   Point dir_;
   Point o2_pos_;
   bool done_ = false;
 
-  static constexpr Point kNorthDir = {.x = 0, .y = -1};
-  static constexpr Point kSouthDir = {.x = 0, .y = 1};
-  static constexpr Point kWestDir = {.x = -1, .y = 0};
-  static constexpr Point kEastDir = {.x = 1, .y = 0};
-  static constexpr Point kInputDirectionMap[] = {Point{}, kNorthDir, kSouthDir,
-                                                 kWestDir, kEastDir};
+  static constexpr Point kInputDirectionMap[] = {
+      Cardinal::kOrigin, Cardinal::kNorth, Cardinal::kSouth, Cardinal::kWest,
+      Cardinal::kEast};
 
   Point min_ = {.x = std::numeric_limits<int>::max(),
                 .y = std::numeric_limits<int>::max()};

@@ -14,7 +14,7 @@ absl::StatusOr<std::vector<std::string>> Day3_2020::Part1(
   int product = 1;
   for (Point dir : {Point{3, 1}}) {
     int trees = 0;
-    for (Point pos = {0, 0}; pos.y < input.size(); pos += dir) {
+    for (Point pos = Cardinal::kOrigin; pos.y < input.size(); pos += dir) {
       pos.x = pos.x % input[pos.y].size();
       if (input[pos.y][pos.x] == '#') ++trees;
     }
@@ -29,7 +29,7 @@ absl::StatusOr<std::vector<std::string>> Day3_2020::Part2(
   for (Point dir :
        {Point{1, 1}, Point{3, 1}, Point{5, 1}, Point{7, 1}, Point{1, 2}}) {
     int64_t trees = 0;
-    for (Point pos = {0, 0}; pos.y < input.size(); pos += dir) {
+    for (Point pos = Cardinal::kOrigin; pos.y < input.size(); pos += dir) {
       pos.x = pos.x % input[pos.y].size();
       if (input[pos.y][pos.x] == '#') ++trees;
     }

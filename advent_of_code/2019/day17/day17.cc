@@ -174,34 +174,29 @@ class ViewPort : public IntCode::IOModule {
     }
     std::string command;
     std::vector<std::string> scratch = board_;
-    constexpr Point kNorthDir{0, -1};
-    constexpr Point kSouthDir{0, 1};
-    constexpr Point kWestDir{-1, 0};
-    constexpr Point kEastDir{1, 0};
-    constexpr Point dirs[] = {kNorthDir, kSouthDir, kWestDir, kEastDir};
     Point robot_dir;
     switch (board_[robot.y][robot.x]) {
       case '^':
-        robot_dir = kNorthDir;
+        robot_dir = Cardinal::kNorth;
         break;
       case 'v':
-        robot_dir = kSouthDir;
+        robot_dir = Cardinal::kSouth;
         break;
       case '<':
-        robot_dir = kWestDir;
+        robot_dir = Cardinal::kWest;
         break;
       case '>':
-        robot_dir = kEastDir;
+        robot_dir = Cardinal::kEast;
         break;
       default:
         return absl::InvalidArgumentError("Bad robot direction");
     }
     while (true) {
-      Point next_dir{0, 0};
-      for (Point d : dirs) {
+      Point next_dir = Cardinal::kOrigin;
+      for (Point d : Cardinal::kAll) {
         Point check = robot + d;
         if (OnBoard(check, scratch) && scratch[check.y][check.x] == '#') {
-          if (next_dir != Point{0, 0})
+          if (next_dir != Cardinal::kOrigin)
             return absl::InvalidArgumentError("Not Supported");
           next_dir = d;
         }
@@ -210,34 +205,34 @@ class ViewPort : public IntCode::IOModule {
       if (next_dir == Point{}) break;
 
       LOG(WARNING) << robot_dir << " <O> " << next_dir;
-      if (robot_dir == kNorthDir) {
-        if (next_dir == kWestDir)
+      if (robot_dir == Cardinal::kNorth) {
+        if (next_dir == Cardinal::kWest)
           command.append("L,");
-        else if (next_dir == kEastDir)
+        else if (next_dir == Cardinal::kEast)
           command.append("R,");
         else
           return absl::InvalidArgumentError("Can't turn");
       }
-      if (robot_dir == kSouthDir) {
-        if (next_dir == kWestDir)
+      if (robot_dir == Cardinal::kSouth) {
+        if (next_dir == Cardinal::kWest)
           command.append("R,");
-        else if (next_dir == kEastDir)
+        else if (next_dir == Cardinal::kEast)
           command.append("L,");
         else
           return absl::InvalidArgumentError("Can't turn");
       }
-      if (robot_dir == kWestDir) {
-        if (next_dir == kNorthDir)
+      if (robot_dir == Cardinal::kWest) {
+        if (next_dir == Cardinal::kNorth)
           command.append("R,");
-        else if (next_dir == kSouthDir)
+        else if (next_dir == Cardinal::kSouth)
           command.append("L,");
         else
           return absl::InvalidArgumentError("Can't turn");
       }
-      if (robot_dir == kEastDir) {
-        if (next_dir == kNorthDir)
+      if (robot_dir == Cardinal::kEast) {
+        if (next_dir == Cardinal::kNorth)
           command.append("L,");
-        else if (next_dir == kSouthDir)
+        else if (next_dir == Cardinal::kSouth)
           command.append("R,");
         else
           return absl::InvalidArgumentError("Can't turn");
