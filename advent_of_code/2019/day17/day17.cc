@@ -6,8 +6,108 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/2019/int_code.h"
+#include "advent_of_code/point.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
+
+struct Program {
+  std::string main;
+  std::string a;
+  std::string b;
+  std::string c;
+
+  std::string DebugString() {
+    std::string ret;
+    absl::StrAppend(&ret, "main(", main.size(), "):", main, "\n");
+    absl::StrAppend(&ret, "a(", a.size(), "):", a, "\n");
+    absl::StrAppend(&ret, "b(", b.size(), "):", b, "\n");
+    absl::StrAppend(&ret, "c(", c.size(), "):", c, "\n");
+    return ret;
+  }
+};
+
+bool ValidProgram(Program* program) {
+  if (!RE2::FullMatch(program->main, "[ABC,]+")) return false;
+  if (program->main.size() > 20) return false;
+  if (program->a.size() > 20) return false;
+  if (program->b.size() > 20) return false;
+  if (program->c.size() > 20) return false;
+  return true;
+}
+
+bool FindC(Program* program) {
+  int start_idx = 0;
+  for (; start_idx < program->main.size(); ++start_idx) {
+    if (program->main[start_idx] != 'A' && program->main[start_idx] != 'B' && 
+        program->main[start_idx] != ',') {
+      break;
+    }
+  }
+  for (int i = start_idx; i < program->main.size(); ++i) {
+    if (program->main[i] == ',') {
+      Program save = *program;
+      program->c = program->main.substr(start_idx, i - start_idx);
+      RE2::GlobalReplace(&program->main, program->c, "C");
+      if (ValidProgram(program)) return true;
+      *program = save;
+    }
+  }
+  Program save = *program;
+  program->c = program->main.substr(start_idx, program->main.size() - start_idx);
+  RE2::GlobalReplace(&program->main, program->c, "C");
+  if (ValidProgram(program)) return true;
+  *program = save;
+
+  return false;
+}
+
+bool FindB(Program* program) {
+  int start_idx = 0;
+  for (; start_idx < program->main.size(); ++start_idx) {
+    if (program->main[start_idx] != 'A' && program->main[start_idx] != ',') {
+      break;
+    }
+  }
+  for (int i = start_idx; i < program->main.size(); ++i) {
+    if (program->main[i] == ',') {
+      Program save = *program;
+      program->b = program->main.substr(start_idx, i - start_idx);
+      RE2::GlobalReplace(&program->main, program->b, "B");
+      if (FindC(program)) return true;
+      *program = save;
+    }
+  }
+
+  return false;
+}
+
+bool FindA(Program* program) {
+  int start_idx = 0;
+  for (int i = start_idx; i < program->main.size(); ++i) {
+    if (program->main[i] == ',') {
+      Program save = *program;
+      program->a = program->main.substr(start_idx, i - start_idx);
+      RE2::GlobalReplace(&program->main, program->a, "A");
+      if (FindB(program)) return true;
+      *program = save;
+    }
+  }
+
+  return false;
+}
+
+Program FindProgram(absl::string_view command) {
+  Program ret;
+  ret.main = command;
+  if (FindA(&ret)) {
+    ret.main.append("\n");
+    ret.a.append("\n");
+    ret.b.append("\n");
+    ret.c.append("\n");
+  }
+  LOG(WARNING) << ret.DebugString();
+  return ret;
+}
 
 class ViewPort : public IntCode::InputSource, public IntCode::OutputSink, public IntCode::PauseCondition {
  public:
@@ -17,13 +117,28 @@ class ViewPort : public IntCode::InputSource, public IntCode::OutputSink, public
     return absl::StrJoin(board_, "\n");
   }
 
+  int64_t dust_collected() const { return dust_collected_; }
+
+  bool OnBoard(Point check, const std::vector<std::string>& board) {
+    return check.y >= 0 && check.x >= 0 && check.y < board.size() && check.x < board[0].size();
+  }         
+
+  bool IsIntersection(Point p, const std::vector<std::string>& board) {
+    if (!OnBoard(p, board)) return false;
+    if (board_[p.y][p.x] != '#') return false;
+    if (!OnBoard(Point{p.x, p.y - 1}, board) || board_[p.y-1][p.x] != '#') return false;
+    if (!OnBoard(Point{p.x, p.y + 1}, board) || board_[p.y+1][p.x] != '#') return false;
+    if (!OnBoard(Point{p.x - 1 , p.y}, board) || board_[p.y][p.x - 1] != '#') return false;
+    if (!OnBoard(Point{p.x + 1 , p.y}, board) || board_[p.y][p.x + 1] != '#') return false;
+    return true;
+  }
+
   absl::StatusOr<int> ComputeAlignment() {
+    LOG(WARNING) << "\n" << DebugBoard();
     int ret = 0;
     for (int i = 1; i < board_.size() - 1; ++i) {
       for (int j = 1; j < board_[i].size() - 1; ++j) {
-        if (board_[i][j] == '#' && 
-            board_[i-1][j] == '#' && board_[i][j-1] == '#' &&
-            board_[i][j+1] == '#' && board_[i+1][j] == '#') {
+        if (IsIntersection(Point{j, i}, board_)) {
           ret += i * j;
         }
       }
@@ -32,34 +147,145 @@ class ViewPort : public IntCode::InputSource, public IntCode::OutputSink, public
   }
 
   absl::StatusOr<int64_t> Fetch() override {
-    return absl::InvalidArgumentError("No input");
+    if (current_output_pos_ >= current_output_.size()) {
+      return absl::InvalidArgumentError("No input");
+    }
+    return current_output_[current_output_pos_++];
+  }
+
+  absl::Status ComputeProgram() {
+    Point robot;
+    absl::flat_hash_set<Point> intersections;
+    for (int y = 0; y < board_.size(); ++y) {
+      for (int x = 0; x < board_[y].size(); ++x) {
+        if (board_[y][x] != '#' && board_[y][x] != '.') {
+          robot.x = x;
+          robot.y = y;
+        }
+        if (IsIntersection(Point{x,y}, board_)) {
+          intersections.insert(Point{x,y});
+        }
+      }
+    }
+    std::string command;
+    std::vector<std::string> scratch = board_;
+    constexpr Point kNorthDir{0, -1};
+    constexpr Point kSouthDir{0, 1};
+    constexpr Point kWestDir{-1, 0};
+    constexpr Point kEastDir{1, 0};
+    constexpr Point dirs[] = {kNorthDir, kSouthDir, kWestDir, kEastDir};
+    Point robot_dir;
+    switch (board_[robot.y][robot.x]) {
+      case '^': robot_dir = kNorthDir; break;
+      case 'v': robot_dir = kSouthDir; break;
+      case '<': robot_dir = kWestDir; break;
+      case '>': robot_dir = kEastDir; break;
+      default: return absl::InvalidArgumentError("Bad robot direction");
+    }
+    while (true) {
+      Point next_dir{0,0};
+      for (Point d : dirs) {
+        Point check = robot + d;
+        if (OnBoard(check, scratch) && scratch[check.y][check.x] == '#') {
+          if (next_dir != Point{0, 0}) return absl::InvalidArgumentError("Not Supported");
+          next_dir = d;
+        }
+      }
+      // No direction to go.
+      if (next_dir == Point{}) break;
+
+      LOG(WARNING) << robot_dir << " <O> " << next_dir;
+      if (robot_dir == kNorthDir) {
+        if (next_dir == kWestDir) command.append("L,");
+        else if (next_dir == kEastDir) command.append("R,");
+        else return absl::InvalidArgumentError("Can't turn");
+      }
+      if (robot_dir == kSouthDir) {
+        if (next_dir == kWestDir) command.append("R,");
+        else if (next_dir == kEastDir) command.append("L,");
+        else return absl::InvalidArgumentError("Can't turn");
+      }
+      if (robot_dir == kWestDir) {
+        if (next_dir == kNorthDir) command.append("R,");
+        else if (next_dir == kSouthDir) command.append("L,");
+        else return absl::InvalidArgumentError("Can't turn");
+      }
+      if (robot_dir == kEastDir) {
+        if (next_dir == kNorthDir) command.append("L,");
+        else if (next_dir == kSouthDir) command.append("R,");
+        else return absl::InvalidArgumentError("Can't turn");
+      }
+      robot_dir = next_dir;
+
+      int i = 0;
+      for (Point check = robot + robot_dir; OnBoard(check, scratch); check += robot_dir) {
+        if (scratch[check.y][check.x] != '#') break;
+        robot = check;
+        ++i;
+        if (intersections.contains(check)) {
+           intersections.erase(check);
+        } else {
+          scratch[check.y][check.x] = '_';
+        }
+      }
+      command.append(absl::StrCat(i, ","));
+    }
+    command.resize(command.size() - 1);
+
+    LOG(WARNING) << "\n" << DebugBoard();
+    LOG(WARNING) << "Robot@" << robot;
+    LOG(WARNING) << "Full Path: " << command;
+    program_ = FindProgram(command);
+    LOG(WARNING) << "Program: " << program_.DebugString();;
+    return absl::OkStatus();
   }
 
   absl::Status Put(int64_t val) override {
+    if (val > 128) {
+      LOG(WARNING) << "Dust collected: " << val;
+      dust_collected_ = val; 
+      return absl::OkStatus();
+    }
     if (val > 127 || val < 0) return absl::InvalidArgumentError("Bad ascii value");
     if (val == '\n') {
-      if (board_.back().size() == 0) {
-        rendered_ = true;
-        return absl::OkStatus();
-      }
-      if (board_.size() > 1) {
-        int this_line_size = (board_.end() - 1)->size();
-        int prev_line_size = (board_.end() - 2)->size();
-        if (this_line_size != prev_line_size) {
-          return absl::InvalidArgumentError(
-            absl::StrCat("Bad board: ", this_line_size, " != ", prev_line_size, ";\n", DebugBoard()));
+      LOG(WARNING) << current_input_;
+      if (current_input_ == "Main:") {
+        if (absl::Status st = ComputeProgram(); !st.ok()) return st;
+        current_output_ = program_.main;
+        current_output_pos_ = 0;
+      } else if (current_input_ == "Function A:") {
+        current_output_ = program_.a;
+        current_output_pos_ = 0;
+      } else if (current_input_ == "Function B:") {
+        current_output_ = program_.b;
+        current_output_pos_ = 0;
+      } else if (current_input_ == "Function C:") {
+        current_output_ = program_.c;
+        current_output_pos_ = 0;
+      } else if (current_input_ == "Continuous video feed?") {
+        current_output_ = continuous_video_feed_;
+        current_output_pos_ = 0;
+      } else {
+        if (!current_input_.empty()) {
+          board_.push_back(std::move(current_input_));
         }
       }
-      board_.push_back("");
+      current_input_ = "";
     } else {
-      board_.back().append(1, static_cast<char>(val));
+      current_input_.append(1, static_cast<char>(val));
     }
     return absl::OkStatus();
   }
 
  private:
-  std::vector<std::string> board_{""};
-  bool rendered_ = false;
+  Program program_;
+  absl::string_view current_output_;
+  int current_output_pos_;
+
+  std::string current_input_;
+  std::vector<std::string> board_;
+  int64_t dust_collected_ = -1;
+  std::string continuous_video_feed_ = "n\n";
 };
 
 absl::StatusOr<std::vector<std::string>> Day17_2019::Part1(
@@ -71,7 +297,6 @@ absl::StatusOr<std::vector<std::string>> Day17_2019::Part1(
   if (absl::Status st = codes->Run(&view_port, &view_port, &view_port); !st.ok()) {
     return st;
   }
-  LOG(WARNING) << "\n" << view_port.DebugBoard();
   absl::StatusOr<int> alignment = view_port.ComputeAlignment();
   if (!alignment.ok()) return alignment.status();
 
@@ -80,5 +305,15 @@ absl::StatusOr<std::vector<std::string>> Day17_2019::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day17_2019::Part2(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
+  if (!codes.ok()) return codes.status();
+
+  if (absl::Status st = codes->Poke(0, 2); !st.ok()) return st;
+
+  ViewPort view_port;
+  if (absl::Status st = codes->Run(&view_port, &view_port, &view_port); !st.ok()) {
+    return st;
+  }
+
+  return std::vector<std::string>{absl::StrCat(view_port.dust_collected())};
 }
