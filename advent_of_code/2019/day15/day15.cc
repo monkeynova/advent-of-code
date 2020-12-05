@@ -10,9 +10,7 @@
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 
-class Droid : public IntCode::InputSource,
-              public IntCode::OutputSink,
-              public IntCode::PauseCondition {
+class Droid : public IntCode::IOModule {
  public:
   Droid() {
     SetBoard(pos_, 1);
@@ -263,7 +261,7 @@ absl::StatusOr<std::vector<std::string>> Day15_2019::Part1(
   if (!codes.ok()) return codes.status();
 
   Droid droid;
-  if (absl::Status st = codes->Run(&droid, &droid, &droid); !st.ok()) {
+  if (absl::Status st = codes->Run(&droid); !st.ok()) {
     return st;
   }
   LOG(WARNING) << droid.min() << "-" << droid.max();
@@ -280,7 +278,7 @@ absl::StatusOr<std::vector<std::string>> Day15_2019::Part2(
   if (!codes.ok()) return codes.status();
 
   Droid droid;
-  if (absl::Status st = codes->Run(&droid, &droid, &droid); !st.ok()) {
+  if (absl::Status st = codes->Run(&droid); !st.ok()) {
     return st;
   }
   LOG(WARNING) << droid.min() << "-" << droid.max();

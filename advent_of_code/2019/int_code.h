@@ -60,6 +60,8 @@ class IntCode {
   class NeverPause : public PauseCondition {
     bool PauseIntCode() override { return false; }
   };
+ 
+  class IOModule : public InputSource, public OutputSink, public PauseCondition {};
 
   static absl::StatusOr<IntCode> Parse(
       const std::vector<absl::string_view>& input);
@@ -96,6 +98,9 @@ class IntCode {
   absl::Status Run(InputSource* input = nullptr, OutputSink* output = nullptr) {
     NeverPause never_pause;
     return Run(input, output, &never_pause);
+  }
+  absl::Status Run(IOModule* io_module) {
+    return Run(io_module, io_module, io_module);
   }
   absl::Status Run(InputSource* input, OutputSink* output,
                    PauseCondition* pause_condition);

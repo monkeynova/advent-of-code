@@ -8,8 +8,10 @@
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 
-class DrawBoard : public IntCode::InputSource, public IntCode::OutputSink {
+class DrawBoard : public IntCode::IOModule {
  public:
+  bool PauseIntCode() override { return false; }
+
   absl::StatusOr<int64_t> Fetch() override {
     // Returns Joystick position.
     VLOG(2) << "Cursor: " << cursor_position_;
@@ -108,7 +110,7 @@ absl::StatusOr<std::vector<std::string>> Day13_2019::Part1(
   if (!codes.ok()) return codes.status();
 
   DrawBoard draw_board;
-  if (absl::Status st = codes->Run(&draw_board, &draw_board); !st.ok())
+  if (absl::Status st = codes->Run(&draw_board); !st.ok())
     return st;
 
   return std::vector<std::string>{absl::StrCat(draw_board.CountBlockTiles())};
@@ -121,7 +123,7 @@ absl::StatusOr<std::vector<std::string>> Day13_2019::Part2(
 
   if (absl::Status st = codes->Poke(0, 2); !st.ok()) return st;
   DrawBoard draw_board;
-  if (absl::Status st = codes->Run(&draw_board, &draw_board); !st.ok())
+  if (absl::Status st = codes->Run(&draw_board); !st.ok())
     return st;
 
   return std::vector<std::string>{absl::StrCat(draw_board.score())};

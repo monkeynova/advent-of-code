@@ -109,7 +109,7 @@ Program FindProgram(absl::string_view command) {
   return ret;
 }
 
-class ViewPort : public IntCode::InputSource, public IntCode::OutputSink, public IntCode::PauseCondition {
+class ViewPort : public IntCode::IOModule {
  public:
   bool PauseIntCode() override { return false; } 
 
@@ -294,7 +294,7 @@ absl::StatusOr<std::vector<std::string>> Day17_2019::Part1(
   if (!codes.ok()) return codes.status();
 
   ViewPort view_port;
-  if (absl::Status st = codes->Run(&view_port, &view_port, &view_port); !st.ok()) {
+  if (absl::Status st = codes->Run(&view_port); !st.ok()) {
     return st;
   }
   absl::StatusOr<int> alignment = view_port.ComputeAlignment();

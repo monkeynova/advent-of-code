@@ -8,8 +8,10 @@
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 
-class Painter : public IntCode::InputSource, public IntCode::OutputSink {
+class Painter : public IntCode::IOModule {
  public:
+  bool PauseIntCode() override { return false; }
+
   absl::StatusOr<int64_t> Fetch() override {
     auto it = panel_to_painted_color_.find(cur_);
     if (it == panel_to_painted_color_.end()) return 0;
@@ -87,7 +89,7 @@ absl::StatusOr<std::vector<std::string>> Day11_2019::Part1(
   if (!codes.ok()) return codes.status();
 
   Painter painter;
-  if (absl::Status st = codes->Run(&painter, &painter); !st.ok()) return st;
+  if (absl::Status st = codes->Run(&painter); !st.ok()) return st;
 
   return std::vector<std::string>{absl::StrCat(painter.UniquePanelsPainted())};
 }
@@ -99,7 +101,7 @@ absl::StatusOr<std::vector<std::string>> Day11_2019::Part2(
 
   Painter painter;
   painter.Set({.x = 0, .y = 0}, 1);
-  if (absl::Status st = codes->Run(&painter, &painter); !st.ok()) return st;
+  if (absl::Status st = codes->Run(&painter); !st.ok()) return st;
 
   return painter.Panels();
 }
