@@ -12,59 +12,6 @@
 // Problem could be solved with a sparse matrix multiply and expontentiation.
 // 100 = 64 + 32 + 4. M^2^2^2^2^2^2 * M^2^2^2^2^2 * M^2^2.
 
-int64_t FilterWeight(int64_t output_position, int64_t input_position) {
-  constexpr int64_t kBasePattern[] = {0, 1, 0, -1};
-  constexpr int kPatternSize = sizeof(kBasePattern) / sizeof(kBasePattern[0]);
-  int index = (kPatternSize + (input_position + 1) / (output_position + 1)) % kPatternSize;
-  VLOG(3) << output_position << ", " << input_position << " => " << index;
-  return kBasePattern[index];
-}
-
-struct PhaseValueState {
-  absl::string_view base_input;
-  int64_t repeat = 1;
-  std::vector<std::string> memo;
-
-  uint64_t length() { return base_input.size() * repeat; }
-};
-
-char PhaseValue(PhaseValueState* state, int phase, int output_position) {
-  if (phase == 0) {
-    return state->base_input[output_position % state->base_input.size()];
-  }
-  if (state->memo.empty()) {
-    state->memo.resize(phase);
-  }
-  if (state->memo[phase-1].empty()) {
-    VLOG(2) << "Allocating: " << phase;
-    state->memo[phase-1].resize(state->length());
-  }
-  if (state->memo[phase-1][output_position] != '\0') {
-    return state->memo[phase-1][output_position];
-  }
-  int sum = 0;
-  for (int64_t input_pos = 0; input_pos < state->length() * state->repeat; ++input_pos) {
-    // VLOG(3) << phase << ", " << input_pos;
-    int64_t weight = FilterWeight(output_position, input_pos);
-    if (weight == 0) {
-      if (input_pos == 0) {
-        input_pos = output_position;
-      } else {
-        input_pos += output_position + 1;
-      }
-      if (input_pos >= state->length() * state->repeat) break;
-      weight = FilterWeight(output_position, input_pos);
-      CHECK_NE(weight, 0);
-    }
-    if (weight != 0) {
-      sum += weight * (PhaseValue(state, phase - 1, input_pos) - '0');
-    }
-  }
-  state->memo[phase-1][output_position] = '0' + (abs(sum) % 10);
-  VLOG(2) << phase << ", " << output_position << " => " << state->memo[phase-1][output_position];
-  return state->memo[phase-1][output_position];
-}
-
 int CalcSumRange(absl::string_view input, int begin, int end) {
   int ret = 0;
   for (int i = begin; i < end; ++i) {
@@ -96,53 +43,53 @@ void BuildAlignedSums(SumRangeState* state) {
   }
 }
 
-int SumRangeAligned(SumRangeState* state, int begin, int end) {
-  int sums_idx = -1;
-  int sums_sums_idx = begin;
-  for (int delta = end - begin; delta / 2; delta /= 2) {
-    ++sums_idx;
-    sums_sums_idx /= 2;
-  }
-  VLOG(2) << "  Aligned: " << begin << "-" << end << " => " << sums_idx << "/" << sums_sums_idx;
-  if (sums_idx == -1) {
+inline int SumRangeAligned(SumRangeState* state, int begin, int sums_idx) {
+  if (sums_idx == 0) {
     return state->input[begin] - '0';
   } else {
-    return state->sums[sums_idx][sums_sums_idx];
+    return state->sums[sums_idx - 1][begin / (1 << sums_idx)];
   }
 }
 
-int SumRange(SumRangeState* state, int begin, int end) {
+int SumRangeUnaligned(SumRangeState* state, int begin, int end) {
   VLOG(2) << "UnAligned: " << begin << "-" << end;
   int ret = 0;
   int low_bit = 1;
+  int shift = 0;
   while (begin + low_bit <= end) {
     VLOG(3) << "  " << begin << "/" << low_bit;
     if (begin & low_bit) {
-      ret += SumRangeAligned(state, begin, begin + low_bit);
+      ret += SumRangeAligned(state, begin, shift);
       begin += low_bit;
     }
     low_bit <<= 1;
+    ++shift;
   }
   while (low_bit) {
     VLOG(3) << "  " << begin << "/" << low_bit;
     if (begin + low_bit <= end) {
-      ret += SumRangeAligned(state, begin, begin + low_bit);
+      ret += SumRangeAligned(state, begin, shift);
       begin += low_bit;
     }
     low_bit >>= 1;
+    --shift;
   }
   return ret;
 }
 
+int SumRange(SumRangeState* state, int begin, int end) {
+  return SumRangeUnaligned(state, begin, end);
+}
+
 void AuditSums(SumRangeState* state) {
-  for (int stride = 1; stride < state->input.length(); stride *= 2) {
+  for (int shift = 0; (1 << shift) < state->input.length(); ++shift) {
+    int stride = (1 << shift);
     for (int begin = 0; begin < state->input.length(); begin += stride) {
       if (begin + stride > state->input.length()) break;
-      int end = begin + stride;
-      int a_sum = SumRangeAligned(state, begin, end);
-      int b_sum = CalcSumRange(state->input, begin, end);
+      int a_sum = SumRangeAligned(state, begin, shift);
+      int b_sum = CalcSumRange(state->input, begin, begin + stride);
       if (a_sum != b_sum) {
-        LOG(WARNING) << begin << "-" << end << "; " << a_sum << " != " << b_sum;
+        LOG(WARNING) << begin << "+" << stride << "; " << a_sum << " != " << b_sum;
       }
     }
   }
@@ -177,19 +124,11 @@ absl::StatusOr<std::vector<std::string>> Day16_2019::Part1(
   if (input.size() != 1) return absl::InvalidArgumentError("Need only 1 line");
 
   std::string ret;
-  if (false) {
-    ret.resize(8);
-    PhaseValueState state{.base_input = input[0]};
-    for (int i = 0; i < 8; ++i) {
-      ret[i] = PhaseValue(&state, 100, i);
-    }
-  } else {
-    ret = std::string(input[0]);
-    for (int i = 0; i < 100; ++i) {
-      ret = RunPhase(i, ret);
-    }
-    ret = ret.substr(0, 8);
+  ret = std::string(input[0]);
+  for (int i = 0; i < 100; ++i) {
+    ret = RunPhase(i, ret);
   }
+  ret = ret.substr(0, 8);
 
   return std::vector<std::string>{ret};
 }
@@ -201,23 +140,15 @@ absl::StatusOr<std::vector<std::string>> Day16_2019::Part2(
     return absl::InvalidArgumentError("bad atoi");
   }
   std::string ret;
-  if (true) {
-    for (int i = 0; i < 10000; ++i) {
-      ret.append(input[0].data(), input[0].size());
-    }
-    for (int i = 0; i < 100; ++i) {
-      VLOG(1) << "Phase: " << i;
-      ret = RunPhase(i, ret);
-    }
-    if (ret.size() < offset + 8) return absl::InvalidArgumentError("can't extract value");
-    ret = ret.substr(offset, 8);
-  } else {
-    ret.resize(8);
-    PhaseValueState state{.base_input = input[0], .repeat = 10000};
-    for (int i = 0; i < 8; ++i) {
-      ret[i] = PhaseValue(&state, 100, offset + i);
-    }
+  for (int i = 0; i < 10000; ++i) {
+    ret.append(input[0].data(), input[0].size());
   }
+  for (int i = 0; i < 100; ++i) {
+    VLOG(1) << "Phase: " << i;
+    ret = RunPhase(i, ret);
+  }
+  if (ret.size() < offset + 8) return absl::InvalidArgumentError("can't extract value");
+  ret = ret.substr(offset, 8);
 
   return std::vector<std::string>{ret};
 }
