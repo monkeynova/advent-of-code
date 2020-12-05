@@ -86,14 +86,17 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
   const DirtyTestParseResult* test = (*tests)[state.range(0)].get();
   std::vector<absl::string_view> lines = absl::StrSplit(test->test, "\n");
   while (!lines.empty() && lines.back().empty()) lines.pop_back();
+
+  int part = test->options.GetInt64(kPartOption);
   if (test->options.GetString(kLongOption) != "" &&
       !absl::GetFlag(FLAGS_run_long_tests)) {
-    state.SetLabel("*** SKIPPED (long) ****");
+    state.SetLabel(absl::StrCat("Part: ", part, "; *** SKIPPED (long) ****"));
     for (auto _ : state) {
     }
     return;
   }
-  switch (test->options.GetInt64(kPartOption)) {
+  state.SetLabel(absl::StrCat("Part: ", part));
+  switch (part) {
     case 1: {
       for (auto _ : state) {
         absl::StatusOr<std::vector<std::string>> st = day->Part1(lines);
