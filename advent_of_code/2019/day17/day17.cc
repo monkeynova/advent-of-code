@@ -265,7 +265,6 @@ class ViewPort : public IntCode::IOModule {
     LOG(WARNING) << "Full Path: " << command;
     program_ = FindProgram(command);
     LOG(WARNING) << "Program: " << program_.DebugString();
-    ;
     return absl::OkStatus();
   }
 
