@@ -7,8 +7,12 @@
 
 absl::StatusOr<IntCode> IntCode::Parse(
     const std::vector<absl::string_view>& input) {
-  if (input.size() != 1) {
+  if (input.empty()) {
     return absl::InvalidArgumentError("input is empty");
+  }
+  if (input.size() > 1) {
+    return absl::InvalidArgumentError(
+        absl::StrCat("input is to large: 1 !=", input.size()));
   }
   std::vector<absl::string_view> code_strs = absl::StrSplit(input[0], ",");
   std::vector<int64_t> codes;

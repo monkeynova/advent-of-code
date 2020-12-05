@@ -76,28 +76,34 @@ absl::Status HandleTestIncludes(std::string* test_case) {
   return absl::OkStatus();
 }
 
-std::vector<DirtyTestParseResult> DirtyTestParse(absl::string_view contents) {
+absl::StatusOr<std::vector<DirtyTestParseResult>> DirtyTestParse(
+    absl::string_view contents) {
   std::vector<DirtyTestParseResult> ret;
-  for (absl::string_view test : absl::StrSplit(contents, "\n==\n")) {
-    std::vector<absl::string_view> lines = absl::StrSplit(test, "\n");
-    int start = 0;
-    int part = 0;
-    // Skip comments.
-    while (start < lines.size() &&
-           (lines[start].empty() || lines[start][0] == '#'))
-      ++start;
-    // Skip options.
-    while (start < lines.size() &&
-           (lines[start].empty() || lines[start][0] == '[')) {
-      (void)RE2::PartialMatch(lines[start], "\\[part=(\\d+)\\]", &part);
-      ++start;
+  DirtyTestParseResult next;
+  bool in_answer = false;
+  bool in_test = false;
+  for (absl::string_view line : absl::StrSplit(contents, "\n")) {
+    if (line == "--") {
+      in_answer = true;
+    } else if (line == "==") {
+      in_answer = false;
+      in_test = false;
+      if (absl::Status st = HandleTestIncludes(&next.test); !st.ok()) return st;
+      ret.push_back(std::move(next));
+      next = DirtyTestParseResult{};
+      continue;
     }
-    if (start < lines.size()) {
-      ret.push_back(
-          DirtyTestParseResult{.part = part,
-                               .lines = std::vector<absl::string_view>(
-                                   lines.begin() + start, lines.end())});
+    if (in_answer) continue;
+    if (!in_test && line.empty()) continue;
+    if (!in_test && line[0] == '#') continue;
+    if (!in_test && line[0] == '[') {
+      (void)RE2::PartialMatch(line, "\\[part=(\\d+)\\]", &next.part);
+      continue;
     }
+    in_test = true;
+    absl::StrAppend(&next.test, line, "\n");
   }
+  if (absl::Status st = HandleTestIncludes(&next.test); !st.ok()) return st;
+  ret.push_back(next);
   return ret;
 }

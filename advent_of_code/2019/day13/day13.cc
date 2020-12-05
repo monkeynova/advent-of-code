@@ -110,8 +110,7 @@ absl::StatusOr<std::vector<std::string>> Day13_2019::Part1(
   if (!codes.ok()) return codes.status();
 
   DrawBoard draw_board;
-  if (absl::Status st = codes->Run(&draw_board); !st.ok())
-    return st;
+  if (absl::Status st = codes->Run(&draw_board); !st.ok()) return st;
 
   return std::vector<std::string>{absl::StrCat(draw_board.CountBlockTiles())};
 }
@@ -123,8 +122,7 @@ absl::StatusOr<std::vector<std::string>> Day13_2019::Part2(
 
   if (absl::Status st = codes->Poke(0, 2); !st.ok()) return st;
   DrawBoard draw_board;
-  if (absl::Status st = codes->Run(&draw_board); !st.ok())
-    return st;
+  if (absl::Status st = codes->Run(&draw_board); !st.ok()) return st;
 
   return std::vector<std::string>{absl::StrCat(draw_board.score())};
 }

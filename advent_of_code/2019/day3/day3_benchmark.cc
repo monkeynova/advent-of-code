@@ -7,7 +7,7 @@ constexpr int kMaxTestCount = 2;
 TEST(DayBenchmarkTest, Consistency) {
   absl::StatusOr<std::vector<DirtyTestParseResult>> tests =
       FileBenchmarkTests();
-  ASSERT_TRUE(tests.ok());
+  ASSERT_TRUE(tests.ok()) << tests.status().message();
   EXPECT_EQ(kMaxTestCount, tests->size());
 }
 

@@ -19,8 +19,8 @@ cc_test(
     srcs = ["day6_test.cc"],
     args = ["--test_file=advent_of_code/2020/day6/day6.test"],
     data = [
-        "input.txt",
         "day6.test",
+        "input.txt",
     ],
     deps = [
         ":day6",
@@ -33,8 +33,8 @@ cc_test(
     srcs = ["day6_benchmark.cc"],
     args = ["--test_file=advent_of_code/2020/day6/day6.test"],
     data = [
-        "input.txt",
         "day6.test",
+        "input.txt",
     ],
     deps = [
         ":day6",

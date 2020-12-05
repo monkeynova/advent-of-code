@@ -60,8 +60,10 @@ class IntCode {
   class NeverPause : public PauseCondition {
     bool PauseIntCode() override { return false; }
   };
- 
-  class IOModule : public InputSource, public OutputSink, public PauseCondition {};
+
+  class IOModule : public InputSource,
+                   public OutputSink,
+                   public PauseCondition {};
 
   static absl::StatusOr<IntCode> Parse(
       const std::vector<absl::string_view>& input);

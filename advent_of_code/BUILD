@@ -21,6 +21,7 @@ cc_library(
     ],
     deps = [
         "@com_google_absl//absl/status",
+        "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
         "@com_google_glog//:glog",
         "@com_googlesource_code_re2//:re2",
@@ -69,6 +70,7 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
+        ":advent_day",
         ":file_util",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/status:statusor",

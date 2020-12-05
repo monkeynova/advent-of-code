@@ -15,6 +15,7 @@ struct Program {
   std::string a;
   std::string b;
   std::string c;
+  std::string video_feed = "n\n";
 
   std::string DebugString() {
     std::string ret;
@@ -38,7 +39,7 @@ bool ValidProgram(Program* program) {
 bool FindC(Program* program) {
   int start_idx = 0;
   for (; start_idx < program->main.size(); ++start_idx) {
-    if (program->main[start_idx] != 'A' && program->main[start_idx] != 'B' && 
+    if (program->main[start_idx] != 'A' && program->main[start_idx] != 'B' &&
         program->main[start_idx] != ',') {
       break;
     }
@@ -53,7 +54,8 @@ bool FindC(Program* program) {
     }
   }
   Program save = *program;
-  program->c = program->main.substr(start_idx, program->main.size() - start_idx);
+  program->c =
+      program->main.substr(start_idx, program->main.size() - start_idx);
   RE2::GlobalReplace(&program->main, program->c, "C");
   if (ValidProgram(program)) return true;
   *program = save;
@@ -111,25 +113,28 @@ Program FindProgram(absl::string_view command) {
 
 class ViewPort : public IntCode::IOModule {
  public:
-  bool PauseIntCode() override { return false; } 
+  bool PauseIntCode() override { return false; }
 
-  std::string DebugBoard() const {
-    return absl::StrJoin(board_, "\n");
-  }
+  std::string DebugBoard() const { return absl::StrJoin(board_, "\n"); }
 
   int64_t dust_collected() const { return dust_collected_; }
 
   bool OnBoard(Point check, const std::vector<std::string>& board) {
-    return check.y >= 0 && check.x >= 0 && check.y < board.size() && check.x < board[0].size();
-  }         
+    return check.y >= 0 && check.x >= 0 && check.y < board.size() &&
+           check.x < board[0].size();
+  }
 
   bool IsIntersection(Point p, const std::vector<std::string>& board) {
     if (!OnBoard(p, board)) return false;
     if (board_[p.y][p.x] != '#') return false;
-    if (!OnBoard(Point{p.x, p.y - 1}, board) || board_[p.y-1][p.x] != '#') return false;
-    if (!OnBoard(Point{p.x, p.y + 1}, board) || board_[p.y+1][p.x] != '#') return false;
-    if (!OnBoard(Point{p.x - 1 , p.y}, board) || board_[p.y][p.x - 1] != '#') return false;
-    if (!OnBoard(Point{p.x + 1 , p.y}, board) || board_[p.y][p.x + 1] != '#') return false;
+    if (!OnBoard(Point{p.x, p.y - 1}, board) || board_[p.y - 1][p.x] != '#')
+      return false;
+    if (!OnBoard(Point{p.x, p.y + 1}, board) || board_[p.y + 1][p.x] != '#')
+      return false;
+    if (!OnBoard(Point{p.x - 1, p.y}, board) || board_[p.y][p.x - 1] != '#')
+      return false;
+    if (!OnBoard(Point{p.x + 1, p.y}, board) || board_[p.y][p.x + 1] != '#')
+      return false;
     return true;
   }
 
@@ -162,8 +167,8 @@ class ViewPort : public IntCode::IOModule {
           robot.x = x;
           robot.y = y;
         }
-        if (IsIntersection(Point{x,y}, board_)) {
-          intersections.insert(Point{x,y});
+        if (IsIntersection(Point{x, y}, board_)) {
+          intersections.insert(Point{x, y});
         }
       }
     }
@@ -176,18 +181,28 @@ class ViewPort : public IntCode::IOModule {
     constexpr Point dirs[] = {kNorthDir, kSouthDir, kWestDir, kEastDir};
     Point robot_dir;
     switch (board_[robot.y][robot.x]) {
-      case '^': robot_dir = kNorthDir; break;
-      case 'v': robot_dir = kSouthDir; break;
-      case '<': robot_dir = kWestDir; break;
-      case '>': robot_dir = kEastDir; break;
-      default: return absl::InvalidArgumentError("Bad robot direction");
+      case '^':
+        robot_dir = kNorthDir;
+        break;
+      case 'v':
+        robot_dir = kSouthDir;
+        break;
+      case '<':
+        robot_dir = kWestDir;
+        break;
+      case '>':
+        robot_dir = kEastDir;
+        break;
+      default:
+        return absl::InvalidArgumentError("Bad robot direction");
     }
     while (true) {
-      Point next_dir{0,0};
+      Point next_dir{0, 0};
       for (Point d : dirs) {
         Point check = robot + d;
         if (OnBoard(check, scratch) && scratch[check.y][check.x] == '#') {
-          if (next_dir != Point{0, 0}) return absl::InvalidArgumentError("Not Supported");
+          if (next_dir != Point{0, 0})
+            return absl::InvalidArgumentError("Not Supported");
           next_dir = d;
         }
       }
@@ -196,34 +211,47 @@ class ViewPort : public IntCode::IOModule {
 
       LOG(WARNING) << robot_dir << " <O> " << next_dir;
       if (robot_dir == kNorthDir) {
-        if (next_dir == kWestDir) command.append("L,");
-        else if (next_dir == kEastDir) command.append("R,");
-        else return absl::InvalidArgumentError("Can't turn");
+        if (next_dir == kWestDir)
+          command.append("L,");
+        else if (next_dir == kEastDir)
+          command.append("R,");
+        else
+          return absl::InvalidArgumentError("Can't turn");
       }
       if (robot_dir == kSouthDir) {
-        if (next_dir == kWestDir) command.append("R,");
-        else if (next_dir == kEastDir) command.append("L,");
-        else return absl::InvalidArgumentError("Can't turn");
+        if (next_dir == kWestDir)
+          command.append("R,");
+        else if (next_dir == kEastDir)
+          command.append("L,");
+        else
+          return absl::InvalidArgumentError("Can't turn");
       }
       if (robot_dir == kWestDir) {
-        if (next_dir == kNorthDir) command.append("R,");
-        else if (next_dir == kSouthDir) command.append("L,");
-        else return absl::InvalidArgumentError("Can't turn");
+        if (next_dir == kNorthDir)
+          command.append("R,");
+        else if (next_dir == kSouthDir)
+          command.append("L,");
+        else
+          return absl::InvalidArgumentError("Can't turn");
       }
       if (robot_dir == kEastDir) {
-        if (next_dir == kNorthDir) command.append("L,");
-        else if (next_dir == kSouthDir) command.append("R,");
-        else return absl::InvalidArgumentError("Can't turn");
+        if (next_dir == kNorthDir)
+          command.append("L,");
+        else if (next_dir == kSouthDir)
+          command.append("R,");
+        else
+          return absl::InvalidArgumentError("Can't turn");
       }
       robot_dir = next_dir;
 
       int i = 0;
-      for (Point check = robot + robot_dir; OnBoard(check, scratch); check += robot_dir) {
+      for (Point check = robot + robot_dir; OnBoard(check, scratch);
+           check += robot_dir) {
         if (scratch[check.y][check.x] != '#') break;
         robot = check;
         ++i;
         if (intersections.contains(check)) {
-           intersections.erase(check);
+          intersections.erase(check);
         } else {
           scratch[check.y][check.x] = '_';
         }
@@ -236,17 +264,19 @@ class ViewPort : public IntCode::IOModule {
     LOG(WARNING) << "Robot@" << robot;
     LOG(WARNING) << "Full Path: " << command;
     program_ = FindProgram(command);
-    LOG(WARNING) << "Program: " << program_.DebugString();;
+    LOG(WARNING) << "Program: " << program_.DebugString();
+    ;
     return absl::OkStatus();
   }
 
   absl::Status Put(int64_t val) override {
     if (val > 128) {
       LOG(WARNING) << "Dust collected: " << val;
-      dust_collected_ = val; 
+      dust_collected_ = val;
       return absl::OkStatus();
     }
-    if (val > 127 || val < 0) return absl::InvalidArgumentError("Bad ascii value");
+    if (val > 127 || val < 0)
+      return absl::InvalidArgumentError("Bad ascii value");
     if (val == '\n') {
       LOG(WARNING) << current_input_;
       if (current_input_ == "Main:") {
@@ -263,7 +293,7 @@ class ViewPort : public IntCode::IOModule {
         current_output_ = program_.c;
         current_output_pos_ = 0;
       } else if (current_input_ == "Continuous video feed?") {
-        current_output_ = continuous_video_feed_;
+        current_output_ = program_.video_feed;
         current_output_pos_ = 0;
       } else {
         if (!current_input_.empty()) {
@@ -285,7 +315,6 @@ class ViewPort : public IntCode::IOModule {
   std::string current_input_;
   std::vector<std::string> board_;
   int64_t dust_collected_ = -1;
-  std::string continuous_video_feed_ = "n\n";
 };
 
 absl::StatusOr<std::vector<std::string>> Day17_2019::Part1(
@@ -311,7 +340,8 @@ absl::StatusOr<std::vector<std::string>> Day17_2019::Part2(
   if (absl::Status st = codes->Poke(0, 2); !st.ok()) return st;
 
   ViewPort view_port;
-  if (absl::Status st = codes->Run(&view_port, &view_port, &view_port); !st.ok()) {
+  if (absl::Status st = codes->Run(&view_port, &view_port, &view_port);
+      !st.ok()) {
     return st;
   }
 
