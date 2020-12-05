@@ -6,6 +6,14 @@
 #include "advent_of_code/file_util.h"
 #include "benchmark/benchmark.h"
 
+struct DirtyTestParseResult {
+  int part;
+  std::string test;
+};
+
+absl::StatusOr<std::vector<DirtyTestParseResult>> DirtyTestParse(
+    absl::string_view contents);
+
 absl::StatusOr<std::vector<DirtyTestParseResult>> FileBenchmarkTests();
 
 void BM_Day_SetError(benchmark::State& state, absl::string_view message) {

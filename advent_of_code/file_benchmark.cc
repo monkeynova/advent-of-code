@@ -4,6 +4,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
 #include "glog/logging.h"
+#include "re2/re2.h"
 
 ABSL_FLAG(std::string, test_file, "",
           "The file which contains the file based test driver tests");
@@ -54,3 +55,36 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
     }
   }
 }
+
+absl::StatusOr<std::vector<DirtyTestParseResult>> DirtyTestParse(
+    absl::string_view contents) {
+  std::vector<DirtyTestParseResult> ret;
+  DirtyTestParseResult next;
+  bool in_answer = false;
+  bool in_test = false;
+  for (absl::string_view line : absl::StrSplit(contents, "\n")) {
+    if (line == "--") {
+      in_answer = true;
+    } else if (line == "==") {
+      in_answer = false;
+      in_test = false;
+      if (absl::Status st = HandleTestIncludes(&next.test); !st.ok()) return st;
+      ret.push_back(std::move(next));
+      next = DirtyTestParseResult{};
+      continue;
+    }
+    if (in_answer) continue;
+    if (!in_test && line.empty()) continue;
+    if (!in_test && line[0] == '#') continue;
+    if (!in_test && line[0] == '[') {
+      (void)RE2::PartialMatch(line, "\\[part=(\\d+)\\]", &next.part);
+      continue;
+    }
+    in_test = true;
+    absl::StrAppend(&next.test, line, "\n");
+  }
+  if (absl::Status st = HandleTestIncludes(&next.test); !st.ok()) return st;
+  ret.push_back(next);
+  return ret;
+}
+
