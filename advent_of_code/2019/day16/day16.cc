@@ -31,11 +31,13 @@ void BuildAlignedSums(SumRangeState* state) {
     next_sums.resize(length);
     if (length == state->input.size() / 2) {
       for (int i = 0; i < length; ++i) {
-        next_sums[i] = state->input[2 * i] + state->input[2 * i + 1] - '0' - '0';
+        next_sums[i] =
+            state->input[2 * i] + state->input[2 * i + 1] - '0' - '0';
       }
     } else {
       for (int i = 0; i < length; ++i) {
-        next_sums[i] = state->sums.back()[2 * i] + state->sums.back()[2 * i + 1];
+        next_sums[i] =
+            state->sums.back()[2 * i] + state->sums.back()[2 * i + 1];
       }
     }
     state->sums.push_back(std::move(next_sums));
@@ -89,7 +91,8 @@ void AuditSums(SumRangeState* state) {
       int a_sum = SumRangeAligned(state, begin, shift);
       int b_sum = CalcSumRange(state->input, begin, begin + stride);
       if (a_sum != b_sum) {
-        LOG(WARNING) << begin << "+" << stride << "; " << a_sum << " != " << b_sum;
+        LOG(WARNING) << begin << "+" << stride << "; " << a_sum
+                     << " != " << b_sum;
       }
     }
   }
@@ -106,7 +109,8 @@ std::string RunPhase(int phase, absl::string_view input) {
     bool negate = false;
     int64_t sum = 0;
     for (int j = i; j < input.size(); j += stride * 2) {
-      int delta = SumRange(&sum_range, j, std::min<int>(j + stride, input.size()));
+      int delta =
+          SumRange(&sum_range, j, std::min<int>(j + stride, input.size()));
       if (negate) {
         sum -= delta;
       } else {
@@ -147,7 +151,8 @@ absl::StatusOr<std::vector<std::string>> Day16_2019::Part2(
     VLOG(1) << "Phase: " << i;
     ret = RunPhase(i, ret);
   }
-  if (ret.size() < offset + 8) return absl::InvalidArgumentError("can't extract value");
+  if (ret.size() < offset + 8)
+    return absl::InvalidArgumentError("can't extract value");
   ret = ret.substr(offset, 8);
 
   return std::vector<std::string>{ret};

@@ -70,7 +70,7 @@ absl::StatusOr<std::vector<std::string>> Day5_2020::Part2(
   }
   int missingid = -1;
   for (int id = 1; id < present.size() - 1; ++id) {
-    if (present[id-1] && present[id+1] && !present[id]) {
+    if (present[id - 1] && present[id + 1] && !present[id]) {
       missingid = id;
     }
   }

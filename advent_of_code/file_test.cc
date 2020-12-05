@@ -63,8 +63,9 @@ void RunTestCase(const AdventDay* advent_day,
   if (std::string reason = options.GetString(kLongOption); !reason.empty()) {
     RE2 valid_reason{"\\d+[sm] \\d+\\.\\d+\\.\\d+"};
     if (!RE2::FullMatch(reason, valid_reason)) {
-      test_result->AddTestOutput(
-          absl::StrCat("ERROR: Bad Reason: ", reason, "; must match ", valid_reason.pattern()));
+      test_result->AddTestOutput(absl::StrCat("ERROR: Bad Reason: ", reason,
+                                              "; must match ",
+                                              valid_reason.pattern()));
       return;
     }
     if (!absl::GetFlag(FLAGS_run_long_tests)) {
@@ -72,7 +73,6 @@ void RunTestCase(const AdventDay* advent_day,
       return;
     }
   }
-
 
   std::vector<absl::string_view> test_lines = absl::StrSplit(test_case, "\n");
   while (!test_lines.empty() && test_lines.back().empty()) {
