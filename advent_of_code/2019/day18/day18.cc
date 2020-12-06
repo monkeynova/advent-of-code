@@ -84,6 +84,12 @@ class Board {
       to_add = FindAllKeysFrom(key_and_pos.first, key_and_pos.second);
       paths.insert(paths.end(), to_add.begin(), to_add.end());
     }
+    std::sort(paths.begin(), paths.end(),
+    [](const KeyPath& a, const KeyPath& b) {
+      if (a.required_keys.size() < b.required_keys.size()) return true;
+      if (b.required_keys.size() < a.required_keys.size()) return false;
+      return a.steps < b.steps;
+    });
     return paths;
   }
 
@@ -159,6 +165,7 @@ class Board {
   absl::StatusOr<absl::optional<int>> MinStepsToAllKeys() {
     std::vector<KeyPath> all_paths = AllKeyPaths();
     absl::flat_hash_map<Point, std::vector<KeyPath>> all_paths_idx;
+    absl::flat_hash_map<Point, std::vector<KeyPath>> all_paths_rev_idx;
     for (KeyPath& path : all_paths) {
       VLOG(1) << path.DebugString();
       path.required_keys_bv = 0;
@@ -166,12 +173,77 @@ class Board {
         path.required_keys_bv |= (1 << (k - 'a'));
       }
       all_paths_idx[path.from].push_back(path);
+      all_paths_rev_idx[path.to].push_back(path);
     }
+    return MinStepsDynamicProgramming(all_paths_rev_idx);
     int have_keys_bv = 0;
     return MinStepsToAllKeysWithPaths(0, have_keys_bv, all_paths_idx, 0, absl::nullopt);
     absl::flat_hash_set<char> have_keys;
     return MinStepsToAllKeysImpl(&have_keys, 0, absl::nullopt);
   }
+
+  absl::StatusOr<absl::optional<int>> MinStepsDynamicProgramming(
+    const absl::flat_hash_map<Point, std::vector<KeyPath>>& all_paths_rev_idx) {
+    absl::flat_hash_map<std::pair<int, Point>, absl::optional<int>> keys_bv_and_pos_to_min_path;
+    absl::optional<int> min;
+    for (const auto& key_and_pos : keys_) {
+      absl::optional<int> next_min =
+          MinStepsDynamicProgrammingState(&keys_bv_and_pos_to_min_path,
+                                          ((1 << keys_.size()) - 1) /*all keys*/,
+                                          key_and_pos.second, all_paths_rev_idx);
+      if (next_min) {
+        if (!min || *min > *next_min) {
+          min = next_min;
+        }
+      }
+    }
+    return min;
+  }
+
+  absl::optional<int> MinStepsDynamicProgrammingState(
+    absl::flat_hash_map<std::pair<int, Point>, absl::optional<int>>* keys_bv_and_pos_to_min_path,
+    int have_keys_bv, Point pos,
+    const absl::flat_hash_map<Point, std::vector<KeyPath>>& all_paths_rev_idx) {
+    VLOG(1) << "MinStepsDynamicProgrammingState keys=0x" << std::hex << have_keys_bv << " @" << pos;
+    std::pair<int, Point> cache_key(have_keys_bv, pos);
+    if (auto it = keys_bv_and_pos_to_min_path->find(cache_key);
+        it != keys_bv_and_pos_to_min_path->end()) {
+      return it->second;
+    }
+
+    absl::optional<int> min;
+    if (auto it = all_paths_rev_idx.find(pos); it != all_paths_rev_idx.end()) {
+      const std::vector<KeyPath>& paths = it->second;
+      if (!paths.empty()) {
+        have_keys_bv &= ~(1 << (paths[0].to_key - 'a'));
+      }
+      for (const KeyPath& path : paths) {
+        VLOG(2) << "  path=" << path.DebugString();
+        if (have_keys_bv == 0) {
+          if (path.from_key == '@') return path.steps;
+        } else if (path.from_key != '@' && 
+                   (have_keys_bv & (1 << (path.from_key - 'a'))) &&
+                   (have_keys_bv & path.required_keys_bv) == path.required_keys_bv) {
+          absl::optional<int> next_min = MinStepsDynamicProgrammingState(
+            keys_bv_and_pos_to_min_path, have_keys_bv, path.from,
+            all_paths_rev_idx);
+          if (next_min) {
+            if (!min || *min > *next_min + path.steps) {
+              min = *next_min + path.steps;
+            }
+          }
+        }
+      }
+    }
+
+    keys_bv_and_pos_to_min_path->emplace(cache_key, min);
+    if (keys_bv_and_pos_to_min_path->size() % 777777 == 0){
+      LOG(WARNING) << "MinStepsDynamicProgrammingState progress: " << keys_bv_and_pos_to_min_path->size()
+       << "/" << (1 << keys_.size()) * keys_.size();
+    }
+    return min;
+  }
+
 
   absl::StatusOr<absl::optional<int>> MinStepsToAllKeysWithPaths(
       int key_count,
@@ -210,7 +282,6 @@ class Board {
     }
     return best_so_far;
   }
-
 
   absl::StatusOr<absl::optional<int>> MinStepsToAllKeysImpl(
       absl::flat_hash_set<char>* have_keys, int base_steps, absl::optional<int> best_so_far) {

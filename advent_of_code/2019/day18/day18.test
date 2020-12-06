@@ -37,7 +37,7 @@
 81
 ==
 
-[part=1][ignore]
+[part=1]
 \#################
 \#i.G..c...e..H.p#
 \########.########
@@ -51,7 +51,7 @@
 136
 ==
 
-# Not greater than 4676
+# 4676 (high)
 [part=1][ignore]
 @include{advent_of_code/2019/day18/input.txt}
 --
