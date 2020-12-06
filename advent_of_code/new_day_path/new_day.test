@@ -1,8 +1,10 @@
 [part=1]
 @include{advent_of_code/new_day_path/input.txt}
 --
+-1
 ==
 
 [part=2]
 @include{advent_of_code/new_day_path/input.txt}
 --
+-1

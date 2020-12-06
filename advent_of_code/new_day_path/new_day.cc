@@ -10,10 +10,10 @@
 
 absl::StatusOr<std::vector<std::string>> NewDay::Part1(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  return IntReturn(-1);
 }
 
 absl::StatusOr<std::vector<std::string>> NewDay::Part2(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  return IntReturn(-1);
 }
