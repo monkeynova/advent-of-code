@@ -87,6 +87,14 @@ class Maze {
     return board_[p.y][p.x] == '.'; 
   }
 
+  bool OnEdge(Point p) {
+    if (p.x == 0) return true;
+    if (p.y == 0) return true;
+    if (p.y == board_.size() - 1) return true;
+    if (p.x == board_[0].size() - 1) return true;
+    return false;
+  }
+
   absl::StatusOr<int> FindPath() {
     struct Path {
       Point pos;
@@ -117,6 +125,40 @@ class Maze {
     return absl::InvalidArgumentError("Could not find path");
   }
 
+  absl::StatusOr<int> FindRecursivePath() {
+    struct Path {
+      Point pos;
+      int steps = 0;
+      int level = 0;
+    };
+    absl::flat_hash_set<std::pair<int, Point>> hist;
+    std::deque<Path> frontier;
+    frontier.push_back(Path{.pos = start_});
+    while (!frontier.empty()) {
+      const Path& cur = frontier.front();
+      //LOG(WARNING) << cur.steps();
+      if (cur.pos == end_ && cur.level == 0) return cur.steps;
+      hist.insert(std::make_pair(cur.level, cur.pos));
+      for (Point dir : Cardinal::kAll) {
+        Point next = cur.pos + dir;
+        if (hist.contains(std::make_pair(cur.level, next))) continue;
+        if (CanStand(next)) {
+          frontier.push_back(Path{.pos = next, .steps = cur.steps + 1, .level = cur.level});
+        }
+      }
+      if (auto it = portals_.find(cur.pos); it != portals_.end()) {
+        Point next = it->second;
+        int next_level = cur.level + (OnEdge(cur.pos) ? -1 : + 1);
+        if (next_level >= 0 &&
+            !hist.contains(std::make_pair(next_level, next))) {
+          frontier.push_back(Path{.pos = next, .steps = cur.steps + 1, .level = next_level});
+        }
+      }
+      frontier.pop_front();
+    }
+    return absl::InvalidArgumentError("Could not find path");
+  }
+
  private:
   const std::vector<absl::string_view>& input_;
 
@@ -138,5 +180,10 @@ absl::StatusOr<std::vector<std::string>> Day20_2019::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day20_2019::Part2(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  Maze maze(input);
+  if (absl::Status st = maze.Initialize(); !st.ok()) return st;
+  absl::StatusOr<int> path_length = maze.FindRecursivePath();
+  if (!path_length.ok()) return path_length.status();
+
+  return std::vector<std::string>{absl::StrCat(*path_length)};
 }
