@@ -286,7 +286,8 @@ absl::Status IntCode::RunSingleOpcode(InputSource* input, OutputSink* output) {
 }
 
 std::string IntCode::DebugDisasm() const {
-  std::vector<std::string> opnames = {"?", "ADD", "MUL", "IN", "OUT", "JNZ", "JZ", "LT", "EQ", "INCR"};
+  std::vector<std::string> opnames = {"?",   "ADD", "MUL", "IN", "OUT",
+                                      "JNZ", "JZ",  "LT",  "EQ", "INCR"};
   opnames.resize(100, "?");
   opnames[99] = "TERM";
   std::vector<int> opsize = {1, 4, 4, 2, 2, 3, 3, 4, 4, 2};
@@ -300,19 +301,19 @@ std::string IntCode::DebugDisasm() const {
       int param_mode = GetParameterMode(parameter_modes, j);
       switch (param_mode) {
         case 0: {
-          absl::StrAppend(&ret, " A*", codes_[i+j]);
+          absl::StrAppend(&ret, " A*", codes_[i + j]);
           break;
         }
         case 1: {
-          absl::StrAppend(&ret, " L$", codes_[i+j]);
+          absl::StrAppend(&ret, " L$", codes_[i + j]);
           break;
         }
         case 2: {
-          absl::StrAppend(&ret, " R+", codes_[i+j]);
+          absl::StrAppend(&ret, " R+", codes_[i + j]);
           break;
         }
         default: {
-          absl::StrAppend(&ret, " ?", codes_[i+j], "?");
+          absl::StrAppend(&ret, " ?", codes_[i + j], "?");
           break;
         }
       }

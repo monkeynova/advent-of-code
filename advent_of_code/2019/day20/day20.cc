@@ -18,7 +18,8 @@ class Maze {
 
   absl::Status Initialize() {
     if (input_[0] != "Buffer") {
-      return absl::InvalidArgumentError("Add buffer to avoid FBTD killing useful whitespace");
+      return absl::InvalidArgumentError(
+          "Add buffer to avoid FBTD killing useful whitespace");
     }
     absl::flat_hash_map<std::string, std::vector<Point>> portals;
     board_.clear();
@@ -26,23 +27,27 @@ class Maze {
       std::string next_line;
       next_line.resize(input_[y].size() - 4, ' ');
       for (int x = 2; x < input_[y].size() - 2; ++x) {
-        next_line[x-2] = input_[y][x];
+        next_line[x - 2] = input_[y][x];
         if (input_[y][x] == '.') {
           if (IsCapAlpha(input_[y - 1][x])) {
             char portal_name[] = {input_[y - 2][x], input_[y - 1][x], '\0'};
-            portals[std::string(portal_name)].push_back(Point{.x = x - 2, .y = y - 3});
+            portals[std::string(portal_name)].push_back(
+                Point{.x = x - 2, .y = y - 3});
           }
           if (IsCapAlpha(input_[y + 1][x])) {
             char portal_name[] = {input_[y + 1][x], input_[y + 2][x], '\0'};
-            portals[std::string(portal_name)].push_back(Point{.x = x - 2, .y = y - 3});
+            portals[std::string(portal_name)].push_back(
+                Point{.x = x - 2, .y = y - 3});
           }
           if (IsCapAlpha(input_[y][x - 1])) {
             char portal_name[] = {input_[y][x - 2], input_[y][x - 1], '\0'};
-            portals[std::string(portal_name)].push_back(Point{.x = x - 2, .y = y - 3});
+            portals[std::string(portal_name)].push_back(
+                Point{.x = x - 2, .y = y - 3});
           }
           if (IsCapAlpha(input_[y][x + 1])) {
             char portal_name[] = {input_[y][x + 1], input_[y][x + 2], '\0'};
-            portals[std::string(portal_name)].push_back(Point{.x = x - 2, .y = y - 3});
+            portals[std::string(portal_name)].push_back(
+                Point{.x = x - 2, .y = y - 3});
           }
         }
       }
@@ -51,7 +56,8 @@ class Maze {
     {
       auto it = portals.find("AA");
       if (it == portals.end()) return absl::InvalidArgumentError("No start");
-      if (it->second.size() != 1) return absl::InvalidArgumentError("Bad start");
+      if (it->second.size() != 1)
+        return absl::InvalidArgumentError("Bad start");
       start_ = it->second[0];
       portals.erase(it);
     }
@@ -64,18 +70,21 @@ class Maze {
     }
     for (const auto& name_to_points : portals) {
       const std::vector<Point>& points = name_to_points.second;
-      if (points.size() != 2) return absl::InvalidArgumentError("Portal not connected right");
+      if (points.size() != 2)
+        return absl::InvalidArgumentError("Portal not connected right");
       portals_.emplace(points[0], points[1]);
       portals_.emplace(points[1], points[0]);
     }
 
-    VLOG(1) << "\nBoard:\n" << absl::StrJoin(board_, "\n")
-    << "\nStart: " << start_ << "; End: " << end_
-    << "\nPortals:\n"
-     << absl::StrJoin(portals_, "\n",
-      [](std::string* out, const std::pair<Point, Point>& portal) {
-        absl::StrAppend(out, portal.first.DebugString(), "<->", portal.second.DebugString());
-      });
+    VLOG(1) << "\nBoard:\n"
+            << absl::StrJoin(board_, "\n") << "\nStart: " << start_
+            << "; End: " << end_ << "\nPortals:\n"
+            << absl::StrJoin(
+                   portals_, "\n",
+                   [](std::string* out, const std::pair<Point, Point>& portal) {
+                     absl::StrAppend(out, portal.first.DebugString(), "<->",
+                                     portal.second.DebugString());
+                   });
     return absl::OkStatus();
   }
 
@@ -84,7 +93,7 @@ class Maze {
     if (p.y < 0) return false;
     if (p.y >= board_.size()) return false;
     if (p.x >= board_[0].size()) return false;
-    return board_[p.y][p.x] == '.'; 
+    return board_[p.y][p.x] == '.';
   }
 
   bool OnEdge(Point p) {
@@ -142,15 +151,17 @@ class Maze {
         Point next = cur.pos + dir;
         if (hist.contains(std::make_pair(cur.level, next))) continue;
         if (CanStand(next)) {
-          frontier.push_back(Path{.pos = next, .steps = cur.steps + 1, .level = cur.level});
+          frontier.push_back(
+              Path{.pos = next, .steps = cur.steps + 1, .level = cur.level});
         }
       }
       if (auto it = portals_.find(cur.pos); it != portals_.end()) {
         Point next = it->second;
-        int next_level = cur.level + (OnEdge(cur.pos) ? -1 : + 1);
+        int next_level = cur.level + (OnEdge(cur.pos) ? -1 : +1);
         if (next_level >= 0 &&
             !hist.contains(std::make_pair(next_level, next))) {
-          frontier.push_back(Path{.pos = next, .steps = cur.steps + 1, .level = next_level});
+          frontier.push_back(
+              Path{.pos = next, .steps = cur.steps + 1, .level = next_level});
         }
       }
       frontier.pop_front();

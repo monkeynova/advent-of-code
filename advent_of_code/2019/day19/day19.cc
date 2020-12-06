@@ -30,7 +30,8 @@ class Drone : public IntCode::IOModule {
         VLOG(3) << "Fetch (y): => " << probe_.y;
         return probe_.y;
       }
-      default: return absl::InvalidArgumentError("Can't fetch in this state");
+      default:
+        return absl::InvalidArgumentError("Can't fetch in this state");
     }
   }
 
@@ -86,13 +87,17 @@ class TractorSearch {
       }
       board.push_back(row);
     }
-    return absl::StrJoin(board, "\n");   
+    return absl::StrJoin(board, "\n");
   }
 
   absl::StatusOr<Point> FindSquareSpace(int size) {
-    VLOG(1) << "Find: " << size << "\n" << DebugBoard(Point{6, 8}, Point{30, 30});
+    VLOG(1) << "Find: " << size << "\n"
+            << DebugBoard(Point{6, 8}, Point{30, 30});
 
-    struct Range { Point min; Point max; };
+    struct Range {
+      Point min;
+      Point max;
+    };
     std::vector<Range> ranges;
     for (Point probe{.x = size, .y = 0};; ++probe.y) {
       absl::StatusOr<int> on = ScanPoint(probe);
@@ -103,23 +108,33 @@ class TractorSearch {
         ranges.back().max = probe;
         break;
       }
-      if (probe.y > 2 * size) return absl::InvalidArgumentError("Can't find start");
+      if (probe.y > 2 * size)
+        return absl::InvalidArgumentError("Can't find start");
     }
     while (true) {
       absl::StatusOr<int> on = ScanPoint(ranges.back().min);
       if (!on.ok()) return on.status();
-      if (!*on) { ++ranges.back().min.x; break; }
+      if (!*on) {
+        ++ranges.back().min.x;
+        break;
+      }
       --ranges.back().min.x;
-      if (ranges.back().min.x < 0) return absl::InvalidArgumentError("Can't find min");
+      if (ranges.back().min.x < 0)
+        return absl::InvalidArgumentError("Can't find min");
     }
     while (true) {
       absl::StatusOr<int> on = ScanPoint(ranges.back().max);
       if (!on.ok()) return on.status();
-      if (!*on) { --ranges.back().max.x; break; }
+      if (!*on) {
+        --ranges.back().max.x;
+        break;
+      }
       ++ranges.back().max.x;
-      if (ranges.back().min.x < 0) return absl::InvalidArgumentError("Can't find max");
+      if (ranges.back().min.x < 0)
+        return absl::InvalidArgumentError("Can't find max");
     }
-    VLOG(2) << "Start Range[" << ranges.size() - 1 <<"] " << ranges.back().min << "-" << ranges.back().max;
+    VLOG(2) << "Start Range[" << ranges.size() - 1 << "] " << ranges.back().min
+            << "-" << ranges.back().max;
     while (true) {
       Range next_range = ranges.back();
       ++next_range.min.y;
@@ -138,21 +153,25 @@ class TractorSearch {
       while (true) {
         absl::StatusOr<int> on = ScanPoint(next_range.max);
         if (!on.ok()) return on.status();
-        if (!*on) { --next_range.max.x; break; }
+        if (!*on) {
+          --next_range.max.x;
+          break;
+        }
         ++next_range.max.x;
       }
       ranges.push_back(next_range);
-      VLOG(2) << "Range[" << ranges.size() -1 <<"] " << next_range.min << "-" << next_range.max;
-      if (ranges.size() > 100 &&
-          ranges[ranges.size() - 100].max.x >= ranges[ranges.size() - 1].min.x + 99) {
+      VLOG(2) << "Range[" << ranges.size() - 1 << "] " << next_range.min << "-"
+              << next_range.max;
+      if (ranges.size() > 100 && ranges[ranges.size() - 100].max.x >=
+                                     ranges[ranges.size() - 1].min.x + 99) {
         return Point{
-          .x = ranges[ranges.size() - 1].min.x,
-          .y = static_cast<int>(ranges.size() - 100),
+            .x = ranges[ranges.size() - 1].min.x,
+            .y = static_cast<int>(ranges.size() - 100),
         };
       }
     }
-    
-    return Point{0,0};
+
+    return Point{0, 0};
   }
 
   absl::StatusOr<int> ScanPoint(Point p) {
@@ -176,7 +195,7 @@ absl::StatusOr<std::vector<std::string>> Day19_2019::Part1(
   if (!codes.ok()) return codes.status();
 
   TractorSearch search(std::move(*codes));
-  absl::StatusOr<int> active = search.ScanRange(Point{0,0}, Point{50, 50});
+  absl::StatusOr<int> active = search.ScanRange(Point{0, 0}, Point{50, 50});
   if (!active.ok()) return active.status();
 
   return IntReturn(*active);
