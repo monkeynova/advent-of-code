@@ -1,6 +1,7 @@
 [part=1]
 @include{advent_of_code/2019/day19/input.txt}
 --
+201
 ==
 
 [part=2]
