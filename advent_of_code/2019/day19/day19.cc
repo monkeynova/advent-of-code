@@ -12,7 +12,53 @@
 
 class Drone : public IntCode::IOModule {
  public:
-  Drone(IntCode codes) : codes_(std::move(codes)) {}
+  Drone(Point probe) : probe_(probe), state_(State::kFetchX) {}
+
+  int output() { return output_; }
+
+  bool PauseIntCode() override { return false; }
+
+  absl::StatusOr<int64_t> Fetch() override {
+    switch (state_) {
+      case State::kFetchX: {
+        state_ = State::kFetchY;
+        VLOG(3) << "Fetch (x): => " << probe_.x;
+        return probe_.x;
+      }
+      case State::kFetchY: {
+        state_ = State::kReceiveActive;
+        VLOG(3) << "Fetch (y): => " << probe_.y;
+        return probe_.y;
+      }
+      default: return absl::InvalidArgumentError("Can't fetch in this state");
+    }
+  }
+
+  absl::Status Put(int64_t val) override {
+    if (state_ != State::kReceiveActive) {
+      return absl::InternalError("Not ready to recieve");
+    }
+    VLOG(3) << "Put: " << probe_ << "=" << val;
+    output_ = val;
+    return absl::OkStatus();
+  }
+
+ private:
+  Point probe_;
+  int output_;
+  enum class State {
+    kNoState = 0,
+    kFetchX = 1,
+    kFetchY = 2,
+    kReceiveActive = 3,
+    kDone = 4,
+  };
+  State state_ = State::kNoState;
+};
+
+class TractorSearch {
+ public:
+  TractorSearch(IntCode codes) : codes_(std::move(codes)) {}
 
   absl::StatusOr<int> ScanRange(Point min, Point max) {
     int active = 0;
@@ -110,61 +156,18 @@ class Drone : public IntCode::IOModule {
   }
 
   absl::StatusOr<int> ScanPoint(Point p) {
-    cur_ = p;
-    state_ = State::kFetchX;
+    Drone prober(p);
     IntCode new_codes = codes_.Clone();
-    if (absl::Status st = new_codes.Run(this); !st.ok()) {
+    if (absl::Status st = new_codes.Run(&prober); !st.ok()) {
       return st;
     }
-    VLOG(2) << "ScanPoint: " << p << " = " << cur_output_;
+    VLOG(2) << "ScanPoint: " << p << " = " << prober.output();
 
-    return cur_output_;
-  }
-
-  bool PauseIntCode() override { return false; }
-
-  absl::StatusOr<int64_t> Fetch() override {
-    switch (state_) {
-      case State::kFetchX: {
-        state_ = State::kFetchY;
-        VLOG(3) << "Fetch (x): => " << cur_.x;
-        return cur_.x;
-      }
-      case State::kFetchY: {
-        state_ = State::kReceiveActive;
-        VLOG(3) << "Fetch (y): => " << cur_.y;
-        return cur_.y;
-      }
-      default: return absl::InvalidArgumentError("Can't fetch in this state");
-    }
-  }
-
-  absl::Status Put(int64_t val) override {
-    if (state_ != State::kReceiveActive) {
-      return absl::InternalError("Not ready to recieve");
-    }
-    VLOG(3) << "Put: " << cur_ << "=" << val;
-    cur_output_ = val;
-    return absl::OkStatus();
-  }
-
-  int ActiveTractorLocations() const {
-    return active_tractor_locations_;
+    return prober.output();
   }
 
  private:
-  enum class State {
-    kNoState = 0,
-    kFetchX = 1,
-    kFetchY = 2,
-    kReceiveActive = 3,
-    kDone = 4,
-  };
   IntCode codes_;
-  State state_ = State::kNoState;
-  Point cur_;
-  int cur_output_;
-  int active_tractor_locations_;
 };
 
 absl::StatusOr<std::vector<std::string>> Day19_2019::Part1(
@@ -172,8 +175,8 @@ absl::StatusOr<std::vector<std::string>> Day19_2019::Part1(
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
 
-  Drone drone(std::move(*codes));
-  absl::StatusOr<int> active = drone.ScanRange(Point{0,0}, Point{50, 50});
+  TractorSearch search(std::move(*codes));
+  absl::StatusOr<int> active = search.ScanRange(Point{0,0}, Point{50, 50});
   if (!active.ok()) return active.status();
 
   return std::vector<std::string>{absl::StrCat(*active)};
@@ -184,8 +187,8 @@ absl::StatusOr<std::vector<std::string>> Day19_2019::Part2(
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
 
-  Drone drone(std::move(*codes));
-  absl::StatusOr<Point> space = drone.FindSquareSpace(100);
+  TractorSearch search(std::move(*codes));
+  absl::StatusOr<Point> space = search.FindSquareSpace(100);
   if (!space.ok()) return space.status();
 
   return std::vector<std::string>{absl::StrCat(space->x * 10000 + space->y)};
