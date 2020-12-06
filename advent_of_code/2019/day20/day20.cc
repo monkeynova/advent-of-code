@@ -136,7 +136,6 @@ class Maze {
     frontier.push_back(Path{.pos = start_});
     while (!frontier.empty()) {
       const Path& cur = frontier.front();
-      //LOG(WARNING) << cur.steps();
       if (cur.pos == end_ && cur.level == 0) return cur.steps;
       hist.insert(std::make_pair(cur.level, cur.pos));
       for (Point dir : Cardinal::kAll) {
