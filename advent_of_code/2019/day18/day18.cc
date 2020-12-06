@@ -21,7 +21,7 @@ class Board {
       for (int x = 0; x < board_[y].size(); ++x) {
         Point cur_point = Point{.x = x, .y = y};
         if (board_[y][x] == '@') {
-          pos_ = cur_point;
+          robots_.push_back(cur_point);
         } else if (board_[y][x] >= 'a' && board_[y][x] <= 'z') {
           keys_[board_[y][x]] = cur_point;
         } else if (board_[y][x] >= 'A' && board_[y][x] <= 'Z') {
@@ -78,8 +78,11 @@ class Board {
 
   std::vector<KeyPath> AllKeyPaths() {
     std::vector<KeyPath> paths;
-    std::vector<KeyPath> to_add = FindAllKeysFrom('@', pos_);
-    paths.insert(paths.end(), to_add.begin(), to_add.end());
+    std::vector<KeyPath> to_add;
+    for (Point pos : robots_) {
+      to_add = FindAllKeysFrom('@', pos);
+      paths.insert(paths.end(), to_add.begin(), to_add.end());
+    }
     for (const auto& key_and_pos : keys_) {
       to_add = FindAllKeysFrom(key_and_pos.first, key_and_pos.second);
       paths.insert(paths.end(), to_add.begin(), to_add.end());
@@ -175,11 +178,57 @@ class Board {
       all_paths_idx[path.from].push_back(path);
       all_paths_rev_idx[path.to_key].push_back(path);
     }
+    if (robots_.size() > 1) {
+      return MinStepsRobotFrontier(all_paths_idx);
+    }
     return MinStepsDynamicProgramming(all_paths_rev_idx);
+    pos_ = robots_[0];
     int have_keys_bv = 0;
     return MinStepsToAllKeysWithPaths(0, have_keys_bv, all_paths_idx, 0, absl::nullopt);
     absl::flat_hash_set<char> have_keys;
     return MinStepsToAllKeysImpl(&have_keys, 0, absl::nullopt);
+  }
+
+  absl::StatusOr<absl::optional<int>> MinStepsRobotFrontier(
+    const absl::flat_hash_map<Point, std::vector<KeyPath>>& all_paths_idx) {
+    struct State {
+      std::vector<Point> robots;
+      int have_keys_bv;
+      int steps;
+    };
+    std::deque<State> frontier;
+    absl::optional<int> min;
+    int all_keys_bv = (1 << keys_.size()) - 1;
+    frontier.push_back({.have_keys_bv = 0, .robots = robots_, .steps = 0});
+    while (!frontier.empty()) {
+      const State& cur = frontier.front();
+      for (int i = 0; i < cur.robots.size(); ++i) {
+        if (auto it = all_paths_idx.find(robots_[i]); it != all_paths_idx.end()) {
+          for (const KeyPath& path : it->second) {
+            if ((path.required_keys_bv & cur.have_keys_bv) != path.required_keys_bv) {
+              continue;
+            }
+            if (min && cur.steps + path.steps >= *min) {
+              continue;
+            }
+            frontier.push_back({
+              .robots = cur.robots,
+              .steps = cur.steps + path.steps,
+              .have_keys_bv = cur.have_keys_bv | (1 << (path.to_key - 'a')),
+            });
+            if (frontier.back().have_keys_bv == all_keys_bv) {
+              if (!min || *min > frontier.back().steps) {
+                min = frontier.back().steps;
+              }
+            } else {
+              frontier.back().robots[i] = path.to;
+            }
+          }
+        }
+      }
+      frontier.pop_front();
+    }
+    return min;
   }
 
   absl::StatusOr<absl::optional<int>> MinStepsDynamicProgramming(
@@ -208,7 +257,7 @@ class Board {
     int have_keys_bv, char to_key,
     const absl::flat_hash_map<char, std::vector<KeyPath>>& all_paths_rev_idx) {
     char to_key_str[] = {to_key, '\0'};
-    VLOG(1) << "MinStepsDynamicProgrammingState keys=0x" << std::hex << have_keys_bv << " key=" << to_key_str;
+    VLOG(2) << "MinStepsDynamicProgrammingState keys=0x" << std::hex << have_keys_bv << " key=" << to_key_str;
     int cache_key = have_keys_bv | ((to_key - 'a') << keys_.size());
     if ((*keys_bv_and_pos_to_min_path)[cache_key] != -2) {
       return (*keys_bv_and_pos_to_min_path)[cache_key];
@@ -220,7 +269,7 @@ class Board {
       have_keys_bv &= ~(1 << (to_key - 'a'));
 
       for (const KeyPath& path : paths) {
-        VLOG(2) << "  path=" << path.DebugString();
+        VLOG(3) << "  path=" << path.DebugString();
         if (have_keys_bv == 0) {
           if (path.from_key == '@') return path.steps;
         } else if (path.from_key != '@' && 
@@ -251,6 +300,7 @@ class Board {
       int have_keys_bv,
       const absl::flat_hash_map<Point, std::vector<KeyPath>>& all_paths_idx,
       int base_steps, absl::optional<int> best_so_far) {
+    if (robots_.size() > 1) return absl::InvalidArgumentError("Doesn't support multiple robots");
     VLOG_IF(1, key_count < 5) << "MinStepsToAllKeysWithPaths: " << key_count << " of " << keys_.size()
             << "; steps=" << base_steps << "; from=" << pos_ << "; best=" 
             << (best_so_far ? *best_so_far : -1);
@@ -286,6 +336,7 @@ class Board {
 
   absl::StatusOr<absl::optional<int>> MinStepsToAllKeysImpl(
       absl::flat_hash_set<char>* have_keys, int base_steps, absl::optional<int> best_so_far) {
+    if (robots_.size() > 1) return absl::InvalidArgumentError("Doesn't support multiple robots");
     VLOG_EVERY_N(1, 7777) << "MinStepsToAllKeys: " << have_keys->size() << " of " << keys_.size() << "; best=" 
             << (best_so_far ? *best_so_far : -1);
     if (have_keys->size() == keys_.size()) return base_steps;
@@ -314,6 +365,7 @@ class Board {
 
  private:
   const std::vector<absl::string_view>& board_;
+  std::vector<Point> robots_;
   Point pos_;
   absl::flat_hash_map<char, Point> keys_;
   absl::flat_hash_map<char, Point> doors_;
@@ -331,5 +383,41 @@ absl::StatusOr<std::vector<std::string>> Day18_2019::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day18_2019::Part2(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  std::vector<std::string> altered_input;
+  for (absl::string_view str : input) {
+    altered_input.push_back(std::string(str));
+  }
+  bool found = false;
+  for (int y = 1; !found && y < altered_input.size() - 1; ++y) {
+    for (int x = 1; !found && x < altered_input[y].size() - 1; ++x) {
+      if (altered_input[y][x] == '@') {
+        found = true;
+        altered_input[y-1][x-1] = '@';
+        altered_input[y+1][x-1] = '@';
+        altered_input[y-1][x+1] = '@';
+        altered_input[y+1][x+1] = '@';
+        altered_input[y-1][x] = '#';
+        altered_input[y+1][x] = '#';
+        altered_input[y][x-1] = '#';
+        altered_input[y][x+1] = '#';
+        altered_input[y][x] = '#';
+      }
+    }
+  }
+  if (!found) return absl::InvalidArgumentError("Could not edit board");
+
+  std::vector<absl::string_view> altered_input_view;
+  for (const std::string& str : altered_input) {
+    altered_input_view.push_back(str);
+  }
+
+  VLOG(1) << "\n" << absl::StrJoin(altered_input_view, "\n");
+
+  Board b(altered_input_view);
+  if (absl::Status st = b.InitializeBoard(); !st.ok()) return st;
+  
+  absl::StatusOr<absl::optional<int>> steps = b.MinStepsToAllKeys();
+  if (!steps.ok()) return steps.status();
+  if (!*steps) return absl::InvalidArgumentError("No Path found");
+  return std::vector<std::string>{absl::StrCat(**steps)};
 }
