@@ -59,6 +59,7 @@ cc_library(
     ],
     deps = [
         "@com_google_absl//absl/hash",
+        "@com_google_absl//absl/strings",
     ],
 )
 
