@@ -38,9 +38,7 @@ struct Point {
   int dist() const { return abs(x) + abs(y); }
   int dist(Point o) const { return abs(x - o.x) + abs(y - o.y); }
 
-  std::string DebugString() const {
-    return absl::StrCat("{", x, ",", y, "}");
-  }
+  std::string DebugString() const { return absl::StrCat("{", x, ",", y, "}"); }
 };
 
 struct Cardinal {

@@ -27,5 +27,33 @@ absl::StatusOr<std::vector<std::string>> Day6_2020::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day6_2020::Part2(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  int group_sum = 0;
+  absl::flat_hash_map<char, int> hist;
+  int group_size = 0;
+  for (absl::string_view str : input) {
+    if (str.empty()) {
+      int all_yes = 0;
+      for (const auto& pair : hist) {
+        if (pair.second == group_size) {
+          ++all_yes;
+        }
+      }
+      group_sum += all_yes;
+      hist.clear();
+      group_size = 0;
+    } else {
+      for (char c : str) {
+        hist[c]++;
+      }
+      group_size++;
+    }
+  }
+  int all_yes = 0;
+  for (const auto& pair : hist) {
+    if (pair.second == group_size) {
+      ++all_yes;
+    }
+  }
+  group_sum += all_yes;
+  return std::vector<std::string>{absl::StrCat(group_sum)};
 }
