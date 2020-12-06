@@ -300,15 +300,15 @@ std::string IntCode::DebugDisasm() const {
       int param_mode = GetParameterMode(parameter_modes, j);
       switch (param_mode) {
         case 0: {
-          absl::StrAppend(&ret, " [", codes_[i+j], "]");
+          absl::StrAppend(&ret, " A*", codes_[i+j]);
           break;
         }
         case 1: {
-          absl::StrAppend(&ret, " *", codes_[i+j]);
+          absl::StrAppend(&ret, " L$", codes_[i+j]);
           break;
         }
         case 2: {
-          absl::StrAppend(&ret, " +", codes_[i+j]);
+          absl::StrAppend(&ret, " R+", codes_[i+j]);
           break;
         }
         default: {
