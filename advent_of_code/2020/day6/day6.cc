@@ -10,7 +10,19 @@
 
 absl::StatusOr<std::vector<std::string>> Day6_2020::Part1(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  int group_sum = 0;
+  absl::flat_hash_set<char> hist;
+  for (absl::string_view str : input) {
+    if (str.empty()) {
+      group_sum += hist.size();
+      hist.clear();
+    }
+    for (char c : str) {
+      hist.insert(c);
+    }
+  }
+  group_sum += hist.size();
+  return std::vector<std::string>{absl::StrCat(group_sum)};
 }
 
 absl::StatusOr<std::vector<std::string>> Day6_2020::Part2(
