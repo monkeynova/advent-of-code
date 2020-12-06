@@ -53,7 +53,7 @@
 
 # 4676 (high)
 [part=1]
-[long=10m (87s opt) 2020.12.05]
+[long=36m (87s opt) 2020.12.05]
 @include{advent_of_code/2019/day18/input.txt}
 --
 4544
