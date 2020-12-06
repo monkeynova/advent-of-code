@@ -24,7 +24,9 @@ absl::StatusOr<IntCode> IntCode::Parse(
           absl::StrCat("\"", str, "\" isn't parseable as an int64_t"));
     }
   }
-  return IntCode(codes);
+  IntCode ret(codes);
+  VLOG(3) << ret.DebugDisasm();
+  return ret;
 }
 
 // `parameter_number` is 1-indexed to make code easier to read in accessors`.
@@ -281,4 +283,42 @@ absl::Status IntCode::RunSingleOpcode(InputSource* input, OutputSink* output) {
   }
 
   return absl::OkStatus();
+}
+
+std::string IntCode::DebugDisasm() const {
+  std::vector<std::string> opnames = {"?", "ADD", "MUL", "IN", "OUT", "JNZ", "JZ", "LT", "EQ", "INCR"};
+  opnames.resize(100, "?");
+  opnames[99] = "TERM";
+  std::vector<int> opsize = {1, 4, 4, 2, 2, 3, 3, 4, 4, 2};
+  opsize.resize(100, 1);
+  std::string ret;
+  for (int i = 0; i < codes_.size();) {
+    const int64_t opcode = codes_[i] % 100;
+    const int64_t parameter_modes = codes_[i] / 100;
+    absl::StrAppend(&ret, i, ": ", opnames[opcode]);
+    for (int j = 1; j < opsize[opcode]; ++j) {
+      int param_mode = GetParameterMode(parameter_modes, j);
+      switch (param_mode) {
+        case 0: {
+          absl::StrAppend(&ret, " [", codes_[i+j], "]");
+          break;
+        }
+        case 1: {
+          absl::StrAppend(&ret, " *", codes_[i+j]);
+          break;
+        }
+        case 2: {
+          absl::StrAppend(&ret, " +", codes_[i+j]);
+          break;
+        }
+        default: {
+          absl::StrAppend(&ret, " ?", codes_[i+j], "?");
+          break;
+        }
+      }
+    }
+    i += opsize[opcode];
+    absl::StrAppend(&ret, "\n");
+  }
+  return ret;
 }

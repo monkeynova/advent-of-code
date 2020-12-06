@@ -73,6 +73,8 @@ class IntCode {
 
   IntCode Clone() const { return *this; }
 
+  std::string DebugDisasm() const;
+
   bool terminated() const { return terminated_; }
 
   absl::Status Poke(int64_t address, int64_t value) {
