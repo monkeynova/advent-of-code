@@ -12,31 +12,107 @@
 
 class Drone : public IntCode::IOModule {
  public:
-  void SetScan(Point min, Point max) {
-    min_ = min;
-    max_ = max;
-    cur_ = min_;
-    board_.clear();
-    std::string blank;
-    blank.resize(max_.x - min_.x, '?');
-    board_.resize(max_.y - min_.y, blank);
-    state_ = State::kFetchX;
+  Drone(IntCode codes) : codes_(std::move(codes)) {}
+
+  absl::StatusOr<int> ScanRange(Point min, Point max) {
+    int active = 0;
+    for (int y = min.y; y < max.y; ++y) {
+      for (int x = min.x; x < max.x; ++x) {
+        Point p{x, y};
+        absl::StatusOr<int> out = ScanPoint(p);
+        if (!out.ok()) return out.status();
+        VLOG(1) << p << "=" << *out;
+        if (*out) ++active;
+      }
+    }
+    return active;
   }
 
-  bool is_done() { return state_ == State::kDone; }
+  std::string DebugBoard(Point min, Point max) {
+    std::vector<std::string> board;
+    for (int y = min.y; y < max.y; ++y) {
+      std::string row;
+      row.resize(max.x - min.x, '.');
+      for (int x = min.x; x < max.x; ++x) {
+        Point p{x, y};
+        absl::StatusOr<int> out = ScanPoint(p);
+        if (out.ok() && *out) row[x - min.x] = '#';
+      }
+      board.push_back(row);
+    }
+    return absl::StrJoin(board, "\n");   
+  }
 
-  bool PauseIntCode() override { return is_done(); }
+  absl::StatusOr<Point> FindSquareSpace(int size) {
+    VLOG(1) << "Find: " << size << "\n" << DebugBoard(Point{6, 8}, Point{30, 30});
+    // Rows/cols after this min are guaranteed to have enabled spots.
+    // TODO(@monkeynova): Find automatically.
+    Point start = Point{6,8};
+    struct Range { Point min; Point max; };
+    std::vector<Range> ranges;
+    ranges.resize(start.y + 1);
+    ranges.back().min = start;
+    ranges.back().max = start;
+    VLOG(2) << "Start Range[" << ranges.size() - 1 <<"] " << ranges.back().min << "-" << ranges.back().max;
+    while (true) {
+      Range next_range = ranges.back();
+      ++next_range.min.y;
+      ++next_range.max.y;
+      ++next_range.max.x;
+      while (true) {
+        absl::StatusOr<int> on = ScanPoint(next_range.min);
+        if (!on.ok()) return on.status();
+        if (*on) break;
+        ++next_range.min.x;
+      }
+      if (next_range.min.x > next_range.max.x) {
+        // Next range started after the end of the previous.
+        next_range.max.x = next_range.min.x;
+      }
+      while (true) {
+        absl::StatusOr<int> on = ScanPoint(next_range.max);
+        if (!on.ok()) return on.status();
+        if (!*on) { --next_range.max.x; break; }
+        ++next_range.max.x;
+      }
+      ranges.push_back(next_range);
+      VLOG(2) << "Range[" << ranges.size() -1 <<"] " << next_range.min << "-" << next_range.max;
+      if (ranges.size() > 100 &&
+          ranges[ranges.size() - 100].max.x >= ranges[ranges.size() - 1].min.x + 99) {
+        return Point{
+          .x = ranges[ranges.size() - 1].min.x,
+          .y = static_cast<int>(ranges.size() - 100),
+        };
+      }
+    }
+    
+    return Point{0,0};
+  }
+
+  absl::StatusOr<int> ScanPoint(Point p) {
+    cur_ = p;
+    state_ = State::kFetchX;
+    IntCode new_codes = codes_.Clone();
+    if (absl::Status st = new_codes.Run(this); !st.ok()) {
+      return st;
+    }
+    VLOG(2) << "ScanPoint: " << p << " = " << cur_output_;
+
+    return cur_output_;
+  }
+
+  bool PauseIntCode() override { return false; }
 
   absl::StatusOr<int64_t> Fetch() override {
     switch (state_) {
       case State::kFetchX: {
         state_ = State::kFetchY;
-        VLOG(2) << "Fetch (x): => " << cur_.x;
+        VLOG(3) << "Fetch (x): => " << cur_.x;
         return cur_.x;
       }
       case State::kFetchY: {
         state_ = State::kReceiveActive;
-        VLOG(2) << "Fetch (y): => " << cur_.y;
+        VLOG(3) << "Fetch (y): => " << cur_.y;
         return cur_.y;
       }
       default: return absl::InvalidArgumentError("Can't fetch in this state");
@@ -47,28 +123,13 @@ class Drone : public IntCode::IOModule {
     if (state_ != State::kReceiveActive) {
       return absl::InternalError("Not ready to recieve");
     }
-    VLOG(2) << "Put: " << cur_ << "=" << val;
-    board_[cur_.y - min_.y][cur_.x - min_.x] = val ? '#' : '.';
-    state_ = State::kFetchX;
-    if (++cur_.x == max_.x) {
-      cur_.x = 0;
-      if (++cur_.y == max_.y) {
-        cur_.y = 0;
-        state_ = State::kDone;
-      }
-    }
+    VLOG(3) << "Put: " << cur_ << "=" << val;
+    cur_output_ = val;
     return absl::OkStatus();
   }
 
   int ActiveTractorLocations() const {
-    VLOG(1) << "\n" << absl::StrJoin(board_, "\n");
-    int active = 0;
-    for (const std::string& line : board_) {
-      for (char c : line) {
-        if (c == '#') ++active;
-      }
-    }
-    return active;
+    return active_tractor_locations_;
   }
 
  private:
@@ -79,11 +140,11 @@ class Drone : public IntCode::IOModule {
     kReceiveActive = 3,
     kDone = 4,
   };
+  IntCode codes_;
   State state_ = State::kNoState;
-  Point min_;
-  Point max_;
   Point cur_;
-  std::vector<std::string> board_;
+  int cur_output_;
+  int active_tractor_locations_;
 };
 
 absl::StatusOr<std::vector<std::string>> Day19_2019::Part1(
@@ -91,19 +152,21 @@ absl::StatusOr<std::vector<std::string>> Day19_2019::Part1(
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
 
-  Drone drone;
-  drone.SetScan(Point{0,0}, Point{50, 50});
-  while (!drone.is_done()) {
-    IntCode new_codes = codes->Clone();
-    if (absl::Status st = new_codes.Run(&drone); !st.ok()) {
-      return st;
-    }
-  }
+  Drone drone(std::move(*codes));
+  absl::StatusOr<int> active = drone.ScanRange(Point{0,0}, Point{50, 50});
+  if (!active.ok()) return active.status();
 
-  return std::vector<std::string>{absl::StrCat(drone.ActiveTractorLocations())};
+  return std::vector<std::string>{absl::StrCat(*active)};
 }
 
 absl::StatusOr<std::vector<std::string>> Day19_2019::Part2(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
+  if (!codes.ok()) return codes.status();
+
+  Drone drone(std::move(*codes));
+  absl::StatusOr<Point> space = drone.FindSquareSpace(100);
+  if (!space.ok()) return space.status();
+
+  return std::vector<std::string>{absl::StrCat(space->x * 10000 + space->y)};
 }
