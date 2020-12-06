@@ -174,7 +174,7 @@ absl::StatusOr<std::vector<std::string>> Day14_2019::Part1(
   absl::StatusOr<int> ore_needed = ComputeOreNeedForFuel(*rule_set);
   if (!ore_needed.ok()) return ore_needed.status();
 
-  return std::vector<std::string>{absl::StrCat(*ore_needed)};
+  return IntReturn(*ore_needed);
 }
 
 absl::StatusOr<std::vector<std::string>> Day14_2019::Part2(
@@ -189,5 +189,5 @@ absl::StatusOr<std::vector<std::string>> Day14_2019::Part2(
   absl::StatusOr<int> fuel_made = FuelFromOre(*rule_set, 1000000000000);
   if (!fuel_made.ok()) return fuel_made.status();
 
-  return std::vector<std::string>{absl::StrCat(*fuel_made)};
+  return IntReturn(*fuel_made);
 }

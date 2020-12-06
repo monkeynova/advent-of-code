@@ -102,7 +102,7 @@ absl::StatusOr<std::vector<std::string>> Day12_2019::Part1(
     }
   }
 
-  return std::vector<std::string>{absl::StrCat(TotalEnergy(moons))};
+  return IntReturn(TotalEnergy(moons));
 }
 
 absl::StatusOr<std::vector<std::string>> Day12_2019::Part2(
@@ -180,5 +180,5 @@ absl::StatusOr<std::vector<std::string>> Day12_2019::Part2(
   product = product * *y_cycle_size / std::gcd(product, *y_cycle_size);
   product = product * *z_cycle_size / std::gcd(product, *z_cycle_size);
 
-  return std::vector<std::string>{absl::StrCat(product)};
+  return IntReturn(product);
 }

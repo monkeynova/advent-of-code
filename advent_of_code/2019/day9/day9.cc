@@ -20,7 +20,7 @@ absl::StatusOr<std::vector<std::string>> Day9_2019::Part1(
         absl::StrCat("Bad output: {", absl::StrJoin(output, ","), "}"));
   }
 
-  return std::vector<std::string>{absl::StrCat(output[0])};
+  return IntReturn(output[0]);
 }
 
 absl::StatusOr<std::vector<std::string>> Day9_2019::Part2(
@@ -37,5 +37,5 @@ absl::StatusOr<std::vector<std::string>> Day9_2019::Part2(
         absl::StrCat("Bad output: {", absl::StrJoin(output, ","), "}"));
   }
 
-  return std::vector<std::string>{absl::StrCat(output[0])};
+  return IntReturn(output[0]);
 }

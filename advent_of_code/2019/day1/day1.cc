@@ -17,7 +17,7 @@ absl::StatusOr<std::vector<std::string>> Day1_2019::Part1(
     total_fuel += module_cost / 3 - 2;
   }
 
-  return std::vector<std::string>{absl::StrCat(total_fuel)};
+  return IntReturn(total_fuel);
 }
 
 absl::StatusOr<std::vector<std::string>> Day1_2019::Part2(
@@ -40,5 +40,5 @@ absl::StatusOr<std::vector<std::string>> Day1_2019::Part2(
     total_fuel += module_fuel;
   }
 
-  return std::vector<std::string>{absl::StrCat(total_fuel)};
+  return IntReturn(total_fuel);
 }

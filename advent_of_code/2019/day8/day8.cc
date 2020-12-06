@@ -41,7 +41,7 @@ absl::StatusOr<std::vector<std::string>> Day8_2019::Part1(
     if (layer[j] == '1') ++num_ones;
     if (layer[j] == '2') ++num_twos;
   }
-  return std::vector<std::string>{absl::StrCat(num_ones * num_twos)};
+  return IntReturn(num_ones * num_twos);
 }
 
 absl::StatusOr<std::vector<std::string>> Day8_2019::Part2(

@@ -175,7 +175,7 @@ absl::StatusOr<std::vector<std::string>> Day20_2019::Part1(
   absl::StatusOr<int> path_length = maze.FindPath();
   if (!path_length.ok()) return path_length.status();
 
-  return std::vector<std::string>{absl::StrCat(*path_length)};
+  return IntReturn(*path_length);
 }
 
 absl::StatusOr<std::vector<std::string>> Day20_2019::Part2(
@@ -185,5 +185,5 @@ absl::StatusOr<std::vector<std::string>> Day20_2019::Part2(
   absl::StatusOr<int> path_length = maze.FindRecursivePath();
   if (!path_length.ok()) return path_length.status();
 
-  return std::vector<std::string>{absl::StrCat(*path_length)};
+  return IntReturn(*path_length);
 }

@@ -24,7 +24,7 @@ absl::StatusOr<std::vector<std::string>> Day1_2020::Part1(
     hist.insert(a);
   }
   if (res == -1) return absl::InvalidArgumentError("nothing found");
-  return std::vector<std::string>{absl::StrCat(res)};
+  return IntReturn(res);
 }
 
 absl::StatusOr<std::vector<std::string>> Day1_2020::Part2(
@@ -50,5 +50,5 @@ absl::StatusOr<std::vector<std::string>> Day1_2020::Part2(
     hist.insert(a);
   }
   if (res == -1) return absl::InvalidArgumentError("nothing found");
-  return std::vector<std::string>{absl::StrCat(res)};
+  return IntReturn(res);
 }

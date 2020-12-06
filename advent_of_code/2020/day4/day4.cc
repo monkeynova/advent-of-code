@@ -94,7 +94,7 @@ absl::StatusOr<std::vector<std::string>> Day4_2020::Part1(
   if (Valid(passport).ok()) {
     ++valid;
   }
-  return std::vector<std::string>{absl::StrCat(valid)};
+  return IntReturn(valid);
 }
 
 absl::StatusOr<std::vector<std::string>> Day4_2020::Part2(
@@ -121,5 +121,5 @@ absl::StatusOr<std::vector<std::string>> Day4_2020::Part2(
   if (Valid2(passport).ok()) {
     ++valid;
   }
-  return std::vector<std::string>{absl::StrCat(valid)};
+  return IntReturn(valid);
 }

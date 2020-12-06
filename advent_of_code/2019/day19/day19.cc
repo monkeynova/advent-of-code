@@ -179,7 +179,7 @@ absl::StatusOr<std::vector<std::string>> Day19_2019::Part1(
   absl::StatusOr<int> active = search.ScanRange(Point{0,0}, Point{50, 50});
   if (!active.ok()) return active.status();
 
-  return std::vector<std::string>{absl::StrCat(*active)};
+  return IntReturn(*active);
 }
 
 absl::StatusOr<std::vector<std::string>> Day19_2019::Part2(
@@ -191,5 +191,5 @@ absl::StatusOr<std::vector<std::string>> Day19_2019::Part2(
   absl::StatusOr<Point> space = search.FindSquareSpace(100);
   if (!space.ok()) return space.status();
 
-  return std::vector<std::string>{absl::StrCat(space->x * 10000 + space->y)};
+  return IntReturn(space->x * 10000 + space->y);
 }

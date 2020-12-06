@@ -23,7 +23,7 @@ absl::StatusOr<std::vector<std::string>> Day2_2019::Part1(
   absl::StatusOr<int> val = codes->Peek(0);
   if (!val.ok()) return val.status();
 
-  return std::vector<std::string>{absl::StrCat(*val)};
+  return IntReturn(*val);
 }
 
 absl::StatusOr<std::vector<std::string>> Day2_2019::Part2(
@@ -40,7 +40,7 @@ absl::StatusOr<std::vector<std::string>> Day2_2019::Part2(
       absl::StatusOr<int> val = codes.Peek(0);
       if (!val.ok()) return val.status();
       if (*val == 19690720) {
-        return std::vector<std::string>{absl::StrCat(100 * noun + verb)};
+        return IntReturn(100 * noun + verb);
       }
     }
   }

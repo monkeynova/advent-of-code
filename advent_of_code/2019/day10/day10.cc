@@ -84,7 +84,7 @@ absl::StatusOr<std::vector<std::string>> Day10_2019::Part1(
   if (!asteroids.ok()) return asteroids.status();
   MostVisible most_visible = FindMostVisible(*asteroids);
 
-  return std::vector<std::string>{absl::StrCat(most_visible.seen)};
+  return IntReturn(most_visible.seen);
 }
 
 struct OrderedDestruct {
@@ -128,5 +128,5 @@ absl::StatusOr<std::vector<std::string>> Day10_2019::Part2(
   }
   std::sort(ordered_destruct.begin(), ordered_destruct.end());
   int ret = ordered_destruct[199].p.x * 100 + ordered_destruct[199].p.y;
-  return std::vector<std::string>{absl::StrCat(ret)};
+  return IntReturn(ret);
 }

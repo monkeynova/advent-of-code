@@ -82,7 +82,7 @@ absl::StatusOr<std::vector<std::string>> Day6_2019::Part1(
   if (!orbits.ok()) return orbits.status();
 
   int count_orbits = CountOrbits(*orbits, "COM", 0);
-  return std::vector<std::string>{absl::StrCat(count_orbits)};
+  return IntReturn(count_orbits);
 }
 
 absl::StatusOr<std::vector<std::string>> Day6_2019::Part2(
@@ -92,5 +92,5 @@ absl::StatusOr<std::vector<std::string>> Day6_2019::Part2(
   if (!orbits.ok()) return orbits.status();
 
   TransferRet transfer = FindTransfer(*orbits, "COM", "YOU", "SAN");
-  return std::vector<std::string>{absl::StrCat(transfer.transfer_size)};
+  return IntReturn(transfer.transfer_size);
 }

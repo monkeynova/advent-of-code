@@ -165,7 +165,7 @@ absl::StatusOr<std::vector<std::string>> Day3_2019::Part1(
     return absl::InvalidArgumentError("No intersect found");
   }
 
-  return std::vector<std::string>{absl::StrCat(min->dist())};
+  return IntReturn(min->dist());
 }
 
 absl::StatusOr<bool> PointOnLine(Point point, Line line) {
@@ -226,5 +226,5 @@ absl::StatusOr<std::vector<std::string>> Day3_2019::Part2(
     return absl::InvalidArgumentError("No intersect found");
   }
 
-  return std::vector<std::string>{absl::StrCat(min_score)};
+  return IntReturn(min_score);
 }

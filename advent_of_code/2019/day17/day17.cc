@@ -323,7 +323,7 @@ absl::StatusOr<std::vector<std::string>> Day17_2019::Part1(
   absl::StatusOr<int> alignment = view_port.ComputeAlignment();
   if (!alignment.ok()) return alignment.status();
 
-  return std::vector<std::string>{absl::StrCat(*alignment)};
+  return IntReturn(*alignment);
 }
 
 absl::StatusOr<std::vector<std::string>> Day17_2019::Part2(
@@ -339,5 +339,5 @@ absl::StatusOr<std::vector<std::string>> Day17_2019::Part2(
     return st;
   }
 
-  return std::vector<std::string>{absl::StrCat(view_port.dust_collected())};
+  return IntReturn(view_port.dust_collected());
 }

@@ -5,10 +5,15 @@
 #include <vector>
 
 #include "absl/status/statusor.h"
+#include "absl/strings/str_cat.h"
 
 class AdventDay {
  public:
   virtual ~AdventDay() = default;
+
+  std::vector<std::string> IntReturn(int64_t val) const {
+    return std::vector<std::string>{absl::StrCat(val)};
+  }
 
   virtual absl::StatusOr<std::vector<std::string>> Part1(
       const std::vector<absl::string_view>& input) const = 0;

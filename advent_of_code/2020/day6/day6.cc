@@ -22,7 +22,7 @@ absl::StatusOr<std::vector<std::string>> Day6_2020::Part1(
     }
   }
   group_sum += hist.size();
-  return std::vector<std::string>{absl::StrCat(group_sum)};
+  return IntReturn(group_sum);
 }
 
 absl::StatusOr<std::vector<std::string>> Day6_2020::Part2(
@@ -55,5 +55,5 @@ absl::StatusOr<std::vector<std::string>> Day6_2020::Part2(
     }
   }
   group_sum += all_yes;
-  return std::vector<std::string>{absl::StrCat(group_sum)};
+  return IntReturn(group_sum);
 }

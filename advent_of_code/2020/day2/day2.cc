@@ -26,7 +26,7 @@ absl::StatusOr<std::vector<std::string>> Day2_2020::Part1(
       ++valid;
     }
   }
-  return std::vector<std::string>{absl::StrCat(valid)};
+  return IntReturn(valid);
 }
 
 absl::StatusOr<std::vector<std::string>> Day2_2020::Part2(
@@ -45,5 +45,5 @@ absl::StatusOr<std::vector<std::string>> Day2_2020::Part2(
       ++valid;
     }
   }
-  return std::vector<std::string>{absl::StrCat(valid)};
+  return IntReturn(valid);
 }

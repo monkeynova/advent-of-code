@@ -21,7 +21,7 @@ absl::StatusOr<std::vector<std::string>> Day5_2019::Part1(
     }
   }
 
-  return std::vector<std::string>{absl::StrCat(output.back())};
+  return IntReturn(output.back());
 }
 
 absl::StatusOr<std::vector<std::string>> Day5_2019::Part2(
@@ -39,5 +39,5 @@ absl::StatusOr<std::vector<std::string>> Day5_2019::Part2(
     }
   }
 
-  return std::vector<std::string>{absl::StrCat(output.back())};
+  return IntReturn(output.back());
 }

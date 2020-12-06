@@ -52,7 +52,7 @@ absl::StatusOr<std::vector<std::string>> Day4_2019::Part1(
     if (IsValidPassword(password)) ++valid;
   }
 
-  return std::vector<std::string>{absl::StrCat(valid)};
+  return IntReturn(valid);
 }
 
 absl::StatusOr<std::vector<std::string>> Day4_2019::Part2(
@@ -69,5 +69,5 @@ absl::StatusOr<std::vector<std::string>> Day4_2019::Part2(
     if (IsValidPassword2(password)) ++valid;
   }
 
-  return std::vector<std::string>{absl::StrCat(valid)};
+  return IntReturn(valid);
 }

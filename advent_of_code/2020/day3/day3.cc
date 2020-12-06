@@ -20,7 +20,7 @@ absl::StatusOr<std::vector<std::string>> Day3_2020::Part1(
     }
     product *= trees;
   }
-  return std::vector<std::string>{absl::StrCat(product)};
+  return IntReturn(product);
 }
 
 absl::StatusOr<std::vector<std::string>> Day3_2020::Part2(
@@ -35,5 +35,5 @@ absl::StatusOr<std::vector<std::string>> Day3_2020::Part2(
     }
     product *= trees;
   }
-  return std::vector<std::string>{absl::StrCat(product)};
+  return IntReturn(product);
 }

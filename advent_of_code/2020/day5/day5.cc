@@ -46,7 +46,7 @@ absl::StatusOr<std::vector<std::string>> Day5_2020::Part1(
     if (!seat.ok()) return seat.status();
     maxid = std::max(maxid, seat->id());
   }
-  return std::vector<std::string>{absl::StrCat(maxid)};
+  return IntReturn(maxid);
 }
 
 absl::StatusOr<std::vector<std::string>> Day5_2020::Part2(
@@ -64,5 +64,5 @@ absl::StatusOr<std::vector<std::string>> Day5_2020::Part2(
       missingid = id;
     }
   }
-  return std::vector<std::string>{absl::StrCat(missingid)};
+  return IntReturn(missingid);
 }

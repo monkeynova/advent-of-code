@@ -91,7 +91,7 @@ absl::StatusOr<std::vector<std::string>> Day11_2019::Part1(
   Painter painter;
   if (absl::Status st = codes->Run(&painter); !st.ok()) return st;
 
-  return std::vector<std::string>{absl::StrCat(painter.UniquePanelsPainted())};
+  return IntReturn(painter.UniquePanelsPainted());
 }
 
 absl::StatusOr<std::vector<std::string>> Day11_2019::Part2(

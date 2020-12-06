@@ -46,7 +46,7 @@ absl::StatusOr<std::vector<std::string>> Day7_2019::Part1(
   absl::StatusOr<int> best_result = FindBestThrust(*codes, 0);
   if (!best_result.ok()) return best_result.status();
 
-  return std::vector<std::string>{absl::StrCat(*best_result)};
+  return IntReturn(*best_result);
 }
 
 class CollectOutputAndPause : public IntCode::OutputSink,
@@ -145,5 +145,5 @@ absl::StatusOr<std::vector<std::string>> Day7_2019::Part2(
   absl::StatusOr<int> best_result = FindBestThrustFeedback(*codes);
   if (!best_result.ok()) return best_result.status();
 
-  return std::vector<std::string>{absl::StrCat(*best_result)};
+  return IntReturn(*best_result);
 }

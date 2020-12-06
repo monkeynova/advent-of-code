@@ -228,7 +228,7 @@ absl::StatusOr<std::vector<std::string>> Day18_2019::Part1(
   absl::StatusOr<absl::optional<int>> steps = b.MinStepsToAllKeys();
   if (!steps.ok()) return steps.status();
   if (!*steps) return absl::InvalidArgumentError("No Path found");
-  return std::vector<std::string>{absl::StrCat(**steps)};
+  return IntReturn(**steps);
 }
 
 absl::StatusOr<std::vector<std::string>> Day18_2019::Part2(
@@ -269,5 +269,5 @@ absl::StatusOr<std::vector<std::string>> Day18_2019::Part2(
   absl::StatusOr<absl::optional<int>> steps = b.MinStepsToAllKeys();
   if (!steps.ok()) return steps.status();
   if (!*steps) return absl::InvalidArgumentError("No Path found");
-  return std::vector<std::string>{absl::StrCat(**steps)};
+  return IntReturn(**steps);
 }
