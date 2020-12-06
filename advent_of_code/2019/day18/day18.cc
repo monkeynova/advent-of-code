@@ -165,7 +165,7 @@ class Board {
   absl::StatusOr<absl::optional<int>> MinStepsToAllKeys() {
     std::vector<KeyPath> all_paths = AllKeyPaths();
     absl::flat_hash_map<Point, std::vector<KeyPath>> all_paths_idx;
-    absl::flat_hash_map<Point, std::vector<KeyPath>> all_paths_rev_idx;
+    absl::flat_hash_map<char, std::vector<KeyPath>> all_paths_rev_idx;
     for (KeyPath& path : all_paths) {
       VLOG(1) << path.DebugString();
       path.required_keys_bv = 0;
@@ -173,7 +173,7 @@ class Board {
         path.required_keys_bv |= (1 << (k - 'a'));
       }
       all_paths_idx[path.from].push_back(path);
-      all_paths_rev_idx[path.to].push_back(path);
+      all_paths_rev_idx[path.to_key].push_back(path);
     }
     return MinStepsDynamicProgramming(all_paths_rev_idx);
     int have_keys_bv = 0;
@@ -183,16 +183,18 @@ class Board {
   }
 
   absl::StatusOr<absl::optional<int>> MinStepsDynamicProgramming(
-    const absl::flat_hash_map<Point, std::vector<KeyPath>>& all_paths_rev_idx) {
-    absl::flat_hash_map<std::pair<int, Point>, absl::optional<int>> keys_bv_and_pos_to_min_path;
+    const absl::flat_hash_map<char, std::vector<KeyPath>>& all_paths_rev_idx) {
+    std::vector<int16_t> keys_bv_and_pos_to_min_path;
+    keys_bv_and_pos_to_min_path.resize(keys_.size() << keys_.size(), -2);
+    int computed = 0;
     absl::optional<int> min;
     for (const auto& key_and_pos : keys_) {
-      absl::optional<int> next_min =
-          MinStepsDynamicProgrammingState(&keys_bv_and_pos_to_min_path,
+      int16_t next_min =
+          MinStepsDynamicProgrammingState(&keys_bv_and_pos_to_min_path, &computed,
                                           ((1 << keys_.size()) - 1) /*all keys*/,
-                                          key_and_pos.second, all_paths_rev_idx);
-      if (next_min) {
-        if (!min || *min > *next_min) {
+                                          key_and_pos.first, all_paths_rev_idx);
+      if (next_min != -1) {
+        if (!min || *min > next_min) {
           min = next_min;
         }
       }
@@ -200,23 +202,23 @@ class Board {
     return min;
   }
 
-  absl::optional<int> MinStepsDynamicProgrammingState(
-    absl::flat_hash_map<std::pair<int, Point>, absl::optional<int>>* keys_bv_and_pos_to_min_path,
-    int have_keys_bv, Point pos,
-    const absl::flat_hash_map<Point, std::vector<KeyPath>>& all_paths_rev_idx) {
-    VLOG(1) << "MinStepsDynamicProgrammingState keys=0x" << std::hex << have_keys_bv << " @" << pos;
-    std::pair<int, Point> cache_key(have_keys_bv, pos);
-    if (auto it = keys_bv_and_pos_to_min_path->find(cache_key);
-        it != keys_bv_and_pos_to_min_path->end()) {
-      return it->second;
+  int16_t MinStepsDynamicProgrammingState(
+    std::vector<int16_t>* keys_bv_and_pos_to_min_path,
+    int* computed,
+    int have_keys_bv, char to_key,
+    const absl::flat_hash_map<char, std::vector<KeyPath>>& all_paths_rev_idx) {
+    char to_key_str[] = {to_key, '\0'};
+    VLOG(1) << "MinStepsDynamicProgrammingState keys=0x" << std::hex << have_keys_bv << " key=" << to_key_str;
+    int cache_key = have_keys_bv | ((to_key - 'a') << keys_.size());
+    if ((*keys_bv_and_pos_to_min_path)[cache_key] != -2) {
+      return (*keys_bv_and_pos_to_min_path)[cache_key];
     }
 
-    absl::optional<int> min;
-    if (auto it = all_paths_rev_idx.find(pos); it != all_paths_rev_idx.end()) {
+    int16_t min = -1;
+    if (auto it = all_paths_rev_idx.find(to_key); it != all_paths_rev_idx.end()) {
       const std::vector<KeyPath>& paths = it->second;
-      if (!paths.empty()) {
-        have_keys_bv &= ~(1 << (paths[0].to_key - 'a'));
-      }
+      have_keys_bv &= ~(1 << (to_key - 'a'));
+
       for (const KeyPath& path : paths) {
         VLOG(2) << "  path=" << path.DebugString();
         if (have_keys_bv == 0) {
@@ -224,22 +226,21 @@ class Board {
         } else if (path.from_key != '@' && 
                    (have_keys_bv & (1 << (path.from_key - 'a'))) &&
                    (have_keys_bv & path.required_keys_bv) == path.required_keys_bv) {
-          absl::optional<int> next_min = MinStepsDynamicProgrammingState(
-            keys_bv_and_pos_to_min_path, have_keys_bv, path.from,
+          int16_t next_min = MinStepsDynamicProgrammingState(
+            keys_bv_and_pos_to_min_path, computed, have_keys_bv, path.from_key,
             all_paths_rev_idx);
-          if (next_min) {
-            if (!min || *min > *next_min + path.steps) {
-              min = *next_min + path.steps;
+          if (next_min != -1) {
+            if (min == -1 || min > next_min + path.steps) {
+              min = next_min + path.steps;
             }
           }
         }
       }
     }
 
-    keys_bv_and_pos_to_min_path->emplace(cache_key, min);
-    if (keys_bv_and_pos_to_min_path->size() % 777777 == 0){
-      LOG(WARNING) << "MinStepsDynamicProgrammingState progress: " << keys_bv_and_pos_to_min_path->size()
-       << "/" << (1 << keys_.size()) * keys_.size();
+    (*keys_bv_and_pos_to_min_path)[cache_key] = min;
+    if (++*computed % 7777777 == 0) {
+      LOG(WARNING) << "Progress: " << *computed << " of " << keys_bv_and_pos_to_min_path->size();
     }
     return min;
   }
