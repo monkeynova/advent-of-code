@@ -45,14 +45,34 @@ class Drone : public IntCode::IOModule {
 
   absl::StatusOr<Point> FindSquareSpace(int size) {
     VLOG(1) << "Find: " << size << "\n" << DebugBoard(Point{6, 8}, Point{30, 30});
-    // Rows/cols after this min are guaranteed to have enabled spots.
-    // TODO(@monkeynova): Find automatically.
-    Point start = Point{6,8};
+
     struct Range { Point min; Point max; };
     std::vector<Range> ranges;
-    ranges.resize(start.y + 1);
-    ranges.back().min = start;
-    ranges.back().max = start;
+    for (Point probe{.x = size, .y = 0};; ++probe.y) {
+      absl::StatusOr<int> on = ScanPoint(probe);
+      if (!on.ok()) return on.status();
+      if (*on) {
+        ranges.resize(probe.y + 1);
+        ranges.back().min = probe;
+        ranges.back().max = probe;
+        break;
+      }
+      if (probe.y > 2 * size) return absl::InvalidArgumentError("Can't find start");
+    }
+    while (true) {
+      absl::StatusOr<int> on = ScanPoint(ranges.back().min);
+      if (!on.ok()) return on.status();
+      if (!*on) { ++ranges.back().min.x; break; }
+      --ranges.back().min.x;
+      if (ranges.back().min.x < 0) return absl::InvalidArgumentError("Can't find min");
+    }
+    while (true) {
+      absl::StatusOr<int> on = ScanPoint(ranges.back().max);
+      if (!on.ok()) return on.status();
+      if (!*on) { --ranges.back().max.x; break; }
+      ++ranges.back().max.x;
+      if (ranges.back().min.x < 0) return absl::InvalidArgumentError("Can't find max");
+    }
     VLOG(2) << "Start Range[" << ranges.size() - 1 <<"] " << ranges.back().min << "-" << ranges.back().max;
     while (true) {
       Range next_range = ranges.back();
