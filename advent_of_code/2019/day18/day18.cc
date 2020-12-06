@@ -12,6 +12,18 @@
 
 static void CharJoin(std::string* out, char c) { out->append(1, c); }
 
+  struct NKeyState {
+    std::string robot_key;
+    int have_key_bv;
+    bool operator==(const NKeyState& other) const {
+      return robot_key == other.robot_key && have_key_bv == other.have_key_bv;
+    }
+  };
+  template <typename H>
+  H AbslHashValue(H h, const NKeyState& key_state) {
+    return H::combine(std::move(h), key_state.robot_key, key_state.have_key_bv);
+  }
+
 class Board {
  public:
   Board(const std::vector<absl::string_view>& board) : board_(board){};
@@ -177,7 +189,8 @@ class Board {
 
   absl::StatusOr<absl::optional<int>> MinStepsToAllKeys() {
     std::vector<KeyPath> all_paths = AllKeyPaths();
-    absl::flat_hash_map<Point, std::vector<KeyPath>> all_paths_idx;
+    absl::flat_hash_map<Point, std::vector<KeyPath>> all_paths_idx_by_point;
+    absl::flat_hash_map<char, std::vector<KeyPath>> all_paths_idx_by_key;
     absl::flat_hash_map<char, std::vector<KeyPath>> all_paths_rev_idx;
     for (KeyPath& path : all_paths) {
       VLOG(1) << path.DebugString();
@@ -185,19 +198,76 @@ class Board {
       for (char k : path.required_keys) {
         path.required_keys_bv |= (1 << (k - 'a'));
       }
-      all_paths_idx[path.from].push_back(path);
+      all_paths_idx_by_point[path.from].push_back(path);
+      all_paths_idx_by_key[path.from_key].push_back(path);
       all_paths_rev_idx[path.to_key].push_back(path);
     }
     if (robots_.size() > 1) {
-      return MinStepsRobotFrontier(all_paths_idx);
+      return MinStepsRobotDP(all_paths_idx_by_key);
+      return MinStepsRobotFrontier(all_paths_idx_by_point);
     }
     return MinStepsDynamicProgramming(all_paths_rev_idx);
     pos_ = robots_[0];
     int have_keys_bv = 0;
-    return MinStepsToAllKeysWithPaths(0, have_keys_bv, all_paths_idx, 0,
+    return MinStepsToAllKeysWithPaths(0, have_keys_bv, all_paths_idx_by_point, 0,
                                       absl::nullopt);
     absl::flat_hash_set<char> have_keys;
     return MinStepsToAllKeysImpl(&have_keys, 0, absl::nullopt);
+  }
+
+  absl::StatusOr<absl::optional<int>> MinStepsRobotDP(
+      const absl::flat_hash_map<char, std::vector<KeyPath>>& all_paths_idx) {
+
+    absl::flat_hash_map<NKeyState, int> states =
+        AllMinStatesForRobotsNKeys(all_paths_idx, keys_.size());
+    absl::optional<int> min;
+    for (const auto& pair : states) {
+      if (!min || *min > pair.second) { min = pair.second; }
+    }
+    return min;
+  }
+
+  absl::flat_hash_map<NKeyState, int> AllMinStatesForRobotsNKeys(
+    const absl::flat_hash_map<char, std::vector<KeyPath>>& all_paths_idx,
+    int num_keys) {
+    LOG(WARNING) << "AllMinStatesForRobotsNKeys (Start) " << num_keys;
+    absl::flat_hash_map<NKeyState, int> out_states;
+    if (num_keys == 0) {
+      std::string robot_key(robots_.size(), '@');
+      NKeyState base_state{
+        .robot_key = robot_key,
+        .have_key_bv = 0,
+      };
+      out_states[base_state] = 0;
+      return out_states;
+    }
+    absl::flat_hash_map<NKeyState, int> in_states =
+        AllMinStatesForRobotsNKeys(all_paths_idx, num_keys - 1);
+    for (const auto& pair : in_states) {
+      const NKeyState& in_state = pair.first;
+      int in_steps = pair.second;
+      for (int i = 0; i < in_state.robot_key.size(); ++i) {
+        if (auto it = all_paths_idx.find(in_state.robot_key[i]); it != all_paths_idx.end()) {
+          for (const KeyPath& path : it->second) {
+            int to_bv = (1 << (path.to_key - 'a'));
+            if (in_state.have_key_bv & to_bv) continue;
+            if ((in_state.have_key_bv & path.required_keys_bv) != path.required_keys_bv) continue;
+            if (in_state.robot_key[i] == '@' && path.from != robots_[i]) continue;
+            NKeyState out_state = in_state;
+            out_state.robot_key[i] = path.to_key;
+            out_state.have_key_bv |= to_bv;
+            if (auto it = out_states.find(out_state); it != out_states.end()) {
+              out_states[out_state] = std::min(out_states[out_state], in_steps + path.steps);
+            } else {
+              out_states[out_state] = in_steps + path.steps;
+            }
+          }
+        }
+      }
+    }
+    LOG(WARNING) << "AllMinStatesForRobotsNKeys (Done) " << num_keys << "; " << out_states.size();
+
+    return out_states;
   }
 
   absl::StatusOr<absl::optional<int>> MinStepsRobotFrontier(

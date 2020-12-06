@@ -83,6 +83,21 @@
 24
 ==
 
-[part=2][ignore]
+[part=2]
+\#############
+\#g#f.D#..h#l#
+\#F###e#E###.#
+\#dCba...BcIJ#
+\#####.@.#####
+\#nK.L...G...#
+\#M###N#H###.#
+\#o#m..#i#jk.#
+\#############
+--
+72
+==
+
+[part=2]
 @include{advent_of_code/2019/day18/input.txt}
 --
+1692
