@@ -57,7 +57,8 @@ absl::StatusOr<std::vector<std::string>> Day22_2019::Part1(
   for (absl::string_view str : input) {
     if (RE2::FullMatch(str, "deal into new stack")) {
       deck = NewStack(deck);
-    } else if (int64_t inc = 0; RE2::FullMatch(str, "deal with increment (-?\\d+)", &inc)) {
+    } else if (int64_t inc = 0;
+               RE2::FullMatch(str, "deal with increment (-?\\d+)", &inc)) {
       deck = IncrementN(deck, inc);
     } else if (int64_t cut = 0; RE2::FullMatch(str, "cut (-?\\d+)", &cut)) {
       deck = CutN(deck, cut);
