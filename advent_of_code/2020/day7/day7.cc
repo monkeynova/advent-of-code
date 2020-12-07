@@ -13,13 +13,34 @@ struct BagRule {
   int count;
 };
 
-absl::StatusOr<int> CountBags(const absl::flat_hash_map<std::string, std::vector<BagRule>>& dependency,
+int CountContainingBags(
+    const absl::flat_hash_map<std::string, std::vector<std::string>>& reverse,
+    absl::string_view bag) {
+  absl::flat_hash_set<std::string> can_contain;
+  absl::flat_hash_set<std::string> added = {std::string(bag)};
+  while (!added.empty()) {
+    absl::flat_hash_set<std::string> new_added;
+    for (const std::string& color : added) {
+      if (auto it = reverse.find(color); it != reverse.end()) {
+        for (const std::string& parent_color : it->second) {
+          if (can_contain.contains(parent_color)) continue;
+          new_added.insert(parent_color);
+          can_contain.insert(parent_color);
+        }
+      }
+    }
+    added = std::move(new_added);
+  }
+  return can_contain.size();
+}
+
+absl::StatusOr<int> CountContainedBags(const absl::flat_hash_map<std::string, std::vector<BagRule>>& dependency,
      absl::string_view bag) {
   auto it = dependency.find(bag);
   if (it == dependency.end()) return absl::InvalidArgumentError("can't find bag");
   int bag_count = 1;
   for (const BagRule& rule : it->second) {
-    absl::StatusOr<int> sub_bags = CountBags(dependency, rule.color);
+    absl::StatusOr<int> sub_bags = CountContainedBags(dependency, rule.color);
     if (!sub_bags.ok()) return sub_bags.status();
     bag_count += rule.count * *sub_bags;
   }
@@ -49,27 +70,13 @@ absl::StatusOr<std::vector<std::string>> Day7_2020::Part1(
       }
     }
   }
-  absl::flat_hash_set<std::string> can_contain;
-  absl::flat_hash_set<std::string> added = {"shiny gold"};
-  while (!added.empty()) {
-    absl::flat_hash_set<std::string> new_added;
-    for (const std::string& color : added) {
-      for (const std::string& parent_color : reverse[color]) {
-        if (can_contain.contains(parent_color)) continue;
-        new_added.insert(parent_color);
-        can_contain.insert(parent_color);
-      }
-    }
-    added = std::move(new_added);
-  }
   LOG(WARNING) << dependency.size();
-  return IntReturn(can_contain.size());
+  return IntReturn(CountContainingBags(reverse, "shiny gold"));
 }
 
 absl::StatusOr<std::vector<std::string>> Day7_2020::Part2(
     const std::vector<absl::string_view>& input) const {
   absl::flat_hash_map<std::string, std::vector<BagRule>> dependency;
-  absl::flat_hash_map<std::string, std::vector<std::string>> reverse;
   for (absl::string_view str : input) {
     std::vector<absl::string_view> pieces = absl::StrSplit(str, " bags contain ");
     if (pieces.size() != 2) return absl::InvalidArgumentError("contains");
@@ -85,11 +92,10 @@ absl::StatusOr<std::vector<std::string>> Day7_2020::Part2(
           return absl::InvalidArgumentError(absl::StrCat("bag rule: ", bag_rule_str));
         }
         insert.push_back(bag_rule);
-        reverse[bag_rule.color].push_back(color);
       }
     }
   }
-  absl::StatusOr<int> bags = CountBags(dependency, "shiny gold");
+  absl::StatusOr<int> bags = CountContainedBags(dependency, "shiny gold");
   if (!bags.ok()) return bags.status();
   return IntReturn(*bags - 1); /* don't include top bag */
 }
