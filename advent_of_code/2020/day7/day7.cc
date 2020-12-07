@@ -8,9 +8,49 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+struct BagRule {
+  std::string color;
+  int count;
+};
+
 absl::StatusOr<std::vector<std::string>> Day7_2020::Part1(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  absl::flat_hash_map<std::string, std::vector<BagRule>> dependency;
+  absl::flat_hash_map<std::string, std::vector<std::string>> reverse;
+  for (absl::string_view str : input) {
+    std::vector<absl::string_view> pieces = absl::StrSplit(str, " bags contain ");
+    if (pieces.size() != 2) return absl::InvalidArgumentError("contains");
+    std::string color = std::string(pieces[0]);
+    if (dependency.contains(color)) return absl::InvalidArgumentError("color dupe");
+    std::vector<BagRule>& insert = dependency[color];
+    if (pieces[1] == "no other bags.") {
+      // OK for the rule to be empty.
+    } else {
+      for (absl::string_view bag_rule_str : absl::StrSplit(pieces[1], ", ")) {
+        BagRule bag_rule;
+        if (!RE2::FullMatch(bag_rule_str, "(\\d+) (.*) bags?\\.?", &bag_rule.count, &bag_rule.color)) {
+          return absl::InvalidArgumentError(absl::StrCat("bag rule: ", bag_rule_str));
+        }
+        insert.push_back(bag_rule);
+        reverse[bag_rule.color].push_back(color);
+      }
+    }
+  }
+  absl::flat_hash_set<std::string> can_contain;
+  absl::flat_hash_set<std::string> added = {"shiny gold"};
+  while (!added.empty()) {
+    absl::flat_hash_set<std::string> new_added;
+    for (const std::string& color : added) {
+      for (const std::string& parent_color : reverse[color]) {
+        if (can_contain.contains(parent_color)) continue;
+        new_added.insert(parent_color);
+        can_contain.insert(parent_color);
+      }
+    }
+    added = std::move(new_added);
+  }
+  LOG(WARNING) << dependency.size();
+  return IntReturn(can_contain.size());
 }
 
 absl::StatusOr<std::vector<std::string>> Day7_2020::Part2(
