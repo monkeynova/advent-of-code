@@ -11,33 +11,32 @@
 
 class SpringBot : public IntCode::IOModule {
  public:
-  SpringBot(absl::string_view program)
-   : in_buf_(program) {}
+  SpringBot(absl::string_view program) : in_buf_(program) {}
 
- int64_t damage() const { return damage_; }
+  int64_t damage() const { return damage_; }
 
- bool PauseIntCode() override { return false; }
+  bool PauseIntCode() override { return false; }
 
- absl::StatusOr<int64_t> Fetch() override {
-   if (in_buf_pos_ < in_buf_.size()) {
-     return in_buf_[in_buf_pos_++];
-   }
-   return absl::InternalError("No more input");
- }
+  absl::StatusOr<int64_t> Fetch() override {
+    if (in_buf_pos_ < in_buf_.size()) {
+      return in_buf_[in_buf_pos_++];
+    }
+    return absl::InternalError("No more input");
+  }
 
- absl::Status Put(int64_t val) override {
-   if (val >= 128) {
-     damage_ = val;
-     LOG(WARNING) << "Damage: " << damage_;
-   } else if (val == '\n') {
-     LOG(WARNING) << "Output: " << cur_line_;
-     out_buf_.push_back(std::move(cur_line_));
-     cur_line_.clear();
-   } else {
-     cur_line_.append(1, val);
-   }
-   return absl::OkStatus();
- }
+  absl::Status Put(int64_t val) override {
+    if (val >= 128) {
+      damage_ = val;
+      LOG(WARNING) << "Damage: " << damage_;
+    } else if (val == '\n') {
+      LOG(WARNING) << "Output: " << cur_line_;
+      out_buf_.push_back(std::move(cur_line_));
+      cur_line_.clear();
+    } else {
+      cur_line_.append(1, val);
+    }
+    return absl::OkStatus();
+  }
 
  private:
   std::string in_buf_;
@@ -56,14 +55,13 @@ absl::StatusOr<std::vector<std::string>> Day21_2019::Part1(
   // Jump = D & (!A | !B | !C)
 
   SpringBot spring_bot(
-    "NOT A J\n"
-    "NOT B T\n"
-    "OR T J\n"
-    "NOT C T\n"
-    "OR T J\n"
-    "AND D J\n"
-    "WALK\n"
-  );
+      "NOT A J\n"
+      "NOT B T\n"
+      "OR T J\n"
+      "NOT C T\n"
+      "OR T J\n"
+      "AND D J\n"
+      "WALK\n");
   if (absl::Status st = codes->Run(&spring_bot); !st.ok()) return st;
 
   return IntReturn(spring_bot.damage());
@@ -80,18 +78,17 @@ absl::StatusOr<std::vector<std::string>> Day21_2019::Part2(
   //
 
   SpringBot spring_bot(
-    "NOT A J\n"
-    "NOT B T\n"
-    "OR T J\n"
-    "NOT C T\n"
-    "OR T J\n"
-    "NOT H T\n"
-    "NOT T T\n"
-    "OR E T\n"
-    "AND T J\n"
-    "AND D J\n"
-    "RUN\n"
-  );
+      "NOT A J\n"
+      "NOT B T\n"
+      "OR T J\n"
+      "NOT C T\n"
+      "OR T J\n"
+      "NOT H T\n"
+      "NOT T T\n"
+      "OR E T\n"
+      "AND T J\n"
+      "AND D J\n"
+      "RUN\n");
   if (absl::Status st = codes->Run(&spring_bot); !st.ok()) return st;
 
   return IntReturn(spring_bot.damage());
