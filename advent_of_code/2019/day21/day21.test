@@ -1,10 +1,10 @@
 [part=1]
 @include{advent_of_code/2019/day21/input.txt}
 --
--1
+19355862
 ==
 
 [part=2]
 @include{advent_of_code/2019/day21/input.txt}
 --
--1
+1140470745

@@ -53,7 +53,7 @@ absl::StatusOr<std::vector<std::string>> Day21_2019::Part1(
   if (!codes.ok()) return codes.status();
 
   // JUMP goes 4 spaces forward.
-  // jump if D and any of ABC are missing.
+  // Jump = D & (!A | !B | !C)
 
   SpringBot spring_bot(
     "NOT A J\n"
@@ -71,5 +71,28 @@ absl::StatusOr<std::vector<std::string>> Day21_2019::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day21_2019::Part2(
     const std::vector<absl::string_view>& input) const {
-  return IntReturn(-1);
+  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
+  if (!codes.ok()) return codes.status();
+
+  // JUMP goes 4 spaces forward.
+  // Jump = D & (!A | !B | !C) & !(!E & !H)
+  // Jump = D & (!A | !B | !C) & (E | H)
+  //
+
+  SpringBot spring_bot(
+    "NOT A J\n"
+    "NOT B T\n"
+    "OR T J\n"
+    "NOT C T\n"
+    "OR T J\n"
+    "NOT H T\n"
+    "NOT T T\n"
+    "OR E T\n"
+    "AND T J\n"
+    "AND D J\n"
+    "RUN\n"
+  );
+  if (absl::Status st = codes->Run(&spring_bot); !st.ok()) return st;
+
+  return IntReturn(spring_bot.damage());
 }
