@@ -13,6 +13,19 @@ struct BagRule {
   int count;
 };
 
+absl::StatusOr<int> CountBags(const absl::flat_hash_map<std::string, std::vector<BagRule>>& dependency,
+     absl::string_view bag) {
+  auto it = dependency.find(bag);
+  if (it == dependency.end()) return absl::InvalidArgumentError("can't find bag");
+  int bag_count = 1;
+  for (const BagRule& rule : it->second) {
+    absl::StatusOr<int> sub_bags = CountBags(dependency, rule.color);
+    if (!sub_bags.ok()) return sub_bags.status();
+    bag_count += rule.count * *sub_bags;
+  }
+  return bag_count;
+}
+
 absl::StatusOr<std::vector<std::string>> Day7_2020::Part1(
     const std::vector<absl::string_view>& input) const {
   absl::flat_hash_map<std::string, std::vector<BagRule>> dependency;
@@ -55,5 +68,28 @@ absl::StatusOr<std::vector<std::string>> Day7_2020::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day7_2020::Part2(
     const std::vector<absl::string_view>& input) const {
-  return std::vector<std::string>{""};
+  absl::flat_hash_map<std::string, std::vector<BagRule>> dependency;
+  absl::flat_hash_map<std::string, std::vector<std::string>> reverse;
+  for (absl::string_view str : input) {
+    std::vector<absl::string_view> pieces = absl::StrSplit(str, " bags contain ");
+    if (pieces.size() != 2) return absl::InvalidArgumentError("contains");
+    std::string color = std::string(pieces[0]);
+    if (dependency.contains(color)) return absl::InvalidArgumentError("color dupe");
+    std::vector<BagRule>& insert = dependency[color];
+    if (pieces[1] == "no other bags.") {
+      // OK for the rule to be empty.
+    } else {
+      for (absl::string_view bag_rule_str : absl::StrSplit(pieces[1], ", ")) {
+        BagRule bag_rule;
+        if (!RE2::FullMatch(bag_rule_str, "(\\d+) (.*) bags?\\.?", &bag_rule.count, &bag_rule.color)) {
+          return absl::InvalidArgumentError(absl::StrCat("bag rule: ", bag_rule_str));
+        }
+        insert.push_back(bag_rule);
+        reverse[bag_rule.color].push_back(color);
+      }
+    }
+  }
+  absl::StatusOr<int> bags = CountBags(dependency, "shiny gold");
+  if (!bags.ok()) return bags.status();
+  return IntReturn(*bags - 1); /* don't include top bag */
 }
