@@ -1,7 +1,10 @@
+# 17018 (high)
+# 8228 (high)
+# 2108 (high)
 [part=1]
 @include{advent_of_code/2019/day22/input.txt}
 --
--1
+1538
 ==
 
 [part=2]
