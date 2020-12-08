@@ -10,24 +10,21 @@
 
 class BootCode {
  public:
-  enum class Instruction {
-    kJmp = 0,
-    kAcc = 1,
-    kNop = 2
-  };
+  enum class Instruction { kJmp = 0, kAcc = 1, kNop = 2 };
   struct Statement {
     Instruction i;
     int64_t arg;
   };
 
-  BootCode(std::vector<Statement> statements) : statements_(std::move(statements)) {}
+  BootCode(std::vector<Statement> statements)
+      : statements_(std::move(statements)) {}
 
-  static absl::StatusOr<BootCode> Parse(const std::vector<absl::string_view>& input) {
+  static absl::StatusOr<BootCode> Parse(
+      const std::vector<absl::string_view>& input) {
     absl::flat_hash_map<absl::string_view, Instruction> imap = {
-      {"jmp", Instruction::kJmp},
-      {"acc", Instruction::kAcc},
-      {"nop", Instruction::kNop}
-    };
+        {"jmp", Instruction::kJmp},
+        {"acc", Instruction::kAcc},
+        {"nop", Instruction::kNop}};
     std::vector<Statement> statements;
     for (absl::string_view str : input) {
       absl::string_view cmd;
@@ -49,10 +46,18 @@ class BootCode {
       hist.insert(ip);
       if (ip >= statements_.size()) return true;
       switch (statements_[ip].i) {
-        case Instruction::kJmp: ip += statements_[ip].arg; break;
-        case Instruction::kAcc: accumulator_ += statements_[ip].arg; ++ip; break;
-        case Instruction::kNop: ++ip; break;
-        default: return absl::InternalError("bad instruction");
+        case Instruction::kJmp:
+          ip += statements_[ip].arg;
+          break;
+        case Instruction::kAcc:
+          accumulator_ += statements_[ip].arg;
+          ++ip;
+          break;
+        case Instruction::kNop:
+          ++ip;
+          break;
+        default:
+          return absl::InternalError("bad instruction");
       }
     }
     return false;
