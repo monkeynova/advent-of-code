@@ -20,6 +20,20 @@ acc +6
 ==
 
 [part=2]
+nop +0
+acc +1
+jmp +4
+acc +3
+jmp -3
+acc -99
+acc +1
+jmp -4
+acc +6
+--
+8
+==
+
+[part=2]
 @include{advent_of_code/2020/day8/input.txt}
 --
 552
