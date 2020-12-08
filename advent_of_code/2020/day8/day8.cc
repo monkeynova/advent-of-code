@@ -9,7 +9,7 @@
 #include "re2/re2.h"
 
 class Code {
- private:
+ public:
   enum class Instruction {
     kJmp = 0,
     kAcc = 1,
@@ -20,7 +20,6 @@ class Code {
     int64_t arg;
   };
 
- public:
   static absl::StatusOr<Code> Parse(const std::vector<absl::string_view>& input) {
     absl::flat_hash_map<absl::string_view, Instruction> imap = {
       {"jmp", Instruction::kJmp},
@@ -41,11 +40,12 @@ class Code {
     return Code(std::move(statements));
   }
 
-  absl::Status Execute() {
+  absl::StatusOr<bool> Execute() {
     absl::flat_hash_set<int> hist;
     int ip = 0;
     while (!hist.contains(ip)) {
       hist.insert(ip);
+      if (ip >= statements_.size()) return true;
       switch (statements_[ip].i) {
         case Instruction::kJmp: ip += statements_[ip].arg; break;
         case Instruction::kAcc: accumulator_ += statements_[ip].arg; ++ip; break;
@@ -53,14 +53,15 @@ class Code {
         default: return absl::InternalError("bad instruction");
       }
     }
-    return absl::OkStatus();
+    return false;
   }
 
   int accumulator() { return accumulator_; }
 
+  std::vector<Statement> statements_;
+
  private:
   Code(std::vector<Statement> statements) : statements_(std::move(statements)) {}
-  std::vector<Statement> statements_;
   int accumulator_ = 0;
 };
 
@@ -69,11 +70,32 @@ absl::StatusOr<std::vector<std::string>> Day8_2020::Part1(
   absl::StatusOr<Code> codes = Code::Parse(input);
   if (!codes.ok()) return codes.status();
 
-  if (absl::Status st = codes->Execute(); !st.ok()) return st;
+  absl::StatusOr<bool> terminated = codes->Execute();
+  if (!terminated.ok()) return terminated.status();
+
   return IntReturn(codes->accumulator());
 }
 
 absl::StatusOr<std::vector<std::string>> Day8_2020::Part2(
     const std::vector<absl::string_view>& input) const {
-  return IntReturn(-1);
+  absl::StatusOr<Code> codes = Code::Parse(input);
+  if (!codes.ok()) return codes.status();
+
+  for (int i = 0; i < codes->statements_.size(); ++i) {
+    Code tmp_code = *codes;
+    if (tmp_code.statements_[i].i == Code::Instruction::kJmp) {
+      tmp_code.statements_[i].i = Code::Instruction::kNop;
+    } else if (tmp_code.statements_[i].i == Code::Instruction::kNop) {
+      tmp_code.statements_[i].i = Code::Instruction::kJmp;
+    } else {
+      continue;
+    }
+    absl::StatusOr<bool> terminated = tmp_code.Execute();
+    if (!terminated.ok()) return terminated.status();
+    if (*terminated) {
+      return IntReturn(tmp_code.accumulator());
+    }
+  }
+
+  return absl::InvalidArgumentError("No version terminated");
 }
