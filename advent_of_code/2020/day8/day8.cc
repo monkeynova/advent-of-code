@@ -29,7 +29,7 @@ class BootCode {
     for (absl::string_view str : input) {
       absl::string_view cmd;
       int arg;
-      static LazyRE2 statement_re{"([a-z]*) ([\\-+]?\\d+)"}; 
+      static LazyRE2 statement_re{"([a-z]*) ([\\-+]?\\d+)"};
       if (!RE2::FullMatch(str, *statement_re, &cmd, &arg)) {
         return absl::InvalidArgumentError(absl::StrCat("re: ", str));
       }

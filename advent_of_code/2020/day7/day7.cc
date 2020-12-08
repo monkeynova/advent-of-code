@@ -67,8 +67,8 @@ absl::StatusOr<std::vector<std::string>> Day7_2020::Part1(
       for (absl::string_view bag_rule_str : absl::StrSplit(pieces[1], ", ")) {
         BagRule bag_rule;
         static LazyRE2 bag_pattern{"(\\d+) (.*) bags?\\.?"};
-        if (!RE2::FullMatch(bag_rule_str, *bag_pattern,
-                            &bag_rule.count, &bag_rule.color)) {
+        if (!RE2::FullMatch(bag_rule_str, *bag_pattern, &bag_rule.count,
+                            &bag_rule.color)) {
           return absl::InvalidArgumentError(
               absl::StrCat("bag rule: ", bag_rule_str));
         }
@@ -98,8 +98,8 @@ absl::StatusOr<std::vector<std::string>> Day7_2020::Part2(
       for (absl::string_view bag_rule_str : absl::StrSplit(pieces[1], ", ")) {
         BagRule bag_rule;
         static LazyRE2 bag_pattern{"(\\d+) (.*) bags?\\.?"};
-        if (!RE2::FullMatch(bag_rule_str, *bag_pattern,
-                            &bag_rule.count, &bag_rule.color)) {
+        if (!RE2::FullMatch(bag_rule_str, *bag_pattern, &bag_rule.count,
+                            &bag_rule.color)) {
           return absl::InvalidArgumentError(
               absl::StrCat("bag rule: ", bag_rule_str));
         }
