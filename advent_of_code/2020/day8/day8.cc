@@ -8,7 +8,7 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
-class Code {
+class BootCode {
  public:
   enum class Instruction {
     kJmp = 0,
@@ -20,7 +20,9 @@ class Code {
     int64_t arg;
   };
 
-  static absl::StatusOr<Code> Parse(const std::vector<absl::string_view>& input) {
+  BootCode(std::vector<Statement> statements) : statements_(std::move(statements)) {}
+
+  static absl::StatusOr<BootCode> Parse(const std::vector<absl::string_view>& input) {
     absl::flat_hash_map<absl::string_view, Instruction> imap = {
       {"jmp", Instruction::kJmp},
       {"acc", Instruction::kAcc},
@@ -37,7 +39,7 @@ class Code {
       if (it == imap.end()) return absl::InvalidArgumentError("cmd");
       statements.push_back(Statement{it->second, arg});
     }
-    return Code(std::move(statements));
+    return BootCode(std::move(statements));
   }
 
   absl::StatusOr<bool> Execute() {
@@ -57,39 +59,39 @@ class Code {
   }
 
   int accumulator() { return accumulator_; }
-
-  std::vector<Statement> statements_;
+  const std::vector<Statement>& statements() { return statements_; }
 
  private:
-  Code(std::vector<Statement> statements) : statements_(std::move(statements)) {}
+  std::vector<Statement> statements_;
   int accumulator_ = 0;
 };
 
 absl::StatusOr<std::vector<std::string>> Day8_2020::Part1(
     const std::vector<absl::string_view>& input) const {
-  absl::StatusOr<Code> codes = Code::Parse(input);
-  if (!codes.ok()) return codes.status();
+  absl::StatusOr<BootCode> boot_code = BootCode::Parse(input);
+  if (!boot_code.ok()) return boot_code.status();
 
-  absl::StatusOr<bool> terminated = codes->Execute();
+  absl::StatusOr<bool> terminated = boot_code->Execute();
   if (!terminated.ok()) return terminated.status();
 
-  return IntReturn(codes->accumulator());
+  return IntReturn(boot_code->accumulator());
 }
 
 absl::StatusOr<std::vector<std::string>> Day8_2020::Part2(
     const std::vector<absl::string_view>& input) const {
-  absl::StatusOr<Code> codes = Code::Parse(input);
-  if (!codes.ok()) return codes.status();
+  absl::StatusOr<BootCode> boot_code = BootCode::Parse(input);
+  if (!boot_code.ok()) return boot_code.status();
 
-  for (int i = 0; i < codes->statements_.size(); ++i) {
-    Code tmp_code = *codes;
-    if (tmp_code.statements_[i].i == Code::Instruction::kJmp) {
-      tmp_code.statements_[i].i = Code::Instruction::kNop;
-    } else if (tmp_code.statements_[i].i == Code::Instruction::kNop) {
-      tmp_code.statements_[i].i = Code::Instruction::kJmp;
+  for (int i = 0; i < boot_code->statements().size(); ++i) {
+    std::vector<BootCode::Statement> edit_statements = boot_code->statements();
+    if (edit_statements[i].i == BootCode::Instruction::kJmp) {
+      edit_statements[i].i = BootCode::Instruction::kNop;
+    } else if (edit_statements[i].i == BootCode::Instruction::kNop) {
+      edit_statements[i].i = BootCode::Instruction::kJmp;
     } else {
       continue;
     }
+    BootCode tmp_code(std::move(edit_statements));
     absl::StatusOr<bool> terminated = tmp_code.Execute();
     if (!terminated.ok()) return terminated.status();
     if (*terminated) {
