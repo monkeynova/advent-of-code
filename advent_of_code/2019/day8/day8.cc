@@ -61,11 +61,13 @@ absl::StatusOr<std::vector<std::string>> Day8_2019::Part2(
   }
   std::string render;
   render.resize(kLayerSize);
-  for (int i = 0; i < kLayerSize; ++i) render[i] = '2';
+  for (int i = 0; i < kLayerSize; ++i) render[i] = '?';
   for (int i = 0; i < layer_count; ++i) {
     const char* layer = input[0].data() + i * kLayerSize;
     for (int j = 0; j < kLayerSize; ++j) {
-      if (render[j] == '2') render[j] = layer[j];
+      if (render[j] == '?' && layer[j] != '2') {
+        render[j] = layer[j] == '0' ? ' ' : 'X';
+      }
     }
   }
   std::vector<std::string> ret;
