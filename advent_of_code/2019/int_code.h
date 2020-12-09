@@ -110,11 +110,8 @@ class IntCode {
                    PauseCondition* pause_condition);
 
  private:
-  IntCode(std::vector<int64_t> codes, int64_t code_pos = 0,
-          bool terminated = false)
-      : codes_(std::move(codes)),
-        code_pos_(code_pos),
-        terminated_(terminated) {}
+  explicit IntCode(std::vector<int64_t> codes)
+      : codes_(std::move(codes)) {}
 
   IntCode(const IntCode&) = default;
   IntCode& operator=(const IntCode&) = default;
@@ -127,9 +124,9 @@ class IntCode {
                              int64_t value);
 
   std::vector<int64_t> codes_;
-  int64_t code_pos_;
+  int64_t code_pos_ = 0;
   int64_t relative_base_ = 0;
-  bool terminated_;
+  bool terminated_ = false;
 };
 
 #endif  // ADVENT_OF_CODE_2019_INT_CODE_H

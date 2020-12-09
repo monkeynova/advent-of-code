@@ -5,6 +5,49 @@
 #include "absl/strings/str_split.h"
 #include "glog/logging.h"
 
+enum class OpCode {
+  kUnknown = 0,
+  kAdd = 1,
+  kMul = 2,
+  kInput = 3,
+  kOutput = 4,
+  kJNZ = 5,
+  kJZ = 6,
+  kLT = 7,
+  kEQ = 8,
+  kIncR = 9,
+  kTerm = 99,
+};
+
+struct OpCodeMeta {
+  OpCode code = OpCode::kUnknown;
+  int size = 1;
+  std::string name = "???";
+};
+
+static void SetOpCode(OpCodeMeta op, std::vector<OpCodeMeta>* dest) {
+  (*dest)[static_cast<int>(op.code)] = op;
+}
+
+static const std::vector<OpCodeMeta>& CodeTypes() {
+  static auto code_types = []() {
+    std::vector<OpCodeMeta> ret(100);
+    SetOpCode({.code = OpCode::kAdd, .size = 4, .name = "ADD"}, &ret);
+    SetOpCode({.code = OpCode::kMul, .size = 4, .name = "MUL"}, &ret);
+    SetOpCode({.code = OpCode::kInput, .size = 2, .name = "IN"}, &ret);
+    SetOpCode({.code = OpCode::kOutput, .size = 2, .name = "OUT"}, &ret);
+    SetOpCode({.code = OpCode::kJNZ, .size = 3, .name = "JNZ"}, &ret);
+    SetOpCode({.code = OpCode::kJZ, .size = 3, .name = "JZ"}, &ret);
+    SetOpCode({.code = OpCode::kLT, .size = 4, .name = "LT"}, &ret);
+    SetOpCode({.code = OpCode::kEQ, .size = 4, .name = "EQ"}, &ret);
+    SetOpCode({.code = OpCode::kIncR, .size = 2, .name = "INCR"}, &ret);
+    SetOpCode({.code = OpCode::kTerm, .size = 1, .name = "TERM"}, &ret);
+    return ret;
+  }();
+
+  return code_types;
+};
+
 absl::StatusOr<IntCode> IntCode::Parse(
     const std::vector<absl::string_view>& input) {
   if (input.empty()) {
@@ -136,13 +179,16 @@ absl::Status IntCode::RunSingleOpcode(InputSource* input, OutputSink* output) {
   }
   const int64_t opcode = codes_[code_pos_] % 100;
   const int64_t parameter_modes = codes_[code_pos_] / 100;
-  switch (opcode) {
-    VLOG(2) << "@" << code_pos_;
-    case 1: {
-      if (code_pos_ + 4 >= codes_.size()) {
-        return absl::InvalidArgumentError(
-            absl::StrCat("Attempt to read from pos=", code_pos_));
-      }
+  const int code_size = CodeTypes()[opcode].size;
+  if (code_pos_ + code_size > codes_.size()) {
+    // Ensure we have space to read the arguments before accessing them.
+    return absl::InvalidArgumentError(
+        absl::StrCat("Attempt to read argument from pos=", code_pos_));
+  }
+  bool jumped = false;
+  VLOG(2) << "@" << code_pos_ << ": " << CodeTypes()[opcode].name;
+  switch (static_cast<OpCode>(opcode)) {
+    case OpCode::kAdd: {
       absl::StatusOr<int64_t> in1 = LoadParameter(parameter_modes, 1);
       if (!in1.ok()) return in1.status();
       absl::StatusOr<int64_t> in2 = LoadParameter(parameter_modes, 2);
@@ -150,14 +196,9 @@ absl::Status IntCode::RunSingleOpcode(InputSource* input, OutputSink* output) {
       if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 + *in2);
           !st.ok())
         return st;
-      code_pos_ += 4;
       break;
     }
-    case 2: {
-      if (code_pos_ + 4 >= codes_.size()) {
-        return absl::InvalidArgumentError(
-            absl::StrCat("Attempt to read from pos=", code_pos_));
-      }
+    case OpCode::kMul: {
       absl::StatusOr<int64_t> in1 = LoadParameter(parameter_modes, 1);
       if (!in1.ok()) return in1.status();
       absl::StatusOr<int64_t> in2 = LoadParameter(parameter_modes, 2);
@@ -165,115 +206,81 @@ absl::Status IntCode::RunSingleOpcode(InputSource* input, OutputSink* output) {
       if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 * *in2);
           !st.ok())
         return st;
-      code_pos_ += 4;
       break;
     }
-    case 3: {
-      if (code_pos_ + 2 >= codes_.size()) {
-        return absl::InvalidArgumentError(
-            absl::StrCat("Attempt to read from pos=", code_pos_));
-      }
+    case OpCode::kInput: {
       if (input == nullptr) {
         return absl::InvalidArgumentError("No input specified");
       }
       absl::StatusOr<int64_t> input_val = input->Fetch();
       if (!input_val.ok()) return input_val.status();
       if (absl::Status st = SaveParameter(parameter_modes, 1, *input_val);
-          !st.ok())
+          !st.ok()) {
         return st;
-      code_pos_ += 2;
+      }
       break;
     }
-    case 4: {
-      if (code_pos_ + 2 >= codes_.size()) {
-        return absl::InvalidArgumentError(
-            absl::StrCat("Attempt to read from pos=", code_pos_));
-      }
+    case OpCode::kOutput: {
       absl::StatusOr<int64_t> in = LoadParameter(parameter_modes, 1);
       if (!in.ok()) return in.status();
       if (output == nullptr) {
         return absl::InvalidArgumentError("No output specified");
       }
       if (absl::Status st = output->Put(*in); !st.ok()) return st;
-      code_pos_ += 2;
       break;
     }
-    case 5: {
-      if (code_pos_ + 3 >= codes_.size()) {
-        return absl::InvalidArgumentError(
-            absl::StrCat("Attempt to read from pos=", code_pos_));
-      }
+    case OpCode::kJNZ: {
       absl::StatusOr<int64_t> in1 = LoadParameter(parameter_modes, 1);
       if (!in1.ok()) return in1.status();
       if (*in1 != 0) {
         absl::StatusOr<int64_t> in2 = LoadParameter(parameter_modes, 2);
         if (!in2.ok()) return in2.status();
         code_pos_ = *in2;
-      } else {
-        code_pos_ += 3;
+        jumped = true;
       }
       break;
     }
-    case 6: {
-      if (code_pos_ + 3 >= codes_.size()) {
-        return absl::InvalidArgumentError(
-            absl::StrCat("Attempt to read from pos=", code_pos_));
-      }
+    case OpCode::kJZ: {
       absl::StatusOr<int64_t> in1 = LoadParameter(parameter_modes, 1);
       if (!in1.ok()) return in1.status();
       if (*in1 == 0) {
         absl::StatusOr<int64_t> in2 = LoadParameter(parameter_modes, 2);
         if (!in2.ok()) return in2.status();
         code_pos_ = *in2;
-      } else {
-        code_pos_ += 3;
+        jumped = true;
       }
       break;
     }
-    case 7: {
-      if (code_pos_ + 4 >= codes_.size()) {
-        return absl::InvalidArgumentError(
-            absl::StrCat("Attempt to read from pos=", code_pos_));
-      }
+    case OpCode::kLT: {
       absl::StatusOr<int64_t> in1 = LoadParameter(parameter_modes, 1);
       if (!in1.ok()) return in1.status();
       absl::StatusOr<int64_t> in2 = LoadParameter(parameter_modes, 2);
       if (!in2.ok()) return in2.status();
       if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 < *in2);
-          !st.ok())
+          !st.ok()) {
         return st;
-      code_pos_ += 4;
+      }
       break;
     }
-    case 8: {
-      if (code_pos_ + 4 >= codes_.size()) {
-        return absl::InvalidArgumentError(
-            absl::StrCat("Attempt to read from pos=", code_pos_));
-      }
+    case OpCode::kEQ: {
       absl::StatusOr<int64_t> in1 = LoadParameter(parameter_modes, 1);
       if (!in1.ok()) return in1.status();
       absl::StatusOr<int64_t> in2 = LoadParameter(parameter_modes, 2);
       if (!in2.ok()) return in2.status();
       if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 == *in2);
-          !st.ok())
+          !st.ok()) {
         return st;
-      code_pos_ += 4;
+      }
       break;
     }
-    case 9: {
-      if (code_pos_ + 2 >= codes_.size()) {
-        return absl::InvalidArgumentError(
-            absl::StrCat("Attempt to read from pos=", code_pos_));
-      }
+    case OpCode::kIncR: {
       absl::StatusOr<int64_t> in = LoadParameter(parameter_modes, 1);
       if (!in.ok()) return in.status();
       relative_base_ += *in;
-      code_pos_ += 2;
       break;
     }
-    case 99: {
+    case OpCode::kTerm: {
       terminated_ = true;
-      ++code_pos_;
       break;
     }
     default: {
@@ -282,43 +289,47 @@ absl::Status IntCode::RunSingleOpcode(InputSource* input, OutputSink* output) {
     }
   }
 
+  if (!jumped) {
+    code_pos_ += code_size;
+  }
+
   return absl::OkStatus();
 }
 
 std::string IntCode::DebugDisasm() const {
-  std::vector<std::string> opnames = {"?",   "ADD", "MUL", "IN", "OUT",
-                                      "JNZ", "JZ",  "LT",  "EQ", "INCR"};
-  opnames.resize(100, "?");
-  opnames[99] = "TERM";
-  std::vector<int> opsize = {1, 4, 4, 2, 2, 3, 3, 4, 4, 2};
-  opsize.resize(100, 1);
+  const std::vector<OpCodeMeta>& code_types = CodeTypes();
   std::string ret;
   for (int i = 0; i < codes_.size();) {
-    const int64_t opcode = codes_[i] % 100;
+    const int64_t opcode = std::max<int>(codes_[i] % 100, 0);
     const int64_t parameter_modes = codes_[i] / 100;
-    absl::StrAppend(&ret, i, ": ", opnames[opcode]);
-    for (int j = 1; j < opsize[opcode]; ++j) {
-      int param_mode = GetParameterMode(parameter_modes, j);
-      switch (param_mode) {
-        case 0: {
-          absl::StrAppend(&ret, " A*", codes_[i + j]);
-          break;
-        }
-        case 1: {
-          absl::StrAppend(&ret, " L$", codes_[i + j]);
-          break;
-        }
-        case 2: {
-          absl::StrAppend(&ret, " R+", codes_[i + j]);
-          break;
-        }
-        default: {
-          absl::StrAppend(&ret, " ?", codes_[i + j], "?");
-          break;
+    absl::StrAppend(&ret, i, ": ", code_types[opcode].name);
+    for (int j = 1; j < code_types[opcode].size; ++j) {
+      if (i + j >= codes_.size()) {
+        absl::StrAppend(&ret, " ?");
+      } else {
+        int param_value = codes_[i + j];
+        int param_mode = GetParameterMode(parameter_modes, j);
+        switch (param_mode) {
+          case 0: {
+            absl::StrAppend(&ret, " A*", param_value);
+            break;
+          }
+          case 1: {
+            absl::StrAppend(&ret, " L$", param_value);
+            break;
+          }
+          case 2: {
+            absl::StrAppend(&ret, " R+", param_value);
+            break;
+          }
+          default: {
+            absl::StrAppend(&ret, " ??", param_value);
+            break;
+          }
         }
       }
     }
-    i += opsize[opcode];
+    i += code_types[opcode].size;
     absl::StrAppend(&ret, "\n");
   }
   return ret;
