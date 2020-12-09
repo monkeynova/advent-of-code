@@ -182,18 +182,14 @@ absl::StatusOr<std::vector<std::string>> Day20_2019::Part1(
     const std::vector<absl::string_view>& input) const {
   Maze maze(input);
   if (absl::Status st = maze.Initialize(); !st.ok()) return st;
-  absl::StatusOr<int> path_length = maze.FindPath();
-  if (!path_length.ok()) return path_length.status();
 
-  return IntReturn(*path_length);
+  return IntReturn(maze.FindPath());
 }
 
 absl::StatusOr<std::vector<std::string>> Day20_2019::Part2(
     const std::vector<absl::string_view>& input) const {
   Maze maze(input);
   if (absl::Status st = maze.Initialize(); !st.ok()) return st;
-  absl::StatusOr<int> path_length = maze.FindRecursivePath();
-  if (!path_length.ok()) return path_length.status();
 
-  return IntReturn(*path_length);
+  return IntReturn(maze.FindRecursivePath());
 }

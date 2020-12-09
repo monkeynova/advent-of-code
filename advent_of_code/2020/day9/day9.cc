@@ -8,20 +8,13 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
-absl::StatusOr<std::vector<std::string>> Day9_2020::Part1(
-    const std::vector<absl::string_view>& input) const {
-  std::vector<int64_t> vals;
-  for (int i = 0; i < input.size(); ++i) {
-    int64_t v;
-    if (!absl::SimpleAtoi(input[i], &v)) return absl::InvalidArgumentError("parse");
-    vals.push_back(v);
-  }
+absl::StatusOr<int> FindMissingXMASPair(const std::vector<int64_t>& vals) {
   absl::flat_hash_set<int64_t> hist;
   if (vals.size() < 26) return absl::InvalidArgumentError("Too short");
   for (int i = 0; i < 25; ++i) {
     hist.insert(vals[i]);
   }
-  for (int i = 25; i < input.size(); ++i) {
+  for (int i = 25; i < vals.size(); ++i) {
     bool found = false;
     for (int64_t v : hist) {
       if (vals[i] - v != v && hist.contains(vals[i] - v)) {
@@ -30,7 +23,7 @@ absl::StatusOr<std::vector<std::string>> Day9_2020::Part1(
       }
     }
     if (!found) {
-      return IntReturn(vals[i]);
+      return vals[i];
     }
     hist.insert(vals[i]);
     hist.erase(vals[i - 25]);
@@ -38,35 +31,7 @@ absl::StatusOr<std::vector<std::string>> Day9_2020::Part1(
   return absl::InvalidArgumentError("Not found");
 }
 
-absl::StatusOr<std::vector<std::string>> Day9_2020::Part2(
-    const std::vector<absl::string_view>& input) const {
-  std::vector<int64_t> vals;
-  for (int i = 0; i < input.size(); ++i) {
-    int64_t v;
-    if (!absl::SimpleAtoi(input[i], &v)) return absl::InvalidArgumentError("parse");
-    vals.push_back(v);
-  }
-  absl::flat_hash_set<int64_t> hist;
-  if (vals.size() < 26) return absl::InvalidArgumentError("Too short");
-  for (int i = 0; i < 25; ++i) {
-    hist.insert(vals[i]);
-  }
-  int search_val = -1;
-  for (int i = 25; i < input.size(); ++i) {
-    bool found = false;
-    for (int64_t v : hist) {
-      if (vals[i] - v != v && hist.contains(vals[i] - v)) {
-        found = true;
-        break;
-      }
-    }
-    if (!found) {
-      search_val = vals[i];
-    }
-    hist.insert(vals[i]);
-    hist.erase(vals[i - 25]);
-  }
-  if (search_val == -1) return absl::InvalidArgumentError("Not found");
+absl::StatusOr<int> FindContiguousRangeMinMaxSum(const std::vector<int64_t>& vals, int64_t search_sum) {
   for (int i = 0; i < vals.size(); ++i) {
     for (int j = 0; j < i; ++j) {
       int64_t running_sum = 0;
@@ -77,10 +42,26 @@ absl::StatusOr<std::vector<std::string>> Day9_2020::Part2(
         min = std::min(min, vals[k]);
         max = std::max(max, vals[k]);
       }
-      if (running_sum == search_val) {
-        return IntReturn(min + max);
+      if (running_sum == search_sum) {
+        return min + max;
       }
     }
   }
-  return absl::InvalidArgumentError("Not found 2");
+  return absl::InvalidArgumentError("Not found");
+}
+
+absl::StatusOr<std::vector<std::string>> Day9_2020::Part1(
+    const std::vector<absl::string_view>& input) const {
+  absl::StatusOr<std::vector<int64_t>> vals = ParseAsInts(input);
+  if (!vals.ok()) return vals.status();
+  return IntReturn(FindMissingXMASPair(*vals));
+}
+
+absl::StatusOr<std::vector<std::string>> Day9_2020::Part2(
+    const std::vector<absl::string_view>& input) const {
+  absl::StatusOr<std::vector<int64_t>> vals = ParseAsInts(input);
+  if (!vals.ok()) return vals.status();
+  absl::StatusOr<int> missing = FindMissingXMASPair(*vals);
+  if (!missing.ok()) return missing.status();
+  return IntReturn(FindContiguousRangeMinMaxSum(*vals, *missing));
 }

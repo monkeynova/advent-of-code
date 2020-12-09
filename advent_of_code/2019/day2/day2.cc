@@ -20,10 +20,7 @@ absl::StatusOr<std::vector<std::string>> Day2_2019::Part1(
   if (absl::Status st = CorrectBoard(&*codes, 12, 2); !st.ok()) return st;
   if (absl::Status st = codes->Run(); !st.ok()) return st;
 
-  absl::StatusOr<int> val = codes->Peek(0);
-  if (!val.ok()) return val.status();
-
-  return IntReturn(*val);
+  return IntReturn(codes->Peek(0));
 }
 
 absl::StatusOr<std::vector<std::string>> Day2_2019::Part2(

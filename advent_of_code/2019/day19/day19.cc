@@ -195,10 +195,8 @@ absl::StatusOr<std::vector<std::string>> Day19_2019::Part1(
   if (!codes.ok()) return codes.status();
 
   TractorSearch search(std::move(*codes));
-  absl::StatusOr<int> active = search.ScanRange(Point{0, 0}, Point{50, 50});
-  if (!active.ok()) return active.status();
 
-  return IntReturn(*active);
+  return IntReturn(search.ScanRange(Point{0, 0}, Point{50, 50}));
 }
 
 absl::StatusOr<std::vector<std::string>> Day19_2019::Part2(

@@ -320,10 +320,8 @@ absl::StatusOr<std::vector<std::string>> Day17_2019::Part1(
   if (absl::Status st = codes->Run(&view_port); !st.ok()) {
     return st;
   }
-  absl::StatusOr<int> alignment = view_port.ComputeAlignment();
-  if (!alignment.ok()) return alignment.status();
 
-  return IntReturn(*alignment);
+  return IntReturn(view_port.ComputeAlignment());
 }
 
 absl::StatusOr<std::vector<std::string>> Day17_2019::Part2(

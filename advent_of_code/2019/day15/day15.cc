@@ -263,10 +263,8 @@ absl::StatusOr<std::vector<std::string>> Day15_2019::Part1(
   }
   LOG(WARNING) << droid.min() << "-" << droid.max();
   LOG(WARNING) << droid.DebugBoard();
-  absl::StatusOr<int> distance = droid.DistanceToO2();
-  if (!distance.ok()) return distance.status();
 
-  return IntReturn(*distance);
+  return IntReturn(droid.DistanceToO2());
 }
 
 absl::StatusOr<std::vector<std::string>> Day15_2019::Part2(
@@ -280,8 +278,6 @@ absl::StatusOr<std::vector<std::string>> Day15_2019::Part2(
   }
   LOG(WARNING) << droid.min() << "-" << droid.max();
   LOG(WARNING) << droid.DebugBoard();
-  absl::StatusOr<int> distance = droid.GreatestDistanceFromO2();
-  if (!distance.ok()) return distance.status();
 
-  return IntReturn(*distance);
+  return IntReturn(droid.GreatestDistanceFromO2());
 }

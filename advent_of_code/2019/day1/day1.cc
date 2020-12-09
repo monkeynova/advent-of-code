@@ -5,15 +5,12 @@
 
 absl::StatusOr<std::vector<std::string>> Day1_2019::Part1(
     const std::vector<absl::string_view>& input) const {
+  absl::StatusOr<std::vector<int64_t>> costs = ParseAsInts(input);
+  if (!costs.ok()) return costs.status();
+
   int total_fuel = 0;
 
-  for (const auto& module_str : input) {
-    if (module_str.empty()) continue;
-    int module_cost;
-    if (!absl::SimpleAtoi(module_str, &module_cost)) {
-      return absl::InvalidArgumentError(
-          absl::StrCat("Cannot parse as int: ", module_str));
-    }
+  for (const auto& module_cost : *costs) {
     total_fuel += module_cost / 3 - 2;
   }
 
@@ -22,15 +19,12 @@ absl::StatusOr<std::vector<std::string>> Day1_2019::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day1_2019::Part2(
     const std::vector<absl::string_view>& input) const {
+  absl::StatusOr<std::vector<int64_t>> costs = ParseAsInts(input);
+  if (!costs.ok()) return costs.status();
+
   int total_fuel = 0;
 
-  for (const auto& module_str : input) {
-    if (module_str.empty()) continue;
-    int module_cost;
-    if (!absl::SimpleAtoi(module_str, &module_cost)) {
-      return absl::InvalidArgumentError(
-          absl::StrCat("Cannot parse as int: ", module_str));
-    }
+  for (const auto& module_cost : *costs) {
     int module_fuel = module_cost / 3 - 2;
     int fuel_fuel = module_fuel;
     while (fuel_fuel / 3 - 2 > 0) {
