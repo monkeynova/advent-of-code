@@ -1,0 +1,10 @@
+[part=1]
+@include{advent_of_code/2020/day10/input.txt}
+--
+-1
+==
+
+[part=2]
+@include{advent_of_code/2020/day10/input.txt}
+--
+-1
