@@ -110,8 +110,7 @@ class IntCode {
                    PauseCondition* pause_condition);
 
  private:
-  explicit IntCode(std::vector<int64_t> codes)
-      : codes_(std::move(codes)) {}
+  explicit IntCode(std::vector<int64_t> codes) : codes_(std::move(codes)) {}
 
   IntCode(const IntCode&) = default;
   IntCode& operator=(const IntCode&) = default;

@@ -31,7 +31,8 @@ absl::StatusOr<int> FindMissingXMASPair(const std::vector<int64_t>& vals) {
   return absl::InvalidArgumentError("Not found");
 }
 
-absl::StatusOr<int> FindContiguousRangeMinMaxSum(const std::vector<int64_t>& vals, int64_t search_sum) {
+absl::StatusOr<int> FindContiguousRangeMinMaxSum(
+    const std::vector<int64_t>& vals, int64_t search_sum) {
   for (int i = 0; i < vals.size(); ++i) {
     for (int j = 0; j < i; ++j) {
       int64_t running_sum = 0;

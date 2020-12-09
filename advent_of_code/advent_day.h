@@ -12,11 +12,13 @@ class AdventDay {
   virtual ~AdventDay() = default;
 
   absl::StatusOr<std::vector<int64_t>> ParseAsInts(
-    const std::vector<absl::string_view>& input) const {
+      const std::vector<absl::string_view>& input) const {
     std::vector<int64_t> vals;
     for (int i = 0; i < input.size(); ++i) {
       int64_t v;
-      if (!absl::SimpleAtoi(input[i], &v)) return absl::InvalidArgumentError("parse");
+      if (!absl::SimpleAtoi(input[i], &v)) {
+        return absl::InvalidArgumentError("parse");
+      }
       vals.push_back(v);
     }
     return vals;
@@ -26,7 +28,8 @@ class AdventDay {
     return std::vector<std::string>{absl::StrCat(val)};
   }
 
-  absl::StatusOr<std::vector<std::string>> IntReturn(absl::StatusOr<int64_t> val) const {
+  absl::StatusOr<std::vector<std::string>> IntReturn(
+      absl::StatusOr<int64_t> val) const {
     if (!val.ok()) return val.status();
     return std::vector<std::string>{absl::StrCat(*val)};
   }
