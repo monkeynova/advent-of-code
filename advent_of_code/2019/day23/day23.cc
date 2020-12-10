@@ -23,22 +23,18 @@ class Network;
 
 class Computer : public IntCode::IOModule {
  public:
-  enum class PacketState {
-   kSetAddress = 1, kSetX = 2, kSetY = 3
-  };
+  enum class PacketState { kSetAddress = 1, kSetX = 2, kSetY = 3 };
 
-  Computer(Network* network, const IntCode& code, int64_t address) 
-   : network_(network), code_(code.Clone()), address_(address) {}
+  Computer(Network* network, const IntCode& code, int64_t address)
+      : network_(network), code_(code.Clone()), address_(address) {}
 
-  absl::Status StepExecution() {
-    return code_.RunSingleOpcode(this);
-  }
+  absl::Status StepExecution() { return code_.RunSingleOpcode(this); }
 
   bool PauseIntCode() override { return false; }
 
   bool idle() const { return idle_; }
 
-  absl::StatusOr<int64_t> Fetch() override { 
+  absl::StatusOr<int64_t> Fetch() override {
     switch (in_packet_state_) {
       case PacketState::kSetAddress: {
         VLOG(1) << "Fetch Address: " << address_;
@@ -57,7 +53,9 @@ class Computer : public IntCode::IOModule {
       case PacketState::kSetY: {
         in_packet_state_ = PacketState::kSetX;
         VLOG(2) << "Fetch Y: " << in_packet_queue_.front();
-        if (in_packet_queue_.empty()) return absl::InternalError("Requested y with no x");
+        if (in_packet_queue_.empty()) {
+          return absl::InternalError("Requested y with no x");
+        }
         int64_t ret = in_packet_queue_.front().y;
         in_packet_queue_.pop_front();
         return ret;
@@ -84,16 +82,17 @@ class Computer : public IntCode::IOModule {
         if (absl::Status st = SendCurrentPacket(); !st.ok()) return st;
         break;
       }
-      default: return absl::InternalError("Bad state");
+      default:
+        return absl::InternalError("Bad state");
     }
     return absl::OkStatus();
   }
 
   absl::Status RecvPacket(Packet packet) {
     if (packet.address != address_) {
-      return absl::InvalidArgumentError(absl::StrCat(
-        "Wrong address: ", packet.address, " != ", address_));
-    } 
+      return absl::InvalidArgumentError(
+          absl::StrCat("Wrong address: ", packet.address, " != ", address_));
+    }
 
     VLOG(2) << "RecvPacket: " << packet;
     in_packet_queue_.push_back(packet);
@@ -117,9 +116,9 @@ class Computer : public IntCode::IOModule {
 class Network {
  public:
   Network(const IntCode& code) {
-   for (int i = 0; i < 49; ++i) {
-     computers_.push_back(Computer(this, code, i));
-   }
+    for (int i = 0; i < 49; ++i) {
+      computers_.push_back(Computer(this, code, i));
+    }
   }
 
   absl::StatusOr<int> RunUntilAddress255ReturnY() {
@@ -146,7 +145,9 @@ class Network {
         last_y = nat_packet_.y;
         Packet host_packet = nat_packet_;
         host_packet.address = 0;
-        if (absl::Status st = computers_[0].RecvPacket(host_packet); !st.ok()) return st;
+        if (absl::Status st = computers_[0].RecvPacket(host_packet); !st.ok()) {
+          return st;
+        }
       }
     }
   }
@@ -157,12 +158,16 @@ class Network {
       nat_packet_ = packet;
     } else {
       if (packet.address < 0 || packet.address >= computers_.size()) {
-        return absl::InvalidArgumentError(absl::StrCat("Bad address: ", packet.address));
+        return absl::InvalidArgumentError(
+            absl::StrCat("Bad address: ", packet.address));
       }
-      if (absl::Status st = computers_[packet.address].RecvPacket(packet); !st.ok()) return st;
+      if (absl::Status st = computers_[packet.address].RecvPacket(packet);
+          !st.ok()) {
+        return st;
+      }
     }
     return absl::OkStatus();
- }
+  }
 
  private:
   std::vector<Computer> computers_;
