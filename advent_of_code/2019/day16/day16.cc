@@ -139,6 +139,8 @@ absl::StatusOr<std::vector<std::string>> Day16_2019::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day16_2019::Part2(
     const std::vector<absl::string_view>& input) const {
+  // TODO(@monkeynova): This model still takes way too long. There aught
+  // to sitll be opportunities to improve the runtime.
   int offset;
   if (!absl::SimpleAtoi(input[0].substr(0, 7), &offset)) {
     return absl::InvalidArgumentError("bad atoi");

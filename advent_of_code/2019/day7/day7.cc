@@ -78,6 +78,9 @@ absl::StatusOr<int> RunAssembly(const IntCode& base_codes,
   absl::optional<int64_t> next_input = 0;
   bool running = true;
   int64_t last_output = -1;
+  // TODO(@monkeynova): This whole mess would be much better implemented with
+  // the IOModule interface. Parallel execution could be implemented like
+  // day23.
   while (running) {
     for (int i = 0; i < 5; ++i) {
       PartialState& unit = assembly[i];
