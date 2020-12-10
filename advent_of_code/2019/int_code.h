@@ -109,13 +109,16 @@ class IntCode {
   absl::Status Run(InputSource* input, OutputSink* output,
                    PauseCondition* pause_condition);
 
+  absl::Status RunSingleOpcode(IOModule* io_module) {
+    return RunSingleOpcode(io_module, io_module);
+  }
+  absl::Status RunSingleOpcode(InputSource* input, OutputSink* output);
+
  private:
   explicit IntCode(std::vector<int64_t> codes) : codes_(std::move(codes)) {}
 
   IntCode(const IntCode&) = default;
   IntCode& operator=(const IntCode&) = default;
-
-  absl::Status RunSingleOpcode(InputSource* input, OutputSink* output);
 
   absl::StatusOr<int64_t> LoadParameter(int64_t parameter_modes,
                                         int64_t parameter);

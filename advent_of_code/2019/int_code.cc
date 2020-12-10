@@ -186,7 +186,7 @@ absl::Status IntCode::RunSingleOpcode(InputSource* input, OutputSink* output) {
         absl::StrCat("Attempt to read argument from pos=", code_pos_));
   }
   bool jumped = false;
-  VLOG(2) << "@" << code_pos_ << ": " << CodeTypes()[opcode].name;
+  VLOG(4) << "@" << code_pos_ << ": " << CodeTypes()[opcode].name;
   switch (static_cast<OpCode>(opcode)) {
     case OpCode::kAdd: {
       absl::StatusOr<int64_t> in1 = LoadParameter(parameter_modes, 1);
