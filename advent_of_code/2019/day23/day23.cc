@@ -28,9 +28,16 @@ class Computer : public IntCode::IOModule {
   Computer(Network* network, const IntCode& code, int64_t address)
       : network_(network), code_(code.Clone()), address_(address) {}
 
-  absl::Status StepExecution() { return code_.RunSingleOpcode(this); }
+  absl::Status StepExecution() {
+    run_step_ = true;
+    return code_.Run(this);
+  }
 
-  bool PauseIntCode() override { return false; }
+  bool PauseIntCode() override { 
+    bool pause = !run_step_;
+    run_step_ = false;
+    return pause;
+  }
 
   bool idle() const { return idle_; }
 
@@ -111,6 +118,7 @@ class Computer : public IntCode::IOModule {
   std::deque<Packet> in_packet_queue_;
   PacketState in_packet_state_ = PacketState::kSetAddress;
   bool idle_ = false;
+  bool run_step_ = true;
 };
 
 class Network {
