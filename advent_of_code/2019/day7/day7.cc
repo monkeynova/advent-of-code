@@ -46,12 +46,15 @@ absl::StatusOr<std::vector<std::string>> Day7_2019::Part1(
   return IntReturn(FindBestThrust(*codes, 0));
 }
 
-class AssemblyIO : public IntCode::OutputSink,
-                   public IntCode::PauseCondition {
+class AssemblyIO : public IntCode::IOModule {
  public:
+  explicit AssemblyIO(std::vector<int64_t> input) : input_(std::move(input)) {}
+
   bool PauseIntCode() override { return output_.has_value(); }
 
   void clear_output() { output_ = absl::nullopt; }
+
+  void add_input(int64_t val) { input_.push_back(val); }
 
   absl::Status Put(int64_t val) override {
     output_ = val;
@@ -59,10 +62,17 @@ class AssemblyIO : public IntCode::OutputSink,
     return absl::OkStatus();
   }
 
+  absl::StatusOr<int64_t> Fetch() override {
+    if (input_pos_ < input_.size()) return input_[input_pos_++];
+    return absl::InvalidArgumentError("Input is exhausted");
+  }
+
   absl::optional<int64_t> output() { return output_; }
   absl::optional<int64_t> last_nonempty_output() { return last_nonempty_output_; }
 
  private:
+  std::vector<int64_t> input_;
+  int input_pos_ = 0;
   absl::optional<int64_t> output_;
   absl::optional<int64_t> last_nonempty_output_;
 };
@@ -71,14 +81,13 @@ absl::StatusOr<int> RunAssembly(const IntCode& base_codes,
                                 std::vector<int> phases) {
   struct PartialState {
     IntCode code;
-    std::vector<int64_t> input;
     AssemblyIO io;
   };
 
   // Initialize.
   std::vector<PartialState> assembly;
   for (int i = 0; i < 5; ++i) {
-    assembly.push_back({.code = base_codes.Clone(), .input = {phases[i]}});
+    assembly.push_back({.code = base_codes.Clone(), .io = AssemblyIO({phases[i]})});
   }
 
   absl::optional<int64_t> next_input = 0;
@@ -90,15 +99,12 @@ absl::StatusOr<int> RunAssembly(const IntCode& base_codes,
     for (int i = 0; i < 5; ++i) {
       PartialState& unit = assembly[i];
       if (next_input) {
-        unit.input.push_back(*next_input);
+        unit.io.add_input(*next_input);
       }
-      IntCode::VectorInput input(unit.input);
       unit.io.clear_output();
-      if (absl::Status st = unit.code.Run(&input, &unit.io, &unit.io);
-          !st.ok()) {
+      if (absl::Status st = unit.code.Run(&unit.io); !st.ok()) {
         return st;
       }
-      unit.input.clear();
       if (unit.io.output()) {
         next_input = *unit.io.output();
       } else {
