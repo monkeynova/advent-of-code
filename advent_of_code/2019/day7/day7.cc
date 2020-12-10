@@ -90,25 +90,18 @@ absl::StatusOr<int> RunAssembly(const IntCode& base_codes,
     assembly.push_back({.code = base_codes.Clone(), .io = AssemblyIO({phases[i]})});
   }
 
-  absl::optional<int64_t> next_input = 0;
+  assembly[0].io.add_input(0);
   bool running = true;
-  // TODO(@monkeynova): This whole mess would be much better implemented with
-  // the IOModule interface. Parallel execution could be implemented like
-  // day23.
   while (running) {
     for (int i = 0; i < 5; ++i) {
       PartialState& unit = assembly[i];
-      if (next_input) {
-        unit.io.add_input(*next_input);
-      }
       unit.io.clear_output();
       if (absl::Status st = unit.code.Run(&unit.io); !st.ok()) {
         return st;
       }
       if (unit.io.output()) {
-        next_input = *unit.io.output();
+        assembly[(i + 1) % 5].io.add_input(*unit.io.output());
       } else {
-        next_input = absl::nullopt;
         running = false;
       }
     }
