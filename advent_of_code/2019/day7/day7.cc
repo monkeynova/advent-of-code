@@ -46,20 +46,25 @@ absl::StatusOr<std::vector<std::string>> Day7_2019::Part1(
   return IntReturn(FindBestThrust(*codes, 0));
 }
 
-class CollectOutputAndPause : public IntCode::OutputSink,
-                              public IntCode::PauseCondition {
+class AssemblyIO : public IntCode::OutputSink,
+                   public IntCode::PauseCondition {
  public:
   bool PauseIntCode() override { return output_.has_value(); }
 
+  void clear_output() { output_ = absl::nullopt; }
+
   absl::Status Put(int64_t val) override {
     output_ = val;
+    last_nonempty_output_ = val;
     return absl::OkStatus();
   }
 
   absl::optional<int64_t> output() { return output_; }
+  absl::optional<int64_t> last_nonempty_output() { return last_nonempty_output_; }
 
  private:
   absl::optional<int64_t> output_;
+  absl::optional<int64_t> last_nonempty_output_;
 };
 
 absl::StatusOr<int> RunAssembly(const IntCode& base_codes,
@@ -67,6 +72,7 @@ absl::StatusOr<int> RunAssembly(const IntCode& base_codes,
   struct PartialState {
     IntCode code;
     std::vector<int64_t> input;
+    AssemblyIO io;
   };
 
   // Initialize.
@@ -77,7 +83,6 @@ absl::StatusOr<int> RunAssembly(const IntCode& base_codes,
 
   absl::optional<int64_t> next_input = 0;
   bool running = true;
-  int64_t last_output = -1;
   // TODO(@monkeynova): This whole mess would be much better implemented with
   // the IOModule interface. Parallel execution could be implemented like
   // day23.
@@ -88,22 +93,18 @@ absl::StatusOr<int> RunAssembly(const IntCode& base_codes,
         unit.input.push_back(*next_input);
       }
       IntCode::VectorInput input(unit.input);
-      CollectOutputAndPause out_and_pause;
-      if (absl::Status st =
-              unit.code.Run(&input, &out_and_pause, &out_and_pause);
+      unit.io.clear_output();
+      if (absl::Status st = unit.code.Run(&input, &unit.io, &unit.io);
           !st.ok()) {
         return st;
       }
       unit.input.clear();
-      if (out_and_pause.output()) {
-        next_input = *out_and_pause.output();
+      if (unit.io.output()) {
+        next_input = *unit.io.output();
       } else {
         next_input = absl::nullopt;
         running = false;
       }
-    }
-    if (next_input) {
-      last_output = *next_input;
     }
   }
 
@@ -112,7 +113,11 @@ absl::StatusOr<int> RunAssembly(const IntCode& base_codes,
     if (absl::Status st = unit.code.Run(); !st.ok()) return st;
   }
 
-  return last_output;
+  if (!assembly.back().io.last_nonempty_output()) {
+    return absl::InvalidArgumentError("No output");
+  }
+
+  return *assembly.back().io.last_nonempty_output();
 }
 
 absl::StatusOr<int> FindBestThrustFeedback(const IntCode& base_codes,
