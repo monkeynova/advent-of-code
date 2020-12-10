@@ -36,6 +36,8 @@ class Computer : public IntCode::IOModule {
 
   bool PauseIntCode() override { return false; }
 
+  bool idle() const { return idle_; }
+
   absl::StatusOr<int64_t> Fetch() override { 
     switch (in_packet_state_) {
       case PacketState::kSetAddress: {
@@ -44,7 +46,10 @@ class Computer : public IntCode::IOModule {
         return address_;
       }
       case PacketState::kSetX: {
-        if (in_packet_queue_.empty()) return -1;
+        if (in_packet_queue_.empty()) {
+          idle_ = true;
+          return -1;
+        }
         VLOG(2) << "Fetch X: " << in_packet_queue_.front();
         in_packet_state_ = PacketState::kSetY;
         return in_packet_queue_.front().x;
@@ -92,6 +97,7 @@ class Computer : public IntCode::IOModule {
 
     VLOG(2) << "RecvPacket: " << packet;
     in_packet_queue_.push_back(packet);
+    idle_ = false;
     return absl::OkStatus();
   }
 
@@ -105,6 +111,7 @@ class Computer : public IntCode::IOModule {
   Packet out_packet_;
   std::deque<Packet> in_packet_queue_;
   PacketState in_packet_state_ = PacketState::kSetAddress;
+  bool idle_ = false;
 };
 
 class Network {
@@ -116,20 +123,38 @@ class Network {
   }
 
   absl::StatusOr<int> RunUntilAddress255ReturnY() {
-    while (address_255_packet_.address != 255) {
+    while (nat_packet_.address != 255) {
       for (Computer& c : computers_) {
         if (absl::Status st = c.StepExecution(); !st.ok()) return st;
       }
     }
-    return address_255_packet_.y;
+    return nat_packet_.y;
+  }
+
+  absl::StatusOr<int> RunUntilDuplicateNat() {
+    absl::optional<int> last_y;
+    while (true) {
+      bool all_idle = true;
+      for (Computer& c : computers_) {
+        if (absl::Status st = c.StepExecution(); !st.ok()) return st;
+        all_idle &= c.idle();
+      }
+      if (all_idle) {
+        if (last_y && nat_packet_.y == *last_y) {
+          return *last_y;
+        }
+        last_y = nat_packet_.y;
+        Packet host_packet = nat_packet_;
+        host_packet.address = 0;
+        if (absl::Status st = computers_[0].RecvPacket(host_packet); !st.ok()) return st;
+      }
+    }
   }
 
   absl::Status SendPacket(Packet packet) {
     VLOG(1) << "Network: SendPacket: " << packet;
     if (packet.address == 255) {
-      if (address_255_packet_.address != 255) {
-        address_255_packet_ = packet;
-      }
+      nat_packet_ = packet;
     } else {
       if (packet.address < 0 || packet.address >= computers_.size()) {
         return absl::InvalidArgumentError(absl::StrCat("Bad address: ", packet.address));
@@ -141,7 +166,7 @@ class Network {
 
  private:
   std::vector<Computer> computers_;
-  Packet address_255_packet_{.address = 0, .x = 123, .y = 456};
+  Packet nat_packet_{.address = 0, .x = 123, .y = 456};
 };
 
 absl::Status Computer::SendCurrentPacket() {
@@ -160,5 +185,10 @@ absl::StatusOr<std::vector<std::string>> Day23_2019::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day23_2019::Part2(
     const std::vector<absl::string_view>& input) const {
-  return IntReturn(-1);
+  absl::StatusOr<IntCode> code = IntCode::Parse(input);
+  if (!code.ok()) return code.status();
+
+  Network network(*code);
+
+  return IntReturn(network.RunUntilDuplicateNat());
 }
