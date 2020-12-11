@@ -47,6 +47,56 @@ int CountSeats(Board b) {
   return count;
 }
 
+using VisMap = absl::flat_hash_map<std::pair<Point, Point>, Point>;
+
+VisMap ComputeVismap(Board in) {
+  VisMap vis_map;
+  for (int y = 0; y < in.size(); ++y) {
+    for (int x = 0; x < in[y].size(); ++x) {
+      Point c{x, y};
+      if (in[c.y][c.x] == '.') continue;
+      for (Point dir : Cardinal::kAllPlus) {
+        Point n = c + dir;
+        while (n.x >= 0 && n.y >= 0 && n.x < in[y].size() && n.y < in.size()) {
+          if (in[n.y][n.x] != '.') {
+            vis_map.emplace(std::make_pair(c, dir), n);
+            break;
+          }
+          n = n + dir;
+        }
+      }
+    }
+  }
+  return vis_map;
+}
+
+Board Update2(Board in, const VisMap& vis_map) {
+  Board out;
+  for (int y = 0; y < in.size(); ++y) {
+    out.push_back(in[y]);
+    for (int x = 0; x < in[y].size(); ++x) {
+      Point c{x, y};
+      int neighbors = 0;
+      if (in[c.y][c.x] != '.') {
+        for (Point dir : Cardinal::kAllPlus) {
+          auto it = vis_map.find(std::make_pair(c, dir));
+          if (it != vis_map.end()) {
+            Point d = it->second;
+            if (in[d.y][d.x] == '#') ++neighbors;
+          }
+        }
+      }
+      if (in[c.y][c.x] == 'L') {
+        if (neighbors == 0) out[c.y][c.x] = '#';
+      } else if (in[c.y][c.x] == '#') {
+        if (neighbors >= 5) out[c.y][c.x] = 'L';
+      }
+    }
+  }
+  return out;
+}
+
+
 absl::StatusOr<std::vector<std::string>> Day11_2020::Part1(
     const std::vector<absl::string_view>& input) const {
   Board cur;
@@ -54,7 +104,7 @@ absl::StatusOr<std::vector<std::string>> Day11_2020::Part1(
     cur.push_back(std::string(str));
   }
   for (int i = 0;; ++i) {
-    LOG(WARNING) << "Board:\n" << absl::StrJoin(cur, "\n") << "\n";
+    // LOG(WARNING) << "Board:\n" << absl::StrJoin(cur, "\n") << "\n";
     Board next = Update(cur);
     if (next == cur) break;
     cur = next;
@@ -64,5 +114,19 @@ absl::StatusOr<std::vector<std::string>> Day11_2020::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day11_2020::Part2(
     const std::vector<absl::string_view>& input) const {
-  return IntReturn(-1);
+  Board cur;
+  for (absl::string_view str : input) {
+    cur.push_back(std::string(str));
+  }
+  VisMap vis_map = ComputeVismap(cur);
+  for (const auto& pair : vis_map) {
+    //LOG(WARNING) << pair.first.first << "," << pair.first.second << " => " << pair.second;
+  }
+  for (int i = 0;; ++i) {
+    //LOG(WARNING) << "Board:\n" << absl::StrJoin(cur, "\n") << "\n";
+    Board next = Update2(cur, vis_map);
+    if (next == cur) break;
+    cur = next;
+  }
+  return IntReturn(CountSeats(cur));
 }
