@@ -7,6 +7,9 @@
 #include "absl/status/statusor.h"
 #include "absl/strings/str_cat.h"
 
+// TODO(@monkeynova): Move from const std::vector<...>& to absl::Span.
+//                    That would allow children to mutate as they
+//                    process.
 class AdventDay {
  public:
   virtual ~AdventDay() = default;
