@@ -13,10 +13,12 @@
 using Board = std::vector<std::string>;
 
 absl::StatusOr<Board> ParseBoard(const std::vector<absl::string_view>& input) {
-  if (input.size() != 5) return absl::InvalidArgumentError("Board isn't of height 5");
+  if (input.size() != 5)
+    return absl::InvalidArgumentError("Board isn't of height 5");
   Board board;
   for (absl::string_view str : input) {
-    if (str.size() != 5) return absl::InvalidArgumentError("Board isn't of width 5");
+    if (str.size() != 5)
+      return absl::InvalidArgumentError("Board isn't of width 5");
     board.push_back(std::string(str));
   }
   return board;
@@ -62,8 +64,7 @@ int64_t BioDiversity(Board input) {
   return ret;
 }
 
-absl::optional<Board> NewBoardPlusOneLevel(
-  const Board& in_board) {
+absl::optional<Board> NewBoardPlusOneLevel(const Board& in_board) {
   std::string empty_row(in_board[2].size(), '.');
   Board new_board(in_board.size(), empty_row);
   bool added = false;
@@ -95,8 +96,7 @@ absl::optional<Board> NewBoardPlusOneLevel(
   return new_board;
 }
 
-absl::optional<Board> NewBoardMinusOneLevel(
-  const Board& in_board) {
+absl::optional<Board> NewBoardMinusOneLevel(const Board& in_board) {
   std::string empty_row(in_board[0].size(), '.');
   Board new_board(in_board.size(), empty_row);
   bool added = false;
@@ -162,19 +162,19 @@ int CountNeighborsRecursive(const Board& in_board, Point p,
       if (board_plus_one) {
         if (p == Point{1, 2}) {
           for (int sub_y = 0; sub_y < board_plus_one->size(); ++sub_y) {
-            if ((*board_plus_one)[sub_y][0] == '#') ++neighbors; 
+            if ((*board_plus_one)[sub_y][0] == '#') ++neighbors;
           }
         } else if (p == Point{3, 2}) {
           for (int sub_y = 0; sub_y < board_plus_one->size(); ++sub_y) {
-            if ((*board_plus_one)[sub_y][4] == '#') ++neighbors; 
+            if ((*board_plus_one)[sub_y][4] == '#') ++neighbors;
           }
         } else if (p == Point{2, 1}) {
           for (int sub_x = 0; sub_x < board_plus_one->size(); ++sub_x) {
-            if ((*board_plus_one)[0][sub_x] == '#') ++neighbors; 
+            if ((*board_plus_one)[0][sub_x] == '#') ++neighbors;
           }
         } else if (p == Point{2, 3}) {
           for (int sub_x = 0; sub_x < board_plus_one->size(); ++sub_x) {
-            if ((*board_plus_one)[4][sub_x] == '#') ++neighbors; 
+            if ((*board_plus_one)[4][sub_x] == '#') ++neighbors;
           }
         } else {
           LOG(DFATAL) << "Can't get here";
@@ -188,7 +188,7 @@ int CountNeighborsRecursive(const Board& in_board, Point p,
 }
 
 absl::flat_hash_map<int, Board> StepGameOfLineRecursive(
-      absl::flat_hash_map<int, Board> depth_to_board) {
+    absl::flat_hash_map<int, Board> depth_to_board) {
   absl::flat_hash_map<int, Board> out;
   for (const auto& depth_and_board : depth_to_board) {
     int depth = depth_and_board.first;
@@ -206,17 +206,17 @@ absl::flat_hash_map<int, Board> StepGameOfLineRecursive(
       std::string cur_row(in_board[y]);
       for (int x = 0; x < in_board[y].size(); ++x) {
         Point p{x, y};
-        if (p == Point{2,2}) {
+        if (p == Point{2, 2}) {
           if (!board_plus_one) {
-            absl::optional<Board> new_board =
-                NewBoardPlusOneLevel(in_board);
+            absl::optional<Board> new_board = NewBoardPlusOneLevel(in_board);
             if (new_board) {
               out.emplace(depth + 1, std::move(*new_board));
             }
           }
           cur_row[x] = '?';
         } else {
-          int neighbors = CountNeighborsRecursive(in_board, p, board_minus_one, board_plus_one);
+          int neighbors = CountNeighborsRecursive(in_board, p, board_minus_one,
+                                                  board_plus_one);
           if (in_board[p.y][p.x] == '#') {
             if (neighbors != 1) cur_row[x] = '.';
           } else {
@@ -226,8 +226,7 @@ absl::flat_hash_map<int, Board> StepGameOfLineRecursive(
         }
       }
       if (!board_minus_one) {
-        absl::optional<Board> new_board =
-           NewBoardMinusOneLevel(in_board);
+        absl::optional<Board> new_board = NewBoardMinusOneLevel(in_board);
         if (new_board) {
           out.emplace(depth - 1, std::move(*new_board));
         }
@@ -239,8 +238,7 @@ absl::flat_hash_map<int, Board> StepGameOfLineRecursive(
   return out;
 }
 
-std::string DebugBoards(
-  absl::flat_hash_map<int, Board> depth_to_board) {
+std::string DebugBoards(absl::flat_hash_map<int, Board> depth_to_board) {
   int min = std::numeric_limits<int>::max();
   int max = std::numeric_limits<int>::min();
   for (const auto& pair : depth_to_board) {
@@ -307,7 +305,7 @@ absl::StatusOr<Board> Day24_2019::Part2(
   for (int i = 0; i < 200; ++i) {
     VLOG(2) << "Boards[" << i << "]:\n" << DebugBoards(level_to_board);
     absl::flat_hash_map<int, Board> next =
-       StepGameOfLineRecursive(level_to_board);
+        StepGameOfLineRecursive(level_to_board);
     level_to_board = std::move(next);
   }
   return IntReturn(CountBugs(level_to_board));

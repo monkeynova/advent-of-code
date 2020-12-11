@@ -33,7 +33,7 @@ class Computer : public IntCode::IOModule {
     return code_.Run(this);
   }
 
-  bool PauseIntCode() override { 
+  bool PauseIntCode() override {
     bool pause = !run_step_;
     run_step_ = false;
     return pause;

@@ -68,7 +68,9 @@ class AssemblyIO : public IntCode::IOModule {
   }
 
   absl::optional<int64_t> output() { return output_; }
-  absl::optional<int64_t> last_nonempty_output() { return last_nonempty_output_; }
+  absl::optional<int64_t> last_nonempty_output() {
+    return last_nonempty_output_;
+  }
 
  private:
   std::vector<int64_t> input_;
@@ -87,7 +89,8 @@ absl::StatusOr<int> RunAssembly(const IntCode& base_codes,
   // Initialize.
   std::vector<PartialState> assembly;
   for (int i = 0; i < 5; ++i) {
-    assembly.push_back({.code = base_codes.Clone(), .io = AssemblyIO({phases[i]})});
+    assembly.push_back(
+        {.code = base_codes.Clone(), .io = AssemblyIO({phases[i]})});
   }
 
   assembly[0].io.add_input(0);
