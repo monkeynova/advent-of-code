@@ -12,6 +12,16 @@
 
 using Board = std::vector<std::string>;
 
+absl::StatusOr<Board> ParseBoard(const std::vector<absl::string_view>& input) {
+  if (input.size() != 5) return absl::InvalidArgumentError("Board isn't of height 5");
+  Board board;
+  for (absl::string_view str : input) {
+    if (str.size() != 5) return absl::InvalidArgumentError("Board isn't of width 5");
+    board.push_back(std::string(str));
+  }
+  return board;
+}
+
 Board StepGameOfLine(Board input) {
   Board out;
   for (int y = 0; y < input.size(); ++y) {
@@ -50,27 +60,6 @@ int64_t BioDiversity(Board input) {
     }
   }
   return ret;
-}
-
-absl::StatusOr<Board> Day24_2019::Part1(
-    const std::vector<absl::string_view>& input) const {
-  if (input.empty()) return absl::InvalidArgumentError("Empty board");
-  int width = input[0].size();
-  Board cur;
-  for (absl::string_view str : input) {
-    if (str.size() != width) return absl::InvalidArgumentError("Bad board");
-    cur.push_back(std::string(str));
-  }
-
-  absl::flat_hash_set<Board> hist;
-  while (!hist.contains(cur)) {
-    hist.insert(cur);
-    VLOG(2) << "Cur Board:\n" << absl::StrJoin(cur, "\n");
-    Board next = StepGameOfLine(cur);
-    cur = std::move(next);
-  }
-  VLOG(1) << "Dupe Board:\n" << absl::StrJoin(cur, "\n");
-  return IntReturn(BioDiversity(cur));
 }
 
 absl::optional<Board> NewBoardPlusOneLevel(
@@ -147,9 +136,9 @@ absl::optional<Board> NewBoardMinusOneLevel(
   return new_board;
 }
 
-int CountNeighbors(const Board& in_board, Point p,
-                   absl::optional<Board> board_minus_one,
-                   absl::optional<Board> board_plus_one) {
+int CountNeighborsRecursive(const Board& in_board, Point p,
+                            absl::optional<Board> board_minus_one,
+                            absl::optional<Board> board_plus_one) {
   int neighbors = 0;
   for (Point dir : Cardinal::kAll) {
     Point n = dir + p;
@@ -227,7 +216,7 @@ absl::flat_hash_map<int, Board> StepGameOfLineRecursive(
           }
           cur_row[x] = '?';
         } else {
-          int neighbors = CountNeighbors(in_board, p, board_minus_one, board_plus_one);
+          int neighbors = CountNeighborsRecursive(in_board, p, board_minus_one, board_plus_one);
           if (in_board[p.y][p.x] == '#') {
             if (neighbors != 1) cur_row[x] = '.';
           } else {
@@ -291,18 +280,29 @@ int64_t CountBugs(absl::flat_hash_map<int, Board> depth_to_board) {
   return bugs;
 }
 
+absl::StatusOr<Board> Day24_2019::Part1(
+    const std::vector<absl::string_view>& input) const {
+  absl::StatusOr<Board> board = ParseBoard(input);
+  if (!board.ok()) return board;
+
+  Board cur = *board;
+  absl::flat_hash_set<Board> hist;
+  while (!hist.contains(cur)) {
+    hist.insert(cur);
+    VLOG(2) << "Cur Board:\n" << absl::StrJoin(cur, "\n");
+    cur = StepGameOfLine(cur);
+  }
+  VLOG(1) << "Dupe Board:\n" << absl::StrJoin(cur, "\n");
+  return IntReturn(BioDiversity(cur));
+}
+
 absl::StatusOr<Board> Day24_2019::Part2(
     const std::vector<absl::string_view>& input) const {
-  if (input.empty()) return absl::InvalidArgumentError("Empty board");
-  int width = input[0].size();
-  Board cur;
-  for (absl::string_view str : input) {
-    if (str.size() != width) return absl::InvalidArgumentError("Bad board");
-    cur.push_back(std::string(str));
-  }
+  absl::StatusOr<Board> cur = ParseBoard(input);
+  if (!cur.ok()) return cur;
 
   absl::flat_hash_map<int, Board> level_to_board;
-  level_to_board[0] = cur;
+  level_to_board[0] = *cur;
 
   for (int i = 0; i < 200; ++i) {
     VLOG(2) << "Boards[" << i << "]:\n" << DebugBoards(level_to_board);
