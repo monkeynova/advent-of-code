@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 
 cc_library(
     name = "day25",
@@ -6,11 +6,26 @@ cc_library(
     hdrs = ["day25.h"],
     deps = [
         "//advent_of_code:advent_day",
+        "//advent_of_code/2019:int_code",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/strings",
         "@com_google_glog//:glog",
         "@com_googlesource_code_re2//:re2",
+    ],
+)
+
+cc_test(
+    name = "day25_interactive",
+    srcs = ["day25_interactive.cc"],
+    data = [
+        "input.txt",
+    ],
+    deps = [
+        "//advent_of_code/2019:int_code",
+        "//advent_of_code:file_util",
+        "@com_monkeynova_gunit_main//:main_lib",
+        "@com_google_glog//:glog",
     ],
 )
 
