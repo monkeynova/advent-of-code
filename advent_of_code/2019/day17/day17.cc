@@ -193,7 +193,7 @@ class ViewPort : public IntCode::IOModule {
     }
     while (true) {
       Point next_dir = Cardinal::kOrigin;
-      for (Point d : Cardinal::kAll) {
+      for (Point d : Cardinal::kFourDirs) {
         Point check = robot + d;
         if (OnBoard(check, scratch) && scratch[check.y][check.x] == '#') {
           if (next_dir != Cardinal::kOrigin)

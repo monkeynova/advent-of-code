@@ -115,7 +115,7 @@ class Board {
                         .to_key = '\0'});
     while (!frontier.empty()) {
       const KeyPath& cur = frontier.front();
-      for (Point dir : Cardinal::kAll) {
+      for (Point dir : Cardinal::kFourDirs) {
         Point next_to = cur.to + dir;
         if (visited.contains(next_to)) continue;
         visited.insert(next_to);

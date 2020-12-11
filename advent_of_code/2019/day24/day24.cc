@@ -31,7 +31,7 @@ Board StepGameOfLine(Board input) {
     for (int x = 0; x < input[y].size(); ++x) {
       Point p{x, y};
       int neighbors = 0;
-      for (Point dir : Cardinal::kAll) {
+      for (Point dir : Cardinal::kFourDirs) {
         Point n = dir + p;
         if (n.x < 0) continue;
         if (n.x >= input[y].size()) continue;
@@ -140,7 +140,7 @@ int CountNeighborsRecursive(const Board& in_board, Point p,
                             absl::optional<Board> board_minus_one,
                             absl::optional<Board> board_plus_one) {
   int neighbors = 0;
-  for (Point dir : Cardinal::kAll) {
+  for (Point dir : Cardinal::kFourDirs) {
     Point n = dir + p;
     if (n.x < 0) {
       if (board_minus_one) {

@@ -19,7 +19,7 @@ Board Update(Board in) {
     for (int x = 0; x < in[y].size(); ++x) {
       Point c{x, y};
       int neighbors = 0;
-      for (Point dir : Cardinal::kAllPlus) {
+      for (Point dir : Cardinal::kEightDirs) {
         Point n = c + dir;
         if (n.x < 0) continue;
         if (n.x >= in[y].size()) continue;
@@ -55,7 +55,7 @@ VisMap ComputeVismap(Board in) {
     for (int x = 0; x < in[y].size(); ++x) {
       Point c{x, y};
       if (in[c.y][c.x] == '.') continue;
-      for (Point dir : Cardinal::kAllPlus) {
+      for (Point dir : Cardinal::kEightDirs) {
         Point n = c + dir;
         while (n.x >= 0 && n.y >= 0 && n.x < in[y].size() && n.y < in.size()) {
           if (in[n.y][n.x] != '.') {
@@ -78,7 +78,7 @@ Board Update2(Board in, const VisMap& vis_map) {
       Point c{x, y};
       int neighbors = 0;
       if (in[c.y][c.x] != '.') {
-        for (Point dir : Cardinal::kAllPlus) {
+        for (Point dir : Cardinal::kEightDirs) {
           auto it = vis_map.find(std::make_pair(c, dir));
           if (it != vis_map.end()) {
             Point d = it->second;
@@ -104,7 +104,7 @@ absl::StatusOr<std::vector<std::string>> Day11_2020::Part1(
     cur.push_back(std::string(str));
   }
   for (int i = 0;; ++i) {
-    // LOG(WARNING) << "Board:\n" << absl::StrJoin(cur, "\n") << "\n";
+    VLOG(1) << "Board:\n" << absl::StrJoin(cur, "\n") << "\n";
     Board next = Update(cur);
     if (next == cur) break;
     cur = next;
@@ -119,11 +119,8 @@ absl::StatusOr<std::vector<std::string>> Day11_2020::Part2(
     cur.push_back(std::string(str));
   }
   VisMap vis_map = ComputeVismap(cur);
-  for (const auto& pair : vis_map) {
-    //LOG(WARNING) << pair.first.first << "," << pair.first.second << " => " << pair.second;
-  }
   for (int i = 0;; ++i) {
-    //LOG(WARNING) << "Board:\n" << absl::StrJoin(cur, "\n") << "\n";
+    VLOG(1) << "Board:\n" << absl::StrJoin(cur, "\n") << "\n";
     Board next = Update2(cur, vis_map);
     if (next == cur) break;
     cur = next;

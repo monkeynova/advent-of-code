@@ -116,7 +116,7 @@ class Maze {
       const Path& cur = frontier.front();
       if (cur.pos == end_) return cur.steps;
       hist.insert(cur.pos);
-      for (Point dir : Cardinal::kAll) {
+      for (Point dir : Cardinal::kFourDirs) {
         Point next = cur.pos + dir;
         if (hist.contains(next)) continue;
         if (CanStand(next)) {
@@ -147,7 +147,7 @@ class Maze {
       const Path& cur = frontier.front();
       if (cur.pos == end_ && cur.level == 0) return cur.steps;
       hist.insert(std::make_pair(cur.level, cur.pos));
-      for (Point dir : Cardinal::kAll) {
+      for (Point dir : Cardinal::kFourDirs) {
         Point next = cur.pos + dir;
         if (hist.contains(std::make_pair(cur.level, next))) continue;
         if (CanStand(next)) {
