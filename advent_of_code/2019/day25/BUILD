@@ -15,7 +15,7 @@ cc_library(
     ],
 )
 
-cc_test(
+cc_binary(
     name = "day25_interactive",
     srcs = ["day25_interactive.cc"],
     data = [

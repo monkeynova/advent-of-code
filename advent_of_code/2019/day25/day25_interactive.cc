@@ -9,11 +9,12 @@ class Terminal : public IntCode::IOModule {
 
   absl::StatusOr<int64_t> Fetch() override {
     if (input_pos_ < input_.size()) return input_[input_pos_++];
-    std::cerr << "cin-ing" <<std::endl;
     std::getline(std::cin, input_);
+    if (std::cin.eof()) {
+      done_ = true;
+    }
     char term[] = {'\n', '\0'};
     absl::StrAppend(&input_, term);
-    std::cerr << "Received: " << input_ << std::endl;
     input_pos_ = 0;
     return input_[input_pos_++];
   }
@@ -37,7 +38,6 @@ class Terminal : public IntCode::IOModule {
 };
 
 int main(int argc, char** argv) {
-  return 0;
   std::vector<char*> args = InitMain(argc, argv);
   if (args.size() != 2) {
     LOG(FATAL) << "Usage:\n" << args[0] << " <file>";

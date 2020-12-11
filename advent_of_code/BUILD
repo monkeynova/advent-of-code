@@ -14,7 +14,6 @@ cc_library(
 
 cc_library(
     name = "file_util",
-    testonly = 1,
     srcs = ["file_util.cc"],
     hdrs = ["file_util.h"],
     visibility = [
@@ -24,7 +23,6 @@ cc_library(
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
-        "@com_google_file_based_test_driver//file_based_test_driver:test_case_options",
         "@com_google_glog//:glog",
         "@com_googlesource_code_re2//:re2",
     ],
@@ -41,6 +39,7 @@ cc_library(
     deps = [
         ":advent_day",
         ":file_util",
+        ":file_test_options",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/functional:bind_front",
         "@com_google_absl//absl/strings",
@@ -49,6 +48,19 @@ cc_library(
         "@com_google_file_based_test_driver//file_based_test_driver:test_case_options",
         "@com_googlesource_code_re2//:re2",
         "@com_monkeynova_gunit_main//:main_lib",
+    ],
+)
+
+cc_library(
+    name = "file_test_options",
+    testonly = 1,
+    srcs = ["file_test_options.cc"],
+    hdrs = ["file_test_options.h"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "@com_google_file_based_test_driver//file_based_test_driver:test_case_options",
     ],
 )
 
@@ -75,6 +87,7 @@ cc_library(
     deps = [
         ":advent_day",
         ":file_util",
+        ":file_test_options",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
