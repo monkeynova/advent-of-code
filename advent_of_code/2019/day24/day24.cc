@@ -10,8 +10,10 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
-std::vector<std::string> StepGameOfLine(std::vector<std::string> input) {
-  std::vector<std::string> out;
+using Board = std::vector<std::string>;
+
+Board StepGameOfLine(Board input) {
+  Board out;
   for (int y = 0; y < input.size(); ++y) {
     std::string cur_row(input[y]);
     for (int x = 0; x < input[y].size(); ++x) {
@@ -37,7 +39,7 @@ std::vector<std::string> StepGameOfLine(std::vector<std::string> input) {
   return out;
 }
 
-int64_t BioDiversity(std::vector<std::string> input) {
+int64_t BioDiversity(Board input) {
   int64_t ret = 0;
   for (int y = 0; y < input.size(); ++y) {
     std::string cur_row(input[y]);
@@ -50,31 +52,31 @@ int64_t BioDiversity(std::vector<std::string> input) {
   return ret;
 }
 
-absl::StatusOr<std::vector<std::string>> Day24_2019::Part1(
+absl::StatusOr<Board> Day24_2019::Part1(
     const std::vector<absl::string_view>& input) const {
   if (input.empty()) return absl::InvalidArgumentError("Empty board");
   int width = input[0].size();
-  std::vector<std::string> cur;
+  Board cur;
   for (absl::string_view str : input) {
     if (str.size() != width) return absl::InvalidArgumentError("Bad board");
     cur.push_back(std::string(str));
   }
 
-  absl::flat_hash_set<std::vector<std::string>> hist;
+  absl::flat_hash_set<Board> hist;
   while (!hist.contains(cur)) {
     hist.insert(cur);
     VLOG(2) << "Cur Board:\n" << absl::StrJoin(cur, "\n");
-    std::vector<std::string> next = StepGameOfLine(cur);
+    Board next = StepGameOfLine(cur);
     cur = std::move(next);
   }
   VLOG(1) << "Dupe Board:\n" << absl::StrJoin(cur, "\n");
   return IntReturn(BioDiversity(cur));
 }
 
-absl::optional<std::vector<std::string>> NewBoardPlusOneLevel(
-  const std::vector<std::string>& in_board) {
+absl::optional<Board> NewBoardPlusOneLevel(
+  const Board& in_board) {
   std::string empty_row(in_board[2].size(), '.');
-  std::vector<std::string> new_board(in_board.size(), empty_row);
+  Board new_board(in_board.size(), empty_row);
   bool added = false;
   if (in_board[1][2] == '#') {
     for (int sub_x = 0; sub_x < new_board[0].size(); ++sub_x) {
@@ -104,10 +106,10 @@ absl::optional<std::vector<std::string>> NewBoardPlusOneLevel(
   return new_board;
 }
 
-absl::optional<std::vector<std::string>> NewBoardMinusOneLevel(
-  const std::vector<std::string>& in_board) {
+absl::optional<Board> NewBoardMinusOneLevel(
+  const Board& in_board) {
   std::string empty_row(in_board[0].size(), '.');
-  std::vector<std::string> new_board(in_board.size(), empty_row);
+  Board new_board(in_board.size(), empty_row);
   bool added = false;
   int count = 0;
   for (int x = 0; x < in_board[0].size(); ++x) {
@@ -145,9 +147,9 @@ absl::optional<std::vector<std::string>> NewBoardMinusOneLevel(
   return new_board;
 }
 
-int CountNeighbors(const std::vector<std::string>& in_board, Point p,
-                   absl::optional<std::vector<std::string>> board_minus_one,
-                   absl::optional<std::vector<std::string>> board_plus_one) {
+int CountNeighbors(const Board& in_board, Point p,
+                   absl::optional<Board> board_minus_one,
+                   absl::optional<Board> board_plus_one) {
   int neighbors = 0;
   for (Point dir : Cardinal::kAll) {
     Point n = dir + p;
@@ -196,18 +198,18 @@ int CountNeighbors(const std::vector<std::string>& in_board, Point p,
   return neighbors;
 }
 
-absl::flat_hash_map<int, std::vector<std::string>> StepGameOfLineRecursive(
-      absl::flat_hash_map<int, std::vector<std::string>> depth_to_board) {
-  absl::flat_hash_map<int, std::vector<std::string>> out;
+absl::flat_hash_map<int, Board> StepGameOfLineRecursive(
+      absl::flat_hash_map<int, Board> depth_to_board) {
+  absl::flat_hash_map<int, Board> out;
   for (const auto& depth_and_board : depth_to_board) {
     int depth = depth_and_board.first;
-    const std::vector<std::string>& in_board = depth_and_board.second;
-    std::vector<std::string> out_board;
-    absl::optional<std::vector<std::string>> board_minus_one = absl::nullopt;
+    const Board& in_board = depth_and_board.second;
+    Board out_board;
+    absl::optional<Board> board_minus_one = absl::nullopt;
     if (auto it = depth_to_board.find(depth - 1); it != depth_to_board.end()) {
       board_minus_one = it->second;
     }
-    absl::optional<std::vector<std::string>> board_plus_one = absl::nullopt;
+    absl::optional<Board> board_plus_one = absl::nullopt;
     if (auto it = depth_to_board.find(depth + 1); it != depth_to_board.end()) {
       board_plus_one = it->second;
     }
@@ -217,7 +219,7 @@ absl::flat_hash_map<int, std::vector<std::string>> StepGameOfLineRecursive(
         Point p{x, y};
         if (p == Point{2,2}) {
           if (!board_plus_one) {
-            absl::optional<std::vector<std::string>> new_board =
+            absl::optional<Board> new_board =
                 NewBoardPlusOneLevel(in_board);
             if (new_board) {
               out.emplace(depth + 1, std::move(*new_board));
@@ -235,7 +237,7 @@ absl::flat_hash_map<int, std::vector<std::string>> StepGameOfLineRecursive(
         }
       }
       if (!board_minus_one) {
-        absl::optional<std::vector<std::string>> new_board =
+        absl::optional<Board> new_board =
            NewBoardMinusOneLevel(in_board);
         if (new_board) {
           out.emplace(depth - 1, std::move(*new_board));
@@ -249,7 +251,7 @@ absl::flat_hash_map<int, std::vector<std::string>> StepGameOfLineRecursive(
 }
 
 std::string DebugBoards(
-  absl::flat_hash_map<int, std::vector<std::string>> depth_to_board) {
+  absl::flat_hash_map<int, Board> depth_to_board) {
   int min = std::numeric_limits<int>::max();
   int max = std::numeric_limits<int>::min();
   for (const auto& pair : depth_to_board) {
@@ -277,7 +279,7 @@ std::string DebugBoards(
   return out;
 }
 
-int64_t CountBugs(absl::flat_hash_map<int, std::vector<std::string>> depth_to_board) {
+int64_t CountBugs(absl::flat_hash_map<int, Board> depth_to_board) {
   int64_t bugs = 0;
   for (const auto& pair : depth_to_board) {
     for (const std::string& str : pair.second) {
@@ -289,22 +291,22 @@ int64_t CountBugs(absl::flat_hash_map<int, std::vector<std::string>> depth_to_bo
   return bugs;
 }
 
-absl::StatusOr<std::vector<std::string>> Day24_2019::Part2(
+absl::StatusOr<Board> Day24_2019::Part2(
     const std::vector<absl::string_view>& input) const {
   if (input.empty()) return absl::InvalidArgumentError("Empty board");
   int width = input[0].size();
-  std::vector<std::string> cur;
+  Board cur;
   for (absl::string_view str : input) {
     if (str.size() != width) return absl::InvalidArgumentError("Bad board");
     cur.push_back(std::string(str));
   }
 
-  absl::flat_hash_map<int, std::vector<std::string>> level_to_board;
+  absl::flat_hash_map<int, Board> level_to_board;
   level_to_board[0] = cur;
 
   for (int i = 0; i < 200; ++i) {
     VLOG(2) << "Boards[" << i << "]:\n" << DebugBoards(level_to_board);
-    absl::flat_hash_map<int, std::vector<std::string>> next =
+    absl::flat_hash_map<int, Board> next =
        StepGameOfLineRecursive(level_to_board);
     level_to_board = std::move(next);
   }
