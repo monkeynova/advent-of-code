@@ -108,5 +108,5 @@ absl::StatusOr<std::vector<std::string>> Day25_2019::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day25_2019::Part2(
     const std::vector<absl::string_view>& input) const {
-  return IntReturn(-1);
+  return std::vector<std::string>({"Merry Christmas"});
 }
