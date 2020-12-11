@@ -98,13 +98,13 @@ void AuditSums(SumRangeState* state) {
   }
 }
 
-std::string RunPhase(int phase, absl::string_view input) {
+std::string RunPhase(int phase, absl::string_view input, int min_position) {
   SumRangeState sum_range{input};
   BuildAlignedSums(&sum_range);
   AuditSums(&sum_range);
   std::string ret;
   ret.resize(input.size());
-  for (int i = 0; i < input.size(); ++i) {
+  for (int i = min_position; i < input.size(); ++i) {
     int stride = i + 1;
     bool negate = false;
     int64_t sum = 0;
@@ -130,7 +130,7 @@ absl::StatusOr<std::vector<std::string>> Day16_2019::Part1(
   std::string ret;
   ret = std::string(input[0]);
   for (int i = 0; i < 100; ++i) {
-    ret = RunPhase(i, ret);
+    ret = RunPhase(i, ret, 0);
   }
   ret = ret.substr(0, 8);
 
@@ -151,7 +151,7 @@ absl::StatusOr<std::vector<std::string>> Day16_2019::Part2(
   }
   for (int i = 0; i < 100; ++i) {
     VLOG(1) << "Phase: " << i;
-    ret = RunPhase(i, ret);
+    ret = RunPhase(i, ret, offset);
   }
   if (ret.size() < offset + 8)
     return absl::InvalidArgumentError("can't extract value");
