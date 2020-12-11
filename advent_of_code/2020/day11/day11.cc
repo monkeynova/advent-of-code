@@ -96,7 +96,6 @@ Board Update2(Board in, const VisMap& vis_map) {
   return out;
 }
 
-
 absl::StatusOr<std::vector<std::string>> Day11_2020::Part1(
     const std::vector<absl::string_view>& input) const {
   Board cur;

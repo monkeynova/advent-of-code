@@ -38,8 +38,8 @@ cc_library(
     ],
     deps = [
         ":advent_day",
-        ":file_util",
         ":file_test_options",
+        ":file_util",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/functional:bind_front",
         "@com_google_absl//absl/strings",
@@ -86,8 +86,8 @@ cc_library(
     ],
     deps = [
         ":advent_day",
-        ":file_util",
         ":file_test_options",
+        ":file_util",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",

@@ -22,10 +22,10 @@ cc_binary(
         "input.txt",
     ],
     deps = [
-        "//advent_of_code/2019:int_code",
         "//advent_of_code:file_util",
-        "@com_monkeynova_gunit_main//:main_lib",
+        "//advent_of_code/2019:int_code",
         "@com_google_glog//:glog",
+        "@com_monkeynova_gunit_main//:main_lib",
     ],
 )
 
@@ -34,8 +34,8 @@ cc_test(
     srcs = ["day25_test.cc"],
     args = ["--test_file=advent_of_code/2019/day25/day25.test"],
     data = [
-        "input.txt",
         "day25.test",
+        "input.txt",
     ],
     deps = [
         ":day25",
@@ -48,8 +48,8 @@ cc_test(
     srcs = ["day25_benchmark.cc"],
     args = ["--test_file=advent_of_code/2019/day25/day25.test"],
     data = [
-        "input.txt",
         "day25.test",
+        "input.txt",
     ],
     deps = [
         ":day25",

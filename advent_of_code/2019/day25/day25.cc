@@ -33,7 +33,7 @@ class Terminal : public IntCode::IOModule {
     }
     return absl::OkStatus();
   }
-  
+
   const std::string& full_output() { return full_output_; }
 
  private:
@@ -50,45 +50,44 @@ absl::StatusOr<std::vector<std::string>> Day25_2019::Part1(
   if (!codes.ok()) return codes.status();
 
   std::string collect_and_go_to_security =
-    "north\n"
-    "take mug\n"
-    "north\n"
-    "take food ration\n"
-    "south\n"
-    "east\n"
-    "north\n"
-    "east\n"
-    "take semiconductor\n"
-    "west\n"
-    "south\n"
-    "south\n"
-    "west\n"
-    "south\n"
-    "east\n"
-    "take ornament\n"
-    "north\n"
-    "take coin\n"
-    "east\n"
-    "take mutex\n"
-    "west\n"
-    "south\n"
-    "east\n"
-    "take candy cane\n"
-    "west\n"
-    "west\n"
-    "south\n"
-    "east\n"
-    "take mouse\n"
-    "south\n"
-    "inv\n";
+      "north\n"
+      "take mug\n"
+      "north\n"
+      "take food ration\n"
+      "south\n"
+      "east\n"
+      "north\n"
+      "east\n"
+      "take semiconductor\n"
+      "west\n"
+      "south\n"
+      "south\n"
+      "west\n"
+      "south\n"
+      "east\n"
+      "take ornament\n"
+      "north\n"
+      "take coin\n"
+      "east\n"
+      "take mutex\n"
+      "west\n"
+      "south\n"
+      "east\n"
+      "take candy cane\n"
+      "west\n"
+      "west\n"
+      "south\n"
+      "east\n"
+      "take mouse\n"
+      "south\n"
+      "inv\n";
   std::vector<std::string> inventory = {
-    "mug", "food ration", "semiconductor", "ornament", "coin", "mutex",
-    "candy cane", "mouse"
-  };
+      "mug",  "food ration", "semiconductor", "ornament",
+      "coin", "mutex",       "candy cane",    "mouse"};
   for (int i = 0; i < (1 << inventory.size()); ++i) {
     // TODO(@monkeynova): We don't have to re-run from scratch.
     IntCode tmp_codes = codes->Clone();
-    std::string command = collect_and_go_to_security; 
+    std::string command = collect_and_go_to_security;
     for (int j = 0; j < inventory.size(); ++j) {
       if (i & (1 << j)) {
         absl::StrAppend(&command, "drop ", inventory[j], "\n");
@@ -97,9 +96,11 @@ absl::StatusOr<std::vector<std::string>> Day25_2019::Part1(
     absl::StrAppend(&command, "west\n");
     Terminal t(command);
     absl::Status st = tmp_codes.Run(&t);
-    (void)st; // Input exhausted...
+    (void)st;  // Input exhausted...
     int code;
-    if (RE2::PartialMatch(t.full_output(), "You should be able to get in by typing (\\d+)", &code)) {
+    if (RE2::PartialMatch(t.full_output(),
+                          "You should be able to get in by typing (\\d+)",
+                          &code)) {
       return IntReturn(code);
     }
   }
