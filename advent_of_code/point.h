@@ -48,6 +48,11 @@ struct Cardinal {
   static constexpr Point kWest{-1, 0};
   static constexpr Point kEast{1, 0};
   static constexpr Point kAll[] = {kNorth, kSouth, kWest, kEast};
+  static constexpr Point kNorthWest{-1, -1};
+  static constexpr Point kNorthEast{1, -1};
+  static constexpr Point kSouthWest{-1, 1};
+  static constexpr Point kSouthEast{1, 1};
+  static constexpr Point kAllPlus[] = {kNorth, kSouth, kWest, kEast, kNorthWest, kNorthEast, kSouthWest, kSouthEast};
 };
 
 template <typename H>
