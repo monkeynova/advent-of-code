@@ -17,6 +17,17 @@ struct CharBoard {
       rows.push_back(empty_row);
     }
   }
+  static absl::StatusOr<CharBoard> Parse(const std::vector<absl::string_view>& in) {
+    CharBoard ret(0, 0);
+    for (absl::string_view line : in) {
+      ret.rows.push_back(std::string(line));
+    }
+    if (absl::Status st = ret.Validate(); !st.ok()) return st;
+    return ret;
+  }
+
+  bool operator==(const CharBoard& o) const { return rows == o.rows; }
+  bool operator!=(const CharBoard& o) const { return !operator==(o); }
 
   int height() const { return rows.size(); }
   int width() const { return rows[0].size(); }
