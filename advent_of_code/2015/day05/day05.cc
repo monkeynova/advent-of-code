@@ -37,6 +37,30 @@ Classification Classify(absl::string_view input) {
   return kNice;
 }
 
+Classification Classify2(absl::string_view input) {
+  bool found_repeat_around = false;
+  for (int i = 2; i < input.size(); ++i) {
+    if (input[i] == input[i-2]) {
+      found_repeat_around = true;
+      break;
+    }
+  }
+  if (!found_repeat_around) return kNaughty;
+
+  bool found_dupe = false;
+  for (int i = 0; i < input.size(); ++i) {
+    for (int j = i + 2; j < input.size(); ++j) {
+      if (input.substr(i, 2) == input.substr(j, 2)) {
+        found_dupe = true; 
+        break;
+      }
+    }
+  }
+  if (!found_dupe) return kNaughty;
+
+  return kNice;
+}
+
 absl::StatusOr<std::vector<std::string>> Day05_2015::Part1(
     const std::vector<absl::string_view>& input) const {
   int nice = 0;
@@ -48,5 +72,9 @@ absl::StatusOr<std::vector<std::string>> Day05_2015::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day05_2015::Part2(
     const std::vector<absl::string_view>& input) const {
-  return IntReturn(-1);
+  int nice = 0;
+  for (absl::string_view str : input) {
+    if (Classify2(str) == kNice) ++nice;
+  }
+  return IntReturn(nice);
 }
