@@ -5,6 +5,7 @@ cc_library(
     srcs = ["day04.cc"],
     hdrs = ["day04.h"],
     deps = [
+        ":md5",
         "//advent_of_code:advent_day",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",
@@ -12,6 +13,13 @@ cc_library(
         "@com_google_glog//:glog",
         "@com_googlesource_code_re2//:re2",
     ],
+)
+
+cc_library(
+    name = "md5",
+    srcs = ["md5.cc"],
+    hdrs = ["md5.h"],
+    deps = [],
 )
 
 cc_test(

@@ -1,7 +1,13 @@
 [part=1]
+abcdef
+--
+609043
+==
+
+[part=1]
 @include{advent_of_code/2015/day04/input.txt}
 --
--1
+117946
 ==
 
 [part=2]
