@@ -6,9 +6,9 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
-#include "advent_of_code/2015/day04/md5.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
+#include "third_party/md5/md5.h"
 
 std::string Hex(absl::string_view buf) {
   static char hexchar[] = {'0', '1', '2', '3','4','5','6','7','8','9','a','b','c','d','e','f'};
