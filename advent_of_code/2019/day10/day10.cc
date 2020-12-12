@@ -4,6 +4,7 @@
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/char_board.h"
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 
@@ -54,27 +55,25 @@ MostVisible FindMostVisible(const Board& board) {
 }
 
 absl::StatusOr<Board> ParseBoard(absl::Span<absl::string_view> input) {
-  if (input.empty()) return absl::InvalidArgumentError("empty input");
   // TODO(@monkeynova): Use CharBoard.
+  absl::StatusOr<CharBoard> char_board = CharBoard::Parse(input);
+  if (!char_board.ok()) return char_board.status();
+
   Board ret;
-  ret.height = input.size();
-  ret.width = input[0].size();
-  for (int y = 0; y < ret.height; ++y) {
-    if (input[y].size() != ret.width)
-      return absl::InvalidArgumentError("bad width");
-    for (int x = 0; x < ret.width; ++x) {
-      switch (input[y][x]) {
-        case '.': {
-          break;
-        }
-        case 'X': {
-          ret.asteroids.insert({.x = x, .y = y});
-          break;
-        }
-        default:
-          return absl::InvalidArgumentError("bad token");
+  ret.height = char_board->height();
+  ret.width = char_board->width();
+  for (Point p : char_board->range()) {
+    switch ((*char_board)[p]) {
+      case '.': {
+        break;
       }
-    }
+      case 'X': {
+        ret.asteroids.insert(p);
+        break;
+      }
+      default:
+        return absl::InvalidArgumentError("bad token");
+    }   
   }
   return ret;
 }
