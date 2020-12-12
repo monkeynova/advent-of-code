@@ -9,8 +9,7 @@
 #include "glog/logging.h"
 
 struct CharBoard {
-  static absl::StatusOr<CharBoard> Parse(
-      absl::Span<absl::string_view> in) {
+  static absl::StatusOr<CharBoard> Parse(absl::Span<absl::string_view> in) {
     CharBoard ret(0, 0);
     for (absl::string_view line : in) {
       ret.rows.push_back(std::string(line));

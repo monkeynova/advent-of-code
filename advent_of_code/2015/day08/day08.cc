@@ -18,7 +18,7 @@ absl::StatusOr<std::vector<std::string>> Day08_2015::Part1(
     delta += 2;
     for (int i = 1; i < str.size() - 1; ++i) {
       if (str[i] == '\\') {
-        if (str[i+1] == '"' || str[i+1] == '\\') {
+        if (str[i + 1] == '"' || str[i + 1] == '\\') {
           delta += 1;
           i += 1;
         } else {

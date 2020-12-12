@@ -5,8 +5,7 @@
 #include "re2/re2.h"
 
 // static
-absl::StatusOr<BootCode> BootCode::Parse(
-    absl::Span<absl::string_view> input) {
+absl::StatusOr<BootCode> BootCode::Parse(absl::Span<absl::string_view> input) {
   absl::flat_hash_map<absl::string_view, Instruction> imap = {
       {"jmp", Instruction::kJmp},
       {"acc", Instruction::kAcc},

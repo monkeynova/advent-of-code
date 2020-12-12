@@ -71,7 +71,8 @@ absl::Status HandleTestIncludes(std::string* test_case) {
           "Unable to include file \"", include_fname, "\": ", st.message()));
       return st;
     }
-    *test_case = absl::StrReplaceAll(*test_case, 
+    *test_case = absl::StrReplaceAll(
+        *test_case,
         {{absl::StrCat("@include{", include_fname, "}"), contents}});
   }
   return absl::OkStatus();

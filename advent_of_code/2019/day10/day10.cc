@@ -73,7 +73,7 @@ absl::StatusOr<Board> ParseBoard(absl::Span<absl::string_view> input) {
       }
       default:
         return absl::InvalidArgumentError("bad token");
-    }   
+    }
   }
   return ret;
 }

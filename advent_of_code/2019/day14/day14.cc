@@ -64,8 +64,7 @@ absl::StatusOr<RuleSet> DagSort(RuleSet rule_set) {
   return out;
 }
 
-absl::StatusOr<RuleSet> ParseRuleSet(
-    absl::Span<absl::string_view> input) {
+absl::StatusOr<RuleSet> ParseRuleSet(absl::Span<absl::string_view> input) {
   RuleSet rule_set;
   absl::flat_hash_set<absl::string_view> rule_history;
   for (absl::string_view rule_str : input) {
