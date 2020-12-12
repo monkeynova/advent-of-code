@@ -44,5 +44,22 @@ absl::StatusOr<std::vector<std::string>> Day04_2015::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day04_2015::Part2(
     const std::vector<absl::string_view>& input) const {
-  return IntReturn(-1);
+  if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
+  MD5_CTX ctx;
+  unsigned char md5_result[16];
+  absl::string_view md5_result_view(reinterpret_cast<char*>(md5_result), 16);
+  for (int i = 0;; ++i) {
+    VLOG(1) << i;
+    MD5_Init(&ctx);
+    std::string str = absl::StrCat(input[0], i);
+    MD5_Update(&ctx, str.data(), str.size());
+    MD5_Final(md5_result, &ctx);
+    VLOG(2) << "MD5(" << str << "): " << Hex(md5_result_view);
+    if (md5_result[0] == 0 &&
+        md5_result[1] == 0 && 
+        md5_result[2] == 0) {
+      return IntReturn(i);
+    }
+  }
+  return absl::InvalidArgumentError("Unreachable");
 }
