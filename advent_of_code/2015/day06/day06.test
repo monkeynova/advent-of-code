@@ -1,7 +1,7 @@
 [part=1]
 @include{advent_of_code/2015/day06/input.txt}
 --
--1
+543903
 ==
 
 [part=2]
