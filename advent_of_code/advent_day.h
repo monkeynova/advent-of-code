@@ -27,6 +27,11 @@ class AdventDay {
     return vals;
   }
 
+  template <class ...Args>
+  absl::Status Error(Args... args) const {
+    return absl::InvalidArgumentError(absl::StrCat(args...));
+  }
+
   absl::StatusOr<std::vector<std::string>> IntReturn(int64_t val) const {
     return std::vector<std::string>{absl::StrCat(val)};
   }
