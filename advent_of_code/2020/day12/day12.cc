@@ -26,9 +26,9 @@ absl::StatusOr<std::vector<std::string>> Day12_2020::Part1(
       case 'F': p += dir * v; break;
       case 'L': {
         switch(v % 360) {
-          case 90: dir = Point{dir.y, -dir.x}; break;
-          case 180: dir = Point{-dir.x, -dir.y}; break;
-          case 270: dir = Point{-dir.y, dir.x}; break;
+          case 90: dir = dir.rotate_left(); break;
+          case 180: dir = -dir; break;
+          case 270: dir = dir.rotate_right(); break;
           case 0: break;
           default: return absl::InvalidArgumentError("Bad rotation");
         }
@@ -36,9 +36,9 @@ absl::StatusOr<std::vector<std::string>> Day12_2020::Part1(
       }
       case 'R':  {
         switch(v % 360) {
-          case 90: dir = Point{-dir.y, dir.x}; break;
-          case 180: dir = Point{-dir.x, -dir.y}; break;
-          case 270: dir = Point{dir.y, -dir.x}; break;
+          case 90: dir = dir.rotate_right(); break;
+          case 180: dir = -dir; break;
+          case 270: dir = dir.rotate_left(); break;
           case 0: break;
           default: return absl::InvalidArgumentError("Bad rotation");
         }
