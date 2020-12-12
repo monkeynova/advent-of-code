@@ -5,7 +5,7 @@ use warnings;
 
 my ($year, $day) = @ARGV;
 
-die "Bad year: $year" unless $year >= 2019;
+die "Bad year: $year" unless $year >= 2015;
 die "Bad day: $day" unless $day > 0 && $day <= 25;
 
 mkdir "advent_of_code/$year" if ! -d "advent_of_code/$year";
