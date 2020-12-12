@@ -52,5 +52,49 @@ absl::StatusOr<std::vector<std::string>> Day12_2020::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day12_2020::Part2(
     const std::vector<absl::string_view>& input) const {
-  return IntReturn(-1);
+  Point ship{0, 0};
+  Point waypoint = ship + (Cardinal::kEast * 10) + Cardinal::kNorth;
+  for (absl::string_view cmd : input) {
+    int v;
+    char c = cmd[0];
+    if (!absl::SimpleAtoi(cmd.substr(1), &v)) return absl::InvalidArgumentError("Bad parse.");
+    switch (c) {
+      case 'N': waypoint += Cardinal::kNorth * v; break;
+      case 'S': waypoint += Cardinal::kSouth * v; break;
+      case 'E': waypoint += Cardinal::kEast * v; break;
+      case 'W': waypoint += Cardinal::kWest * v; break;
+      case 'F': {
+        Point delta = waypoint - ship;
+        ship += delta * v;
+        waypoint = ship + delta;
+        break;
+      }
+      case 'L': {
+        Point delta = waypoint - ship;
+        switch(v % 360) {
+          case 90: delta = Point{delta.y, -delta.x}; break;
+          case 180: delta = Point{-delta.x, -delta.y}; break;
+          case 270: delta = Point{-delta.y, delta.x}; break;
+          case 0: break;
+          default: return absl::InvalidArgumentError(absl::StrCat("Bad rotation: ", v));
+        }
+        waypoint = ship + delta;
+        break;
+      }
+      case 'R':  {
+        Point delta = waypoint - ship;
+        switch(v % 360) {
+          case 90: delta = Point{-delta.y, delta.x}; break;
+          case 180: delta = Point{-delta.x, -delta.y}; break;
+          case 270: delta = Point{delta.y, -delta.x}; break;
+          case 0: break;
+          default: return absl::InvalidArgumentError(absl::StrCat("Bad rotation: ", v));
+        }
+        waypoint = ship + delta;
+        break;
+      }
+      default: return absl::InvalidArgumentError("Bad command");
+    }
+  }
+  return IntReturn(ship.dist());
 }
