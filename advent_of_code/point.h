@@ -10,6 +10,10 @@
 struct Point {
   int x;
   int y;
+ 
+  Point operator*(int s) const {
+    return Point{s * x, s * y};
+  }
 
   bool operator==(const Point& other) const {
     return x == other.x && y == other.y;

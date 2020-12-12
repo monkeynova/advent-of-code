@@ -1,7 +1,17 @@
 [part=1]
+F10
+N3
+F7
+R90
+F11
+--
+25
+==
+
+[part=1]
 @include{advent_of_code/2020/day12/input.txt}
 --
--1
+879
 ==
 
 [part=2]
