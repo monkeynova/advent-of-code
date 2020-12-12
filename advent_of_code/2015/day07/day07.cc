@@ -26,7 +26,7 @@ absl::StatusOr<int> EvaluateMemo(
   if (!absl::SimpleAtoi(dest, &ret)) {
     auto it = ops_by_dest.find(dest);
     if (it == ops_by_dest.end()) {
-      return absl::NotFoundError(absl::StrCat("No ", dest));
+      return AdventDay::Error("No ", dest);
     }
     const Operation& op = it->second;
     if (op.operation == "") {
@@ -75,12 +75,13 @@ absl::StatusOr<int> Evaluate(
   return EvaluateMemo(&memo, ops_by_dest, dest);
 }
 
-absl::StatusOr<std::vector<std::string>> Day07_2015::Part1(
-    const std::vector<absl::string_view>& input) const {
+absl::StatusOr<absl::flat_hash_map<std::string, Operation>> Parse(
+  const std::vector<absl::string_view>& input) {
   absl::flat_hash_map<std::string, Operation> ops_by_dest;
+
   for (absl::string_view str : input) {
     std::vector<absl::string_view> op_and_dest = absl::StrSplit(str, " -> ");
-    if (op_and_dest.size() != 2) return Error("Bad input: ", str);
+    if (op_and_dest.size() != 2) return AdventDay::Error("Bad input: ", str);
     Operation op;
     op.dest = op_and_dest[1];
     if (RE2::FullMatch(op_and_dest[0], "(\\d+|[a-z]+)", &op.arg1)) {
@@ -98,14 +99,31 @@ absl::StatusOr<std::vector<std::string>> Day07_2015::Part1(
     } else if (RE2::FullMatch(op_and_dest[0], "(\\d+|[a-z]+) RSHIFT (\\d+|[a-z]+)", &op.arg1, &op.arg2)) {
       op.operation = "RSHIFT";
     } else {
-      return Error("Bad op: ", op_and_dest[0]);
+      return AdventDay::Error("Bad op: ", op_and_dest[0]);
     }
     ops_by_dest[op.dest] = op;
   }
-  return IntReturn(Evaluate(ops_by_dest, "a"));
+
+  return ops_by_dest;
+}
+
+
+absl::StatusOr<std::vector<std::string>> Day07_2015::Part1(
+    const std::vector<absl::string_view>& input) const {
+  absl::StatusOr<absl::flat_hash_map<std::string, Operation>> ops_by_dest =
+      Parse(input);
+  if (!ops_by_dest.ok()) return ops_by_dest.status();
+  return IntReturn(Evaluate(*ops_by_dest, "a"));
 }
 
 absl::StatusOr<std::vector<std::string>> Day07_2015::Part2(
     const std::vector<absl::string_view>& input) const {
-  return IntReturn(-1);
+  absl::StatusOr<absl::flat_hash_map<std::string, Operation>> ops_by_dest =
+      Parse(input);
+  if (!ops_by_dest.ok()) return ops_by_dest.status();
+  absl::StatusOr<int> a_val = Evaluate(*ops_by_dest, "a");
+  if (!a_val.ok()) return a_val.status();
+
+  (*ops_by_dest)["b"] = Operation{.arg1 = absl::StrCat(*a_val)};
+  return IntReturn(Evaluate(*ops_by_dest, "a"));
 }

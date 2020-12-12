@@ -28,7 +28,7 @@ class AdventDay {
   }
 
   template <class ...Args>
-  absl::Status Error(Args... args) const {
+  static absl::Status Error(Args... args) {
     return absl::InvalidArgumentError(absl::StrCat(args...));
   }
 
