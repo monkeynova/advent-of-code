@@ -10,6 +10,8 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+// TODO(@monkeynova): Move to CharBoard.
+
 bool IsCapAlpha(char c) { return c >= 'A' && c <= 'Z'; }
 
 class Maze {

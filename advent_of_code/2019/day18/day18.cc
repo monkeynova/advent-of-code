@@ -10,6 +10,8 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+// TODO(@monkeynova): Use CharBoard for storage.
+
 static void CharJoin(std::string* out, char c) { out->append(1, c); }
 
 struct NKeyState {

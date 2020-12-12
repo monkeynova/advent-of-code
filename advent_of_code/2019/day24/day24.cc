@@ -10,6 +10,8 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+// TODO(@monkeynova): Move to CharBoard.
+
 using Board = std::vector<std::string>;
 
 absl::StatusOr<Board> ParseBoard(const std::vector<absl::string_view>& input) {

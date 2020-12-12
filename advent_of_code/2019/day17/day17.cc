@@ -118,11 +118,6 @@ class ViewPort : public IntCode::IOModule {
 
   int64_t dust_collected() const { return dust_collected_; }
 
-  bool OnBoard(Point check, const std::vector<std::string>& board) {
-    return check.y >= 0 && check.x >= 0 && check.y < board.size() &&
-           check.x < board[0].size();
-  }
-
   bool IsIntersection(Point p, const CharBoard& board) {
     if (!board.OnBoard(p)) return false;
     if (board[p] != '#') return false;

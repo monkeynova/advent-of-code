@@ -6,6 +6,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/2019/int_code.h"
+#include "advent_of_code/char_board.h"
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
@@ -76,18 +77,13 @@ class TractorSearch {
   }
 
   std::string DebugBoard(Point min, Point max) {
-    std::vector<std::string> board;
-    for (int y = min.y; y < max.y; ++y) {
-      std::string row;
-      row.resize(max.x - min.x, '.');
-      for (int x = min.x; x < max.x; ++x) {
-        Point p{x, y};
-        absl::StatusOr<int> out = ScanPoint(p);
-        if (out.ok() && *out) row[x - min.x] = '#';
-      }
-      board.push_back(row);
+    PointRectangle r{.min = min, .max = max};
+    CharBoard board(r);
+    for (Point p : r) {
+      absl::StatusOr<int> out = ScanPoint(p);
+      if (out.ok() && *out) board[p - r.min] = '#';
     }
-    return absl::StrJoin(board, "\n");
+    return board.DebugString();
   }
 
   absl::StatusOr<Point> FindSquareSpace(int size) {
