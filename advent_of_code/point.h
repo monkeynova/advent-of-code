@@ -53,6 +53,53 @@ struct Point {
 
 Point operator*(int s, Point p) { return {.x = s * p.x, .y = s * p.y}; }
 
+template <typename H>
+H AbslHashValue(H h, const Point& p) {
+  return H::combine(std::move(h), p.x, p.y);
+}
+
+std::ostream& operator<<(std::ostream& out, const Point& p) {
+  out << "{" << p.x << "," << p.y << "}";
+  return out;
+}
+
+struct PointRectangle {
+  struct iterator {
+    Point cur = Point{0, 0};
+    PointRectangle* base = nullptr;
+
+    iterator operator++() {
+      if (++cur.x > base->max.x) {
+        cur.x = base->min.x;
+        if (++cur.y > base->max.y) {
+          base = nullptr;
+          cur = Point{0, 0};
+        }
+      }
+      return *this;
+    }
+
+    bool operator==(const iterator& o) const {
+      return base == o.base && cur == o.cur;
+    }
+    bool operator!=(const iterator& o) const { return !operator==(o); }
+
+    Point operator*() const { return cur; }
+  };
+
+  Point min;
+  Point max;
+
+  iterator begin() { return iterator{.cur = min, .base = this}; }
+  iterator end() { return iterator{}; }
+};
+
+std::ostream& operator<<(std::ostream& out, const PointRectangle& r) {
+  out << r.min << "-" << r.max;
+  return out;
+}
+
+
 struct Cardinal {
   static constexpr Point kOrigin{0, 0};
   static constexpr Point kNorth{0, -1};
@@ -68,15 +115,5 @@ struct Cardinal {
                                          kEast,      kNorthWest, kNorthEast,
                                          kSouthWest, kSouthEast};
 };
-
-template <typename H>
-H AbslHashValue(H h, const Point& p) {
-  return H::combine(std::move(h), p.x, p.y);
-}
-
-std::ostream& operator<<(std::ostream& out, const Point& p) {
-  out << "{" << p.x << "," << p.y << "}";
-  return out;
-}
 
 #endif  //  ADVENT_OF_CODE_2019_POINT_H

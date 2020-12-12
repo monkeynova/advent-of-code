@@ -77,6 +77,20 @@ cc_library(
 )
 
 cc_library(
+    name = "char_board",
+    hdrs = ["char_board.h"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        ":point",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings",
+        "@com_google_glog//:glog",
+    ],
+)
+
+cc_library(
     name = "file_benchmark",
     testonly = 1,
     srcs = ["file_benchmark.cc"],
