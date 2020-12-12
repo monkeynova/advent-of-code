@@ -5,6 +5,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/2019/int_code.h"
+#include "advent_of_code/char_board.h"
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 
@@ -39,29 +40,20 @@ class Painter : public IntCode::IOModule {
 
   int UniquePanelsPainted() { return panel_to_painted_color_.size(); }
 
-  std::vector<std::string> Panels() {
-    Point min{.x = std::numeric_limits<int>::max(),
-              .y = std::numeric_limits<int>::max()};
-    Point max{.x = std::numeric_limits<int>::min(),
-              .y = std::numeric_limits<int>::min()};
+  CharBoard Panels() {
+    PointRectangle r = PointRectangle::Null();
+
     for (const auto& point_and_color : panel_to_painted_color_) {
       const Point& p = point_and_color.first;
-      min.x = std::min(min.x, p.x);
-      min.y = std::min(min.y, p.y);
-      max.x = std::max(max.x, p.x);
-      max.y = std::max(max.y, p.y);
+      r.ExpandInclude(p);
     }
-    LOG(WARNING) << min << " => " << max;
-    std::vector<std::string> ret;
-    for (int y = min.y; y <= max.y; ++y) {
-      std::string next;
-      for (int x = min.x; x <= max.x; ++x) {
-        auto it = panel_to_painted_color_.find({.x = x, .y = y});
-        bool is_white =
-            (it != panel_to_painted_color_.end() && it->second == 1);
-        next.append(is_white ? "X" : " ");
-      }
-      ret.push_back(next);
+    VLOG(1) << r;
+    CharBoard ret(r);
+    for (Point p : r) {
+      auto it = panel_to_painted_color_.find(p);
+      bool is_white =
+          (it != panel_to_painted_color_.end() && it->second == 1);
+      ret.set(p, is_white ? 'X' : ' ');
     }
     return ret;
   }
@@ -93,5 +85,5 @@ absl::StatusOr<std::vector<std::string>> Day11_2019::Part2(
   painter.Set({.x = 0, .y = 0}, 1);
   if (absl::Status st = codes->Run(&painter); !st.ok()) return st;
 
-  return painter.Panels();
+  return painter.Panels().rows;
 }

@@ -64,6 +64,14 @@ std::ostream& operator<<(std::ostream& out, const Point& p) {
 }
 
 struct PointRectangle {
+  static PointRectangle Null() {
+    return {
+      .min = {.x = std::numeric_limits<int>::max(),
+              .y = std::numeric_limits<int>::max()},
+      .max = {.x = std::numeric_limits<int>::min(),
+              .y = std::numeric_limits<int>::min()}};
+  }
+
   struct iterator {
     Point cur = Point{0, 0};
     PointRectangle* base = nullptr;
@@ -89,6 +97,13 @@ struct PointRectangle {
 
   Point min;
   Point max;
+
+  void ExpandInclude(Point p) {
+    min.x = std::min(min.x, p.x);
+    min.y = std::min(min.y, p.y);
+    max.x = std::max(max.x, p.x);
+    max.y = std::max(max.y, p.y);
+  }
 
   iterator begin() { return iterator{.cur = min, .base = this}; }
   iterator end() { return iterator{}; }

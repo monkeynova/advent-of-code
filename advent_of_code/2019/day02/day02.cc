@@ -41,5 +41,5 @@ absl::StatusOr<std::vector<std::string>> Day02_2019::Part2(
       }
     }
   }
-  return std::vector<std::string>{""};
+  return absl::NotFoundError("Culd not find value");
 }

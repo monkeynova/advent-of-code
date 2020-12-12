@@ -9,14 +9,6 @@
 #include "glog/logging.h"
 
 struct CharBoard {
-  CharBoard(int width, int height) {
-    std::string empty_row;
-    empty_row.resize(width, '.');
-    rows.reserve(height);
-    for (int i = 0; i < height; ++i) {
-      rows.push_back(empty_row);
-    }
-  }
   static absl::StatusOr<CharBoard> Parse(const std::vector<absl::string_view>& in) {
     CharBoard ret(0, 0);
     for (absl::string_view line : in) {
@@ -25,6 +17,17 @@ struct CharBoard {
     if (absl::Status st = ret.Validate(); !st.ok()) return st;
     return ret;
   }
+
+  CharBoard(int width, int height) {
+    std::string empty_row;
+    empty_row.resize(width, '.');
+    rows.reserve(height);
+    for (int i = 0; i < height; ++i) {
+      rows.push_back(empty_row);
+    }
+  }
+
+  CharBoard(PointRectangle r) : CharBoard(r.max.x - r.min.x + 1, r.max.y - r.min.y + 1) {}
 
   bool operator==(const CharBoard& o) const { return rows == o.rows; }
   bool operator!=(const CharBoard& o) const { return !operator==(o); }
