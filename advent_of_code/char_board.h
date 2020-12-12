@@ -53,6 +53,9 @@ struct CharBoard {
   char at(Point p) const { return rows[p.y][p.x]; }
   void set(Point p, char c) { rows[p.y][p.x] = c; }
 
+  char operator[](Point p) const { return rows[p.y][p.x]; }
+  char& operator[](Point p) { return rows[p.y][p.x]; }
+
   std::string DebugString() const {
     return absl::StrJoin(rows, "\n");
   }

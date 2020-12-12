@@ -6,6 +6,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/2019/int_code.h"
+#include "advent_of_code/char_board.h"
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
@@ -107,15 +108,13 @@ Program FindProgram(absl::string_view command) {
     ret.b.append("\n");
     ret.c.append("\n");
   }
-  LOG(WARNING) << ret.DebugString();
+  VLOG(1) << ret.DebugString();
   return ret;
 }
 
 class ViewPort : public IntCode::IOModule {
  public:
   bool PauseIntCode() override { return false; }
-
-  std::string DebugBoard() const { return absl::StrJoin(board_, "\n"); }
 
   int64_t dust_collected() const { return dust_collected_; }
 
@@ -124,28 +123,22 @@ class ViewPort : public IntCode::IOModule {
            check.x < board[0].size();
   }
 
-  bool IsIntersection(Point p, const std::vector<std::string>& board) {
-    if (!OnBoard(p, board)) return false;
-    if (board_[p.y][p.x] != '#') return false;
-    if (!OnBoard(Point{p.x, p.y - 1}, board) || board_[p.y - 1][p.x] != '#')
-      return false;
-    if (!OnBoard(Point{p.x, p.y + 1}, board) || board_[p.y + 1][p.x] != '#')
-      return false;
-    if (!OnBoard(Point{p.x - 1, p.y}, board) || board_[p.y][p.x - 1] != '#')
-      return false;
-    if (!OnBoard(Point{p.x + 1, p.y}, board) || board_[p.y][p.x + 1] != '#')
-      return false;
+  bool IsIntersection(Point p, const CharBoard& board) {
+    if (!board.OnBoard(p)) return false;
+    if (board[p] != '#') return false;
+    for (Point d : Cardinal::kFourDirs) {
+      Point n = p + d;
+      if (!board.OnBoard(n) || board[n] != '#') return false;
+    }
     return true;
   }
 
   absl::StatusOr<int> ComputeAlignment() {
-    LOG(WARNING) << "\n" << DebugBoard();
+    VLOG(1) << "\n" << board_.DebugString();
     int ret = 0;
-    for (int i = 1; i < board_.size() - 1; ++i) {
-      for (int j = 1; j < board_[i].size() - 1; ++j) {
-        if (IsIntersection(Point{j, i}, board_)) {
-          ret += i * j;
-        }
+    for (Point p : board_.range()) {
+      if (IsIntersection(p, board_)) {
+        ret += p.x * p.y;
       }
     }
     return ret;
@@ -161,21 +154,18 @@ class ViewPort : public IntCode::IOModule {
   absl::Status ComputeProgram() {
     Point robot;
     absl::flat_hash_set<Point> intersections;
-    for (int y = 0; y < board_.size(); ++y) {
-      for (int x = 0; x < board_[y].size(); ++x) {
-        if (board_[y][x] != '#' && board_[y][x] != '.') {
-          robot.x = x;
-          robot.y = y;
-        }
-        if (IsIntersection(Point{x, y}, board_)) {
-          intersections.insert(Point{x, y});
-        }
+    for (Point p : board_.range()) {
+      if (board_[p] != '#' && board_[p] != '.') {
+        robot = p;
+      }
+      if (IsIntersection(p, board_)) {
+        intersections.insert(p);
       }
     }
     std::string command;
-    std::vector<std::string> scratch = board_;
+    CharBoard scratch = board_;
     Point robot_dir;
-    switch (board_[robot.y][robot.x]) {
+    switch (board_[robot]) {
       case '^':
         robot_dir = Cardinal::kNorth;
         break;
@@ -195,7 +185,7 @@ class ViewPort : public IntCode::IOModule {
       Point next_dir = Cardinal::kOrigin;
       for (Point d : Cardinal::kFourDirs) {
         Point check = robot + d;
-        if (OnBoard(check, scratch) && scratch[check.y][check.x] == '#') {
+        if (scratch.OnBoard(check) && scratch[check] == '#') {
           if (next_dir != Cardinal::kOrigin)
             return absl::InvalidArgumentError("Not Supported");
           next_dir = d;
@@ -204,7 +194,7 @@ class ViewPort : public IntCode::IOModule {
       // No direction to go.
       if (next_dir == Point{}) break;
 
-      LOG(WARNING) << robot_dir << " <O> " << next_dir;
+      VLOG(2) << robot_dir << " <O> " << next_dir;
       if (robot_dir == Cardinal::kNorth) {
         if (next_dir == Cardinal::kWest)
           command.append("L,");
@@ -240,39 +230,39 @@ class ViewPort : public IntCode::IOModule {
       robot_dir = next_dir;
 
       int i = 0;
-      for (Point check = robot + robot_dir; OnBoard(check, scratch);
+      for (Point check = robot + robot_dir; scratch.OnBoard(check);
            check += robot_dir) {
-        if (scratch[check.y][check.x] != '#') break;
+        if (scratch[check] != '#') break;
         robot = check;
         ++i;
         if (intersections.contains(check)) {
           intersections.erase(check);
         } else {
-          scratch[check.y][check.x] = '_';
+          scratch[check] = '_';
         }
       }
       command.append(absl::StrCat(i, ","));
     }
     command.resize(command.size() - 1);
 
-    LOG(WARNING) << "\n" << DebugBoard();
-    LOG(WARNING) << "Robot@" << robot;
-    LOG(WARNING) << "Full Path: " << command;
+    VLOG(1) << "\n" << board_.DebugString();
+    VLOG(1) << "Robot@" << robot;
+    VLOG(1) << "Full Path: " << command;
     program_ = FindProgram(command);
-    LOG(WARNING) << "Program: " << program_.DebugString();
+    VLOG(1) << "Program: " << program_.DebugString();
     return absl::OkStatus();
   }
 
   absl::Status Put(int64_t val) override {
     if (val > 128) {
-      LOG(WARNING) << "Dust collected: " << val;
+      VLOG(2) << "Dust collected: " << val;
       dust_collected_ = val;
       return absl::OkStatus();
     }
     if (val > 127 || val < 0)
       return absl::InvalidArgumentError("Bad ascii value");
     if (val == '\n') {
-      LOG(WARNING) << current_input_;
+      VLOG(2) << current_input_;
       if (current_input_ == "Main:") {
         if (absl::Status st = ComputeProgram(); !st.ok()) return st;
         current_output_ = program_.main;
@@ -291,7 +281,7 @@ class ViewPort : public IntCode::IOModule {
         current_output_pos_ = 0;
       } else {
         if (!current_input_.empty()) {
-          board_.push_back(std::move(current_input_));
+          board_.rows.push_back(std::move(current_input_));
         }
       }
       current_input_ = "";
@@ -307,7 +297,7 @@ class ViewPort : public IntCode::IOModule {
   int current_output_pos_;
 
   std::string current_input_;
-  std::vector<std::string> board_;
+  CharBoard board_{0, 0};
   int64_t dust_collected_ = -1;
 };
 
