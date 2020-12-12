@@ -15,8 +15,8 @@ int CountOn(const CharBoard& board) {
   int lit = 0;
   VLOG(1) << "CountOn: " << board.range();
   for (const Point p : board.range()) {
-    VLOG(2) << "CountOn: " << p << ": " << board.at(p);
-    if (board.at(p) == '#') ++lit;
+    VLOG(2) << "CountOn: " << p << ": " << board[p];
+    if (board[p] == '#') ++lit;
   }
   return lit;
 }
@@ -36,17 +36,17 @@ absl::StatusOr<std::vector<std::string>> Day06_2015::Part1(
     if (cmd == "turn on") {
       for (Point p : r) {
         VLOG(2) << p;
-        yard.set(p, '#');
+        yard[p] = '#';
       }
     } else if (cmd == "turn off") {
       for (Point p : r) {
         VLOG(2) << p;
-        yard.set(p, '.');
+        yard[p] = '.';
       }
     } else if (cmd == "toggle") {
       for (Point p : r) {
-        VLOG(2) << p << ": " << yard.at(p);
-        yard.set(p, yard.at(p) == '#' ? '.' : '#');
+        VLOG(2) << p << ": " << yard[p];
+        yard[p] = yard[p] == '#' ? '.' : '#';
       }
     } else {
       return absl::InvalidArgumentError(absl::StrCat("Bad instruction: ", str));

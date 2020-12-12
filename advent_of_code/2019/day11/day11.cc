@@ -53,7 +53,7 @@ class Painter : public IntCode::IOModule {
       auto it = panel_to_painted_color_.find(p);
       bool is_white =
           (it != panel_to_painted_color_.end() && it->second == 1);
-      ret.set(p, is_white ? 'X' : ' ');
+      ret[p - r.min] = is_white ? 'X' : ' ';
     }
     return ret;
   }
