@@ -80,7 +80,7 @@ int TotalEnergy(const std::vector<Moon>& moons) {
 }
 
 absl::StatusOr<std::vector<std::string>> Day12_2019::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   RE2 pattern{"<x=(-?\\d+), y=(-?\\d+), z=(-?\\d+)>"};
   std::vector<Moon> moons;
   for (absl::string_view str : input) {
@@ -106,7 +106,7 @@ absl::StatusOr<std::vector<std::string>> Day12_2019::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day12_2019::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   RE2 pattern{"<x=(-?\\d+), y=(-?\\d+), z=(-?\\d+)>"};
   std::vector<Moon> moons;
   for (absl::string_view str : input) {

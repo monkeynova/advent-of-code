@@ -76,7 +76,7 @@ absl::StatusOr<int> Evaluate(
 }
 
 absl::StatusOr<absl::flat_hash_map<std::string, Operation>> Parse(
-    const std::vector<absl::string_view>& input) {
+    absl::Span<absl::string_view> input) {
   absl::flat_hash_map<std::string, Operation> ops_by_dest;
 
   for (absl::string_view str : input) {
@@ -114,7 +114,7 @@ absl::StatusOr<absl::flat_hash_map<std::string, Operation>> Parse(
 }
 
 absl::StatusOr<std::vector<std::string>> Day07_2015::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<std::string, Operation>> ops_by_dest =
       Parse(input);
   if (!ops_by_dest.ok()) return ops_by_dest.status();
@@ -122,7 +122,7 @@ absl::StatusOr<std::vector<std::string>> Day07_2015::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day07_2015::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<std::string, Operation>> ops_by_dest =
       Parse(input);
   if (!ops_by_dest.ok()) return ops_by_dest.status();

@@ -22,7 +22,7 @@ int CountOn(const CharBoard& board) {
 }
 
 absl::StatusOr<std::vector<std::string>> Day06_2015::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   CharBoard yard(1000, 1000);
 
   for (absl::string_view str : input) {
@@ -58,7 +58,7 @@ absl::StatusOr<std::vector<std::string>> Day06_2015::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day06_2015::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   std::vector<std::vector<int>> yard;
   std::vector<int> empty_row;
   empty_row.resize(1000);

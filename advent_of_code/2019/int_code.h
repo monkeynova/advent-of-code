@@ -66,7 +66,7 @@ class IntCode {
                    public PauseCondition {};
 
   static absl::StatusOr<IntCode> Parse(
-      const std::vector<absl::string_view>& input);
+      absl::Span<absl::string_view> input);
 
   IntCode(IntCode&&) = default;
   IntCode& operator=(IntCode&&) = default;

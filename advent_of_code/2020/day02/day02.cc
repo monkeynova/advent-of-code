@@ -7,7 +7,7 @@
 #include "re2/re2.h"
 
 absl::StatusOr<std::vector<std::string>> Day02_2020::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   static LazyRE2 pattern{"(\\d+)-(\\d+) (.): (.*)"};
   int valid = 0;
   for (absl::string_view str : input) {
@@ -30,7 +30,7 @@ absl::StatusOr<std::vector<std::string>> Day02_2020::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day02_2020::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   static LazyRE2 pattern{"(\\d+)-(\\d+) (.): (.*)"};
   int valid = 0;
   for (absl::string_view str : input) {

@@ -14,7 +14,7 @@
 
 using Board = std::vector<std::string>;
 
-absl::StatusOr<Board> ParseBoard(const std::vector<absl::string_view>& input) {
+absl::StatusOr<Board> ParseBoard(absl::Span<absl::string_view> input) {
   if (input.size() != 5)
     return absl::InvalidArgumentError("Board isn't of height 5");
   Board board;
@@ -281,7 +281,7 @@ int64_t CountBugs(absl::flat_hash_map<int, Board> depth_to_board) {
 }
 
 absl::StatusOr<Board> Day24_2019::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<Board> board = ParseBoard(input);
   if (!board.ok()) return board;
 
@@ -297,7 +297,7 @@ absl::StatusOr<Board> Day24_2019::Part1(
 }
 
 absl::StatusOr<Board> Day24_2019::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<Board> cur = ParseBoard(input);
   if (!cur.ok()) return cur;
 

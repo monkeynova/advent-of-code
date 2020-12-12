@@ -39,7 +39,7 @@ bool IsValidPassword2(absl::string_view password) {
 }
 
 absl::StatusOr<std::vector<std::string>> Day04_2019::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Empty input");
   std::vector<absl::string_view> range = absl::StrSplit(input[0], "-");
   if (range.size() != 2) return absl::InvalidArgumentError("Bad range");
@@ -56,7 +56,7 @@ absl::StatusOr<std::vector<std::string>> Day04_2019::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day04_2019::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Empty input");
   std::vector<absl::string_view> range = absl::StrSplit(input[0], "-");
   if (range.size() != 2) return absl::InvalidArgumentError("Bad range");

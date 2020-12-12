@@ -10,7 +10,7 @@
 #include "re2/re2.h"
 
 absl::StatusOr<std::vector<std::string>> Day01_2015::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
   int floor = 0;
   for (char c : input[0]) {
@@ -25,7 +25,7 @@ absl::StatusOr<std::vector<std::string>> Day01_2015::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day01_2015::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
   int floor = 0;
   for (int i = 0; i < input[0].size(); ++i) {

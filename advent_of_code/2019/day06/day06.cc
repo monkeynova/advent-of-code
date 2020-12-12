@@ -8,7 +8,7 @@
 #include "re2/re2.h"
 
 absl::StatusOr<absl::flat_hash_map<std::string, std::vector<std::string>>>
-ParseOrbits(const std::vector<absl::string_view>& input) {
+ParseOrbits(absl::Span<absl::string_view> input) {
   absl::flat_hash_map<std::string, std::vector<std::string>> orbits;
   RE2 orbit_pattern{"(...)\\)(...)"};
   for (absl::string_view rec : input) {
@@ -76,7 +76,7 @@ TransferRet FindTransfer(
 }
 
 absl::StatusOr<std::vector<std::string>> Day06_2019::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<std::string, std::vector<std::string>>>
       orbits = ParseOrbits(input);
   if (!orbits.ok()) return orbits.status();
@@ -86,7 +86,7 @@ absl::StatusOr<std::vector<std::string>> Day06_2019::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day06_2019::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<std::string, std::vector<std::string>>>
       orbits = ParseOrbits(input);
   if (!orbits.ok()) return orbits.status();

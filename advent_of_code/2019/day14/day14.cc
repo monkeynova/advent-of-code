@@ -65,7 +65,7 @@ absl::StatusOr<RuleSet> DagSort(RuleSet rule_set) {
 }
 
 absl::StatusOr<RuleSet> ParseRuleSet(
-    const std::vector<absl::string_view>& input) {
+    absl::Span<absl::string_view> input) {
   RuleSet rule_set;
   absl::flat_hash_set<absl::string_view> rule_history;
   for (absl::string_view rule_str : input) {
@@ -163,7 +163,7 @@ absl::StatusOr<int> FuelFromOre(const RuleSet& rule_set, uint64_t ore_supply) {
 }
 
 absl::StatusOr<std::vector<std::string>> Day14_2019::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<RuleSet> rule_set = ParseRuleSet(input);
   if (!rule_set.ok()) return rule_set.status();
 
@@ -175,7 +175,7 @@ absl::StatusOr<std::vector<std::string>> Day14_2019::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day14_2019::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<RuleSet> rule_set = ParseRuleSet(input);
   if (!rule_set.ok()) return rule_set.status();
 

@@ -48,7 +48,8 @@ int main(int argc, char** argv) {
     LOG(FATAL) << st.message();
   }
 
-  absl::StatusOr<IntCode> codes = IntCode::Parse({absl::string_view(data)});
+  std::vector<absl::string_view> tmp = {absl::string_view(data)};
+  absl::StatusOr<IntCode> codes = IntCode::Parse(absl::MakeSpan(tmp));
   if (!codes.ok()) LOG(FATAL) << codes.status().message();
 
   Terminal t;

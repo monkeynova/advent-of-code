@@ -17,7 +17,7 @@ class BootCode {
       : statements_(std::move(statements)) {}
 
   static absl::StatusOr<BootCode> Parse(
-      const std::vector<absl::string_view>& input);
+      absl::Span<absl::string_view> input);
 
   absl::StatusOr<bool> Execute();
 

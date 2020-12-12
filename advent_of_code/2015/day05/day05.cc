@@ -62,7 +62,7 @@ Classification Classify2(absl::string_view input) {
 }
 
 absl::StatusOr<std::vector<std::string>> Day05_2015::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   int nice = 0;
   for (absl::string_view str : input) {
     if (Classify1(str) == kNice) ++nice;
@@ -71,7 +71,7 @@ absl::StatusOr<std::vector<std::string>> Day05_2015::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day05_2015::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   int nice = 0;
   for (absl::string_view str : input) {
     if (Classify2(str) == kNice) ++nice;

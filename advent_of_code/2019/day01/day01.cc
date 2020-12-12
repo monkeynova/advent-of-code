@@ -4,7 +4,7 @@
 #include "absl/strings/str_cat.h"
 
 absl::StatusOr<std::vector<std::string>> Day01_2019::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> costs = ParseAsInts(input);
   if (!costs.ok()) return costs.status();
 
@@ -18,7 +18,7 @@ absl::StatusOr<std::vector<std::string>> Day01_2019::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day01_2019::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> costs = ParseAsInts(input);
   if (!costs.ok()) return costs.status();
 

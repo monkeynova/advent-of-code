@@ -21,7 +21,7 @@ std::string Hex(absl::string_view buf) {
 }
 
 absl::StatusOr<std::vector<std::string>> Day04_2015::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
   MD5_CTX ctx;
   unsigned char md5_result[16];
@@ -41,7 +41,7 @@ absl::StatusOr<std::vector<std::string>> Day04_2015::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day04_2015::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
   MD5_CTX ctx;
   unsigned char md5_result[16];

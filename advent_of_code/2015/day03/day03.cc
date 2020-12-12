@@ -11,7 +11,7 @@
 #include "re2/re2.h"
 
 absl::StatusOr<std::vector<std::string>> Day03_2015::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
   absl::flat_hash_map<Point, int> visit;
   Point p{0, 0};
@@ -38,7 +38,7 @@ absl::StatusOr<std::vector<std::string>> Day03_2015::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day03_2015::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
   if (input[0].size() % 2 != 0)
     return absl::InvalidArgumentError("Bad input length");

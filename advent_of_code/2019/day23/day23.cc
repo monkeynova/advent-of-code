@@ -187,7 +187,7 @@ absl::Status Computer::SendCurrentPacket() {
 }
 
 absl::StatusOr<std::vector<std::string>> Day23_2019::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> code = IntCode::Parse(input);
   if (!code.ok()) return code.status();
 
@@ -197,7 +197,7 @@ absl::StatusOr<std::vector<std::string>> Day23_2019::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day23_2019::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> code = IntCode::Parse(input);
   if (!code.ok()) return code.status();
 

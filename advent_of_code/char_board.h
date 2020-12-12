@@ -10,7 +10,7 @@
 
 struct CharBoard {
   static absl::StatusOr<CharBoard> Parse(
-      const std::vector<absl::string_view>& in) {
+      absl::Span<absl::string_view> in) {
     CharBoard ret(0, 0);
     for (absl::string_view line : in) {
       ret.rows.push_back(std::string(line));

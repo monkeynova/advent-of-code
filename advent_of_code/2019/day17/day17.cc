@@ -297,7 +297,7 @@ class ViewPort : public IntCode::IOModule {
 };
 
 absl::StatusOr<std::vector<std::string>> Day17_2019::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
 
@@ -310,7 +310,7 @@ absl::StatusOr<std::vector<std::string>> Day17_2019::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day17_2019::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
 

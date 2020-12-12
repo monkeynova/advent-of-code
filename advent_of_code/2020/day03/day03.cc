@@ -10,7 +10,7 @@
 #include "re2/re2.h"
 
 absl::StatusOr<std::vector<std::string>> Day03_2020::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   int product = 1;
   for (Point dir : {Point{3, 1}}) {
     int trees = 0;
@@ -24,7 +24,7 @@ absl::StatusOr<std::vector<std::string>> Day03_2020::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day03_2020::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   int64_t product = 1;
   for (Point dir :
        {Point{1, 1}, Point{3, 1}, Point{5, 1}, Point{7, 1}, Point{1, 2}}) {

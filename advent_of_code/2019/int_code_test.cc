@@ -32,7 +32,7 @@ void RunTestCase(absl::string_view test_case_with_options,
   while (test_lines.back().empty()) {
     test_lines.pop_back();
   }
-  absl::StatusOr<IntCode> codes = IntCode::Parse(test_lines);
+  absl::StatusOr<IntCode> codes = IntCode::Parse(absl::MakeSpan(test_lines));
   if (!codes.ok()) {
     test_result->AddTestOutput(absl::StrCat("ERROR: Cannot parse Intcode: ",
                                             codes.status().message()));

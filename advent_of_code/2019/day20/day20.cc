@@ -16,7 +16,7 @@ bool IsCapAlpha(char c) { return c >= 'A' && c <= 'Z'; }
 
 class Maze {
  public:
-  Maze(const std::vector<absl::string_view>& input) : input_(input) {}
+  Maze(absl::Span<absl::string_view> input) : input_(input) {}
 
   absl::Status Initialize() {
     if (input_[0] != "Buffer") {
@@ -172,7 +172,7 @@ class Maze {
   }
 
  private:
-  const std::vector<absl::string_view>& input_;
+  const absl::Span<absl::string_view> input_;
 
   std::vector<std::string> board_;
   absl::flat_hash_map<Point, Point> portals_;
@@ -181,7 +181,7 @@ class Maze {
 };
 
 absl::StatusOr<std::vector<std::string>> Day20_2019::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   Maze maze(input);
   if (absl::Status st = maze.Initialize(); !st.ok()) return st;
 
@@ -189,7 +189,7 @@ absl::StatusOr<std::vector<std::string>> Day20_2019::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day20_2019::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   Maze maze(input);
   if (absl::Status st = maze.Initialize(); !st.ok()) return st;
 

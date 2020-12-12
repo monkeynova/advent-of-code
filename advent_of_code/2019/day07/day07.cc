@@ -39,7 +39,7 @@ absl::StatusOr<int> FindBestThrust(const IntCode& base_codes, int input_value,
 }
 
 absl::StatusOr<std::vector<std::string>> Day07_2019::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
 
@@ -145,7 +145,7 @@ absl::StatusOr<int> FindBestThrustFeedback(const IntCode& base_codes,
 }
 
 absl::StatusOr<std::vector<std::string>> Day07_2019::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
 

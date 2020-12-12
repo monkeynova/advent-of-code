@@ -6,7 +6,7 @@
 
 // static
 absl::StatusOr<BootCode> BootCode::Parse(
-    const std::vector<absl::string_view>& input) {
+    absl::Span<absl::string_view> input) {
   absl::flat_hash_map<absl::string_view, Instruction> imap = {
       {"jmp", Instruction::kJmp},
       {"acc", Instruction::kAcc},

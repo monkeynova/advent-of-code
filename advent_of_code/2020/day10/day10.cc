@@ -9,7 +9,7 @@
 #include "re2/re2.h"
 
 absl::StatusOr<std::vector<std::string>> Day10_2020::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> jolts = ParseAsInts(input);
   if (!jolts.ok()) return jolts.status();
   std::sort(jolts->begin(), jolts->end());
@@ -51,7 +51,7 @@ absl::StatusOr<int64_t> CountValidArrangements(
 }
 
 absl::StatusOr<std::vector<std::string>> Day10_2020::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> jolts = ParseAsInts(input);
   if (!jolts.ok()) return jolts.status();
   std::sort(jolts->begin(), jolts->end());

@@ -9,7 +9,7 @@
 #include "re2/re2.h"
 
 absl::StatusOr<std::vector<std::string>> Day06_2020::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   int group_sum = 0;
   absl::flat_hash_set<char> hist;
   for (absl::string_view str : input) {
@@ -26,7 +26,7 @@ absl::StatusOr<std::vector<std::string>> Day06_2020::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day06_2020::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   int group_sum = 0;
   absl::flat_hash_map<char, int> hist;
   int group_size = 0;

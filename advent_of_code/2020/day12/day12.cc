@@ -11,7 +11,7 @@
 #include "re2/re2.h"
 
 absl::StatusOr<std::vector<std::string>> Day12_2020::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   Point p{0, 0};
   Point dir = Cardinal::kEast;
   for (absl::string_view cmd : input) {
@@ -79,7 +79,7 @@ absl::StatusOr<std::vector<std::string>> Day12_2020::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day12_2020::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   Point ship{0, 0};
   Point waypoint = 10 * Cardinal::kEast + Cardinal::kNorth;
   for (absl::string_view cmd : input) {

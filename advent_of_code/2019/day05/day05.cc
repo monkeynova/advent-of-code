@@ -7,7 +7,7 @@
 #include "glog/logging.h"
 
 absl::StatusOr<std::vector<std::string>> Day05_2019::Part1(
-    const std::vector<absl::string_view>& input_text) const {
+    absl::Span<absl::string_view> input_text) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input_text);
   if (!codes.ok()) return codes.status();
 
@@ -25,7 +25,7 @@ absl::StatusOr<std::vector<std::string>> Day05_2019::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day05_2019::Part2(
-    const std::vector<absl::string_view>& input_text) const {
+    absl::Span<absl::string_view> input_text) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input_text);
   if (!codes.ok()) return codes.status();
 

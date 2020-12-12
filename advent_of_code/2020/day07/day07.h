@@ -6,9 +6,9 @@
 class Day07_2020 : public AdventDay {
  public:
   absl::StatusOr<std::vector<std::string>> Part1(
-      const std::vector<absl::string_view>& input) const override;
+      absl::Span<absl::string_view> input) const override;
   absl::StatusOr<std::vector<std::string>> Part2(
-      const std::vector<absl::string_view>& input) const override;
+      absl::Span<absl::string_view> input) const override;
 };
 
 #endif  // ADVENT_OF_CODE_2020_DAY07_H

@@ -6,6 +6,7 @@
 
 #include "absl/status/statusor.h"
 #include "absl/strings/str_cat.h"
+#include "absl/types/span.h"
 
 // TODO(@monkeynova): Move from const std::vector<...>& to absl::Span.
 //                    That would allow children to mutate as they
@@ -15,7 +16,7 @@ class AdventDay {
   virtual ~AdventDay() = default;
 
   absl::StatusOr<std::vector<int64_t>> ParseAsInts(
-      const std::vector<absl::string_view>& input) const {
+      absl::Span<absl::string_view> input) const {
     std::vector<int64_t> vals;
     for (int i = 0; i < input.size(); ++i) {
       int64_t v;
@@ -43,9 +44,9 @@ class AdventDay {
   }
 
   virtual absl::StatusOr<std::vector<std::string>> Part1(
-      const std::vector<absl::string_view>& input) const = 0;
+      absl::Span<absl::string_view> input) const = 0;
   virtual absl::StatusOr<std::vector<std::string>> Part2(
-      const std::vector<absl::string_view>& input) const = 0;
+      absl::Span<absl::string_view> input) const = 0;
 };
 
 #endif  // ADVENT_OF_CODE_ADVENT_DAY_H

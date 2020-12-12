@@ -28,7 +28,7 @@ H AbslHashValue(H h, const NKeyState& key_state) {
 
 class Board {
  public:
-  Board(const std::vector<absl::string_view>& board) : board_(board){};
+  Board(absl::Span<absl::string_view> board) : board_(board){};
 
   absl::Status InitializeBoard() {
     for (int y = 0; y < board_.size(); ++y) {
@@ -218,13 +218,13 @@ class Board {
   }
 
  private:
-  const std::vector<absl::string_view>& board_;
+  const absl::Span<absl::string_view> board_;
   std::vector<Point> robots_;
   absl::flat_hash_map<char, Point> keys_;
 };
 
 absl::StatusOr<std::vector<std::string>> Day18_2019::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   Board b(input);
   if (absl::Status st = b.InitializeBoard(); !st.ok()) return st;
   absl::StatusOr<absl::optional<int>> steps = b.MinStepsToAllKeys();
@@ -234,7 +234,7 @@ absl::StatusOr<std::vector<std::string>> Day18_2019::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day18_2019::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   std::vector<std::string> altered_input;
   for (absl::string_view str : input) {
     altered_input.push_back(std::string(str));
@@ -265,7 +265,7 @@ absl::StatusOr<std::vector<std::string>> Day18_2019::Part2(
 
   VLOG(1) << "\n" << absl::StrJoin(altered_input_view, "\n");
 
-  Board b(altered_input_view);
+  Board b(absl::MakeSpan(altered_input_view));
   if (absl::Status st = b.InitializeBoard(); !st.ok()) return st;
 
   absl::StatusOr<absl::optional<int>> steps = b.MinStepsToAllKeys();

@@ -6,7 +6,7 @@
 #include "glog/logging.h"
 
 absl::StatusOr<std::vector<std::string>> Day08_2019::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   const int kWidth = 25;
   const int kHeight = 6;
   const int kLayerSize = kWidth * kHeight;
@@ -45,7 +45,7 @@ absl::StatusOr<std::vector<std::string>> Day08_2019::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day08_2019::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   const int kWidth = 25;
   const int kHeight = 6;
   const int kLayerSize = kWidth * kHeight;

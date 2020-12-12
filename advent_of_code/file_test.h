@@ -16,11 +16,6 @@ void RunTestCase(const AdventDay* advent_day,
                  absl::string_view test_case_with_options,
                  file_based_test_driver::RunTestCaseResult* test_result);
 
-void RunTestCaseBenchmark(
-    const AdventDay* advent_day, benchmark::State& state,
-    absl::string_view test_case_with_options,
-    file_based_test_driver::RunTestCaseResult* test_result);
-
 template <typename Day>
 class FileTest : public ::testing::Test {
  public:

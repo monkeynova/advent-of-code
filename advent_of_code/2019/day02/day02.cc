@@ -13,7 +13,7 @@ absl::Status CorrectBoard(IntCode* codes, int noun, int verb) {
 }
 
 absl::StatusOr<std::vector<std::string>> Day02_2019::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
 
@@ -24,7 +24,7 @@ absl::StatusOr<std::vector<std::string>> Day02_2019::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day02_2019::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> start_codes = IntCode::Parse(input);
   if (!start_codes.ok()) return start_codes.status();
 

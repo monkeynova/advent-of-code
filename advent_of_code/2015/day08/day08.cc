@@ -10,11 +10,11 @@
 #include "re2/re2.h"
 
 absl::StatusOr<std::vector<std::string>> Day08_2015::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   return IntReturn(-1);
 }
 
 absl::StatusOr<std::vector<std::string>> Day08_2015::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   return IntReturn(-1);
 }

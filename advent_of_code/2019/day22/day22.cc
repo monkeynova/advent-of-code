@@ -74,7 +74,7 @@ Transform IncrementNInverse(int64_t n, int64_t deck_size) {
 }
 
 absl::StatusOr<std::pair<Transform, Transform>> CreateTransform(
-    const std::vector<absl::string_view>& input, int64_t deck_size) {
+    absl::Span<absl::string_view> input, int64_t deck_size) {
   Transform t{.mult = 1, .add = 0, .mod = deck_size};
   Transform inv_t{.mult = 1, .add = 0, .mod = deck_size};
   for (absl::string_view str : input) {
@@ -101,7 +101,7 @@ absl::StatusOr<std::pair<Transform, Transform>> CreateTransform(
 }
 
 absl::StatusOr<std::vector<std::string>> Day22_2019::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::pair<Transform, Transform>> pair =
       CreateTransform(input, /*deck_size=*/10007);
   if (!pair.ok()) return pair.status();
@@ -111,7 +111,7 @@ absl::StatusOr<std::vector<std::string>> Day22_2019::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day22_2019::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   int64_t run_count = 101741582076661;
   absl::StatusOr<std::pair<Transform, Transform>> pair =
       CreateTransform(input, /*deck_size=*/119315717514047);

@@ -10,7 +10,7 @@
 #include "re2/re2.h"
 
 absl::StatusOr<std::vector<std::string>> Day02_2015::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   int need = 0;
   for (absl::string_view dims : input) {
     int l, w, h;
@@ -24,7 +24,7 @@ absl::StatusOr<std::vector<std::string>> Day02_2015::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day02_2015::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   int need = 0;
   for (absl::string_view dims : input) {
     int l, w, h;

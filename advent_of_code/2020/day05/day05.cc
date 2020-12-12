@@ -39,7 +39,7 @@ absl::StatusOr<Seat> ParseSeat(absl::string_view seat_str) {
 }
 
 absl::StatusOr<std::vector<std::string>> Day05_2020::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   int maxid = 0;
   for (absl::string_view rec : input) {
     absl::StatusOr<Seat> seat = ParseSeat(rec);
@@ -50,7 +50,7 @@ absl::StatusOr<std::vector<std::string>> Day05_2020::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day05_2020::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   std::vector<bool> present;
   present.resize(1 << 10);
   for (absl::string_view rec : input) {

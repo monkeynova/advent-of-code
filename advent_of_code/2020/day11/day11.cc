@@ -80,7 +80,7 @@ CharBoard Update2(CharBoard in, const VisMap& vis_map) {
 }
 
 absl::StatusOr<std::vector<std::string>> Day11_2020::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<CharBoard> parsed = CharBoard::Parse(input);
   if (!parsed.ok()) return parsed.status();
 
@@ -95,7 +95,7 @@ absl::StatusOr<std::vector<std::string>> Day11_2020::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day11_2020::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   absl::StatusOr<CharBoard> parsed = CharBoard::Parse(input);
   if (!parsed.ok()) return parsed.status();
 

@@ -143,7 +143,7 @@ absl::StatusOr<std::vector<Point>> Intersect(std::vector<Line> wire1,
 }
 
 absl::StatusOr<std::vector<std::string>> Day03_2019::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   if (input.size() != 2) {
     return absl::InvalidArgumentError("input does not contain 2 lines");
   }
@@ -194,7 +194,7 @@ absl::StatusOr<int> CostToOverlap(Point intersect,
 }
 
 absl::StatusOr<std::vector<std::string>> Day03_2019::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   if (input.size() != 2) {
     return absl::InvalidArgumentError("input does not contain 2 lines");
   }

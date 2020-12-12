@@ -124,7 +124,7 @@ std::string RunPhase(int phase, absl::string_view input, int min_position) {
 }
 
 absl::StatusOr<std::vector<std::string>> Day16_2019::Part1(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Need only 1 line");
 
   std::string ret;
@@ -138,7 +138,7 @@ absl::StatusOr<std::vector<std::string>> Day16_2019::Part1(
 }
 
 absl::StatusOr<std::vector<std::string>> Day16_2019::Part2(
-    const std::vector<absl::string_view>& input) const {
+    absl::Span<absl::string_view> input) const {
   // TODO(@monkeynova): This model still takes way too long. There aught
   // to sitll be opportunities to improve the runtime.
   int offset;

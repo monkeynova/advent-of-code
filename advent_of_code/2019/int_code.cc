@@ -48,8 +48,7 @@ static const std::vector<OpCodeMeta>& CodeTypes() {
   return code_types;
 };
 
-absl::StatusOr<IntCode> IntCode::Parse(
-    const std::vector<absl::string_view>& input) {
+absl::StatusOr<IntCode> IntCode::Parse(absl::Span<absl::string_view> input) {
   if (input.empty()) {
     return absl::InvalidArgumentError("input is empty");
   }
