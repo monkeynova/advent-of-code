@@ -11,7 +11,16 @@
 
 absl::StatusOr<std::vector<std::string>> Day02_2015::Part1(
     const std::vector<absl::string_view>& input) const {
-  return IntReturn(-1);
+  int need = 0;
+  for (absl::string_view dims : input) {
+    int l, w, h;
+    if (!RE2::FullMatch(dims, "(\\d+)x(\\d+)x(\\d+)", &l ,&w, &h)) {
+      return absl::InvalidArgumentError(absl::StrCat("Bad input: ", dims));
+    }
+    need += 2 * l * w + 2 * l * h + 2 * w * h;
+    need += std::min(l * w, std::min(l * h, w * h));
+  }
+  return IntReturn(need);
 }
 
 absl::StatusOr<std::vector<std::string>> Day02_2015::Part2(
