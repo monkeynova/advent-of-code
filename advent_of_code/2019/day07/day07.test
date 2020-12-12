@@ -1,0 +1,10 @@
+[part=1]
+@include{advent_of_code/2019/day07/input.txt}
+--
+206580
+==
+
+[part=2]
+@include{advent_of_code/2019/day07/input.txt}
+--
+2299406

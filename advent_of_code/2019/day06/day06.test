@@ -1,0 +1,10 @@
+[part=1]
+@include{advent_of_code/2019/day06/input.txt}
+--
+142497
+==
+
+[part=2]
+@include{advent_of_code/2019/day06/input.txt}
+--
+301
