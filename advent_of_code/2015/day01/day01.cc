@@ -11,7 +11,14 @@
 
 absl::StatusOr<std::vector<std::string>> Day01_2015::Part1(
     const std::vector<absl::string_view>& input) const {
-  return IntReturn(-1);
+  if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
+  int floor = 0;
+  for (char c : input[0]) {
+    if (c == '(') ++floor;
+    else if (c == ')') --floor;
+    else return absl::InvalidArgumentError("Bad char");
+  }
+  return IntReturn(floor);
 }
 
 absl::StatusOr<std::vector<std::string>> Day01_2015::Part2(
