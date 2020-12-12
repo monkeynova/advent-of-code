@@ -18,14 +18,14 @@ Classification Classify1(absl::string_view input) {
   int vowel_count = 0;
   const absl::flat_hash_set<char> vowels = {'a', 'e', 'i', 'o', 'u'};
   bool has_double = false;
-  const absl::flat_hash_set<absl::string_view> bad_pairs =
-    {"ab", "cd", "pq", "xy"};
+  const absl::flat_hash_set<absl::string_view> bad_pairs = {"ab", "cd", "pq",
+                                                            "xy"};
   bool has_bad_pair = false;
 
   for (int i = 0; i < input.size(); ++i) {
     if (vowels.contains(input[i])) ++vowel_count;
     if (i > 0) {
-      if (input[i-1] == input[i]) has_double = true;
+      if (input[i - 1] == input[i]) has_double = true;
       if (bad_pairs.contains(input.substr(i - 1, 2))) has_bad_pair = true;
     }
   }
@@ -40,7 +40,7 @@ Classification Classify1(absl::string_view input) {
 Classification Classify2(absl::string_view input) {
   bool found_repeat_around = false;
   for (int i = 2; i < input.size(); ++i) {
-    if (input[i] == input[i-2]) {
+    if (input[i] == input[i - 2]) {
       found_repeat_around = true;
       break;
     }
@@ -51,7 +51,7 @@ Classification Classify2(absl::string_view input) {
   for (int i = 0; i < input.size(); ++i) {
     for (int j = i + 2; j < input.size(); ++j) {
       if (input.substr(i, 2) == input.substr(j, 2)) {
-        found_dupe = true; 
+        found_dupe = true;
         break;
       }
     }

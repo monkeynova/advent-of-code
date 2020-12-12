@@ -4,8 +4,8 @@ cc_library(
     name = "md5",
     srcs = ["md5.cc"],
     hdrs = ["md5.h"],
-    deps = [],
     visibility = [
         "//visibility:public",
     ],
+    deps = [],
 )

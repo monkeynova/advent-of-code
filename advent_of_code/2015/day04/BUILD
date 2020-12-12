@@ -7,7 +7,7 @@ cc_library(
     deps = [
         "//advent_of_code:advent_day",
         "//third_party/md5",
-       "@com_google_absl//absl/container:flat_hash_map",
+        "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/strings",
         "@com_google_glog//:glog",

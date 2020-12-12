@@ -11,13 +11,13 @@
 #include "third_party/md5/md5.h"
 
 std::string Hex(absl::string_view buf) {
-  static char hexchar[] = {'0', '1', '2', '3','4','5','6','7','8','9','a','b','c','d','e','f'};
-  return absl::StrJoin(buf, "", 
-    [](std::string* out, char c) {
-      unsigned char uc = static_cast<unsigned char>(c);
-      char tmp[] = {hexchar[uc >> 4], hexchar[uc & 0xf], '\0'};
-      absl::StrAppend(out, tmp);
-    });
+  static char hexchar[] = {'0', '1', '2', '3', '4', '5', '6', '7',
+                           '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+  return absl::StrJoin(buf, "", [](std::string* out, char c) {
+    unsigned char uc = static_cast<unsigned char>(c);
+    char tmp[] = {hexchar[uc >> 4], hexchar[uc & 0xf], '\0'};
+    absl::StrAppend(out, tmp);
+  });
 }
 
 absl::StatusOr<std::vector<std::string>> Day04_2015::Part1(
@@ -33,9 +33,7 @@ absl::StatusOr<std::vector<std::string>> Day04_2015::Part1(
     MD5_Update(&ctx, str.data(), str.size());
     MD5_Final(md5_result, &ctx);
     VLOG(2) << "MD5(" << str << "): " << Hex(md5_result_view);
-    if (md5_result[0] == 0 &&
-        md5_result[1] == 0 && 
-        (md5_result[2] >> 4) == 0) {
+    if (md5_result[0] == 0 && md5_result[1] == 0 && (md5_result[2] >> 4) == 0) {
       return IntReturn(i);
     }
   }
@@ -55,9 +53,7 @@ absl::StatusOr<std::vector<std::string>> Day04_2015::Part2(
     MD5_Update(&ctx, str.data(), str.size());
     MD5_Final(md5_result, &ctx);
     VLOG(2) << "MD5(" << str << "): " << Hex(md5_result_view);
-    if (md5_result[0] == 0 &&
-        md5_result[1] == 0 && 
-        md5_result[2] == 0) {
+    if (md5_result[0] == 0 && md5_result[1] == 0 && md5_result[2] == 0) {
       return IntReturn(i);
     }
   }
