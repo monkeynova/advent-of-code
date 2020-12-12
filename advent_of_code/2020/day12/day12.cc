@@ -53,7 +53,7 @@ absl::StatusOr<std::vector<std::string>> Day12_2020::Part1(
 absl::StatusOr<std::vector<std::string>> Day12_2020::Part2(
     const std::vector<absl::string_view>& input) const {
   Point ship{0, 0};
-  Point waypoint = (Cardinal::kEast * 10) + Cardinal::kNorth;
+  Point waypoint = 10 * Cardinal::kEast + Cardinal::kNorth;
   for (absl::string_view cmd : input) {
     int v;
     char c = cmd[0];
@@ -64,14 +64,14 @@ absl::StatusOr<std::vector<std::string>> Day12_2020::Part2(
       case 'E': waypoint += Cardinal::kEast * v; break;
       case 'W': waypoint += Cardinal::kWest * v; break;
       case 'F': {
-        ship += waypoint * v;
+        ship += v * waypoint;
         break;
       }
       case 'L': {
         switch(v % 360) {
-          case 90: waypoint = Point{waypoint.y, -waypoint.x}; break;
-          case 180: waypoint = Point{-waypoint.x, -waypoint.y}; break;
-          case 270: waypoint = Point{-waypoint.y, waypoint.x}; break;
+          case 90: waypoint = waypoint.rotate_left(); break;
+          case 180: waypoint = -waypoint; break;
+          case 270: waypoint = waypoint.rotate_right(); break;
           case 0: break;
           default: return absl::InvalidArgumentError(absl::StrCat("Bad rotation: ", v));
         }
@@ -79,9 +79,9 @@ absl::StatusOr<std::vector<std::string>> Day12_2020::Part2(
       }
       case 'R':  {
         switch(v % 360) {
-          case 90: waypoint = Point{-waypoint.y, waypoint.x}; break;
-          case 180: waypoint = Point{-waypoint.x, -waypoint.y}; break;
-          case 270: waypoint = Point{waypoint.y, -waypoint.x}; break;
+          case 90: waypoint = waypoint.rotate_right(); break;
+          case 180: waypoint = -waypoint; break;
+          case 270: waypoint = waypoint.rotate_left(); break;
           case 0: break;
           default: return absl::InvalidArgumentError(absl::StrCat("Bad rotation: ", v));
         }

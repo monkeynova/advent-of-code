@@ -26,20 +26,10 @@ class Painter : public IntCode::IOModule {
     if (paint) {
       panel_to_painted_color_[cur_] = val;
     } else {
-      // (0, -1) + 0=left  -> (-1, 0)
-      // (0, -1) + 1=right -> (1, 0)
-      // (0, 1)  + 0=left  -> (1, 0)
-      // (0, 1)  + 1=right -> (-1, 0)
-      // (1, 0)  + 0=left  -> (0, -1)
-      // (1, 0)  + 1=right -> (0, 1)
-      // (-1, 0) + 0=left  -> (0, 1)
-      // (-1, 0) + 1=right -> (0, -1)
-      // Rotate left  = [[0, 1], [-1, 0]]
-      // Rotate right = [[0, -1], [1, 0]]
       if (!val /* left */) {
-        dir_ = {.x = dir_.y, .y = -dir_.x};
+        dir_ = dir_.rotate_left();
       } else {
-        dir_ = {.x = -dir_.y, .y = dir_.x};
+        dir_ = dir_.rotate_right();
       }
       cur_ += dir_;
     }

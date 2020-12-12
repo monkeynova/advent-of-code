@@ -12,7 +12,7 @@ struct Point {
   int y;
  
   Point operator*(int s) const {
-    return Point{s * x, s * y};
+    return {.x = s * x, .y = s * y};
   }
 
   bool operator==(const Point& other) const {
@@ -39,11 +39,29 @@ struct Point {
     return {.x = x / gcd, .y = y / gcd};
   }
 
+  Point operator-() const {
+    return {.x = -x, .y = -y};
+  }
+
+  // Rotate left matrix = [[0, 1], [-1, 0]]
+  Point rotate_left() const {
+    return {.x = y, .y = -x};
+  }
+
+  // Rotate right matrix = [[0, -1], [1, 0]]
+  Point rotate_right() const {
+    return {.x = -y, .y = x};
+  }
+
   int dist() const { return abs(x) + abs(y); }
   int dist(Point o) const { return abs(x - o.x) + abs(y - o.y); }
 
   std::string DebugString() const { return absl::StrCat("{", x, ",", y, "}"); }
 };
+
+Point operator*(int s, Point p) {
+  return {.x = s * p.x, .y = s * p.y};
+}
 
 struct Cardinal {
   static constexpr Point kOrigin{0, 0};
