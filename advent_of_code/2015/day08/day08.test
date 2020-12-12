@@ -1,10 +1,10 @@
 [part=1]
 @include{advent_of_code/2015/day08/input.txt}
 --
--1
+ERROR: Could not run test: Not implemented
 ==
 
 [part=2]
 @include{advent_of_code/2015/day08/input.txt}
 --
--1
+ERROR: Could not run test: Not implemented
