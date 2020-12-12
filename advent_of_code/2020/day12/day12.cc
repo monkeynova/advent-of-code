@@ -17,34 +17,62 @@ absl::StatusOr<std::vector<std::string>> Day12_2020::Part1(
   for (absl::string_view cmd : input) {
     int v;
     char c = cmd[0];
-    if (!absl::SimpleAtoi(cmd.substr(1), &v)) return absl::InvalidArgumentError("Bad parse.");
+    if (!absl::SimpleAtoi(cmd.substr(1), &v))
+      return absl::InvalidArgumentError("Bad parse.");
     switch (c) {
-      case 'N': p += Cardinal::kNorth * v; break;
-      case 'S': p += Cardinal::kSouth * v; break;
-      case 'E': p += Cardinal::kEast * v; break;
-      case 'W': p += Cardinal::kWest * v; break;
-      case 'F': p += dir * v; break;
+      case 'N':
+        p += Cardinal::kNorth * v;
+        break;
+      case 'S':
+        p += Cardinal::kSouth * v;
+        break;
+      case 'E':
+        p += Cardinal::kEast * v;
+        break;
+      case 'W':
+        p += Cardinal::kWest * v;
+        break;
+      case 'F':
+        p += dir * v;
+        break;
       case 'L': {
-        switch(v % 360) {
-          case 90: dir = dir.rotate_left(); break;
-          case 180: dir = -dir; break;
-          case 270: dir = dir.rotate_right(); break;
-          case 0: break;
-          default: return absl::InvalidArgumentError("Bad rotation");
+        switch (v % 360) {
+          case 90:
+            dir = dir.rotate_left();
+            break;
+          case 180:
+            dir = -dir;
+            break;
+          case 270:
+            dir = dir.rotate_right();
+            break;
+          case 0:
+            break;
+          default:
+            return absl::InvalidArgumentError("Bad rotation");
         }
         break;
       }
-      case 'R':  {
-        switch(v % 360) {
-          case 90: dir = dir.rotate_right(); break;
-          case 180: dir = -dir; break;
-          case 270: dir = dir.rotate_left(); break;
-          case 0: break;
-          default: return absl::InvalidArgumentError("Bad rotation");
+      case 'R': {
+        switch (v % 360) {
+          case 90:
+            dir = dir.rotate_right();
+            break;
+          case 180:
+            dir = -dir;
+            break;
+          case 270:
+            dir = dir.rotate_left();
+            break;
+          case 0:
+            break;
+          default:
+            return absl::InvalidArgumentError("Bad rotation");
         }
         break;
       }
-      default: return absl::InvalidArgumentError("Bad command");
+      default:
+        return absl::InvalidArgumentError("Bad command");
     }
   }
   return IntReturn(p.dist());
@@ -57,37 +85,65 @@ absl::StatusOr<std::vector<std::string>> Day12_2020::Part2(
   for (absl::string_view cmd : input) {
     int v;
     char c = cmd[0];
-    if (!absl::SimpleAtoi(cmd.substr(1), &v)) return absl::InvalidArgumentError("Bad parse.");
+    if (!absl::SimpleAtoi(cmd.substr(1), &v))
+      return absl::InvalidArgumentError("Bad parse.");
     switch (c) {
-      case 'N': waypoint += Cardinal::kNorth * v; break;
-      case 'S': waypoint += Cardinal::kSouth * v; break;
-      case 'E': waypoint += Cardinal::kEast * v; break;
-      case 'W': waypoint += Cardinal::kWest * v; break;
+      case 'N':
+        waypoint += Cardinal::kNorth * v;
+        break;
+      case 'S':
+        waypoint += Cardinal::kSouth * v;
+        break;
+      case 'E':
+        waypoint += Cardinal::kEast * v;
+        break;
+      case 'W':
+        waypoint += Cardinal::kWest * v;
+        break;
       case 'F': {
         ship += v * waypoint;
         break;
       }
       case 'L': {
-        switch(v % 360) {
-          case 90: waypoint = waypoint.rotate_left(); break;
-          case 180: waypoint = -waypoint; break;
-          case 270: waypoint = waypoint.rotate_right(); break;
-          case 0: break;
-          default: return absl::InvalidArgumentError(absl::StrCat("Bad rotation: ", v));
+        switch (v % 360) {
+          case 90:
+            waypoint = waypoint.rotate_left();
+            break;
+          case 180:
+            waypoint = -waypoint;
+            break;
+          case 270:
+            waypoint = waypoint.rotate_right();
+            break;
+          case 0:
+            break;
+          default:
+            return absl::InvalidArgumentError(
+                absl::StrCat("Bad rotation: ", v));
         }
         break;
       }
-      case 'R':  {
-        switch(v % 360) {
-          case 90: waypoint = waypoint.rotate_right(); break;
-          case 180: waypoint = -waypoint; break;
-          case 270: waypoint = waypoint.rotate_left(); break;
-          case 0: break;
-          default: return absl::InvalidArgumentError(absl::StrCat("Bad rotation: ", v));
+      case 'R': {
+        switch (v % 360) {
+          case 90:
+            waypoint = waypoint.rotate_right();
+            break;
+          case 180:
+            waypoint = -waypoint;
+            break;
+          case 270:
+            waypoint = waypoint.rotate_left();
+            break;
+          case 0:
+            break;
+          default:
+            return absl::InvalidArgumentError(
+                absl::StrCat("Bad rotation: ", v));
         }
         break;
       }
-      default: return absl::InvalidArgumentError("Bad command");
+      default:
+        return absl::InvalidArgumentError("Bad command");
     }
   }
   return IntReturn(ship.dist());

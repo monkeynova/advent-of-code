@@ -14,9 +14,12 @@ absl::StatusOr<std::vector<std::string>> Day01_2015::Part1(
   if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
   int floor = 0;
   for (char c : input[0]) {
-    if (c == '(') ++floor;
-    else if (c == ')') --floor;
-    else return absl::InvalidArgumentError("Bad char");
+    if (c == '(')
+      ++floor;
+    else if (c == ')')
+      --floor;
+    else
+      return absl::InvalidArgumentError("Bad char");
   }
   return IntReturn(floor);
 }
@@ -27,9 +30,12 @@ absl::StatusOr<std::vector<std::string>> Day01_2015::Part2(
   int floor = 0;
   for (int i = 0; i < input[0].size(); ++i) {
     char c = input[0][i];
-    if (c == '(') ++floor;
-    else if (c == ')') --floor;
-    else return absl::InvalidArgumentError("Bad char");
+    if (c == '(')
+      ++floor;
+    else if (c == ')')
+      --floor;
+    else
+      return absl::InvalidArgumentError("Bad char");
     if (floor < 0) return IntReturn(i + 1);
   }
   return absl::InvalidArgumentError("No basement");

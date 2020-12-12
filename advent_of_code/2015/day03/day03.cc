@@ -17,12 +17,21 @@ absl::StatusOr<std::vector<std::string>> Day03_2015::Part1(
   Point p{0, 0};
   for (char c : input[0]) {
     ++visit[p];
-    switch(c) {
-      case '^': p += Cardinal::kNorth; break;
-      case 'v': p += Cardinal::kSouth; break;
-      case '<': p += Cardinal::kWest; break;
-      case '>': p += Cardinal::kEast; break;
-      default: return absl::InvalidArgumentError("Bad direction");
+    switch (c) {
+      case '^':
+        p += Cardinal::kNorth;
+        break;
+      case 'v':
+        p += Cardinal::kSouth;
+        break;
+      case '<':
+        p += Cardinal::kWest;
+        break;
+      case '>':
+        p += Cardinal::kEast;
+        break;
+      default:
+        return absl::InvalidArgumentError("Bad direction");
     }
   }
   return IntReturn(visit.size());
@@ -31,26 +40,45 @@ absl::StatusOr<std::vector<std::string>> Day03_2015::Part1(
 absl::StatusOr<std::vector<std::string>> Day03_2015::Part2(
     const std::vector<absl::string_view>& input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
-  if (input[0].size() % 2 != 0) return absl::InvalidArgumentError("Bad input length");
+  if (input[0].size() % 2 != 0)
+    return absl::InvalidArgumentError("Bad input length");
   absl::flat_hash_map<Point, int> visit;
   Point p1{0, 0};
   Point p2{0, 0};
   for (int i = 0; i < input[0].size(); i += 2) {
     ++visit[p1];
     ++visit[p2];
-    switch(input[0][i]) {
-      case '^': p1 += Cardinal::kNorth; break;
-      case 'v': p1 += Cardinal::kSouth; break;
-      case '<': p1 += Cardinal::kWest; break;
-      case '>': p1 += Cardinal::kEast; break;
-      default: return absl::InvalidArgumentError("Bad direction");
+    switch (input[0][i]) {
+      case '^':
+        p1 += Cardinal::kNorth;
+        break;
+      case 'v':
+        p1 += Cardinal::kSouth;
+        break;
+      case '<':
+        p1 += Cardinal::kWest;
+        break;
+      case '>':
+        p1 += Cardinal::kEast;
+        break;
+      default:
+        return absl::InvalidArgumentError("Bad direction");
     }
-    switch(input[0][i + 1]) {
-      case '^': p2 += Cardinal::kNorth; break;
-      case 'v': p2 += Cardinal::kSouth; break;
-      case '<': p2 += Cardinal::kWest; break;
-      case '>': p2 += Cardinal::kEast; break;
-      default: return absl::InvalidArgumentError("Bad direction");
+    switch (input[0][i + 1]) {
+      case '^':
+        p2 += Cardinal::kNorth;
+        break;
+      case 'v':
+        p2 += Cardinal::kSouth;
+        break;
+      case '<':
+        p2 += Cardinal::kWest;
+        break;
+      case '>':
+        p2 += Cardinal::kEast;
+        break;
+      default:
+        return absl::InvalidArgumentError("Bad direction");
     }
   }
   return IntReturn(visit.size());

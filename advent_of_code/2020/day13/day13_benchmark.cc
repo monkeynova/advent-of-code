@@ -1,5 +1,5 @@
-#include "advent_of_code/file_benchmark.h"
 #include "advent_of_code/2020/day13/day13.h"
+#include "advent_of_code/file_benchmark.h"
 #include "gmock/gmock.h"
 
 constexpr int kMaxTestCount = 2;
