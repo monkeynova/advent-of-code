@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "absl/strings/str_cat.h"
+#include "absl/strings/str_replace.h"
 #include "absl/strings/str_split.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
@@ -70,8 +71,8 @@ absl::Status HandleTestIncludes(std::string* test_case) {
           "Unable to include file \"", include_fname, "\": ", st.message()));
       return st;
     }
-    RE2::Replace(test_case, absl::StrCat("@include{", include_fname, "}"),
-                 contents);
+    *test_case = absl::StrReplaceAll(*test_case, 
+        {{absl::StrCat("@include{", include_fname, "}"), contents}});
   }
   return absl::OkStatus();
 }

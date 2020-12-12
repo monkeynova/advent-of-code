@@ -11,7 +11,24 @@
 
 absl::StatusOr<std::vector<std::string>> Day08_2015::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  int delta = 0;
+  for (absl::string_view str : input) {
+    if (str[0] != '"') return Error("Bad input");
+    if (str.back() != '"') return Error("Bad input");
+    delta += 2;
+    for (int i = 1; i < str.size() - 1; ++i) {
+      if (str[i] == '\\') {
+        if (str[i+1] == '"' || str[i+1] == '\\') {
+          delta += 1;
+          i += 1;
+        } else {
+          delta += 3;
+          i += 3;
+        }
+      }
+    }
+  }
+  return IntReturn(delta);
 }
 
 absl::StatusOr<std::vector<std::string>> Day08_2015::Part2(

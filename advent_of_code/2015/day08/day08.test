@@ -1,7 +1,16 @@
 [part=1]
+""
+"abc"
+"aaa\"aaa"
+"\x27"
+--
+12
+==
+
+[part=1]
 @include{advent_of_code/2015/day08/input.txt}
 --
-ERROR: Could not run test: Not implemented
+1342
 ==
 
 [part=2]
