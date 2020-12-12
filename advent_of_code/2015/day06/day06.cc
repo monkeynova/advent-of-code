@@ -23,8 +23,8 @@ absl::StatusOr<std::vector<std::string>> Day06_2015::Part1(
     Point min;
     Point max;
     absl::string_view cmd;
-    if (!RE2::FullMatch(str, "(.*) (\\d+),(\\d+) through (\\d+),(\\d+)",
-                        &cmd, &min.x, &min.y, &max.x, &max.y)) {
+    if (!RE2::FullMatch(str, "(.*) (\\d+),(\\d+) through (\\d+),(\\d+)", &cmd,
+                        &min.x, &min.y, &max.x, &max.y)) {
       return absl::InvalidArgumentError(absl::StrCat("Bad instruction: ", str));
     }
     if (cmd == "turn on") {
@@ -73,8 +73,8 @@ absl::StatusOr<std::vector<std::string>> Day06_2015::Part2(
     Point min;
     Point max;
     absl::string_view cmd;
-    if (!RE2::FullMatch(str, "(.*) (\\d+),(\\d+) through (\\d+),(\\d+)",
-                        &cmd, &min.x, &min.y, &max.x, &max.y)) {
+    if (!RE2::FullMatch(str, "(.*) (\\d+),(\\d+) through (\\d+),(\\d+)", &cmd,
+                        &min.x, &min.y, &max.x, &max.y)) {
       return absl::InvalidArgumentError(absl::StrCat("Bad instruction: ", str));
     }
     if (cmd == "turn on") {
