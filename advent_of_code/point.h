@@ -65,11 +65,10 @@ std::ostream& operator<<(std::ostream& out, const Point& p) {
 
 struct PointRectangle {
   static PointRectangle Null() {
-    return {
-      .min = {.x = std::numeric_limits<int>::max(),
-              .y = std::numeric_limits<int>::max()},
-      .max = {.x = std::numeric_limits<int>::min(),
-              .y = std::numeric_limits<int>::min()}};
+    return {.min = {.x = std::numeric_limits<int>::max(),
+                    .y = std::numeric_limits<int>::max()},
+            .max = {.x = std::numeric_limits<int>::min(),
+                    .y = std::numeric_limits<int>::min()}};
   }
 
   struct iterator {
@@ -113,7 +112,6 @@ std::ostream& operator<<(std::ostream& out, const PointRectangle& r) {
   out << r.min << "-" << r.max;
   return out;
 }
-
 
 struct Cardinal {
   static constexpr Point kOrigin{0, 0};

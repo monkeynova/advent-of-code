@@ -76,7 +76,7 @@ absl::StatusOr<int> Evaluate(
 }
 
 absl::StatusOr<absl::flat_hash_map<std::string, Operation>> Parse(
-  const std::vector<absl::string_view>& input) {
+    const std::vector<absl::string_view>& input) {
   absl::flat_hash_map<std::string, Operation> ops_by_dest;
 
   for (absl::string_view str : input) {
@@ -90,13 +90,19 @@ absl::StatusOr<absl::flat_hash_map<std::string, Operation>> Parse(
       op.operation = "";
     } else if (RE2::FullMatch(op_and_dest[0], "NOT (\\d+|[a-z]+)", &op.arg1)) {
       op.operation = "NOT";
-    } else if (RE2::FullMatch(op_and_dest[0], "(\\d+|[a-z]+) AND (\\d+|[a-z]+)", &op.arg1, &op.arg2)) {
+    } else if (RE2::FullMatch(op_and_dest[0], "(\\d+|[a-z]+) AND (\\d+|[a-z]+)",
+                              &op.arg1, &op.arg2)) {
       op.operation = "AND";
-    } else if (RE2::FullMatch(op_and_dest[0], "(\\d+|[a-z]+) OR (\\d+|[a-z]+)", &op.arg1, &op.arg2)) {
+    } else if (RE2::FullMatch(op_and_dest[0], "(\\d+|[a-z]+) OR (\\d+|[a-z]+)",
+                              &op.arg1, &op.arg2)) {
       op.operation = "OR";
-    } else if (RE2::FullMatch(op_and_dest[0], "(\\d+|[a-z]+) LSHIFT (\\d+|[a-z]+)", &op.arg1, &op.arg2)) {
+    } else if (RE2::FullMatch(op_and_dest[0],
+                              "(\\d+|[a-z]+) LSHIFT (\\d+|[a-z]+)", &op.arg1,
+                              &op.arg2)) {
       op.operation = "LSHIFT";
-    } else if (RE2::FullMatch(op_and_dest[0], "(\\d+|[a-z]+) RSHIFT (\\d+|[a-z]+)", &op.arg1, &op.arg2)) {
+    } else if (RE2::FullMatch(op_and_dest[0],
+                              "(\\d+|[a-z]+) RSHIFT (\\d+|[a-z]+)", &op.arg1,
+                              &op.arg2)) {
       op.operation = "RSHIFT";
     } else {
       return AdventDay::Error("Bad op: ", op_and_dest[0]);
@@ -106,7 +112,6 @@ absl::StatusOr<absl::flat_hash_map<std::string, Operation>> Parse(
 
   return ops_by_dest;
 }
-
 
 absl::StatusOr<std::vector<std::string>> Day07_2015::Part1(
     const std::vector<absl::string_view>& input) const {

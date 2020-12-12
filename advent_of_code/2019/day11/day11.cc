@@ -51,8 +51,7 @@ class Painter : public IntCode::IOModule {
     CharBoard ret(r);
     for (Point p : r) {
       auto it = panel_to_painted_color_.find(p);
-      bool is_white =
-          (it != panel_to_painted_color_.end() && it->second == 1);
+      bool is_white = (it != panel_to_painted_color_.end() && it->second == 1);
       ret[p - r.min] = is_white ? 'X' : ' ';
     }
     return ret;
