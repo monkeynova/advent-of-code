@@ -14,7 +14,7 @@ enum Classification {
   kNice = 2,
 };
 
-Classification Classify(absl::string_view input) {
+Classification Classify1(absl::string_view input) {
   int vowel_count = 0;
   const absl::flat_hash_set<char> vowels = {'a', 'e', 'i', 'o', 'u'};
   bool has_double = false;
@@ -65,7 +65,7 @@ absl::StatusOr<std::vector<std::string>> Day05_2015::Part1(
     const std::vector<absl::string_view>& input) const {
   int nice = 0;
   for (absl::string_view str : input) {
-    if (Classify(str) == kNice) ++nice;
+    if (Classify1(str) == kNice) ++nice;
   }
   return IntReturn(nice);
 }
