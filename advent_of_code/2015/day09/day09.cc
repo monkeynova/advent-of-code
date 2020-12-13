@@ -33,11 +33,13 @@ absl::optional<int> opt_add(int d, absl::optional<int> a) {
 }
 
 absl::optional<int> ShortestAllVisitFrom(
-  const absl::flat_hash_map<absl::string_view, std::vector<Route>>& src_routes,
-  absl::string_view from, absl::flat_hash_set<absl::string_view>* visited) {
+    const absl::flat_hash_map<absl::string_view, std::vector<Route>>&
+        src_routes,
+    absl::string_view from, absl::flat_hash_set<absl::string_view>* visited) {
   std::string prefix;
   prefix.resize(visited->size() * 2 - 2, ' ');
-  VLOG(1) << prefix << "ShortestAllVisitFrom(" << from << ", " << visited->size() << ")";
+  VLOG(1) << prefix << "ShortestAllVisitFrom(" << from << ", "
+          << visited->size() << ")";
   if (visited->size() == src_routes.size()) return 0;
   absl::optional<int> min;
   auto it = src_routes.find(from);
@@ -46,15 +48,18 @@ absl::optional<int> ShortestAllVisitFrom(
   for (const Route& r : it->second) {
     if (visited->contains(r.dst)) continue;
     visited->insert(r.dst);
-    min = opt_min(min, opt_add(r.weight, ShortestAllVisitFrom(src_routes, r.dst, visited)));
+    min = opt_min(min, opt_add(r.weight, ShortestAllVisitFrom(src_routes, r.dst,
+                                                              visited)));
     visited->erase(r.dst);
   }
-  VLOG(1) << prefix << "ShortestAllVisitFrom = " << (!min ? "nullopt" : absl::StrCat(*min));
+  VLOG(1) << prefix << "ShortestAllVisitFrom = "
+          << (!min ? "nullopt" : absl::StrCat(*min));
   return min;
 }
 
 absl::optional<int> ShortestAllVisit(
-  const absl::flat_hash_map<absl::string_view, std::vector<Route>>& src_routes) {
+    const absl::flat_hash_map<absl::string_view, std::vector<Route>>&
+        src_routes) {
   absl::optional<int> min;
   absl::flat_hash_set<absl::string_view> visited;
   for (const auto& pair : src_routes) {
@@ -66,11 +71,13 @@ absl::optional<int> ShortestAllVisit(
 }
 
 absl::optional<int> LongestAllVisitFrom(
-  const absl::flat_hash_map<absl::string_view, std::vector<Route>>& src_routes,
-  absl::string_view from, absl::flat_hash_set<absl::string_view>* visited) {
+    const absl::flat_hash_map<absl::string_view, std::vector<Route>>&
+        src_routes,
+    absl::string_view from, absl::flat_hash_set<absl::string_view>* visited) {
   std::string prefix;
   prefix.resize(visited->size() * 2 - 2, ' ');
-  VLOG(1) << prefix << "LongestAllVisitFrom(" << from << ", " << visited->size() << ")";
+  VLOG(1) << prefix << "LongestAllVisitFrom(" << from << ", " << visited->size()
+          << ")";
   if (visited->size() == src_routes.size()) return 0;
   absl::optional<int> max;
   auto it = src_routes.find(from);
@@ -79,15 +86,18 @@ absl::optional<int> LongestAllVisitFrom(
   for (const Route& r : it->second) {
     if (visited->contains(r.dst)) continue;
     visited->insert(r.dst);
-    max = opt_max(max, opt_add(r.weight, LongestAllVisitFrom(src_routes, r.dst, visited)));
+    max = opt_max(max, opt_add(r.weight, LongestAllVisitFrom(src_routes, r.dst,
+                                                             visited)));
     visited->erase(r.dst);
   }
-  VLOG(1) << prefix << "LongestAllVisitFrom = " << (!max ? "nullopt" : absl::StrCat(*max));
+  VLOG(1) << prefix << "LongestAllVisitFrom = "
+          << (!max ? "nullopt" : absl::StrCat(*max));
   return max;
 }
 
 absl::optional<int> LongestAllVisit(
-  const absl::flat_hash_map<absl::string_view, std::vector<Route>>& src_routes) {
+    const absl::flat_hash_map<absl::string_view, std::vector<Route>>&
+        src_routes) {
   absl::optional<int> max;
   absl::flat_hash_set<absl::string_view> visited;
   for (const auto& pair : src_routes) {
@@ -103,7 +113,8 @@ absl::StatusOr<std::vector<std::string>> Day09_2015::Part1(
   absl::flat_hash_map<absl::string_view, std::vector<Route>> src_routes;
   for (absl::string_view str : input) {
     Route r;
-    if (!RE2::FullMatch(str, "(.*) to (.*) = (\\d+)", &r.src, &r.dst, &r.weight)) {
+    if (!RE2::FullMatch(str, "(.*) to (.*) = (\\d+)", &r.src, &r.dst,
+                        &r.weight)) {
       return Error("Bad input");
     }
     src_routes[r.src].push_back(r);
@@ -117,7 +128,8 @@ absl::StatusOr<std::vector<std::string>> Day09_2015::Part2(
   absl::flat_hash_map<absl::string_view, std::vector<Route>> src_routes;
   for (absl::string_view str : input) {
     Route r;
-    if (!RE2::FullMatch(str, "(.*) to (.*) = (\\d+)", &r.src, &r.dst, &r.weight)) {
+    if (!RE2::FullMatch(str, "(.*) to (.*) = (\\d+)", &r.src, &r.dst,
+                        &r.weight)) {
       return Error("Bad input");
     }
     src_routes[r.src].push_back(r);
