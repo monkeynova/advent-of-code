@@ -1,7 +1,15 @@
 [part=1]
+Butterscotch: capacity -1, durability -2, flavor 6, texture 3, calories 8
+Cinnamon: capacity 2, durability 3, flavor -2, texture -1, calories 3
+--
+62842880
+==
+
+# 6211814400 (high)
+[part=1]
 @include{advent_of_code/2015/day15/input.txt}
 --
-ERROR: Could not run test: Not implemented
+13882464
 ==
 
 [part=2]
