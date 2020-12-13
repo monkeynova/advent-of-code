@@ -102,5 +102,33 @@ absl::StatusOr<std::vector<std::string>> Day13_2015::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day13_2015::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  // Alice would gain 2 happiness units by sitting next to Bob.
+  CostMap cost_map;
+  for (absl::string_view str : input) {
+    CostPair cost_pair;
+    absl::string_view dir;
+    if (!RE2::FullMatch(str, "(.*) would (gain|lose) (\\d+) happiness units by sitting next to (.*).",
+                        &cost_pair.from, &dir, &cost_pair.happiness, &cost_pair.to)) {
+      return Error("Bad input: ", str);
+    }
+    if (dir == "lose") {
+      cost_pair.happiness = -cost_pair.happiness;
+    }
+    cost_map[cost_pair.from][cost_pair.to] = cost_pair;
+  }
+  for (const auto& pair : cost_map) {
+    absl::string_view who = pair.first;
+    CostPair cost_pair_from;
+    cost_pair_from.from = "me";
+    cost_pair_from.to = who;
+    cost_pair_from.happiness = 0;
+    cost_map[cost_pair_from.from][cost_pair_from.to] = cost_pair_from;
+    CostPair cost_pair_to;
+    cost_pair_to.from = who;;
+    cost_pair_to.to = "me";
+    cost_pair_to.happiness = 0;
+    cost_map[cost_pair_to.from][cost_pair_to.to] = cost_pair_to;
+  }
+
+  return IntReturn(FindBestSeating(cost_map));
 }

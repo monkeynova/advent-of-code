@@ -21,7 +21,8 @@ David would gain 41 happiness units by sitting next to Carol.
 733
 ==
 
+[long=8s (0s opt) 2020.12.13]
 [part=2]
 @include{advent_of_code/2015/day13/input.txt}
 --
-ERROR: Could not run test: Not implemented
+725
