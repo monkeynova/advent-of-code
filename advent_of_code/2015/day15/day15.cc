@@ -18,7 +18,8 @@ struct Ingredient {
   int64_t calories = 0;
 };
 
-int64_t FindBestScore(absl::Span<Ingredient> ingredients, int q_remain, Ingredient score = {}) {
+int64_t FindBestScore(absl::Span<Ingredient> ingredients, int q_remain,
+                      Ingredient score = {}) {
   VLOG(1) << "FindBestScore: " << ingredients[0].name << ": " << q_remain;
   if (ingredients.size() == 1) {
     score.capacity += ingredients[0].capacity * q_remain;
@@ -45,13 +46,16 @@ int64_t FindBestScore(absl::Span<Ingredient> ingredients, int q_remain, Ingredie
       score.texture += ingredients[0].texture;
       score.calories += ingredients[0].calories;
     }
-    max = std::max(max, FindBestScore(ingredients.subspan(1), q_remain - i, score));
+    max = std::max(max,
+                   FindBestScore(ingredients.subspan(1), q_remain - i, score));
   }
 
   return max;
 }
 
-int64_t FindBestScoreRequiredCalories(absl::Span<Ingredient> ingredients, int q_remain, int calories, Ingredient score = {}) {
+int64_t FindBestScoreRequiredCalories(absl::Span<Ingredient> ingredients,
+                                      int q_remain, int calories,
+                                      Ingredient score = {}) {
   VLOG(1) << "FindBestScore: " << ingredients[0].name << ": " << q_remain;
   if (ingredients.size() == 1) {
     score.capacity += ingredients[0].capacity * q_remain;
@@ -79,12 +83,13 @@ int64_t FindBestScoreRequiredCalories(absl::Span<Ingredient> ingredients, int q_
       score.texture += ingredients[0].texture;
       score.calories += ingredients[0].calories;
     }
-    max = std::max(max, FindBestScoreRequiredCalories(ingredients.subspan(1), q_remain - i, calories, score));
+    max = std::max(
+        max, FindBestScoreRequiredCalories(ingredients.subspan(1), q_remain - i,
+                                           calories, score));
   }
 
   return max;
 }
-
 
 absl::StatusOr<std::vector<std::string>> Day15_2015::Part1(
     absl::Span<absl::string_view> input) const {
@@ -92,9 +97,12 @@ absl::StatusOr<std::vector<std::string>> Day15_2015::Part1(
   std::vector<Ingredient> ingredients;
   for (absl::string_view str : input) {
     Ingredient i;
-    if (!RE2::FullMatch(str, "(.*): capacity (-?\\d+), durability (-?\\d+), flavor (-?\\d+), texture (-?\\d+), calories (-?\\d+)",
-                        &i.name, &i.capacity, &i.durability, &i.flavor, &i.texture, &i.calories)) {
-      return Error("Bad input: " , str);
+    if (!RE2::FullMatch(str,
+                        "(.*): capacity (-?\\d+), durability (-?\\d+), flavor "
+                        "(-?\\d+), texture (-?\\d+), calories (-?\\d+)",
+                        &i.name, &i.capacity, &i.durability, &i.flavor,
+                        &i.texture, &i.calories)) {
+      return Error("Bad input: ", str);
     }
     ingredients.push_back(i);
   }
@@ -108,12 +116,16 @@ absl::StatusOr<std::vector<std::string>> Day15_2015::Part2(
   std::vector<Ingredient> ingredients;
   for (absl::string_view str : input) {
     Ingredient i;
-    if (!RE2::FullMatch(str, "(.*): capacity (-?\\d+), durability (-?\\d+), flavor (-?\\d+), texture (-?\\d+), calories (-?\\d+)",
-                        &i.name, &i.capacity, &i.durability, &i.flavor, &i.texture, &i.calories)) {
-      return Error("Bad input: " , str);
+    if (!RE2::FullMatch(str,
+                        "(.*): capacity (-?\\d+), durability (-?\\d+), flavor "
+                        "(-?\\d+), texture (-?\\d+), calories (-?\\d+)",
+                        &i.name, &i.capacity, &i.durability, &i.flavor,
+                        &i.texture, &i.calories)) {
+      return Error("Bad input: ", str);
     }
     ingredients.push_back(i);
   }
 
-  return IntReturn(FindBestScoreRequiredCalories(absl::MakeSpan(ingredients), 100, 500));
+  return IntReturn(
+      FindBestScoreRequiredCalories(absl::MakeSpan(ingredients), 100, 500));
 }
