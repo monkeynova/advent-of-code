@@ -16,9 +16,12 @@ struct CostPair {
   int happiness;
 };
 
-using CostMap = absl::flat_hash_map<absl::string_view, absl::flat_hash_map<absl::string_view, CostPair>>;
+using CostMap =
+    absl::flat_hash_map<absl::string_view,
+                        absl::flat_hash_map<absl::string_view, CostPair>>;
 
-absl::StatusOr<int> PairDelta(const CostMap& cost_map, absl::string_view from, absl::string_view to) {
+absl::StatusOr<int> PairDelta(const CostMap& cost_map, absl::string_view from,
+                              absl::string_view to) {
   auto it1 = cost_map.find(from);
   if (it1 == cost_map.end()) return AdventDay::Error("Can't find: ", from);
   auto it2 = it1->second.find(to);
@@ -29,20 +32,21 @@ absl::StatusOr<int> PairDelta(const CostMap& cost_map, absl::string_view from, a
   auto it4 = it3->second.find(from);
   if (it4 == it3->second.end()) return AdventDay::Error("Can't find: ", from);
 
-  VLOG(2) << "  PairDelta(" << from << ", " << to << "): " << it2->second.happiness + it4->second.happiness;
+  VLOG(2) << "  PairDelta(" << from << ", " << to
+          << "): " << it2->second.happiness + it4->second.happiness;
   return it2->second.happiness + it4->second.happiness;
 }
 
 absl::StatusOr<int> BestFillRemainingSeats(
-  const CostMap& cost_map,
-  int delta_happiness,
-  std::vector<absl::string_view>* seating,
-  absl::flat_hash_set<absl::string_view>* seated) {
-
-  VLOG(1) << "BestFillRemainingSeats(" << absl::StrJoin(*seating, ",") << "): " << delta_happiness;
+    const CostMap& cost_map, int delta_happiness,
+    std::vector<absl::string_view>* seating,
+    absl::flat_hash_set<absl::string_view>* seated) {
+  VLOG(1) << "BestFillRemainingSeats(" << absl::StrJoin(*seating, ",")
+          << "): " << delta_happiness;
 
   if (seated->size() == cost_map.size()) {
-    absl::StatusOr<int> wrap_around = PairDelta(cost_map, (*seating)[0], seating->back());
+    absl::StatusOr<int> wrap_around =
+        PairDelta(cost_map, (*seating)[0], seating->back());
     if (!wrap_around.ok()) return wrap_around.status();
     return *wrap_around + delta_happiness;
   }
@@ -54,15 +58,17 @@ absl::StatusOr<int> BestFillRemainingSeats(
 
     int this_delta = 0;
     if (!seating->empty()) {
-      absl::StatusOr<int> pair_delta = PairDelta(cost_map, to_seat, seating->back());
+      absl::StatusOr<int> pair_delta =
+          PairDelta(cost_map, to_seat, seating->back());
       if (!pair_delta.ok()) return pair_delta.status();
       this_delta = *pair_delta;
     }
 
     seating->push_back(to_seat);
     seated->insert(to_seat);
- 
-    absl::StatusOr<int> next_best = BestFillRemainingSeats(cost_map, delta_happiness + this_delta, seating, seated);
+
+    absl::StatusOr<int> next_best = BestFillRemainingSeats(
+        cost_map, delta_happiness + this_delta, seating, seated);
     if (!next_best.ok()) return next_best.status();
     max_happiness = opt_max(max_happiness, *next_best);
 
@@ -87,8 +93,11 @@ absl::StatusOr<std::vector<std::string>> Day13_2015::Part1(
   for (absl::string_view str : input) {
     CostPair cost_pair;
     absl::string_view dir;
-    if (!RE2::FullMatch(str, "(.*) would (gain|lose) (\\d+) happiness units by sitting next to (.*).",
-                        &cost_pair.from, &dir, &cost_pair.happiness, &cost_pair.to)) {
+    if (!RE2::FullMatch(str,
+                        "(.*) would (gain|lose) (\\d+) happiness units by "
+                        "sitting next to (.*).",
+                        &cost_pair.from, &dir, &cost_pair.happiness,
+                        &cost_pair.to)) {
       return Error("Bad input: ", str);
     }
     if (dir == "lose") {
@@ -107,8 +116,11 @@ absl::StatusOr<std::vector<std::string>> Day13_2015::Part2(
   for (absl::string_view str : input) {
     CostPair cost_pair;
     absl::string_view dir;
-    if (!RE2::FullMatch(str, "(.*) would (gain|lose) (\\d+) happiness units by sitting next to (.*).",
-                        &cost_pair.from, &dir, &cost_pair.happiness, &cost_pair.to)) {
+    if (!RE2::FullMatch(str,
+                        "(.*) would (gain|lose) (\\d+) happiness units by "
+                        "sitting next to (.*).",
+                        &cost_pair.from, &dir, &cost_pair.happiness,
+                        &cost_pair.to)) {
       return Error("Bad input: ", str);
     }
     if (dir == "lose") {
@@ -124,7 +136,8 @@ absl::StatusOr<std::vector<std::string>> Day13_2015::Part2(
     cost_pair_from.happiness = 0;
     cost_map[cost_pair_from.from][cost_pair_from.to] = cost_pair_from;
     CostPair cost_pair_to;
-    cost_pair_to.from = who;;
+    cost_pair_to.from = who;
+    ;
     cost_pair_to.to = "me";
     cost_pair_to.happiness = 0;
     cost_map[cost_pair_to.from][cost_pair_to.to] = cost_pair_to;
