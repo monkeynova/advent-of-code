@@ -16,6 +16,18 @@
 ==
 
 [part=2]
+{"a":[1,{"c":"red","b":2},3]}
+--
+4
+==
+
+[part=2]
+{"d":"red","e":[1,2,3,4],"f":5}
+--
+0
+==
+
+[part=2]
 @include{advent_of_code/2015/day12/input.txt}
 --
-ERROR: Could not run test: Not implemented
+68466

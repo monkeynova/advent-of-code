@@ -9,6 +9,76 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+absl::StatusOr<int> ParseAndCountNonRed(absl::string_view* json, bool* is_red = nullptr) {
+  if (is_red) *is_red = false;
+
+  if (json->empty()) return 0;
+  if ((*json)[0] == '-' || ((*json)[0] <= '9' && (*json)[0] >= '0')) {
+    int len = 1;
+    while (len < json->size() && (*json)[len] <= '9' && (*json)[len] >= '0') {
+      ++len;
+    }
+    absl::string_view num = json->substr(0, len);
+    int val;
+    if (!absl::SimpleAtoi(num, &val)) return AdventDay::Error("Not numeric: ", *json);
+    *json = json->substr(len);
+    return val;
+  }
+  if ((*json)[0] == '\"') {
+    int len = 1;
+    while (len < json->size() && (*json)[len] != '"') {
+      ++len;
+    }
+    ++len;
+    if (is_red) *is_red = json->substr(1, len - 2) == "red";
+    *json = json->substr(len);
+    return 0;
+  }
+  if ((*json)[0] == '[') {
+    int ret = 0;
+    *json = json->substr(1);
+    while (!json->empty() && (*json)[0] != ']') {
+      absl::StatusOr<int> next = ParseAndCountNonRed(json);
+      if (!next.ok()) return next.status();
+      ret += *next;
+      if ((*json)[0] == ',') {
+        *json = json->substr(1);
+      } else if ((*json)[0] != ']') {
+        return AdventDay::Error("Bad array: ", *json);
+      }
+    }
+    if (json->empty()) return AdventDay::Error("Truncated array");
+    *json = json->substr(1);
+    return ret;
+  }
+  if ((*json)[0] == '{') {
+    bool has_red = false;
+    int ret = 0;
+    *json = json->substr(1);
+    while (!json->empty() && (*json)[0] != '}') {
+      absl::StatusOr<int> next = ParseAndCountNonRed(json);
+      if (!next.ok()) return next.status();
+      ret += *next;
+      if ((*json)[0] != ':') return AdventDay::Error("Missing k/v break: ", *json);
+      *json = json->substr(1);
+      bool is_red;
+      next = ParseAndCountNonRed(json, &is_red);
+      if (!next.ok()) return next.status();
+      ret += *next;
+      if (is_red) has_red = true;
+      if ((*json)[0] == ',') {
+        *json = json->substr(1);
+      } else if ((*json)[0] != '}') {
+        return AdventDay::Error("Bad map: ", *json);
+      }
+    }
+    if (json->empty()) return AdventDay::Error("Truncated map");
+    *json = json->substr(1);
+    return has_red ? 0 : ret;
+  }
+  return AdventDay::Error("Cannot handle: ", *json);
+}
+
 absl::StatusOr<std::vector<std::string>> Day12_2015::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
@@ -23,5 +93,11 @@ absl::StatusOr<std::vector<std::string>> Day12_2015::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day12_2015::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 1) return Error("Bad input");
+  absl::string_view json = input[0];
+  absl::StatusOr<int> ret = ParseAndCountNonRed(&json);
+  if (!ret.ok()) return ret.status();
+  if (!json.empty()) return Error("Json not fully consumed: ", json);
+  
+  return IntReturn(*ret);
 }
