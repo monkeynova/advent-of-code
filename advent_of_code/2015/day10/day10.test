@@ -4,7 +4,8 @@
 329356
 ==
 
+[long=3s (0s opt) 2020.12.12]
 [part=2]
 @include{advent_of_code/2015/day10/input.txt}
 --
-ERROR: Could not run test: Not implemented
+4666278

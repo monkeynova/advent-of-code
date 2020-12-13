@@ -35,5 +35,11 @@ absl::StatusOr<std::vector<std::string>> Day10_2015::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day10_2015::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 1) return Error("Bad input");
+  std::string str = std::string(input[0]);
+  for (int i = 0; i < 50; ++i) {
+    VLOG(1) << str;
+    str = LookAndSay(str);
+  }
+  return IntReturn(str.size());
 }
