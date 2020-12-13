@@ -44,14 +44,14 @@ RaceResult RunRace(const std::vector<Flight>& flights, int time) {
 
 absl::StatusOr<std::vector<std::string>> Day14_2015::Part1(
     absl::Span<absl::string_view> input) const {
+  static LazyRE2 parse = {
+      "(.*) can fly (\\d+) km/s for (\\d+) seconds, but then "
+      "must rest for (\\d+) seconds\\."};
   // Prancer can fly 25 km/s for 6 seconds, but then must rest for 143 seconds.
   std::vector<Flight> flights;
   for (absl::string_view str : input) {
     Flight next;
-    if (!RE2::FullMatch(str,
-                        "(.*) can fly (\\d+) km/s for (\\d+) seconds, but then "
-                        "must rest for (\\d+) seconds\\.",
-                        &next.name, &next.speed, &next.run_time,
+    if (!RE2::FullMatch(str, *parse, &next.name, &next.speed, &next.run_time,
                         &next.rest_time)) {
       return Error("Bad input: ", str);
     }
@@ -62,13 +62,13 @@ absl::StatusOr<std::vector<std::string>> Day14_2015::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day14_2015::Part2(
     absl::Span<absl::string_view> input) const {
+  static LazyRE2 parse = {
+      "(.*) can fly (\\d+) km/s for (\\d+) seconds, but then "
+      "must rest for (\\d+) seconds\\."};
   std::vector<Flight> flights;
   for (absl::string_view str : input) {
     Flight next;
-    if (!RE2::FullMatch(str,
-                        "(.*) can fly (\\d+) km/s for (\\d+) seconds, but then "
-                        "must rest for (\\d+) seconds\\.",
-                        &next.name, &next.speed, &next.run_time,
+    if (!RE2::FullMatch(str, *parse, &next.name, &next.speed, &next.run_time,
                         &next.rest_time)) {
       return Error("Bad input: ", str);
     }
