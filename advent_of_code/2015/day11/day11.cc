@@ -25,7 +25,7 @@ bool IsValid(absl::string_view password) {
     // TODO(@monkeynova): Push to Increment.
     if (kBadChars.contains(password[i])) return false;
     if (i + 1 < password.size()) {
-      if (password[i] == password[i+1]) {
+      if (password[i] == password[i + 1]) {
         if (last_pair.empty()) {
           last_pair = password.substr(i, 2);
         } else if (password.substr(i, 2) != last_pair) {
@@ -34,12 +34,11 @@ bool IsValid(absl::string_view password) {
       }
     }
     if (i + 2 < password.size()) {
-      if (password[i] == password[i+1] - 1 &&
-          password[i] == password[i+2] - 2) {
+      if (password[i] == password[i + 1] - 1 &&
+          password[i] == password[i + 2] - 2) {
         has_inc_triple = true;
       }
     }
-
   }
   if (!has_inc_triple) return false;
   if (!has_two_pairs) return false;
