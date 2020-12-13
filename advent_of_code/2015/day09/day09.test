@@ -1,7 +1,16 @@
 [part=1]
+London to Dublin = 464
+London to Belfast = 518
+Dublin to Belfast = 141
+--
+605
+==
+
+# 316 (high)
+[part=1]
 @include{advent_of_code/2015/day09/input.txt}
 --
-ERROR: Could not run test: Not implemented
+141
 ==
 
 [part=2]

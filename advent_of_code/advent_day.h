@@ -43,6 +43,12 @@ class AdventDay {
     return std::vector<std::string>{absl::StrCat(*val)};
   }
 
+  absl::StatusOr<std::vector<std::string>> IntReturn(
+      absl::optional<int64_t> val) const {
+    if (!val) return absl::NotFoundError("Not found");
+    return std::vector<std::string>{absl::StrCat(*val)};
+  }
+
   virtual absl::StatusOr<std::vector<std::string>> Part1(
       absl::Span<absl::string_view> input) const = 0;
   virtual absl::StatusOr<std::vector<std::string>> Part2(
