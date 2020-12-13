@@ -47,7 +47,7 @@ absl::StatusOr<std::vector<std::string>> Day13_2020::Part2(
     if (ids[i] == "x") continue;
     int id;
     if (!absl::SimpleAtoi(ids[i], &id)) return Error("Bad id:", id);
-    
+
     routes.push_back({.id = id, .offset = i});
     if (id > max_id) {
       max_id = id;
