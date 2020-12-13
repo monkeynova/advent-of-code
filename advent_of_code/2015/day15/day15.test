@@ -13,6 +13,13 @@ Cinnamon: capacity 2, durability 3, flavor -2, texture -1, calories 3
 ==
 
 [part=2]
+Butterscotch: capacity -1, durability -2, flavor 6, texture 3, calories 8
+Cinnamon: capacity 2, durability 3, flavor -2, texture -1, calories 3
+--
+57600000
+==
+
+[part=2]
 @include{advent_of_code/2015/day15/input.txt}
 --
-ERROR: Could not run test: Not implemented
+11171160
