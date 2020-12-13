@@ -9,7 +9,8 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
-absl::StatusOr<int> ParseAndCountNonRed(absl::string_view* json, bool* is_red = nullptr) {
+absl::StatusOr<int> ParseAndCountNonRed(absl::string_view* json,
+                                        bool* is_red = nullptr) {
   if (is_red) *is_red = false;
 
   if (json->empty()) return 0;
@@ -20,7 +21,8 @@ absl::StatusOr<int> ParseAndCountNonRed(absl::string_view* json, bool* is_red = 
     }
     absl::string_view num = json->substr(0, len);
     int val;
-    if (!absl::SimpleAtoi(num, &val)) return AdventDay::Error("Not numeric: ", *json);
+    if (!absl::SimpleAtoi(num, &val))
+      return AdventDay::Error("Not numeric: ", *json);
     *json = json->substr(len);
     return val;
   }
@@ -59,7 +61,8 @@ absl::StatusOr<int> ParseAndCountNonRed(absl::string_view* json, bool* is_red = 
       absl::StatusOr<int> next = ParseAndCountNonRed(json);
       if (!next.ok()) return next.status();
       ret += *next;
-      if ((*json)[0] != ':') return AdventDay::Error("Missing k/v break: ", *json);
+      if ((*json)[0] != ':')
+        return AdventDay::Error("Missing k/v break: ", *json);
       *json = json->substr(1);
       bool is_red;
       next = ParseAndCountNonRed(json, &is_red);
@@ -98,6 +101,6 @@ absl::StatusOr<std::vector<std::string>> Day12_2015::Part2(
   absl::StatusOr<int> ret = ParseAndCountNonRed(&json);
   if (!ret.ok()) return ret.status();
   if (!json.empty()) return Error("Json not fully consumed: ", json);
-  
+
   return IntReturn(*ret);
 }
