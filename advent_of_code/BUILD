@@ -78,6 +78,17 @@ cc_library(
 )
 
 cc_library(
+    name = "opt_cmp",
+    hdrs = ["opt_cmp.h"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "@com_google_absl//absl/types:optional",
+    ],
+)
+
+cc_library(
     name = "char_board",
     hdrs = ["char_board.h"],
     visibility = [

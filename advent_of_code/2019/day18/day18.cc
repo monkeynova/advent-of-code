@@ -6,6 +6,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/opt_cmp.h"
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
@@ -161,9 +162,7 @@ class Board {
         AllMinStatesForRobotsNKeys(all_paths_idx, keys_.size());
     absl::optional<int> min;
     for (const auto& pair : states) {
-      if (!min || *min > pair.second) {
-        min = pair.second;
-      }
+      min = opt_min(min, pair.second);
     }
     return min;
   }

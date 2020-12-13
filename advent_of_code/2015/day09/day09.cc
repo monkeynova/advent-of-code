@@ -6,6 +6,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/opt_cmp.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 
@@ -14,23 +15,6 @@ struct Route {
   absl::string_view dst;
   int weight;
 };
-
-absl::optional<int> opt_min(absl::optional<int> a, absl::optional<int> b) {
-  if (!a) return b;
-  if (!b) return a;
-  return std::min(*a, *b);
-}
-
-absl::optional<int> opt_max(absl::optional<int> a, absl::optional<int> b) {
-  if (!a) return b;
-  if (!b) return a;
-  return std::max(*a, *b);
-}
-
-absl::optional<int> opt_add(int d, absl::optional<int> a) {
-  if (!a) return a;
-  return *a + d;
-}
 
 absl::optional<int> ShortestAllVisitFrom(
     const absl::flat_hash_map<absl::string_view, std::vector<Route>>&
