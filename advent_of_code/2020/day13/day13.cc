@@ -11,7 +11,22 @@
 
 absl::StatusOr<std::vector<std::string>> Day13_2020::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 2) return Error("Bad input");
+  int start;
+  if (!absl::SimpleAtoi(input[0], &start)) return Error("Bad input");
+  int min_delta = std::numeric_limits<int>::max();
+  int min_id;
+  for (absl::string_view piece : absl::StrSplit(input[1], ",")) {
+    if (piece == "x") continue;
+    int id;
+    if (!absl::SimpleAtoi(piece, &id)) return Error("Bad id:", id);
+    int delta = id - (start % id);
+    if (delta < min_delta) {
+      min_delta = delta;
+      min_id = id;
+    }
+  }
+  return IntReturn(min_delta * min_id);
 }
 
 absl::StatusOr<std::vector<std::string>> Day13_2020::Part2(
