@@ -11,7 +11,14 @@
 
 absl::StatusOr<std::vector<std::string>> Day12_2015::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 1) return Error("Bad input");
+  absl::string_view json = input[0];
+  int sum = 0;
+  int next = 0;
+  while (RE2::FindAndConsume(&json, "(-?\\d+)", &next)) {
+    sum += next;
+  }
+  return IntReturn(sum);
 }
 
 absl::StatusOr<std::vector<std::string>> Day12_2015::Part2(
