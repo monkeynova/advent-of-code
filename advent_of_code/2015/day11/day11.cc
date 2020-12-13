@@ -60,5 +60,13 @@ absl::StatusOr<std::vector<std::string>> Day11_2015::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day11_2015::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  std::string password = std::string(input[0]);
+  do {
+    Increment(&password);
+  } while (!IsValid(password));
+  do {
+    Increment(&password);
+  } while (!IsValid(password));
+
+  return std::vector<std::string>{password};
 }
