@@ -4,7 +4,8 @@
 2660
 ==
 
+# 647 (low)
 [part=2]
 @include{advent_of_code/2015/day14/input.txt}
 --
-ERROR: Could not run test: Not implemented
+1256
