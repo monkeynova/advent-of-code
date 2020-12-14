@@ -19,7 +19,8 @@ absl::StatusOr<std::vector<std::string>> Day14_2020::Part1(
     int64_t addr;
     int64_t val;
     if (RE2::FullMatch(str, "mask = ([10X]+)", &mask_str)) {
-      if (mask_str.size() != 36) return Error("Bad mask:", mask_str, "; ", mask_str.size());
+      if (mask_str.size() != 36)
+        return Error("Bad mask:", mask_str, "; ", mask_str.size());
       mask = 0;
       mask_val = 0;
       int64_t one_bit = 1;
@@ -34,8 +35,11 @@ absl::StatusOr<std::vector<std::string>> Day14_2020::Part1(
             mask_val |= (one_bit << (35 - i));
             break;
           }
-          case 'X': break;
-          default: return Error("Bad mask char: ", mask_str.substr(i,1), "; ", mask_str);
+          case 'X':
+            break;
+          default:
+            return Error("Bad mask char: ", mask_str.substr(i, 1), "; ",
+                         mask_str);
         }
       }
 
@@ -64,7 +68,8 @@ absl::StatusOr<std::vector<std::string>> Day14_2020::Part2(
     int64_t addr;
     int64_t val;
     if (RE2::FullMatch(str, "mask = ([10X]+)", &mask_str)) {
-      if (mask_str.size() != 36) return Error("Bad mask:", mask_str, "; ", mask_str.size());
+      if (mask_str.size() != 36)
+        return Error("Bad mask:", mask_str, "; ", mask_str.size());
       mask = 0;
       mask_val = 0;
       floating_mask = 0;
@@ -93,10 +98,13 @@ absl::StatusOr<std::vector<std::string>> Day14_2020::Part2(
             }
             break;
           }
-          default: return Error("Bad mask char: ", mask_str.substr(i,1), "; ", mask_str);
+          default:
+            return Error("Bad mask char: ", mask_str.substr(i, 1), "; ",
+                         mask_str);
         }
       }
-      VLOG(1) << absl::StrCat("mask = 0x", absl::Hex(mask), "; mask_val = ", mask_val);
+      VLOG(1) << absl::StrCat("mask = 0x", absl::Hex(mask),
+                              "; mask_val = ", mask_val);
       VLOG(1) << absl::StrCat("floating_mask = 0x", absl::Hex(floating_mask));
       VLOG(1) << "floating = " << absl::StrJoin(floating, ",");
 
@@ -104,7 +112,8 @@ absl::StatusOr<std::vector<std::string>> Day14_2020::Part2(
       int64_t base_addr = ((addr & ~mask) | mask_val) & ~floating_mask;
       VLOG(1) << "addr = " << (addr);
       VLOG(1) << "addr & ~mask = " << (addr & ~mask);
-      VLOG(1) << "((addr & ~mask) | mask_val) = " << ((addr & ~mask) | mask_val);
+      VLOG(1) << "((addr & ~mask) | mask_val) = "
+              << ((addr & ~mask) | mask_val);
       VLOG(1) << "base_addr = " << base_addr;
       for (int64_t f : floating) {
         mem[base_addr | f] = val;
