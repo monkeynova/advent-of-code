@@ -25,9 +25,9 @@ absl::StatusOr<std::vector<std::string>> Day16_2015::Part1(
                         &id, &f1, &v1, &f2, &v2, &f3, &v3)) {
       return Error("Bad input: ", str);
     }
-    if (features[f1] != v1) aunts.erase(id);
-    if (features[f2] != v2) aunts.erase(id);
-    if (features[f3] != v3) aunts.erase(id);
+    for (auto pair : std::vector<std::pair<absl::string_view, int>>{{f1, v1}, {f2, v2}, {f3, v3}}) {
+      if (features[pair.first] != pair.second) aunts.erase(id);
+    }
   }
   if (aunts.size() != 1) return Error("Aunt not unique: ", aunts.size());
   return IntReturn(*aunts.begin());
@@ -35,5 +35,30 @@ absl::StatusOr<std::vector<std::string>> Day16_2015::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day16_2015::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::flat_hash_map<absl::string_view, int> features = {
+      {"children", 3}, {"cats", 7},    {"samoyeds", 2}, {"pomeranians", 3},
+      {"akitas", 0},   {"vizslas", 0}, {"goldfish", 5}, {"trees", 3},
+      {"cars", 2},     {"perfumes", 1}};
+  absl::flat_hash_set<int> aunts;
+  for (int i = 1; i <= 500; ++i) aunts.insert(i);
+  for (absl::string_view str : input) {
+    int id, v1, v2, v3;
+    absl::string_view f1, f2, f3;
+    // Sue 1: children: 1, cars: 8, vizslas: 7
+    if (!RE2::FullMatch(str, "Sue (\\d+): (.*): (\\d+), (.*): (\\d+), (.*): (\\d+)",
+                        &id, &f1, &v1, &f2, &v2, &f3, &v3)) {
+      return Error("Bad input: ", str);
+    }
+    for (auto pair : std::vector<std::pair<absl::string_view, int>>{{f1, v1}, {f2, v2}, {f3, v3}}) {
+      if (pair.first == "cats" || pair.first == "trees") {
+        if (features[pair.first] >= pair.second) aunts.erase(id);
+      } else if (pair.first == "pomeranians" || pair.first == "goldfish") {
+        if (features[pair.first] <= pair.second) aunts.erase(id);
+      } else {
+        if (features[pair.first] != pair.second) aunts.erase(id);
+      }
+    }
+  }
+  if (aunts.size() != 1) return Error("Aunt not unique: ", aunts.size());
+  return IntReturn(*aunts.begin());
 }
