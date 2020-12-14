@@ -21,11 +21,13 @@ absl::StatusOr<std::vector<std::string>> Day16_2015::Part1(
     int id, v1, v2, v3;
     absl::string_view f1, f2, f3;
     // Sue 1: children: 1, cars: 8, vizslas: 7
-    if (!RE2::FullMatch(str, "Sue (\\d+): (.*): (\\d+), (.*): (\\d+), (.*): (\\d+)",
+    if (!RE2::FullMatch(str,
+                        "Sue (\\d+): (.*): (\\d+), (.*): (\\d+), (.*): (\\d+)",
                         &id, &f1, &v1, &f2, &v2, &f3, &v3)) {
       return Error("Bad input: ", str);
     }
-    for (auto pair : std::vector<std::pair<absl::string_view, int>>{{f1, v1}, {f2, v2}, {f3, v3}}) {
+    for (auto pair : std::vector<std::pair<absl::string_view, int>>{
+             {f1, v1}, {f2, v2}, {f3, v3}}) {
       if (features[pair.first] != pair.second) aunts.erase(id);
     }
   }
@@ -45,11 +47,13 @@ absl::StatusOr<std::vector<std::string>> Day16_2015::Part2(
     int id, v1, v2, v3;
     absl::string_view f1, f2, f3;
     // Sue 1: children: 1, cars: 8, vizslas: 7
-    if (!RE2::FullMatch(str, "Sue (\\d+): (.*): (\\d+), (.*): (\\d+), (.*): (\\d+)",
+    if (!RE2::FullMatch(str,
+                        "Sue (\\d+): (.*): (\\d+), (.*): (\\d+), (.*): (\\d+)",
                         &id, &f1, &v1, &f2, &v2, &f3, &v3)) {
       return Error("Bad input: ", str);
     }
-    for (auto pair : std::vector<std::pair<absl::string_view, int>>{{f1, v1}, {f2, v2}, {f3, v3}}) {
+    for (auto pair : std::vector<std::pair<absl::string_view, int>>{
+             {f1, v1}, {f2, v2}, {f3, v3}}) {
       if (pair.first == "cats" || pair.first == "trees") {
         if (features[pair.first] >= pair.second) aunts.erase(id);
       } else if (pair.first == "pomeranians" || pair.first == "goldfish") {
