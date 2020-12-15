@@ -61,7 +61,9 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
+        "@com_google_absl//absl/status:statusor",
         "@com_google_file_based_test_driver//file_based_test_driver:test_case_options",
+        "@com_googlesource_code_re2//:re2",
     ],
 )
 

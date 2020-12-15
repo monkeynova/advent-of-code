@@ -14,7 +14,7 @@
 ABSL_FLAG(std::string, test_file, "",
           "The file which contains the file based test driver tests");
 
-ABSL_FLAG(bool, run_long_tests, false,
+ABSL_FLAG(absl::Duration, run_long_tests, absl::Seconds(0),
           "Unless true, tests marked [long=$reason] will be ignored");
 
 std::string TestCaseFileName() { return absl::GetFlag(FLAGS_test_file); }
@@ -55,15 +55,14 @@ void RunTestCase(const AdventDay* advent_day,
     return;
   }
 
-  if (std::string reason = options.GetString(kLongOption); !reason.empty()) {
-    RE2 valid_reason{"\\d+[sm] (\\(\\d+[sm] opt\\) )?\\d+\\.\\d+\\.\\d+"};
-    if (!RE2::FullMatch(reason, valid_reason)) {
-      test_result->AddTestOutput(absl::StrCat("ERROR: Bad Reason: ", reason,
-                                              "; must match ",
-                                              valid_reason.pattern()));
+  if (std::string long_opt = options.GetString(kLongOption); !long_opt.empty()) {
+    absl::StatusOr<absl::Duration> long_duration = ParseLongTestDuration(long_opt);
+    if (!long_duration.ok()) {
+      test_result->AddTestOutput(
+          absl::StrCat("ERROR: Could not parse 'long' option: ", long_duration.status().message()));
       return;
     }
-    if (!absl::GetFlag(FLAGS_run_long_tests)) {
+    if (absl::GetFlag(FLAGS_run_long_tests) < *long_duration) {
       test_result->set_ignore_test_output(true);
       return;
     }

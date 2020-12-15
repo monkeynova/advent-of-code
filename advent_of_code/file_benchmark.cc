@@ -11,7 +11,7 @@
 ABSL_FLAG(std::string, test_file, "",
           "The file which contains the file based test driver tests");
 
-ABSL_FLAG(bool, run_long_tests, false,
+ABSL_FLAG(absl::Duration, run_long_tests, absl::Seconds(0),
           "Unless true, tests marked [long=$reason] will be ignored");
 
 struct DirtyTestParseResult {
@@ -89,13 +89,19 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
   while (!lines.empty() && lines.back().empty()) lines.pop_back();
 
   int part = test->options.GetInt64(kPartOption);
-  if (test->options.GetString(kLongOption) != "" &&
-      !absl::GetFlag(FLAGS_run_long_tests)) {
-    state.SetLabel(absl::StrCat("Part: ", part, "; *** SKIPPED (long) ****"));
-    for (auto _ : state) {
+  if (std::string long_option = test->options.GetString(kLongOption); !long_option.empty()) {
+    absl::StatusOr<absl::Duration> long_duration = ParseLongTestDuration(long_option);
+    if (!long_duration.ok()) {
+      return BM_Day_SetError(state, long_duration.status().message());
     }
-    return;
+    if (absl::GetFlag(FLAGS_run_long_tests) < *long_duration) {
+      state.SetLabel(absl::StrCat("Part: ", part, "; *** SKIPPED (long) ****"));
+      for (auto _ : state) {
+      }
+      return;
+    }
   }
+
   state.SetLabel(absl::StrCat("Part: ", part));
   switch (part) {
     case 1: {
