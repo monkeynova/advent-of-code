@@ -6,12 +6,48 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/char_board.h"
+#include "advent_of_code/point.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+CharBoard RunStep(const CharBoard& in) {
+  CharBoard out = in;
+  for (Point p : in.range()) {
+    int neighbors = 0;
+    for (Point dir : Cardinal::kEightDirs) {
+      Point n = p + dir;
+      if (in.OnBoard(n) && in[n] == '#') {
+        ++neighbors;
+      }
+    }
+    if (in[p] == '#') {
+      out[p] = neighbors == 2 || neighbors == 3 ? '#' : '.';
+    } else {
+      out[p] = neighbors == 3 ? '#' : '.';
+    }
+  }
+  return out;
+}
+
+int CountOn(const CharBoard& in) {
+  int on = 0;
+  for (Point p : in.range()) {
+    on += in[p] == '#';
+  }
+  return on;
+}
+
 absl::StatusOr<std::vector<std::string>> Day18_2015::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
+  if (!board.ok()) return board.status();
+  CharBoard cur = *board;
+  for (int i = 0; i < 100; ++i) {
+    VLOG(1) << cur.DebugString();
+    cur = RunStep(cur);
+  }
+  return IntReturn(CountOn(cur));
 }
 
 absl::StatusOr<std::vector<std::string>> Day18_2015::Part2(
