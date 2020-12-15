@@ -1,7 +1,17 @@
 [part=1]
+H => HO
+H => OH
+O => HH
+
+HOHOHO
+--
+7
+==
+
+[part=1]
 @include{advent_of_code/2015/day19/input.txt}
 --
-ERROR: Could not run test: Not implemented
+576
 ==
 
 [part=2]
