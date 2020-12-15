@@ -53,7 +53,6 @@ CharBoard RunStep2(const CharBoard& in) {
   return out;
 }
 
-
 int CountOn(const CharBoard& in) {
   int on = 0;
   for (Point p : in.range()) {
