@@ -61,7 +61,6 @@ absl::StatusOr<std::vector<std::string>> Day14_2020::Part2(
   absl::flat_hash_map<int64_t, int64_t> mem;
   int64_t mask = 0;
   int64_t mask_val = 0;
-  int64_t floating_mask = 0;
   std::vector<int64_t> floating;
   for (absl::string_view str : input) {
     absl::string_view mask_str;
@@ -72,7 +71,6 @@ absl::StatusOr<std::vector<std::string>> Day14_2020::Part2(
         return Error("Bad mask:", mask_str, "; ", mask_str.size());
       mask = 0;
       mask_val = 0;
-      floating_mask = 0;
       floating.clear();
       int64_t one_bit = 1;
       for (int i = 0; i < mask_str.size(); ++i) {
@@ -87,13 +85,14 @@ absl::StatusOr<std::vector<std::string>> Day14_2020::Part2(
             break;
           }
           case 'X': {
-            floating_mask |= (one_bit << (35 - i));
+            mask |= (one_bit << (35 - i));
             if (floating.empty()) {
               floating.push_back(0);
               floating.push_back(one_bit << (35 - i));
             } else {
-              for (int64_t f : absl::MakeSpan(floating)) {
-                floating.push_back(f | (one_bit << (35 - i)));
+              int floating_start_size = floating.size();
+              for (int j = 0; j < floating_start_size; ++j) {
+                floating.push_back(floating[j] | (one_bit << (35 - i)));
               }
             }
             break;
@@ -105,11 +104,10 @@ absl::StatusOr<std::vector<std::string>> Day14_2020::Part2(
       }
       VLOG(1) << absl::StrCat("mask = 0x", absl::Hex(mask),
                               "; mask_val = ", mask_val);
-      VLOG(1) << absl::StrCat("floating_mask = 0x", absl::Hex(floating_mask));
       VLOG(1) << "floating = " << absl::StrJoin(floating, ",");
 
     } else if (RE2::FullMatch(str, "mem\\[(\\d+)\\] = (\\d+)", &addr, &val)) {
-      int64_t base_addr = ((addr & ~mask) | mask_val) & ~floating_mask;
+      int64_t base_addr = (addr & ~mask) | mask_val;
       VLOG(1) << "addr = " << (addr);
       VLOG(1) << "addr & ~mask = " << (addr & ~mask);
       VLOG(1) << "((addr & ~mask) | mask_val) = "
