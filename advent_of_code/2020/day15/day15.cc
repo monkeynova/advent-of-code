@@ -22,7 +22,8 @@ absl::StatusOr<std::vector<std::string>> Day15_2020::Part1(
       hist[last] = round;
     }
     int parsed;
-    if (!absl::SimpleAtoi(pieces[round], &parsed)) return Error("Bad int: ", pieces[round]);
+    if (!absl::SimpleAtoi(pieces[round], &parsed))
+      return Error("Bad int: ", pieces[round]);
     last = parsed;
     VLOG(1) << last;
   }
@@ -51,7 +52,8 @@ absl::StatusOr<std::vector<std::string>> Day15_2020::Part2(
       hist[last] = round;
     }
     int parsed;
-    if (!absl::SimpleAtoi(pieces[round], &parsed)) return Error("Bad int: ", pieces[round]);
+    if (!absl::SimpleAtoi(pieces[round], &parsed))
+      return Error("Bad int: ", pieces[round]);
     last = parsed;
     VLOG(1) << last;
   }
