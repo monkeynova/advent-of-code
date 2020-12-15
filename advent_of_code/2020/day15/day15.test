@@ -4,12 +4,10 @@
 436
 ==
 
-# This test fails, but AOC input succeeds.
-[ignore]
 [part=1]
 1,3,2
 --
-436
+1
 ==
 
 [part=1]
