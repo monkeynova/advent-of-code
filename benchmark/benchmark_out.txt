@@ -135,9 +135,9 @@ BM_Day<Day22_2019>/0    6527812 ns      6303782 ns          147 Part: 1
 BM_Day<Day22_2019>/1    5391638 ns      5385814 ns          129 Part: 2
 BM_Day<Day23_2019>/0    4882520 ns      4876603 ns          131 Part: 1
 BM_Day<Day23_2019>/1  369111465 ns    322606667 ns            3 Part: 2
-BM_Day<Day24_2019>/0 ERROR OCCURRED: 'Board isn't of width 5'
+BM_Day<Day24_2019>/0     158178 ns       157818 ns         4479 Part: 1
 BM_Day<Day24_2019>/1     178456 ns       175996 ns         4095 Part: 1
-BM_Day<Day24_2019>/2 ERROR OCCURRED: 'Board isn't of width 5'
+BM_Day<Day24_2019>/2  215848599 ns    215486333 ns            3 Part: 2
 BM_Day<Day24_2019>/3  221649328 ns    221080333 ns            3 Part: 2
 BM_Day<Day25_2019>/0  348208361 ns    343903500 ns            2 Part: 1
 BM_Day<Day25_2019>/1        115 ns          106 ns      5839513 Part: 2

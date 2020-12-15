@@ -87,6 +87,12 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
   const DirtyTestParseResult* test = (*tests)[state.range(0)].get();
   std::vector<absl::string_view> lines = absl::StrSplit(test->test, "\n");
   while (!lines.empty() && lines.back().empty()) lines.pop_back();
+  for (int i = 0; i < lines.size(); ++i) {
+    if (!lines[i].empty() && lines[i][0] == '\\') {
+      // First character is escaped.
+      lines[i] = lines[i].substr(1);
+    }
+  }
 
   int part = test->options.GetInt64(kPartOption);
   if (std::string long_option = test->options.GetString(kLongOption); !long_option.empty()) {
