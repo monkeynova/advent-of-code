@@ -30,6 +30,30 @@ CharBoard RunStep(const CharBoard& in) {
   return out;
 }
 
+CharBoard RunStep2(const CharBoard& in) {
+  CharBoard out = in;
+  for (Point p : in.range()) {
+    int neighbors = 0;
+    for (Point dir : Cardinal::kEightDirs) {
+      Point n = p + dir;
+      if (in.OnBoard(n) && in[n] == '#') {
+        ++neighbors;
+      }
+    }
+    if (in[p] == '#') {
+      out[p] = neighbors == 2 || neighbors == 3 ? '#' : '.';
+    } else {
+      out[p] = neighbors == 3 ? '#' : '.';
+    }
+  }
+  out[Point{0, 0}] = '#';
+  out[Point{out.width() - 1, 0}] = '#';
+  out[Point{0, out.height() - 1}] = '#';
+  out[Point{out.width() - 1, out.height() - 1}] = '#';
+  return out;
+}
+
+
 int CountOn(const CharBoard& in) {
   int on = 0;
   for (Point p : in.range()) {
@@ -52,5 +76,12 @@ absl::StatusOr<std::vector<std::string>> Day18_2015::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day18_2015::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
+  if (!board.ok()) return board.status();
+  CharBoard cur = *board;
+  for (int i = 0; i < 100; ++i) {
+    VLOG(1) << cur.DebugString();
+    cur = RunStep2(cur);
+  }
+  return IntReturn(CountOn(cur));
 }
