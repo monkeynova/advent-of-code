@@ -30,5 +30,29 @@ absl::StatusOr<std::vector<std::string>> Day17_2015::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day17_2015::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<std::vector<int64_t>> cap = ParseAsInts(input);
+  if (!cap.ok()) return cap.status();
+
+  int min_valid = std::numeric_limits<int>::max();
+  int valid = 0;
+  for (int i = 0; i < (1 << cap->size()); ++i) {
+    int sum = 0;
+    int entries = 0;
+    for (int bit = 0; (1 << bit) <= i; ++bit) {
+      if (i & (1 << bit)) {
+        sum += (*cap)[bit];
+        ++entries;
+      }
+    }
+    if (sum == 150) {
+      if (entries == min_valid) {
+        ++valid;
+      } else if (entries < min_valid) {
+        min_valid = entries;
+        valid = 1;
+      }
+    }
+  }
+
+  return IntReturn(valid);
 }
