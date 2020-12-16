@@ -55,11 +55,14 @@ void RunTestCase(const AdventDay* advent_day,
     return;
   }
 
-  if (std::string long_opt = options.GetString(kLongOption); !long_opt.empty()) {
-    absl::StatusOr<absl::Duration> long_duration = ParseLongTestDuration(long_opt);
+  if (std::string long_opt = options.GetString(kLongOption);
+      !long_opt.empty()) {
+    absl::StatusOr<absl::Duration> long_duration =
+        ParseLongTestDuration(long_opt);
     if (!long_duration.ok()) {
       test_result->AddTestOutput(
-          absl::StrCat("ERROR: Could not parse 'long' option: ", long_duration.status().message()));
+          absl::StrCat("ERROR: Could not parse 'long' option: ",
+                       long_duration.status().message()));
       return;
     }
     if (absl::GetFlag(FLAGS_run_long_tests) < *long_duration) {

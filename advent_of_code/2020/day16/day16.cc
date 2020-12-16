@@ -28,28 +28,36 @@ absl::StatusOr<ParseResult> Parse(absl::Span<absl::string_view> input) {
   for (; i < input.size(); ++i) {
     absl::string_view col;
     OrRange or_range;
-    if (!RE2::FullMatch(input[i], "(.*): (\\d+)-(\\d+) or (\\d+)-(\\d+)",
-                        &col, &or_range.min1, &or_range.max1, &or_range.min2, &or_range.max2)) break;
-    if (res.rules.contains(col)) return AdventDay::Error("Duplicate rule: ", col);
+    if (!RE2::FullMatch(input[i], "(.*): (\\d+)-(\\d+) or (\\d+)-(\\d+)", &col,
+                        &or_range.min1, &or_range.max1, &or_range.min2,
+                        &or_range.max2))
+      break;
+    if (res.rules.contains(col))
+      return AdventDay::Error("Duplicate rule: ", col);
     res.rules.emplace(col, or_range);
   }
   if (!input[i].empty()) return AdventDay::Error("Not empty line: ", input[i]);
   ++i;
-  if (input[i] != "your ticket:") return AdventDay::Error("Not 'your ticket' ", input[i]);
+  if (input[i] != "your ticket:")
+    return AdventDay::Error("Not 'your ticket' ", input[i]);
   ++i;
   std::vector<absl::string_view> my_ticket_str = absl::StrSplit(input[i], ",");
-  absl::StatusOr<std::vector<int64_t>> my_ticket = AdventDay::ParseAsInts(absl::MakeSpan(my_ticket_str));
+  absl::StatusOr<std::vector<int64_t>> my_ticket =
+      AdventDay::ParseAsInts(absl::MakeSpan(my_ticket_str));
   if (!my_ticket.ok()) return my_ticket.status();
   res.my_ticket = *my_ticket;
   ++i;
 
   if (!input[i].empty()) return AdventDay::Error("Not empty line: ", input[i]);
   ++i;
-  if (input[i] != "nearby tickets:") return AdventDay::Error("Not 'nearby tickets' ", input[i]);
+  if (input[i] != "nearby tickets:")
+    return AdventDay::Error("Not 'nearby tickets' ", input[i]);
   ++i;
   for (; i < input.size(); ++i) {
-    std::vector<absl::string_view> other_ticket_str = absl::StrSplit(input[i], ",");
-    absl::StatusOr<std::vector<int64_t>> other_ticket = AdventDay::ParseAsInts(absl::MakeSpan(other_ticket_str));
+    std::vector<absl::string_view> other_ticket_str =
+        absl::StrSplit(input[i], ",");
+    absl::StatusOr<std::vector<int64_t>> other_ticket =
+        AdventDay::ParseAsInts(absl::MakeSpan(other_ticket_str));
     if (!other_ticket.ok()) return other_ticket.status();
     res.other_tickets.push_back(*other_ticket);
   }
@@ -58,17 +66,17 @@ absl::StatusOr<ParseResult> Parse(absl::Span<absl::string_view> input) {
 }
 
 bool CheckRange(int v, OrRange or_range) {
-        if (v >= or_range.min1 && v <= or_range.max1) {
-          VLOG(3) << "Valid: [" << or_range.min1 << "," <<  or_range.max1 << "],["
-                  <<or_range.min2 << "," <<  or_range.max2 << "]";
-          return true;
-        }
-        if (v >= or_range.min2 && v <= or_range.max2) {
-          VLOG(3) << "Valid: [" << or_range.min1 << "," <<  or_range.max1 << "],["
-                  <<or_range.min2 << "," <<  or_range.max2 << "]";
-          return true;
-        }
-        return false;
+  if (v >= or_range.min1 && v <= or_range.max1) {
+    VLOG(3) << "Valid: [" << or_range.min1 << "," << or_range.max1 << "],["
+            << or_range.min2 << "," << or_range.max2 << "]";
+    return true;
+  }
+  if (v >= or_range.min2 && v <= or_range.max2) {
+    VLOG(3) << "Valid: [" << or_range.min1 << "," << or_range.max1 << "],["
+            << or_range.min2 << "," << or_range.max2 << "]";
+    return true;
+  }
+  return false;
 }
 
 absl::StatusOr<std::vector<std::string>> Day16_2020::Part1(
@@ -107,10 +115,12 @@ bool IsValid(const ParseResult& parse, absl::string_view field_name, int pos) {
   return true;
 }
 
-bool FindRemainingFieldOrder(const ParseResult& parse, 
- const absl::flat_hash_map<absl::string_view, absl::flat_hash_set<int>>& is_valid,
- std::vector<absl::string_view>* ret,
-                             const absl::flat_hash_set<absl::string_view>& remaining) {
+bool FindRemainingFieldOrder(
+    const ParseResult& parse,
+    const absl::flat_hash_map<absl::string_view, absl::flat_hash_set<int>>&
+        is_valid,
+    std::vector<absl::string_view>* ret,
+    const absl::flat_hash_set<absl::string_view>& remaining) {
   VLOG(3) << "FindRemaningFieldOrder: " << absl::StrJoin(*ret, ",");
   absl::flat_hash_set<absl::string_view> sub_remaining = remaining;
   for (absl::string_view field : remaining) {
@@ -120,17 +130,19 @@ bool FindRemainingFieldOrder(const ParseResult& parse,
     ret->push_back(field);
     sub_remaining.erase(field);
     if (sub_remaining.empty()) return true;
-    if (FindRemainingFieldOrder(parse, is_valid, ret, sub_remaining)) return true;
+    if (FindRemainingFieldOrder(parse, is_valid, ret, sub_remaining))
+      return true;
     sub_remaining.insert(field);
     ret->pop_back();
   }
   return false;
 }
 
-void BurnIsValid(absl::flat_hash_map<absl::string_view, absl::flat_hash_set<int>>* is_valid) {
+void BurnIsValid(absl::flat_hash_map<absl::string_view,
+                                     absl::flat_hash_set<int>>* is_valid) {
   std::vector<absl::string_view> singletons;
   for (const auto& [field, map] : *is_valid) {
-    if (map.size() == 1) singletons.push_back(field); 
+    if (map.size() == 1) singletons.push_back(field);
   }
   while (!singletons.empty()) {
     std::vector<absl::string_view> new_singletons;
@@ -141,7 +153,7 @@ void BurnIsValid(absl::flat_hash_map<absl::string_view, absl::flat_hash_set<int>
         if (singleton_field == field) continue;
         if (!map.contains(pos)) continue;
         map.erase(pos);
-        if (map.size() == 1) new_singletons.push_back(field); 
+        if (map.size() == 1) new_singletons.push_back(field);
       }
     }
     singletons = std::move(new_singletons);
@@ -197,11 +209,14 @@ absl::StatusOr<std::vector<std::string>> Day16_2020::Part2(
     }
   }
   VLOG(1) << valid_tickets.size() << " valid tickets";
-  VLOG(2) << absl::StrJoin(valid_tickets, "\n", 
-             [](std::string* out, const std::vector<int64_t>& t) { absl::StrAppend(out, absl::StrJoin(t, ",")); });
+  VLOG(2) << absl::StrJoin(valid_tickets, "\n",
+                           [](std::string* out, const std::vector<int64_t>& t) {
+                             absl::StrAppend(out, absl::StrJoin(t, ","));
+                           });
   parse->other_tickets = valid_tickets;
   std::vector<absl::string_view> field_order = FindFieldOrder(*parse);
-  VLOG(1) << "found size == " << field_order.size() << " of " << parse->rules.size();
+  VLOG(1) << "found size == " << field_order.size() << " of "
+          << parse->rules.size();
   VLOG(1) << "Found order: " << absl::StrJoin(field_order, ",");
   absl::string_view prefix = "departure";
   int prefix_count = 0;

@@ -12,7 +12,8 @@ class SearchCharBoardInterface {
   virtual bool ConsiderNext(const CharBoard& board, Point next) = 0;
 };
 
-void SearchCharBoard(const CharBoard& board, Point start, absl::Span<Point> dirs, SearchInterface* search) {
+void SearchCharBoard(const CharBoard& board, Point start,
+                     absl::Span<Point> dirs, SearchInterface* search) {
   absl::flat_hash_set<Point> hist;
   hist.insert(start);
   std::deque<Point> queue = {start};

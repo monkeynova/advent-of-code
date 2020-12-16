@@ -95,8 +95,10 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
   }
 
   int part = test->options.GetInt64(kPartOption);
-  if (std::string long_option = test->options.GetString(kLongOption); !long_option.empty()) {
-    absl::StatusOr<absl::Duration> long_duration = ParseLongTestDuration(long_option);
+  if (std::string long_option = test->options.GetString(kLongOption);
+      !long_option.empty()) {
+    absl::StatusOr<absl::Duration> long_duration =
+        ParseLongTestDuration(long_option);
     if (!long_duration.ok()) {
       return BM_Day_SetError(state, long_duration.status().message());
     }

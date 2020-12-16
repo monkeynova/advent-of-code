@@ -10,8 +10,9 @@
 #include "re2/re2.h"
 
 absl::flat_hash_set<std::string> RunStep(
-  const absl::flat_hash_map<absl::string_view, std::vector<absl::string_view>>& map,
-  absl::string_view input) {
+    const absl::flat_hash_map<absl::string_view,
+                              std::vector<absl::string_view>>& map,
+    absl::string_view input) {
   absl::flat_hash_set<std::string> unique;
   for (const auto& pair : map) {
     absl::string_view src = pair.first;
@@ -19,7 +20,8 @@ absl::flat_hash_set<std::string> RunStep(
     for (int i = 0; i < input.size() - src.size() + 1; ++i) {
       if (input.substr(i, src.size()) == src) {
         for (absl::string_view dest : dest_list) {
-          unique.insert(absl::StrCat(input.substr(0, i), dest, input.substr(i + src.size())));
+          unique.insert(absl::StrCat(input.substr(0, i), dest,
+                                     input.substr(i + src.size())));
         }
       }
     }
@@ -36,7 +38,8 @@ ParseTree BuildParseTree(
 }
 #endif
 
-int FindMinPath(const absl::flat_hash_map<absl::string_view, std::vector<absl::string_view>>& map,
+int FindMinPath(const absl::flat_hash_map<absl::string_view,
+                                          std::vector<absl::string_view>>& map,
                 absl::string_view src, absl::string_view dest) {
   struct Path {
     std::string str;
@@ -47,7 +50,8 @@ int FindMinPath(const absl::flat_hash_map<absl::string_view, std::vector<absl::s
   hist.insert(std::string(src));
   for (int64_t i = 0; !frontier.empty(); ++i) {
     const Path& p = frontier.front();
-    VLOG_IF(1, i % 7777 == 0) << "expanding: " << p.str << "; " << i << "; " << p.dist << "; " << frontier.size();
+    VLOG_IF(1, i % 7777 == 0) << "expanding: " << p.str << "; " << i << "; "
+                              << p.dist << "; " << frontier.size();
     for (const std::string& expansion : RunStep(map, p.str)) {
       if (expansion == dest) return p.dist + 1;
       if (expansion.size() > dest.size()) continue;
@@ -82,10 +86,13 @@ absl::optional<int> FindMinPathReverseImpl(
     CHECK(it->first == find);
     if (min && found_len > find.size()) break;
     for (int i = 0; i <= dest.size() - find.size(); ++i) {
-      VLOG(3) << "Trying: " << dest << "@" << i << "; " << it->first << " => " << it->second;
+      VLOG(3) << "Trying: " << dest << "@" << i << "; " << it->first << " => "
+              << it->second;
       if (dest.substr(i, find.size()) == find) {
-        std::string sub_dest = absl::StrCat(dest.substr(0, i), it->second, dest.substr(i + find.size()));
-        absl::optional<int> sub_min = FindMinPathReverseImpl(map, map_by_len, memo, src, sub_dest);
+        std::string sub_dest = absl::StrCat(dest.substr(0, i), it->second,
+                                            dest.substr(i + find.size()));
+        absl::optional<int> sub_min =
+            FindMinPathReverseImpl(map, map_by_len, memo, src, sub_dest);
         if (sub_min) {
           if (!min || *min > *sub_min + 1) {
             min = *sub_min + 1;
@@ -99,15 +106,16 @@ absl::optional<int> FindMinPathReverseImpl(
   return min;
 }
 
-absl::optional<int> FindMinPathReverse(const std::map<absl::string_view, absl::string_view>& map,
-                       absl::string_view src, absl::string_view dest) {
+absl::optional<int> FindMinPathReverse(
+    const std::map<absl::string_view, absl::string_view>& map,
+    absl::string_view src, absl::string_view dest) {
   std::vector<absl::string_view> map_by_len;
   for (const auto& pair : map) map_by_len.push_back(pair.first);
   std::sort(map_by_len.begin(), map_by_len.end(),
-  [](absl::string_view a, absl::string_view b) {
-    if (a.size() != b.size()) return a.size() > b.size();
-    return a < b;
-  });
+            [](absl::string_view a, absl::string_view b) {
+              if (a.size() != b.size()) return a.size() > b.size();
+              return a < b;
+            });
   absl::flat_hash_map<std::string, absl::optional<int>> memo;
   return FindMinPathReverseImpl(map, map_by_len, &memo, src, dest);
 }
