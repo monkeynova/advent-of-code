@@ -22,7 +22,9 @@ nearby tickets:
 25916
 ==
 
+# 1693193837 (low)
+# 5102826630463 (high)
 [part=2]
 @include{advent_of_code/2020/day16/input.txt}
 --
-ERROR: Could not run test: Not implemented
+2564529489989
