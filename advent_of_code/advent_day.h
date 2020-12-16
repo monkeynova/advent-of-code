@@ -15,13 +15,13 @@ class AdventDay {
  public:
   virtual ~AdventDay() = default;
 
-  absl::StatusOr<std::vector<int64_t>> ParseAsInts(
-      absl::Span<absl::string_view> input) const {
+  static absl::StatusOr<std::vector<int64_t>> ParseAsInts(
+      absl::Span<absl::string_view> input) {
     std::vector<int64_t> vals;
     for (int i = 0; i < input.size(); ++i) {
       int64_t v;
       if (!absl::SimpleAtoi(input[i], &v)) {
-        return absl::InvalidArgumentError("parse");
+        return Error("parse as int: ", input[i]);
       }
       vals.push_back(v);
     }
