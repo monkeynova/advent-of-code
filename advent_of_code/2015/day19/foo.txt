@@ -1,0 +1,106 @@
+O { 
+  PBPMg
+}
+CaCaCaSiThCaCaSiThCaCaPBSi {
+  F
+} {
+  F
+}
+CaCaSiThCaCaSiThCaCaCaCaCaCaSi {
+  F : F
+}
+Si {
+  Mg
+}
+CaSi {
+  PTiTiBF : PBF
+}
+Si {
+  CaSi {
+    Ti { 
+      F  
+    } 
+    SiAl
+  }
+  PTiBPTi {
+    CaSiAl
+  }
+  CaPTiTiBPMg : F  
+} 
+PTi { 
+  F
+} 
+Si {
+  CaCaF
+}  {
+  CaF
+} 
+CaSi { 
+  Si { 
+    Mg
+  }
+  F : CaSi {
+    Mg
+  }
+  CaCaSiThP { 
+    F 
+  }
+  PBCaSi {
+     Mg
+  }
+  CaCaSiThCaSi {
+    TiMg
+  }
+  F
+}
+SiThSiThCaCaSi {
+  Mg
+}
+CaCaSi {
+  F
+}
+TiBPTi {
+  CaSiAl
+}
+CaPTi {
+  F
+}
+PBPBCaCaSiThCaPBSiThP {
+  F
+}
+SiThCaSiThCaSiThCaPTiBSi {
+  F : F
+}
+CaCaP {
+  F
+}
+PBCaCaPBSi {
+  Ti { 
+    F
+  }
+  CaP {
+    F
+  }
+  Si {
+    CaCaCaSiThCa { 
+      CaF
+    }
+    : CaSi {
+      F
+    }
+    BCaCaCaSiThF
+  }
+  PBF
+}
+CaSi {
+  F
+} {
+  CaCaCaF
+}
+Si {
+  F
+} 
+Ti {
+  PMg
+}
+F
