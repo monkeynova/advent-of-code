@@ -129,4 +129,58 @@ struct Cardinal {
                                          kSouthWest, kSouthEast};
 };
 
+struct Point3 {
+  int x;
+  int y;
+  int z;
+
+  Point3 operator*(int s) const { return {.x = s * x, .y = s * y, .z = s * z}; }
+
+  bool operator==(const Point3& other) const {
+    return x == other.x && y == other.y && z == other.z;
+  }
+  bool operator!=(const Point3& other) const { return !operator==(other); }
+
+  Point3 operator-(const Point3& other) const {
+    return {.x = x - other.x, .y = y - other.y, .z = z - other.z};
+  }
+
+  Point3 operator+(const Point3& other) const {
+    return {.x = x + other.x, .y = y + other.y, .z = z + other.z};
+  }
+
+  Point3& operator+=(const Point3& other) {
+    x += other.x;
+    y += other.y;
+    z += other.z;
+    return *this;
+  }
+
+  Point3 operator-() const { return {.x = -x, .y = -y, .z = -z}; }
+
+  int dist() const { return abs(x) + abs(y) + abs(z); }
+  int dist(Point3 o) const { return abs(x - o.x) + abs(y - o.y) + abs(z - o.z); }
+
+  std::string DebugString() const { return absl::StrCat("{", x, ",", y, ",", z, "}"); }
+};
+
+Point3 operator*(int s, Point3 p) { return {.x = s * p.x, .y = s * p.y, .z = s * p.z}; }
+
+template <typename H>
+H AbslHashValue(H h, const Point3& p) {
+  return H::combine(std::move(h), p.x, p.y, p.z);
+}
+
+std::ostream& operator<<(std::ostream& out, const Point3& p) {
+  out << "{" << p.x << "," << p.y << "," << p.z << "}";
+  return out;
+}
+
+struct Cardinal3 {
+  static constexpr Point3 kOrigin{0, 0, 0};
+  static constexpr Point3 xHat{1, 0, 0};
+  static constexpr Point3 yHat{0, 1, 0};
+  static constexpr Point3 zHat{0, 0, 1};
+};
+
 #endif  //  ADVENT_OF_CODE_2019_POINT_H

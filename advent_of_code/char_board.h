@@ -27,8 +27,11 @@ struct CharBoard {
     }
   }
 
-  CharBoard(PointRectangle r)
+  explicit CharBoard(PointRectangle r)
       : CharBoard(r.max.x - r.min.x + 1, r.max.y - r.min.y + 1) {}
+    
+  CharBoard(const CharBoard&) = default;
+  CharBoard& operator=(const CharBoard&) = default;
 
   bool operator==(const CharBoard& o) const { return rows == o.rows; }
   bool operator!=(const CharBoard& o) const { return !operator==(o); }

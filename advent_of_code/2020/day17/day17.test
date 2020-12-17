@@ -1,7 +1,15 @@
 [part=1]
+\.#.
+\..#
+\###
+--
+112
+==
+
+[part=1]
 @include{advent_of_code/2020/day17/input.txt}
 --
-ERROR: Could not run test: Not implemented
+384
 ==
 
 [part=2]
