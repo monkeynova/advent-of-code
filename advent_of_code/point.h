@@ -159,7 +159,6 @@ struct Point3 {
   Point3 operator-() const { return {.x = -x, .y = -y, .z = -z}; }
 
   int dist() const { return abs(x) + abs(y) + abs(z); }
-  int dist(Point3 o) const { return abs(x - o.x) + abs(y - o.y) + abs(z - o.z); }
 
   std::string DebugString() const { return absl::StrCat("{", x, ",", y, ",", z, "}"); }
 };
@@ -182,5 +181,62 @@ struct Cardinal3 {
   static constexpr Point3 yHat{0, 1, 0};
   static constexpr Point3 zHat{0, 0, 1};
 };
+
+struct Point4 {
+  int x;
+  int y;
+  int z;
+  int w;
+
+  Point4 operator*(int s) const { return {.x = s * x, .y = s * y, .z = s * z, .w = s * w}; }
+
+  bool operator==(const Point4& other) const {
+    return x == other.x && y == other.y && z == other.z && w == other.w;
+  }
+  bool operator!=(const Point4& other) const { return !operator==(other); }
+
+  Point4 operator-(const Point4& other) const {
+    return {.x = x - other.x, .y = y - other.y, .z = z - other.z, .w = w - other.w};
+  }
+
+  Point4 operator+(const Point4& other) const {
+    return {.x = x + other.x, .y = y + other.y, .z = z + other.z, .w = w + other.w};
+  }
+
+  Point4& operator+=(const Point4& other) {
+    x += other.x;
+    y += other.y;
+    z += other.z;
+    w += other.w;
+    return *this;
+  }
+
+  Point4 operator-() const { return {.x = -x, .y = -y, .z = -z, .w = -w}; }
+
+  int dist() const { return abs(x) + abs(y) + abs(z) + abs(w); }
+
+  std::string DebugString() const { return absl::StrCat("{", x, ",", y, ",", z, ",", w, "}"); }
+};
+
+Point4 operator*(int s, Point4 p) { return {.x = s * p.x, .y = s * p.y, .z = s * p.z, .w = s * p.w}; }
+
+template <typename H>
+H AbslHashValue(H h, const Point4& p) {
+  return H::combine(std::move(h), p.x, p.y, p.z, p.w);
+}
+
+std::ostream& operator<<(std::ostream& out, const Point4& p) {
+  out << "{" << p.x << "," << p.y << "," << p.z << "," << p.w << "}";
+  return out;
+}
+
+struct Cardinal4 {
+  static constexpr Point4 kOrigin{0, 0, 0, 0};
+  static constexpr Point4 xHat{1, 0, 0, 0};
+  static constexpr Point4 yHat{0, 1, 0, 0};
+  static constexpr Point4 zHat{0, 0, 1, 0};
+  static constexpr Point4 wHat{0, 0, 0, 1};
+};
+
 
 #endif  //  ADVENT_OF_CODE_2019_POINT_H

@@ -11,11 +11,11 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
-class Grid {
+class Grid3 {
  public:
-  Grid() = default;
+  Grid3() = default;
 
-  Grid(const CharBoard& char_board) {
+  Grid3(const CharBoard& char_board) {
     for (Point p : char_board.range()) {
       if (char_board[p] == '#') {
         grid_.insert(Point3{p.x, p.y, 0});
@@ -23,8 +23,8 @@ class Grid {
     }
   }
 
-  Grid Step() const {
-    Grid ret;
+  Grid3 Step() const {
+    Grid3 ret;
     absl::flat_hash_map<Point3, int> neighbors;
     for (Point3 p : grid_) {
       // TODO(@monkeynova): xHat should be kXHat.
@@ -54,11 +54,57 @@ class Grid {
   absl::flat_hash_set<Point3> grid_;
 };
 
+class Grid4 {
+ public:
+  Grid4() = default;
+
+  Grid4(const CharBoard& char_board) {
+    for (Point p : char_board.range()) {
+      if (char_board[p] == '#') {
+        grid_.insert(Point4{p.x, p.y, 0, 0});
+      }
+    }
+  }
+
+  Grid4 Step() const {
+    Grid4 ret;
+    absl::flat_hash_map<Point4, int> neighbors;
+    for (Point4 p : grid_) {
+      // TODO(@monkeynova): xHat should be kXHat.
+      for (Point4 xdir : {-Cardinal4::xHat, Cardinal4::kOrigin, Cardinal4::xHat}) {
+        for (Point4 ydir : {-Cardinal4::yHat, Cardinal4::kOrigin, Cardinal4::yHat}) {
+          for (Point4 zdir : {-Cardinal4::zHat, Cardinal4::kOrigin, Cardinal4::zHat}) {
+            for (Point4 wdir : {-Cardinal4::wHat, Cardinal4::kOrigin, Cardinal4::wHat}) {
+              Point4 total_dir = xdir + ydir + zdir + wdir;
+              if (total_dir == Cardinal4::kOrigin) continue;
+              ++neighbors[p + total_dir];
+            }
+          }
+        }
+      }
+    }
+    for (const auto& [point, count] : neighbors) {
+      if (count == 3) ret.grid_.insert(point);
+      else if (grid_.contains(point) && count == 2) ret.grid_.insert(point);
+    }
+
+    return ret;
+  }
+
+  int CountTiles() const {
+    return grid_.size();
+  } 
+  
+ private:
+  absl::flat_hash_set<Point4> grid_;
+};
+
+
 absl::StatusOr<std::vector<std::string>> Day17_2020::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<CharBoard> initial = CharBoard::Parse(input);
   if (!initial.ok()) return initial.status();
-  Grid grid(*initial);
+  Grid3 grid(*initial);
   for (int i = 0; i < 6; ++i) {
     grid = grid.Step();
   }
@@ -67,5 +113,11 @@ absl::StatusOr<std::vector<std::string>> Day17_2020::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day17_2020::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<CharBoard> initial = CharBoard::Parse(input);
+  if (!initial.ok()) return initial.status();
+  Grid4 grid(*initial);
+  for (int i = 0; i < 6; ++i) {
+    grid = grid.Step();
+  }
+  return IntReturn(grid.CountTiles());
 }
