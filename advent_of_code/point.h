@@ -160,10 +160,14 @@ struct Point3 {
 
   int dist() const { return abs(x) + abs(y) + abs(z); }
 
-  std::string DebugString() const { return absl::StrCat("{", x, ",", y, ",", z, "}"); }
+  std::string DebugString() const {
+    return absl::StrCat("{", x, ",", y, ",", z, "}");
+  }
 };
 
-Point3 operator*(int s, Point3 p) { return {.x = s * p.x, .y = s * p.y, .z = s * p.z}; }
+Point3 operator*(int s, Point3 p) {
+  return {.x = s * p.x, .y = s * p.y, .z = s * p.z};
+}
 
 template <typename H>
 H AbslHashValue(H h, const Point3& p) {
@@ -188,7 +192,9 @@ struct Point4 {
   int z;
   int w;
 
-  Point4 operator*(int s) const { return {.x = s * x, .y = s * y, .z = s * z, .w = s * w}; }
+  Point4 operator*(int s) const {
+    return {.x = s * x, .y = s * y, .z = s * z, .w = s * w};
+  }
 
   bool operator==(const Point4& other) const {
     return x == other.x && y == other.y && z == other.z && w == other.w;
@@ -196,11 +202,13 @@ struct Point4 {
   bool operator!=(const Point4& other) const { return !operator==(other); }
 
   Point4 operator-(const Point4& other) const {
-    return {.x = x - other.x, .y = y - other.y, .z = z - other.z, .w = w - other.w};
+    return {
+        .x = x - other.x, .y = y - other.y, .z = z - other.z, .w = w - other.w};
   }
 
   Point4 operator+(const Point4& other) const {
-    return {.x = x + other.x, .y = y + other.y, .z = z + other.z, .w = w + other.w};
+    return {
+        .x = x + other.x, .y = y + other.y, .z = z + other.z, .w = w + other.w};
   }
 
   Point4& operator+=(const Point4& other) {
@@ -215,10 +223,14 @@ struct Point4 {
 
   int dist() const { return abs(x) + abs(y) + abs(z) + abs(w); }
 
-  std::string DebugString() const { return absl::StrCat("{", x, ",", y, ",", z, ",", w, "}"); }
+  std::string DebugString() const {
+    return absl::StrCat("{", x, ",", y, ",", z, ",", w, "}");
+  }
 };
 
-Point4 operator*(int s, Point4 p) { return {.x = s * p.x, .y = s * p.y, .z = s * p.z, .w = s * p.w}; }
+Point4 operator*(int s, Point4 p) {
+  return {.x = s * p.x, .y = s * p.y, .z = s * p.z, .w = s * p.w};
+}
 
 template <typename H>
 H AbslHashValue(H h, const Point4& p) {
@@ -237,6 +249,5 @@ struct Cardinal4 {
   static constexpr Point4 zHat{0, 0, 1, 0};
   static constexpr Point4 wHat{0, 0, 0, 1};
 };
-
 
 #endif  //  ADVENT_OF_CODE_2019_POINT_H

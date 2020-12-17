@@ -29,7 +29,7 @@ struct CharBoard {
 
   explicit CharBoard(PointRectangle r)
       : CharBoard(r.max.x - r.min.x + 1, r.max.y - r.min.y + 1) {}
-    
+
   CharBoard(const CharBoard&) = default;
   CharBoard& operator=(const CharBoard&) = default;
 

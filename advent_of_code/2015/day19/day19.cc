@@ -57,7 +57,8 @@ int FindMinPath(const absl::flat_hash_map<absl::string_view,
       for (int j = 0; j < p.str.size() - src.size() + 1; ++j) {
         if (p.str.substr(j, src.size()) == src) {
           for (absl::string_view test_dest : dest_list) {
-            std::string next = absl::StrCat(p.str.substr(0, j), test_dest, p.str.substr(j + src.size()));
+            std::string next = absl::StrCat(p.str.substr(0, j), test_dest,
+                                            p.str.substr(j + src.size()));
             if (next == dest) return p.dist + 1;
             if (next.size() > dest.size()) continue;
             if (hist.contains(next)) continue;
@@ -153,7 +154,8 @@ absl::optional<int> MatchFromFront(
     VLOG(2) << "Found: " << it->first << " for " << first_elem;
 
     if (dest.substr(0, rule_dest.size()) == rule_dest) {
-      std::string sub_dest = absl::StrCat(rule_src, dest.substr(rule_dest.size()));
+      std::string sub_dest =
+          absl::StrCat(rule_src, dest.substr(rule_dest.size()));
       absl::optional<int> sub_min = MatchFromFront(map, src, sub_dest);
       if (sub_min) {
         if (!min || *min > *sub_min) {
@@ -167,7 +169,8 @@ absl::optional<int> MatchFromFront(
 }
 
 absl::flat_hash_set<absl::string_view> FindTerminalElements(
-  const absl::flat_hash_map<absl::string_view, std::vector<absl::string_view>>& map) {
+    const absl::flat_hash_map<absl::string_view,
+                              std::vector<absl::string_view>>& map) {
   absl::flat_hash_set<absl::string_view> ret;
   for (const auto& [src, dest_list] : map) {
     for (absl::string_view dest : dest_list) {
@@ -208,7 +211,8 @@ void PruneRulesFromTerminals(
         }
         off += first_elem.size();
       }
-      VLOG(2) << "Should prune: "  << src << " => " << dest << " = " << prune_rule;
+      VLOG(2) << "Should prune: " << src << " => " << dest << " = "
+              << prune_rule;
       if (prune_rule) {
         VLOG(1) << "Pruning: " << src << " => " << dest;
         reverse->erase(dest);
@@ -222,7 +226,8 @@ void PruneRulesFromTerminals(
 }
 
 std::vector<absl::string_view> SplitOnTerminalElements(
-  absl::string_view str, const absl::flat_hash_set<absl::string_view>& terminals) {
+    absl::string_view str,
+    const absl::flat_hash_set<absl::string_view>& terminals) {
   std::vector<absl::string_view> ret;
   int last_start = 0;
   for (int off = 0; off < str.size();) {
@@ -237,8 +242,9 @@ std::vector<absl::string_view> SplitOnTerminalElements(
 }
 
 absl::StatusOr<int> MatchFromFrontRnAr(
-  absl::string_view str,
-  const absl::flat_hash_map<absl::string_view, std::vector<absl::string_view>>& map) {
+    absl::string_view str,
+    const absl::flat_hash_map<absl::string_view,
+                              std::vector<absl::string_view>>& map) {
   absl::string_view first_elem = FirstElement(str);
   int off = first_elem.size();
 
@@ -252,16 +258,18 @@ absl::StatusOr<int> MatchFromFrontRnAr(
       int min = std::numeric_limits<int>::max();
       absl::string_view next_start;
       for (const auto& [start, _] : map) {
-        int next_min = FindMinPath(map, start, str.substr(0, off + next_elem.size()));
+        int next_min =
+            FindMinPath(map, start, str.substr(0, off + next_elem.size()));
         if (next_min > 0 && next_min < min) {
           min = next_min;
           next_start = start;
         }
       }
-      VLOG(2) << "MatchFromFrontRnAr: " << str.substr(0, off + next_elem.size()) << " to " << next_start
-              << " takes " << min << " steps.";
+      VLOG(2) << "MatchFromFrontRnAr: " << str.substr(0, off + next_elem.size())
+              << " to " << next_start << " takes " << min << " steps.";
       replace_steps += min;
-      replaced_string = absl::StrCat(next_start, str.substr(off + next_elem.size()));
+      replaced_string =
+          absl::StrCat(next_start, str.substr(off + next_elem.size()));
       str = replaced_string;
       off = next_start.size();
       absl::string_view check_rn = FirstElement(str.substr(off));
@@ -316,7 +324,8 @@ absl::StatusOr<std::vector<std::string>> Day19_2015::Part2(
   // All rules that don't have Rn..Ar add one element.
   // All rules that add Rn..Ar (without Y) add 3.
   // All ruels that add Rn..Y..Ar (with a single Y) add 5.
-  // steps is # of elements - 1 (start) - 2 * count('Ar' == 'Rn') - 2 * count 'Y'.
+  // steps is # of elements - 1 (start) - 2 * count('Ar' == 'Rn') - 2 * count
+  // 'Y'.
   int steps = -1;
   for (int off = 0; off < final.size();) {
     absl::string_view next_elem = FirstElement(final.substr(off));
@@ -330,13 +339,14 @@ absl::StatusOr<std::vector<std::string>> Day19_2015::Part2(
 
   absl::flat_hash_set<absl::string_view> terminals = FindTerminalElements(map);
   VLOG(1) << "Terminal Elements = " << absl::StrJoin(terminals, ",");
-  std::vector<absl::string_view> terminal_split = SplitOnTerminalElements(final, {"Ar"});//terminals);
+  std::vector<absl::string_view> terminal_split =
+      SplitOnTerminalElements(final, {"Ar"});  // terminals);
   VLOG(1) << "Terminal Split = " << absl::StrJoin(terminal_split, ", ");
   PruneRulesFromTerminals(final, terminals, &map, &reverse);
 
   return IntReturn(MatchFromFrontRnAr(final, map));
 
-  //return IntReturn(MatchFromFront(reverse, "e", final));
+  // return IntReturn(MatchFromFront(reverse, "e", final));
 
   return IntReturn(FindMinPath(map, "e", final));
 }
