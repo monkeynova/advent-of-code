@@ -27,18 +27,8 @@ class Grid3 {
     Grid3 ret;
     absl::flat_hash_map<Point3, int> neighbors;
     for (Point3 p : grid_) {
-      // TODO(@monkeynova): xHat should be kXHat.
-      for (Point3 xdir :
-           {-Cardinal3::xHat, Cardinal3::kOrigin, Cardinal3::xHat}) {
-        for (Point3 ydir :
-             {-Cardinal3::yHat, Cardinal3::kOrigin, Cardinal3::yHat}) {
-          for (Point3 zdir :
-               {-Cardinal3::zHat, Cardinal3::kOrigin, Cardinal3::zHat}) {
-            Point3 total_dir = xdir + ydir + zdir;
-            if (total_dir == Cardinal3::kOrigin) continue;
-            ++neighbors[p + total_dir];
-          }
-        }
+      for (Point3 dir : Cardinal3::kNeighborDirs) {
+        ++neighbors[p + dir];
       }
     }
     for (const auto& [point, count] : neighbors) {
@@ -73,21 +63,8 @@ class Grid4 {
     Grid4 ret;
     absl::flat_hash_map<Point4, int> neighbors;
     for (Point4 p : grid_) {
-      // TODO(@monkeynova): xHat should be kXHat.
-      for (Point4 xdir :
-           {-Cardinal4::xHat, Cardinal4::kOrigin, Cardinal4::xHat}) {
-        for (Point4 ydir :
-             {-Cardinal4::yHat, Cardinal4::kOrigin, Cardinal4::yHat}) {
-          for (Point4 zdir :
-               {-Cardinal4::zHat, Cardinal4::kOrigin, Cardinal4::zHat}) {
-            for (Point4 wdir :
-                 {-Cardinal4::wHat, Cardinal4::kOrigin, Cardinal4::wHat}) {
-              Point4 total_dir = xdir + ydir + zdir + wdir;
-              if (total_dir == Cardinal4::kOrigin) continue;
-              ++neighbors[p + total_dir];
-            }
-          }
-        }
+      for (Point4 dir : Cardinal4::kNeighborDirs) {
+        ++neighbors[p + dir];
       }
     }
     for (const auto& [point, count] : neighbors) {

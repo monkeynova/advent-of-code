@@ -185,9 +185,9 @@ absl::StatusOr<int> CostToOverlap(Point intersect,
     if (!on_line.ok()) return on_line.status();
 
     if (*on_line) {
-      return cost_to_start[i] + wire[i].from.dist(intersect);
+      return cost_to_start[i] + (wire[i].from - intersect).dist();
     }
-    cost_to_start[i + 1] = cost_to_start[i] + wire[i].from.dist(wire[i].to);
+    cost_to_start[i + 1] = cost_to_start[i] + (wire[i].from - wire[i].to).dist();
   }
 
   return absl::InvalidArgumentError("Point not found on wire");

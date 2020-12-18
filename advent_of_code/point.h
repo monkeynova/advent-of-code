@@ -1,6 +1,7 @@
 #ifndef ADVENT_OF_CODE_2019_POINT_H
 #define ADVENT_OF_CODE_2019_POINT_H
 
+#include <array>
 #include <iostream>
 #include <numeric>
 
@@ -11,18 +12,18 @@ struct Point {
   int x;
   int y;
 
-  Point operator*(int s) const { return {.x = s * x, .y = s * y}; }
+  constexpr Point operator*(int s) const { return {.x = s * x, .y = s * y}; }
 
-  bool operator==(const Point& other) const {
+  constexpr bool operator==(const Point& other) const {
     return x == other.x && y == other.y;
   }
-  bool operator!=(const Point& other) const { return !operator==(other); }
+  constexpr bool operator!=(const Point& other) const { return !operator==(other); }
 
-  Point operator-(const Point& other) const {
+  constexpr Point operator-(const Point& other) const {
     return {.x = x - other.x, .y = y - other.y};
   }
 
-  Point operator+(const Point& other) const {
+  constexpr Point operator+(const Point& other) const {
     return {.x = x + other.x, .y = y + other.y};
   }
 
@@ -37,7 +38,7 @@ struct Point {
     return {.x = x / gcd, .y = y / gcd};
   }
 
-  Point operator-() const { return {.x = -x, .y = -y}; }
+  constexpr Point operator-() const { return {.x = -x, .y = -y}; }
 
   // Rotate left matrix = [[0, 1], [-1, 0]]
   Point rotate_left() const { return {.x = y, .y = -x}; }
@@ -46,7 +47,6 @@ struct Point {
   Point rotate_right() const { return {.x = -y, .y = x}; }
 
   int dist() const { return abs(x) + abs(y); }
-  int dist(Point o) const { return abs(x - o.x) + abs(y - o.y); }
 
   std::string DebugString() const { return absl::StrCat("{", x, ",", y, "}"); }
 };
@@ -115,15 +115,17 @@ std::ostream& operator<<(std::ostream& out, const PointRectangle& r) {
 
 struct Cardinal {
   static constexpr Point kOrigin{0, 0};
-  static constexpr Point kNorth{0, -1};
-  static constexpr Point kSouth{0, 1};
-  static constexpr Point kWest{-1, 0};
-  static constexpr Point kEast{1, 0};
+  static constexpr Point kXHat{1, 0};
+  static constexpr Point kYHat{0, 1};
+  static constexpr Point kNorth = -kYHat;
+  static constexpr Point kSouth = kYHat;
+  static constexpr Point kWest = -kXHat;
+  static constexpr Point kEast = kXHat;
   static constexpr Point kFourDirs[] = {kNorth, kSouth, kWest, kEast};
-  static constexpr Point kNorthWest{-1, -1};
-  static constexpr Point kNorthEast{1, -1};
-  static constexpr Point kSouthWest{-1, 1};
-  static constexpr Point kSouthEast{1, 1};
+  static constexpr Point kNorthWest = kNorth + kWest;
+  static constexpr Point kNorthEast = kNorth + kEast;
+  static constexpr Point kSouthWest = kSouth + kWest;
+  static constexpr Point kSouthEast = kSouth + kEast;
   static constexpr Point kEightDirs[] = {kNorth,     kSouth,     kWest,
                                          kEast,      kNorthWest, kNorthEast,
                                          kSouthWest, kSouthEast};
@@ -134,18 +136,18 @@ struct Point3 {
   int y;
   int z;
 
-  Point3 operator*(int s) const { return {.x = s * x, .y = s * y, .z = s * z}; }
+  constexpr Point3 operator*(int s) const { return {.x = s * x, .y = s * y, .z = s * z}; }
 
-  bool operator==(const Point3& other) const {
+  constexpr bool operator==(const Point3& other) const {
     return x == other.x && y == other.y && z == other.z;
   }
-  bool operator!=(const Point3& other) const { return !operator==(other); }
+  constexpr bool operator!=(const Point3& other) const { return !operator==(other); }
 
-  Point3 operator-(const Point3& other) const {
+  constexpr Point3 operator-(const Point3& other) const {
     return {.x = x - other.x, .y = y - other.y, .z = z - other.z};
   }
 
-  Point3 operator+(const Point3& other) const {
+  constexpr Point3 operator+(const Point3& other) const {
     return {.x = x + other.x, .y = y + other.y, .z = z + other.z};
   }
 
@@ -156,7 +158,7 @@ struct Point3 {
     return *this;
   }
 
-  Point3 operator-() const { return {.x = -x, .y = -y, .z = -z}; }
+  constexpr Point3 operator-() const { return {.x = -x, .y = -y, .z = -z}; }
 
   int dist() const { return abs(x) + abs(y) + abs(z); }
 
@@ -165,7 +167,7 @@ struct Point3 {
   }
 };
 
-Point3 operator*(int s, Point3 p) {
+constexpr Point3 operator*(int s, Point3 p) {
   return {.x = s * p.x, .y = s * p.y, .z = s * p.z};
 }
 
@@ -181,9 +183,25 @@ std::ostream& operator<<(std::ostream& out, const Point3& p) {
 
 struct Cardinal3 {
   static constexpr Point3 kOrigin{0, 0, 0};
-  static constexpr Point3 xHat{1, 0, 0};
-  static constexpr Point3 yHat{0, 1, 0};
-  static constexpr Point3 zHat{0, 0, 1};
+  static constexpr Point3 kXHat{1, 0, 0};
+  static constexpr Point3 kYHat{0, 1, 0};
+  static constexpr Point3 kZHat{0, 0, 1};
+  static constexpr std::array<Point3, 3 * 3 * 3 - 1> kNeighborDirs = []() constexpr {
+    std::array<Point3, 3 * 3 * 3 - 1> ret{};
+    int i = 0;
+    for (Point3 xdir :
+         {-Cardinal3::kXHat, Cardinal3::kOrigin, Cardinal3::kXHat}) {
+      for (Point3 ydir :
+           {-Cardinal3::kYHat, Cardinal3::kOrigin, Cardinal3::kYHat}) {
+        for (Point3 zdir :
+             {-Cardinal3::kZHat, Cardinal3::kOrigin, Cardinal3::kZHat}) {
+          Point3 next = xdir + ydir + zdir;
+          if (next != Cardinal3::kOrigin) ret[i++] = next;
+        }
+      }
+    }
+    return ret;
+  }();
 };
 
 struct Point4 {
@@ -192,21 +210,21 @@ struct Point4 {
   int z;
   int w;
 
-  Point4 operator*(int s) const {
+  constexpr Point4 operator*(int s) const {
     return {.x = s * x, .y = s * y, .z = s * z, .w = s * w};
   }
 
-  bool operator==(const Point4& other) const {
+  constexpr bool operator==(const Point4& other) const {
     return x == other.x && y == other.y && z == other.z && w == other.w;
   }
-  bool operator!=(const Point4& other) const { return !operator==(other); }
+  constexpr bool operator!=(const Point4& other) const { return !operator==(other); }
 
-  Point4 operator-(const Point4& other) const {
+  constexpr Point4 operator-(const Point4& other) const {
     return {
         .x = x - other.x, .y = y - other.y, .z = z - other.z, .w = w - other.w};
   }
 
-  Point4 operator+(const Point4& other) const {
+  constexpr Point4 operator+(const Point4& other) const {
     return {
         .x = x + other.x, .y = y + other.y, .z = z + other.z, .w = w + other.w};
   }
@@ -219,7 +237,7 @@ struct Point4 {
     return *this;
   }
 
-  Point4 operator-() const { return {.x = -x, .y = -y, .z = -z, .w = -w}; }
+  constexpr Point4 operator-() const { return {.x = -x, .y = -y, .z = -z, .w = -w}; }
 
   int dist() const { return abs(x) + abs(y) + abs(z) + abs(w); }
 
@@ -228,7 +246,7 @@ struct Point4 {
   }
 };
 
-Point4 operator*(int s, Point4 p) {
+constexpr Point4 operator*(int s, Point4 p) {
   return {.x = s * p.x, .y = s * p.y, .z = s * p.z, .w = s * p.w};
 }
 
@@ -244,10 +262,29 @@ std::ostream& operator<<(std::ostream& out, const Point4& p) {
 
 struct Cardinal4 {
   static constexpr Point4 kOrigin{0, 0, 0, 0};
-  static constexpr Point4 xHat{1, 0, 0, 0};
-  static constexpr Point4 yHat{0, 1, 0, 0};
-  static constexpr Point4 zHat{0, 0, 1, 0};
-  static constexpr Point4 wHat{0, 0, 0, 1};
+  static constexpr Point4 kXHat{1, 0, 0, 0};
+  static constexpr Point4 kYHat{0, 1, 0, 0};
+  static constexpr Point4 kZHat{0, 0, 1, 0};
+  static constexpr Point4 kWHat{0, 0, 0, 1};
+  static constexpr std::array<Point4, 3 * 3 * 3 * 3 - 1> kNeighborDirs = []() constexpr {
+    std::array<Point4, 3 * 3 * 3 * 3 - 1> ret{};
+    int i = 0;
+    for (Point4 xdir :
+         {-Cardinal4::kXHat, Cardinal4::kOrigin, Cardinal4::kXHat}) {
+      for (Point4 ydir :
+           {-Cardinal4::kYHat, Cardinal4::kOrigin, Cardinal4::kYHat}) {
+        for (Point4 zdir :
+             {-Cardinal4::kZHat, Cardinal4::kOrigin, Cardinal4::kZHat}) {
+          for (Point4 wdir :
+               {-Cardinal4::kWHat, Cardinal4::kOrigin, Cardinal4::kWHat}) {
+            Point4 next = xdir + ydir + zdir + wdir;
+            if (next != Cardinal4::kOrigin) ret[i++] = next;
+          }
+        }
+      }
+    }
+    return ret;
+  }();
 };
 
 #endif  //  ADVENT_OF_CODE_2019_POINT_H
