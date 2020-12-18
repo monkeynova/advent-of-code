@@ -29,10 +29,14 @@ class Val : public ExprTree {
 
 class Mult : public ExprTree {
  public:
-  Mult(std::unique_ptr<ExprTree> left, std::unique_ptr<ExprTree>right) : left_(std::move(left)), right_(std::move(right)) {}
+  Mult(std::unique_ptr<ExprTree> left, std::unique_ptr<ExprTree> right)
+      : left_(std::move(left)), right_(std::move(right)) {}
 
   int64_t Eval() override { return left_->Eval() * right_->Eval(); }
-  std::string DebugString() override { return absl::StrCat("(", left_->DebugString(), "*", right_->DebugString(), ")"); }
+  std::string DebugString() override {
+    return absl::StrCat("(", left_->DebugString(), "*", right_->DebugString(),
+                        ")");
+  }
 
  private:
   std::unique_ptr<ExprTree> left_;
@@ -41,10 +45,14 @@ class Mult : public ExprTree {
 
 class Add : public ExprTree {
  public:
-  Add(std::unique_ptr<ExprTree> left, std::unique_ptr<ExprTree> right) : left_(std::move(left)), right_(std::move(right)) {}
+  Add(std::unique_ptr<ExprTree> left, std::unique_ptr<ExprTree> right)
+      : left_(std::move(left)), right_(std::move(right)) {}
 
   int64_t Eval() override { return left_->Eval() + right_->Eval(); }
-  std::string DebugString() override { return absl::StrCat("(", left_->DebugString(), "+", right_->DebugString(), ")"); }
+  std::string DebugString() override {
+    return absl::StrCat("(", left_->DebugString(), "+", right_->DebugString(),
+                        ")");
+  }
 
  private:
   std::unique_ptr<ExprTree> left_;
@@ -87,14 +95,17 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree(absl::string_view* str) {
     if (!next_val.ok()) return next_val.status();
     switch (op) {
       case '+': {
-        last_val = absl::make_unique<Add>(std::move(*last_val), std::move(*next_val));
+        last_val =
+            absl::make_unique<Add>(std::move(*last_val), std::move(*next_val));
         break;
       }
       case '*': {
-        last_val = absl::make_unique<Mult>(std::move(*last_val), std::move(*next_val));
+        last_val =
+            absl::make_unique<Mult>(std::move(*last_val), std::move(*next_val));
         break;
       }
-      default: return AdventDay::Error("Bad op: ", *str);
+      default:
+        return AdventDay::Error("Bad op: ", *str);
     }
   }
   return last_val;
@@ -140,7 +151,8 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseAddTree(absl::string_view* str) {
     if (op != '+') return AdventDay::Error("Not add: ", *str);
     *str = str->substr(1);
     absl::StatusOr<std::unique_ptr<ExprTree>> next_val = ParseValue2(str);
-    last_val = absl::make_unique<Add>(std::move(*last_val), std::move(*next_val));
+    last_val =
+        absl::make_unique<Add>(std::move(*last_val), std::move(*next_val));
   }
   return last_val;
 }
@@ -154,7 +166,8 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseMulTree(absl::string_view* str) {
     if (op != '*') return AdventDay::Error("Not mult: ", *str);
     *str = str->substr(1);
     absl::StatusOr<std::unique_ptr<ExprTree>> next_val = ParseAddTree(str);
-    last_val = absl::make_unique<Mult>(std::move(*last_val), std::move(*next_val));
+    last_val =
+        absl::make_unique<Mult>(std::move(*last_val), std::move(*next_val));
   }
   return last_val;
 }
