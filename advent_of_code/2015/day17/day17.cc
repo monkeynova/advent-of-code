@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day17_2015::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> cap = ParseAsInts(input);
@@ -56,3 +59,5 @@ absl::StatusOr<std::vector<std::string>> Day17_2015::Part2(
 
   return IntReturn(valid);
 }
+
+}  // namespace advent_of_code

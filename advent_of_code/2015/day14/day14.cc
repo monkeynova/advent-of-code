@@ -10,6 +10,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 struct Flight {
   absl::string_view name;
   int speed;
@@ -41,6 +44,8 @@ RaceResult RunRace(const std::vector<Flight>& flights, int time) {
   }
   return res;
 }
+
+}  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day14_2015::Part1(
     absl::Span<absl::string_view> input) const {
@@ -87,3 +92,5 @@ absl::StatusOr<std::vector<std::string>> Day14_2015::Part2(
   }
   return IntReturn(max);
 }
+
+}  // namespace advent_of_code

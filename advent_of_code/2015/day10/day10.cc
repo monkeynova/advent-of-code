@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 std::string LookAndSay(absl::string_view input) {
   std::string out;
   for (int i = 0; i < input.size();) {
@@ -21,6 +24,8 @@ std::string LookAndSay(absl::string_view input) {
   }
   return out;
 }
+
+}  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day10_2015::Part1(
     absl::Span<absl::string_view> input) const {
@@ -43,3 +48,5 @@ absl::StatusOr<std::vector<std::string>> Day10_2015::Part2(
   }
   return IntReturn(str.size());
 }
+
+}  // namespace advent_of_code

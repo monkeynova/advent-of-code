@@ -9,6 +9,8 @@
 #include "gtest/gtest.h"
 #include "main_lib.h"
 
+namespace advent_of_code {
+
 std::string TestCaseFileName();
 std::vector<int> TestCaseLines();
 
@@ -29,3 +31,4 @@ class FileTest : public ::testing::Test {
 };
 
 #endif  //  ADVENT_OF_CODE_FILE_TEST_H
+}  // namespace advent_of_code

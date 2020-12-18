@@ -8,6 +8,9 @@
 #include "absl/strings/str_split.h"
 #include "glog/logging.h"
 
+namespace advent_of_code {
+namespace {
+
 struct Ingredient {
   std::string name;
   int quantity;
@@ -161,6 +164,8 @@ absl::StatusOr<int> FuelFromOre(const RuleSet& rule_set, uint64_t ore_supply) {
   return guess;
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day14_2019::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<RuleSet> rule_set = ParseRuleSet(input);
@@ -184,3 +189,5 @@ absl::StatusOr<std::vector<std::string>> Day14_2019::Part2(
 
   return IntReturn(FuelFromOre(*rule_set, 1000000000000));
 }
+
+}  // namespace advent_of_code

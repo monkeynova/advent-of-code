@@ -3,6 +3,9 @@
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
 
+namespace advent_of_code {
+namespace {}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day01_2019::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> costs = ParseAsInts(input);
@@ -36,3 +39,5 @@ absl::StatusOr<std::vector<std::string>> Day01_2019::Part2(
 
   return IntReturn(total_fuel);
 }
+
+}  // namespace advent_of_code

@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 absl::StatusOr<int> ParseAndCountNonRed(absl::string_view* json,
                                         bool* is_red = nullptr) {
   if (is_red) *is_red = false;
@@ -82,6 +85,8 @@ absl::StatusOr<int> ParseAndCountNonRed(absl::string_view* json,
   return AdventDay::Error("Cannot handle: ", *json);
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day12_2015::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
@@ -104,3 +109,5 @@ absl::StatusOr<std::vector<std::string>> Day12_2015::Part2(
 
   return IntReturn(*ret);
 }
+
+}  // namespace advent_of_code

@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 struct Ingredient {
   absl::string_view name;
   int64_t capacity = 0;
@@ -91,6 +94,8 @@ int64_t FindBestScoreRequiredCalories(absl::Span<Ingredient> ingredients,
   return max;
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day15_2015::Part1(
     absl::Span<absl::string_view> input) const {
   // Sprinkles: capacity 5, durability -1, flavor 0, texture 0, calories 5
@@ -129,3 +134,5 @@ absl::StatusOr<std::vector<std::string>> Day15_2015::Part2(
   return IntReturn(
       FindBestScoreRequiredCalories(absl::MakeSpan(ingredients), 100, 500));
 }
+
+}  // namespace advent_of_code

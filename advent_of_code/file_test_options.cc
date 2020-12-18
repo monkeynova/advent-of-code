@@ -2,6 +2,8 @@
 
 #include "re2/re2.h"
 
+namespace advent_of_code {
+
 void SetupTestCaseOptions(file_based_test_driver::TestCaseOptions* options) {
   options->RegisterInt64(kPartOption, 0);
   options->RegisterBool(kIgnoreOption, false);
@@ -35,3 +37,5 @@ absl::StatusOr<absl::Duration> ParseLongTestDuration(
 
   return ret;
 }
+
+}  // namespace advent_of_code

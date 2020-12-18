@@ -14,6 +14,8 @@ ABSL_FLAG(std::string, test_file, "",
 ABSL_FLAG(absl::Duration, run_long_tests, absl::Seconds(0),
           "Unless true, tests marked [long=$reason] will be ignored");
 
+namespace advent_of_code {
+
 struct DirtyTestParseResult {
   int part;
   std::string test;
@@ -137,3 +139,5 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
     }
   }
 }
+
+}  // namespace advent_of_code

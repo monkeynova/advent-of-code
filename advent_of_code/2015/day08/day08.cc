@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day08_2015::Part1(
     absl::Span<absl::string_view> input) const {
   int delta = 0;
@@ -48,3 +51,5 @@ absl::StatusOr<std::vector<std::string>> Day08_2015::Part2(
   }
   return IntReturn(delta);
 }
+
+}  // namespace advent_of_code

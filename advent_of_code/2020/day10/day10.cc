@@ -8,6 +8,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day10_2020::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> jolts = ParseAsInts(input);
@@ -60,3 +63,5 @@ absl::StatusOr<std::vector<std::string>> Day10_2020::Part2(
   // TODO(@monkeynova): Maybe handle if max is not unique.
   return IntReturn(CountValidArrangements(*jolts, &memo, 0, 0));
 }
+
+}  // namespace advent_of_code

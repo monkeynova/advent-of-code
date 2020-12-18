@@ -11,6 +11,8 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+
 static absl::Status NullFreeString(absl::string_view str,
                                    std::string* out_str) {
   if (str.find('\0') != absl::string_view::npos) {
@@ -77,3 +79,5 @@ absl::Status HandleTestIncludes(std::string* test_case) {
   }
   return absl::OkStatus();
 }
+
+}  // namespace advent_of_code

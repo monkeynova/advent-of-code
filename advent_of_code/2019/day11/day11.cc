@@ -9,6 +9,9 @@
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 
+namespace advent_of_code {
+namespace {
+
 class Painter : public IntCode::IOModule {
  public:
   bool PauseIntCode() override { return false; }
@@ -64,6 +67,8 @@ class Painter : public IntCode::IOModule {
   absl::flat_hash_map<Point, int> panel_to_painted_color_;
 };
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day11_2019::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
@@ -86,3 +91,5 @@ absl::StatusOr<std::vector<std::string>> Day11_2019::Part2(
 
   return painter.Panels().rows;
 }
+
+}  // namespace advent_of_code

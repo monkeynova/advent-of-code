@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 struct Transform {
   absl::uint128 mult;
   absl::uint128 add;
@@ -100,6 +103,8 @@ absl::StatusOr<std::pair<Transform, Transform>> CreateTransform(
   return std::make_pair(t, inv_t);
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day22_2019::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::pair<Transform, Transform>> pair =
@@ -128,3 +133,4 @@ absl::StatusOr<std::vector<std::string>> Day22_2019::Part2(
   }
   return IntReturn(full_reverse_transform.Apply(2020));
 }
+}  // namespace advent_of_code

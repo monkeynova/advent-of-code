@@ -7,6 +7,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 absl::StatusOr<absl::flat_hash_map<std::string, std::vector<std::string>>>
 ParseOrbits(absl::Span<absl::string_view> input) {
   absl::flat_hash_map<std::string, std::vector<std::string>> orbits;
@@ -75,6 +78,8 @@ TransferRet FindTransfer(
   return ret;
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day06_2019::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<std::string, std::vector<std::string>>>
@@ -94,3 +99,5 @@ absl::StatusOr<std::vector<std::string>> Day06_2019::Part2(
   TransferRet transfer = FindTransfer(*orbits, "COM", "YOU", "SAN");
   return IntReturn(transfer.transfer_size);
 }
+
+}  // namespace advent_of_code

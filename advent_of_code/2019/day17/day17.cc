@@ -11,6 +11,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 struct Program {
   std::string main;
   std::string a;
@@ -296,6 +299,8 @@ class ViewPort : public IntCode::IOModule {
   int64_t dust_collected_ = -1;
 };
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day17_2019::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
@@ -324,3 +329,5 @@ absl::StatusOr<std::vector<std::string>> Day17_2019::Part2(
 
   return IntReturn(view_port.dust_collected());
 }
+
+}  // namespace advent_of_code

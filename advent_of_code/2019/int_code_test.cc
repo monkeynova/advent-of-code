@@ -14,6 +14,8 @@
 ABSL_FLAG(std::string, test_file, "",
           "The file which contains the file based test driver tests");
 
+namespace advent_of_code {
+
 constexpr char kInputOption[] = "input";
 
 void RunTestCase(absl::string_view test_case_with_options,
@@ -67,3 +69,5 @@ TEST(IntCodeTest, FileBasedTest) {
   EXPECT_TRUE(file_based_test_driver::RunTestCasesFromFiles(
       absl::GetFlag(FLAGS_test_file), &RunTestCase));
 }
+
+}  // namespace advent_of_code

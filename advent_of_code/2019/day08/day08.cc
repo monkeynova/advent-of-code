@@ -5,6 +5,9 @@
 #include "absl/strings/str_split.h"
 #include "glog/logging.h"
 
+namespace advent_of_code {
+namespace {}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day08_2019::Part1(
     absl::Span<absl::string_view> input) const {
   const int kWidth = 25;
@@ -77,3 +80,5 @@ absl::StatusOr<std::vector<std::string>> Day08_2019::Part2(
 
   return ret;
 }
+
+}  // namespace advent_of_code

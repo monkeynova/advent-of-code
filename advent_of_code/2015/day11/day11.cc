@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 void Increment(std::string* password) {
   for (int i = password->size() - 1; i >= 0; --i) {
     if (++(*password)[i] != 'z' + 1) break;
@@ -46,6 +49,8 @@ bool IsValid(absl::string_view password) {
   return true;
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day11_2015::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
@@ -69,3 +74,5 @@ absl::StatusOr<std::vector<std::string>> Day11_2015::Part2(
 
   return std::vector<std::string>{password};
 }
+
+}  // namespace advent_of_code

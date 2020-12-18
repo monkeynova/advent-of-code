@@ -8,6 +8,9 @@
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 
+namespace advent_of_code {
+namespace {
+
 struct Line {
   Point from;
   Point to;
@@ -142,6 +145,8 @@ absl::StatusOr<std::vector<Point>> Intersect(std::vector<Line> wire1,
   return ret;
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day03_2019::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 2) {
@@ -229,3 +234,5 @@ absl::StatusOr<std::vector<std::string>> Day03_2019::Part2(
 
   return IntReturn(min_score);
 }
+
+}  // namespace advent_of_code

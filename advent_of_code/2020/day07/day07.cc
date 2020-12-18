@@ -8,6 +8,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 struct BagRule {
   std::string color;
   int count;
@@ -48,6 +51,8 @@ absl::StatusOr<int> CountContainedBags(
   }
   return bag_count;
 }
+
+}  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day07_2020::Part1(
     absl::Span<absl::string_view> input) const {
@@ -111,3 +116,5 @@ absl::StatusOr<std::vector<std::string>> Day07_2020::Part2(
   if (!bags.ok()) return bags.status();
   return IntReturn(*bags - 1); /* don't include top bag */
 }
+
+}  // namespace advent_of_code

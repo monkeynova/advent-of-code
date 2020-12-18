@@ -10,6 +10,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 struct CostPair {
   absl::string_view from;
   absl::string_view to;
@@ -86,6 +89,8 @@ absl::StatusOr<int> FindBestSeating(const CostMap& cost_map) {
   return BestFillRemainingSeats(cost_map, 0, &seating, &seated);
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day13_2015::Part1(
     absl::Span<absl::string_view> input) const {
   // Alice would gain 2 happiness units by sitting next to Bob.
@@ -145,3 +150,5 @@ absl::StatusOr<std::vector<std::string>> Day13_2015::Part2(
 
   return IntReturn(FindBestSeating(cost_map));
 }
+
+}  // namespace advent_of_code

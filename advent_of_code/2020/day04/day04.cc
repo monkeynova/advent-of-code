@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 absl::Status Valid(
     const absl::flat_hash_map<std::string, std::string>& passport) {
   for (absl::string_view test :
@@ -70,6 +73,8 @@ absl::Status Valid2(absl::flat_hash_map<std::string, std::string> passport) {
   ;
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day04_2020::Part1(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<std::string, std::string> passport;
@@ -123,3 +128,5 @@ absl::StatusOr<std::vector<std::string>> Day04_2020::Part2(
   }
   return IntReturn(valid);
 }
+
+}  // namespace advent_of_code

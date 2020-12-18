@@ -8,6 +8,9 @@
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 
+namespace advent_of_code {
+namespace {
+
 struct Board {
   absl::flat_hash_set<Point> asteroids;
   int width;
@@ -78,6 +81,8 @@ absl::StatusOr<Board> ParseBoard(absl::Span<absl::string_view> input) {
   return ret;
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day10_2019::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<Board> asteroids = ParseBoard(input);
@@ -130,3 +135,5 @@ absl::StatusOr<std::vector<std::string>> Day10_2019::Part2(
   int ret = ordered_destruct[199].p.x * 100 + ordered_destruct[199].p.y;
   return IntReturn(ret);
 }
+
+}  // namespace advent_of_code

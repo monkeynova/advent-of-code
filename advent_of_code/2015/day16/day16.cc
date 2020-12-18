@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day16_2015::Part1(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<absl::string_view, int> features = {
@@ -66,3 +69,5 @@ absl::StatusOr<std::vector<std::string>> Day16_2015::Part2(
   if (aunts.size() != 1) return Error("Aunt not unique: ", aunts.size());
   return IntReturn(*aunts.begin());
 }
+
+}  // namespace advent_of_code

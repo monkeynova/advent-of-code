@@ -6,11 +6,16 @@
 #include "advent_of_code/2019/int_code.h"
 #include "glog/logging.h"
 
+namespace advent_of_code {
+namespace {
+
 absl::Status CorrectBoard(IntCode* codes, int noun, int verb) {
   if (absl::Status st = codes->Poke(1, noun); !st.ok()) return st;
   if (absl::Status st = codes->Poke(2, verb); !st.ok()) return st;
   return absl::OkStatus();
 }
+
+}  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day02_2019::Part1(
     absl::Span<absl::string_view> input) const {
@@ -43,3 +48,5 @@ absl::StatusOr<std::vector<std::string>> Day02_2019::Part2(
   }
   return absl::NotFoundError("Culd not find value");
 }
+
+}  // namespace advent_of_code

@@ -10,6 +10,9 @@
 #include "advent_of_code/2019/int_code.h"
 #include "glog/logging.h"
 
+namespace advent_of_code {
+namespace {
+
 absl::StatusOr<int> FindBestThrust(const IntCode& base_codes, int input_value,
                                    int index = 0,
                                    // Copy since we're going to mutate.
@@ -37,6 +40,8 @@ absl::StatusOr<int> FindBestThrust(const IntCode& base_codes, int input_value,
   }
   return best_thrust;
 }
+
+}  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day07_2019::Part1(
     absl::Span<absl::string_view> input) const {
@@ -151,3 +156,5 @@ absl::StatusOr<std::vector<std::string>> Day07_2019::Part2(
 
   return IntReturn(FindBestThrustFeedback(*codes));
 }
+
+}  // namespace advent_of_code

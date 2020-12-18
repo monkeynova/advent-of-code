@@ -11,6 +11,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 class Drone : public IntCode::IOModule {
  public:
   Drone(Point probe) : probe_(probe), state_(State::kFetchX) {}
@@ -185,6 +188,8 @@ class TractorSearch {
   IntCode codes_;
 };
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day19_2019::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
@@ -206,3 +211,5 @@ absl::StatusOr<std::vector<std::string>> Day19_2019::Part2(
 
   return IntReturn(space->x * 10000 + space->y);
 }
+
+}  // namespace advent_of_code

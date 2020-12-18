@@ -8,6 +8,8 @@
 #include "absl/hash/hash.h"
 #include "absl/strings/str_cat.h"
 
+namespace advent_of_code {
+
 struct Point {
   int x;
   int y;
@@ -301,4 +303,6 @@ struct Cardinal4 {
   ();
 };
 
-#endif  //  ADVENT_OF_CODE_2019_POINT_H
+}  // namespace advent_of_code
+
+#endif  // ADVENT_OF_CODE_2019_POINT_H

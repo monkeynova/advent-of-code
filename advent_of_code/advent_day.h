@@ -8,6 +8,8 @@
 #include "absl/strings/str_cat.h"
 #include "absl/types/span.h"
 
+namespace advent_of_code {
+
 // TODO(@monkeynova): Move from const std::vector<...>& to absl::Span.
 //                    That would allow children to mutate as they
 //                    process.
@@ -54,5 +56,7 @@ class AdventDay {
   virtual absl::StatusOr<std::vector<std::string>> Part2(
       absl::Span<absl::string_view> input) const = 0;
 };
+
+}  // namespace advent_of_code
 
 #endif  // ADVENT_OF_CODE_ADVENT_DAY_H

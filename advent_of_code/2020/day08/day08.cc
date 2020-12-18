@@ -8,6 +8,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 class BootCode {
  public:
   enum class Instruction { kJmp = 0, kAcc = 1, kNop = 2 };
@@ -76,6 +79,8 @@ absl::StatusOr<bool> BootCode::Execute() {
   return false;
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day08_2020::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<BootCode> boot_code = BootCode::Parse(input);
@@ -111,3 +116,5 @@ absl::StatusOr<std::vector<std::string>> Day08_2020::Part2(
 
   return absl::InvalidArgumentError("No version terminated");
 }
+
+}  // namespace advent_of_code

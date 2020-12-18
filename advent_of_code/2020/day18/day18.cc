@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 class ExprTree {
  public:
   virtual ~ExprTree() = default;
@@ -182,6 +185,8 @@ absl::StatusOr<std::unique_ptr<ExprTree>> Parse2(absl::string_view str) {
   return ret;
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day18_2020::Part1(
     absl::Span<absl::string_view> input) const {
   int64_t sum = 0;
@@ -204,3 +209,5 @@ absl::StatusOr<std::vector<std::string>> Day18_2020::Part2(
   }
   return IntReturn(sum);
 }
+
+}  // namespace advent_of_code

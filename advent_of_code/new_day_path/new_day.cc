@@ -13,6 +13,8 @@ namespace advent_of_code {
 
 namespace {
 
+// Helper methods go here.
+
 }  // namespace
 
 absl::StatusOr<std::vector<std::string>> NewDay::Part1(

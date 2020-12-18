@@ -11,6 +11,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 class Grid3 {
  public:
   Grid3() = default;
@@ -83,6 +86,8 @@ class Grid4 {
   absl::flat_hash_set<Point4> grid_;
 };
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day17_2020::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<CharBoard> initial = CharBoard::Parse(input);
@@ -104,3 +109,5 @@ absl::StatusOr<std::vector<std::string>> Day17_2020::Part2(
   }
   return IntReturn(grid.CountTiles());
 }
+
+}  // namespace advent_of_code

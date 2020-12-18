@@ -3,6 +3,9 @@
 #include "glog/logging.h"
 #include "main_lib.h"
 
+namespace advent_of_code {
+namespace {
+
 class Terminal : public IntCode::IOModule {
  public:
   bool PauseIntCode() override { return done_; }
@@ -37,7 +40,7 @@ class Terminal : public IntCode::IOModule {
   std::string output_;
 };
 
-int main(int argc, char** argv) {
+int RunInteractive(int argc, char** argv) {
   std::vector<char*> args = InitMain(argc, argv);
   if (args.size() != 2) {
     LOG(FATAL) << "Usage:\n" << args[0] << " <file>";
@@ -57,4 +60,11 @@ int main(int argc, char** argv) {
     LOG(FATAL) << st.message();
   }
   return 0;
+}
+
+}  // namespace
+}  // namespace advent_of_code
+
+int main(int argc, char** argv) {
+  return advent_of_code::RunInteractive(argc, argv);
 }

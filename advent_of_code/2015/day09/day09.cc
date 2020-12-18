@@ -10,6 +10,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 struct Route {
   absl::string_view src;
   absl::string_view dst;
@@ -92,6 +95,8 @@ absl::optional<int> LongestAllVisit(
   return *max;
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day09_2015::Part1(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<absl::string_view, std::vector<Route>> src_routes;
@@ -121,3 +126,5 @@ absl::StatusOr<std::vector<std::string>> Day09_2015::Part2(
   }
   return IntReturn(LongestAllVisit(src_routes));
 }
+
+}  // namespace advent_of_code

@@ -8,6 +8,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 absl::StatusOr<int> FindMissingXMASPair(const std::vector<int64_t>& vals) {
   absl::flat_hash_set<int64_t> hist;
   if (vals.size() < 26) return absl::InvalidArgumentError("Too short");
@@ -51,6 +54,8 @@ absl::StatusOr<int> FindContiguousRangeMinMaxSum(
   return absl::InvalidArgumentError("Not found");
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day09_2020::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> vals = ParseAsInts(input);
@@ -66,3 +71,5 @@ absl::StatusOr<std::vector<std::string>> Day09_2020::Part2(
   if (!missing.ok()) return missing.status();
   return IntReturn(FindContiguousRangeMinMaxSum(*vals, *missing));
 }
+
+}  // namespace advent_of_code

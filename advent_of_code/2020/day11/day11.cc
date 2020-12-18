@@ -11,6 +11,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 CharBoard Update(CharBoard in) {
   CharBoard out(in);
   for (Point c : in.range()) {
@@ -79,6 +82,8 @@ CharBoard Update2(CharBoard in, const VisMap& vis_map) {
   return out;
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day11_2020::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<CharBoard> parsed = CharBoard::Parse(input);
@@ -109,3 +114,5 @@ absl::StatusOr<std::vector<std::string>> Day11_2020::Part2(
   }
   return IntReturn(CountSeats(cur));
 }
+
+}  // namespace advent_of_code

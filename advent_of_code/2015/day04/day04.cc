@@ -10,6 +10,9 @@
 #include "re2/re2.h"
 #include "third_party/md5/md5.h"
 
+namespace advent_of_code {
+namespace {
+
 std::string Hex(absl::string_view buf) {
   static char hexchar[] = {'0', '1', '2', '3', '4', '5', '6', '7',
                            '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
@@ -19,6 +22,8 @@ std::string Hex(absl::string_view buf) {
     absl::StrAppend(out, tmp);
   });
 }
+
+}  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day04_2015::Part1(
     absl::Span<absl::string_view> input) const {
@@ -59,3 +64,5 @@ absl::StatusOr<std::vector<std::string>> Day04_2015::Part2(
   }
   return absl::InvalidArgumentError("Unreachable");
 }
+
+}  // namespace advent_of_code

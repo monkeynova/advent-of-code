@@ -10,6 +10,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 // TODO(@monkeynova): Move to CharBoard.
 
 bool IsCapAlpha(char c) { return c >= 'A' && c <= 'Z'; }
@@ -180,6 +183,8 @@ class Maze {
   Point end_;
 };
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day20_2019::Part1(
     absl::Span<absl::string_view> input) const {
   Maze maze(input);
@@ -195,3 +200,5 @@ absl::StatusOr<std::vector<std::string>> Day20_2019::Part2(
 
   return IntReturn(maze.FindRecursivePath());
 }
+
+}  // namespace advent_of_code

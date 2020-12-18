@@ -11,6 +11,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 CharBoard RunStep(const CharBoard& in) {
   CharBoard out = in;
   for (Point p : in.range()) {
@@ -61,6 +64,8 @@ int CountOn(const CharBoard& in) {
   return on;
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day18_2015::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
@@ -84,3 +89,5 @@ absl::StatusOr<std::vector<std::string>> Day18_2015::Part2(
   }
   return IntReturn(CountOn(cur));
 }
+
+}  // namespace advent_of_code

@@ -8,6 +8,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day06_2020::Part1(
     absl::Span<absl::string_view> input) const {
   int group_sum = 0;
@@ -57,3 +60,5 @@ absl::StatusOr<std::vector<std::string>> Day06_2020::Part2(
   group_sum += all_yes;
   return IntReturn(group_sum);
 }
+
+}  // namespace advent_of_code

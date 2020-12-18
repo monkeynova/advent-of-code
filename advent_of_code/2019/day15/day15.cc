@@ -10,6 +10,9 @@
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 
+namespace advent_of_code {
+namespace {
+
 class Droid : public IntCode::IOModule {
  public:
   Droid() {
@@ -252,6 +255,8 @@ class Droid : public IntCode::IOModule {
   absl::flat_hash_map<Point, int> board_;
 };
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day15_2019::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
@@ -281,3 +286,5 @@ absl::StatusOr<std::vector<std::string>> Day15_2019::Part2(
 
   return IntReturn(droid.GreatestDistanceFromO2());
 }
+
+}  // namespace advent_of_code

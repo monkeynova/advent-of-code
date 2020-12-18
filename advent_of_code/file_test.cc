@@ -17,6 +17,8 @@ ABSL_FLAG(std::string, test_file, "",
 ABSL_FLAG(absl::Duration, run_long_tests, absl::Seconds(0),
           "Unless true, tests marked [long=$reason] will be ignored");
 
+namespace advent_of_code {
+
 std::string TestCaseFileName() { return absl::GetFlag(FLAGS_test_file); }
 
 static void CollectLines(
@@ -98,3 +100,5 @@ void RunTestCase(const AdventDay* advent_day,
   }
   test_result->AddTestOutput(absl::StrJoin(*output, "\n"));
 }
+
+}  // namespace advent_of_code

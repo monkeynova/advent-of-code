@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 // Problem could be solved with a sparse matrix multiply and expontentiation.
 // 100 = 64 + 32 + 4. M^2^2^2^2^2^2 * M^2^2^2^2^2 * M^2^2.
 
@@ -123,6 +126,8 @@ std::string RunPhase(int phase, absl::string_view input, int min_position) {
   return ret;
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day16_2019::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Need only 1 line");
@@ -159,3 +164,5 @@ absl::StatusOr<std::vector<std::string>> Day16_2019::Part2(
 
   return std::vector<std::string>{ret};
 }
+
+}  // namespace advent_of_code

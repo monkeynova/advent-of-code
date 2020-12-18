@@ -10,6 +10,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 // TODO(@monkeynova): Move to CharBoard.
 
 using Board = std::vector<std::string>;
@@ -280,6 +283,8 @@ int64_t CountBugs(absl::flat_hash_map<int, Board> depth_to_board) {
   return bugs;
 }
 
+}  // namespace
+
 absl::StatusOr<Board> Day24_2019::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<Board> board = ParseBoard(input);
@@ -312,3 +317,5 @@ absl::StatusOr<Board> Day24_2019::Part2(
   }
   return IntReturn(CountBugs(level_to_board));
 }
+
+}  // namespace advent_of_code

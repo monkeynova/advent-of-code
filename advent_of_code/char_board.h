@@ -8,6 +8,8 @@
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 
+namespace advent_of_code {
+
 struct CharBoard {
   static absl::StatusOr<CharBoard> Parse(absl::Span<absl::string_view> in) {
     CharBoard ret(0, 0);
@@ -76,5 +78,7 @@ struct CharBoard {
 std::ostream& operator<<(std::ostream& out, const CharBoard& b) {
   return out << b.DebugString();
 }
+
+}  // namespace advent_of_code
 
 #endif  // ADVENT_OF_CODE_CHAR_BOARD_H

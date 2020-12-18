@@ -6,6 +6,9 @@
 #include "advent_of_code/2019/int_code.h"
 #include "glog/logging.h"
 
+namespace advent_of_code {
+namespace {}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day05_2019::Part1(
     absl::Span<absl::string_view> input_text) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input_text);
@@ -41,3 +44,5 @@ absl::StatusOr<std::vector<std::string>> Day05_2019::Part2(
 
   return IntReturn(output.back());
 }
+
+}  // namespace advent_of_code

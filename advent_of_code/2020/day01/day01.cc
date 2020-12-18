@@ -6,6 +6,9 @@
 #include "absl/strings/str_split.h"
 #include "glog/logging.h"
 
+namespace advent_of_code {
+namespace {}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day01_2020::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
@@ -45,3 +48,5 @@ absl::StatusOr<std::vector<std::string>> Day01_2020::Part2(
   if (res == -1) return absl::InvalidArgumentError("nothing found");
   return IntReturn(res);
 }
+
+}  // namespace advent_of_code

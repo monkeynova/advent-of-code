@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 struct OrRange {
   int min1;
   int max1;
@@ -78,6 +81,8 @@ bool CheckRange(int v, OrRange or_range) {
   }
   return false;
 }
+
+}  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day16_2020::Part1(
     absl::Span<absl::string_view> input) const {
@@ -232,3 +237,5 @@ absl::StatusOr<std::vector<std::string>> Day16_2020::Part2(
   if (prefix_count != 6) return Error("Wrong number of prefix=", prefix);
   return IntReturn(product);
 }
+
+}  // namespace advent_of_code

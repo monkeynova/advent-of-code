@@ -9,6 +9,8 @@
 #include "absl/strings/string_view.h"
 #include "glog/logging.h"
 
+namespace advent_of_code {
+
 class IntCode {
  public:
   class InputSource {
@@ -126,5 +128,7 @@ class IntCode {
   int64_t relative_base_ = 0;
   bool terminated_ = false;
 };
+
+}  // namespace advent_of_code
 
 #endif  // ADVENT_OF_CODE_2019_INT_CODE_H

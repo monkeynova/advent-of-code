@@ -5,6 +5,8 @@
 #include "absl/strings/str_split.h"
 #include "glog/logging.h"
 
+namespace advent_of_code {
+
 enum class OpCode {
   kUnknown = 0,
   kAdd = 1,
@@ -333,3 +335,5 @@ std::string IntCode::DebugDisasm() const {
   }
   return ret;
 }
+
+}  // namespace advent_of_code

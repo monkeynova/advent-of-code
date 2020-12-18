@@ -3,6 +3,8 @@
 
 #include "advent_of_code/advent_day.h"
 
+namespace advent_of_code {
+
 class Day16_2020 : public AdventDay {
  public:
   absl::StatusOr<std::vector<std::string>> Part1(
@@ -10,5 +12,7 @@ class Day16_2020 : public AdventDay {
   absl::StatusOr<std::vector<std::string>> Part2(
       absl::Span<absl::string_view> input) const override;
 };
+
+}  // namespace advent_of_code
 
 #endif  // ADVENT_OF_CODE_2020_DAY16_H

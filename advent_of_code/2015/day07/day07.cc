@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 struct Operation {
   std::string operation;
   std::string arg1;
@@ -113,6 +116,8 @@ absl::StatusOr<absl::flat_hash_map<std::string, Operation>> Parse(
   return ops_by_dest;
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day07_2015::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<std::string, Operation>> ops_by_dest =
@@ -132,3 +137,5 @@ absl::StatusOr<std::vector<std::string>> Day07_2015::Part2(
   (*ops_by_dest)["b"] = Operation{.arg1 = absl::StrCat(*a_val)};
   return IntReturn(Evaluate(*ops_by_dest, "a"));
 }
+
+}  // namespace advent_of_code

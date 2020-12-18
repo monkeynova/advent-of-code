@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 class SpringBot : public IntCode::IOModule {
  public:
   SpringBot(absl::string_view program) : in_buf_(program) {}
@@ -45,6 +48,8 @@ class SpringBot : public IntCode::IOModule {
   std::string cur_line_;
   int64_t damage_ = -1;
 };
+
+}  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day21_2019::Part1(
     absl::Span<absl::string_view> input) const {
@@ -93,3 +98,5 @@ absl::StatusOr<std::vector<std::string>> Day21_2019::Part2(
 
   return IntReturn(spring_bot.damage());
 }
+
+}  // namespace advent_of_code

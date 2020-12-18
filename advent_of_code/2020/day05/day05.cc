@@ -8,6 +8,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 struct Seat {
   int col;
   int row;
@@ -38,6 +41,8 @@ absl::StatusOr<Seat> ParseSeat(absl::string_view seat_str) {
   return seat;
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day05_2020::Part1(
     absl::Span<absl::string_view> input) const {
   int maxid = 0;
@@ -66,3 +71,5 @@ absl::StatusOr<std::vector<std::string>> Day05_2020::Part2(
   }
   return IntReturn(missingid);
 }
+
+}  // namespace advent_of_code

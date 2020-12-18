@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 absl::flat_hash_set<std::string> RunStep(
     const absl::flat_hash_map<absl::string_view,
                               std::vector<absl::string_view>>& map,
@@ -280,6 +283,8 @@ absl::StatusOr<int> MatchFromFrontRnAr(
   return AdventDay::Error("Nothing to return");
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day19_2015::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() < 3) return Error("Bad input");
@@ -354,3 +359,5 @@ absl::StatusOr<std::vector<std::string>> Day19_2015::Part2(
 
   return IntReturn(FindMinPath(map, "e", final));
 }
+
+}  // namespace advent_of_code

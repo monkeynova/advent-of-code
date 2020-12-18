@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 struct Packet {
   int64_t address;
   int64_t x;
@@ -186,6 +189,8 @@ absl::Status Computer::SendCurrentPacket() {
   return network_->SendPacket(out_packet_);
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day23_2019::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> code = IntCode::Parse(input);
@@ -205,3 +210,5 @@ absl::StatusOr<std::vector<std::string>> Day23_2019::Part2(
 
   return IntReturn(network.RunUntilDuplicateNat());
 }
+
+}  // namespace advent_of_code

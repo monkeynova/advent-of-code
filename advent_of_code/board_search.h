@@ -4,6 +4,8 @@
 #include "advent_of_code/char_board.h"
 #include "advent_of_code/point.h"
 
+namespace advent_of_code {
+
 class SearchCharBoardInterface {
  public:
   virtual ~SearchCharBoardInterface() = default;
@@ -30,5 +32,7 @@ void SearchCharBoard(const CharBoard& board, Point start,
     }
   }
 }
+
+}  // namespace advent_of_code
 
 #endif  // ADVENT_OF_CODE_CHAR_BOARD_H

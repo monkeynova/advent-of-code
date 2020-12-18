@@ -2,6 +2,8 @@
 #include "advent_of_code/file_benchmark.h"
 #include "gmock/gmock.h"
 
+namespace advent_of_code {
+
 constexpr int kMaxTestCount = 7;
 
 TEST(DayBenchmarkTest, Consistency) {
@@ -11,3 +13,5 @@ TEST(DayBenchmarkTest, Consistency) {
 }
 
 BENCHMARK_TEMPLATE(BM_Day, Day15_2020)->DenseRange(0, kMaxTestCount - 1);
+
+}  // namespace advent_of_code

@@ -7,6 +7,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 struct Vector {
   int x = 0;
   int y = 0;
@@ -78,6 +81,8 @@ int TotalEnergy(const std::vector<Moon>& moons) {
   }
   return energy;
 }
+
+}  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day12_2019::Part1(
     absl::Span<absl::string_view> input) const {
@@ -182,3 +187,5 @@ absl::StatusOr<std::vector<std::string>> Day12_2019::Part2(
 
   return IntReturn(product);
 }
+
+}  // namespace advent_of_code

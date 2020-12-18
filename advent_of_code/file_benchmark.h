@@ -6,6 +6,8 @@
 #include "advent_of_code/file_util.h"
 #include "benchmark/benchmark.h"
 
+namespace advent_of_code {
+
 absl::StatusOr<int> FileBenchmarkTestCount();
 
 void BM_Day_SetError(benchmark::State& state, absl::string_view message) {
@@ -20,5 +22,7 @@ void BM_Day(benchmark::State& state) {
   AdventType day;
   BM_Day(state, &day);
 }
+
+}  // namespace advent_of_code
 
 #endif  // ADVENT_OF_CODE_FILE_BENCHMARK_H

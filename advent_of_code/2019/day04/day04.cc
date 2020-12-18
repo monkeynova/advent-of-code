@@ -5,6 +5,9 @@
 #include "absl/strings/str_split.h"
 #include "glog/logging.h"
 
+namespace advent_of_code {
+namespace {
+
 void AdvancePassword(std::string& password) {
   for (int idx = password.size() - 1; idx >= 0; --idx) {
     ++password[idx];
@@ -37,6 +40,8 @@ bool IsValidPassword2(absl::string_view password) {
   }
   return has_pair;
 }
+
+}  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day04_2019::Part1(
     absl::Span<absl::string_view> input) const {
@@ -71,3 +76,5 @@ absl::StatusOr<std::vector<std::string>> Day04_2019::Part2(
 
   return IntReturn(valid);
 }
+
+}  // namespace advent_of_code

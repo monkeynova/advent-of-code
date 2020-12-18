@@ -11,6 +11,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 // TODO(@monkeynova): Use CharBoard for storage.
 
 static void CharJoin(std::string* out, char c) { out->append(1, c); }
@@ -222,6 +225,8 @@ class Board {
   absl::flat_hash_map<char, Point> keys_;
 };
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day18_2019::Part1(
     absl::Span<absl::string_view> input) const {
   Board b(input);
@@ -272,3 +277,5 @@ absl::StatusOr<std::vector<std::string>> Day18_2019::Part2(
   if (!*steps) return absl::InvalidArgumentError("No Path found");
   return IntReturn(**steps);
 }
+
+}  // namespace advent_of_code

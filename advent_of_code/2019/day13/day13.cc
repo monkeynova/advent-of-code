@@ -8,6 +8,9 @@
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 
+namespace advent_of_code {
+namespace {
+
 class DrawBoard : public IntCode::IOModule {
  public:
   bool PauseIntCode() override { return false; }
@@ -104,6 +107,8 @@ class DrawBoard : public IntCode::IOModule {
   absl::flat_hash_map<Point, int> board_;
 };
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day13_2019::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
@@ -126,3 +131,5 @@ absl::StatusOr<std::vector<std::string>> Day13_2019::Part2(
 
   return IntReturn(draw_board.score());
 }
+
+}  // namespace advent_of_code

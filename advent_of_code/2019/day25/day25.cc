@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 class Terminal : public IntCode::IOModule {
  public:
   explicit Terminal(std::string input) : input_(input) {}
@@ -43,6 +46,8 @@ class Terminal : public IntCode::IOModule {
   std::string output_;
   std::string full_output_;
 };
+
+}  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day25_2019::Part1(
     absl::Span<absl::string_view> input) const {
@@ -111,3 +116,5 @@ absl::StatusOr<std::vector<std::string>> Day25_2019::Part2(
     absl::Span<absl::string_view> input) const {
   return std::vector<std::string>({"Merry Christmas"});
 }
+
+}  // namespace advent_of_code

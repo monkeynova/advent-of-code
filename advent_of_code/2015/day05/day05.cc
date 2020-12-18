@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {
+
 enum Classification {
   kNaughty = 1,
   kNice = 2,
@@ -61,6 +64,8 @@ Classification Classify2(absl::string_view input) {
   return kNice;
 }
 
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day05_2015::Part1(
     absl::Span<absl::string_view> input) const {
   int nice = 0;
@@ -78,3 +83,5 @@ absl::StatusOr<std::vector<std::string>> Day05_2015::Part2(
   }
   return IntReturn(nice);
 }
+
+}  // namespace advent_of_code

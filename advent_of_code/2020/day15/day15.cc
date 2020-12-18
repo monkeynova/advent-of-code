@@ -9,6 +9,9 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+namespace {}  // namespace
+
 absl::StatusOr<std::vector<std::string>> Day15_2020::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
@@ -68,3 +71,5 @@ absl::StatusOr<std::vector<std::string>> Day15_2020::Part2(
   }
   return IntReturn(last);
 }
+
+}  // namespace advent_of_code
