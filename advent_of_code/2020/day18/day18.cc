@@ -13,6 +13,7 @@ class ExprTree {
  public:
   virtual ~ExprTree() = default;
   virtual int64_t Eval() = 0;
+  virtual std::string DebugString() = 0;
 };
 
 class Val : public ExprTree {
@@ -20,6 +21,7 @@ class Val : public ExprTree {
   explicit Val(int64_t val) : val_(val) {}
 
   int64_t Eval() override { return val_; }
+  std::string DebugString() override { return absl::StrCat(val_); }
 
  private:
   int64_t val_;
@@ -30,6 +32,7 @@ class Mult : public ExprTree {
   Mult(std::unique_ptr<ExprTree> left, std::unique_ptr<ExprTree>right) : left_(std::move(left)), right_(std::move(right)) {}
 
   int64_t Eval() override { return left_->Eval() * right_->Eval(); }
+  std::string DebugString() override { return absl::StrCat("(", left_->DebugString(), "*", right_->DebugString(), ")"); }
 
  private:
   std::unique_ptr<ExprTree> left_;
@@ -41,6 +44,7 @@ class Add : public ExprTree {
   Add(std::unique_ptr<ExprTree> left, std::unique_ptr<ExprTree> right) : left_(std::move(left)), right_(std::move(right)) {}
 
   int64_t Eval() override { return left_->Eval() + right_->Eval(); }
+  std::string DebugString() override { return absl::StrCat("(", left_->DebugString(), "+", right_->DebugString(), ")"); }
 
  private:
   std::unique_ptr<ExprTree> left_;
@@ -102,6 +106,69 @@ absl::StatusOr<std::unique_ptr<ExprTree>> Parse(absl::string_view str) {
   return ret;
 }
 
+absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree2(absl::string_view* str);
+
+absl::StatusOr<std::unique_ptr<ExprTree>> ParseValue2(absl::string_view* str) {
+  if (str->empty()) return AdventDay::Error("No value");
+  while ((*str)[0] == ' ') *str = str->substr(1);
+  if ((*str)[0] == '(') {
+    *str = str->substr(1);
+    absl::StatusOr<std::unique_ptr<ExprTree>> ret = ParseOpTree2(str);
+    if (!ret.ok()) return ret.status();
+    if ((*str)[0] != ')') return AdventDay::Error("No matching ')'");
+    *str = str->substr(1);
+    while ((*str)[0] == ' ') *str = str->substr(1);
+    return ret;
+  } else if ((*str)[0] >= '0' && (*str)[0] <= '9') {
+    int64_t val = 0;
+    while ((*str)[0] >= '0' && (*str)[0] <= '9') {
+      val = val * 10 + (*str)[0] - '0';
+      *str = str->substr(1);
+    }
+    while ((*str)[0] == ' ') *str = str->substr(1);
+    return absl::make_unique<Val>(val);
+  }
+  return AdventDay::Error("can't get value from: ", *str);
+}
+
+absl::StatusOr<std::unique_ptr<ExprTree>> ParseAddTree(absl::string_view* str) {
+  absl::StatusOr<std::unique_ptr<ExprTree>> last_val = ParseValue2(str);
+  if (!last_val.ok()) return last_val.status();
+  while (!str->empty()) {
+    char op = (*str)[0];
+    if (op == ')' || op == '*') break;
+    if (op != '+') return AdventDay::Error("Not add: ", *str);
+    *str = str->substr(1);
+    absl::StatusOr<std::unique_ptr<ExprTree>> next_val = ParseValue2(str);
+    last_val = absl::make_unique<Add>(std::move(*last_val), std::move(*next_val));
+  }
+  return last_val;
+}
+
+absl::StatusOr<std::unique_ptr<ExprTree>> ParseMulTree(absl::string_view* str) {
+  absl::StatusOr<std::unique_ptr<ExprTree>> last_val = ParseAddTree(str);
+  if (!last_val.ok()) return last_val.status();
+  while (!str->empty()) {
+    char op = (*str)[0];
+    if (op == ')') break;
+    if (op != '*') return AdventDay::Error("Not mult: ", *str);
+    *str = str->substr(1);
+    absl::StatusOr<std::unique_ptr<ExprTree>> next_val = ParseAddTree(str);
+    last_val = absl::make_unique<Mult>(std::move(*last_val), std::move(*next_val));
+  }
+  return last_val;
+}
+
+absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree2(absl::string_view* str) {
+  return ParseMulTree(str);
+}
+
+absl::StatusOr<std::unique_ptr<ExprTree>> Parse2(absl::string_view str) {
+  absl::StatusOr<std::unique_ptr<ExprTree>> ret = ParseOpTree2(&str);
+  if (!str.empty()) return AdventDay::Error("Bad parse remain=", str);
+  return ret;
+}
+
 absl::StatusOr<std::vector<std::string>> Day18_2020::Part1(
     absl::Span<absl::string_view> input) const {
   int64_t sum = 0;
@@ -115,5 +182,12 @@ absl::StatusOr<std::vector<std::string>> Day18_2020::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day18_2020::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  int64_t sum = 0;
+  for (absl::string_view expr : input) {
+    absl::StatusOr<std::unique_ptr<ExprTree>> tree = Parse2(expr);
+    if (!tree.ok()) return tree.status();
+    VLOG(1) << (*tree)->DebugString();
+    sum += (*tree)->Eval();
+  }
+  return IntReturn(sum);
 }

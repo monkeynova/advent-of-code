@@ -17,6 +17,18 @@
 ==
 
 [part=2]
+2 * 3 + (4 * 5)
+--
+46
+==
+
+[part=2]
+((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2
+--
+23340
+==
+
+[part=2]
 @include{advent_of_code/2020/day18/input.txt}
 --
-ERROR: Could not run test: Not implemented
+8952864356993
