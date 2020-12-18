@@ -1,7 +1,10 @@
+# 518 (low)
+# 674 (low)
+# 844 (low)
 [part=1]
 @include{advent_of_code/2015/day22/input.txt}
 --
-ERROR: Could not run test: Not implemented
+900
 ==
 
 [part=2]
