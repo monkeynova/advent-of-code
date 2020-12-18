@@ -9,6 +9,12 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
+namespace advent_of_code {
+
+namespace {
+
+}  // namespace
+
 absl::StatusOr<std::vector<std::string>> NewDay::Part1(
     absl::Span<absl::string_view> input) const {
   return Error("Not implemented");
@@ -18,3 +24,5 @@ absl::StatusOr<std::vector<std::string>> NewDay::Part2(
     absl::Span<absl::string_view> input) const {
   return Error("Not implemented");
 }
+
+}  // namespace advent_of_code
