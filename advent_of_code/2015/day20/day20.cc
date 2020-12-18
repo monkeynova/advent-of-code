@@ -12,13 +12,45 @@
 namespace advent_of_code {
 namespace {
 
+int PresentCount(int house_num) {
+  int presents = 1; // 1st elf.
+  if (house_num != 1) {
+    // Elf #house_num
+    presents += house_num;
+  }
+  for (int i = 2; i * i <= house_num; ++i) {
+    if (house_num % i == 0) {
+      presents += i;
+      presents += house_num / i;
+    }
+  }
+
+  return presents * 10;
+}
+
 // Helper methods go here.
 
 }  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day20_2015::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  std::vector<std::pair<int,int>> test_suite = {{1, 10}, {2, 30}, {6, 120}, {8, 150}};
+  for (const auto& [house, presents] : test_suite) {
+    if (PresentCount(house) != presents) {
+      return Error("Bad PresentCount(", house, "): ", PresentCount(house), " != ", presents);
+    }
+  }
+
+  absl::StatusOr<std::vector<int64_t>> present_count_list = ParseAsInts(input);
+  if (!present_count_list.ok()) return present_count_list.status();
+  if (present_count_list->size() != 1) return Error("Bad count");
+  int present_count = (*present_count_list)[0];
+
+  for (int house_num = 1; house_num < present_count / 10; ++house_num) {
+    if (PresentCount(house_num) > present_count) return IntReturn(house_num);
+  }
+  
+  return Error("Not found");
 }
 
 absl::StatusOr<std::vector<std::string>> Day20_2015::Part2(
