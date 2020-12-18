@@ -32,17 +32,11 @@ struct Effect {
   std::function<void(Character&, Character&)> on_remove;
 };
 
-void ShieldOff(Character& me, Character& boss) {
-  me.armor -= 7;
-}
+void ShieldOff(Character& me, Character& boss) { me.armor -= 7; }
 
-void PoisonEffect(Character& me, Character& boss) {
-  boss.hit_points -= 3;
-}
+void PoisonEffect(Character& me, Character& boss) { boss.hit_points -= 3; }
 
-void RechargeEffect(Character& me, Character& boss) {
-  me.mana += 101;
-}
+void RechargeEffect(Character& me, Character& boss) { me.mana += 101; }
 
 struct GameState {
   int mana_cost;
@@ -142,7 +136,7 @@ absl::optional<int> MinManaSpendForWin(Character me, Character boss) {
       std::vector<GameState> next_states = NextGameStates(state);
       for (GameState& ns : next_states) {
         states.push(std::move(ns));
-      } 
+      }
     }
   }
 
@@ -171,7 +165,7 @@ absl::optional<int> MinManaSpendForWinHard(Character me, Character boss) {
       std::vector<GameState> next_states = NextGameStates(state);
       for (GameState& ns : next_states) {
         states.push(std::move(ns));
-      } 
+      }
     }
   }
 
