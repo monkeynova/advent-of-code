@@ -14,6 +14,20 @@
         "problemMatcher": [],
         "group": {
           "kind": "build",
+          "isDefault": false
+        }
+      },
+      {
+        "label": "Test current day",
+        "type": "shell",
+        "command": "bazel",
+        "args": [
+          "test",
+          "${relativeFileDirname}:${fileBasenameNoExtension}_test"
+        ],
+        "problemMatcher": [],
+        "group": {
+          "kind": "build",
           "isDefault": true
         }
       },
