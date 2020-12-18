@@ -122,6 +122,60 @@ absl::optional<int> MinCostToWin(Character boss) {
   return min;
 }
 
+absl::optional<int> MaxCostToLoseRings(Character boss, Character me, Item weapon,
+                                       absl::optional<Item> armor, std::vector<Item> rings) {
+  for (Item r : rings) {
+    me.armor += r.armor;
+    me.damage += r.damage;
+  }
+  if (CanWin(boss, me)) return absl::nullopt;
+  VLOG(1) << "Can't win with " << weapon.name << ", " << (armor ? armor->name : "<no armor>") << ", " 
+   << absl::StrJoin(rings, ", ", [](std::string* out, const Item& i) { absl::StrAppend(out, i.name); });
+  int cost = 0;
+  cost += weapon.cost;
+  if (armor) cost += armor->cost;
+  for (Item r: rings) cost += r.cost;
+  return cost;
+}
+
+absl::optional<int> MaxCostToLoseArmor(Character boss, Character me, Item weapon,
+                                       absl::optional<Item> armor) {
+  if (armor) {
+    me.armor += armor->armor;
+  }
+  absl::optional<int> max;
+  max = opt_max(max, MaxCostToLoseRings(boss, me, weapon, armor, {}));
+  for (int ring_id = 0; ring_id < rings.size(); ++ring_id) {
+    max = opt_max(max, MaxCostToLoseRings(boss, me, weapon, armor, {rings[ring_id]}));
+  }
+  for (int ring_id1 = 0; ring_id1 < rings.size(); ++ring_id1) {
+    for (int ring_id2 = 0; ring_id2 < ring_id1; ++ring_id2) {
+      max = opt_max(max, MaxCostToLoseRings(boss, me, weapon, armor, {rings[ring_id1], rings[ring_id2]}));
+    }
+  }
+  return max;
+}
+
+absl::optional<int> MaxCostToLoseWeapon(Character boss, Character me, Item weapon) {
+  me.damage += weapon.damage;
+  absl::optional<int> max;
+  max = opt_max(max, MaxCostToLoseArmor(boss, me, weapon, absl::nullopt));
+  for (int armor_id = 0; armor_id < armors.size(); ++armor_id) {
+    max = opt_max(max, MaxCostToLoseArmor(boss, me, weapon, armors[armor_id]));
+  }
+  return max;
+}
+
+absl::optional<int> MaxCostToLose(Character boss) {
+  Character me{100, 0, 0};
+  absl::optional<int> max;
+  for (int weapon_id = 0; weapon_id < weapons.size(); ++weapon_id) {
+    max = opt_max(max, MaxCostToLoseWeapon(boss, me, weapons[weapon_id]));
+  }
+  return max;
+}
+
+
 }  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day21_2015::Part1(
@@ -143,7 +197,19 @@ absl::StatusOr<std::vector<std::string>> Day21_2015::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day21_2015::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  Character boss{0,0,0};
+  for (absl::string_view str : input) {
+    if (!RE2::FullMatch(str, "Hit Points: (\\d+)", &boss.hit_points) &&
+        !RE2::FullMatch(str, "Damage: (\\d+)", &boss.damage) &&
+        !RE2::FullMatch(str, "Armor: (\\d+)", &boss.armor)) {
+      return Error("Bad input: ", str);
+    }
+  }
+  if (boss.hit_points == 0) return Error("No Hit Points");
+  if (boss.damage == 0) return Error("No Damage");
+  if (boss.armor == 0) return Error("No Armor");
+
+  return IntReturn(MaxCostToLose(boss));
 }
 
 }  // namespace advent_of_code
