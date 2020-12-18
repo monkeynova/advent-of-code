@@ -149,6 +149,35 @@ absl::optional<int> MinManaSpendForWin(Character me, Character boss) {
   return absl::nullopt;
 }
 
+absl::optional<int> MinManaSpendForWinHard(Character me, Character boss) {
+  std::priority_queue<GameState, std::vector<GameState>, GameStateGt> states;
+  states.push({.me = me, .boss = boss, .mana_cost = 0});
+  bool run_boss_turn = false;
+  while (!states.empty()) {
+    GameState state = states.top();
+    states.pop();
+    VLOG(1) << "Trying state with mana_cost: " << state.mana_cost;
+    if (state.boss.hit_points <= 0) return state.mana_cost;
+    if (run_boss_turn) {
+      ApplyEffects(state.effects, state.me, state.boss);
+      if (state.boss.hit_points <= 0) return state.mana_cost;
+      state.me.hit_points -= state.boss.damage - state.me.armor;
+    }
+    run_boss_turn = true;
+    --state.me.hit_points;
+    if (state.me.hit_points > 0) {
+      ApplyEffects(state.effects, state.me, state.boss);
+      if (state.boss.hit_points <= 0) return state.mana_cost;
+      std::vector<GameState> next_states = NextGameStates(state);
+      for (GameState& ns : next_states) {
+        states.push(std::move(ns));
+      } 
+    }
+  }
+
+  return absl::nullopt;
+}
+
 }  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day22_2015::Part1(
@@ -169,7 +198,18 @@ absl::StatusOr<std::vector<std::string>> Day22_2015::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day22_2015::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  Character me{50, 0, 0, 500};
+  Character boss{0, 0, 0, 0};
+  for (absl::string_view str : input) {
+    if (!RE2::FullMatch(str, "Hit Points: (\\d+)", &boss.hit_points) &&
+        !RE2::FullMatch(str, "Damage: (\\d+)", &boss.damage)) {
+      return Error("Bad input: ", str);
+    }
+  }
+  if (boss.hit_points == 0) return Error("No Hit Points");
+  if (boss.damage == 0) return Error("No Damage");
+
+  return IntReturn(MinManaSpendForWinHard(me, boss));
 }
 
 }  // namespace advent_of_code
