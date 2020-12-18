@@ -13,7 +13,7 @@ namespace advent_of_code {
 namespace {
 
 int PresentCount(int house_num) {
-  int presents = 1; // 1st elf.
+  int presents = 1;  // 1st elf.
   if (house_num != 1) {
     // Elf #house_num
     presents += house_num;
@@ -58,10 +58,12 @@ int PresentCountPart2(int house_num) {
 
 absl::StatusOr<std::vector<std::string>> Day20_2015::Part1(
     absl::Span<absl::string_view> input) const {
-  std::vector<std::pair<int,int>> test_suite = {{1, 10}, {2, 30}, {6, 120}, {8, 150}};
+  std::vector<std::pair<int, int>> test_suite = {
+      {1, 10}, {2, 30}, {6, 120}, {8, 150}};
   for (const auto& [house, presents] : test_suite) {
     if (PresentCount(house) != presents) {
-      return Error("Bad PresentCount(", house, "): ", PresentCount(house), " != ", presents);
+      return Error("Bad PresentCount(", house, "): ", PresentCount(house),
+                   " != ", presents);
     }
   }
 
@@ -73,7 +75,7 @@ absl::StatusOr<std::vector<std::string>> Day20_2015::Part1(
   for (int house_num = 1; house_num < present_count / 10; ++house_num) {
     if (PresentCount(house_num) > present_count) return IntReturn(house_num);
   }
-  
+
   return Error("Not found");
 }
 
@@ -85,9 +87,10 @@ absl::StatusOr<std::vector<std::string>> Day20_2015::Part2(
   int present_count = (*present_count_list)[0];
 
   for (int house_num = 1; house_num < present_count / 11; ++house_num) {
-    if (PresentCountPart2(house_num) > present_count) return IntReturn(house_num);
+    if (PresentCountPart2(house_num) > present_count)
+      return IntReturn(house_num);
   }
-  
+
   return Error("Not found");
 }
 
