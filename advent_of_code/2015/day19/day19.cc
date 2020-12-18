@@ -246,8 +246,6 @@ absl::StatusOr<int> MatchFromFrontRnAr(
     const absl::flat_hash_map<absl::string_view,
                               std::vector<absl::string_view>>& map) {
   absl::string_view first_elem = FirstElement(str);
-  int off = first_elem.size();
-
   absl::string_view second_elem = FirstElement(str.substr(first_elem.size()));
   if (second_elem != "Rn") return AdventDay::Error("Not XRn");
   std::string replaced_string;
@@ -316,6 +314,12 @@ absl::StatusOr<std::vector<std::string>> Day19_2015::Part2(
     map[from].push_back(to);
     if (reverse.find(to) != reverse.end()) return Error("Can't invert");
     reverse[to] = from;
+  }
+
+  if (final.size() < 10) {
+    // TODO(@monkeynova): This filter might be better served in a reverse
+    // model where we recognize the hack will work.
+    return IntReturn(FindMinPath(map, "e", final));
   }
 
   // 'Ar' always terminates a rule.
