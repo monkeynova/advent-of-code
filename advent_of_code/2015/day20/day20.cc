@@ -28,6 +28,30 @@ int PresentCount(int house_num) {
   return presents * 10;
 }
 
+int PresentCountPart2(int house_num) {
+  int presents = 0;
+  if (house_num <= 50) {
+    // 1st elf.
+    ++presents;
+  }
+  if (house_num != 1) {
+    // Elf #house_num
+    presents += house_num;
+  }
+  for (int i = 2; i * i <= house_num; ++i) {
+    if (house_num % i == 0) {
+      if (house_num / i <= 50) {
+        presents += i;
+      }
+      if (i <= 50) {
+        presents += house_num / i;
+      }
+    }
+  }
+
+  return presents * 11;
+}
+
 // Helper methods go here.
 
 }  // namespace
@@ -55,7 +79,16 @@ absl::StatusOr<std::vector<std::string>> Day20_2015::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day20_2015::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<std::vector<int64_t>> present_count_list = ParseAsInts(input);
+  if (!present_count_list.ok()) return present_count_list.status();
+  if (present_count_list->size() != 1) return Error("Bad count");
+  int present_count = (*present_count_list)[0];
+
+  for (int house_num = 1; house_num < present_count / 11; ++house_num) {
+    if (PresentCountPart2(house_num) > present_count) return IntReturn(house_num);
+  }
+  
+  return Error("Not found");
 }
 
 }  // namespace advent_of_code
