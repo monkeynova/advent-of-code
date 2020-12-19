@@ -18,15 +18,14 @@ namespace {
 int64_t ComputeCodeValue(int position) {
   int64_t val = 20151125;
   int64_t power_product = 252533;
-  int64_t product = val;
   for (int bit = 0; (1<<bit) <= position; ++bit) {
     if (position & (1 << bit)) {
-      product = (product * power_product) % 33554393;
+      val = (val * power_product) % 33554393;
     }
     power_product = (power_product * power_product) % 33554393;
   }
-  VLOG(1) << "ComputeCodeValue(" << position << ") = " << product;
-  return product;
+  VLOG(1) << "ComputeCodeValue(" << position << ") = " << val;
+  return val;
 }
 
 int64_t ComputeCodePosition(int row, int col) {
