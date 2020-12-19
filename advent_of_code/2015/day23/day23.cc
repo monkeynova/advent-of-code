@@ -84,6 +84,8 @@ class VM {
     }
   }
 
+  int64_t set_register_a(int64_t v) { return register_a_ = v; }
+
   int64_t register_b() const { return register_b_; }
 
  private:
@@ -122,7 +124,11 @@ absl::StatusOr<std::vector<std::string>> Day23_2015::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day23_2015::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<VM> vm = VM::Parse(input);
+  if (!vm.ok()) return vm.status();
+  vm->set_register_a(1);
+  vm->Execute();
+  return IntReturn(vm->register_b());
 }
 
 }  // namespace advent_of_code
