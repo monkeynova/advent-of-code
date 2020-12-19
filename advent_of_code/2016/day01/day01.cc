@@ -40,7 +40,27 @@ absl::StatusOr<std::vector<std::string>> Day01_2016::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day01_2016::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 1) return Error("Bad input size");
+  std::vector<absl::string_view> instructions = absl::StrSplit(input[0], ", ");
+  Point p = {0, 0};
+  Point heading = Cardinal::kNorth;
+  absl::flat_hash_set<Point> hist = {p};
+  for (absl::string_view ins : instructions) {
+    int dist;
+    if (RE2::FullMatch(ins, "L(\\d+)", &dist)) {
+      heading = heading.rotate_left();
+    } else if (RE2::FullMatch(ins, "R(\\d+)", &dist)) {
+      heading = heading.rotate_right();
+    } else {
+      return Error("Bad instruction: ", ins);
+    }
+    for (int i = 0; i < dist; ++i) {
+      p += heading;
+      if (hist.contains(p)) return IntReturn(p.dist());
+      hist.insert(p);
+    }
+  }
+  return Error("No duplicate location");
 }
 
 }  // namespace advent_of_code
