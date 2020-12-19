@@ -15,16 +15,59 @@ namespace {
 
 // Helper methods go here.
 
+int64_t ComputeCodeValue(int position) {
+  int64_t val = 20151125;
+  // TODO(@monkeynova): Exponential.
+  for (int i = 0; i < position; ++i) {
+    val = (val * 252533) % 33554393;
+  }
+  VLOG(1) << "ComputeCodeValue(" << position << ") = " << val;
+  return val;
+}
+
+int64_t ComputeCodePosition(int row, int col) {
+  int64_t diag = row + col - 2;
+  int64_t position = 0;
+  for (int64_t tmp = 1; tmp <= diag; ++tmp) {
+    position += tmp;
+  }
+  position += (col - 1);
+  VLOG(1) << "ComputeCodePosition(" << row << "," << col << ") = " << position;
+  return position;
+}
+
 }  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day25_2015::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  struct TestVal {
+    int row;
+    int col;
+    int expected;
+  };
+  std::vector<TestVal> tests = {{1, 1, 20151125}, {2, 1, 31916031}, {1, 2, 18749137},
+                                {3, 4, 7981243}, {5, 6, 31663883}};
+  for (TestVal t : tests) {
+    int64_t computed = ComputeCodeValue(ComputeCodePosition(t.row, t.col));
+    if (computed != t.expected) {
+      return Error("Test failed: ", t.row, "x", t.col, " should be ", t.expected, " but is ", computed);
+    }
+  }
+
+  if (input.size() != 1) return Error("Bad input size: ", input.size());
+  int row;
+  int col;
+  if (!RE2::FullMatch(input[0], 
+                      "To continue, please consult the code grid in the manual.  "
+                      "Enter the code at row (\\d+), column (\\d+).", &row, &col)) {
+    return Error("Can't parse input");
+  }
+  return IntReturn(ComputeCodeValue(ComputeCodePosition(row, col)));
 }
 
 absl::StatusOr<std::vector<std::string>> Day25_2015::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  return std::vector<std::string>{"Merry Christmas"};
 }
 
 }  // namespace advent_of_code
