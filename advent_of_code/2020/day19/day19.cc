@@ -99,7 +99,7 @@ struct RuleHist {
 };
 
 struct State {
-  std::vector<std::vector<int>> rule_chain;
+  std::vector<int> rule_chain;
   absl::string_view str;
   absl::flat_hash_set<RuleHist> rule_hist;
   bool operator<(const State& o) const {
@@ -112,38 +112,28 @@ struct State {
 bool MatchRuleSetWalk(const absl::flat_hash_map<int, Rule>& rule_set,
                       absl::string_view str) {
   std::priority_queue<State> frontier;
-  frontier.push({.rule_chain = {{0}}, .str = str});
+  frontier.push({.rule_chain = {0}, .str = str});
   while (!frontier.empty()) {
     State state = frontier.top();
     frontier.pop();
-    VLOG(2) << absl::StrJoin(
-        state.rule_chain, ", ",
-        [](std::string* out, const std::vector<int>& rule) {
-          absl::StrAppend(out, absl::StrJoin(rule, ","));
-        });
-    CHECK(!state.rule_chain.empty());
-    while (state.rule_chain.back().empty()) {
-      state.rule_chain.pop_back();
-      if (state.rule_chain.empty()) {
-        // Ran out of rules. If we're at the end of string,
-        // return true. Otherwise remove this branch and
-        // continue.
-        if (state.str == "") return true;
-        break;
-      }
-    }
+    VLOG(2) << absl::StrJoin(state.rule_chain, ", ") << ", ";
     if (state.rule_chain.empty()) {
+      // Ran out of rules. If we're at the end of string,
+      // return true. Otherwise remove this branch and
+      // continue.
+      if (state.str == "") return true;
       continue;
     }
-    int next_rule = state.rule_chain.back().back();
 
-    // Skip infinite loops. If we want to parse on a loop, it must
+    int next_rule = state.rule_chain.back();
+
+    // Skip infinite loops. If we want to parse on a rule loop, it must
     // consume some input.
     RuleHist rh{.str = state.str, .rule_num = next_rule};
     if (state.rule_hist.contains(rh)) continue;
     state.rule_hist.insert(rh);
 
-    state.rule_chain.back().pop_back();
+    state.rule_chain.pop_back();
     auto it = rule_set.find(next_rule);
     CHECK(it != rule_set.end()) << next_rule;
     const Rule& r = it->second;
@@ -156,10 +146,9 @@ bool MatchRuleSetWalk(const absl::flat_hash_map<int, Rule>& rule_set,
       continue;
     }
 
-    for (std::vector<int> sub_rules : r.sub_rules) {
+    for (const std::vector<int>& sub_rules : r.sub_rules) {
       State new_state = state;
-      std::reverse(sub_rules.begin(), sub_rules.end());
-      new_state.rule_chain.push_back(sub_rules);
+      new_state.rule_chain.insert(new_state.rule_chain.end(), sub_rules.rbegin(), sub_rules.rend());
       frontier.push(new_state);
     }
   }
@@ -183,8 +172,9 @@ absl::StatusOr<std::vector<std::string>> Day19_2020::Part1(
     if (parse_rules) {
       absl::StatusOr<Rule> rule = ParseRule(in);
       if (!rule.ok()) return rule.status();
-      if (rule_set.contains(rule->rule_num))
+      if (rule_set.contains(rule->rule_num)) {
         return Error("Duplicate rule: ", rule->rule_num);
+      }
       rule_set.emplace(rule->rule_num, *rule);
     } else {
       messages.push_back(in);
@@ -214,8 +204,9 @@ absl::StatusOr<std::vector<std::string>> Day19_2020::Part2(
     if (parse_rules) {
       absl::StatusOr<Rule> rule = ParseRule(in);
       if (!rule.ok()) return rule.status();
-      if (rule_set.contains(rule->rule_num))
+      if (rule_set.contains(rule->rule_num)) {
         return Error("Duplicate rule: ", rule->rule_num);
+      }
       rule_set.emplace(rule->rule_num, *rule);
     } else {
       messages.push_back(in);
@@ -230,12 +221,12 @@ absl::StatusOr<std::vector<std::string>> Day19_2020::Part2(
 
   if (VLOG_IS_ON(2)) {
     for (const auto& [rule_num, rule] : rule_set) {
-      VLOG(1) << "Rule: " << rule_num << " (" << rule.rule_num << ")";
+      VLOG(2) << "Rule: " << rule_num << " (" << rule.rule_num << ")";
       char tmp_token[] = {rule.token, '\0'};
       if (rule.token != '\0') VLOG(1) << "  token = " << tmp_token;
       if (!rule.sub_rules.empty()) {
         for (const auto& sub_rule : rule.sub_rules) {
-          VLOG(1) << "  SubRule: " << absl::StrJoin(sub_rule, "|");
+          VLOG(2) << "  SubRule: " << absl::StrJoin(sub_rule, "|");
         }
       }
     }
