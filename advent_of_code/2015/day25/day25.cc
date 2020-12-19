@@ -17,21 +17,21 @@ namespace {
 
 int64_t ComputeCodeValue(int position) {
   int64_t val = 20151125;
-  // TODO(@monkeynova): Exponential.
-  for (int i = 0; i < position; ++i) {
-    val = (val * 252533) % 33554393;
+  int64_t power_product = 252533;
+  int64_t product = val;
+  for (int bit = 0; (1<<bit) <= position; ++bit) {
+    if (position & (1 << bit)) {
+      product = (product * power_product) % 33554393;
+    }
+    power_product = (power_product * power_product) % 33554393;
   }
-  VLOG(1) << "ComputeCodeValue(" << position << ") = " << val;
-  return val;
+  VLOG(1) << "ComputeCodeValue(" << position << ") = " << product;
+  return product;
 }
 
 int64_t ComputeCodePosition(int row, int col) {
   int64_t diag = row + col - 2;
-  int64_t position = 0;
-  for (int64_t tmp = 1; tmp <= diag; ++tmp) {
-    position += tmp;
-  }
-  position += (col - 1);
+  int64_t position = diag * (diag + 1) / 2 + (col - 1);
   VLOG(1) << "ComputeCodePosition(" << row << "," << col << ") = " << position;
   return position;
 }
