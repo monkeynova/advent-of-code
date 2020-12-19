@@ -18,7 +18,7 @@ namespace {
 int64_t ComputeCodeValue(int position) {
   int64_t val = 20151125;
   int64_t power_product = 252533;
-  for (int bit = 0; (1<<bit) <= position; ++bit) {
+  for (int bit = 0; (1 << bit) <= position; ++bit) {
     if (position & (1 << bit)) {
       val = (val * power_product) % 33554393;
     }

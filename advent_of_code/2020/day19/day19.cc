@@ -30,7 +30,8 @@ absl::StatusOr<Rule> ParseRule(absl::string_view in) {
     return AdventDay::Error("Bad number: ", rule_and_dest[0]);
   }
   if (!RE2::FullMatch(rule_and_dest[1], "\"(.)\"", &ret.token)) {
-    std::vector<absl::string_view> pieces = absl::StrSplit(rule_and_dest[1], " | ");
+    std::vector<absl::string_view> pieces =
+        absl::StrSplit(rule_and_dest[1], " | ");
     for (absl::string_view piece : pieces) {
       std::vector<absl::string_view> rule_order = absl::StrSplit(piece, " ");
       std::vector<int> sub_rule;
@@ -77,46 +78,49 @@ bool MatchRulePartial(const absl::flat_hash_map<int, Rule>& rule_set,
   return false;
 }
 
-bool MatchRuleSet(const absl::flat_hash_map<int, Rule>& rule_set, absl::string_view str) {
+bool MatchRuleSet(const absl::flat_hash_map<int, Rule>& rule_set,
+                  absl::string_view str) {
   if (!MatchRulePartial(rule_set, 0, &str)) return false;
   if (!str.empty()) return false;
   return true;
 }
 
-  struct RuleHist {
-    absl::string_view str;
-    int rule_num;
-    bool operator==(const RuleHist& o) const {
-      return str == o.str && rule_num == o.rule_num;
-    }
-    bool operator!=(const RuleHist& o) const { return !operator==(o); }
-    template <typename H>
-    friend H AbslHashValue(H h, const RuleHist& rh) {
-      return H::combine(std::move(h), rh.str, rh.rule_num);
-    }
-  };
+struct RuleHist {
+  absl::string_view str;
+  int rule_num;
+  bool operator==(const RuleHist& o) const {
+    return str == o.str && rule_num == o.rule_num;
+  }
+  bool operator!=(const RuleHist& o) const { return !operator==(o); }
+  template <typename H>
+  friend H AbslHashValue(H h, const RuleHist& rh) {
+    return H::combine(std::move(h), rh.str, rh.rule_num);
+  }
+};
 
-  struct State {
-    std::vector<std::vector<int>> rule_chain;
-    absl::string_view str;
-    absl::flat_hash_set<RuleHist> rule_hist;
-    bool operator<(const State& o) const {
-      // Priority queue orders by greater-than.
-      // We want shortest strings first.
-      return str.size() > o.str.size();
-    }
-  };
+struct State {
+  std::vector<std::vector<int>> rule_chain;
+  absl::string_view str;
+  absl::flat_hash_set<RuleHist> rule_hist;
+  bool operator<(const State& o) const {
+    // Priority queue orders by greater-than.
+    // We want shortest strings first.
+    return str.size() > o.str.size();
+  }
+};
 
-
-bool MatchRuleSetWalk(const absl::flat_hash_map<int, Rule>& rule_set, absl::string_view str) {
+bool MatchRuleSetWalk(const absl::flat_hash_map<int, Rule>& rule_set,
+                      absl::string_view str) {
   std::priority_queue<State> frontier;
   frontier.push({.rule_chain = {{0}}, .str = str});
   while (!frontier.empty()) {
     State state = frontier.top();
     frontier.pop();
-    VLOG(2) << absl::StrJoin(state.rule_chain, ", ", [](std::string* out, const std::vector<int>& rule) {
-      absl::StrAppend(out, absl::StrJoin(rule, ","));
-    });
+    VLOG(2) << absl::StrJoin(
+        state.rule_chain, ", ",
+        [](std::string* out, const std::vector<int>& rule) {
+          absl::StrAppend(out, absl::StrJoin(rule, ","));
+        });
     CHECK(!state.rule_chain.empty());
     while (state.rule_chain.back().empty()) {
       state.rule_chain.pop_back();
@@ -179,7 +183,8 @@ absl::StatusOr<std::vector<std::string>> Day19_2020::Part1(
     if (parse_rules) {
       absl::StatusOr<Rule> rule = ParseRule(in);
       if (!rule.ok()) return rule.status();
-      if (rule_set.contains(rule->rule_num)) return Error("Duplicate rule: ", rule->rule_num);
+      if (rule_set.contains(rule->rule_num))
+        return Error("Duplicate rule: ", rule->rule_num);
       rule_set.emplace(rule->rule_num, *rule);
     } else {
       messages.push_back(in);
@@ -209,15 +214,19 @@ absl::StatusOr<std::vector<std::string>> Day19_2020::Part2(
     if (parse_rules) {
       absl::StatusOr<Rule> rule = ParseRule(in);
       if (!rule.ok()) return rule.status();
-      if (rule_set.contains(rule->rule_num)) return Error("Duplicate rule: ", rule->rule_num);
+      if (rule_set.contains(rule->rule_num))
+        return Error("Duplicate rule: ", rule->rule_num);
       rule_set.emplace(rule->rule_num, *rule);
     } else {
       messages.push_back(in);
     }
   }
-  
-  rule_set.insert_or_assign(8, Rule{.rule_num = 8, .token = '\0', .sub_rules = {{42}, {42, 8}} });
-  rule_set.insert_or_assign(11, Rule{.rule_num = 11, .token = '\0', .sub_rules = {{42, 31}, {42, 11, 31}} });
+
+  rule_set.insert_or_assign(
+      8, Rule{.rule_num = 8, .token = '\0', .sub_rules = {{42}, {42, 8}}});
+  rule_set.insert_or_assign(11, Rule{.rule_num = 11,
+                                     .token = '\0',
+                                     .sub_rules = {{42, 31}, {42, 11, 31}}});
 
   if (VLOG_IS_ON(2)) {
     for (const auto& [rule_num, rule] : rule_set) {
