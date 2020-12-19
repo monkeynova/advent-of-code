@@ -148,7 +148,8 @@ bool MatchRuleSetWalk(const absl::flat_hash_map<int, Rule>& rule_set,
 
     for (const std::vector<int>& sub_rules : r.sub_rules) {
       State new_state = state;
-      new_state.rule_chain.insert(new_state.rule_chain.end(), sub_rules.rbegin(), sub_rules.rend());
+      new_state.rule_chain.insert(new_state.rule_chain.end(),
+                                  sub_rules.rbegin(), sub_rules.rend());
       frontier.push(new_state);
     }
   }
