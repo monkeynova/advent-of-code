@@ -27,13 +27,15 @@ class VM {
         ins.op = OpCode::kInc;
       } else if (RE2::FullMatch(ins_str, "jmp ([+-]\\d+)", &ins.literal)) {
         ins.op = OpCode::kJmp;
-      } else if (RE2::FullMatch(ins_str, "jie ([ab]), ([+-]\\d+)", &ins.reg, &ins.literal)) {
+      } else if (RE2::FullMatch(ins_str, "jie ([ab]), ([+-]\\d+)", &ins.reg,
+                                &ins.literal)) {
         ins.op = OpCode::kJie;
-      } else if (RE2::FullMatch(ins_str, "jio ([ab]), ([+-]\\d+)", &ins.reg, &ins.literal)) {
+      } else if (RE2::FullMatch(ins_str, "jio ([ab]), ([+-]\\d+)", &ins.reg,
+                                &ins.literal)) {
         ins.op = OpCode::kJio;
       } else {
         return AdventDay::Error("Bad instruction: ", ins_str);
-      } 
+      }
       ret.instructions_.push_back(ins);
     }
     return ret;
@@ -43,7 +45,9 @@ class VM {
     int ip = 0;
     while (ip < instructions_.size()) {
       const Instruction& ins = instructions_[ip];
-      int64_t* reg = ins.reg.empty() ? nullptr : ins.reg == "a" ? &register_a_ : &register_b_;
+      int64_t* reg = ins.reg.empty()
+                         ? nullptr
+                         : ins.reg == "a" ? &register_a_ : &register_b_;
       switch (ins.op) {
         case OpCode::kHlf: {
           *reg /= 2;
