@@ -1,7 +1,8 @@
+# 724587339 (low)
 [part=1]
 @include{advent_of_code/2015/day24/input.txt}
 --
-ERROR: Could not run test: Not implemented
+11846773891
 ==
 
 [part=2]
