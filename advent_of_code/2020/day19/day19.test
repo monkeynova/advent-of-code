@@ -125,6 +125,7 @@ aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba
 12
 ==
 
+[long=3m (7s opt) 2020.12.19]
 [part=2]
 @include{advent_of_code/2020/day19/input.txt}
 --

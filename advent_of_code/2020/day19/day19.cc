@@ -188,7 +188,7 @@ absl::StatusOr<std::vector<std::string>> Day19_2020::Part1(
 
   int match_count = 0;
   for (absl::string_view m : messages) {
-    bool matches = MatchRuleSetWalk(rule_set, m);
+    bool matches = MatchRuleSet(rule_set, m);
     if (matches) ++match_count;
     VLOG(1) << m << "; " << (matches ? "MATCH" : "<no match>");
   }
