@@ -1,4 +1,5 @@
 # 724587339 (low)
+[long=80s (1s opt) 2020.12.18]
 [part=1]
 @include{advent_of_code/2015/day24/input.txt}
 --
