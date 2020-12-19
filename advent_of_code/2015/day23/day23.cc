@@ -13,13 +13,111 @@ namespace advent_of_code {
 
 namespace {
 
+class VM {
+ public:
+  static absl::StatusOr<VM> Parse(absl::Span<absl::string_view> input) {
+    VM ret;
+    for (absl::string_view ins_str : input) {
+      Instruction ins;
+      if (RE2::FullMatch(ins_str, "hlf ([ab])", &ins.reg)) {
+        ins.op = OpCode::kHlf;
+      } else if (RE2::FullMatch(ins_str, "tpl ([ab])", &ins.reg)) {
+        ins.op = OpCode::kTpl;
+      } else if (RE2::FullMatch(ins_str, "inc ([ab])", &ins.reg)) {
+        ins.op = OpCode::kInc;
+      } else if (RE2::FullMatch(ins_str, "jmp ([+-]\\d+)", &ins.literal)) {
+        ins.op = OpCode::kJmp;
+      } else if (RE2::FullMatch(ins_str, "jie ([ab]), ([+-]\\d+)", &ins.reg, &ins.literal)) {
+        ins.op = OpCode::kJie;
+      } else if (RE2::FullMatch(ins_str, "jio ([ab]), ([+-]\\d+)", &ins.reg, &ins.literal)) {
+        ins.op = OpCode::kJio;
+      } else {
+        return AdventDay::Error("Bad instruction: ", ins_str);
+      } 
+      ret.instructions_.push_back(ins);
+    }
+    return ret;
+  }
+
+  void Execute() {
+    int ip = 0;
+    while (ip < instructions_.size()) {
+      const Instruction& ins = instructions_[ip];
+      int64_t* reg = ins.reg.empty() ? nullptr : ins.reg == "a" ? &register_a_ : &register_b_;
+      switch (ins.op) {
+        case OpCode::kHlf: {
+          *reg /= 2;
+          ++ip;
+          break;
+        }
+        case OpCode::kTpl: {
+          *reg *= 3;
+          ++ip;
+          break;
+        }
+        case OpCode::kInc: {
+          (*reg)++;
+          ++ip;
+          break;
+        }
+        case OpCode::kJmp: {
+          ip += ins.literal;
+          break;
+        }
+        case OpCode::kJie: {
+          if (*reg % 2 == 0) {
+            ip += ins.literal;
+          } else {
+            ++ip;
+          }
+          break;
+        }
+        case OpCode::kJio: {
+          if (*reg == 1) {
+            ip += ins.literal;
+          } else {
+            ++ip;
+          }
+          break;
+        }
+      }
+    }
+  }
+
+  int64_t register_b() const { return register_b_; }
+
+ private:
+  enum class OpCode {
+    kHlf = 1,
+    kTpl = 2,
+    kInc = 3,
+    kJmp = 4,
+    kJie = 5,
+    kJio = 6,
+  };
+  struct Instruction {
+    OpCode op;
+    absl::string_view reg;
+    int64_t literal;
+  };
+
+  VM() = default;
+
+  int64_t register_a_ = 0;
+  int64_t register_b_ = 0;
+  std::vector<Instruction> instructions_;
+};
+
 // Helper methods go here.
 
 }  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day23_2015::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<VM> vm = VM::Parse(input);
+  if (!vm.ok()) return vm.status();
+  vm->Execute();
+  return IntReturn(vm->register_b());
 }
 
 absl::StatusOr<std::vector<std::string>> Day23_2015::Part2(
