@@ -37,6 +37,12 @@ struct Point {
     return *this;
   }
 
+  Point& operator-=(const Point& other) {
+    x -= other.x;
+    y -= other.y;
+    return *this;
+  }
+
   Point min_step() const {
     int gcd = std::gcd(abs(x), abs(y));
     return {.x = x / gcd, .y = y / gcd};
