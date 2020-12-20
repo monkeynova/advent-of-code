@@ -19,7 +19,20 @@ namespace {
 
 absl::StatusOr<std::vector<std::string>> Day03_2016::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  int count = 0;
+  for (absl::string_view in : input) {
+    int s1;
+    int s2;
+    int s3;
+    if (!RE2::FullMatch(in, "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)", &s1, &s2, &s3)) {
+      return Error("Bad input: ", in);
+    }
+    bool valid = s1 + s2 > s3 && s1 + s3 > s2 && s2 + s3 > s1;
+    if (valid) {
+      ++count;
+    }
+  }
+  return IntReturn(count);
 }
 
 absl::StatusOr<std::vector<std::string>> Day03_2016::Part2(
