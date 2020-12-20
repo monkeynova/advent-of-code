@@ -14,7 +14,8 @@ namespace advent_of_code {
 namespace {
 
 bool IsValid(int t1[3]) {
-  return t1[0] + t1[1] > t1[2] && t1[0] + t1[2] > t1[1] && t1[1] + t1[2] > t1[0];
+  return t1[0] + t1[1] > t1[2] && t1[0] + t1[2] > t1[1] &&
+         t1[1] + t1[2] > t1[0];
 }
 
 // Helper methods go here.
@@ -26,7 +27,8 @@ absl::StatusOr<std::vector<std::string>> Day03_2016::Part1(
   int count = 0;
   for (absl::string_view in : input) {
     int t1[3];
-    if (!RE2::FullMatch(in, "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)", &t1[0], &t1[1], &t1[2])) {
+    if (!RE2::FullMatch(in, "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)", &t1[0], &t1[1],
+                        &t1[2])) {
       return Error("Bad input: ", in);
     }
     if (IsValid(t1)) ++count;
@@ -42,14 +44,17 @@ absl::StatusOr<std::vector<std::string>> Day03_2016::Part2(
     int t1[3];
     int t2[3];
     int t3[3];
-    if (!RE2::FullMatch(input[i], "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)", &t1[0], &t2[0], &t3[0])) {
+    if (!RE2::FullMatch(input[i], "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)", &t1[0],
+                        &t2[0], &t3[0])) {
       return Error("Bad input: ", input[i]);
     }
-    if (!RE2::FullMatch(input[i+1], "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)", &t1[1], &t2[1], &t3[1])) {
-      return Error("Bad input: ", input[i+1]);
+    if (!RE2::FullMatch(input[i + 1], "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)", &t1[1],
+                        &t2[1], &t3[1])) {
+      return Error("Bad input: ", input[i + 1]);
     }
-    if (!RE2::FullMatch(input[i+2], "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)", &t1[2], &t2[2], &t3[2])) {
-      return Error("Bad input: ", input[i+2]);
+    if (!RE2::FullMatch(input[i + 2], "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)", &t1[2],
+                        &t2[2], &t3[2])) {
+      return Error("Bad input: ", input[i + 2]);
     }
     if (IsValid(t1)) ++count;
     if (IsValid(t2)) ++count;
