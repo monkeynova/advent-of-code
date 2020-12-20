@@ -38,7 +38,7 @@ absl::StatusOr<std::vector<std::string>> Day02_2016::Part1(
         default: return Error("Bad instruction: ", ins);
       }
       Point next = p + dir;
-      if (next.x >= 0 && next.y >= 0 && next.x <= 2 && next.y <= 2) {
+      if (codes.contains(next)) {
         p = next;
       }
     }
@@ -51,7 +51,35 @@ absl::StatusOr<std::vector<std::string>> Day02_2016::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day02_2016::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  std::string code;
+  Point p = {0, 2};
+  absl::flat_hash_map<Point, std::string> codes = {
+    {{2, 0}, "1"}, 
+    {{1, 1}, "2"}, {{2, 1}, "3"}, {{3, 1}, "4"},
+    {{0, 2}, "5"}, {{1, 2}, "6"}, {{2, 2}, "7"}, {{3, 2}, "8"}, {{4, 2}, "9"},
+    {{1, 3}, "A"}, {{2, 3}, "B"}, {{3, 3}, "C"},
+    {{2, 4}, "D"},
+  };
+  for (absl::string_view ins : input) {
+    for (char c : ins) {
+      Point dir;
+      switch (c) {
+        case 'U': dir = Cardinal::kNorth; break;
+        case 'D': dir = Cardinal::kSouth; break;
+        case 'L': dir = Cardinal::kWest; break;
+        case 'R': dir = Cardinal::kEast; break;
+        default: return Error("Bad instruction: ", ins);
+      }
+      Point next = p + dir;
+      if (codes.contains(next)) {
+        p = next;
+      }
+    }
+    auto it = codes.find(p);
+    if (it == codes.end()) return Error("Bad point: ", p.DebugString());
+    code += it->second;
+  }
+  return std::vector<std::string>{code};
 }
 
 }  // namespace advent_of_code

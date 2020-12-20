@@ -14,6 +14,15 @@ UUUUD
 ==
 
 [part=2]
+ULL
+RRDDD
+LURDL
+UUUUD
+--
+5DB3
+==
+
+[part=2]
 @include{advent_of_code/2016/day02/input.txt}
 --
-ERROR: Could not run test: Not implemented
+C2C28
