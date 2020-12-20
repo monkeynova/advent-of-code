@@ -14,32 +14,33 @@ namespace advent_of_code {
 namespace {
 
 bool Validate(absl::string_view room, absl::string_view sum) {
-    absl::flat_hash_map<char, int> counts;
-    for (char c : room) {
-      if (c != '-') {
-        ++counts[c];
-      }
+  absl::flat_hash_map<char, int> counts;
+  for (char c : room) {
+    if (c != '-') {
+      ++counts[c];
     }
-    struct Sortable {
-      char c;
-      int count;
-      bool operator<(const Sortable& o) const {
-        if (count != o.count) return count > o.count;
-        return c < o.c;
-      }
-    };
-    std::vector<Sortable> sorted;
-    for (const auto& [c, count] : counts) {
-      sorted.push_back({.c = c, .count = count});
+  }
+  struct Sortable {
+    char c;
+    int count;
+    bool operator<(const Sortable& o) const {
+      if (count != o.count) return count > o.count;
+      return c < o.c;
     }
-    std::sort(sorted.begin(), sorted.end());
-    std::string assert;
-    assert.resize(5);
-    for (int i = 0; i < 5; ++i) {
-      assert[i] = sorted[i].c;
-    }
-    VLOG(2) << sum << " =?= " << assert;
-  return sum == assert;;
+  };
+  std::vector<Sortable> sorted;
+  for (const auto& [c, count] : counts) {
+    sorted.push_back({.c = c, .count = count});
+  }
+  std::sort(sorted.begin(), sorted.end());
+  std::string assert;
+  assert.resize(5);
+  for (int i = 0; i < 5; ++i) {
+    assert[i] = sorted[i].c;
+  }
+  VLOG(2) << sum << " =?= " << assert;
+  return sum == assert;
+  ;
 }
 
 std::string Decrypt(absl::string_view name, int sector) {
@@ -65,7 +66,8 @@ absl::StatusOr<std::vector<std::string>> Day04_2016::Part1(
     absl::string_view room;
     int sector;
     absl::string_view sum;
-    if (!RE2::FullMatch(in, "([a-z\\-]+)-(\\d+)\\[(.....)\\]", &room, &sector, &sum)) {
+    if (!RE2::FullMatch(in, "([a-z\\-]+)-(\\d+)\\[(.....)\\]", &room, &sector,
+                        &sum)) {
       return Error("Bad input: ", in);
     }
     if (Validate(room, sum)) {
@@ -82,7 +84,8 @@ absl::StatusOr<std::vector<std::string>> Day04_2016::Part2(
     absl::string_view room;
     int sector;
     absl::string_view sum;
-    if (!RE2::FullMatch(in, "([a-z\\-]+)-(\\d+)\\[(.....)\\]", &room, &sector, &sum)) {
+    if (!RE2::FullMatch(in, "([a-z\\-]+)-(\\d+)\\[(.....)\\]", &room, &sector,
+                        &sum)) {
       return Error("Bad input: ", in);
     }
     if (!Validate(room, sum)) continue;
