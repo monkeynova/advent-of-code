@@ -19,7 +19,45 @@ namespace {
 
 absl::StatusOr<std::vector<std::string>> Day04_2016::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  int sector_sum = 0;
+  for (absl::string_view in : input) {
+    absl::string_view room;
+    int sector;
+    absl::string_view sum;
+    if (!RE2::FullMatch(in, "([a-z\\-]+)-(\\d+)\\[(.....)\\]", &room, &sector, &sum)) {
+      return Error("Bad input: ", in);
+    }
+    absl::flat_hash_map<char, int> counts;
+    for (char c : room) {
+      if (c != '-') {
+        ++counts[c];
+      }
+    }
+    struct Sortable {
+      char c;
+      int count;
+      bool operator<(const Sortable& o) const {
+        if (count != o.count) return count > o.count;
+        return c < o.c;
+      }
+    };
+    std::vector<Sortable> sorted;
+    for (const auto& [c, count] : counts) {
+      sorted.push_back({.c = c, .count = count});
+    }
+    std::sort(sorted.begin(), sorted.end());
+    bool is_valid = true;
+    for (int i = 0; i < 5; ++i) {
+      if (sum[i] != sorted[i].c) {
+        is_valid = false;
+        break;
+      }
+    }
+    if (is_valid) {
+      sector_sum += sector;
+    }
+  }
+  return IntReturn(sector_sum);
 }
 
 absl::StatusOr<std::vector<std::string>> Day04_2016::Part2(

@@ -1,7 +1,33 @@
 [part=1]
+aaaaa-bbb-z-y-x-123[abxyz]
+--
+123
+==
+
+[part=1]
+a-b-c-d-e-f-g-h-987[abcde]
+--
+987
+==
+
+[part=1]
+not-a-real-room-404[oarel]
+--
+404
+==
+
+[part=1]
+totally-real-room-200[decoy]
+--
+0
+==
+
+
+# 21247 (low)
+[part=1]
 @include{advent_of_code/2016/day04/input.txt}
 --
-ERROR: Could not run test: Not implemented
+137896
 ==
 
 [part=2]
