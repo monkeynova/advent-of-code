@@ -55,7 +55,35 @@ absl::StatusOr<std::vector<std::string>> Day05_2016::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day05_2016::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 1) return Error("Bad input size");
+  static char hexchar[] = {'0', '1', '2', '3', '4', '5', '6', '7',
+                           '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
+  MD5_CTX ctx;
+  unsigned char md5_result[16];
+  absl::string_view md5_result_view(reinterpret_cast<char*>(md5_result), 16);
+  std::string out;
+  out.resize(8, '_');
+  int added = 0;
+  for (int i = 0;; ++i) {
+    MD5_Init(&ctx);
+    std::string str = absl::StrCat(input[0], i);
+    MD5_Update(&ctx, str.data(), str.size());
+    MD5_Final(md5_result, &ctx);
+    VLOG(2) << "MD5(" << str << "): " << Hex(md5_result_view);
+    if (md5_result[0] == 0 && md5_result[1] == 0 && (md5_result[2] >> 4) == 0) {
+      int pos = md5_result[2] & 0xf;
+      char tmp[] = {hexchar[md5_result[3] >> 4], '\0'};
+      VLOG(1) << "Adding: " << pos << ", " << tmp << " (" << i << ")";
+      if (pos < 8 && out[pos] == '_') {
+        out[pos] = hexchar[md5_result[3] >> 4];
+        ++added;
+        if (added == 8) break;
+      }
+    }
+  }
+
+  return std::vector<std::string>{out};
 }
 
 }  // namespace advent_of_code
