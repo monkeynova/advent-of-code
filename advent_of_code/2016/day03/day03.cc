@@ -13,6 +13,10 @@ namespace advent_of_code {
 
 namespace {
 
+bool IsValid(int t1[3]) {
+  return t1[0] + t1[1] > t1[2] && t1[0] + t1[2] > t1[1] && t1[1] + t1[2] > t1[0];
+}
+
 // Helper methods go here.
 
 }  // namespace
@@ -21,23 +25,37 @@ absl::StatusOr<std::vector<std::string>> Day03_2016::Part1(
     absl::Span<absl::string_view> input) const {
   int count = 0;
   for (absl::string_view in : input) {
-    int s1;
-    int s2;
-    int s3;
-    if (!RE2::FullMatch(in, "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)", &s1, &s2, &s3)) {
+    int t1[3];
+    if (!RE2::FullMatch(in, "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)", &t1[0], &t1[1], &t1[2])) {
       return Error("Bad input: ", in);
     }
-    bool valid = s1 + s2 > s3 && s1 + s3 > s2 && s2 + s3 > s1;
-    if (valid) {
-      ++count;
-    }
+    if (IsValid(t1)) ++count;
   }
   return IntReturn(count);
 }
 
 absl::StatusOr<std::vector<std::string>> Day03_2016::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  int count = 0;
+  if (input.size() % 3 != 0) return Error("Bad size");
+  for (int i = 0; i < input.size(); i += 3) {
+    int t1[3];
+    int t2[3];
+    int t3[3];
+    if (!RE2::FullMatch(input[i], "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)", &t1[0], &t2[0], &t3[0])) {
+      return Error("Bad input: ", input[i]);
+    }
+    if (!RE2::FullMatch(input[i+1], "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)", &t1[1], &t2[1], &t3[1])) {
+      return Error("Bad input: ", input[i+1]);
+    }
+    if (!RE2::FullMatch(input[i+2], "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)", &t1[2], &t2[2], &t3[2])) {
+      return Error("Bad input: ", input[i+2]);
+    }
+    if (IsValid(t1)) ++count;
+    if (IsValid(t2)) ++count;
+    if (IsValid(t3)) ++count;
+  }
+  return IntReturn(count);
 }
 
 }  // namespace advent_of_code
