@@ -21,11 +21,12 @@ bool SupportsTLS(absl::string_view str) {
     if (str[i] == '[') ++level;
     if (str[i] == ']') --level;
     if (i >= 3) {
-      if (str[i] == str[i-3] &&
-          str[i-1] == str[i-2] &&
-          str[i] != str[i-1]) {
-        if (level == 0) match_outside = true;
-        else match_inside = true;
+      if (str[i] == str[i - 3] && str[i - 1] == str[i - 2] &&
+          str[i] != str[i - 1]) {
+        if (level == 0)
+          match_outside = true;
+        else
+          match_inside = true;
       }
     }
   }
@@ -40,21 +41,21 @@ bool SupportsSSL(absl::string_view str) {
     if (str[i] == '[') ++level;
     if (str[i] == ']') --level;
     if (i >= 2) {
-      if (str[i] == str[i-2] &&
-          str[i] != str[i-1]) {
+      if (str[i] == str[i - 2] && str[i] != str[i - 1]) {
         if (level == 0) {
           // ABA
-          char tmp[] = {str[i], str[i-1], '\0'};
+          char tmp[] = {str[i], str[i - 1], '\0'};
           outside.insert(std::string(tmp));
         } else {
           // BAB
-          char tmp[] = {str[i-1], str[i], '\0'};
+          char tmp[] = {str[i - 1], str[i], '\0'};
           inside.insert(std::string(tmp));
         }
       }
     }
   }
-  VLOG(1) << str << ": " << absl::StrJoin(outside, ",") << "; " << absl::StrJoin(inside, ",");
+  VLOG(1) << str << ": " << absl::StrJoin(outside, ",") << "; "
+          << absl::StrJoin(inside, ",");
   for (const auto& s : outside) {
     if (inside.contains(s)) return true;
   }
