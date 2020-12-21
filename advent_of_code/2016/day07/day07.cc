@@ -32,6 +32,35 @@ bool SupportsTLS(absl::string_view str) {
   return match_outside && !match_inside;
 }
 
+bool SupportsSSL(absl::string_view str) {
+  int level = 0;
+  absl::flat_hash_set<std::string> outside;
+  absl::flat_hash_set<std::string> inside;
+  for (int i = 0; i < str.size(); ++i) {
+    if (str[i] == '[') ++level;
+    if (str[i] == ']') --level;
+    if (i >= 2) {
+      if (str[i] == str[i-2] &&
+          str[i] != str[i-1]) {
+        if (level == 0) {
+          // ABA
+          char tmp[] = {str[i], str[i-1], '\0'};
+          outside.insert(std::string(tmp));
+        } else {
+          // BAB
+          char tmp[] = {str[i-1], str[i], '\0'};
+          inside.insert(std::string(tmp));
+        }
+      }
+    }
+  }
+  VLOG(1) << str << ": " << absl::StrJoin(outside, ",") << "; " << absl::StrJoin(inside, ",");
+  for (const auto& s : outside) {
+    if (inside.contains(s)) return true;
+  }
+  return false;
+}
+
 // Helper methods go here.
 
 }  // namespace
@@ -49,7 +78,13 @@ absl::StatusOr<std::vector<std::string>> Day07_2016::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day07_2016::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  int count = 0;
+  for (absl::string_view str : input) {
+    bool supports = SupportsSSL(str);
+    VLOG(1) << str << ": " << supports;
+    if (supports) ++count;
+  }
+  return IntReturn(count);
 }
 
 }  // namespace advent_of_code

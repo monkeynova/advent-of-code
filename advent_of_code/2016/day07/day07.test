@@ -14,6 +14,15 @@ ioxxoj[asdfgh]zxcvbn
 ==
 
 [part=2]
+aba[bab]xyz
+xyx[xyx]xyx
+aaa[kek]eke
+zazbz[bzb]cdb
+--
+3
+==
+
+[part=2]
 @include{advent_of_code/2016/day07/input.txt}
 --
-ERROR: Could not run test: Not implemented
+231
