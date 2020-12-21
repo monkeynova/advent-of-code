@@ -46,7 +46,29 @@ absl::StatusOr<std::vector<std::string>> Day06_2016::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day06_2016::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  std::vector<absl::flat_hash_map<char, int>> freqs;
+  if (input.empty()) return Error("Bad Input");
+  freqs.resize(input[0].size());
+  for (absl::string_view txt : input) {
+    if (freqs.size() != txt.size()) return Error("Mismatch input");
+    for (int i = 0; i < txt.size(); ++i) {
+      ++freqs[i][txt[i]];
+    }
+  }
+  std::string out;
+  out.resize(freqs.size());
+  for (int i = 0; i < freqs.size(); ++i) {
+    char min_char = '\0';
+    int min_count = std::numeric_limits<int>::max();
+    for (const auto& [c, count] : freqs[i]) {
+      if (count < min_count) {
+        min_count = count;
+        min_char = c;
+      }
+    }
+    out[i] = min_char;
+  }
+  return std::vector<std::string>{out};
 }
 
 }  // namespace advent_of_code
