@@ -1,7 +1,25 @@
 [part=1]
+ADVENT
+--
+6
+==
+
+[part=1]
+A(1x5)BC 
+--
+7
+==
+
+[part=1]
+(6x1)(1x3)A
+--
+6
+==
+
+[part=1]
 @include{advent_of_code/2016/day09/input.txt}
 --
-ERROR: Could not run test: Not implemented
+120765
 ==
 
 [part=2]
