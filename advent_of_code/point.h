@@ -37,11 +37,7 @@ struct Point {
     return *this;
   }
 
-  Point& operator-=(const Point& other) {
-    x -= other.x;
-    y -= other.y;
-    return *this;
-  }
+  Point& operator-=(const Point& other) { return *this += -other; }
 
   Point min_step() const {
     int gcd = std::gcd(abs(x), abs(y));
@@ -172,6 +168,8 @@ struct Point3 {
     return *this;
   }
 
+  Point3& operator-=(const Point3& other) { return *this += -other; }
+
   constexpr Point3 operator-() const { return {.x = -x, .y = -y, .z = -z}; }
 
   int dist() const { return abs(x) + abs(y) + abs(z); }
@@ -254,6 +252,8 @@ struct Point4 {
     w += other.w;
     return *this;
   }
+
+  Point4& operator-=(const Point4& other) { return *this += -other; }
 
   constexpr Point4 operator-() const {
     return {.x = -x, .y = -y, .z = -z, .w = -w};
