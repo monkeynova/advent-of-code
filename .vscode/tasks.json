@@ -23,7 +23,7 @@
         "command": "bazel",
         "args": [
           "test",
-          "${relativeFileDirname}:${fileBasenameNoExtension}_test"
+          "${relativeFileDirname}/..."
         ],
         "problemMatcher": [],
         "group": {
