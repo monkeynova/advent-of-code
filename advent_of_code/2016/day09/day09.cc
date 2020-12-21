@@ -20,7 +20,8 @@ absl::StatusOr<std::string> DecompressV1(absl::string_view in) {
       int count;
       int len;
       absl::string_view skip;
-      if (!RE2::FullMatch(in.substr(i), "(\\((\\d+)x(\\d+)\\)).*", &skip, &len, &count)) {
+      if (!RE2::FullMatch(in.substr(i), "(\\((\\d+)x(\\d+)\\)).*", &skip, &len,
+                          &count)) {
         return AdventDay::Error("Bad parse: ", in.substr(i));
       }
       for (int j = 0; j < count; ++j) {
@@ -41,10 +42,12 @@ absl::StatusOr<std::string> DecompressV2(absl::string_view in) {
       int count;
       int len;
       absl::string_view skip;
-      if (!RE2::FullMatch(in.substr(i), "(\\((\\d+)x(\\d+)\\)).*", &skip, &len, &count)) {
+      if (!RE2::FullMatch(in.substr(i), "(\\((\\d+)x(\\d+)\\)).*", &skip, &len,
+                          &count)) {
         return AdventDay::Error("Bad parse: ", in.substr(i));
       }
-      absl::StatusOr<std::string> tmp = DecompressV2(in.substr(i + skip.size(), len));
+      absl::StatusOr<std::string> tmp =
+          DecompressV2(in.substr(i + skip.size(), len));
       if (!tmp.ok()) return tmp.status();
       for (int j = 0; j < count; ++j) {
         ret.append(*tmp);
@@ -64,10 +67,12 @@ absl::StatusOr<int64_t> DecompressV2NonWhitespaceLen(absl::string_view in) {
       int64_t count;
       int64_t len;
       absl::string_view skip;
-      if (!RE2::FullMatch(in.substr(i), "(\\((\\d+)x(\\d+)\\)).*", &skip, &len, &count)) {
+      if (!RE2::FullMatch(in.substr(i), "(\\((\\d+)x(\\d+)\\)).*", &skip, &len,
+                          &count)) {
         return AdventDay::Error("Bad parse: ", in.substr(i));
       }
-      absl::StatusOr<int64_t> sub_len = DecompressV2NonWhitespaceLen(in.substr(i + skip.size(), len));
+      absl::StatusOr<int64_t> sub_len =
+          DecompressV2NonWhitespaceLen(in.substr(i + skip.size(), len));
       if (!sub_len.ok()) return sub_len.status();
       ret += count * *sub_len;
       i += skip.size() + len - 1;
@@ -80,7 +85,8 @@ absl::StatusOr<int64_t> DecompressV2NonWhitespaceLen(absl::string_view in) {
 
 int NonWhitespaceLen(absl::string_view s) {
   int len = s.size();
-  for (char s : s) if (s == ' ') --len;
+  for (char s : s)
+    if (s == ' ') --len;
   return len;
 }
 
