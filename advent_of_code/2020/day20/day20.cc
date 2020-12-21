@@ -14,7 +14,8 @@ namespace advent_of_code {
 
 namespace {
 
-std::string EdgeString(const CharBoard& board, Point start, Point end, Point dir) {
+std::string EdgeString(const CharBoard& board, Point start, Point end,
+                       Point dir) {
   std::string row;
   row.resize((end - start).dist() + 1);
   for (Point p = start; true; p += dir) {
@@ -24,8 +25,9 @@ std::string EdgeString(const CharBoard& board, Point start, Point end, Point dir
   return row;
 }
 
-void AddEdge(const CharBoard& board, int tile_num, Point start, Point end, Point dir,
-            absl::flat_hash_map<std::string, std::vector<int>>* edge_to_tile) {
+void AddEdge(const CharBoard& board, int tile_num, Point start, Point end,
+             Point dir,
+             absl::flat_hash_map<std::string, std::vector<int>>* edge_to_tile) {
   std::string row = EdgeString(board, start, end, dir);
   (*edge_to_tile)[row].push_back(tile_num);
   VLOG(3) << "Add edge: " << row << " to " << tile_num;
@@ -34,19 +36,24 @@ void AddEdge(const CharBoard& board, int tile_num, Point start, Point end, Point
   VLOG(3) << "Add edge: " << row << " to " << tile_num;
 }
 
-absl::StatusOr<int64_t> AlignTileCorners(const absl::flat_hash_map<int, CharBoard>& tiles) {
+absl::StatusOr<int64_t> AlignTileCorners(
+    const absl::flat_hash_map<int, CharBoard>& tiles) {
   absl::flat_hash_map<std::string, std::vector<int>> edge_to_tile;
   for (const auto& [num, tile] : tiles) {
     PointRectangle range = tile.range();
-    AddEdge(tile, num, range.min, {range.max.x, range.min.y}, {1, 0}, &edge_to_tile);
-    AddEdge(tile, num, range.min, {range.min.x, range.max.y}, {0, 1}, &edge_to_tile);
-    AddEdge(tile, num, {range.min.x, range.max.y}, range.max, {1, 0}, &edge_to_tile);
-    AddEdge(tile, num, {range.max.x, range.min.y}, range.max, {0, 1}, &edge_to_tile);
+    AddEdge(tile, num, range.min, {range.max.x, range.min.y}, {1, 0},
+            &edge_to_tile);
+    AddEdge(tile, num, range.min, {range.min.x, range.max.y}, {0, 1},
+            &edge_to_tile);
+    AddEdge(tile, num, {range.min.x, range.max.y}, range.max, {1, 0},
+            &edge_to_tile);
+    AddEdge(tile, num, {range.max.x, range.min.y}, range.max, {0, 1},
+            &edge_to_tile);
   }
   absl::flat_hash_map<int, int> tile_to_single_edge;
   for (const auto& [edge, tile_ids] : edge_to_tile) {
     VLOG(3) << "edge-to-tiles: " << edge << " " << absl::StrJoin(tile_ids, ",");
-    int delta = tile_ids.size() == 1 ? 1: 0;
+    int delta = tile_ids.size() == 1 ? 1 : 0;
     for (int tile : tile_ids) {
       tile_to_single_edge[tile] += delta;
     }
@@ -73,30 +80,35 @@ absl::StatusOr<int64_t> AlignTileCorners(const absl::flat_hash_map<int, CharBoar
   return ret;
 }
 
-  CharBoard Transform(const CharBoard& in, std::function<Point(Point)> trans) {
-    CharBoard out = in;
-    for (Point p : in.range()) {
-      out[trans(p)] = in[p];
-    }
-    return out;
+CharBoard Transform(const CharBoard& in, std::function<Point(Point)> trans) {
+  CharBoard out = in;
+  for (Point p : in.range()) {
+    out[trans(p)] = in[p];
   }
+  return out;
+}
 
-  std::vector<std::function<Point(Point)>> Transforms(PointRectangle range) {
-    std::vector<std::function<Point(Point)>> ret;
-    ret.push_back([](Point p) { return Point{p.x, p.y}; });
-    ret.push_back([range](Point p) { return Point{range.max.x - p.x, p.y}; });
-    ret.push_back([range](Point p) { return Point{p.x, range.max.y - p.y}; });
-    ret.push_back([range](Point p) { return Point{range.max.x - p.x, range.max.y - p.y}; });
-    ret.push_back([](Point p) { return Point{p.y, p.x}; });
-    ret.push_back([range](Point p) { return Point{p.y, range.max.x - p.x}; });
-    ret.push_back([range](Point p) { return Point{range.max.y - p.y, p.x}; });
-    ret.push_back([range](Point p) { return Point{range.max.y - p.y, range.max.x - p.x}; });
-    return ret;
-  }
+std::vector<std::function<Point(Point)>> Transforms(PointRectangle range) {
+  std::vector<std::function<Point(Point)>> ret;
+  ret.push_back([](Point p) { return Point{p.x, p.y}; });
+  ret.push_back([range](Point p) { return Point{range.max.x - p.x, p.y}; });
+  ret.push_back([range](Point p) { return Point{p.x, range.max.y - p.y}; });
+  ret.push_back([range](Point p) {
+    return Point{range.max.x - p.x, range.max.y - p.y};
+  });
+  ret.push_back([](Point p) { return Point{p.y, p.x}; });
+  ret.push_back([range](Point p) { return Point{p.y, range.max.x - p.x}; });
+  ret.push_back([range](Point p) { return Point{range.max.y - p.y, p.x}; });
+  ret.push_back([range](Point p) {
+    return Point{range.max.y - p.y, range.max.x - p.x};
+  });
+  return ret;
+}
 
 class TileMerger {
  public:
-  TileMerger(const absl::flat_hash_map<int, CharBoard>& tiles) : tiles_(tiles) {}
+  TileMerger(const absl::flat_hash_map<int, CharBoard>& tiles)
+      : tiles_(tiles) {}
 
   absl::StatusOr<CharBoard> Merge() {
     if (absl::Status st = InitSideLength(); !st.ok()) return st;
@@ -109,14 +121,16 @@ class TileMerger {
     }
     for (int tile_y = 0; tile_y < side_tile_count_; ++tile_y) {
       for (int tile_x = 0; tile_x < side_tile_count_; ++tile_x) {
-        if (absl::Status st = FindAndInsertTile(&merged, tile_x, tile_y); !st.ok()) return st;
+        if (absl::Status st = FindAndInsertTile(&merged, tile_x, tile_y);
+            !st.ok())
+          return st;
         VLOG(2) << "Merging board\n" << merged.DebugString();
       }
     }
     VLOG(1) << "Board with boarders:\n" << merged.DebugString();
     CharBoard no_borders(merged_side_length - 2 * side_tile_count_,
                          merged_side_length - 2 * side_tile_count_);
-    Point out = {0,0};
+    Point out = {0, 0};
     for (int y = 0; y < merged.height(); ++y) {
       if (y % tile_edge_size_ == 0) continue;
       if (y % tile_edge_size_ == tile_edge_size_ - 1) continue;
@@ -136,11 +150,14 @@ class TileMerger {
  private:
   absl::Status InitSideLength() {
     side_tile_count_ = 1;
-    for (; side_tile_count_ * side_tile_count_ < tiles_.size(); ++side_tile_count_) {}
+    for (; side_tile_count_ * side_tile_count_ < tiles_.size();
+         ++side_tile_count_) {
+    }
     if (side_tile_count_ * side_tile_count_ != tiles_.size()) {
       return AdventDay::Error("Tiles aren't square-able: ", tiles_.size());
     }
-    VLOG(1) << "Final board is " << side_tile_count_ << "x" << side_tile_count_ << " tiles";
+    VLOG(1) << "Final board is " << side_tile_count_ << "x" << side_tile_count_
+            << " tiles";
     return absl::OkStatus();
   }
 
@@ -157,10 +174,14 @@ class TileMerger {
         return AdventDay::Error("Heights aren't consistent");
       }
       PointRectangle range = tile.range();
-      AddEdge(tile, num, range.min, {range.max.x, range.min.y}, {1, 0}, &edge_to_tile_);
-      AddEdge(tile, num, range.min, {range.min.x, range.max.y}, {0, 1}, &edge_to_tile_);
-      AddEdge(tile, num, {range.min.x, range.max.y}, range.max, {1, 0}, &edge_to_tile_);
-      AddEdge(tile, num, {range.max.x, range.min.y}, range.max, {0, 1}, &edge_to_tile_);
+      AddEdge(tile, num, range.min, {range.max.x, range.min.y}, {1, 0},
+              &edge_to_tile_);
+      AddEdge(tile, num, range.min, {range.min.x, range.max.y}, {0, 1},
+              &edge_to_tile_);
+      AddEdge(tile, num, {range.min.x, range.max.y}, range.max, {1, 0},
+              &edge_to_tile_);
+      AddEdge(tile, num, {range.max.x, range.min.y}, range.max, {0, 1},
+              &edge_to_tile_);
     }
     return absl::OkStatus();
   }
@@ -168,8 +189,9 @@ class TileMerger {
   absl::Status ClassifyTiles() {
     absl::flat_hash_map<int, int> tile_to_single_edge;
     for (const auto& [edge, tile_ids] : edge_to_tile_) {
-      VLOG(3) << "edge-to-tiles: " << edge << " " << absl::StrJoin(tile_ids, ",");
-      int delta = tile_ids.size() == 1 ? 1: 0;
+      VLOG(3) << "edge-to-tiles: " << edge << " "
+              << absl::StrJoin(tile_ids, ",");
+      int delta = tile_ids.size() == 1 ? 1 : 0;
       for (int tile : tile_ids) {
         tile_to_single_edge[tile] += delta;
       }
@@ -188,16 +210,19 @@ class TileMerger {
     }
     return absl::OkStatus();
   }
-  
+
   absl::Status FindAndInsertTile(CharBoard* board, int tile_x, int tile_y) {
     Point fill_from = {tile_x * tile_edge_size_, tile_y * tile_edge_size_};
-    absl::StatusOr<CharBoard> oriented = absl::NotFoundError("Nothing looked up");
+    absl::StatusOr<CharBoard> oriented =
+        absl::NotFoundError("Nothing looked up");
 
     std::string orient_x;
     if (tile_y > 0) {
       orient_x.resize(tile_edge_size_);
-      Point orient_x_start = {tile_x * tile_edge_size_, tile_y * tile_edge_size_ - 1};
-      Point orient_x_end = {(tile_x + 1) * tile_edge_size_, tile_y * tile_edge_size_ - 1};
+      Point orient_x_start = {tile_x * tile_edge_size_,
+                              tile_y * tile_edge_size_ - 1};
+      Point orient_x_end = {(tile_x + 1) * tile_edge_size_,
+                            tile_y * tile_edge_size_ - 1};
       for (Point p = orient_x_start; p != orient_x_end; p += {1, 0}) {
         orient_x[(p - orient_x_start).dist()] = (*board)[p];
       }
@@ -205,8 +230,10 @@ class TileMerger {
     std::string orient_y;
     if (tile_x > 0) {
       orient_y.resize(tile_edge_size_);
-      Point orient_y_start = {tile_x * tile_edge_size_ - 1, tile_y * tile_edge_size_};
-      Point orient_y_end = {tile_x * tile_edge_size_ - 1, (tile_y + 1) * tile_edge_size_};
+      Point orient_y_start = {tile_x * tile_edge_size_ - 1,
+                              tile_y * tile_edge_size_};
+      Point orient_y_end = {tile_x * tile_edge_size_ - 1,
+                            (tile_y + 1) * tile_edge_size_};
       for (Point p = orient_y_start; p != orient_y_end; p += {0, 1}) {
         orient_y[(p - orient_y_start).dist()] = (*board)[p];
       }
@@ -221,7 +248,8 @@ class TileMerger {
     return absl::OkStatus();
   }
 
-  absl::StatusOr<int> Intersect(const std::vector<int>& v1, const std::vector<int>& v2) {
+  absl::StatusOr<int> Intersect(const std::vector<int>& v1,
+                                const std::vector<int>& v2) {
     for (int a : v1) {
       for (int b : v2) {
         if (a == b) return a;
@@ -241,7 +269,8 @@ class TileMerger {
       tile_num = *corners_.begin();
     } else if (y_align.empty()) {
       auto x_it = edge_to_tile_.find(x_align);
-      if (x_it == edge_to_tile_.end()) return AdventDay::Error("Can't find x: ", x_align);
+      if (x_it == edge_to_tile_.end())
+        return AdventDay::Error("Can't find x: ", x_align);
       absl::flat_hash_set<int> in_y;
       for (int y_tile : corners_) {
         in_y.insert(y_tile);
@@ -257,7 +286,8 @@ class TileMerger {
       }
     } else if (x_align.empty()) {
       auto y_it = edge_to_tile_.find(y_align);
-      if (y_it == edge_to_tile_.end()) return AdventDay::Error("Can't find y: ", y_align);
+      if (y_it == edge_to_tile_.end())
+        return AdventDay::Error("Can't find y: ", y_align);
       absl::flat_hash_set<int> in_x;
       for (int x_tile : corners_) {
         in_x.insert(x_tile);
@@ -291,17 +321,20 @@ class TileMerger {
     }
     auto tile_it = tiles_.find(*tile_num);
     used_tiles_.insert(*tile_num);
-    if (tile_it == tiles_.end()) return AdventDay::Error("Can't find tile: ", *tile_num);
+    if (tile_it == tiles_.end())
+      return AdventDay::Error("Can't find tile: ", *tile_num);
     const CharBoard& tile = tile_it->second;
 
     VLOG(3) << "  tile\n" << tile.DebugString();
     for (std::function<Point(Point)> t : Transforms(tile.range())) {
       CharBoard tmp = Transform(tile, t);
       VLOG(4) << "Oriented to\n" << tmp.DebugString();
-  
-      std::string x_edge = EdgeString(tmp, {0, 0}, {tmp.width() - 1, 0}, {1, 0});
-      std::string y_edge = EdgeString(tmp, {0, 0}, {0, tmp.height() - 1}, {0, 1});
-      
+
+      std::string x_edge =
+          EdgeString(tmp, {0, 0}, {tmp.width() - 1, 0}, {1, 0});
+      std::string y_edge =
+          EdgeString(tmp, {0, 0}, {0, tmp.height() - 1}, {0, 1});
+
       VLOG(4) << "  x_edge: " << x_edge;
       VLOG(4) << "  y_edge: " << y_edge;
 
@@ -330,11 +363,9 @@ bool IsSeaMonster(const CharBoard& board, Point p) {
   //                  # ",
   //#    ##    ##    ###",
   // #  #  #  #  #  #   ",
-  absl::flat_hash_set<Point> kSeaMonster =
-  {
-    {0, 1}, {1, 2}, {4, 2}, {5, 1}, {6, 1}, {7, 2},
-    {10, 2}, {11, 1}, {12, 1}, {13, 2}, {16, 2},
-    {17, 1}, {18, 1}, {18, 0}, {19, 1},
+  absl::flat_hash_set<Point> kSeaMonster = {
+      {0, 1},  {1, 2},  {4, 2},  {5, 1},  {6, 1},  {7, 2},  {10, 2}, {11, 1},
+      {12, 1}, {13, 2}, {16, 2}, {17, 1}, {18, 1}, {18, 0}, {19, 1},
   };
 
   for (Point check : kSeaMonster) {
@@ -385,13 +416,15 @@ absl::StatusOr<std::vector<std::string>> Day20_2020::Part1(
     if (RE2::FullMatch(input[i], "Tile (\\d+):", &cur_tile_num)) {
       cur_tile_index = i + 1;
     } else if (input[i].empty()) {
-      absl::StatusOr<CharBoard> board = CharBoard::Parse(input.subspan(cur_tile_index, i - cur_tile_index));
+      absl::StatusOr<CharBoard> board =
+          CharBoard::Parse(input.subspan(cur_tile_index, i - cur_tile_index));
       if (!board.ok()) return board.status();
       if (tiles.contains(cur_tile_num)) return Error("Dup tile:", cur_tile_num);
       tiles.emplace(cur_tile_num, std::move(*board));
     }
   }
-  absl::StatusOr<CharBoard> board = CharBoard::Parse(input.subspan(cur_tile_index, input.size()));
+  absl::StatusOr<CharBoard> board =
+      CharBoard::Parse(input.subspan(cur_tile_index, input.size()));
   if (!board.ok()) return board.status();
   if (tiles.contains(cur_tile_num)) return Error("Dup tile:", cur_tile_num);
   tiles.emplace(cur_tile_num, std::move(*board));
@@ -408,13 +441,15 @@ absl::StatusOr<std::vector<std::string>> Day20_2020::Part2(
     if (RE2::FullMatch(input[i], "Tile (\\d+):", &cur_tile_num)) {
       cur_tile_index = i + 1;
     } else if (input[i].empty()) {
-      absl::StatusOr<CharBoard> board = CharBoard::Parse(input.subspan(cur_tile_index, i - cur_tile_index));
+      absl::StatusOr<CharBoard> board =
+          CharBoard::Parse(input.subspan(cur_tile_index, i - cur_tile_index));
       if (!board.ok()) return board.status();
       if (tiles.contains(cur_tile_num)) return Error("Dup tile:", cur_tile_num);
       tiles.emplace(cur_tile_num, std::move(*board));
     }
   }
-  absl::StatusOr<CharBoard> board = CharBoard::Parse(input.subspan(cur_tile_index, input.size()));
+  absl::StatusOr<CharBoard> board =
+      CharBoard::Parse(input.subspan(cur_tile_index, input.size()));
   if (!board.ok()) return board.status();
   if (tiles.contains(cur_tile_num)) return Error("Dup tile:", cur_tile_num);
   tiles.emplace(cur_tile_num, std::move(*board));
