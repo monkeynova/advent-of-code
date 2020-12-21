@@ -14,6 +14,15 @@ sqjhc mxmxvkd sbzzf (contains fish)
 ==
 
 [part=2]
+mxmxvkd kfcds sqjhc nhms (contains dairy, fish)
+trh fvjkl sbzzf mxmxvkd (contains dairy)
+sqjhc fvjkl (contains soy)
+sqjhc mxmxvkd sbzzf (contains fish)
+--
+mxmxvkd,sqjhc,fvjkl
+==
+
+[part=2]
 @include{advent_of_code/2020/day21/input.txt}
 --
-ERROR: Could not run test: Not implemented
+hn,dgsdtj,kpksf,sjcvsr,bstzgn,kmmqmv,vkdxfj,bsfqgb

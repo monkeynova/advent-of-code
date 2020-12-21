@@ -109,7 +109,30 @@ absl::StatusOr<std::vector<std::string>> Day21_2020::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day21_2020::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  std::vector<Food> foods;
+  for (absl::string_view in : input) {
+    absl::StatusOr<Food> food = ParseFood(in);
+    if (!food.ok()) return food.status();
+    foods.push_back(std::move(*food));
+  }
+  absl::StatusOr<absl::flat_hash_map<absl::string_view, absl::string_view>> ingredient_to_allergen = FindAllergens(foods);
+  if (!ingredient_to_allergen.ok()) return ingredient_to_allergen.status();
+
+  struct IandA {
+    absl::string_view i;
+    absl::string_view a;
+    bool operator<(const IandA& o) const {
+      return a < o.a;
+    }
+  };
+  std::vector<IandA> ingredient_and_allergen;
+  for (const auto& pair : *ingredient_to_allergen) {
+    ingredient_and_allergen.push_back({.i = pair.first, .a = pair.second});
+  }
+  std::sort(ingredient_and_allergen.begin(), ingredient_and_allergen.end());
+  std::string out = absl::StrJoin(ingredient_and_allergen, ",",
+                                  [](std::string* out, const IandA& ianda) { absl::StrAppend(out, ianda.i);});
+  return std::vector<std::string>{out};;
 }
 
 }  // namespace advent_of_code
