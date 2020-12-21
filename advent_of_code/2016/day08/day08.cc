@@ -35,7 +35,8 @@ absl::StatusOr<std::vector<std::string>> Day08_2016::Part1(
         tmp[Point{(row_x + r) % tmp.width(), y}] = display[Point{row_x, y}];
       }
       display = tmp;
-    } else if (RE2::FullMatch(ins, "rotate column x=(\\d+) by (\\d+)", &x, &r)) {
+    } else if (RE2::FullMatch(ins, "rotate column x=(\\d+) by (\\d+)", &x,
+                              &r)) {
       CharBoard tmp = display;
       for (int row_y = 0; row_y < tmp.height(); ++row_y) {
         tmp[Point{x, (row_y + r) % tmp.height()}] = display[Point{x, row_y}];
@@ -71,7 +72,8 @@ absl::StatusOr<std::vector<std::string>> Day08_2016::Part2(
         tmp[Point{(row_x + r) % tmp.width(), y}] = display[Point{row_x, y}];
       }
       display = tmp;
-    } else if (RE2::FullMatch(ins, "rotate column x=(\\d+) by (\\d+)", &x, &r)) {
+    } else if (RE2::FullMatch(ins, "rotate column x=(\\d+) by (\\d+)", &x,
+                              &r)) {
       CharBoard tmp = display;
       for (int row_y = 0; row_y < tmp.height(); ++row_y) {
         tmp[Point{x, (row_y + r) % tmp.height()}] = display[Point{x, row_y}];
