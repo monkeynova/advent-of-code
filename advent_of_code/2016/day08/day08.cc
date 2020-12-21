@@ -57,7 +57,33 @@ absl::StatusOr<std::vector<std::string>> Day08_2016::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day08_2016::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  CharBoard display(50, 6);
+  for (absl::string_view ins : input) {
+    int x;
+    int y;
+    int r;
+    if (RE2::FullMatch(ins, "rect (\\d+)x(\\d+)", &x, &y)) {
+      PointRectangle r = {{0, 0}, {x - 1, y - 1}};
+      for (Point p : r) display[p] = '#';
+    } else if (RE2::FullMatch(ins, "rotate row y=(\\d+) by (\\d+)", &y, &r)) {
+      CharBoard tmp = display;
+      for (int row_x = 0; row_x < tmp.width(); ++row_x) {
+        tmp[Point{(row_x + r) % tmp.width(), y}] = display[Point{row_x, y}];
+      }
+      display = tmp;
+    } else if (RE2::FullMatch(ins, "rotate column x=(\\d+) by (\\d+)", &x, &r)) {
+      CharBoard tmp = display;
+      for (int row_y = 0; row_y < tmp.height(); ++row_y) {
+        tmp[Point{x, (row_y + r) % tmp.height()}] = display[Point{x, row_y}];
+      }
+      display = tmp;
+    } else {
+      return Error("Bad instruction: ", ins);
+    }
+    VLOG(1) << "Ins: " << ins;
+    VLOG(1) << "Board:\n" << display.DebugString();
+  }
+  return display.rows;
 }
 
 }  // namespace advent_of_code
