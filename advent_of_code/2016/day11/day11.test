@@ -1,7 +1,17 @@
 [part=1]
+The first floor contains a hydrogen-compatible microchip, and a lithium-compatible microchip.
+The second floor contains a hydrogen generator.
+The third floor contains a lithium generator.
+The fourth floor contains nothing relevant.
+--
+11
+==
+
+[long=30s (10s opt) 2020.12.21]
+[part=1]
 @include{advent_of_code/2016/day11/input.txt}
 --
-ERROR: Could not run test: Not implemented
+31
 ==
 
 [part=2]
