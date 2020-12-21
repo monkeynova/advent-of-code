@@ -19,7 +19,29 @@ namespace {
 
 absl::StatusOr<std::vector<std::string>> Day06_2016::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  std::vector<absl::flat_hash_map<char, int>> freqs;
+  if (input.empty()) return Error("Bad Input");
+  freqs.resize(input[0].size());
+  for (absl::string_view txt : input) {
+    if (freqs.size() != txt.size()) return Error("Mismatch input");
+    for (int i = 0; i < txt.size(); ++i) {
+      ++freqs[i][txt[i]];
+    }
+  }
+  std::string out;
+  out.resize(freqs.size());
+  for (int i = 0; i < freqs.size(); ++i) {
+    char max_char = '\0';
+    int max_count = -1;
+    for (const auto& [c, count] : freqs[i]) {
+      if (count > max_count) {
+        max_count = count;
+        max_char = c;
+      }
+    }
+    out[i] = max_char;
+  }
+  return std::vector<std::string>{out};
 }
 
 absl::StatusOr<std::vector<std::string>> Day06_2016::Part2(
