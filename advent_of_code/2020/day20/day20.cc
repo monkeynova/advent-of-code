@@ -128,21 +128,7 @@ class TileMerger {
       }
     }
     VLOG(1) << "Board with boarders:\n" << merged.DebugString();
-    CharBoard no_borders(merged_side_length - 2 * side_tile_count_,
-                         merged_side_length - 2 * side_tile_count_);
-    Point out = {0, 0};
-    for (int y = 0; y < merged.height(); ++y) {
-      if (y % tile_edge_size_ == 0) continue;
-      if (y % tile_edge_size_ == tile_edge_size_ - 1) continue;
-      for (int x = 0; x < merged.width(); ++x) {
-        if (x % tile_edge_size_ == 0) continue;
-        if (x % tile_edge_size_ == tile_edge_size_ - 1) continue;
-        no_borders[out] = merged[Point{x, y}];
-        ++out.x;
-      }
-      out.x = 0;
-      ++out.y;
-    }
+    CharBoard no_borders = RemoveBorder(merged);
     VLOG(1) << "Board without boarders:\n" << no_borders.DebugString();
     return no_borders;
   }
@@ -248,16 +234,6 @@ class TileMerger {
     return absl::OkStatus();
   }
 
-  absl::StatusOr<int> Intersect(const std::vector<int>& v1,
-                                const std::vector<int>& v2) {
-    for (int a : v1) {
-      for (int b : v2) {
-        if (a == b) return a;
-      }
-    }
-    return AdventDay::Error("Null intersect");
-  }
-
   absl::StatusOr<CharBoard> Orient(std::string x_align, std::string y_align) {
     VLOG(3) << "Orienting";
     VLOG(3) << "  x_align: " << x_align;
@@ -347,6 +323,25 @@ class TileMerger {
     }
 
     return AdventDay::Error("Could not orient board");
+  }
+
+  CharBoard RemoveBorder(const CharBoard& in) {
+    CharBoard no_borders(in.width() - 2 * side_tile_count_,
+                         in.height() - 2 * side_tile_count_);
+    Point out = {0, 0};
+    for (int y = 0; y < in.height(); ++y) {
+      if (y % tile_edge_size_ == 0) continue;
+      if (y % tile_edge_size_ == tile_edge_size_ - 1) continue;
+      for (int x = 0; x < in.width(); ++x) {
+        if (x % tile_edge_size_ == 0) continue;
+        if (x % tile_edge_size_ == tile_edge_size_ - 1) continue;
+        no_borders[out] = in[Point{x, y}];
+        ++out.x;
+      }
+      out.x = 0;
+      ++out.y;
+    }
+    return no_borders;
   }
 
   int side_tile_count_;
