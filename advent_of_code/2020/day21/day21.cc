@@ -15,13 +15,14 @@ namespace {
 
 // Helper methods go here.
 struct Food {
-  absl::flat_hash_set<absl::string_view> ingredients; 
+  absl::flat_hash_set<absl::string_view> ingredients;
   absl::flat_hash_set<absl::string_view> allergens;
 };
 
 absl::StatusOr<Food> ParseFood(absl::string_view txt) {
   Food food;
-  std::vector<absl::string_view> ingredients_and_allergens = absl::StrSplit(txt, " (contains ");
+  std::vector<absl::string_view> ingredients_and_allergens =
+      absl::StrSplit(txt, " (contains ");
   if (ingredients_and_allergens.size() != 2) {
     return AdventDay::Error("Bad input: ", txt);
   }
@@ -48,8 +49,8 @@ void Intersect(absl::flat_hash_set<absl::string_view>* out,
   *out = std::move(new_out);
 }
 
-absl::StatusOr<absl::flat_hash_map<absl::string_view, absl::string_view>> FindAllergens(
-  const std::vector<Food>& foods) {
+absl::StatusOr<absl::flat_hash_map<absl::string_view, absl::string_view>>
+FindAllergens(const std::vector<Food>& foods) {
   absl::flat_hash_map<absl::string_view, std::vector<int>> allergen_to_food_idx;
   for (int food_idx = 0; food_idx < foods.size(); ++food_idx) {
     for (absl::string_view a : foods[food_idx].allergens) {
@@ -57,8 +58,10 @@ absl::StatusOr<absl::flat_hash_map<absl::string_view, absl::string_view>> FindAl
     }
   }
 
-  absl::flat_hash_map<absl::string_view, absl::string_view> allergen_to_ingredient;
-  absl::flat_hash_map<absl::string_view, absl::string_view> ingredient_to_allergen;
+  absl::flat_hash_map<absl::string_view, absl::string_view>
+      allergen_to_ingredient;
+  absl::flat_hash_map<absl::string_view, absl::string_view>
+      ingredient_to_allergen;
   absl::flat_hash_set<absl::string_view> assigned_ingredients;
 
   while (allergen_to_ingredient.size() < allergen_to_food_idx.size()) {
@@ -66,7 +69,8 @@ absl::StatusOr<absl::flat_hash_map<absl::string_view, absl::string_view>> FindAl
     for (const auto& [allergen, food_idx_list] : allergen_to_food_idx) {
       if (allergen_to_ingredient.contains(allergen)) continue;
 
-      absl::flat_hash_set<absl::string_view> in = foods[*food_idx_list.begin()].ingredients;
+      absl::flat_hash_set<absl::string_view> in =
+          foods[*food_idx_list.begin()].ingredients;
       for (int idx : food_idx_list) {
         Intersect(&in, foods[idx].ingredients, assigned_ingredients);
       }
@@ -95,7 +99,8 @@ absl::StatusOr<std::vector<std::string>> Day21_2020::Part1(
     if (!food.ok()) return food.status();
     foods.push_back(std::move(*food));
   }
-  absl::StatusOr<absl::flat_hash_map<absl::string_view, absl::string_view>> ingredient_to_allergen = FindAllergens(foods);
+  absl::StatusOr<absl::flat_hash_map<absl::string_view, absl::string_view>>
+      ingredient_to_allergen = FindAllergens(foods);
   if (!ingredient_to_allergen.ok()) return ingredient_to_allergen.status();
 
   int count = 0;
@@ -115,15 +120,14 @@ absl::StatusOr<std::vector<std::string>> Day21_2020::Part2(
     if (!food.ok()) return food.status();
     foods.push_back(std::move(*food));
   }
-  absl::StatusOr<absl::flat_hash_map<absl::string_view, absl::string_view>> ingredient_to_allergen = FindAllergens(foods);
+  absl::StatusOr<absl::flat_hash_map<absl::string_view, absl::string_view>>
+      ingredient_to_allergen = FindAllergens(foods);
   if (!ingredient_to_allergen.ok()) return ingredient_to_allergen.status();
 
   struct IandA {
     absl::string_view i;
     absl::string_view a;
-    bool operator<(const IandA& o) const {
-      return a < o.a;
-    }
+    bool operator<(const IandA& o) const { return a < o.a; }
   };
   std::vector<IandA> ingredient_and_allergen;
   for (const auto& pair : *ingredient_to_allergen) {
@@ -131,8 +135,11 @@ absl::StatusOr<std::vector<std::string>> Day21_2020::Part2(
   }
   std::sort(ingredient_and_allergen.begin(), ingredient_and_allergen.end());
   std::string out = absl::StrJoin(ingredient_and_allergen, ",",
-                                  [](std::string* out, const IandA& ianda) { absl::StrAppend(out, ianda.i);});
-  return std::vector<std::string>{out};;
+                                  [](std::string* out, const IandA& ianda) {
+                                    absl::StrAppend(out, ianda.i);
+                                  });
+  return std::vector<std::string>{out};
+  ;
 }
 
 }  // namespace advent_of_code
