@@ -14,7 +14,8 @@ The fourth floor contains nothing relevant.
 31
 ==
 
+[long=60m (12m opt) 2020.12.21]
 [part=2]
 @include{advent_of_code/2016/day11/input.txt}
 --
-ERROR: Could not run test: Not implemented
+55
