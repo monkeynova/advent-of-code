@@ -11,8 +11,8 @@
 #include "file_based_test_driver/file_based_test_driver.h"
 #include "file_based_test_driver/run_test_case_result.h"
 #include "file_based_test_driver/test_case_options.h"
-#include "re2/re2.h"
 #include "main_lib.h"
+#include "re2/re2.h"
 
 ABSL_FLAG(std::string, test_file, "",
           "The file which contains the file based test driver tests");
