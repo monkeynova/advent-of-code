@@ -1,15 +1,18 @@
 #include "advent_of_code/file_test.h"
 
 #include "absl/flags/flag.h"
+#include "absl/functional/bind_front.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/file_test_options.h"
 #include "advent_of_code/file_util.h"
 #include "benchmark/benchmark.h"
 #include "file_based_test_driver/base/file_util.h"
+#include "file_based_test_driver/file_based_test_driver.h"
 #include "file_based_test_driver/run_test_case_result.h"
 #include "file_based_test_driver/test_case_options.h"
 #include "re2/re2.h"
+#include "main_lib.h"
 
 ABSL_FLAG(std::string, test_file, "",
           "The file which contains the file based test driver tests");
@@ -99,6 +102,13 @@ void RunTestCase(const AdventDay* advent_day,
     return;
   }
   test_result->AddTestOutput(absl::StrJoin(*output, "\n"));
+}
+
+bool TestSingleDay(AdventDay* solver) {
+  InitializeAbslFlagsFromGtest();
+  google::InstallFailureSignalHandler();
+  return file_based_test_driver::RunTestCasesFromFiles(
+      TestCaseFileName(), absl::bind_front(&RunTestCase, solver));
 }
 
 }  // namespace advent_of_code
