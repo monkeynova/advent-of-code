@@ -13,6 +13,8 @@ namespace advent_of_code {
 
 namespace {
 
+// TODO(@monkeunova): Could use a bit vector rather than sets.
+
 struct Floor {
   std::set<absl::string_view> generators;
   std::set<absl::string_view> microchips;
@@ -179,13 +181,8 @@ absl::StatusOr<int> StepsToAllOnFourthFloor(State start) {
   return AdventDay::Error("No path found");
 }
 
-// Helper methods go here.
-
-}  // namespace
-
-absl::StatusOr<std::vector<std::string>> Day11_2016::Part1(
-    absl::Span<absl::string_view> input) const {
-  if (input.size() != 4) return Error("Bad input size");
+absl::StatusOr<State> ParseInitialState(absl::Span<absl::string_view> input) {
+  if (input.size() != 4) return AdventDay::Error("Bad input size");
   State s;
   s.floors.resize(4);
   int floor = 0;
@@ -193,7 +190,7 @@ absl::StatusOr<std::vector<std::string>> Day11_2016::Part1(
   for (absl::string_view in : input) {
     std::string prefix = absl::StrCat("The ", kFloorNames[floor], " floor contains ");
     if (in.substr(0, prefix.size()) != prefix) {
-      return Error("Bad prefix: ", in, " !~ ", prefix);
+      return AdventDay::Error("Bad prefix: ", in, " !~ ", prefix);
     }
     in = in.substr(prefix.size());
     if (in == "nothing relevant.") continue;
@@ -211,18 +208,33 @@ absl::StatusOr<std::vector<std::string>> Day11_2016::Part1(
       } else if (RE2::FullMatch(comp, "a (.*)-compatible microchip", &e)) {
         s.floors[floor].microchips.insert(e);
       } else {
-        return Error("Bad component: ", comp);
+        return AdventDay::Error("Bad component: ", comp);
       }
     }
     ++floor;
   }
+  return s;
+}
 
-  return IntReturn(StepsToAllOnFourthFloor(s));
+// Helper methods go here.
+
+}  // namespace
+
+absl::StatusOr<std::vector<std::string>> Day11_2016::Part1(
+    absl::Span<absl::string_view> input) const {
+  absl::StatusOr<State> s = ParseInitialState(input);
+  if (!s.ok()) return s.status();
+  return IntReturn(StepsToAllOnFourthFloor(*s));
 }
 
 absl::StatusOr<std::vector<std::string>> Day11_2016::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<State> s = ParseInitialState(input);
+  s->floors[0].generators.insert("elerium");
+  s->floors[0].microchips.insert("elerium");
+  s->floors[0].generators.insert("dilithium");
+  s->floors[0].microchips.insert("dilithium");
+  return IntReturn(StepsToAllOnFourthFloor(*s));
 }
 
 }  // namespace advent_of_code
