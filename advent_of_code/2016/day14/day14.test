@@ -11,7 +11,17 @@ abc
 15168
 ==
 
+# TODO(@monkeynova): Non-opt is a guess.
+[long=20m (30s opt) 2020.12.22]
+[part=2]
+abc
+--
+22551
+==
+
+# TODO(@monkeynova): Non-opt is a guess.
+[long=20m (30s opt) 2020.12.22]
 [part=2]
 @include{advent_of_code/2016/day14/input.txt}
 --
-ERROR: Could not run test: Not implemented
+20864
