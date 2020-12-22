@@ -6,6 +6,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/char_board.h"
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
@@ -55,6 +56,47 @@ class SparseBoard {
     return absl::nullopt;
   }
   
+  absl::optional<int> DistinctWithin(Point start, int dist) {
+    struct Path {
+      int num_steps;
+      Point cur;
+    };
+    std::deque<Path> frontier = {{.cur = start, .num_steps = 0}};
+    absl::flat_hash_set<Point> hist;
+    hist.insert(start);
+    CharBoard debug(dist + 2, dist + 2);
+    if (VLOG_IS_ON(1)) {
+      for (Point p : debug.range()) debug[p] = '?';
+      debug[start] = '.';
+    }
+    int visited = 0;
+    while (!frontier.empty()) {
+      Path path = frontier.front();
+      frontier.pop_front();
+      ++visited;
+      for (Point dir : Cardinal::kFourDirs) {
+        Point next = dir + path.cur;
+        if (path.num_steps + 1 > dist) continue;
+        if (hist.contains(next)) continue;
+        hist.insert(next);
+        if (VLOG_IS_ON(1)) {
+          debug[next] = IsWall(next) ? '#' : '.';
+        }
+        if (OnBoard(next) && !IsWall(next)) {
+          frontier.push_back({.cur = next, .num_steps = path.num_steps + 1});
+        }
+      }
+    }
+    if (VLOG_IS_ON(1)) {
+      int count = 0;
+      for (Point p : debug.range()) {
+        if (debug[p] == '.') ++count;
+      }
+      VLOG(1) << "Discovered " << count << " walkable in:\n" << debug.DebugString();
+    }
+    return visited;
+  }
+
  private:
   int input_;
   // absl::flat_hash_map<Point, bool> known_wall_;
@@ -80,7 +122,11 @@ absl::StatusOr<std::vector<std::string>> Day13_2016::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day13_2016::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 1) return Error("Bad input size");
+  int v;
+  if (!absl::SimpleAtoi(input[0], &v)) return Error("Bad atoi: ", input[0]);
+  SparseBoard board(v);
+  return IntReturn(board.DistinctWithin({1, 1}, 50));
 }
 
 }  // namespace advent_of_code
