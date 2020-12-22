@@ -1,7 +1,8 @@
+# 10001101110101111 (low)
 [part=1]
 @include{advent_of_code/2016/day16/input.txt}
 --
-ERROR: Could not run test: Not implemented
+11111000111110000
 ==
 
 [part=2]
