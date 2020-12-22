@@ -11,7 +11,8 @@ Disc #2 has 2 positions; at time=0, it is at position 1.
 122318
 ==
 
+# 4531268 (high)
 [part=2]
 @include{advent_of_code/2016/day15/input.txt}
 --
-ERROR: Could not run test: Not implemented
+3208583
