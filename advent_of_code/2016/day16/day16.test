@@ -5,7 +5,8 @@
 11111000111110000
 ==
 
+[long=3s (0s opt) 2020.12.22]
 [part=2]
 @include{advent_of_code/2016/day16/input.txt}
 --
-ERROR: Could not run test: Not implemented
+10111100110110100

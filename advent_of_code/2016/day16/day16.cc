@@ -74,7 +74,8 @@ absl::StatusOr<std::vector<std::string>> Day16_2016::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day16_2016::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 1) return Error("Bad input size");
+  return std::vector<std::string>{RunPart1(input[0], 35651584)};
 }
 
 }  // namespace advent_of_code
