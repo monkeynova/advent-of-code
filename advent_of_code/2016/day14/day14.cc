@@ -40,7 +40,7 @@ absl::StatusOr<std::vector<std::string>> Day14_2016::Part1(
     std::string str = absl::StrCat(input[0], index);
     MD5_Update(&ctx, str.data(), str.size());
     MD5_Final(md5_result, &ctx);
-    
+
     std::string hex = Hex(md5_result_view);
     window.push_back(hex);
     if (window.size() < 1001) continue;
@@ -52,25 +52,24 @@ absl::StatusOr<std::vector<std::string>> Day14_2016::Part1(
     {
       absl::string_view test = window[test_index];
       for (int i = 0; i + 2 < test.size(); ++i) {
-        if (test[i] == test[i+1] &&
-            test[i] == test[i+2]) {
-          VLOG(2) << "Found 3-ple of " << test.substr(i, 1) << " in " << test << " @" << test_index << "," << i;
+        if (test[i] == test[i + 1] && test[i] == test[i + 2]) {
+          VLOG(2) << "Found 3-ple of " << test.substr(i, 1) << " in " << test
+                  << " @" << test_index << "," << i;
           hunt_set.insert(test[i]);
           break;
         }
       }
-    }  
+    }
     for (char hunt : hunt_set) {
       bool found_5ple = false;
       for (int j = 1; j <= 1000; ++j) {
         absl::string_view test = window[test_index + j];
         for (int i = 0; i + 4 < test.size(); ++i) {
-          if (test[i] == hunt &&
-              test[i] == test[i+1] &&
-              test[i] == test[i+2] &&
-              test[i] == test[i+3] &&
-              test[i] == test[i+4]) {
-            VLOG(2) << "Found 5-ple of " << test.substr(i, 1) << " in " << test << " @" << test_index + j << "," << i;
+          if (test[i] == hunt && test[i] == test[i + 1] &&
+              test[i] == test[i + 2] && test[i] == test[i + 3] &&
+              test[i] == test[i + 4]) {
+            VLOG(2) << "Found 5-ple of " << test.substr(i, 1) << " in " << test
+                    << " @" << test_index + j << "," << i;
             found_5ple = true;
           }
         }
@@ -104,7 +103,7 @@ absl::StatusOr<std::vector<std::string>> Day14_2016::Part2(
       MD5_Final(md5_result, &ctx);
       str = Hex(md5_result_view);
     }
-    
+
     std::string hex = Hex(md5_result_view);
     window.push_back(hex);
     if (window.size() < 1001) continue;
@@ -116,25 +115,24 @@ absl::StatusOr<std::vector<std::string>> Day14_2016::Part2(
     {
       absl::string_view test = window[test_index];
       for (int i = 0; i + 2 < test.size(); ++i) {
-        if (test[i] == test[i+1] &&
-            test[i] == test[i+2]) {
-          VLOG(2) << "Found 3-ple of " << test.substr(i, 1) << " in " << test << " @" << test_index << "," << i;
+        if (test[i] == test[i + 1] && test[i] == test[i + 2]) {
+          VLOG(2) << "Found 3-ple of " << test.substr(i, 1) << " in " << test
+                  << " @" << test_index << "," << i;
           hunt_set.insert(test[i]);
           break;
         }
       }
-    }  
+    }
     for (char hunt : hunt_set) {
       bool found_5ple = false;
       for (int j = 1; j <= 1000; ++j) {
         absl::string_view test = window[test_index + j];
         for (int i = 0; i + 4 < test.size(); ++i) {
-          if (test[i] == hunt &&
-              test[i] == test[i+1] &&
-              test[i] == test[i+2] &&
-              test[i] == test[i+3] &&
-              test[i] == test[i+4]) {
-            VLOG(2) << "Found 5-ple of " << test.substr(i, 1) << " in " << test << " @" << test_index + j << "," << i;
+          if (test[i] == hunt && test[i] == test[i + 1] &&
+              test[i] == test[i + 2] && test[i] == test[i + 3] &&
+              test[i] == test[i + 4]) {
+            VLOG(2) << "Found 5-ple of " << test.substr(i, 1) << " in " << test
+                    << " @" << test_index + j << "," << i;
             found_5ple = true;
           }
         }
