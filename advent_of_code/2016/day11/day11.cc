@@ -45,17 +45,19 @@ H AbslHashValue(H h, const State& s) {
 
 std::ostream& operator<<(std::ostream& out, const State& s) {
   for (int i = 0; i < s.floors.size(); ++i) {
-    out << "F" << i + 1 << (s.cur_floor == i ? " E": "  ") << ":";
+    out << "F" << i + 1 << (s.cur_floor == i ? " E" : "  ") << ":";
     out << " G{";
-    for (int bit_index = 0; (1<< bit_index) <= s.floors[i].generators_bv; ++bit_index) {
-      if (s.floors[i].generators_bv & (1<< bit_index)) {
+    for (int bit_index = 0; (1 << bit_index) <= s.floors[i].generators_bv;
+         ++bit_index) {
+      if (s.floors[i].generators_bv & (1 << bit_index)) {
         out << s.elements[bit_index] << ",";
       }
     }
     out << "}";
     out << " M{";
-    for (int bit_index = 0; (1<< bit_index) <= s.floors[i].microchips_bv; ++bit_index) {
-      if (s.floors[i].microchips_bv & (1<< bit_index)) {
+    for (int bit_index = 0; (1 << bit_index) <= s.floors[i].microchips_bv;
+         ++bit_index) {
+      if (s.floors[i].microchips_bv & (1 << bit_index)) {
         out << s.elements[bit_index] << ",";
       }
     }
@@ -68,12 +70,14 @@ std::vector<State> NextStates(const State& state) {
   int cur_floor_num = state.cur_floor;
   std::vector<int> next_floors;
   if (cur_floor_num - 1 >= 0) next_floors.push_back(cur_floor_num - 1);
-  if (cur_floor_num + 1 < state.floors.size()) next_floors.push_back(cur_floor_num + 1);
+  if (cur_floor_num + 1 < state.floors.size())
+    next_floors.push_back(cur_floor_num + 1);
   const Floor& cur_floor = state.floors[cur_floor_num];
 
   std::vector<State> ret;
-  for (int bit_index = 0; (1<< bit_index) <= cur_floor.generators_bv; ++bit_index) {
-    if (!(cur_floor.generators_bv & (1<<bit_index))) continue;
+  for (int bit_index = 0; (1 << bit_index) <= cur_floor.generators_bv;
+       ++bit_index) {
+    if (!(cur_floor.generators_bv & (1 << bit_index))) continue;
     for (int next_floor : next_floors) {
       State next = state;
       ++next.steps;
@@ -83,10 +87,11 @@ std::vector<State> NextStates(const State& state) {
       ret.push_back(next);
     }
   }
-  for (int bit_index1 = 0; (1<< bit_index1) <= cur_floor.generators_bv; ++bit_index1) {
-    if (!(cur_floor.generators_bv & (1<<bit_index1))) continue;
+  for (int bit_index1 = 0; (1 << bit_index1) <= cur_floor.generators_bv;
+       ++bit_index1) {
+    if (!(cur_floor.generators_bv & (1 << bit_index1))) continue;
     for (int bit_index2 = 0; bit_index2 < bit_index1; ++bit_index2) {
-      if (!(cur_floor.generators_bv & (1<<bit_index2))) continue;
+      if (!(cur_floor.generators_bv & (1 << bit_index2))) continue;
       for (int next_floor : next_floors) {
         State next = state;
         ++next.steps;
@@ -99,8 +104,9 @@ std::vector<State> NextStates(const State& state) {
       }
     }
   }
-  for (int bit_index = 0; (1<< bit_index) <= cur_floor.microchips_bv; ++bit_index) {
-    if (!(cur_floor.microchips_bv & (1<<bit_index))) continue;
+  for (int bit_index = 0; (1 << bit_index) <= cur_floor.microchips_bv;
+       ++bit_index) {
+    if (!(cur_floor.microchips_bv & (1 << bit_index))) continue;
     for (int next_floor : next_floors) {
       State next = state;
       ++next.steps;
@@ -110,10 +116,11 @@ std::vector<State> NextStates(const State& state) {
       ret.push_back(next);
     }
   }
-  for (int bit_index1 = 0; (1<< bit_index1) <= cur_floor.microchips_bv; ++bit_index1) {
-    if (!(cur_floor.microchips_bv & (1<<bit_index1))) continue;
+  for (int bit_index1 = 0; (1 << bit_index1) <= cur_floor.microchips_bv;
+       ++bit_index1) {
+    if (!(cur_floor.microchips_bv & (1 << bit_index1))) continue;
     for (int bit_index2 = 0; bit_index2 < bit_index1; ++bit_index2) {
-      if (!(cur_floor.microchips_bv & (1<<bit_index2))) continue;
+      if (!(cur_floor.microchips_bv & (1 << bit_index2))) continue;
       for (int next_floor : next_floors) {
         State next = state;
         ++next.steps;
@@ -126,10 +133,12 @@ std::vector<State> NextStates(const State& state) {
       }
     }
   }
-  for (int bit_index1 = 0; (1<< bit_index1) <= cur_floor.microchips_bv; ++bit_index1) {
-    if (!(cur_floor.microchips_bv & (1<<bit_index1))) continue;
-    for (int bit_index2 = 0; (1<< bit_index2) <= cur_floor.generators_bv; ++bit_index2) {
-      if (!(cur_floor.generators_bv & (1<<bit_index2))) continue;
+  for (int bit_index1 = 0; (1 << bit_index1) <= cur_floor.microchips_bv;
+       ++bit_index1) {
+    if (!(cur_floor.microchips_bv & (1 << bit_index1))) continue;
+    for (int bit_index2 = 0; (1 << bit_index2) <= cur_floor.generators_bv;
+         ++bit_index2) {
+      if (!(cur_floor.generators_bv & (1 << bit_index2))) continue;
       for (int next_floor : next_floors) {
         State next = state;
         ++next.steps;
@@ -149,9 +158,10 @@ bool ValidState(const State& state) {
   for (const Floor& f : state.floors) {
     // TODO(@monkeynova): This could be a single bit op.
     if (f.generators_bv != 0) {
-      for (int bit_index = 0; (1<< bit_index) <= f.microchips_bv; ++bit_index) {
-        if (!(f.microchips_bv & (1<<bit_index))) continue;
-        if (!(f.generators_bv & (1<<bit_index))) return false;
+      for (int bit_index = 0; (1 << bit_index) <= f.microchips_bv;
+           ++bit_index) {
+        if (!(f.microchips_bv & (1 << bit_index))) continue;
+        if (!(f.generators_bv & (1 << bit_index))) return false;
       }
     }
   }
@@ -200,7 +210,8 @@ absl::StatusOr<State> ParseInitialState(absl::Span<absl::string_view> input) {
   absl::string_view kFloorNames[] = {"first", "second", "third", "fourth"};
   absl::flat_hash_map<absl::string_view, int> element_to_id;
   for (absl::string_view in : input) {
-    std::string prefix = absl::StrCat("The ", kFloorNames[floor], " floor contains ");
+    std::string prefix =
+        absl::StrCat("The ", kFloorNames[floor], " floor contains ");
     if (in.substr(0, prefix.size()) != prefix) {
       return AdventDay::Error("Bad prefix: ", in, " !~ ", prefix);
     }
@@ -211,7 +222,8 @@ absl::StatusOr<State> ParseInitialState(absl::Span<absl::string_view> input) {
       components.back() = components.back().substr(4);
     }
     if (components.back().back() == '.') {
-      components.back() = components.back().substr(0, components.back().size() - 1);
+      components.back() =
+          components.back().substr(0, components.back().size() - 1);
     }
     for (absl::string_view comp : components) {
       absl::string_view e;
