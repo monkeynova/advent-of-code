@@ -28,17 +28,20 @@ absl::StatusOr<std::vector<std::string>> Day15_2016::Part1(
   std::vector<Disc> discs;
   for (absl::string_view str : input) {
     Disc d;
-    if (!RE2::FullMatch(str, "Disc #(\\d+) has (\\d+) positions; at time=0, it is at position (\\d+).",
+    if (!RE2::FullMatch(str,
+                        "Disc #(\\d+) has (\\d+) positions; at time=0, it is "
+                        "at position (\\d+).",
                         &d.index, &d.positions, &d.start)) {
       return Error("Bad description: ", str);
     }
     discs.push_back(d);
   }
-  
+
   int64_t delta = 1;
   int64_t start = 0;
   for (Disc d : discs) {
-    VLOG(1) << "Disk: {" << d.index << "," << d.start << "," << d.positions <<"}";
+    VLOG(1) << "Disk: {" << d.index << "," << d.start << "," << d.positions
+            << "}";
     VLOG(1) << "  start=" << start;
     while ((start + d.start + d.index) % d.positions != 0) {
       start += delta;
@@ -46,7 +49,7 @@ absl::StatusOr<std::vector<std::string>> Day15_2016::Part1(
     VLOG(1) << "  start=" << start;
     delta *= d.positions / std::gcd(d.positions, delta);
   }
-  
+
   return IntReturn(start);
 }
 
@@ -55,18 +58,23 @@ absl::StatusOr<std::vector<std::string>> Day15_2016::Part2(
   std::vector<Disc> discs;
   for (absl::string_view str : input) {
     Disc d;
-    if (!RE2::FullMatch(str, "Disc #(\\d+) has (\\d+) positions; at time=0, it is at position (\\d+).",
+    if (!RE2::FullMatch(str,
+                        "Disc #(\\d+) has (\\d+) positions; at time=0, it is "
+                        "at position (\\d+).",
                         &d.index, &d.positions, &d.start)) {
       return Error("Bad description: ", str);
     }
     discs.push_back(d);
   }
-  discs.push_back({.index = static_cast<int64_t>(discs.size() + 1), .start = 0, .positions = 11});
-  
+  discs.push_back({.index = static_cast<int64_t>(discs.size() + 1),
+                   .start = 0,
+                   .positions = 11});
+
   int64_t delta = 1;
   int64_t start = 0;
   for (Disc d : discs) {
-    VLOG(1) << "Disk: {" << d.index << "," << d.start << "," << d.positions <<"}";
+    VLOG(1) << "Disk: {" << d.index << "," << d.start << "," << d.positions
+            << "}";
     VLOG(1) << "  start=" << start;
     while ((start + d.start + d.index) % d.positions != 0) {
       start += delta;
@@ -74,7 +82,7 @@ absl::StatusOr<std::vector<std::string>> Day15_2016::Part2(
     VLOG(1) << "  start=" << start;
     delta *= d.positions / std::gcd(d.positions, delta);
   }
-  
+
   return IntReturn(start);
 }
 
