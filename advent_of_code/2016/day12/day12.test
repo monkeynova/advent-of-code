@@ -1,7 +1,18 @@
 [part=1]
+cpy 41 a
+inc a
+inc a
+dec a
+jnz a 2
+dec a
+--
+42
+==
+
+[part=1]
 @include{advent_of_code/2016/day12/input.txt}
 --
-ERROR: Could not run test: Not implemented
+317993
 ==
 
 [part=2]
