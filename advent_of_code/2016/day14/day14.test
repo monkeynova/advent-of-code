@@ -1,7 +1,14 @@
 [part=1]
+abc
+--
+22728
+==
+
+# 15218 (high)
+[part=1]
 @include{advent_of_code/2016/day14/input.txt}
 --
-ERROR: Could not run test: Not implemented
+15168
 ==
 
 [part=2]
