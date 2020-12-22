@@ -33,7 +33,8 @@ void PlayWar(std::deque<int>* deck1, std::deque<int>* deck2) {
 
 bool PlayWarRecursiveRec(
     std::deque<int>* deck1, std::deque<int>* deck2, int depth,
-    absl::flat_hash_map<std::pair<std::deque<int>, std::deque<int>>, bool>*  memo) {
+    absl::flat_hash_map<std::pair<std::deque<int>, std::deque<int>>, bool>*
+        memo) {
   auto memo_key = std::make_pair(*deck1, *deck2);
   if (auto it = memo->find(memo_key); it != memo->end()) return it->second;
 
@@ -80,7 +81,6 @@ bool PlayWarRecursive(std::deque<int>* deck1, std::deque<int>* deck2) {
   return PlayWarRecursiveRec(deck1, deck2, 0, &memo);
 }
 
-
 int ScoreDeck(const std::deque<int>& deck) {
   int score = 0;
   for (int i = 0; i < deck.size(); ++i) {
@@ -101,9 +101,12 @@ absl::StatusOr<std::vector<std::string>> Day22_2020::Part1(
     int player;
     int card;
     if (RE2::FullMatch(str, "Player (\\d+):", &player)) {
-      if (player == 1) cur_deck = &deck1;
-      else if (player == 2) cur_deck = &deck2;
-      else return Error("Bad player: ", player);
+      if (player == 1)
+        cur_deck = &deck1;
+      else if (player == 2)
+        cur_deck = &deck2;
+      else
+        return Error("Bad player: ", player);
     } else if (absl::SimpleAtoi(str, &card)) {
       if (cur_deck == nullptr) return Error("No deck");
       cur_deck->push_back(card);
@@ -131,9 +134,12 @@ absl::StatusOr<std::vector<std::string>> Day22_2020::Part2(
     int player;
     int card;
     if (RE2::FullMatch(str, "Player (\\d+):", &player)) {
-      if (player == 1) cur_deck = &deck1;
-      else if (player == 2) cur_deck = &deck2;
-      else return Error("Bad player: ", player);
+      if (player == 1)
+        cur_deck = &deck1;
+      else if (player == 2)
+        cur_deck = &deck2;
+      else
+        return Error("Bad player: ", player);
     } else if (absl::SimpleAtoi(str, &card)) {
       if (cur_deck == nullptr) return Error("No deck");
       cur_deck->push_back(card);
