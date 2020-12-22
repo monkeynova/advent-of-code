@@ -33,7 +33,8 @@ struct Instruction {
       i.op_code = OpCode::kInc;
     } else if (RE2::FullMatch(in, "dec ([a-z]+)", &i.arg1)) {
       i.op_code = OpCode::kDec;
-    } else if (RE2::FullMatch(in, "jnz ([-a-z0-9]+) ([-a-z0-9]+)", &i.arg1, &i.arg2)) {
+    } else if (RE2::FullMatch(in, "jnz ([-a-z0-9]+) ([-a-z0-9]+)", &i.arg1,
+                              &i.arg2)) {
       i.op_code = OpCode::kJnz;
     } else {
       return AdventDay::Error("Bad instruction: ", in);
@@ -114,7 +115,7 @@ class VM {
       }
     }
     return absl::OkStatus();
-  }  
+  }
 
   int64_t register_a() { return registers_.a; }
   void set_register_c(int64_t v) { registers_.c = v; }
