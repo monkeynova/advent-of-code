@@ -13,7 +13,8 @@ namespace advent_of_code {
 
 namespace {
 
-// TODO(@monkeunova): Could use a bit vector rather than sets.
+// TODO(@monkeunova): We could probably A* the search with a
+//                    SUM(dist_to_4th_floor) / 2 metric.
 
 struct Floor {
   int generators_bv;
@@ -156,13 +157,8 @@ std::vector<State> NextStates(const State& state) {
 
 bool ValidState(const State& state) {
   for (const Floor& f : state.floors) {
-    // TODO(@monkeynova): This could be a single bit op.
     if (f.generators_bv != 0) {
-      for (int bit_index = 0; (1 << bit_index) <= f.microchips_bv;
-           ++bit_index) {
-        if (!(f.microchips_bv & (1 << bit_index))) continue;
-        if (!(f.generators_bv & (1 << bit_index))) return false;
-      }
+      if (f.microchips_bv & ~f.generators_bv) return false;
     }
   }
   return true;
