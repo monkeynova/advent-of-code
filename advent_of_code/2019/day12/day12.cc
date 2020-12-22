@@ -4,46 +4,21 @@
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/point.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
 namespace {
 
-struct Vector {
-  int x = 0;
-  int y = 0;
-  int z = 0;
-  Vector& operator+=(const Vector& other) {
-    x += other.x;
-    y += other.y;
-    z += other.z;
-    return *this;
-  }
-  bool operator==(const Vector& other) const {
-    return x == other.x && y == other.y && z == other.z;
-  }
-  bool operator!=(const Vector& other) const { return !operator==(other); }
-  int norm() const { return abs(x) + abs(y) + abs(z); }
-};
-
-template <typename H>
-H AbslHashValue(H h, const Vector& v) {
-  return H::combine(std::move(h), v.x, v.y, v.z);
-}
-
-std::ostream& operator<<(std::ostream& out, const Vector& v) {
-  return out << "{" << v.x << "," << v.y << "," << v.z << "}";
-}
-
 struct Moon {
-  Vector position;
-  Vector velocity;
+  Point3 position = Cardinal3::kOrigin;
+  Point3 velocity = Cardinal3::kOrigin;
   bool operator==(const Moon& other) const {
     return position == other.position && velocity == other.velocity;
   }
   bool operator!=(const Moon& other) const { return !operator==(other); }
-  int energy() const { return position.norm() * velocity.norm(); }
+  int energy() const { return position.dist() * velocity.dist(); }
 };
 
 template <typename H>
@@ -55,23 +30,14 @@ std::ostream& operator<<(std::ostream& out, const Moon& m) {
   return out << "{" << m.position << "," << m.velocity << "}";
 }
 
-void ApplyGravity(int pos1, int pos2, int* vel1, int* vel2) {
-  if (pos1 < pos2) {
-    ++*vel1;
-    --*vel2;
-  } else if (pos1 > pos2) {
-    --*vel1;
-    ++*vel2;
-  }
-}
-
 void ApplyGravity(Moon* m1, Moon* m2) {
-  ApplyGravity(m1->position.x, m2->position.x, &m1->velocity.x,
-               &m2->velocity.x);
-  ApplyGravity(m1->position.y, m2->position.y, &m1->velocity.y,
-               &m2->velocity.y);
-  ApplyGravity(m1->position.z, m2->position.z, &m1->velocity.z,
-               &m2->velocity.z);
+  Point3 gravity = m2->position - m1->position;
+  gravity.x = gravity.x > 0 ? 1 : gravity.x < 0 ? -1 : 0;
+  gravity.y = gravity.y > 0 ? 1 : gravity.y < 0 ? -1 : 0;
+  gravity.z = gravity.z > 0 ? 1 : gravity.z < 0 ? -1 : 0;
+  m1->velocity += gravity;
+  m2->velocity -= gravity;
+  return;
 }
 
 int TotalEnergy(const std::vector<Moon>& moons) {
