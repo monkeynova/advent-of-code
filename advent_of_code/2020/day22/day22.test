@@ -1,7 +1,25 @@
 [part=1]
+Player 1:
+9
+2
+6
+3
+1
+
+Player 2:
+5
+8
+4
+7
+10
+--
+306
+==
+
+[part=1]
 @include{advent_of_code/2020/day22/input.txt}
 --
-ERROR: Could not run test: Not implemented
+32366
 ==
 
 [part=2]
