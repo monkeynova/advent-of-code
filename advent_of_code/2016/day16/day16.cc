@@ -29,11 +29,11 @@ class DragonCurve {
   static std::string Checksum(absl::string_view tmp) {
     std::string ret;
     ret.resize((tmp.size() + 1) / 2);
-    for (int i = 0; i < tmp.size(); i +=2 ) {
-      if (tmp[i] == tmp[i+1]) {
-        ret[i/2] = '1';
+    for (int i = 0; i < tmp.size(); i += 2) {
+      if (tmp[i] == tmp[i + 1]) {
+        ret[i / 2] = '1';
       } else {
-        ret[i/2] = '0';
+        ret[i / 2] = '0';
       }
     }
     VLOG(2) << ret;
@@ -41,7 +41,6 @@ class DragonCurve {
   }
 
   explicit DragonCurve(absl::string_view str) : str_(str) {}
-
 
  private:
   absl::string_view str_;
