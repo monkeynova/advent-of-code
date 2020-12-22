@@ -20,17 +20,16 @@ class SparseBoard {
   SparseBoard(int input) : input_(input) {}
 
   bool IsWall(Point p) const {
-    int64_t discriminant = p.x * p.x + 3 * p.x + 2 * p.x * p.y + p.y + p.y * p.y + input_;
+    int64_t discriminant =
+        p.x * p.x + 3 * p.x + 2 * p.x * p.y + p.y + p.y * p.y + input_;
     int on_bits = 0;
-    for (int64_t bv = 0; (1<<bv) <= discriminant; ++bv) {
-      if (discriminant & (1<<bv)) ++on_bits;
+    for (int64_t bv = 0; (1 << bv) <= discriminant; ++bv) {
+      if (discriminant & (1 << bv)) ++on_bits;
     }
-    return on_bits % 2; 
+    return on_bits % 2;
   }
 
-  bool OnBoard(Point p) const {
-    return p.x >= 0 && p.y >= 0;
-  }
+  bool OnBoard(Point p) const { return p.x >= 0 && p.y >= 0; }
 
   absl::optional<int> ShortestPath(Point start, Point end) {
     struct Path {
@@ -55,7 +54,7 @@ class SparseBoard {
     }
     return absl::nullopt;
   }
-  
+
   absl::optional<int> DistinctWithin(Point start, int dist) {
     struct Path {
       int num_steps;
@@ -92,7 +91,8 @@ class SparseBoard {
       for (Point p : debug.range()) {
         if (debug[p] == '.') ++count;
       }
-      VLOG(1) << "Discovered " << count << " walkable in:\n" << debug.DebugString();
+      VLOG(1) << "Discovered " << count << " walkable in:\n"
+              << debug.DebugString();
     }
     return visited;
   }
@@ -109,7 +109,7 @@ class SparseBoard {
 absl::StatusOr<std::vector<std::string>> Day13_2016::Part1(
     absl::Span<absl::string_view> input) const {
   SparseBoard test_board(10);
-  absl::optional<int> test_dist = test_board.ShortestPath({1,1}, {7,4});
+  absl::optional<int> test_dist = test_board.ShortestPath({1, 1}, {7, 4});
   if (!test_dist) return Error("Can't find test dist");
   if (*test_dist != 11) return Error("Wrong test dist: ", *test_dist);
 
