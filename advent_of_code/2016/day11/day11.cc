@@ -16,22 +16,23 @@ namespace {
 // TODO(@monkeunova): Could use a bit vector rather than sets.
 
 struct Floor {
-  std::set<absl::string_view> generators;
-  std::set<absl::string_view> microchips;
+  int generators_bv;
+  int microchips_bv;
   bool operator==(const Floor& o) const {
-    return generators == o.generators && microchips == o.microchips;
+    return generators_bv == o.generators_bv && microchips_bv == o.microchips_bv;
   }
 };
 
 template <typename H>
 H AbslHashValue(H h, const Floor& f) {
-  return H::combine(std::move(h), f.generators, f.microchips);
+  return H::combine(std::move(h), f.generators_bv, f.microchips_bv);
 }
 
 struct State {
   int cur_floor = 0;
   int steps = 0;
   std::vector<Floor> floors;
+  std::vector<absl::string_view> elements;
   bool operator==(const State& o) const {
     return cur_floor == o.cur_floor && floors == o.floors;
   }
@@ -45,8 +46,20 @@ H AbslHashValue(H h, const State& s) {
 std::ostream& operator<<(std::ostream& out, const State& s) {
   for (int i = 0; i < s.floors.size(); ++i) {
     out << "F" << i + 1 << (s.cur_floor == i ? " E": "  ") << ":";
-    out << " G{" << absl::StrJoin(s.floors[i].generators, ",") << "}";
-    out << " M{" << absl::StrJoin(s.floors[i].microchips, ",") << "}" << std::endl;
+    out << " G{";
+    for (int bit_index = 0; (1<< bit_index) <= s.floors[i].generators_bv; ++bit_index) {
+      if (s.floors[i].generators_bv & (1<< bit_index)) {
+        out << s.elements[bit_index] << ",";
+      }
+    }
+    out << "}";
+    out << " M{";
+    for (int bit_index = 0; (1<< bit_index) <= s.floors[i].microchips_bv; ++bit_index) {
+      if (s.floors[i].microchips_bv & (1<< bit_index)) {
+        out << s.elements[bit_index] << ",";
+      }
+    }
+    out << "}\n";
   }
   return out;
 }
@@ -59,77 +72,73 @@ std::vector<State> NextStates(const State& state) {
   const Floor& cur_floor = state.floors[cur_floor_num];
 
   std::vector<State> ret;
-  if (!cur_floor.generators.empty()) {
-    for (absl::string_view g : cur_floor.generators) {
+  for (int bit_index = 0; (1<< bit_index) <= cur_floor.generators_bv; ++bit_index) {
+    if (!(cur_floor.generators_bv & (1<<bit_index))) continue;
+    for (int next_floor : next_floors) {
+      State next = state;
+      ++next.steps;
+      next.cur_floor = next_floor;
+      next.floors[next_floor].generators_bv |= (1 << bit_index);
+      next.floors[cur_floor_num].generators_bv &= ~(1 << bit_index);
+      ret.push_back(next);
+    }
+  }
+  for (int bit_index1 = 0; (1<< bit_index1) <= cur_floor.generators_bv; ++bit_index1) {
+    if (!(cur_floor.generators_bv & (1<<bit_index1))) continue;
+    for (int bit_index2 = 0; bit_index2 < bit_index1; ++bit_index2) {
+      if (!(cur_floor.generators_bv & (1<<bit_index2))) continue;
       for (int next_floor : next_floors) {
         State next = state;
         ++next.steps;
         next.cur_floor = next_floor;
-        next.floors[next_floor].generators.insert(g);
-        next.floors[cur_floor_num].generators.erase(g);
+        next.floors[next_floor].generators_bv |= (1 << bit_index1);
+        next.floors[cur_floor_num].generators_bv &= ~(1 << bit_index1);
+        next.floors[next_floor].generators_bv |= (1 << bit_index2);
+        next.floors[cur_floor_num].generators_bv &= ~(1 << bit_index2);
         ret.push_back(next);
       }
     }
   }
-  if (cur_floor.generators.size() > 1) {
-    for (absl::string_view g1 : cur_floor.generators) {
-      for (absl::string_view g2 : cur_floor.generators) {
-        if (g1 >= g2) continue;
-        for (int next_floor : next_floors) {
-          State next = state;
-          ++next.steps;
-          next.cur_floor = next_floor;
-          next.floors[next_floor].generators.insert(g1);
-          next.floors[cur_floor_num].generators.erase(g1);
-          next.floors[next_floor].generators.insert(g2);
-          next.floors[cur_floor_num].generators.erase(g2);
-          ret.push_back(next);
-        }
-      }
+  for (int bit_index = 0; (1<< bit_index) <= cur_floor.microchips_bv; ++bit_index) {
+    if (!(cur_floor.microchips_bv & (1<<bit_index))) continue;
+    for (int next_floor : next_floors) {
+      State next = state;
+      ++next.steps;
+      next.cur_floor = next_floor;
+      next.floors[next_floor].microchips_bv |= (1 << bit_index);
+      next.floors[cur_floor_num].microchips_bv &= ~(1 << bit_index);
+      ret.push_back(next);
     }
   }
-  if (!cur_floor.microchips.empty()) {
-    for (absl::string_view g : cur_floor.microchips) {
+  for (int bit_index1 = 0; (1<< bit_index1) <= cur_floor.microchips_bv; ++bit_index1) {
+    if (!(cur_floor.microchips_bv & (1<<bit_index1))) continue;
+    for (int bit_index2 = 0; bit_index2 < bit_index1; ++bit_index2) {
+      if (!(cur_floor.microchips_bv & (1<<bit_index2))) continue;
       for (int next_floor : next_floors) {
         State next = state;
         ++next.steps;
         next.cur_floor = next_floor;
-        next.floors[next_floor].microchips.insert(g);
-        next.floors[cur_floor_num].microchips.erase(g);
+        next.floors[next_floor].microchips_bv |= (1 << bit_index1);
+        next.floors[cur_floor_num].microchips_bv &= ~(1 << bit_index1);
+        next.floors[next_floor].microchips_bv |= (1 << bit_index2);
+        next.floors[cur_floor_num].microchips_bv &= ~(1 << bit_index2);
         ret.push_back(next);
       }
     }
   }
-  if (cur_floor.microchips.size() > 1) {
-    for (absl::string_view m1 : cur_floor.microchips) {
-      for (absl::string_view m2 : cur_floor.microchips) {
-        if (m1 >= m2) continue;
-        for (int next_floor : next_floors) {
-          State next = state;
-          ++next.steps;
-          next.cur_floor = next_floor;
-          next.floors[next_floor].microchips.insert(m1);
-          next.floors[cur_floor_num].microchips.erase(m1);
-          next.floors[next_floor].microchips.insert(m2);
-          next.floors[cur_floor_num].microchips.erase(m2);
-          ret.push_back(next);
-        }
-      }
-    }
-  }
-  if (!cur_floor.microchips.empty() && !cur_floor.generators.empty()) {
-    for (absl::string_view m : cur_floor.microchips) {
-      for (absl::string_view g : cur_floor.generators) {
-        for (int next_floor : next_floors) {
-          State next = state;
-          ++next.steps;
-          next.cur_floor = next_floor;
-          next.floors[next_floor].microchips.insert(m);
-          next.floors[cur_floor_num].microchips.erase(m);
-          next.floors[next_floor].generators.insert(g);
-          next.floors[cur_floor_num].generators.erase(g);
-          ret.push_back(next);
-        }
+  for (int bit_index1 = 0; (1<< bit_index1) <= cur_floor.microchips_bv; ++bit_index1) {
+    if (!(cur_floor.microchips_bv & (1<<bit_index1))) continue;
+    for (int bit_index2 = 0; (1<< bit_index2) <= cur_floor.generators_bv; ++bit_index2) {
+      if (!(cur_floor.generators_bv & (1<<bit_index2))) continue;
+      for (int next_floor : next_floors) {
+        State next = state;
+        ++next.steps;
+        next.cur_floor = next_floor;
+        next.floors[next_floor].microchips_bv |= (1 << bit_index1);
+        next.floors[cur_floor_num].microchips_bv &= ~(1 << bit_index1);
+        next.floors[next_floor].generators_bv |= (1 << bit_index2);
+        next.floors[cur_floor_num].generators_bv &= ~(1 << bit_index2);
+        ret.push_back(next);
       }
     }
   }
@@ -138,9 +147,11 @@ std::vector<State> NextStates(const State& state) {
 
 bool ValidState(const State& state) {
   for (const Floor& f : state.floors) {
-    if (!f.generators.empty()) {
-      for (absl::string_view microchip : f.microchips) {
-        if (f.generators.find(microchip) == f.generators.end()) return false;
+    // TODO(@monkeynova): This could be a single bit op.
+    if (f.generators_bv != 0) {
+      for (int bit_index = 0; (1<< bit_index) <= f.microchips_bv; ++bit_index) {
+        if (!(f.microchips_bv & (1<<bit_index))) continue;
+        if (!(f.generators_bv & (1<<bit_index))) return false;
       }
     }
   }
@@ -149,8 +160,8 @@ bool ValidState(const State& state) {
 
 bool FinalState(const State& state) {
   for (int idx = 0; idx < state.floors.size() - 1; ++idx) {
-    if (!state.floors[idx].microchips.empty()) return false;
-    if (!state.floors[idx].generators.empty()) return false;
+    if (state.floors[idx].microchips_bv != 0) return false;
+    if (state.floors[idx].generators_bv != 0) return false;
   }
   return true;
 }
@@ -187,6 +198,7 @@ absl::StatusOr<State> ParseInitialState(absl::Span<absl::string_view> input) {
   s.floors.resize(4);
   int floor = 0;
   absl::string_view kFloorNames[] = {"first", "second", "third", "fourth"};
+  absl::flat_hash_map<absl::string_view, int> element_to_id;
   for (absl::string_view in : input) {
     std::string prefix = absl::StrCat("The ", kFloorNames[floor], " floor contains ");
     if (in.substr(0, prefix.size()) != prefix) {
@@ -204,9 +216,17 @@ absl::StatusOr<State> ParseInitialState(absl::Span<absl::string_view> input) {
     for (absl::string_view comp : components) {
       absl::string_view e;
       if (RE2::FullMatch(comp, "a (.*) generator", &e)) {
-        s.floors[floor].generators.insert(e);
+        if (!element_to_id.contains(e)) {
+          element_to_id[e] = s.elements.size();
+          s.elements.push_back(e);
+        }
+        s.floors[floor].generators_bv |= (1 << element_to_id[e]);
       } else if (RE2::FullMatch(comp, "a (.*)-compatible microchip", &e)) {
-        s.floors[floor].microchips.insert(e);
+        if (!element_to_id.contains(e)) {
+          element_to_id[e] = s.elements.size();
+          s.elements.push_back(e);
+        }
+        s.floors[floor].microchips_bv |= (1 << element_to_id[e]);
       } else {
         return AdventDay::Error("Bad component: ", comp);
       }
@@ -230,10 +250,16 @@ absl::StatusOr<std::vector<std::string>> Day11_2016::Part1(
 absl::StatusOr<std::vector<std::string>> Day11_2016::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<State> s = ParseInitialState(input);
-  s->floors[0].generators.insert("elerium");
-  s->floors[0].microchips.insert("elerium");
-  s->floors[0].generators.insert("dilithium");
-  s->floors[0].microchips.insert("dilithium");
+  std::string elerium = "elerium";
+  std::string dilithium = "dilithium";
+  int e_index = s->elements.size();
+  s->elements.push_back(elerium);
+  s->floors[0].generators_bv |= (1 << e_index);
+  s->floors[0].microchips_bv |= (1 << e_index);
+  int d_index = s->elements.size();
+  s->elements.push_back(dilithium);
+  s->floors[0].generators_bv |= (1 << d_index);
+  s->floors[0].microchips_bv |= (1 << d_index);
   return IntReturn(StepsToAllOnFourthFloor(*s));
 }
 
