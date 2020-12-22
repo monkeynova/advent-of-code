@@ -42,6 +42,20 @@ class DragonCurve {
 
   explicit DragonCurve(absl::string_view str) : str_(str) {}
 
+  char CharAt(int p) {
+    // TODO(@monkeynova) We could be more efficient by calculating the needed
+    // char on demand for it's position and doing the checksum in slices
+    // of size = 2 ** N.
+    return '\0';
+    // size
+    // 2 * size + 1
+    // 4 * size + 3
+    // 8 * size + 7
+    // ...
+    // 2 ** N * size + (2 ** N - 1)
+    // 2 ** (N+1) * size + (2 ** (N+1) - 1)
+  }
+
  private:
   absl::string_view str_;
 };
@@ -54,7 +68,7 @@ std::string RunPart1(absl::string_view input, int size) {
   }
   VLOG(1) << "Expanded: " << s;
   s = s.substr(0, size);
-  VLOG(1) << "Truncated: " << s;
+  VLOG(1) << "Truncated:" << s;
   while (s.size() % 2 == 0) {
     s = DragonCurve::Checksum(s);
   }
