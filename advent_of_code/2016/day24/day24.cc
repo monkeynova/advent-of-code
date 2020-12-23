@@ -32,12 +32,14 @@ absl::StatusOr<int> MinPathAllNums(const CharBoard& b) {
   Point start;
   int need_keys = 0;
   for (Point p : b.range()) {
-    if (b[p] == '0') start = p;
+    if (b[p] == '0')
+      start = p;
     else if (b[p] > '0' && b[p] <= '9') {
       need_keys |= 1 << (b[p] - '1');
     }
   }
-  std::deque<PathState> frontier = {PathState{.cur = start, .have_keys = 0, .num_steps = 0}};
+  std::deque<PathState> frontier = {
+      PathState{.cur = start, .have_keys = 0, .num_steps = 0}};
   absl::flat_hash_set<PathState> hist;
   hist.insert(frontier.front());
   while (!frontier.empty()) {
@@ -71,12 +73,14 @@ absl::StatusOr<int> MinPathAllNumsReturn(const CharBoard& b) {
   Point start;
   int need_keys = 0;
   for (Point p : b.range()) {
-    if (b[p] == '0') start = p;
+    if (b[p] == '0')
+      start = p;
     else if (b[p] > '0' && b[p] <= '9') {
       need_keys |= 1 << (b[p] - '1');
     }
   }
-  std::deque<PathState> frontier = {PathState{.cur = start, .have_keys = 0, .num_steps = 0}};
+  std::deque<PathState> frontier = {
+      PathState{.cur = start, .have_keys = 0, .num_steps = 0}};
   absl::flat_hash_set<PathState> hist;
   hist.insert(frontier.front());
   while (!frontier.empty()) {
@@ -105,7 +109,6 @@ absl::StatusOr<int> MinPathAllNumsReturn(const CharBoard& b) {
 
   return AdventDay::Error("No path found");
 }
-
 
 // Helper methods go here.
 
