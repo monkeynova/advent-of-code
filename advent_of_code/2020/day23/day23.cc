@@ -27,8 +27,7 @@ struct Cups {
 std::ostream& operator<<(std::ostream& o, const Cups& c) {
   o << "1";
   for (int idx = c.cups[c.cup_to_index.find(1)->second].next;
-       c.cups[idx].val != 1;
-       idx = c.cups[idx].next) {
+       c.cups[idx].val != 1; idx = c.cups[idx].next) {
     o << ",";
     if (idx == c.cur_idx) o << "(";
     o << c.cups[idx].val;
@@ -66,7 +65,6 @@ void RunMove2(Cups* cups) {
   cups->cur_idx = cups->cups[cups->cur_idx].next;
 }
 
-
 }  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day23_2020::Part1(
@@ -88,8 +86,7 @@ absl::StatusOr<std::vector<std::string>> Day23_2020::Part1(
   std::string ret;
   int ret_i = 0;
   ret.resize(cups.cups.size() - 1);
-  for (int idx = cups.cups[cups.cup_to_index[1]].next;
-       cups.cups[idx].val != 1;
+  for (int idx = cups.cups[cups.cup_to_index[1]].next; cups.cups[idx].val != 1;
        idx = cups.cups[idx].next) {
     ret[ret_i] = cups.cups[idx].val + '0';
     ++ret_i;
