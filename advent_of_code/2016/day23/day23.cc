@@ -119,13 +119,24 @@ class VM {
             Instruction& to_edit = instructions_[*input + ip];
             switch (to_edit.op_code) {
               // One-arg ops.
-              case OpCode::kInc: to_edit.op_code = OpCode::kDec; break;
-              case OpCode::kDec: to_edit.op_code = OpCode::kInc; break;
-              case OpCode::kTgl: to_edit.op_code = OpCode::kInc; break;
+              case OpCode::kInc:
+                to_edit.op_code = OpCode::kDec;
+                break;
+              case OpCode::kDec:
+                to_edit.op_code = OpCode::kInc;
+                break;
+              case OpCode::kTgl:
+                to_edit.op_code = OpCode::kInc;
+                break;
               // Two arg ops.
-              case OpCode::kJnz: to_edit.op_code = OpCode::kCpy; break;
-              case OpCode::kCpy: to_edit.op_code = OpCode::kJnz; break;
-              default: return AdventDay::Error("Bad op to toggle");
+              case OpCode::kJnz:
+                to_edit.op_code = OpCode::kCpy;
+                break;
+              case OpCode::kCpy:
+                to_edit.op_code = OpCode::kJnz;
+                break;
+              default:
+                return AdventDay::Error("Bad op to toggle");
             }
           }
           break;
