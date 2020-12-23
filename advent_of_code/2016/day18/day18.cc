@@ -48,7 +48,30 @@ absl::StatusOr<std::vector<std::string>> Day18_2016::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day18_2016::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 1) return Error("Bad input size");
+  CharBoard b(input[0].size(), 400000);
+  absl::flat_hash_set<int> next_traps = {6, 3, 4, 1};
+  for (Point p : b.range()) {
+    if (p.y == 0) {
+      b[p] = input[0][p.x];
+    } else {
+      int prev_traps = 0;
+      for (Point dir : {Cardinal::kNorthWest, Cardinal::kNorth, Cardinal::kNorthEast}) {
+        prev_traps <<= 1;
+        Point prev = p + dir;
+        if (b.OnBoard(prev) && b[prev] == '^') {
+          prev_traps |= 1;
+        }
+      }
+      b[p] = next_traps.contains(prev_traps) ? '^' : '.';
+    }
+  }
+  VLOG(2) << "Board:\n" << b.DebugString();
+  int safe_count = 0;
+  for (Point p : b.range())  {
+    if (b[p] == '.') ++safe_count;
+  }
+  return IntReturn(safe_count);
 }
 
 }  // namespace advent_of_code
