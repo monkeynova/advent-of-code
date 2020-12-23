@@ -1,7 +1,25 @@
 [part=1]
+ihgpwlah
+--
+DDRRRD
+==
+
+[part=1]
+kglvqrro
+--
+DDUDRLRRUDRD
+==
+
+[part=1]
+ulqzkmiv
+--
+DRURDRUDDLLDLUURRDULRLDUUDDDRR
+==
+
+[part=1]
 @include{advent_of_code/2016/day17/input.txt}
 --
-ERROR: Could not run test: Not implemented
+RLDUDRDDRR
 ==
 
 [part=2]
