@@ -159,7 +159,11 @@ absl::StatusOr<std::vector<std::string>> Day23_2016::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day23_2016::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<VM> vm = VM::Parse(input);
+  if (!vm.ok()) return vm.status();
+  vm->set_register_a(12);
+  if (absl::Status st = vm->Execute(); !st.ok()) return st;
+  return IntReturn(vm->register_a());
 }
 
 }  // namespace advent_of_code

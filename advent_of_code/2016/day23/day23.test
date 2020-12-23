@@ -16,7 +16,9 @@ dec a
 11760
 ==
 
+# fastmode not actually run
+[long=10m (50s opt) 2020.12.23]
 [part=2]
 @include{advent_of_code/2016/day23/input.txt}
 --
-ERROR: Could not run test: Not implemented
+479008320
