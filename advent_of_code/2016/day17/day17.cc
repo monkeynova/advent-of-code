@@ -40,8 +40,9 @@ absl::StatusOr<std::string> FindPath(absl::string_view input) {
     std::string dir;
     Point p;
   };
-  std::deque<Path> frontier = {Path{.dir = "", .p = {0,0}}};
-  constexpr Point kKeyDirs[] = {Cardinal::kNorth, Cardinal::kSouth, Cardinal::kWest, Cardinal::kEast};
+  std::deque<Path> frontier = {Path{.dir = "", .p = {0, 0}}};
+  constexpr Point kKeyDirs[] = {Cardinal::kNorth, Cardinal::kSouth,
+                                Cardinal::kWest, Cardinal::kEast};
   constexpr absl::string_view kDirNames = "UDLR";
   while (!frontier.empty()) {
     Path cur = frontier.front();
@@ -68,8 +69,9 @@ absl::optional<int> FindLongestPath(absl::string_view input) {
     std::string dir;
     Point p;
   };
-  std::deque<Path> frontier = {Path{.dir = "", .p = {0,0}}};
-  constexpr Point kKeyDirs[] = {Cardinal::kNorth, Cardinal::kSouth, Cardinal::kWest, Cardinal::kEast};
+  std::deque<Path> frontier = {Path{.dir = "", .p = {0, 0}}};
+  constexpr Point kKeyDirs[] = {Cardinal::kNorth, Cardinal::kSouth,
+                                Cardinal::kWest, Cardinal::kEast};
   constexpr absl::string_view kDirNames = "UDLR";
   absl::optional<int> longest_path;
   while (!frontier.empty()) {
@@ -94,7 +96,6 @@ absl::optional<int> FindLongestPath(absl::string_view input) {
 
   return longest_path;
 }
-
 
 }  // namespace
 
