@@ -18,6 +18,20 @@
 ==
 
 [part=2]
+5
+--
+2
+==
+
+[part=2]
+21
+--
+15
+==
+
+# 26735 (low)
+# 626975 (low)
+[part=2]
 @include{advent_of_code/2016/day19/input.txt}
 --
-ERROR: Could not run test: Not implemented
+1424135
