@@ -1,7 +1,13 @@
 [part=1]
+389125467
+--
+67384529
+==
+
+[part=1]
 @include{advent_of_code/2020/day23/input.txt}
 --
-ERROR: Could not run test: Not implemented
+27865934
 ==
 
 [part=2]
