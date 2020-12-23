@@ -6,8 +6,8 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
-#include "advent_of_code/point.h"
 #include "advent_of_code/md5.h"
+#include "advent_of_code/point.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 

@@ -8,8 +8,8 @@ namespace advent_of_code {
 class MD5 {
  public:
   MD5()
-   : md5_result_view_(reinterpret_cast<char*>(md5_result_), 16),
-     md5_result_hex_view_(reinterpret_cast<char*>(md5_result_hex_), 32) {}
+      : md5_result_view_(reinterpret_cast<char*>(md5_result_), 16),
+        md5_result_hex_view_(reinterpret_cast<char*>(md5_result_hex_), 32) {}
 
   absl::string_view Digest(absl::string_view in) {
     MD5_Init(&ctx);

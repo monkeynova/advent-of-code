@@ -12,9 +12,7 @@
 
 namespace advent_of_code {
 
-namespace {
-
-}  // namespace
+namespace {}  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day14_2016::Part1(
     absl::Span<absl::string_view> input) const {

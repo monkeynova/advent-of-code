@@ -12,10 +12,7 @@
 
 namespace advent_of_code {
 
-namespace {
-
-
-}  // namespace
+namespace {}  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day05_2016::Part1(
     absl::Span<absl::string_view> input) const {
@@ -49,7 +46,8 @@ absl::StatusOr<std::vector<std::string>> Day05_2016::Part2(
     VLOG(2) << "MD5(" << str << "): " << md5_result;
     if (md5_result.substr(0, 5) == "00000") {
       int pos = md5_result[5] - '0';
-      VLOG(1) << "Adding: " << pos << ", " << md5_result.substr(6, 1) << " (" << i << ")";
+      VLOG(1) << "Adding: " << pos << ", " << md5_result.substr(6, 1) << " ("
+              << i << ")";
       if (pos < 8 && out[pos] == '_') {
         out[pos] = md5_result[6];
         ++added;

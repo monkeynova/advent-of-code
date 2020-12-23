@@ -143,6 +143,6 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
-        "//third_party/md5"
+        "//third_party/md5",
     ],
 )

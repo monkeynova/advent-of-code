@@ -11,9 +11,7 @@
 #include "re2/re2.h"
 
 namespace advent_of_code {
-namespace {
-
-}  // namespace
+namespace {}  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day04_2015::Part1(
     absl::Span<absl::string_view> input) const {
