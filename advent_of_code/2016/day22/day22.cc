@@ -38,7 +38,7 @@ struct State {
   int num_steps = 0;
   bool operator<(const State& o) const {
     // Greater than for use in a priority queue...
-    return  o.num_steps + o.data_loc.dist() < num_steps + data_loc.dist();
+    return o.num_steps + o.data_loc.dist() < num_steps + data_loc.dist();
   }
   bool operator==(const State& o) const {
     return grid == o.grid && data_loc == o.data_loc;
@@ -59,7 +59,8 @@ H AbslHashValue(H h, const State& s) {
 }
 
 absl::StatusOr<int> FindMinPath(absl::flat_hash_map<Point, Node> grid) {
-  State initial_state {.data_loc = {0,0}, .grid = grid, .grid_end = {0, 0}, .num_steps = 0};
+  State initial_state{
+      .data_loc = {0, 0}, .grid = grid, .grid_end = {0, 0}, .num_steps = 0};
   for (const auto& [p, _] : grid) {
     if (p.y == 0 && p.x > initial_state.data_loc.x) {
       initial_state.data_loc = p;
@@ -71,7 +72,7 @@ absl::StatusOr<int> FindMinPath(absl::flat_hash_map<Point, Node> grid) {
       initial_state.grid_end.x = p.x;
     }
   }
-  VLOG(1) << "Moving from " << initial_state.data_loc << " to " << Point{0,0};
+  VLOG(1) << "Moving from " << initial_state.data_loc << " to " << Point{0, 0};
   std::priority_queue<State> frontier;
   absl::flat_hash_set<State> hist;
   hist.insert(initial_state);
@@ -79,7 +80,8 @@ absl::StatusOr<int> FindMinPath(absl::flat_hash_map<Point, Node> grid) {
   while (!frontier.empty()) {
     State cur = frontier.top();
     frontier.pop();
-    VLOG_EVERY_N(2, 777) << "data @" << cur.data_loc << " after " << cur.num_steps << " steps";
+    VLOG_EVERY_N(2, 777) << "data @" << cur.data_loc << " after "
+                         << cur.num_steps << " steps";
     for (const auto& [src_p, src_node] : cur.grid) {
       for (Point dir : Cardinal::kFourDirs) {
         Point dst_p = src_p + dir;
@@ -113,9 +115,7 @@ absl::StatusOr<int> FindMinPath(absl::flat_hash_map<Point, Node> grid) {
 struct PathState {
   CharBoard b;
   int num_steps;
-  bool operator==(const PathState& o) const {
-    return b == o.b;
-  }
+  bool operator==(const PathState& o) const { return b == o.b; }
 };
 
 template <typename H>
@@ -140,12 +140,12 @@ absl::StatusOr<int> RunHacks(const absl::flat_hash_map<Point, Node>& grid) {
   for (const auto& [p, n] : grid) {
     if (p.y == 0 && p.x > goal_loc.x) goal_loc.x = p.x;
     // TODO(@monkeynova): Need better heuristic...
-    if (n.used > 400) board[p] = '#';
+    if (n.used > 400)
+      board[p] = '#';
     else if (n.used == 0) {
       board[p] = '_';
       empty = p;
-    }
-    else {
+    } else {
       board[p] = '.';
       min_used = std::min(min_used, n.used);
       max_used = std::max(max_used, n.used);
@@ -155,11 +155,12 @@ absl::StatusOr<int> RunHacks(const absl::flat_hash_map<Point, Node>& grid) {
   }
   if (2 * min_used < min_space) return AdventDay::Error("Invalid assumption");
   if (max_used > min_space) return AdventDay::Error("Invalid assumption");
-  board[goal_loc] = 'G';  
+  board[goal_loc] = 'G';
   LOG(INFO) << "Empty at " << empty;
-  LOG(INFO) << "Used: (" << min_used << "," << max_used << ") out of (" << min_space << "," << max_space << ")";
+  LOG(INFO) << "Used: (" << min_used << "," << max_used << ") out of ("
+            << min_space << "," << max_space << ")";
   LOG(INFO) << "Board:\n" << board.DebugString();
-  
+
   std::deque<PathState> frontier = {{.b = board, .num_steps = 0}};
   absl::flat_hash_set<PathState> hist;
   hist.insert(frontier.front());
@@ -174,7 +175,7 @@ absl::StatusOr<int> RunHacks(const absl::flat_hash_map<Point, Node>& grid) {
             PathState new_state = path_state;
             ++new_state.num_steps;
             std::swap(new_state.b[next], new_state.b[p]);
-            if (new_state.b[Point{0,0}] == 'G') return new_state.num_steps;
+            if (new_state.b[Point{0, 0}] == 'G') return new_state.num_steps;
             if (!hist.contains(new_state)) {
               hist.insert(new_state);
               frontier.push_back(new_state);
@@ -196,7 +197,7 @@ absl::StatusOr<int> RunHacks(const absl::flat_hash_map<Point, Node>& grid) {
 absl::StatusOr<std::vector<std::string>> Day22_2016::Part1(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<Point, Node> grid;
-  for (absl::string_view str: input) {
+  for (absl::string_view str : input) {
     Point p;
     if (RE2::FullMatch(str, "root@ebhq-gridcenter# df -h")) continue;
     // Filesystem            Size  Used  Avail  Use%
@@ -205,8 +206,11 @@ absl::StatusOr<std::vector<std::string>> Day22_2016::Part1(
     }
     Node n;
     int size;
-    if (!RE2::FullMatch(str, "/dev/grid/node-x(\\d+)-y(\\d+)\\s+(\\d+)T\\s+(\\d+)T\\s+(\\d+)T\\s+\\d+%",
-                        &p.x, &p.y, &size, &n.used, &n.avail)) {
+    if (!RE2::FullMatch(
+            str,
+            "/dev/grid/"
+            "node-x(\\d+)-y(\\d+)\\s+(\\d+)T\\s+(\\d+)T\\s+(\\d+)T\\s+\\d+%",
+            &p.x, &p.y, &size, &n.used, &n.avail)) {
       return Error("Bad line: ", str);
     }
     if (size != n.used + n.avail) return Error("Bad used: ", str);
@@ -218,7 +222,6 @@ absl::StatusOr<std::vector<std::string>> Day22_2016::Part1(
     for (const auto& [p2, n2] : grid) {
       if (p1 == p2) continue;
       if (n1.used > 0 && n1.used < n2.avail) ++viable;
-
     }
   }
   return IntReturn(viable);
@@ -227,7 +230,7 @@ absl::StatusOr<std::vector<std::string>> Day22_2016::Part1(
 absl::StatusOr<std::vector<std::string>> Day22_2016::Part2(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<Point, Node> grid;
-  for (absl::string_view str: input) {
+  for (absl::string_view str : input) {
     Point p;
     if (RE2::FullMatch(str, "root@ebhq-gridcenter# df -h")) continue;
     // Filesystem            Size  Used  Avail  Use%
@@ -236,12 +239,16 @@ absl::StatusOr<std::vector<std::string>> Day22_2016::Part2(
     }
     Node n;
     int size;
-    if (!RE2::FullMatch(str, "/dev/grid/node-x(\\d+)-y(\\d+)\\s+(\\d+)T\\s+(\\d+)T\\s+(\\d+)T\\s+\\d+%",
-                        &p.x, &p.y, &size, &n.used, &n.avail)) {
+    if (!RE2::FullMatch(
+            str,
+            "/dev/grid/"
+            "node-x(\\d+)-y(\\d+)\\s+(\\d+)T\\s+(\\d+)T\\s+(\\d+)T\\s+\\d+%",
+            &p.x, &p.y, &size, &n.used, &n.avail)) {
       return Error("Bad line: ", str);
     }
     if (size != n.used + n.avail) return Error("Bad used: ", str);
-    if (n.used > 0 && 2 * n.used < size) return Error("Only work with over half full disks");
+    if (n.used > 0 && 2 * n.used < size)
+      return Error("Only work with over half full disks");
     if (grid.contains(p)) return Error("Dupe point: ", p.DebugString());
     grid[p] = n;
   }
