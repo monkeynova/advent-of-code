@@ -28,7 +28,8 @@ absl::StatusOr<std::vector<std::string>> Day18_2016::Part1(
       b[p] = input[0][p.x];
     } else {
       int prev_traps = 0;
-      for (Point dir : {Cardinal::kNorthWest, Cardinal::kNorth, Cardinal::kNorthEast}) {
+      for (Point dir :
+           {Cardinal::kNorthWest, Cardinal::kNorth, Cardinal::kNorthEast}) {
         prev_traps <<= 1;
         Point prev = p + dir;
         if (b.OnBoard(prev) && b[prev] == '^') {
@@ -40,7 +41,7 @@ absl::StatusOr<std::vector<std::string>> Day18_2016::Part1(
   }
   LOG(INFO) << "Board:\n" << b.DebugString();
   int safe_count = 0;
-  for (Point p : b.range())  {
+  for (Point p : b.range()) {
     if (b[p] == '.') ++safe_count;
   }
   return IntReturn(safe_count);
@@ -56,7 +57,8 @@ absl::StatusOr<std::vector<std::string>> Day18_2016::Part2(
       b[p] = input[0][p.x];
     } else {
       int prev_traps = 0;
-      for (Point dir : {Cardinal::kNorthWest, Cardinal::kNorth, Cardinal::kNorthEast}) {
+      for (Point dir :
+           {Cardinal::kNorthWest, Cardinal::kNorth, Cardinal::kNorthEast}) {
         prev_traps <<= 1;
         Point prev = p + dir;
         if (b.OnBoard(prev) && b[prev] == '^') {
@@ -68,7 +70,7 @@ absl::StatusOr<std::vector<std::string>> Day18_2016::Part2(
   }
   VLOG(2) << "Board:\n" << b.DebugString();
   int safe_count = 0;
-  for (Point p : b.range())  {
+  for (Point p : b.range()) {
     if (b[p] == '.') ++safe_count;
   }
   return IntReturn(safe_count);
