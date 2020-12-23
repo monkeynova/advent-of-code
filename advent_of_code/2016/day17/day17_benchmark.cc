@@ -6,7 +6,7 @@ namespace advent_of_code {
 
 namespace advent_of_code {
 
-constexpr int kMaxTestCount = 5;
+constexpr int kMaxTestCount = 8;
 
 TEST(DayBenchmarkTest, Consistency) {
   absl::StatusOr<int> test_count = FileBenchmarkTestCount();

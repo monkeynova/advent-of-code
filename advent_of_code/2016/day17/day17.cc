@@ -63,6 +63,39 @@ absl::StatusOr<std::string> FindPath(absl::string_view input) {
   return AdventDay::Error("No path found");
 }
 
+absl::optional<int> FindLongestPath(absl::string_view input) {
+  struct Path {
+    std::string dir;
+    Point p;
+  };
+  std::deque<Path> frontier = {Path{.dir = "", .p = {0,0}}};
+  constexpr Point kKeyDirs[] = {Cardinal::kNorth, Cardinal::kSouth, Cardinal::kWest, Cardinal::kEast};
+  constexpr absl::string_view kDirNames = "UDLR";
+  absl::optional<int> longest_path;
+  while (!frontier.empty()) {
+    Path cur = frontier.front();
+    frontier.pop_front();
+    std::string md5 = MD5Hex(absl::StrCat(input, cur.dir));
+    for (int i = 0; i < 4; ++i) {
+      if (md5[i] >= 'b') {
+        Path next = cur;
+        next.p += kKeyDirs[i];
+        next.dir.append(kDirNames.substr(i, 1));
+        if (next.p == Point{3, 3}) {
+          longest_path = next.dir.size();
+          continue;
+        }
+        if (next.p.x >= 0 && next.p.y >= 0 && next.p.x <= 3 && next.p.y <= 3) {
+          frontier.push_back(next);
+        }
+      }
+    }
+  }
+
+  return longest_path;
+}
+
+
 }  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day17_2016::Part1(
@@ -75,7 +108,8 @@ absl::StatusOr<std::vector<std::string>> Day17_2016::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day17_2016::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 1) return Error("Input size");
+  return IntReturn(FindLongestPath(input[0]));
 }
 
 }  // namespace advent_of_code
