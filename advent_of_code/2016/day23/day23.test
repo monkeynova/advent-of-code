@@ -1,7 +1,19 @@
 [part=1]
+cpy 2 a
+tgl a
+tgl a
+tgl a
+cpy 1 a
+dec a
+dec a
+--
+3
+==
+
+[part=1]
 @include{advent_of_code/2016/day23/input.txt}
 --
-ERROR: Could not run test: Not implemented
+11760
 ==
 
 [part=2]
