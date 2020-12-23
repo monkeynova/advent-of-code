@@ -13,6 +13,14 @@
 ==
 
 [part=2]
+5-8
+0-2
+4-7
+--
+4294967287
+==
+
+[part=2]
 @include{advent_of_code/2016/day20/input.txt}
 --
-ERROR: Could not run test: Not implemented
+104

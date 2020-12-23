@@ -50,7 +50,31 @@ absl::StatusOr<std::vector<std::string>> Day20_2016::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day20_2016::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  std::vector<Block> blocks;
+  for (absl::string_view s : input) {
+    Block b;
+    if (!RE2::FullMatch(s, "(\\d+)-(\\d+)", &b.start, &b.end)) {
+      return Error("Bad range: ", s);
+    }
+    blocks.push_back(b);
+  }
+  std::sort(blocks.begin(), blocks.end());
+  if (blocks[0].start != 0) return IntReturn(0);
+  int64_t invalid_through = blocks[0].end;
+  int64_t allowed = 0;
+  for (Block b : blocks) {
+    if (b.start <= invalid_through + 1) {
+      if (b.end > invalid_through) invalid_through = b.end;
+    } else {
+      allowed += b.start - invalid_through - 1;
+      invalid_through = b.end;
+    }
+  }
+  if (invalid_through < std::numeric_limits<uint32_t>::max()) {
+    allowed += std::numeric_limits<uint32_t>::max() - invalid_through - 1;
+  }
+
+  return IntReturn(allowed);
 }
 
 }  // namespace advent_of_code
