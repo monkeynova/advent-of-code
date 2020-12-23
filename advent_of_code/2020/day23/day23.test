@@ -10,12 +10,14 @@
 27865934
 ==
 
+[long=8s (2s opt) 2020.12.23]
 [part=2]
 389125467
 --
 149245887792
 ==
 
+[long=8s (2s opt) 2020.12.23]
 [part=2]
 @include{advent_of_code/2020/day23/input.txt}
 --
