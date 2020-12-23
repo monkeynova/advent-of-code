@@ -13,12 +13,14 @@ namespace advent_of_code {
 
 namespace {
 
-absl::StatusOr<std::string> ApplyRule(absl::string_view rule, absl::string_view str) {
+absl::StatusOr<std::string> ApplyRule(absl::string_view rule,
+                                      absl::string_view str) {
   int x;
   int y;
   char a;
   char b;
-  if (RE2::FullMatch(rule, "swap position (\\d+) with position (\\d+)", &x, &y)) {
+  if (RE2::FullMatch(rule, "swap position (\\d+) with position (\\d+)", &x,
+                     &y)) {
     std::string ret = std::string(str);
     std::swap(ret[x], ret[y]);
     return ret;
@@ -98,12 +100,14 @@ absl::StatusOr<std::string> ApplyRule(absl::string_view rule, absl::string_view 
   return AdventDay::Error("Bad rule: ", rule);
 }
 
-absl::StatusOr<std::string> ApplyRuleReverse(absl::string_view rule, absl::string_view str) {
+absl::StatusOr<std::string> ApplyRuleReverse(absl::string_view rule,
+                                             absl::string_view str) {
   int x;
   int y;
   char a;
   char b;
-  if (RE2::FullMatch(rule, "swap position (\\d+) with position (\\d+)", &x, &y)) {
+  if (RE2::FullMatch(rule, "swap position (\\d+) with position (\\d+)", &x,
+                     &y)) {
     std::string ret = std::string(str);
     std::swap(ret[x], ret[y]);
     return ret;
@@ -154,13 +158,15 @@ absl::StatusOr<std::string> ApplyRuleReverse(absl::string_view rule, absl::strin
     if (x == -1) return AdventDay::Error("Not found for rotation");
     int left_rotate = -1;
     for (int src_pos = 0; src_pos < str.size(); ++src_pos) {
-      int right_rotate = (src_pos + ((src_pos >= 4)? 2 : 1)) % str.size();
+      int right_rotate = (src_pos + ((src_pos >= 4) ? 2 : 1)) % str.size();
       if ((src_pos + right_rotate) % str.size() == x) {
-        //if (left_rotate != -1) return AdventDay::Error("Inverse rotation not unique");
+        // if (left_rotate != -1) return AdventDay::Error("Inverse rotation not
+        // unique");
         left_rotate = right_rotate;
       }
     }
-    if (left_rotate == -1) return AdventDay::Error("Not found for inverse rotation");
+    if (left_rotate == -1)
+      return AdventDay::Error("Not found for inverse rotation");
     std::string ret = std::string(str);
     for (int i = 0; i < ret.size(); ++i) {
       ret[i] = str[(i + left_rotate) % ret.size()];
@@ -192,18 +198,17 @@ absl::StatusOr<std::string> ApplyRuleReverse(absl::string_view rule, absl::strin
   return AdventDay::Error("Bad rule: ", rule);
 }
 
-
 absl::Status RunTest() {
   std::string pw = "abcde";
   std::vector<std::string> instructions = {
-    "swap position 4 with position 0",
-    "swap letter d with letter b",
-    "reverse positions 0 through 4",
-    "rotate left 1 step",
-    "move position 1 to position 4",
-    "move position 3 to position 0",
-    "rotate based on position of letter b",
-    "rotate based on position of letter d",
+      "swap position 4 with position 0",
+      "swap letter d with letter b",
+      "reverse positions 0 through 4",
+      "rotate left 1 step",
+      "move position 1 to position 4",
+      "move position 3 to position 0",
+      "rotate based on position of letter b",
+      "rotate based on position of letter d",
   };
   VLOG(1) << "Test: " << pw;
   for (absl::string_view in : instructions) {
@@ -222,16 +227,17 @@ absl::Status RunTest() {
 absl::Status RunReverseTest() {
   std::string pw = "decab";
   std::vector<std::string> instructions = {
-    "swap position 4 with position 0",
-    "swap letter d with letter b",
-    "reverse positions 0 through 4",
-    "rotate left 1 step",
-    "move position 1 to position 4",
-    "move position 3 to position 0",
-    "rotate based on position of letter b",
-    "rotate based on position of letter d",
+      "swap position 4 with position 0",
+      "swap letter d with letter b",
+      "reverse positions 0 through 4",
+      "rotate left 1 step",
+      "move position 1 to position 4",
+      "move position 3 to position 0",
+      "rotate based on position of letter b",
+      "rotate based on position of letter d",
   };
-  std::vector<absl::string_view> reverse(instructions.begin(), instructions.end());
+  std::vector<absl::string_view> reverse(instructions.begin(),
+                                         instructions.end());
   std::reverse(reverse.begin(), reverse.end());
   VLOG(1) << "Test: " << pw;
   for (absl::string_view in : reverse) {
@@ -246,7 +252,6 @@ absl::Status RunReverseTest() {
   }
   return absl::OkStatus();
 }
-
 
 }  // namespace
 
