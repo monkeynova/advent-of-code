@@ -7,33 +7,13 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/point.h"
+#include "advent_of_code/md5.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
-#include "third_party/md5/md5.h"
 
 namespace advent_of_code {
 
 namespace {
-
-std::string Hex(absl::string_view buf) {
-  static char hexchar[] = {'0', '1', '2', '3', '4', '5', '6', '7',
-                           '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-  return absl::StrJoin(buf, "", [](std::string* out, char c) {
-    unsigned char uc = static_cast<unsigned char>(c);
-    char tmp[] = {hexchar[uc >> 4], hexchar[uc & 0xf], '\0'};
-    absl::StrAppend(out, tmp);
-  });
-}
-
-std::string MD5Hex(std::string str) {
-  MD5_CTX ctx;
-  unsigned char md5_result[16];
-  absl::string_view md5_result_view(reinterpret_cast<char*>(md5_result), 16);
-  MD5_Init(&ctx);
-  MD5_Update(&ctx, str.data(), str.size());
-  MD5_Final(md5_result, &ctx);
-  return Hex(md5_result_view);
-}
 
 absl::StatusOr<std::string> FindPath(absl::string_view input) {
   struct Path {
@@ -47,7 +27,8 @@ absl::StatusOr<std::string> FindPath(absl::string_view input) {
   while (!frontier.empty()) {
     Path cur = frontier.front();
     frontier.pop_front();
-    std::string md5 = MD5Hex(absl::StrCat(input, cur.dir));
+    MD5 digest;
+    absl::string_view md5 = digest.DigestHex(absl::StrCat(input, cur.dir));
     for (int i = 0; i < 4; ++i) {
       if (md5[i] >= 'b') {
         Path next = cur;
@@ -77,7 +58,8 @@ absl::optional<int> FindLongestPath(absl::string_view input) {
   while (!frontier.empty()) {
     Path cur = frontier.front();
     frontier.pop_front();
-    std::string md5 = MD5Hex(absl::StrCat(input, cur.dir));
+    MD5 digest;
+    absl::string_view md5 = digest.DigestHex(absl::StrCat(input, cur.dir));
     for (int i = 0; i < 4; ++i) {
       if (md5[i] >= 'b') {
         Path next = cur;

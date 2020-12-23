@@ -5,7 +5,7 @@ cc_library(
     srcs = ["md5.cc"],
     hdrs = ["md5.h"],
     visibility = [
-        "//visibility:public",
+        "//advent_of_code:__pkg__"
     ],
     deps = [],
 )

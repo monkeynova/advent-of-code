@@ -135,3 +135,14 @@ cc_library(
         "@com_googlesource_code_re2//:re2",
     ],
 )
+
+cc_library(
+    name = "md5",
+    hdrs = ["md5.h"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "//third_party/md5"
+    ],
+)

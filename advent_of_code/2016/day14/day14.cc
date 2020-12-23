@@ -6,23 +6,13 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/md5.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
-#include "third_party/md5/md5.h"
 
 namespace advent_of_code {
 
 namespace {
-
-std::string Hex(absl::string_view buf) {
-  static char hexchar[] = {'0', '1', '2', '3', '4', '5', '6', '7',
-                           '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-  return absl::StrJoin(buf, "", [](std::string* out, char c) {
-    unsigned char uc = static_cast<unsigned char>(c);
-    char tmp[] = {hexchar[uc >> 4], hexchar[uc & 0xf], '\0'};
-    absl::StrAppend(out, tmp);
-  });
-}
 
 }  // namespace
 
@@ -30,19 +20,12 @@ absl::StatusOr<std::vector<std::string>> Day14_2016::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
 
-  MD5_CTX ctx;
-  unsigned char md5_result[16];
-  absl::string_view md5_result_view(reinterpret_cast<char*>(md5_result), 16);
   std::vector<std::string> window;
   int found = 0;
   for (int index = 0; true; ++index) {
-    MD5_Init(&ctx);
+    MD5 digest;
     std::string str = absl::StrCat(input[0], index);
-    MD5_Update(&ctx, str.data(), str.size());
-    MD5_Final(md5_result, &ctx);
-
-    std::string hex = Hex(md5_result_view);
-    window.push_back(hex);
+    window.push_back(std::string(digest.DigestHex(str)));
     if (window.size() < 1001) continue;
 
     if (window.size() != index + 1) return Error("Bad append");
@@ -90,22 +73,16 @@ absl::StatusOr<std::vector<std::string>> Day14_2016::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
 
-  MD5_CTX ctx;
-  unsigned char md5_result[16];
-  absl::string_view md5_result_view(reinterpret_cast<char*>(md5_result), 16);
   std::vector<std::string> window;
   int found = 0;
   for (int index = 0; true; ++index) {
     std::string str = absl::StrCat(input[0], index);
     for (int i = 0; i < 2017; ++i) {
-      MD5_Init(&ctx);
-      MD5_Update(&ctx, str.data(), str.size());
-      MD5_Final(md5_result, &ctx);
-      str = Hex(md5_result_view);
+      MD5 digest;
+      str = std::string(digest.DigestHex(str));
     }
 
-    std::string hex = Hex(md5_result_view);
-    window.push_back(hex);
+    window.push_back(str);
     if (window.size() < 1001) continue;
 
     if (window.size() != index + 1) return Error("Bad append");
