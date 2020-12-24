@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_library",)
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
     name = "assem_bunny",
@@ -17,4 +17,3 @@ cc_library(
         "@com_googlesource_code_re2//:re2",
     ],
 )
-

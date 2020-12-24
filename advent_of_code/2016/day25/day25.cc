@@ -30,10 +30,8 @@ class OutputWatch : public AssemBunny::OutputInterface,
     output_history_.insert(registers);
     return absl::OkStatus();
   }
-  
-  const std::vector<int64_t>& output() {
-    return output_;
-  }
+
+  const std::vector<int64_t>& output() { return output_; }
 
  private:
   std::vector<int64_t> output_;

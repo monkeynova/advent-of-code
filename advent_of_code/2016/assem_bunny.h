@@ -30,12 +30,13 @@ class AssemBunny {
       if (absl::SimpleAtoi(name, &literal)) return &literal;
       return nullptr;
     }
-  
+
     bool operator==(const Registers& o) const {
       return a == o.a && b == o.b && c == o.c && d == o.d;
     }
 
-    friend std::ostream& operator<<(std::ostream& out, const AssemBunny::Registers& r) {
+    friend std::ostream& operator<<(std::ostream& out,
+                                    const AssemBunny::Registers& r) {
       return out << "{" << r.a << "," << r.b << "," << r.c << "," << r.d << "}";
     }
 
@@ -82,7 +83,7 @@ class AssemBunny {
     kTgl = 5,
     kOut = 6,
   };
-  
+
   struct Instruction {
     OpCode op_code;
     absl::string_view arg1;

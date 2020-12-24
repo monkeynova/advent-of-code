@@ -18,7 +18,7 @@ absl::StatusOr<std::vector<std::string>> Day23_2016::Part1(
   if (!vm.ok()) return vm.status();
   vm->registers().a = 7;
   if (absl::Status st = vm->Execute(); !st.ok()) return st;
-  return IntReturn(vm->registers().a );
+  return IntReturn(vm->registers().a);
 }
 
 absl::StatusOr<std::vector<std::string>> Day23_2016::Part2(
@@ -27,7 +27,7 @@ absl::StatusOr<std::vector<std::string>> Day23_2016::Part2(
   if (!vm.ok()) return vm.status();
   vm->registers().a = 12;
   if (absl::Status st = vm->Execute(); !st.ok()) return st;
-  return IntReturn(vm->registers().a );
+  return IntReturn(vm->registers().a);
 }
 
 }  // namespace advent_of_code

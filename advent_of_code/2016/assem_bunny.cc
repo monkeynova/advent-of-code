@@ -3,7 +3,8 @@
 namespace advent_of_code {
 
 // static
-absl::StatusOr<AssemBunny::Instruction> AssemBunny::Instruction::Parse(absl::string_view in) {
+absl::StatusOr<AssemBunny::Instruction> AssemBunny::Instruction::Parse(
+    absl::string_view in) {
   Instruction i;
   if (RE2::FullMatch(in, "cpy ([-a-z0-9]+) ([a-z]+)", &i.arg1, &i.arg2)) {
     i.op_code = OpCode::kCpy;
@@ -95,8 +96,11 @@ absl::Status AssemBunny::Execute(OutputInterface* output_interface,
       case OpCode::kOut: {
         int64_t* output = registers_.Val(i.arg1);
         if (output == nullptr) return AdventDay::Error("Bad arg: ", i.arg1);
-        if (output_interface == nullptr) return AdventDay::Error("No output sink");
-        if (absl::Status st = output_interface->OnOutput(*output, this); !st.ok()) return st;
+        if (output_interface == nullptr)
+          return AdventDay::Error("No output sink");
+        if (absl::Status st = output_interface->OnOutput(*output, this);
+            !st.ok())
+          return st;
         break;
       }
     }
