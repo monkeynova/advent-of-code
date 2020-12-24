@@ -13,39 +13,6 @@ namespace advent_of_code {
 
 namespace {
 
-/*
-cpy a d    // d = a
-cpy 4 c    // c = 4
-cpy 643 b  // b = 643
-inc d      //
-dec b      //
-jnz b -2   // b = 0; d = a + 643
-dec c      //
-jnz c -5   // c = 0; d = a + 4 * 643)
-cpy d a    // a = a + 4 * 643
-jnz 0 0    // nop
-cpy a b    // b = a + 4 * 643
-cpy 0 a    // a = 0
-cpy 2 c    // c = 2
-jnz b 2    //
-jnz 1 6    //
-dec b      //
-dec c      //
-jnz c -4   // c = 0; b = (a + 4 * 263) - 2
-inc a      //
-jnz 1 -7
-cpy 2 b    // b = 2; a = (4 * (a + 643)) / 2; c = (4 * (a + 643)) % 2
-jnz c 2    //
-jnz 1 4
-dec b      //
-dec c
-jnz 1 -4   // b = b - c
-jnz 0 0
-out b
-jnz a -19
-jnz 1 -21
-*/
-
 enum class OpCode {
   kCpy = 1,
   kInc = 2,
