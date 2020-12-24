@@ -52,10 +52,10 @@ class Droid : public IntCode::IOModule {
       std::vector<InputDirection> directions;
     };
     absl::flat_hash_set<Point> computed_path = {pos_};
-    std::deque<Path> paths;
-    paths.push_back({.location = pos_});
-    for (int depth = 1; !paths.empty(); ++depth) {
-      const Path& to_extend = paths.front();
+    std::deque<Path> frontier;
+    frontier.push_back({.location = pos_});
+    for (int depth = 1; !frontier.empty(); ++depth) {
+      const Path& to_extend = frontier.front();
       for (InputDirection dir :
            {InputDirection::kNorthInput, InputDirection::kSouthInput,
             InputDirection::kWestInput, InputDirection::kEastInput}) {
@@ -74,12 +74,12 @@ class Droid : public IntCode::IOModule {
           // Wall.
           continue;
         }
-        paths.push_back(
+        frontier.push_back(
             {.location = new_location, .directions = to_extend.directions});
-        paths.back().directions.push_back(dir);
+        frontier.back().directions.push_back(dir);
         computed_path.insert(new_location);
       }
-      paths.pop_front();
+      frontier.pop_front();
     }
     // Fully explored the map.
     done_ = true;
@@ -93,10 +93,10 @@ class Droid : public IntCode::IOModule {
       std::vector<InputDirection> directions;
     };
     absl::flat_hash_set<Point> computed_path = {Point{.x = 0, .y = 0}};
-    std::deque<Path> paths;
-    paths.push_back({.location = Point{.x = 0, .y = 0}});
-    for (int depth = 1; !paths.empty(); ++depth) {
-      const Path& to_extend = paths.front();
+    std::deque<Path> frontier;
+    frontier.push_back({.location = Point{.x = 0, .y = 0}});
+    for (int depth = 1; !frontier.empty(); ++depth) {
+      const Path& to_extend = frontier.front();
       for (InputDirection dir :
            {InputDirection::kNorthInput, InputDirection::kSouthInput,
             InputDirection::kWestInput, InputDirection::kEastInput}) {
@@ -122,12 +122,12 @@ class Droid : public IntCode::IOModule {
                                    });
           return to_extend.directions.size() + 1;
         }
-        paths.push_back(
+        frontier.push_back(
             {.location = new_location, .directions = to_extend.directions});
-        paths.back().directions.push_back(dir);
+        frontier.back().directions.push_back(dir);
         computed_path.insert(new_location);
       }
-      paths.pop_front();
+      frontier.pop_front();
     }
     return absl::InternalError("Ran out of paths");
   }
