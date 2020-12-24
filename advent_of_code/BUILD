@@ -102,18 +102,6 @@ cc_library(
 )
 
 cc_library(
-    name = "board_search",
-    hdrs = ["board_search.h"],
-    visibility = [
-        "//visibility:public",
-    ],
-    deps = [
-        ":char_board",
-        ":point",
-    ],
-)
-
-cc_library(
     name = "char_board",
     hdrs = ["char_board.h"],
     visibility = [
