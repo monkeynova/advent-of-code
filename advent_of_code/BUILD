@@ -91,6 +91,15 @@ cc_library(
 )
 
 cc_library(
+    name = "bfs",
+    hdrs = ["bfs.h"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+    ],
+)
+cc_library(
     name = "board_search",
     hdrs = ["board_search.h"],
     visibility = [
