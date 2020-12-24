@@ -16,7 +16,8 @@ namespace {
 
 // Helper methods go here.
 
-absl::StatusOr<absl::flat_hash_map<Point, bool>> ParseGrid(absl::Span<absl::string_view> input) {
+absl::StatusOr<absl::flat_hash_map<Point, bool>> ParseGrid(
+    absl::Span<absl::string_view> input) {
   absl::flat_hash_map<Point, bool> grid;
   for (absl::string_view str : input) {
     Point p = {0, 0};
@@ -26,20 +27,22 @@ absl::StatusOr<absl::flat_hash_map<Point, bool>> ParseGrid(absl::Span<absl::stri
       } else if (str[i] == 'e') {
         p += 2 * Cardinal::kEast;
       } else if (str[i] == 'n') {
-        if (i + 1 == str.size()) return AdventDay::Error("Bad sequence (@", i, "): ", str);
-        if (str[i+1] == 'w') {
+        if (i + 1 == str.size())
+          return AdventDay::Error("Bad sequence (@", i, "): ", str);
+        if (str[i + 1] == 'w') {
           p += Cardinal::kNorthWest;
-        } else if (str[i+1] == 'e') {
+        } else if (str[i + 1] == 'e') {
           p += Cardinal::kNorthEast;
         } else {
           return AdventDay::Error("Bad sequence (@", i, "): ", str);
         }
         ++i;
       } else if (str[i] == 's') {
-        if (i + 1 == str.size()) return AdventDay::Error("Bad sequence (@", i, "): ", str);
-        if (str[i+1] == 'w') {
+        if (i + 1 == str.size())
+          return AdventDay::Error("Bad sequence (@", i, "): ", str);
+        if (str[i + 1] == 'w') {
           p += Cardinal::kSouthWest;
-        } else if (str[i+1] == 'e') {
+        } else if (str[i + 1] == 'e') {
           p += Cardinal::kSouthEast;
         } else {
           return AdventDay::Error("Bad sequence (@", i, "): ", str);
@@ -54,9 +57,11 @@ absl::StatusOr<absl::flat_hash_map<Point, bool>> ParseGrid(absl::Span<absl::stri
   return grid;
 }
 
-absl::StatusOr<absl::flat_hash_map<Point, bool>> RunStep(const absl::flat_hash_map<Point, bool>& grid) {
-  const std::vector<Point> kDirs = {2 * Cardinal::kWest, 2 * Cardinal::kEast, Cardinal::kSouthWest,
-  Cardinal::kSouthEast, Cardinal::kNorthWest, Cardinal::kNorthEast};
+absl::StatusOr<absl::flat_hash_map<Point, bool>> RunStep(
+    const absl::flat_hash_map<Point, bool>& grid) {
+  const std::vector<Point> kDirs = {2 * Cardinal::kWest,  2 * Cardinal::kEast,
+                                    Cardinal::kSouthWest, Cardinal::kSouthEast,
+                                    Cardinal::kNorthWest, Cardinal::kNorthEast};
 
   absl::flat_hash_map<Point, int> neighbors;
   for (const auto& [p, is_black] : grid) {

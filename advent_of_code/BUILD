@@ -97,8 +97,10 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
+        "@com_google_glog//:glog",
     ],
 )
+
 cc_library(
     name = "board_search",
     hdrs = ["board_search.h"],

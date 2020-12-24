@@ -6,8 +6,8 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
-#include "advent_of_code/char_board.h"
 #include "advent_of_code/bfs.h"
+#include "advent_of_code/char_board.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 
@@ -18,12 +18,12 @@ namespace {
 class PathWalk : public BFSInterface<PathWalk> {
  public:
   PathWalk(const CharBoard& board, bool back_to_origin)
-   : board_(board),
-     start_(FindStart(board)),
-     cur_(start_),
-     need_keys_(NeedKeys(board)),
-     have_keys_(0),
-     back_to_origin_(back_to_origin) {}
+      : board_(board),
+        start_(FindStart(board)),
+        cur_(start_),
+        need_keys_(NeedKeys(board)),
+        have_keys_(0),
+        back_to_origin_(back_to_origin) {}
 
   void AddNextSteps(State* state) final {
     for (Point dir : Cardinal::kFourDirs) {
@@ -67,7 +67,7 @@ class PathWalk : public BFSInterface<PathWalk> {
     }
     return start;
   }
-  
+
   int NeedKeys(const CharBoard& b) {
     int need_keys = 0;
     for (Point p : b.range()) {

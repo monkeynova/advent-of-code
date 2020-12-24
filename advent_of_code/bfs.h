@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 
+#include "glog/logging.h"
+
 namespace advent_of_code {
 
 template <typename BFSImpl>
@@ -13,8 +15,8 @@ class BFSInterface {
   class State {
    public:
     explicit State(BFSImpl start) {
-     hist_.insert(start);
-     frontier_.push_back(std::move(start));
+      hist_.insert(start);
+      frontier_.push_back(std::move(start));
     }
     void AddNextStep(BFSImpl next) {
       ++next.num_steps_;
@@ -49,7 +51,7 @@ class BFSInterface {
 
 template <typename BFSImpl>
 absl::optional<int> BFSInterface<BFSImpl>::FindMinSteps() {
-  static_assert(std::is_base_of<BFSInterface<BFSImpl>, BFSImpl>(), 
+  static_assert(std::is_base_of<BFSInterface<BFSImpl>, BFSImpl>(),
                 "BFSInterface must be templated with a subclass");
   State state(*dynamic_cast<BFSImpl*>(this));
   while (!state.frontier_.empty()) {
