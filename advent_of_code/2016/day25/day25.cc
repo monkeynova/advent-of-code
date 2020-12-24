@@ -13,7 +13,7 @@ namespace advent_of_code {
 
 namespace {
 
-  /*
+/*
 cpy a d    // d = a
 cpy 4 c    // c = 4
 cpy 643 b  // b = 643
@@ -27,16 +27,16 @@ jnz 0 0    // nop
 cpy a b    // b = a + 4 * 643
 cpy 0 a    // a = 0
 cpy 2 c    // c = 2
-jnz b 2    // 
-jnz 1 6    // 
+jnz b 2    //
+jnz 1 6    //
 dec b      //
 dec c      //
 jnz c -4   // c = 0; b = (a + 4 * 263) - 2
-inc a      // 
+inc a      //
 jnz 1 -7
 cpy 2 b    // b = 2; a = (4 * (a + 643)) / 2; c = (4 * (a + 643)) % 2
-jnz c 2    // 
-jnz 1 4 
+jnz c 2    //
+jnz 1 4
 dec b      //
 dec c
 jnz 1 -4   // b = b - c
@@ -44,7 +44,7 @@ jnz 0 0
 out b
 jnz a -19
 jnz 1 -21
-  */
+*/
 
 enum class OpCode {
   kCpy = 1,
@@ -110,7 +110,6 @@ template <typename H>
 H AbslHashValue(H h, const Registers& r) {
   return H::combine(std::move(h), r.a, r.b, r.c, r.d);
 }
-
 
 class VM {
  public:
