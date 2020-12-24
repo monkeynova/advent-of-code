@@ -6,8 +6,8 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
-#include "advent_of_code/char_board.h"
 #include "advent_of_code/bfs.h"
+#include "advent_of_code/char_board.h"
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
@@ -40,7 +40,7 @@ class SparseBoard {
 class PathWalkToEnd : public BFSInterface<PathWalkToEnd> {
  public:
   PathWalkToEnd(const SparseBoard& board, Point start, Point end)
-   : board_(board), cur_(start), end_(end) {}
+      : board_(board), cur_(start), end_(end) {}
 
   void AddNextSteps(State* state) override {
     for (Point dir : Cardinal::kFourDirs) {
@@ -55,9 +55,7 @@ class PathWalkToEnd : public BFSInterface<PathWalkToEnd> {
 
   bool IsFinal() override { return cur_ == end_; }
 
-  bool operator==(const PathWalkToEnd& o) const {
-    return cur_ == o.cur_;
-  }
+  bool operator==(const PathWalkToEnd& o) const { return cur_ == o.cur_; }
 
   template <typename H>
   friend H AbslHashValue(H h, const PathWalkToEnd& p) {
@@ -78,7 +76,7 @@ class PathWalkToDistance : public BFSInterface<PathWalkToDistance> {
  public:
   PathWalkToDistance(const SparseBoard& board, Point start, int distance,
                      int* visited)
-   : board_(board), cur_(start), distance_(distance), visited_(visited) {}
+      : board_(board), cur_(start), distance_(distance), visited_(visited) {}
 
   void AddNextSteps(State* state) override {
     ++*visited_;
@@ -97,16 +95,15 @@ class PathWalkToDistance : public BFSInterface<PathWalkToDistance> {
 
   bool IsFinal() override { return false; }
 
-  bool operator==(const PathWalkToDistance& o) const {
-    return cur_ == o.cur_;
-  }
+  bool operator==(const PathWalkToDistance& o) const { return cur_ == o.cur_; }
 
   template <typename H>
   friend H AbslHashValue(H h, const PathWalkToDistance& p) {
     return H::combine(std::move(h), p.cur_);
   }
 
-  friend std::ostream& operator<<(std::ostream& o, const PathWalkToDistance& p) {
+  friend std::ostream& operator<<(std::ostream& o,
+                                  const PathWalkToDistance& p) {
     return o << p.cur_;
   }
 
@@ -123,7 +120,7 @@ absl::StatusOr<std::vector<std::string>> Day13_2016::Part1(
     absl::Span<absl::string_view> input) const {
   SparseBoard test_board(10);
   absl::optional<int> test_dist =
-     PathWalkToEnd(test_board, {1, 1}, {7, 4}).FindMinSteps();
+      PathWalkToEnd(test_board, {1, 1}, {7, 4}).FindMinSteps();
   if (!test_dist) return Error("Can't find test dist");
   if (*test_dist != 11) return Error("Wrong test dist: ", *test_dist);
 

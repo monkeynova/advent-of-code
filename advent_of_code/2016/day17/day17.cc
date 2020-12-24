@@ -23,7 +23,10 @@ class PathWalk : public BFSInterface<PathWalk> {
   static constexpr absl::string_view kDirNames = "UDLR";
 
   PathWalk(absl::string_view input, std::string* path_dest, bool stop_on_end)
-   : input_(input), cur_(Point{0, 0}), path_dest_(path_dest), stop_on_end_(stop_on_end) {}
+      : input_(input),
+        cur_(Point{0, 0}),
+        path_dest_(path_dest),
+        stop_on_end_(stop_on_end) {}
 
   bool IsFinal() override {
     if (cur_ == Point{3, 3}) {
