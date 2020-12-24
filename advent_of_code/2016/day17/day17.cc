@@ -6,6 +6,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/bfs.h"
 #include "advent_of_code/md5.h"
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
@@ -15,84 +16,82 @@ namespace advent_of_code {
 
 namespace {
 
-absl::StatusOr<std::string> FindPath(absl::string_view input) {
-  struct Path {
-    std::string dir;
-    Point p;
-  };
-  std::deque<Path> frontier = {Path{.dir = "", .p = {0, 0}}};
-  constexpr Point kKeyDirs[] = {Cardinal::kNorth, Cardinal::kSouth,
-                                Cardinal::kWest, Cardinal::kEast};
-  constexpr absl::string_view kDirNames = "UDLR";
-  while (!frontier.empty()) {
-    Path cur = frontier.front();
-    frontier.pop_front();
+class PathWalk : public BFSInterface<PathWalk> {
+ public:
+  static constexpr Point kKeyDirs[] = {Cardinal::kNorth, Cardinal::kSouth,
+                                       Cardinal::kWest, Cardinal::kEast};
+  static constexpr absl::string_view kDirNames = "UDLR";
+
+  PathWalk(absl::string_view input, std::string* path_dest, bool stop_on_end)
+   : input_(input), cur_(Point{0, 0}), path_dest_(path_dest), stop_on_end_(stop_on_end) {}
+
+  bool IsFinal() override {
+    if (cur_ == Point{3, 3}) {
+      *path_dest_ = path_;
+      if (stop_on_end_) return true;
+    }
+    return false;
+  }
+
+  void AddNextSteps(State* state) override {
+    if (cur_ == Point{3, 3}) return;
+
     MD5 digest;
-    absl::string_view md5 = digest.DigestHex(absl::StrCat(input, cur.dir));
+    absl::string_view md5 = digest.DigestHex(absl::StrCat(input_, path_));
     for (int i = 0; i < 4; ++i) {
       if (md5[i] >= 'b') {
-        Path next = cur;
-        next.p += kKeyDirs[i];
-        next.dir.append(kDirNames.substr(i, 1));
-        if (next.p == Point{3, 3}) return next.dir;
-        if (next.p.x >= 0 && next.p.y >= 0 && next.p.x <= 3 && next.p.y <= 3) {
-          frontier.push_back(next);
-        }
+        PathWalk next = *this;
+        next.cur_ += kKeyDirs[i];
+        next.path_.append(kDirNames.substr(i, 1));
+        if (next.cur_.x < 0) continue;
+        if (next.cur_.y < 0) continue;
+        if (next.cur_.x > 3) continue;
+        if (next.cur_.y > 3) continue;
+        state->AddNextStep(next);
       }
     }
   }
 
-  return AdventDay::Error("No path found");
-}
-
-absl::optional<int> FindLongestPath(absl::string_view input) {
-  struct Path {
-    std::string dir;
-    Point p;
-  };
-  std::deque<Path> frontier = {Path{.dir = "", .p = {0, 0}}};
-  constexpr Point kKeyDirs[] = {Cardinal::kNorth, Cardinal::kSouth,
-                                Cardinal::kWest, Cardinal::kEast};
-  constexpr absl::string_view kDirNames = "UDLR";
-  absl::optional<int> longest_path;
-  while (!frontier.empty()) {
-    Path cur = frontier.front();
-    frontier.pop_front();
-    MD5 digest;
-    absl::string_view md5 = digest.DigestHex(absl::StrCat(input, cur.dir));
-    for (int i = 0; i < 4; ++i) {
-      if (md5[i] >= 'b') {
-        Path next = cur;
-        next.p += kKeyDirs[i];
-        next.dir.append(kDirNames.substr(i, 1));
-        if (next.p == Point{3, 3}) {
-          longest_path = next.dir.size();
-          continue;
-        }
-        if (next.p.x >= 0 && next.p.y >= 0 && next.p.x <= 3 && next.p.y <= 3) {
-          frontier.push_back(next);
-        }
-      }
-    }
+  bool operator==(const PathWalk& o) const {
+    return cur_ == o.cur_ && path_ == o.path_;
   }
 
-  return longest_path;
-}
+  template <typename H>
+  friend H AbslHashValue(H h, const PathWalk& p) {
+    return H::combine(std::move(h), p.path_, p.cur_);
+  }
+
+  friend std::ostream& operator<<(std::ostream& o, const PathWalk& p) {
+    return o << p.path_ << "->" << p.cur_;
+  }
+
+ private:
+  absl::string_view input_;
+  std::string path_;
+  Point cur_;
+  std::string* path_dest_;
+  bool stop_on_end_;
+};
 
 }  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day17_2016::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Input size");
-  absl::StatusOr<std::string> path = FindPath(input[0]);
-  if (!path.ok()) return path.status();
-  return std::vector<std::string>{*path};
+  std::string path;
+  if (!PathWalk(input[0], &path, true).FindMinSteps()) {
+    return Error("Path not found");
+  }
+  return std::vector<std::string>{path};
 }
 
 absl::StatusOr<std::vector<std::string>> Day17_2016::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Input size");
-  return IntReturn(FindLongestPath(input[0]));
+  std::string path;
+  // We walk until exhausting paths.
+  (void)PathWalk(input[0], &path, false).FindMinSteps();
+  return IntReturn(path.size());
 }
 
 }  // namespace advent_of_code
