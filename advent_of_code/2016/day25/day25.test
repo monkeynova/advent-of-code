@@ -1,7 +1,8 @@
+# 1073741181 (high)
 [part=1]
 @include{advent_of_code/2016/day25/input.txt}
 --
-ERROR: Could not run test: Not implemented
+158
 ==
 
 [part=2]
