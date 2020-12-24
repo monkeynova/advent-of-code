@@ -43,6 +43,8 @@ class BFSInterface {
  protected:
   BFSInterface() = default;
 
+  int num_steps() const { return num_steps_; }
+
  private:
   int num_steps_ = 0;
 
