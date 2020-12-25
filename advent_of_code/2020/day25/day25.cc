@@ -6,28 +6,11 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/mod.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
-
-namespace {
-
-int64_t PowerMod(int64_t base, int64_t exp, int64_t mod) {
-  int64_t product = 1;
-  int64_t power_mult = base;
-  for (int64_t bit = 1; bit <= exp; bit <<= 1) {
-    if (exp & bit) product = (product * power_mult) % mod;
-    power_mult = (power_mult * power_mult) % mod;
-  }
-  return product;
-}
-
-int64_t Transform(int64_t subject_number, int64_t loop_size) {
-  return PowerMod(subject_number, loop_size, 20201227);
-}
-
-}  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day25_2020::Part1(
     absl::Span<absl::string_view> input) const {
@@ -35,23 +18,16 @@ absl::StatusOr<std::vector<std::string>> Day25_2020::Part1(
   absl::StatusOr<std::vector<int64_t>> ints = ParseAsInts(input);
   if (!ints.ok()) return ints.status();
 
-  std::vector<int64_t> tmp(2);
-  int have = 0;
-  for (int i = 1; have < 2; ++i) {
-    if (!tmp[0] && Transform(7, i) == (*ints)[0]) {
-      ++have;
-      tmp[0] = i;
+  for (int i = 1; i <= 20201227; ++i) {
+    if (PowerMod<int64_t>(7, i, 20201227) == (*ints)[0]) {
+      return IntReturn(PowerMod<int64_t>((*ints)[1], i, 20201227));
     }
-    if (!tmp[1] && Transform(7, i) == (*ints)[1]) {
-      ++have;
-      tmp[1] = i;
+    if (PowerMod<int64_t>(7, i, 20201227) == (*ints)[1]) {
+      return IntReturn(PowerMod<int64_t>((*ints)[0], i, 20201227));
     }
   }
-  VLOG(1) << "tmp=" << absl::StrJoin(tmp, ",");
-  VLOG(1) << Transform((*ints)[0], tmp[1]);
-  VLOG(1) << Transform((*ints)[1], tmp[0]);
 
-  return IntReturn(Transform(7, tmp[0] * tmp[1]));
+  return Error("No value found");
 }
 
 absl::StatusOr<std::vector<std::string>> Day25_2020::Part2(

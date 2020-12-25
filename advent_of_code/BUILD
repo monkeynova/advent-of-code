@@ -145,3 +145,14 @@ cc_library(
         "//third_party/md5",
     ],
 )
+
+cc_library(
+    name = "mod",
+    hdrs = ["mod.h"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "@com_google_glog//:glog",
+    ],
+)

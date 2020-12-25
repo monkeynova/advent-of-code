@@ -6,6 +6,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/mod.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 
@@ -56,24 +57,8 @@ Transform CutNInverse(int64_t n, int64_t deck_size) {
   return Transform{.mult = 1, .add = deck_size + n, .mod = deck_size};
 }
 
-absl::uint128 PowerMod(absl::uint128 base, absl::uint128 exp,
-                       absl::uint128 mod) {
-  absl::uint128 product = 1;
-  absl::uint128 power_mult = base;
-  for (int64_t bit = 1; bit <= exp; bit <<= 1) {
-    if (exp & bit) product = (product * power_mult) % mod;
-    power_mult = (power_mult * power_mult) % mod;
-  }
-  return product;
-}
-
 Transform IncrementNInverse(int64_t n, int64_t deck_size) {
-  // TODO(@monkeynova): Error handling.
-  CHECK(std::gcd(n, deck_size) == 1);
-  // If 'n' and 'mod' are relatively prime, n ** (mod - 1) == 1, which means
-  // n ** -1 == n ** (mod - 2).
-  absl::uint128 inverse_n = PowerMod(n, deck_size - 2, deck_size);
-  return Transform{.mult = inverse_n, .add = 0, .mod = deck_size};
+  return Transform{.mult = InverseMod<absl::uint128>(n, deck_size), .add = 0, .mod = deck_size};
 }
 
 absl::StatusOr<std::pair<Transform, Transform>> CreateTransform(
