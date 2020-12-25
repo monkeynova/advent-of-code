@@ -26,6 +26,6 @@ T InverseMod(T n, T mod) {
   return PowerMod<T>(n, mod - 2, mod);
 }
 
-}  // advent_of_code
+}  // namespace advent_of_code
 
 #endif  // ADVENT_OF_CODE_MOD_H
