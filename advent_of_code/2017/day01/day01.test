@@ -1,0 +1,29 @@
+[part=1]
+1111
+--
+4
+==
+
+[part=1]
+1122
+--
+3
+==
+
+[part=1]
+91212129
+--
+9
+==
+
+# 236 (low)
+[part=1]
+@include{advent_of_code/2017/day01/input.txt}
+--
+1253
+==
+
+[part=2]
+@include{advent_of_code/2017/day01/input.txt}
+--
+ERROR: Could not run test: Not implemented
