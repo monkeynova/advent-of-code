@@ -21,8 +21,9 @@ absl::StatusOr<std::vector<std::string>> Day01_2017::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   int sum = 0;
-  for (int i = 0; i < input[0].size(); ++i) {
-    if (input[0][i] == input[0][(i+1) % input[0].size()]) {
+  int size = input[0].size();
+  for (int i = 0; i < size; ++i) {
+    if (input[0][i] == input[0][(i+1) % size]) {
       sum += input[0][i] - '0';
     }
   }
@@ -31,7 +32,15 @@ absl::StatusOr<std::vector<std::string>> Day01_2017::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day01_2017::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 1) return Error("Bad input");
+  int sum = 0;
+  int size = input[0].size();
+  for (int i = 0; i < size; ++i) {
+    if (input[0][i] == input[0][(i + (size/2)) % size]) {
+      sum += input[0][i] - '0';
+    }
+  }
+  return IntReturn(sum);
 }
 
 }  // namespace advent_of_code
