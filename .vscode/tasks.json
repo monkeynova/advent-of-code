@@ -71,12 +71,10 @@
           "id": "year",
           "description": "Which year ?",
           "options": [
-            "2020",
             "2018",
             "2017",
-            "2016",
           ],
-          "default": "2020"
+          "default": "2017"
         },
         {
             "type": "pickString",
