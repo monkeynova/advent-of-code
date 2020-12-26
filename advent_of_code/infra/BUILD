@@ -25,9 +25,9 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
-        "//advent_of_code:advent_day",
         ":file_test_options",
         ":file_util",
+        "//advent_of_code:advent_day",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/functional:bind_front",
         "@com_google_absl//absl/strings",
@@ -63,9 +63,9 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
-        "//advent_of_code:advent_day",
         ":file_test_options",
         ":file_util",
+        "//advent_of_code:advent_day",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
@@ -73,4 +73,3 @@ cc_library(
         "@com_googlesource_code_re2//:re2",
     ],
 )
-

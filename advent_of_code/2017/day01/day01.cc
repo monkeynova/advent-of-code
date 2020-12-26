@@ -23,7 +23,7 @@ absl::StatusOr<std::vector<std::string>> Day01_2017::Part1(
   int sum = 0;
   int size = input[0].size();
   for (int i = 0; i < size; ++i) {
-    if (input[0][i] == input[0][(i+1) % size]) {
+    if (input[0][i] == input[0][(i + 1) % size]) {
       sum += input[0][i] - '0';
     }
   }
@@ -36,7 +36,7 @@ absl::StatusOr<std::vector<std::string>> Day01_2017::Part2(
   int sum = 0;
   int size = input[0].size();
   for (int i = 0; i < size; ++i) {
-    if (input[0][i] == input[0][(i + (size/2)) % size]) {
+    if (input[0][i] == input[0][(i + (size / 2)) % size]) {
       sum += input[0][i] - '0';
     }
   }

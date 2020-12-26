@@ -22,8 +22,8 @@ cc_binary(
         "input.txt",
     ],
     deps = [
-        "//advent_of_code/infra:file_util",
         "//advent_of_code/2019:int_code",
+        "//advent_of_code/infra:file_util",
         "@com_google_glog//:glog",
         "@com_monkeynova_gunit_main//:main_lib",
     ],

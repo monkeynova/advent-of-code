@@ -57,7 +57,6 @@ Transform CutNInverse(int64_t n, int64_t deck_size) {
   return Transform{.mult = 1, .add = deck_size + n, .mod = deck_size};
 }
 
-
 Transform IncrementNInverse(int64_t n, int64_t deck_size) {
   return Transform{.mult = InverseMod<absl::uint128>(n, deck_size),
                    .add = 0,
