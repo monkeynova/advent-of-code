@@ -55,7 +55,18 @@ absl::StatusOr<std::vector<std::string>> Day06_2017::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day06_2017::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 1) return Error("Bad size");
+  std::vector<absl::string_view> split = absl::StrSplit(input[0], "\t");
+  absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(split);
+  if (!list.ok()) return list.status();
+  std::vector<int64_t> tmp = *list;
+  absl::flat_hash_map<std::vector<int64_t>, int> hist;
+  for (int i = 0; !hist.contains(tmp); ++i) {
+    VLOG(2) << absl::StrJoin(tmp, ",");
+    hist[tmp] = i;
+    tmp = RunStep(std::move(tmp));
+  }
+  return IntReturn(hist.size() - hist[tmp]);
 }
 
 }  // namespace advent_of_code
