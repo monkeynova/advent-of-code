@@ -64,7 +64,7 @@ absl::StatusOr<std::vector<std::string>> Day03_2017::Part2(
   if (nums->size() != 1) return Error("Bad size");
   int min_val = nums->at(0);
   absl::flat_hash_map<Point, int> sums;
-  sums[{0,0}] = 1;
+  sums[{0, 0}] = 1;
   for (int i = 2;; ++i) {
     Point p = FromPosition(i);
     int this_sum = 0;
