@@ -30,7 +30,19 @@ absl::StatusOr<std::vector<std::string>> Day05_2017::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day05_2017::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<std::vector<int64_t>> jumps = ParseAsInts(input);
+  if (!jumps.ok()) return jumps.status();
+  int steps = 0;
+  for (int ip = 0; ip >= 0 && ip < jumps->size(); ++steps) {
+    int delta = (*jumps)[ip];
+    if (delta >= 3) {
+      --(*jumps)[ip];
+    } else {
+      ++(*jumps)[ip];
+    }
+    ip += delta;
+  }
+  return IntReturn(steps);
 }
 
 }  // namespace advent_of_code
