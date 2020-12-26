@@ -19,7 +19,13 @@ namespace {
 
 absl::StatusOr<std::vector<std::string>> Day05_2017::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<std::vector<int64_t>> jumps = ParseAsInts(input);
+  if (!jumps.ok()) return jumps.status();
+  int steps = 0;
+  for (int ip = 0; ip >= 0 && ip < jumps->size(); ++steps) {
+    ip += (*jumps)[ip]++;
+  }
+  return IntReturn(steps);
 }
 
 absl::StatusOr<std::vector<std::string>> Day05_2017::Part2(
