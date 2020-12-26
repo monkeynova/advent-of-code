@@ -59,7 +59,25 @@ absl::StatusOr<std::vector<std::string>> Day03_2017::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day03_2017::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<std::vector<int64_t>> nums = ParseAsInts(input);
+  if (!nums.ok()) return nums.status();
+  if (nums->size() != 1) return Error("Bad size");
+  int min_val = nums->at(0);
+  absl::flat_hash_map<Point, int> sums;
+  sums[{0,0}] = 1;
+  for (int i = 2;; ++i) {
+    Point p = FromPosition(i);
+    int this_sum = 0;
+    for (Point dir : Cardinal::kEightDirs) {
+      auto it = sums.find(p + dir);
+      if (it != sums.end()) this_sum += it->second;
+    }
+    if (this_sum > min_val) return IntReturn(this_sum);
+    LOG(INFO) << p << ": " << this_sum;
+    if (this_sum == 0) return Error("Zero sum!");
+    sums[p] = this_sum;
+  }
+  return Error("Left infinite loop");
 }
 
 }  // namespace advent_of_code
