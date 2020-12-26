@@ -1,5 +1,5 @@
-#ifndef ADVENT_OF_CODE_FILE_TEST_OPTIONS_H
-#define ADVENT_OF_CODE_FILE_TEST_OPTIONS_H
+#ifndef ADVENT_OF_CODE_INFRA_FILE_TEST_OPTIONS_H
+#define ADVENT_OF_CODE_INFRA_FILE_TEST_OPTIONS_H
 
 #include "absl/status/statusor.h"
 #include "file_based_test_driver/test_case_options.h"
@@ -17,4 +17,4 @@ absl::StatusOr<absl::Duration> ParseLongTestDuration(
 
 }  // namespace advent_of_code
 
-#endif  // ADVENT_OF_CODE_FILE_TEST_OPTIONS_H
+#endif  // ADVENT_OF_CODE_INFRA_FILE_TEST_OPTIONS_H

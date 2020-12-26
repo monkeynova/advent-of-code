@@ -27,7 +27,7 @@ cc_test(
     ],
     deps = [
         ":day13",
-        "//advent_of_code:file_test",
+        "//advent_of_code/infra:file_test",
     ],
 )
 
@@ -41,7 +41,7 @@ cc_test(
     ],
     deps = [
         ":day13",
-        "//advent_of_code:file_benchmark",
+        "//advent_of_code/infra:file_benchmark",
         "@com_monkeynova_gunit_main//:test_main",
     ],
 )

@@ -1,5 +1,5 @@
 #include "advent_of_code/2019/int_code.h"
-#include "advent_of_code/file_util.h"
+#include "advent_of_code/infra/file_util.h"
 #include "glog/logging.h"
 #include "main_lib.h"
 

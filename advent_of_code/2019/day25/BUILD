@@ -22,7 +22,7 @@ cc_binary(
         "input.txt",
     ],
     deps = [
-        "//advent_of_code:file_util",
+        "//advent_of_code/infra:file_util",
         "//advent_of_code/2019:int_code",
         "@com_google_glog//:glog",
         "@com_monkeynova_gunit_main//:main_lib",
@@ -39,7 +39,7 @@ cc_test(
     ],
     deps = [
         ":day25",
-        "//advent_of_code:file_test",
+        "//advent_of_code/infra:file_test",
     ],
 )
 
@@ -53,7 +53,7 @@ cc_test(
     ],
     deps = [
         ":day25",
-        "//advent_of_code:file_benchmark",
+        "//advent_of_code/infra:file_benchmark",
         "@com_monkeynova_gunit_main//:test_main",
     ],
 )

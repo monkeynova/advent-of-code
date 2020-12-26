@@ -1,6 +1,6 @@
 #include "advent_of_code/2015/day15/day15.h"
 
-#include "advent_of_code/file_test.h"
+#include "advent_of_code/infra/file_test.h"
 #include "gmock/gmock.h"
 
 namespace advent_of_code {

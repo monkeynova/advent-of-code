@@ -1,5 +1,5 @@
-#ifndef ADVENT_OF_CODE_FILE_UTIL_H
-#define ADVENT_OF_CODE_FILE_UTIL_H
+#ifndef ADVENT_OF_CODE_INFRA_FILE_UTIL_H
+#define ADVENT_OF_CODE_INFRA_FILE_UTIL_H
 
 #include <vector>
 
@@ -15,4 +15,4 @@ absl::Status HandleTestIncludes(std::string* test_case);
 
 }  // namespace advent_of_code
 
-#endif  // ADVENT_OF_CODE_FILE_UTIL_H
+#endif  // ADVENT_OF_CODE_INFRA_FILE_UTIL_H

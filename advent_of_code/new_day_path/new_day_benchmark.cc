@@ -1,4 +1,4 @@
-#include "advent_of_code/file_benchmark.h"
+#include "advent_of_code/infra/file_benchmark.h"
 #include "advent_of_code/new_day_path/new_day.h"
 #include "gmock/gmock.h"
 

@@ -1,9 +1,9 @@
-#ifndef ADVENT_OF_CODE_FILE_BENCHMARK_H
-#define ADVENT_OF_CODE_FILE_BENCHMARK_H
+#ifndef ADVENT_OF_CODE_INFRA_FILE_BENCHMARK_H
+#define ADVENT_OF_CODE_INFRA_FILE_BENCHMARK_H
 
 #include "absl/status/statusor.h"
 #include "advent_of_code/advent_day.h"
-#include "advent_of_code/file_util.h"
+#include "advent_of_code/infra/file_util.h"
 #include "benchmark/benchmark.h"
 
 namespace advent_of_code {
@@ -25,4 +25,4 @@ void BM_Day(benchmark::State& state) {
 
 }  // namespace advent_of_code
 
-#endif  // ADVENT_OF_CODE_FILE_BENCHMARK_H
+#endif  // ADVENT_OF_CODE_INFRA_FILE_BENCHMARK_H
