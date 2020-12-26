@@ -30,7 +30,18 @@ absl::StatusOr<std::vector<std::string>> Day04_2017::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day04_2017::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  int valid = 0;
+  for (absl::string_view in : input) {
+    std::vector<absl::string_view> list = absl::StrSplit(in, " ");
+    absl::flat_hash_set<std::string> uniq;
+    for (absl::string_view w : list) {
+      std::string sorted_word = std::string(w);
+      std::sort(sorted_word.begin(), sorted_word.end());
+      uniq.insert(sorted_word);
+    }
+    if (list.size() == uniq.size()) ++valid;
+  }
+  return IntReturn(valid);
 }
 
 }  // namespace advent_of_code
