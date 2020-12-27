@@ -26,23 +26,35 @@ absl::StatusOr<std::vector<std::string>> Day08_2017::Part1(
     absl::string_view reg;
     absl::string_view op;
     int num;
-    if (!RE2::FullMatch(op_and_cond[1], "([a-z]+) (<|>|<=|>=|==|!=) (-?\\d+)", &reg, &op, &num)) {
+    if (!RE2::FullMatch(op_and_cond[1], "([a-z]+) (<|>|<=|>=|==|!=) (-?\\d+)",
+                        &reg, &op, &num)) {
       return Error("Bad cond: ", op_and_cond[1]);
     }
-    if (op == "==") { if (registers[reg] != num) continue; }
-    else if (op == "!=") { if (registers[reg] == num) continue; }
-    else if (op == "<") { if (registers[reg] >= num) continue; }
-    else if (op == ">") { if (registers[reg] <= num) continue; }
-    else if (op == ">=") { if (registers[reg] < num) continue; }
-    else if (op == "<=") { if (registers[reg] > num) continue; }
-    else return Error("Bad cond: ", op);
+    if (op == "==") {
+      if (registers[reg] != num) continue;
+    } else if (op == "!=") {
+      if (registers[reg] == num) continue;
+    } else if (op == "<") {
+      if (registers[reg] >= num) continue;
+    } else if (op == ">") {
+      if (registers[reg] <= num) continue;
+    } else if (op == ">=") {
+      if (registers[reg] < num) continue;
+    } else if (op == "<=") {
+      if (registers[reg] > num) continue;
+    } else
+      return Error("Bad cond: ", op);
 
-    if (!RE2::FullMatch(op_and_cond[0], "([a-z]+) (inc|dec) (-?\\d+)", &reg, &op, &num)) {
+    if (!RE2::FullMatch(op_and_cond[0], "([a-z]+) (inc|dec) (-?\\d+)", &reg,
+                        &op, &num)) {
       return Error("Bad op: ", op_and_cond[0]);
     }
-    if (op == "inc") registers[reg] += num;
-    else if (op == "dec") registers[reg] -= num;
-    else return Error("Bad op: ", op);
+    if (op == "inc")
+      registers[reg] += num;
+    else if (op == "dec")
+      registers[reg] -= num;
+    else
+      return Error("Bad op: ", op);
   }
   int max = std::numeric_limits<int>::min();
   for (const auto& [_, val] : registers) max = std::max(max, val);
@@ -59,28 +71,37 @@ absl::StatusOr<std::vector<std::string>> Day08_2017::Part2(
     absl::string_view reg;
     absl::string_view op;
     int num;
-    if (!RE2::FullMatch(op_and_cond[1], "([a-z]+) (<|>|<=|>=|==|!=) (-?\\d+)", &reg, &op, &num)) {
+    if (!RE2::FullMatch(op_and_cond[1], "([a-z]+) (<|>|<=|>=|==|!=) (-?\\d+)",
+                        &reg, &op, &num)) {
       return Error("Bad cond: ", op_and_cond[1]);
     }
-    if (op == "==") { if (registers[reg] != num) continue; }
-    else if (op == "!=") { if (registers[reg] == num) continue; }
-    else if (op == "<") { if (registers[reg] >= num) continue; }
-    else if (op == ">") { if (registers[reg] <= num) continue; }
-    else if (op == ">=") { if (registers[reg] < num) continue; }
-    else if (op == "<=") { if (registers[reg] > num) continue; }
-    else return Error("Bad cond: ", op);
+    if (op == "==") {
+      if (registers[reg] != num) continue;
+    } else if (op == "!=") {
+      if (registers[reg] == num) continue;
+    } else if (op == "<") {
+      if (registers[reg] >= num) continue;
+    } else if (op == ">") {
+      if (registers[reg] <= num) continue;
+    } else if (op == ">=") {
+      if (registers[reg] < num) continue;
+    } else if (op == "<=") {
+      if (registers[reg] > num) continue;
+    } else
+      return Error("Bad cond: ", op);
 
-    if (!RE2::FullMatch(op_and_cond[0], "([a-z]+) (inc|dec) (-?\\d+)", &reg, &op, &num)) {
+    if (!RE2::FullMatch(op_and_cond[0], "([a-z]+) (inc|dec) (-?\\d+)", &reg,
+                        &op, &num)) {
       return Error("Bad op: ", op_and_cond[0]);
     }
     if (op == "inc") {
       registers[reg] += num;
       max = std::max(max, registers[reg]);
-    }
-    else if (op == "dec") {
+    } else if (op == "dec") {
       registers[reg] -= num;
       max = std::max(max, registers[reg]);
-    } else return Error("Bad op: ", op);
+    } else
+      return Error("Bad op: ", op);
   }
   return IntReturn(max);
 }
