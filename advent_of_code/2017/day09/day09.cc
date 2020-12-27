@@ -42,6 +42,36 @@ int TotalGroupScore(absl::string_view str) {
   return total_score;
 }
 
+int GarbageCount(absl::string_view str) {
+  int garbage_count = 0;
+  int group_level = 0;
+  bool in_garbage = false;
+  bool in_garbage_escape = false;
+
+  for (char c : str) {
+    VLOG(2) << c << ": group_level" << group_level << ", in_garbage=" << in_garbage
+            << ", in_garbage_escape=" << in_garbage_escape;
+    if (in_garbage) {
+      if (in_garbage_escape) {
+        in_garbage_escape = false;
+      } else {
+        if (c == '>') in_garbage = false;
+        else if (c == '!') in_garbage_escape = true;
+        else ++garbage_count;
+      }
+    } else {
+      if (c == '{') ++group_level;
+      if (c == '}') {
+        --group_level;
+      }
+      if (c == '<') in_garbage = true;
+    }
+  }
+
+  return garbage_count;
+}
+
+
 // Helper methods go here.
 
 }  // namespace
@@ -57,7 +87,7 @@ absl::StatusOr<std::vector<std::string>> Day09_2017::Part1(
   for (const auto& [str, expect] : tests) {
     int got = TotalGroupScore(str);
     if (got != expect) {
-      LOG(ERROR) << "Bad result: " << got << " != " << expect << "; " << str;
+      return Error("Bad test: ", got, " != ", expect, ": ", str);
     }
   }
   if (input.size() != 1) return Error("Bad input");
@@ -66,7 +96,20 @@ absl::StatusOr<std::vector<std::string>> Day09_2017::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day09_2017::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  std::vector<std::pair<absl::string_view, int>> tests = {
+    {"<>", 0},
+    {"<random characters>", 17},
+    {"<{o\"i!a,<{i<a>", 10},
+    {"<!!>", 0},
+  };
+  for (const auto& [str, expect] : tests) {
+    int got = GarbageCount(str);
+    if (got != expect) {
+      return Error("Bad test: ", got, " != ", expect, ": ", str);
+    }
+  }
+  if (input.size() != 1) return Error("Bad input");
+  return IntReturn(GarbageCount(input[0]));
 }
 
 }  // namespace advent_of_code
