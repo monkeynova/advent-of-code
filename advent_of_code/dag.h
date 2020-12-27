@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "absl/container/flat_hash_map.h"
+#include "absl/strings/str_join.h"
 #include "glog/logging.h"
 
 namespace advent_of_code {

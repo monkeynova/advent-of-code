@@ -5,6 +5,7 @@
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/dag.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 
@@ -12,20 +13,48 @@ namespace advent_of_code {
 namespace {
 
 struct BagRule {
-  std::string color;
-  int count;
+  absl::flat_hash_map<absl::string_view, int> bag_to_count;
 };
 
-int CountContainingBags(
-    const absl::flat_hash_map<std::string, std::vector<std::string>>& reverse,
-    absl::string_view bag) {
-  absl::flat_hash_set<std::string> can_contain;
-  absl::flat_hash_set<std::string> added = {std::string(bag)};
+absl::StatusOr<DAG<BagRule>> Parse(absl::Span<absl::string_view> input) {
+  DAG<BagRule> ret;
+  for (absl::string_view str : input) {
+    std::vector<absl::string_view> pieces =
+        absl::StrSplit(str, " bags contain ");
+    if (pieces.size() != 2) return absl::InvalidArgumentError("contains");
+    if (ret.GetData(pieces[0]) != nullptr) {
+      return AdventDay::Error("color dupe: ", pieces[0]);
+    }
+    if (pieces[1] == "no other bags.") {
+      // OK for the rule to be empty.
+      ret.AddNode(pieces[0], BagRule{});
+    } else {
+      BagRule bag_rule;
+      for (absl::string_view bag_rule_str : absl::StrSplit(pieces[1], ", ")) {
+        static LazyRE2 bag_pattern{"(\\d+) (.*) bags?\\.?"};
+        int count;
+        absl::string_view color;
+        if (!RE2::FullMatch(bag_rule_str, *bag_pattern, &count, &color)) {
+          return AdventDay::Error("bag rule: ", bag_rule_str);
+        }
+        bag_rule.bag_to_count.emplace(color, count);
+        ret.AddEdge(pieces[0], color);
+      }
+      ret.AddNode(pieces[0], std::move(bag_rule));
+    }
+  }
+  return ret;
+}
+
+int CountContainingBags(const DAG<BagRule>& bags, absl::string_view bag) {
+  absl::flat_hash_set<absl::string_view> can_contain;
+  absl::flat_hash_set<absl::string_view> added = {bag};
   while (!added.empty()) {
-    absl::flat_hash_set<std::string> new_added;
-    for (const std::string& color : added) {
-      if (auto it = reverse.find(color); it != reverse.end()) {
-        for (const std::string& parent_color : it->second) {
+    absl::flat_hash_set<absl::string_view> new_added;
+    for (const absl::string_view& color : added) {
+      const std::vector<absl::string_view>* incoming = bags.Incoming(color);
+      if (incoming != nullptr) {
+        for (absl::string_view parent_color : *incoming) {
           if (can_contain.contains(parent_color)) continue;
           new_added.insert(parent_color);
           can_contain.insert(parent_color);
@@ -38,16 +67,24 @@ int CountContainingBags(
 }
 
 absl::StatusOr<int> CountContainedBags(
-    const absl::flat_hash_map<std::string, std::vector<BagRule>>& dependency,
+    const DAG<BagRule>& bags,
     absl::string_view bag) {
-  auto it = dependency.find(bag);
-  if (it == dependency.end())
-    return absl::InvalidArgumentError("can't find bag");
+  const BagRule* bag_rule = bags.GetData(bag);
+  if (bag_rule == nullptr) {
+    return AdventDay::Error("Cannot find bag: ", bag);
+  }
+  const std::vector<absl::string_view>* outgoing = bags.Outgoing(bag);
   int bag_count = 1;
-  for (const BagRule& rule : it->second) {
-    absl::StatusOr<int> sub_bags = CountContainedBags(dependency, rule.color);
-    if (!sub_bags.ok()) return sub_bags.status();
-    bag_count += rule.count * *sub_bags;
+  if (outgoing != nullptr) {
+    for (absl::string_view sub_bag : *outgoing) {
+      absl::StatusOr<int> sub_bags = CountContainedBags(bags, sub_bag);
+      if (!sub_bags.ok()) return sub_bags.status();
+      auto sub_bag_count_it = bag_rule->bag_to_count.find(sub_bag);
+      if (sub_bag_count_it == bag_rule->bag_to_count.end()) {
+        return AdventDay::Error("Cannot find bag count: ", sub_bag);
+      }
+      bag_count += sub_bag_count_it->second * *sub_bags;
+    }
   }
   return bag_count;
 }
@@ -56,65 +93,20 @@ absl::StatusOr<int> CountContainedBags(
 
 absl::StatusOr<std::vector<std::string>> Day07_2020::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::flat_hash_map<std::string, std::vector<BagRule>> dependency;
-  absl::flat_hash_map<std::string, std::vector<std::string>> reverse;
-  for (absl::string_view str : input) {
-    std::vector<absl::string_view> pieces =
-        absl::StrSplit(str, " bags contain ");
-    if (pieces.size() != 2) return absl::InvalidArgumentError("contains");
-    std::string color = std::string(pieces[0]);
-    if (dependency.contains(color))
-      return absl::InvalidArgumentError("color dupe");
-    std::vector<BagRule>& insert = dependency[color];
-    if (pieces[1] == "no other bags.") {
-      // OK for the rule to be empty.
-    } else {
-      for (absl::string_view bag_rule_str : absl::StrSplit(pieces[1], ", ")) {
-        BagRule bag_rule;
-        static LazyRE2 bag_pattern{"(\\d+) (.*) bags?\\.?"};
-        if (!RE2::FullMatch(bag_rule_str, *bag_pattern, &bag_rule.count,
-                            &bag_rule.color)) {
-          return absl::InvalidArgumentError(
-              absl::StrCat("bag rule: ", bag_rule_str));
-        }
-        insert.push_back(bag_rule);
-        reverse[bag_rule.color].push_back(color);
-      }
-    }
-  }
-  LOG(WARNING) << dependency.size();
-  return IntReturn(CountContainingBags(reverse, "shiny gold"));
+  absl::StatusOr<DAG<BagRule>> bags = Parse(input);
+  if (!bags.ok()) return bags.status();
+  VLOG(1) << bags->nodes().size();
+  return IntReturn(CountContainingBags(*bags, "shiny gold"));
 }
 
 absl::StatusOr<std::vector<std::string>> Day07_2020::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::flat_hash_map<std::string, std::vector<BagRule>> dependency;
-  for (absl::string_view str : input) {
-    std::vector<absl::string_view> pieces =
-        absl::StrSplit(str, " bags contain ");
-    if (pieces.size() != 2) return absl::InvalidArgumentError("contains");
-    std::string color = std::string(pieces[0]);
-    if (dependency.contains(color))
-      return absl::InvalidArgumentError("color dupe");
-    std::vector<BagRule>& insert = dependency[color];
-    if (pieces[1] == "no other bags.") {
-      // OK for the rule to be empty.
-    } else {
-      for (absl::string_view bag_rule_str : absl::StrSplit(pieces[1], ", ")) {
-        BagRule bag_rule;
-        static LazyRE2 bag_pattern{"(\\d+) (.*) bags?\\.?"};
-        if (!RE2::FullMatch(bag_rule_str, *bag_pattern, &bag_rule.count,
-                            &bag_rule.color)) {
-          return absl::InvalidArgumentError(
-              absl::StrCat("bag rule: ", bag_rule_str));
-        }
-        insert.push_back(bag_rule);
-      }
-    }
-  }
-  absl::StatusOr<int> bags = CountContainedBags(dependency, "shiny gold");
+  absl::StatusOr<DAG<BagRule>> bags = Parse(input);
   if (!bags.ok()) return bags.status();
-  return IntReturn(*bags - 1); /* don't include top bag */
+
+  absl::StatusOr<int> contained_bags = CountContainedBags(*bags, "shiny gold");
+  if (!contained_bags.ok()) return bags.status();
+  return IntReturn(*contained_bags - 1); /* don't include top bag */
 }
 
 }  // namespace advent_of_code
