@@ -82,3 +82,14 @@ cc_library(
         "@com_google_glog//:glog",
     ],
 )
+
+cc_library(
+    name = "dag",
+    hdrs = ["dag.h"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "@com_google_glog//:glog",
+    ],
+)
