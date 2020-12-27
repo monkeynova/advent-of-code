@@ -1,7 +1,7 @@
 [part=1]
 @include{advent_of_code/2017/day09/input.txt}
 --
-ERROR: Could not run test: Not implemented
+10616
 ==
 
 [part=2]
