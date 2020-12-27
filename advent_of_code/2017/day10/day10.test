@@ -1,7 +1,8 @@
+# 6972 (high)
 [part=1]
 @include{advent_of_code/2017/day10/input.txt}
 --
-ERROR: Could not run test: Not implemented
+6952
 ==
 
 [part=2]
