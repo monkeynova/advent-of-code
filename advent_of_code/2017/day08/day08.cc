@@ -19,7 +19,34 @@ namespace {
 
 absl::StatusOr<std::vector<std::string>> Day08_2017::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::flat_hash_map<absl::string_view, int> registers;
+  for (absl::string_view in : input) {
+    std::vector<absl::string_view> op_and_cond = absl::StrSplit(in, " if ");
+    if (op_and_cond.size() != 2) return Error("Bad if");
+    absl::string_view reg;
+    absl::string_view op;
+    int num;
+    if (!RE2::FullMatch(op_and_cond[1], "([a-z]+) (<|>|<=|>=|==|!=) (-?\\d+)", &reg, &op, &num)) {
+      return Error("Bad cond: ", op_and_cond[1]);
+    }
+    if (op == "==") { if (registers[reg] != num) continue; }
+    else if (op == "!=") { if (registers[reg] == num) continue; }
+    else if (op == "<") { if (registers[reg] >= num) continue; }
+    else if (op == ">") { if (registers[reg] <= num) continue; }
+    else if (op == ">=") { if (registers[reg] < num) continue; }
+    else if (op == "<=") { if (registers[reg] > num) continue; }
+    else return Error("Bad cond: ", op);
+
+    if (!RE2::FullMatch(op_and_cond[0], "([a-z]+) (inc|dec) (-?\\d+)", &reg, &op, &num)) {
+      return Error("Bad op: ", op_and_cond[0]);
+    }
+    if (op == "inc") registers[reg] += num;
+    else if (op == "dec") registers[reg] -= num;
+    else return Error("Bad op: ", op);
+  }
+  int max = std::numeric_limits<int>::min();
+  for (const auto& [_, val] : registers) max = std::max(max, val);
+  return IntReturn(max);
 }
 
 absl::StatusOr<std::vector<std::string>> Day08_2017::Part2(

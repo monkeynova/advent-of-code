@@ -1,7 +1,16 @@
 [part=1]
+b inc 5 if a > 1
+a inc 1 if b < 5
+c dec -10 if a >= 1
+c inc -20 if c == 10
+--
+1
+==
+
+[part=1]
 @include{advent_of_code/2017/day08/input.txt}
 --
-ERROR: Could not run test: Not implemented
+4416
 ==
 
 [part=2]
