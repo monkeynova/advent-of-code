@@ -20,7 +20,8 @@ int TotalGroupScore(absl::string_view str) {
   bool in_garbage_escape = false;
 
   for (char c : str) {
-    VLOG(2) << c << ": group_level" << group_level << ", in_garbage=" << in_garbage
+    VLOG(2) << c << ": group_level" << group_level
+            << ", in_garbage=" << in_garbage
             << ", in_garbage_escape=" << in_garbage_escape;
     if (in_garbage) {
       if (in_garbage_escape) {
@@ -49,15 +50,19 @@ int GarbageCount(absl::string_view str) {
   bool in_garbage_escape = false;
 
   for (char c : str) {
-    VLOG(2) << c << ": group_level" << group_level << ", in_garbage=" << in_garbage
+    VLOG(2) << c << ": group_level" << group_level
+            << ", in_garbage=" << in_garbage
             << ", in_garbage_escape=" << in_garbage_escape;
     if (in_garbage) {
       if (in_garbage_escape) {
         in_garbage_escape = false;
       } else {
-        if (c == '>') in_garbage = false;
-        else if (c == '!') in_garbage_escape = true;
-        else ++garbage_count;
+        if (c == '>')
+          in_garbage = false;
+        else if (c == '!')
+          in_garbage_escape = true;
+        else
+          ++garbage_count;
       }
     } else {
       if (c == '{') ++group_level;
@@ -71,7 +76,6 @@ int GarbageCount(absl::string_view str) {
   return garbage_count;
 }
 
-
 // Helper methods go here.
 
 }  // namespace
@@ -79,10 +83,10 @@ int GarbageCount(absl::string_view str) {
 absl::StatusOr<std::vector<std::string>> Day09_2017::Part1(
     absl::Span<absl::string_view> input) const {
   std::vector<std::pair<absl::string_view, int>> tests = {
-    {"{}", 1},
-    {"{{{}}}", 6},
-    {"{{}{}}", 5},
-    {"{{<a!>},{<a!>},{<a!>},{<ab>}}", 3},
+      {"{}", 1},
+      {"{{{}}}", 6},
+      {"{{}{}}", 5},
+      {"{{<a!>},{<a!>},{<a!>},{<ab>}}", 3},
   };
   for (const auto& [str, expect] : tests) {
     int got = TotalGroupScore(str);
@@ -97,10 +101,10 @@ absl::StatusOr<std::vector<std::string>> Day09_2017::Part1(
 absl::StatusOr<std::vector<std::string>> Day09_2017::Part2(
     absl::Span<absl::string_view> input) const {
   std::vector<std::pair<absl::string_view, int>> tests = {
-    {"<>", 0},
-    {"<random characters>", 17},
-    {"<{o\"i!a,<{i<a>", 10},
-    {"<!!>", 0},
+      {"<>", 0},
+      {"<random characters>", 17},
+      {"<{o\"i!a,<{i<a>", 10},
+      {"<!!>", 0},
   };
   for (const auto& [str, expect] : tests) {
     int got = GarbageCount(str);
