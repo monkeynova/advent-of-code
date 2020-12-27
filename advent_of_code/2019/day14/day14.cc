@@ -6,83 +6,32 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/dag.h"
 #include "glog/logging.h"
 
 namespace advent_of_code {
 namespace {
 
-struct Ingredient {
-  std::string name;
-  int quantity;
-};
-
 struct Rule {
   std::string name;
   int quantity_out;
-  std::vector<Ingredient> in;
+  absl::flat_hash_map<absl::string_view, int> in;
 };
 
-using RuleSet = std::vector<Rule>;
-
-absl::StatusOr<RuleSet> DagSort(RuleSet rule_set) {
-  absl::flat_hash_map<std::string, const Rule*> name_to_rule;
-  absl::flat_hash_map<std::string, int> name_to_dep_count;
-  for (const Rule& rule : rule_set) {
-    name_to_rule[rule.name] = &rule;
-    if (!name_to_dep_count.contains(rule.name)) {
-      name_to_dep_count.emplace(rule.name, 0);
-    }
-    for (const Ingredient& in : rule.in) {
-      ++name_to_dep_count[in.name];
-    }
-  }
-
-  RuleSet out;
-  while (!name_to_rule.empty()) {
-    VLOG(2) << absl::StrJoin(
-        name_to_dep_count, ",",
-        [](std::string* out, const std::pair<std::string, int>& name_count) {
-          absl::StrAppend(out, name_count.first, ":", name_count.second);
-        });
-    std::vector<const Rule*> to_remove;
-    for (const auto& name_rule : name_to_rule) {
-      int deps = name_to_dep_count[name_rule.first];
-      if (deps < 0) return absl::InvalidArgumentError("Bad Deps");
-      if (deps == 0) {
-        to_remove.push_back(name_rule.second);
-      }
-    }
-    if (to_remove.empty()) return absl::InvalidArgumentError("Not a DAG");
-    for (const Rule* rule : to_remove) {
-      out.push_back(*rule);
-      VLOG(2) << "Removing: " << rule->name;
-      name_to_rule.erase(rule->name);
-      name_to_dep_count.erase(rule->name);
-      for (const Ingredient& in : rule->in) {
-        VLOG(2) << "  Decrementing: " << in.name;
-        --name_to_dep_count[in.name];
-      }
-    }
-  }
-  return out;
-}
-
-absl::StatusOr<RuleSet> ParseRuleSet(absl::Span<absl::string_view> input) {
-  RuleSet rule_set;
-  absl::flat_hash_set<absl::string_view> rule_history;
+absl::StatusOr<DAG<Rule>> ParseRuleSet(absl::Span<absl::string_view> input) {
+  DAG<Rule> rule_set;
   for (absl::string_view rule_str : input) {
     std::vector<absl::string_view> in_out = absl::StrSplit(rule_str, " => ");
     if (in_out.size() != 2) return absl::InvalidArgumentError("Bad rule");
     std::vector<absl::string_view> inputs = absl::StrSplit(in_out[0], ", ");
 
-    rule_set.push_back(Rule{});
-    Rule& rule = rule_set.back();
+    Rule rule;
     std::vector<absl::string_view> quantity_name =
         absl::StrSplit(in_out[1], " ");
-    if (rule_history.contains(quantity_name[1]))
+    absl::string_view src = quantity_name[1];
+    if (rule_set.GetData(src) != nullptr) {
       return absl::InvalidArgumentError("Duplicate rule");
-    rule_history.insert(quantity_name[1]);
-    rule.name = quantity_name[1];
+    }
     if (quantity_name.size() != 2) {
       return absl::InvalidArgumentError("Bad ingredient");
     }
@@ -95,34 +44,42 @@ absl::StatusOr<RuleSet> ParseRuleSet(absl::Span<absl::string_view> input) {
       if (quantity_name.size() != 2) {
         return absl::InvalidArgumentError("Bad ingredient");
       }
-      Ingredient i;
-      i.name = quantity_name[1];
-      if (!absl::SimpleAtoi(quantity_name[0], &i.quantity)) {
+      absl::string_view dest = quantity_name[1];
+      int quantity;
+      if (!absl::SimpleAtoi(quantity_name[0], &quantity)) {
         return absl::InvalidArgumentError("Bad quantity");
       }
-      rule.in.push_back(i);
+      rule.in.emplace(dest, quantity);
+      rule_set.AddEdge(src, dest);
     }
+    rule_set.AddNode(src, std::move(rule));
   }
-  return DagSort(std::move(rule_set));
+  return rule_set;
 }
 
-absl::StatusOr<int64_t> ComputeOreNeedForFuel(const RuleSet& rule_set,
-                                              int64_t fuel_needed = 1) {
+absl::StatusOr<int64_t> ComputeOreNeedForFuel(
+    const DAG<Rule>& rule_set,
+    const std::vector<absl::string_view>& ordered_ingredients,
+    int64_t fuel_needed) {
+  // TODO(@monkeynova): Remember this ordering...
   absl::flat_hash_map<absl::string_view, int64_t> needs;
   needs.emplace("FUEL", fuel_needed);
-  for (const Rule& rule : rule_set) {
+  for (absl::string_view node : ordered_ingredients) {
+    if (node == "ORE") continue;
+    const Rule* rule = rule_set.GetData(node);
+    if (rule == nullptr) return AdventDay::Error("Cannot find ", node);
     VLOG(1) << absl::StrJoin(
         needs, ", ",
         [](std::string* out, const std::pair<absl::string_view, int>& need) {
           absl::StrAppend(out, need.first, ":", need.second);
         });
-    int64_t needed = needs[rule.name];
+    int64_t needed = needs[node];
     if (needed <= 0) continue;
-    needs.erase(rule.name);
+    needs.erase(node);
 
-    int64_t mult = (needed + rule.quantity_out - 1) / rule.quantity_out;
-    for (const Ingredient& in : rule.in) {
-      needs[in.name] += mult * in.quantity;
+    int64_t mult = (needed + rule->quantity_out - 1) / rule->quantity_out;
+    for (const auto& [name, qty] : rule->in) {
+      needs[name] += mult * qty;
     }
   }
   if (needs.size() != 1) {
@@ -134,11 +91,34 @@ absl::StatusOr<int64_t> ComputeOreNeedForFuel(const RuleSet& rule_set,
   return needs.begin()->second;
 }
 
-absl::StatusOr<int> FuelFromOre(const RuleSet& rule_set, uint64_t ore_supply) {
+absl::StatusOr<int64_t> ComputeOreNeedForFuel(const DAG<Rule>& rule_set) {
+  absl::StatusOr<std::vector<absl::string_view>> ordered_ingredients =
+      rule_set.DAGSort();
+  if (!ordered_ingredients.ok()) return ordered_ingredients.status();
+  if (ordered_ingredients->at(0) != "FUEL") {
+    return AdventDay::Error("Not a DAG rooted at FUEL");
+  }
+  if (ordered_ingredients->back() != "ORE") {
+    return AdventDay::Error("Not a DAG with leaf at ORE");
+  }
+  return ComputeOreNeedForFuel(rule_set, *ordered_ingredients, 1);
+}
+
+absl::StatusOr<int> FuelFromOre(const DAG<Rule>& rule_set,
+                                uint64_t ore_supply) {
+  absl::StatusOr<std::vector<absl::string_view>> ordered_ingredients =
+      rule_set.DAGSort();
+  if (!ordered_ingredients.ok()) return ordered_ingredients.status();
+  if (ordered_ingredients->at(0) != "FUEL") {
+    return AdventDay::Error("Not a DAG rooted at FUEL");
+  }
+  if (ordered_ingredients->back() != "ORE") {
+    return AdventDay::Error("Not a DAG with leaf at ORE");
+  }
   int64_t guess = 1;
   absl::StatusOr<int64_t> ore_needed = 0;
   while (*ore_needed < ore_supply) {
-    ore_needed = ComputeOreNeedForFuel(rule_set, guess);
+    ore_needed = ComputeOreNeedForFuel(rule_set, *ordered_ingredients, guess);
     if (!ore_needed.ok()) return ore_needed.status();
     VLOG(1) << guess << " => " << *ore_needed;
     guess <<= 1;
@@ -147,7 +127,7 @@ absl::StatusOr<int> FuelFromOre(const RuleSet& rule_set, uint64_t ore_supply) {
   int64_t max = guess >> 1;
   while (min < max) {
     guess = (min + max) / 2;
-    ore_needed = ComputeOreNeedForFuel(rule_set, guess);
+    ore_needed = ComputeOreNeedForFuel(rule_set, *ordered_ingredients, guess);
     if (!ore_needed.ok()) return ore_needed.status();
     VLOG(1) << guess << " => " << *ore_needed;
     if (*ore_needed == ore_supply) {
@@ -159,7 +139,7 @@ absl::StatusOr<int> FuelFromOre(const RuleSet& rule_set, uint64_t ore_supply) {
       max = guess;
     }
   }
-  ore_needed = ComputeOreNeedForFuel(rule_set, guess);
+  ore_needed = ComputeOreNeedForFuel(rule_set, *ordered_ingredients, guess);
   if (*ore_needed > ore_supply) return guess - 1;
   return guess;
 }
@@ -168,24 +148,16 @@ absl::StatusOr<int> FuelFromOre(const RuleSet& rule_set, uint64_t ore_supply) {
 
 absl::StatusOr<std::vector<std::string>> Day14_2019::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<RuleSet> rule_set = ParseRuleSet(input);
+  absl::StatusOr<DAG<Rule>> rule_set = ParseRuleSet(input);
   if (!rule_set.ok()) return rule_set.status();
-
-  if ((*rule_set)[0].name != "FUEL") {
-    return absl::InvalidArgumentError("Rules aren't a DAG rooted with FUEL");
-  }
 
   return IntReturn(ComputeOreNeedForFuel(*rule_set));
 }
 
 absl::StatusOr<std::vector<std::string>> Day14_2019::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<RuleSet> rule_set = ParseRuleSet(input);
+  absl::StatusOr<DAG<Rule>> rule_set = ParseRuleSet(input);
   if (!rule_set.ok()) return rule_set.status();
-
-  if ((*rule_set)[0].name != "FUEL") {
-    return absl::InvalidArgumentError("Rules aren't a DAG rooted with FUEL");
-  }
 
   return IntReturn(FuelFromOre(*rule_set, 1000000000000));
 }

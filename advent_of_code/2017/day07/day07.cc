@@ -14,10 +14,8 @@ namespace advent_of_code {
 
 namespace {
 
-absl::optional<int> FindBadWeight(
-    absl::string_view root,
-    const DAG<int>& dag,
-    int* this_weight_out = nullptr) {
+absl::optional<int> FindBadWeight(absl::string_view root, const DAG<int>& dag,
+                                  int* this_weight_out = nullptr) {
   const int* weight = dag.GetData(root);
   CHECK(weight != nullptr);
 
@@ -32,8 +30,7 @@ absl::optional<int> FindBadWeight(
   absl::flat_hash_map<int, int> sub_weight_example;
   for (int i = 0; i < children->size(); ++i) {
     int this_weight;
-    absl::optional<int> bad =
-        FindBadWeight((*children)[i], dag, &this_weight);
+    absl::optional<int> bad = FindBadWeight((*children)[i], dag, &this_weight);
     VLOG(1) << (*children)[i] << ": " << this_weight;
     if (bad) return bad;
     ++sub_weight_counts[this_weight];
@@ -71,7 +68,8 @@ absl::StatusOr<DAG<int>> Parse(absl::Span<absl::string_view> input) {
     if (p_and_c_list.size() > 2) return AdventDay::Error("Bad input: ", str);
     absl::string_view parent;
     int weight;
-    if (!RE2::FullMatch(p_and_c_list[0], "(.*) \\((\\d+)\\)", &parent, &weight)) {
+    if (!RE2::FullMatch(p_and_c_list[0], "(.*) \\((\\d+)\\)", &parent,
+                        &weight)) {
       return AdventDay::Error("Bad parent: ", p_and_c_list[0]);
     }
     dag.AddNode(parent, weight);
