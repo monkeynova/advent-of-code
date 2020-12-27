@@ -1,7 +1,25 @@
 [part=1]
+ne,ne,ne
+--
+3
+==
+
+[part=1]
+ne,ne,sw,sw
+--
+0
+==
+
+[part=1]
+se,sw,se,sw,sw
+--
+3
+==
+
+[part=1]
 @include{advent_of_code/2017/day11/input.txt}
 --
-ERROR: Could not run test: Not implemented
+759
 ==
 
 [part=2]
