@@ -66,9 +66,8 @@ int CountContainingBags(const DAG<BagRule>& bags, absl::string_view bag) {
   return can_contain.size();
 }
 
-absl::StatusOr<int> CountContainedBags(
-    const DAG<BagRule>& bags,
-    absl::string_view bag) {
+absl::StatusOr<int> CountContainedBags(const DAG<BagRule>& bags,
+                                       absl::string_view bag) {
   const BagRule* bag_rule = bags.GetData(bag);
   if (bag_rule == nullptr) {
     return AdventDay::Error("Cannot find bag: ", bag);
