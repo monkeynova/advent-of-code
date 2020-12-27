@@ -15,7 +15,8 @@ namespace {
 
 absl::optional<int> FindBadWeight(
     absl::string_view root,
-    const absl::flat_hash_map<absl::string_view, std::vector<absl::string_view>>& tree, 
+    const absl::flat_hash_map<absl::string_view,
+                              std::vector<absl::string_view>>& tree,
     const absl::flat_hash_map<absl::string_view, int>& weights,
     int* this_weight = nullptr) {
   auto weight_it = weights.find(root);
@@ -33,7 +34,8 @@ absl::optional<int> FindBadWeight(
   absl::flat_hash_map<int, int> sub_weight_example;
   for (int i = 0; i < children.size(); ++i) {
     int this_weight;
-    absl::optional<int> bad = FindBadWeight(children[i], tree, weights, &this_weight);
+    absl::optional<int> bad =
+        FindBadWeight(children[i], tree, weights, &this_weight);
     VLOG(1) << children[i] << ": " << this_weight;
     if (bad) return bad;
     ++sub_weight_counts[this_weight];
@@ -58,7 +60,8 @@ absl::optional<int> FindBadWeight(
     return target_weight - miss_target_weight + miss_weight;
   }
   if (this_weight != nullptr) {
-    *this_weight = weight_it->second + children.size() * sub_weight_counts.begin()->first;
+    *this_weight =
+        weight_it->second + children.size() * sub_weight_counts.begin()->first;
   }
   return absl::nullopt;
 }
@@ -102,7 +105,8 @@ absl::StatusOr<std::vector<std::string>> Day07_2017::Part2(
     if (p_and_c_list.size() > 2) return Error("Bad input: ", str);
     absl::string_view parent;
     int weight;
-    if (!RE2::FullMatch(p_and_c_list[0], "(.*) \\((\\d+)\\)", &parent, &weight)) {
+    if (!RE2::FullMatch(p_and_c_list[0], "(.*) \\((\\d+)\\)", &parent,
+                        &weight)) {
       return Error("Bad parent: ", p_and_c_list[0]);
     }
     weights[parent] = weight;
