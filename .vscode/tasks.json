@@ -34,6 +34,20 @@
         }
       },
       {
+        "label": "Update benchmarks",
+        "type": "shell",
+        "command": "benchmark/run_all_benchmarks.sh",
+        "args": [],
+        "options": {
+          "cwd": "${workspaceFolder}",
+        },
+        "problemMatcher": [],
+        "group": {
+          "kind": "build",
+          "isDefault": false
+        }
+      },
+      {
         "label": "Test current day",
         "type": "shell",
         "command": "bazel",
