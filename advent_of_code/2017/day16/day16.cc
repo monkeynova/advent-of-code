@@ -51,29 +51,29 @@ struct Line {
 void RunDance(const std::vector<DanceMove>& moves, Line* line) {
   for (const DanceMove& m : moves) {
     switch (m.op) {
-    case DanceMove::kSpin: {
-      absl::string_view line_view = line->vals;
-      int split = line_view.size() - m.n1;
-      line->vals = absl::StrCat(line_view.substr(split), line_view.substr(0, split));
-      break;
-    }
-    case DanceMove::kExchange: {
-      std::swap(line->vals[m.n1], line->vals[m.n2]);
-      break;
-    }
-    case DanceMove::kPartner: {
-      int n1, n2;
-      for (int i = 0; i < line->vals.length(); ++i) {
-        if (m.c1 == line->vals[i]) n1 = i;
-        if (m.c2 == line->vals[i]) n2 = i;
+      case DanceMove::kSpin: {
+        absl::string_view line_view = line->vals;
+        int split = line_view.size() - m.n1;
+        line->vals =
+            absl::StrCat(line_view.substr(split), line_view.substr(0, split));
+        break;
       }
-      std::swap(line->vals[n1], line->vals[n2]);
-      break;
-    }
+      case DanceMove::kExchange: {
+        std::swap(line->vals[m.n1], line->vals[m.n2]);
+        break;
+      }
+      case DanceMove::kPartner: {
+        int n1, n2;
+        for (int i = 0; i < line->vals.length(); ++i) {
+          if (m.c1 == line->vals[i]) n1 = i;
+          if (m.c2 == line->vals[i]) n2 = i;
+        }
+        std::swap(line->vals[n1], line->vals[n2]);
+        break;
+      }
     }
   }
 }
-
 
 // Helper methods go here.
 
