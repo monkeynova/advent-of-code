@@ -6,6 +6,8 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/dag.h"
+#include "advent_of_code/bfs.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 
@@ -13,13 +15,74 @@ namespace advent_of_code {
 
 namespace {
 
-// Helper methods go here.
+absl::StatusOr<DAG<bool>> Parse(absl::Span<absl::string_view> input) {
+  DAG<bool> ret;
+  for (absl::string_view str : input) {
+    std::vector<absl::string_view> node_and_cons = absl::StrSplit(str, " <-> ");
+    if (node_and_cons.size() != 2) return AdventDay::Error("Bad line: ", str);
+    absl::string_view node = node_and_cons[0];
+    std::vector<absl::string_view> cons = absl::StrSplit(node_and_cons[1], ", ");
+    for (absl::string_view con : cons) {
+      ret.AddEdge(node, con);
+    }
+  }
+  return ret;
+}
+
+class PathWalk : public BFSInterface<PathWalk> {
+ public:
+  PathWalk(const DAG<bool>& graph, absl::string_view start)
+   : graph_(graph), cur_(start) {}
+
+ int FindReachable() {
+   int reachable = 0;
+   reachable_ = &reachable;
+   FindMinSteps();
+   return reachable;
+ }
+ 
+ bool IsFinal() override {
+   return false;
+ }
+
+ void AddNextSteps(State* state) override {
+   if (reachable_ != nullptr) ++*reachable_;
+
+   const std::vector<absl::string_view>* outgoing = graph_.Outgoing(cur_);
+   if (outgoing != nullptr) {
+     for (absl::string_view next_cur : *outgoing) {
+       PathWalk next = *this;
+       next.cur_ = next_cur;
+       state->AddNextStep(next);
+     }
+   }
+ }
+
+ template <typename H>
+ friend H AbslHashValue(H h, const PathWalk& p) {
+   return H::combine(std::move(h), p.cur_);
+ }
+
+ bool operator==(const PathWalk& o) const { return cur_ == o.cur_; }
+
+ friend std::ostream& operator<<(std::ostream& out, const PathWalk& p) {
+   return out << p.cur_;
+ }
+
+ private:
+  const DAG<bool>& graph_;
+  absl::string_view cur_;
+  int* reachable_ = nullptr;
+};
 
 }  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day12_2017::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<DAG<bool>> graph = Parse(input);
+  if (!graph.ok()) return graph.status();
+
+  return IntReturn(PathWalk(*graph, "0").FindReachable());
 }
 
 absl::StatusOr<std::vector<std::string>> Day12_2017::Part2(
