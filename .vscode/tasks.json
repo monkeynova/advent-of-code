@@ -23,7 +23,8 @@
         "command": "bazel",
         "args": [
           "test",
-          "-c", "opt",
+          "-c",
+          "opt",
           "...",
           "--test_arg=--run_long_tests=20s"
         ],
@@ -39,7 +40,7 @@
         "command": "benchmark/run_all_benchmarks.sh",
         "args": [],
         "options": {
-          "cwd": "${workspaceFolder}",
+          "cwd": "${workspaceFolder}"
         },
         "problemMatcher": [],
         "group": {
