@@ -7,8 +7,8 @@
 
 namespace advent_of_code {
 
-void KnotHashRunLoop(const std::vector<int64_t>& lengths,
-                     std::vector<int>* loop, int round_count = 1);
+void KnotHashRunLoop(absl::string_view lengths,
+                     std::vector<unsigned char>* loop, int round_count = 1);
 
 std::string KnotHash(absl::string_view input);
 

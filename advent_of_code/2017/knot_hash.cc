@@ -6,15 +6,15 @@
 
 namespace advent_of_code {
 
-void KnotHashRunLoop(const std::vector<int64_t>& lengths,
-                     std::vector<int>* loop, int round_count) {
+void KnotHashRunLoop(absl::string_view lengths,
+                     std::vector<unsigned char>* loop, int round_count) {
   int position = 0;
   int skip_size = 0;
   const int loop_size = loop->size();
-  absl::Span<int> loop_span = absl::MakeSpan(*loop);
+  absl::Span<unsigned char> loop_span = absl::MakeSpan(*loop);
   for (int round = 0; round < round_count; ++round) {
     for (int i = 0; i < lengths.size(); ++i) {
-      int len = lengths[i];
+      unsigned char len = lengths[i];
       VLOG(1) << "len=" << len
               << "; loop=" << absl::StrJoin(loop_span.subspan(0, position), ",")
               << (position > 0 ? ",(" : "(") << loop->at(position)
@@ -45,16 +45,11 @@ void KnotHashRunLoop(const std::vector<int64_t>& lengths,
 }
 
 std::string KnotHash(absl::string_view input) {
-  std::vector<int64_t> lengths;
-  lengths.reserve(input.size() + 5);
-  for (char c : input) {
-    lengths.push_back(c);
-  }
-  for (int i : {17, 31, 73, 47, 23}) {
-    lengths.push_back(i);
-  }
+  std::string lengths = std::string(input);
+  const char kSuffix[] = {17, 31, 73, 47, 23, '\0'};
+  lengths.append(kSuffix);
 
-  std::vector<int> loop(256);
+  std::vector<unsigned char> loop(256);
   for (int i = 0; i < loop.size(); ++i) loop[i] = i;
   KnotHashRunLoop(lengths, &loop, 64);
 

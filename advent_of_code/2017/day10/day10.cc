@@ -16,9 +16,10 @@ absl::StatusOr<std::vector<std::string>> Day10_2017::Part1(
     absl::Span<absl::string_view> input) const {
   {
     // TODO(@monkeynova): Move to knot_hash_test.cc?
-    std::vector<int> loop(5);
+    const char kTmpStr[] = {3, 4, 1, 5, '\0'};
+    std::vector<unsigned char> loop(5);
     for (int i = 0; i < loop.size(); ++i) loop[i] = i;
-    KnotHashRunLoop({3, 4, 1, 5}, &loop);
+    KnotHashRunLoop(kTmpStr, &loop);
     if (loop[0] * loop[1] != 12) {
       return Error("Test case failed");
     }
@@ -26,11 +27,18 @@ absl::StatusOr<std::vector<std::string>> Day10_2017::Part1(
 
   if (input.size() != 1) return Error("Bad size");
   std::vector<absl::string_view> length_strs = absl::StrSplit(input[0], ",");
-  absl::StatusOr<std::vector<int64_t>> lengths = ParseAsInts(length_strs);
+  absl::StatusOr<std::vector<int64_t>> lengths_long = ParseAsInts(length_strs);
 
-  std::vector<int> loop(256);
+  std::string lengths;
+  lengths.resize(lengths_long->size());
+  for (int i = 0; i < lengths_long->size(); ++i) {
+    if ((*lengths_long)[i] > 255) return Error("Bad length");
+    if ((*lengths_long)[i] < 0) return Error("Bad length");
+    lengths[i] = (*lengths_long)[i];
+  }
+  std::vector<unsigned char> loop(256);
   for (int i = 0; i < loop.size(); ++i) loop[i] = i;
-  KnotHashRunLoop(*lengths, &loop);
+  KnotHashRunLoop(lengths, &loop);
 
   return IntReturn(loop[0] * loop[1]);
 }
