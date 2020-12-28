@@ -1,7 +1,13 @@
 [part=1]
+flqrgnkx
+--
+8108
+==
+
+[part=1]
 @include{advent_of_code/2017/day14/input.txt}
 --
-ERROR: Could not run test: Not implemented
+8250
 ==
 
 [part=2]
