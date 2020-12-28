@@ -26,7 +26,7 @@ absl::StatusOr<std::vector<std::string>> Day15_2017::Part1(
   int64_t generator_a;
   int64_t generator_b;
   for (absl::string_view row : input) {
-    if (!RE2::FullMatch(row, "Generator A starts with (\\d+)", &generator_a) && 
+    if (!RE2::FullMatch(row, "Generator A starts with (\\d+)", &generator_a) &&
         !RE2::FullMatch(row, "Generator B starts with (\\d+)", &generator_b)) {
       return Error("Bad line: ", row);
     }
@@ -49,7 +49,7 @@ absl::StatusOr<std::vector<std::string>> Day15_2017::Part2(
   int64_t generator_a;
   int64_t generator_b;
   for (absl::string_view row : input) {
-    if (!RE2::FullMatch(row, "Generator A starts with (\\d+)", &generator_a) && 
+    if (!RE2::FullMatch(row, "Generator A starts with (\\d+)", &generator_a) &&
         !RE2::FullMatch(row, "Generator B starts with (\\d+)", &generator_b)) {
       return Error("Bad line: ", row);
     }

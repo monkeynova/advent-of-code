@@ -9,7 +9,7 @@
 
 namespace advent_of_code {
 
-template <typename BFSImpl, typename HistType=BFSImpl>
+template <typename BFSImpl, typename HistType = BFSImpl>
 class BFSInterface {
  public:
   class State {
