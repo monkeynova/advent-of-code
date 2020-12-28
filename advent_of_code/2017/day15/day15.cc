@@ -19,7 +19,25 @@ namespace {
 
 absl::StatusOr<std::vector<std::string>> Day15_2017::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 2) return Error("Bad size");
+  int64_t a_mult = 16807;
+  int64_t b_mult = 48271;
+  int64_t mod = 2147483647;
+  int64_t generator_a;
+  int64_t generator_b;
+  for (absl::string_view row : input) {
+    if (!RE2::FullMatch(row, "Generator A starts with (\\d+)", &generator_a) && 
+        !RE2::FullMatch(row, "Generator B starts with (\\d+)", &generator_b)) {
+      return Error("Bad line: ", row);
+    }
+  }
+  int count = 0;
+  for (int i = 0; i < 40'000'000; ++i) {
+    generator_a = (generator_a * a_mult) % mod;
+    generator_b = (generator_b * b_mult) % mod;
+    if ((generator_a & 0xffff) == (generator_b & 0xffff)) ++count;
+  }
+  return IntReturn(count);
 }
 
 absl::StatusOr<std::vector<std::string>> Day15_2017::Part2(
