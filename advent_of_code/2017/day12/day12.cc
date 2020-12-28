@@ -40,6 +40,18 @@ class PathWalk : public BFSInterface<PathWalk> {
    FindMinSteps();
    return reachable;
  }
+
+ int CountGroups() {
+   int groups = 0;
+   absl::flat_hash_set<absl::string_view> nodes = graph_.nodes();
+   to_see_ = &nodes;
+   while (!nodes.empty()) {
+     ++groups;
+     cur_ = *nodes.begin();
+     FindMinSteps();
+   }
+   return groups;
+ }
  
  bool IsFinal() override {
    return false;
@@ -47,6 +59,7 @@ class PathWalk : public BFSInterface<PathWalk> {
 
  void AddNextSteps(State* state) override {
    if (reachable_ != nullptr) ++*reachable_;
+   if (to_see_ != nullptr) to_see_->erase(cur_);
 
    const std::vector<absl::string_view>* outgoing = graph_.Outgoing(cur_);
    if (outgoing != nullptr) {
@@ -73,6 +86,7 @@ class PathWalk : public BFSInterface<PathWalk> {
   const DAG<bool>& graph_;
   absl::string_view cur_;
   int* reachable_ = nullptr;
+  absl::flat_hash_set<absl::string_view>* to_see_ = nullptr;
 };
 
 }  // namespace
@@ -87,7 +101,10 @@ absl::StatusOr<std::vector<std::string>> Day12_2017::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day12_2017::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<DAG<bool>> graph = Parse(input);
+  if (!graph.ok()) return graph.status();
+
+  return IntReturn(PathWalk(*graph, "0").CountGroups());
 }
 
 }  // namespace advent_of_code
