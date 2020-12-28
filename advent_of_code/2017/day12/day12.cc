@@ -6,8 +6,8 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
-#include "advent_of_code/dag.h"
 #include "advent_of_code/bfs.h"
+#include "advent_of_code/dag.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 
@@ -21,7 +21,8 @@ absl::StatusOr<DAG<bool>> Parse(absl::Span<absl::string_view> input) {
     std::vector<absl::string_view> node_and_cons = absl::StrSplit(str, " <-> ");
     if (node_and_cons.size() != 2) return AdventDay::Error("Bad line: ", str);
     absl::string_view node = node_and_cons[0];
-    std::vector<absl::string_view> cons = absl::StrSplit(node_and_cons[1], ", ");
+    std::vector<absl::string_view> cons =
+        absl::StrSplit(node_and_cons[1], ", ");
     for (absl::string_view con : cons) {
       ret.AddEdge(node, con);
     }
@@ -32,55 +33,53 @@ absl::StatusOr<DAG<bool>> Parse(absl::Span<absl::string_view> input) {
 class PathWalk : public BFSInterface<PathWalk> {
  public:
   PathWalk(const DAG<bool>& graph, absl::string_view start)
-   : graph_(graph), cur_(start) {}
+      : graph_(graph), cur_(start) {}
 
- int FindReachable() {
-   int reachable = 0;
-   reachable_ = &reachable;
-   FindMinSteps();
-   return reachable;
- }
+  int FindReachable() {
+    int reachable = 0;
+    reachable_ = &reachable;
+    FindMinSteps();
+    return reachable;
+  }
 
- int CountGroups() {
-   int groups = 0;
-   absl::flat_hash_set<absl::string_view> nodes = graph_.nodes();
-   to_see_ = &nodes;
-   while (!nodes.empty()) {
-     ++groups;
-     cur_ = *nodes.begin();
-     FindMinSteps();
-   }
-   return groups;
- }
- 
- bool IsFinal() override {
-   return false;
- }
+  int CountGroups() {
+    int groups = 0;
+    absl::flat_hash_set<absl::string_view> nodes = graph_.nodes();
+    to_see_ = &nodes;
+    while (!nodes.empty()) {
+      ++groups;
+      cur_ = *nodes.begin();
+      FindMinSteps();
+    }
+    return groups;
+  }
 
- void AddNextSteps(State* state) override {
-   if (reachable_ != nullptr) ++*reachable_;
-   if (to_see_ != nullptr) to_see_->erase(cur_);
+  bool IsFinal() override { return false; }
 
-   const std::vector<absl::string_view>* outgoing = graph_.Outgoing(cur_);
-   if (outgoing != nullptr) {
-     for (absl::string_view next_cur : *outgoing) {
-       PathWalk next = *this;
-       next.cur_ = next_cur;
-       state->AddNextStep(next);
-     }
-   }
- }
+  void AddNextSteps(State* state) override {
+    if (reachable_ != nullptr) ++*reachable_;
+    if (to_see_ != nullptr) to_see_->erase(cur_);
 
- template <typename H>
- friend H AbslHashValue(H h, const PathWalk& p) {
-   return H::combine(std::move(h), p.cur_);
- }
+    const std::vector<absl::string_view>* outgoing = graph_.Outgoing(cur_);
+    if (outgoing != nullptr) {
+      for (absl::string_view next_cur : *outgoing) {
+        PathWalk next = *this;
+        next.cur_ = next_cur;
+        state->AddNextStep(next);
+      }
+    }
+  }
 
- bool operator==(const PathWalk& o) const { return cur_ == o.cur_; }
+  template <typename H>
+  friend H AbslHashValue(H h, const PathWalk& p) {
+    return H::combine(std::move(h), p.cur_);
+  }
 
- friend std::ostream& operator<<(std::ostream& out, const PathWalk& p) {
-   return out << p.cur_;
- }
+  bool operator==(const PathWalk& o) const { return cur_ == o.cur_; }
+
+  friend std::ostream& operator<<(std::ostream& out, const PathWalk& p) {
+    return out << p.cur_;
+  }
 
  private:
   const DAG<bool>& graph_;
