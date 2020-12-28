@@ -41,7 +41,7 @@ class PathWalk : public BFSInterface<PathWalk> {
   }
 
   bool operator==(const PathWalk& o) const { return cur_ == o.cur_; }
-  
+
   friend std::ostream& operator<<(std::ostream& o, const PathWalk& p) {
     return o << p.cur_;
   }
@@ -74,9 +74,12 @@ absl::StatusOr<CharBoard> BuildBoard(absl::string_view input) {
     std::string hash = KnotHash(absl::StrCat(input, "-", y));
     for (int i = 0; i < hash.size(); ++i) {
       char c = hash[i];
-      if (c >= 'a' && c <= 'f') c -= 'a' - 10;
-      else if (c >= '0' && c <= '9') c -= '0';
-      else return AdventDay::Error("Bad hash char: ", hash);
+      if (c >= 'a' && c <= 'f')
+        c -= 'a' - 10;
+      else if (c >= '0' && c <= '9')
+        c -= '0';
+      else
+        return AdventDay::Error("Bad hash char: ", hash);
       if (c & 8) board[{i * 4 + 0, y}] = '#';
       if (c & 4) board[{i * 4 + 1, y}] = '#';
       if (c & 2) board[{i * 4 + 2, y}] = '#';
@@ -95,7 +98,8 @@ absl::StatusOr<std::vector<std::string>> Day14_2017::Part1(
   if (!board.ok()) return board.status();
   VLOG(1) << "Board:\n" << board->DebugString();
   int count = 0;
-  for (Point p : board->range()) if ((*board)[p] == '#') ++count;
+  for (Point p : board->range())
+    if ((*board)[p] == '#') ++count;
   return IntReturn(count);
 }
 

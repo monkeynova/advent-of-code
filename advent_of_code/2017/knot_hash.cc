@@ -6,8 +6,8 @@
 
 namespace advent_of_code {
 
-void KnotHashRunLoop(const std::vector<int64_t>& lengths, std::vector<int>* loop,
-                     int round_count) {
+void KnotHashRunLoop(const std::vector<int64_t>& lengths,
+                     std::vector<int>* loop, int round_count) {
   int position = 0;
   int skip_size = 0;
   const int loop_size = loop->size();
