@@ -1,5 +1,5 @@
-#include "advent_of_code/infra/file_benchmark.h"
 #include "advent_of_code/2017/day14/day14.h"
+#include "advent_of_code/infra/file_benchmark.h"
 #include "gmock/gmock.h"
 
 namespace advent_of_code {

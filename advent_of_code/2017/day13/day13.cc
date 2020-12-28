@@ -62,7 +62,8 @@ absl::StatusOr<std::vector<std::string>> Day13_2017::Part2(
       int loops = (fw.depth + delay) / (fw.range - 1);
       int in_loop = (fw.depth + delay) % (fw.range - 1);
       int pos = loops % 2 == 0 ? in_loop : fw.range - 1 - in_loop;
-      VLOG(2) << "depth=" << fw.depth << "; range=" << fw.range << "; pos=" << pos;
+      VLOG(2) << "depth=" << fw.depth << "; range=" << fw.range
+              << "; pos=" << pos;
       if (pos == 0) {
         VLOG(1) << "Caught @" << delay;
         caught = true;
