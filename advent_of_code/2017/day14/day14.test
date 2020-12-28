@@ -11,6 +11,12 @@ flqrgnkx
 ==
 
 [part=2]
+flqrgnkx
+--
+1242
+==
+
+[part=2]
 @include{advent_of_code/2017/day14/input.txt}
 --
-ERROR: Could not run test: Not implemented
+1113
