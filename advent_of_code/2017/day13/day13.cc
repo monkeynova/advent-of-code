@@ -26,15 +26,9 @@ absl::StatusOr<std::vector<std::string>> Day13_2017::Part1(
     if (!RE2::FullMatch(row, "(\\d+): (\\d+)", &depth, &range)) {
       return Error("Bad row: ", row);
     }
-    int pos = 0;
-    int to_move = depth;
-    while (to_move > 0) {
-      int delta = std::min(to_move, range - 1);
-      if (pos == 0) pos += delta;
-      else if (pos == range - 1) pos -= delta;
-      else return Error("Consistency error");
-      to_move -= delta;
-    }
+    int loops = depth / (range - 1);
+    int in_loop = depth % (range - 1);
+    int pos = loops % 2 == 0 ? in_loop : range - 1 - in_loop;
     VLOG(2) << "depth=" << depth << "; range=" << range << "; pos=" << pos;
     if (pos == 0) {
       severity += depth * range;
@@ -45,7 +39,38 @@ absl::StatusOr<std::vector<std::string>> Day13_2017::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day13_2017::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  struct Firewall {
+    int depth;
+    int range;
+  };
+  std::vector<Firewall> firewalls;
+  for (absl::string_view row : input) {
+    Firewall fw;
+    if (!RE2::FullMatch(row, "(\\d+): (\\d+)", &fw.depth, &fw.range)) {
+      return Error("Bad row: ", row);
+    }
+    firewalls.push_back(fw);
+  }
+
+  int delay = -1;
+  bool caught = true;
+  while (caught) {
+    ++delay;
+    VLOG(1) << "delay=" << delay;
+    caught = false;
+    for (Firewall fw : firewalls) {
+      int loops = (fw.depth + delay) / (fw.range - 1);
+      int in_loop = (fw.depth + delay) % (fw.range - 1);
+      int pos = loops % 2 == 0 ? in_loop : fw.range - 1 - in_loop;
+      VLOG(2) << "depth=" << fw.depth << "; range=" << fw.range << "; pos=" << pos;
+      if (pos == 0) {
+        VLOG(1) << "Caught @" << delay;
+        caught = true;
+        break;
+      }
+    }
+  }
+  return IntReturn(delay);
 }
 
 }  // namespace advent_of_code
