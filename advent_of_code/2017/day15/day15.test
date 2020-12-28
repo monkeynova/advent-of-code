@@ -12,6 +12,13 @@ Generator B starts with 8921
 ==
 
 [part=2]
+Generator A starts with 65
+Generator B starts with 8921
+--
+309
+==
+
+[part=2]
 @include{advent_of_code/2017/day15/input.txt}
 --
-ERROR: Could not run test: Not implemented
+320
