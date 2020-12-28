@@ -1,7 +1,16 @@
 [part=1]
+0: 3
+1: 2
+4: 4
+6: 4
+--
+24
+==
+
+[part=1]
 @include{advent_of_code/2017/day13/input.txt}
 --
-ERROR: Could not run test: Not implemented
+1876
 ==
 
 [part=2]
