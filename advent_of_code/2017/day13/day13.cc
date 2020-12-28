@@ -26,9 +26,7 @@ absl::StatusOr<std::vector<std::string>> Day13_2017::Part1(
     if (!RE2::FullMatch(row, "(\\d+): (\\d+)", &depth, &range)) {
       return Error("Bad row: ", row);
     }
-    int loops = depth / (range - 1);
-    int in_loop = depth % (range - 1);
-    int pos = loops % 2 == 0 ? in_loop : range - 1 - in_loop;
+    int pos = depth % (2 * (range - 1));
     VLOG(2) << "depth=" << depth << "; range=" << range << "; pos=" << pos;
     if (pos == 0) {
       severity += depth * range;
@@ -59,9 +57,7 @@ absl::StatusOr<std::vector<std::string>> Day13_2017::Part2(
     VLOG(1) << "delay=" << delay;
     caught = false;
     for (Firewall fw : firewalls) {
-      int loops = (fw.depth + delay) / (fw.range - 1);
-      int in_loop = (fw.depth + delay) % (fw.range - 1);
-      int pos = loops % 2 == 0 ? in_loop : fw.range - 1 - in_loop;
+      int pos = (delay + fw.depth) % (2 * (fw.range - 1));
       VLOG(2) << "depth=" << fw.depth << "; range=" << fw.range
               << "; pos=" << pos;
       if (pos == 0) {
