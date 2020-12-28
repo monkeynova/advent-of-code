@@ -16,7 +16,7 @@ namespace advent_of_code {
 
 namespace {
 
-class PathWalk : public BFSInterface<PathWalk> {
+class PathWalk : public BFSInterface<PathWalk, Point> {
  public:
   explicit PathWalk(const CharBoard& board) : board_(board) {}
 
@@ -35,16 +35,7 @@ class PathWalk : public BFSInterface<PathWalk> {
     return groups;
   }
 
-  template <typename H>
-  friend H AbslHashValue(H h, const PathWalk& p) {
-    return H::combine(std::move(h), p.cur_);
-  }
-
-  bool operator==(const PathWalk& o) const { return cur_ == o.cur_; }
-
-  friend std::ostream& operator<<(std::ostream& o, const PathWalk& p) {
-    return o << p.cur_;
-  }
+  Point identifier() { return cur_; }
 
   bool IsFinal() { return false; }
 

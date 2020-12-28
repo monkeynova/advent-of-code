@@ -30,7 +30,7 @@ absl::StatusOr<DAG<bool>> Parse(absl::Span<absl::string_view> input) {
   return ret;
 }
 
-class PathWalk : public BFSInterface<PathWalk> {
+class PathWalk : public BFSInterface<PathWalk, absl::string_view> {
  public:
   PathWalk(const DAG<bool>& graph, absl::string_view start)
       : graph_(graph), cur_(start) {}
@@ -70,16 +70,7 @@ class PathWalk : public BFSInterface<PathWalk> {
     }
   }
 
-  template <typename H>
-  friend H AbslHashValue(H h, const PathWalk& p) {
-    return H::combine(std::move(h), p.cur_);
-  }
-
-  bool operator==(const PathWalk& o) const { return cur_ == o.cur_; }
-
-  friend std::ostream& operator<<(std::ostream& out, const PathWalk& p) {
-    return out << p.cur_;
-  }
+  absl::string_view identifier() { return cur_; }
 
  private:
   const DAG<bool>& graph_;

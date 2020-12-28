@@ -45,6 +45,8 @@ class PathWalk : public BFSInterface<PathWalk> {
     return true;
   }
 
+  const PathWalk& identifier() { return *this; }
+
   bool operator==(const PathWalk& o) const {
     return cur_ == o.cur_ && have_keys_ == o.have_keys_;
   }

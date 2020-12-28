@@ -37,7 +37,7 @@ class SparseBoard {
   // absl::flat_hash_map<Point, bool> known_wall_;
 };
 
-class PathWalkToEnd : public BFSInterface<PathWalkToEnd> {
+class PathWalkToEnd : public BFSInterface<PathWalkToEnd, Point> {
  public:
   PathWalkToEnd(const SparseBoard& board, Point start, Point end)
       : board_(board), cur_(start), end_(end) {}
@@ -55,16 +55,7 @@ class PathWalkToEnd : public BFSInterface<PathWalkToEnd> {
 
   bool IsFinal() override { return cur_ == end_; }
 
-  bool operator==(const PathWalkToEnd& o) const { return cur_ == o.cur_; }
-
-  template <typename H>
-  friend H AbslHashValue(H h, const PathWalkToEnd& p) {
-    return H::combine(std::move(h), p.cur_);
-  }
-
-  friend std::ostream& operator<<(std::ostream& o, const PathWalkToEnd& p) {
-    return o << p.cur_;
-  }
+  Point identifier() { return cur_; }
 
  private:
   const SparseBoard& board_;
@@ -72,7 +63,7 @@ class PathWalkToEnd : public BFSInterface<PathWalkToEnd> {
   Point end_;
 };
 
-class PathWalkToDistance : public BFSInterface<PathWalkToDistance> {
+class PathWalkToDistance : public BFSInterface<PathWalkToDistance, Point> {
  public:
   PathWalkToDistance(const SparseBoard& board, Point start, int distance,
                      int* visited)
@@ -93,19 +84,9 @@ class PathWalkToDistance : public BFSInterface<PathWalkToDistance> {
     }
   }
 
+  Point identifier() { return cur_; }
+
   bool IsFinal() override { return false; }
-
-  bool operator==(const PathWalkToDistance& o) const { return cur_ == o.cur_; }
-
-  template <typename H>
-  friend H AbslHashValue(H h, const PathWalkToDistance& p) {
-    return H::combine(std::move(h), p.cur_);
-  }
-
-  friend std::ostream& operator<<(std::ostream& o,
-                                  const PathWalkToDistance& p) {
-    return o << p.cur_;
-  }
 
  private:
   const SparseBoard& board_;
