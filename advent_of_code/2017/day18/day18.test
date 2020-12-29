@@ -21,6 +21,18 @@ jgz a -2
 ==
 
 [part=2]
+snd 1
+snd 2
+snd p
+rcv a
+rcv b
+rcv c
+rcv d
+--
+3
+==
+
+[part=2]
 @include{advent_of_code/2017/day18/input.txt}
 --
-ERROR: Could not run test: Not implemented
+5969

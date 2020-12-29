@@ -61,78 +61,97 @@ class VM {
     return ret;
   }
 
-  void Execute() {
-    int ip = 0;
-    bool done = false;
-    absl::flat_hash_map<std::string_view, int64_t> registers;
-    absl::string_view reg_names = "abcdefghijklmnopqrstuvwxyz";
-    for (int i = 0; i < reg_names.size(); ++i) {
-      registers[reg_names.substr(i, 1)] = 0;
-    }
-    while (!done && ip < instructions_.size() && ip >= 0) {
+  void set_program_id(int id) {
+    registers_["p"] = id;
+  }
+
+  void ExecuteToRecv() {
+    bool recv = false;
+    while (!recv && ip_ < instructions_.size() && ip_ >= 0) {
       bool jumped = false;
-      const Instruction& i = instructions_[ip];
+      const Instruction& i = instructions_[ip_];
       switch (i.op_code) {
         case Instruction::kSnd: {
-          last_snd_ = GetValue(i.arg1, registers);
-          VLOG(1) << "SND: " << last_snd_;
+          send_queue_.push_back(GetValue(i.arg1));
           break;
         }
         case Instruction::kSet: {
-          registers[i.arg1] = GetValue(i.arg2, registers);
-          VLOG(1) << "SET: " << i.arg1 << "=" << registers[i.arg1];
+          registers_[i.arg1] = GetValue(i.arg2);
           break;
         }
         case Instruction::kAdd: {
-          registers[i.arg1] += GetValue(i.arg2, registers);
-          VLOG(1) << "ADD: " << i.arg1 << "+=" << GetValue(i.arg2, registers) << "=" << registers[i.arg1];
+          registers_[i.arg1] += GetValue(i.arg2);
           break;
         }
         case Instruction::kMul: {
-          registers[i.arg1] *= GetValue(i.arg2, registers);
-          VLOG(1) << "MUL: " << i.arg1 << "*=" << GetValue(i.arg2, registers) << "=" << registers[i.arg1];
+          registers_[i.arg1] *= GetValue(i.arg2);
           break;
         }
         case Instruction::kMod: {
-          registers[i.arg1] %= GetValue(i.arg2, registers);
-          VLOG(1) << "MOD: " << i.arg1 << "*%" << GetValue(i.arg2, registers) << "=" << registers[i.arg1];
+          registers_[i.arg1] %= GetValue(i.arg2);
           break;
         }
         case Instruction::kRcv: {
-          VLOG(1) << "RCV: " << GetValue(i.arg1, registers);
-          if (GetValue(i.arg1, registers) != 0) {
-            last_recv_ = last_snd_;
-            done = true;
+          if (!recv_queue_.empty()) {
+            registers_[i.arg1] = recv_queue_.front();
+            recv_queue_.pop_front();
+          } else {
+            if (!part1_ || GetValue(i.arg1) != 0) {
+              recv = true;
+              // Don't advance IP. Come back here.
+              jumped = true;
+            }
           }
           break;
         }
         case Instruction::kJgz: {
-          VLOG(1) << "JGZ: " << GetValue(i.arg1, registers) << "," << GetValue(i.arg2, registers);
-          if (GetValue(i.arg1, registers) > 0) {
-            ip += GetValue(i.arg2, registers);
+          if (GetValue(i.arg1) > 0) {
+            ip_ += GetValue(i.arg2);
             jumped = true;
           }
           break;
         }
       }
-      if (!jumped) ++ip;
+      if (!jumped) ++ip_;
     }
   }
  
-  int last_recv() const { return last_recv_; }
+  bool done() { return done_; }
+
+  std::vector<int> ConsumeSendQueue() {
+    std::vector<int> ret = send_queue_;
+    send_queue_.clear();
+    return ret;
+  }
+
+  void AddRecvQueue(std::vector<int> in) {
+    recv_queue_.insert(recv_queue_.end(), in.begin(), in.end());
+  }
+
+  void set_part1() { part1_ = true; }
 
  private:
-  int GetValue(absl::string_view name,
-               const absl::flat_hash_map<std::string_view, int64_t> registers) {
-    if (auto it = registers.find(name); it != registers.end()) return it->second;
+  VM() {
+    absl::string_view reg_names = "abcdefghijklmnopqrstuvwxyz";
+    for (int i = 0; i < reg_names.size(); ++i) {
+      registers_[reg_names.substr(i, 1)] = 0;
+    }
+  }
+
+  int GetValue(absl::string_view name) const {
+    if (auto it = registers_.find(name); it != registers_.end()) return it->second;
     int n;
     CHECK(absl::SimpleAtoi(name, &n));
     return n;
   }
 
   std::vector<Instruction> instructions_;
-  int last_recv_ = -1;
-  int last_snd_ = -1;
+  int ip_ = 0;
+  absl::flat_hash_map<std::string_view, int64_t> registers_;
+  std::vector<int> send_queue_;
+  std::deque<int> recv_queue_;
+  bool done_ = false;
+  bool part1_ = false;
 };
 
 // Helper methods go here.
@@ -143,13 +162,37 @@ absl::StatusOr<std::vector<std::string>> Day18_2017::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<VM> vm = VM::Parse(input);
   if (!vm.ok()) return vm.status();
-  vm->Execute();
-  return IntReturn(vm->last_recv());
+  vm->set_part1();
+  vm->ExecuteToRecv();
+  std::vector<int> send_queue = vm->ConsumeSendQueue();
+  return IntReturn(send_queue.back());
 }
 
 absl::StatusOr<std::vector<std::string>> Day18_2017::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<VM> vm = VM::Parse(input);
+  if (!vm.ok()) return vm.status();
+  VM p0 = *vm;
+  p0.set_program_id(0);
+  VM p1 = *vm;
+  p1.set_program_id(1);
+  bool saw_send = true;
+  int p1_sends = 0;
+  while (saw_send) {
+    saw_send = false;
+    p0.ExecuteToRecv();
+    std::vector<int> send_queue = p0.ConsumeSendQueue();
+    VLOG(1) << "p0 send_queue: " << send_queue.size();
+    saw_send |= !send_queue.empty();
+    p1.AddRecvQueue(send_queue);
+    p1.ExecuteToRecv();
+    send_queue = p1.ConsumeSendQueue();
+    VLOG(1) << "p1 send_queue: " << send_queue.size();
+    p1_sends += send_queue.size();
+    saw_send |= !send_queue.empty();
+    p0.AddRecvQueue(send_queue);
+  }
+  return IntReturn(p1_sends);
 }
 
 }  // namespace advent_of_code
