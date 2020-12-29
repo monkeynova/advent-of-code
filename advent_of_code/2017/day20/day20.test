@@ -3,7 +3,7 @@
 [part=1]
 @include{advent_of_code/2017/day20/input.txt}
 --
-47
+161
 ==
 
 [part=2]
