@@ -82,7 +82,36 @@ absl::StatusOr<std::vector<std::string>> Day20_2017::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day20_2017::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<std::vector<Particle>> particles = Parse(input);
+  if (!particles.ok()) return particles.status();
+
+  std::vector<Particle> alive = *particles;
+  // TODO(@monkeynova): 1'000 was picked after watching the output. This could
+  //                    probably be determined in a more sophisticated manner.
+  for (int step = 0; step < 1'000; ++step) {
+    // Remove collisions.
+    absl::flat_hash_map<Point3, int> position_to_count;
+    bool to_remove = false;
+    for (const Particle& p : alive) {
+      if (++position_to_count[p.p] > 1) to_remove = true; 
+    }
+    if (to_remove) {
+      std::vector<Particle> new_alive;
+      for (const Particle& p : alive) {
+        if (position_to_count[p.p] == 1) new_alive.push_back(p);
+      }
+      if (new_alive.size() >= alive.size()) return Error("Didn't remove");
+      VLOG(1) << "Removed: " << alive.size() - new_alive.size() << " @" << step;
+      alive = std::move(new_alive);
+    }
+    // Update positions.
+    for (Particle& p : alive) {
+      p.v += p.a;
+      p.p += p.v;
+    }
+  }
+
+  return IntReturn(alive.size());
 }
 
 }  // namespace advent_of_code
