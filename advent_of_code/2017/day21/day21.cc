@@ -54,8 +54,9 @@ absl::StatusOr<CharBoard> FindPattern(
   for (int i = 0; i < in_transforms.size(); ++i) {
     CharBoard test = Transform(in, in_transforms[i]);
     if (auto it = patterns.find(test); it != patterns.end()) {
-      auto out_transforms = Transforms(it->second.range());
-      return Transform(it->second, out_transforms[i]);
+      return it->second;
+      // auto out_transforms = Transforms(it->second.range());
+      // return Transform(it->second, out_transforms[i]);
     }
   }
   return AdventDay::Error("No Patter found");
@@ -151,7 +152,26 @@ absl::StatusOr<std::vector<std::string>> Day21_2017::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day21_2017::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<absl::flat_hash_map<CharBoard, CharBoard>> patterns =
+      Parse(input);
+  if (!patterns.ok()) return patterns.status();
+
+  std::vector<absl::string_view> init = {".#.", "..#", "###"};
+  absl::StatusOr<CharBoard> tmp = CharBoard::Parse(absl::MakeSpan(init));
+  if (!tmp.ok()) return tmp.status();
+  
+  VLOG(1) << "tmp=\n" << tmp->DebugString();
+  for (int i = 0; i < 18; ++i) {
+    absl::StatusOr<CharBoard> next = RunIteration(*tmp, *patterns);
+    if (!next.ok()) return next.status();
+    tmp = std::move(next);
+    VLOG(1) << "tmp=\n" << tmp->DebugString();
+  }
+
+  int count = 0;
+  for (Point p : tmp->range()) if ((*tmp)[p] == '#') ++count;
+
+  return IntReturn(count);
 }
 
 }  // namespace advent_of_code
