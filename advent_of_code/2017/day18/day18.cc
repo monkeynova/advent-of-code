@@ -30,17 +30,22 @@ struct Instruction {
     Instruction ret;
     if (RE2::FullMatch(str, "snd (-?\\d+|[a-z])", &ret.arg1)) {
       ret.op_code = Instruction::kSnd;
-    } else if (RE2::FullMatch(str, "set ([a-z]) (-?\\d+|[a-z])", &ret.arg1, &ret.arg2)) {
+    } else if (RE2::FullMatch(str, "set ([a-z]) (-?\\d+|[a-z])", &ret.arg1,
+                              &ret.arg2)) {
       ret.op_code = Instruction::kSet;
-    } else if (RE2::FullMatch(str, "add ([a-z]) (-?\\d+|[a-z])", &ret.arg1, &ret.arg2)) {
+    } else if (RE2::FullMatch(str, "add ([a-z]) (-?\\d+|[a-z])", &ret.arg1,
+                              &ret.arg2)) {
       ret.op_code = Instruction::kAdd;
-    } else if (RE2::FullMatch(str, "mul ([a-z]) (-?\\d+|[a-z])", &ret.arg1, &ret.arg2)) {
+    } else if (RE2::FullMatch(str, "mul ([a-z]) (-?\\d+|[a-z])", &ret.arg1,
+                              &ret.arg2)) {
       ret.op_code = Instruction::kMul;
-    } else if (RE2::FullMatch(str, "mod ([a-z]) (-?\\d+|[a-z])", &ret.arg1, &ret.arg2)) {
+    } else if (RE2::FullMatch(str, "mod ([a-z]) (-?\\d+|[a-z])", &ret.arg1,
+                              &ret.arg2)) {
       ret.op_code = Instruction::kMod;
     } else if (RE2::FullMatch(str, "rcv (-?\\d+|[a-z])", &ret.arg1)) {
       ret.op_code = Instruction::kRcv;
-    } else if (RE2::FullMatch(str, "jgz (-?\\d+|[a-z]) (-?\\d+|[a-z])", &ret.arg1, &ret.arg2)) {
+    } else if (RE2::FullMatch(str, "jgz (-?\\d+|[a-z]) (-?\\d+|[a-z])",
+                              &ret.arg1, &ret.arg2)) {
       ret.op_code = Instruction::kJgz;
     } else {
       return AdventDay::Error("Bad instruction: ", str);
@@ -61,9 +66,7 @@ class VM {
     return ret;
   }
 
-  void set_program_id(int id) {
-    registers_["p"] = id;
-  }
+  void set_program_id(int id) { registers_["p"] = id; }
 
   void ExecuteToRecv() {
     bool recv = false;
@@ -115,7 +118,7 @@ class VM {
       if (!jumped) ++ip_;
     }
   }
- 
+
   bool done() { return done_; }
 
   std::vector<int> ConsumeSendQueue() {
@@ -139,7 +142,8 @@ class VM {
   }
 
   int GetValue(absl::string_view name) const {
-    if (auto it = registers_.find(name); it != registers_.end()) return it->second;
+    if (auto it = registers_.find(name); it != registers_.end())
+      return it->second;
     int n;
     CHECK(absl::SimpleAtoi(name, &n));
     return n;
