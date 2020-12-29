@@ -15,7 +15,8 @@ namespace {
 
 class TuringMachine {
  public:
-  static absl::StatusOr<TuringMachine> Parse(absl::Span<absl::string_view> input) {
+  static absl::StatusOr<TuringMachine> Parse(
+      absl::Span<absl::string_view> input) {
     TuringMachine ret;
     Rule cur_rule;
     Rule::If* cur_if = nullptr;
@@ -24,7 +25,9 @@ class TuringMachine {
       absl::string_view str;
       if (RE2::FullMatch(row, "Begin in state (.*).", &ret.cur_state_)) {
         // OK.
-      } else if (RE2::FullMatch(row, "Perform a diagnostic checksum after (\\d+) steps.", &ret.stop_steps_)) {
+      } else if (RE2::FullMatch(
+                     row, "Perform a diagnostic checksum after (\\d+) steps.",
+                     &ret.stop_steps_)) {
         // OK.
       } else if (RE2::FullMatch(row, "In state (.*):", &str)) {
         if (!cur_rule.in_state.empty()) {
@@ -34,7 +37,8 @@ class TuringMachine {
         }
         cur_rule.in_state = str;
       } else if (RE2::FullMatch(row, "  If the current value is ([01]):", &n)) {
-        if (cur_rule.in_state.empty()) return AdventDay::Error("Current value with no state");
+        if (cur_rule.in_state.empty())
+          return AdventDay::Error("Current value with no state");
         if (n == 0) {
           cur_if = &cur_rule.if0;
         } else if (n == 1) {
@@ -45,7 +49,8 @@ class TuringMachine {
       } else if (RE2::FullMatch(row, "    - Write the value ([01]).", &n)) {
         if (cur_if == nullptr) return AdventDay::Error("Write with no current");
         cur_if->write = n;
-      } else if (RE2::FullMatch(row, "    - Move one slot to the (left|right).", &str)) {
+      } else if (RE2::FullMatch(row, "    - Move one slot to the (left|right).",
+                                &str)) {
         if (cur_if == nullptr) return AdventDay::Error("Write with no current");
         if (str == "left") {
           cur_if->dir = -1;
@@ -70,11 +75,14 @@ class TuringMachine {
   absl::Status Run() {
     for (int step = 0; step < stop_steps_; ++step) {
       auto it = state_to_rule_.find(cur_state_);
-      if (it == state_to_rule_.end()) return AdventDay::Error("Bad state: ", cur_state_);
+      if (it == state_to_rule_.end())
+        return AdventDay::Error("Bad state: ", cur_state_);
       const Rule& r = it->second;
       const Rule::If& rif = tape_.contains(head_pos_) ? r.if1 : r.if0;
-      if (rif.write) tape_.insert(head_pos_);
-      else tape_.erase(head_pos_);
+      if (rif.write)
+        tape_.insert(head_pos_);
+      else
+        tape_.erase(head_pos_);
       head_pos_ += rif.dir;
       cur_state_ = rif.next_state;
     }
