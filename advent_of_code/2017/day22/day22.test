@@ -1,7 +1,15 @@
 [part=1]
+\..#
+\#..
+\...
+--
+5587
+==
+
+[part=1]
 @include{advent_of_code/2017/day22/input.txt}
 --
-ERROR: Could not run test: Not implemented
+5570
 ==
 
 [part=2]
