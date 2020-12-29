@@ -64,6 +64,58 @@ int StrongestBridge(const std::vector<Converter>& ordered) {
   return StrongestBridge(&memo, ordered, 0,  std::set<int>{});
 }
 
+struct LengthStrength {
+  int length;
+  int strength;
+  bool operator>(const LengthStrength& o) const {
+    if (length != o.length) return length > o.length;
+    return strength > o.strength;
+  }
+};
+
+using Memo2 = absl::flat_hash_map<std::pair<int, std::set<int>>, LengthStrength>;
+
+LengthStrength StrongestLongestBridge(Memo2* memo, const std::vector<Converter>& ordered, int ports, std::set<int> used) {
+  auto memo_key = std::make_pair(ports, used);
+  if (auto it = memo->find(memo_key); it != memo->end()) {
+    return it->second;
+  }
+
+  LengthStrength ret = {0, 0};
+  for (int i = 0; i < ordered.size(); ++i) {
+    if (auto it = used.find(i); it != used.end()) continue;
+    LengthStrength next = {-1, -1};
+    if (ordered[i].in == ports) {
+      used.insert(i);
+      next = StrongestLongestBridge(memo, ordered, ordered[i].out, used);
+      used.erase(i);
+    }
+    if (ordered[i].out == ports) {
+      used.insert(i);
+      next = StrongestLongestBridge(memo, ordered, ordered[i].in, used);
+      used.erase(i);
+    }
+    if (next.length == -1) continue;
+    ++next.length;
+    next.strength += ordered[i].in + ordered[i].out;
+    if (next > ret) {
+      ret = next;
+    }
+  }
+
+  VLOG(1) << "StrongestBridge(" << ports << ", " << absl::StrJoin(used, ",") << ") = " << ret.length << ", " << ret.strength;
+
+  (*memo)[memo_key] = ret;
+  return ret;
+}
+
+
+LengthStrength StrongestLongestBridge(const std::vector<Converter>& ordered) {
+  Memo2 memo;
+  return StrongestLongestBridge(&memo, ordered, 0,  std::set<int>{});
+}
+
+
 }  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day24_2017::Part1(
@@ -82,7 +134,16 @@ absl::StatusOr<std::vector<std::string>> Day24_2017::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day24_2017::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  std::vector<Converter> convs;
+  for (absl::string_view row : input) {
+    Converter c;
+    if (!RE2::FullMatch(row, "(\\d+)/(\\d+)", &c.in, &c.out)) {
+      return Error("Bad line: ", row);
+    }
+    convs.push_back(c);
+  }
+  std::sort(convs.begin(), convs.end());
+  return IntReturn(StrongestLongestBridge(convs).strength);
 }
 
 }  // namespace advent_of_code
