@@ -13,13 +13,71 @@ namespace advent_of_code {
 
 namespace {
 
-// Helper methods go here.
+struct Converter {
+  int in;
+  int out;
+  bool operator<(const Converter& o) const {
+    if (in != o.in) return in < o.in;
+    return out < o.out;
+  }
+};
+
+using Memo = absl::flat_hash_map<std::pair<int, std::set<int>>, int>;
+
+int StrongestBridge(Memo* memo, const std::vector<Converter>& ordered, int ports, std::set<int> used) {
+  auto memo_key = std::make_pair(ports, used);
+  if (auto it = memo->find(memo_key); it != memo->end()) {
+    return it->second;
+  }
+
+  int strongest_bridge = 0;
+  for (int i = 0; i < ordered.size(); ++i) {
+    if (auto it = used.find(i); it != used.end()) continue;
+    int next_strongest = -1;
+    if (ordered[i].in == ports) {
+      used.insert(i);
+      next_strongest = StrongestBridge(memo, ordered, ordered[i].out, used);
+      used.erase(i);
+    }
+    if (ordered[i].out == ports) {
+      used.insert(i);
+      next_strongest = StrongestBridge(memo, ordered, ordered[i].in, used);
+      used.erase(i);
+    }
+    if (next_strongest != -1) {
+      int this_bridge = next_strongest + ordered[i].in + ordered[i].out;
+      if (this_bridge > strongest_bridge) {
+        strongest_bridge = this_bridge;
+      }
+    }
+  }
+
+  VLOG(1) << "StrongestBridge(" << ports << ", " << absl::StrJoin(used, ",") << ") = " << strongest_bridge;
+
+  (*memo)[memo_key] = strongest_bridge;
+  return strongest_bridge;
+}
+
+
+int StrongestBridge(const std::vector<Converter>& ordered) {
+  Memo memo;
+  return StrongestBridge(&memo, ordered, 0,  std::set<int>{});
+}
 
 }  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day24_2017::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  std::vector<Converter> convs;
+  for (absl::string_view row : input) {
+    Converter c;
+    if (!RE2::FullMatch(row, "(\\d+)/(\\d+)", &c.in, &c.out)) {
+      return Error("Bad line: ", row);
+    }
+    convs.push_back(c);
+  }
+  std::sort(convs.begin(), convs.end());
+  return IntReturn(StrongestBridge(convs));
 }
 
 absl::StatusOr<std::vector<std::string>> Day24_2017::Part2(
