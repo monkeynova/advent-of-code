@@ -19,7 +19,8 @@ struct Nav {
   Point dir = Cardinal::kNorth;
 };
 
-absl::StatusOr<absl::flat_hash_set<Point>> Parse(absl::Span<absl::string_view> input) {
+absl::StatusOr<absl::flat_hash_set<Point>> Parse(
+    absl::Span<absl::string_view> input) {
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
   if (b->width() % 2 != 1) return AdventDay::Error("Bad width");
@@ -28,7 +29,8 @@ absl::StatusOr<absl::flat_hash_set<Point>> Parse(absl::Span<absl::string_view> i
   Point center = {b->width() / 2, b->height() / 2};
 
   absl::flat_hash_set<Point> sparse_board;
-  for (Point p : b->range()) if (b->at(p) == '#') sparse_board.insert(p - center);
+  for (Point p : b->range())
+    if (b->at(p) == '#') sparse_board.insert(p - center);
   return sparse_board;
 }
 
@@ -56,7 +58,8 @@ enum State {
   kFlagged = 3,
 };
 
-absl::StatusOr<absl::flat_hash_map<Point, State>> Parse2(absl::Span<absl::string_view> input) {
+absl::StatusOr<absl::flat_hash_map<Point, State>> Parse2(
+    absl::Span<absl::string_view> input) {
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
   if (b->width() % 2 != 1) return AdventDay::Error("Bad width");
@@ -65,7 +68,8 @@ absl::StatusOr<absl::flat_hash_map<Point, State>> Parse2(absl::Span<absl::string
   Point center = {b->width() / 2, b->height() / 2};
 
   absl::flat_hash_map<Point, State> sparse_board;
-  for (Point p : b->range()) if (b->at(p) == '#') sparse_board.emplace(p - center, kInfected);
+  for (Point p : b->range())
+    if (b->at(p) == '#') sparse_board.emplace(p - center, kInfected);
   return sparse_board;
 }
 
@@ -105,7 +109,6 @@ bool Move2(Nav& nav, absl::flat_hash_map<Point, State>& board) {
   return infected;
 }
 
-
 }  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day22_2017::Part1(
@@ -115,7 +118,9 @@ absl::StatusOr<std::vector<std::string>> Day22_2017::Part1(
   Nav n;
   int infected = 0;
   for (int i = 0; i < 10'000; ++i) {
-    VLOG(1) << absl::StrJoin(*sparse_board, ",", [](std::string* out, Point p) { absl::StrAppend(out, p.DebugString());});
+    VLOG(1) << absl::StrJoin(*sparse_board, ",", [](std::string* out, Point p) {
+      absl::StrAppend(out, p.DebugString());
+    });
     if (Move(n, *sparse_board)) ++infected;
   }
 
@@ -124,7 +129,8 @@ absl::StatusOr<std::vector<std::string>> Day22_2017::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day22_2017::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<absl::flat_hash_map<Point, State>> sparse_board = Parse2(input);
+  absl::StatusOr<absl::flat_hash_map<Point, State>> sparse_board =
+      Parse2(input);
 
   Nav n;
   int infected = 0;
