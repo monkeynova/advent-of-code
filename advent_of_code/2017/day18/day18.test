@@ -1,7 +1,23 @@
 [part=1]
+set a 1
+add a 2
+mul a a
+mod a 5
+snd a
+set a 0
+rcv a
+jgz a -1
+set a 1
+jgz a -2
+--
+4
+==
+
+# -6669
+[part=1]
 @include{advent_of_code/2017/day18/input.txt}
 --
-ERROR: Could not run test: Not implemented
+1187
 ==
 
 [part=2]
