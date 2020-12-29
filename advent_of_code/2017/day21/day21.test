@@ -4,6 +4,7 @@
 152
 ==
 
+[long=25s (2s opt) 2020.12.29]
 # high (2090214)
 [part=2]
 @include{advent_of_code/2017/day21/input.txt}
