@@ -18,6 +18,19 @@ ITSZCJNMUO
 ==
 
 [part=2]
+Ignore Starting Whitespace
+     |          
+     |  +--+    
+     A  |  C    
+ F---|----E|--+ 
+     |  |  |  D 
+     +B-+  +--+ 
+--
+38
+==
+
+[part=2]
+Ignore Starting Whitespace
 @include{advent_of_code/2017/day19/input.txt}
 --
-ERROR: Could not run test: Not implemented
+17420
