@@ -128,6 +128,7 @@ absl::StatusOr<std::vector<std::string>> Day24_2017::Part1(
     }
     convs.push_back(c);
   }
+  // TODO(@monkeynova): This sort isn't helpful. And index would be.
   std::sort(convs.begin(), convs.end());
   return IntReturn(StrongestBridge(convs));
 }
