@@ -12,6 +12,7 @@
 5570
 ==
 
+[long=15s (0s opt) 2020.12.29]
 [part=2]
 \..#
 \#..
@@ -20,6 +21,7 @@
 2511944
 ==
 
+[long=15s (0s opt) 2020.12.29]
 [part=2]
 @include{advent_of_code/2017/day22/input.txt}
 --
