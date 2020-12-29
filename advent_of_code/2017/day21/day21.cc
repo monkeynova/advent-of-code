@@ -49,7 +49,8 @@ CharBoard SubBoard(const CharBoard& in, PointRectangle sub_range) {
 }
 
 absl::StatusOr<CharBoard> FindPattern(
-    const CharBoard& in, const absl::flat_hash_map<CharBoard, CharBoard>& patterns) {
+    const CharBoard& in,
+    const absl::flat_hash_map<CharBoard, CharBoard>& patterns) {
   auto in_transforms = Transforms(in.range());
   for (int i = 0; i < in_transforms.size(); ++i) {
     CharBoard test = Transform(in, in_transforms[i]);
@@ -69,7 +70,8 @@ void SpliceBoard(CharBoard* out, const CharBoard& in, Point splice_at) {
 }
 
 absl::StatusOr<CharBoard> RunIteration(
-    const CharBoard& in, const absl::flat_hash_map<CharBoard, CharBoard>& patterns) {
+    const CharBoard& in,
+    const absl::flat_hash_map<CharBoard, CharBoard>& patterns) {
   Point stride;
   if (in.width() != in.height()) return AdventDay::Error("Not square");
   if (in.width() % 2 == 0) {
@@ -86,12 +88,15 @@ absl::StatusOr<CharBoard> RunIteration(
     for (int x = 0; x < in.width() / stride.x; ++x) {
       Point slice_at = {x * stride.x, y * stride.y};
       VLOG(2) << "Slice @" << slice_at;
-      CharBoard slice = SubBoard(in, PointRectangle{slice_at, slice_at + stride - Point{1, 1}});
+      CharBoard slice = SubBoard(
+          in, PointRectangle{slice_at, slice_at + stride - Point{1, 1}});
       VLOG(2) << "Slice:\n" << slice.DebugString();
       absl::StatusOr<CharBoard> new_slice = FindPattern(slice, patterns);
       if (!new_slice.ok()) return new_slice.status();
-      if (new_slice->width() != stride.x + 1) return AdventDay::Error("Bad pattern: x");
-      if (new_slice->height() != stride.y + 1) return AdventDay::Error("Bad pattern: y");
+      if (new_slice->width() != stride.x + 1)
+        return AdventDay::Error("Bad pattern: x");
+      if (new_slice->height() != stride.y + 1)
+        return AdventDay::Error("Bad pattern: y");
 
       Point splice_at = {x * (stride.x + 1), y * (stride.y + 1)};
       VLOG(2) << "Splice @" << splice_at;
@@ -135,7 +140,7 @@ absl::StatusOr<std::vector<std::string>> Day21_2017::Part1(
   std::vector<absl::string_view> init = {".#.", "..#", "###"};
   absl::StatusOr<CharBoard> tmp = CharBoard::Parse(absl::MakeSpan(init));
   if (!tmp.ok()) return tmp.status();
-  
+
   VLOG(1) << "tmp=\n" << tmp->DebugString();
   for (int i = 0; i < 5; ++i) {
     absl::StatusOr<CharBoard> next = RunIteration(*tmp, *patterns);
@@ -145,7 +150,8 @@ absl::StatusOr<std::vector<std::string>> Day21_2017::Part1(
   }
 
   int count = 0;
-  for (Point p : tmp->range()) if ((*tmp)[p] == '#') ++count;
+  for (Point p : tmp->range())
+    if ((*tmp)[p] == '#') ++count;
 
   return IntReturn(count);
 }
@@ -159,7 +165,7 @@ absl::StatusOr<std::vector<std::string>> Day21_2017::Part2(
   std::vector<absl::string_view> init = {".#.", "..#", "###"};
   absl::StatusOr<CharBoard> tmp = CharBoard::Parse(absl::MakeSpan(init));
   if (!tmp.ok()) return tmp.status();
-  
+
   VLOG(1) << "tmp=\n" << tmp->DebugString();
   for (int i = 0; i < 18; ++i) {
     absl::StatusOr<CharBoard> next = RunIteration(*tmp, *patterns);
@@ -169,7 +175,8 @@ absl::StatusOr<std::vector<std::string>> Day21_2017::Part2(
   }
 
   int count = 0;
-  for (Point p : tmp->range()) if ((*tmp)[p] == '#') ++count;
+  for (Point p : tmp->range())
+    if ((*tmp)[p] == '#') ++count;
 
   return IntReturn(count);
 }
