@@ -33,22 +33,78 @@ absl::StatusOr<absl::flat_hash_set<Point>> Parse(absl::Span<absl::string_view> i
 }
 
 bool Move(Nav& nav, absl::flat_hash_set<Point>& board) {
-  bool ret;
+  bool infected = false;
 
   if (board.contains(nav.cur)) {
     nav.dir = nav.dir.rotate_right();
     board.erase(nav.cur);
-    ret = false;
   } else {
     nav.dir = nav.dir.rotate_left();
     board.insert(nav.cur);
-    ret = true;
+    infected = true;
   }
 
-  nav.cur = nav.cur + nav.dir;
+  nav.cur += nav.dir;
 
-  return ret;
+  return infected;
 }
+
+enum State {
+  kClean = 0,
+  kWeakened = 1,
+  kInfected = 2,
+  kFlagged = 3,
+};
+
+absl::StatusOr<absl::flat_hash_map<Point, State>> Parse2(absl::Span<absl::string_view> input) {
+  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
+  if (!b.ok()) return b.status();
+  if (b->width() % 2 != 1) return AdventDay::Error("Bad width");
+  if (b->height() % 2 != 1) return AdventDay::Error("Bad width");
+
+  Point center = {b->width() / 2, b->height() / 2};
+
+  absl::flat_hash_map<Point, State> sparse_board;
+  for (Point p : b->range()) if (b->at(p) == '#') sparse_board.emplace(p - center, kInfected);
+  return sparse_board;
+}
+
+bool Move2(Nav& nav, absl::flat_hash_map<Point, State>& board) {
+  bool infected = false;
+
+  if (!board.contains(nav.cur)) board[nav.cur] = kClean;
+  switch (board[nav.cur]) {
+    case kClean: {
+      nav.dir = nav.dir.rotate_left();
+      board[nav.cur] = kWeakened;
+      break;
+    }
+    case kWeakened: {
+      // Same direction.
+      board[nav.cur] = kInfected;
+      infected = true;
+      break;
+    }
+    case kInfected: {
+      nav.dir = nav.dir.rotate_right();
+      board[nav.cur] = kFlagged;
+      break;
+    }
+    case kFlagged: {
+      nav.dir = -nav.dir;
+      board[nav.cur] = kClean;
+      break;
+    }
+    default: {
+      LOG(FATAL) << "Bad state";
+    }
+  }
+
+  nav.cur += nav.dir;
+
+  return infected;
+}
+
 
 }  // namespace
 
@@ -58,7 +114,7 @@ absl::StatusOr<std::vector<std::string>> Day22_2017::Part1(
 
   Nav n;
   int infected = 0;
-  for (int i = 0; i < 10000; ++i) {
+  for (int i = 0; i < 10'000; ++i) {
     VLOG(1) << absl::StrJoin(*sparse_board, ",", [](std::string* out, Point p) { absl::StrAppend(out, p.DebugString());});
     if (Move(n, *sparse_board)) ++infected;
   }
@@ -68,7 +124,15 @@ absl::StatusOr<std::vector<std::string>> Day22_2017::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day22_2017::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<absl::flat_hash_map<Point, State>> sparse_board = Parse2(input);
+
+  Nav n;
+  int infected = 0;
+  for (int i = 0; i < 10'000'000; ++i) {
+    if (Move2(n, *sparse_board)) ++infected;
+  }
+
+  return IntReturn(infected);
 }
 
 }  // namespace advent_of_code
