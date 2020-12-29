@@ -24,13 +24,16 @@ struct Converter {
 
 using Memo = absl::flat_hash_map<std::pair<int, std::set<int>>, int>;
 
-int StrongestBridge(Memo* memo, const std::vector<Converter>& ordered, int ports, std::set<int> used) {
+int StrongestBridge(Memo* memo, const std::vector<Converter>& ordered,
+                    int ports, std::set<int> used) {
   auto memo_key = std::make_pair(ports, used);
   if (auto it = memo->find(memo_key); it != memo->end()) {
     return it->second;
   }
 
   int strongest_bridge = 0;
+  // TODO(@monkeynova): We should have an index on the ports to avoid a full
+  // linear scan.
   for (int i = 0; i < ordered.size(); ++i) {
     if (auto it = used.find(i); it != used.end()) continue;
     int next_strongest = -1;
@@ -52,16 +55,16 @@ int StrongestBridge(Memo* memo, const std::vector<Converter>& ordered, int ports
     }
   }
 
-  VLOG(1) << "StrongestBridge(" << ports << ", " << absl::StrJoin(used, ",") << ") = " << strongest_bridge;
+  VLOG(1) << "StrongestBridge(" << ports << ", " << absl::StrJoin(used, ",")
+          << ") = " << strongest_bridge;
 
   (*memo)[memo_key] = strongest_bridge;
   return strongest_bridge;
 }
 
-
 int StrongestBridge(const std::vector<Converter>& ordered) {
   Memo memo;
-  return StrongestBridge(&memo, ordered, 0,  std::set<int>{});
+  return StrongestBridge(&memo, ordered, 0, std::set<int>{});
 }
 
 struct LengthStrength {
@@ -73,15 +76,20 @@ struct LengthStrength {
   }
 };
 
-using Memo2 = absl::flat_hash_map<std::pair<int, std::set<int>>, LengthStrength>;
+using Memo2 =
+    absl::flat_hash_map<std::pair<int, std::set<int>>, LengthStrength>;
 
-LengthStrength StrongestLongestBridge(Memo2* memo, const std::vector<Converter>& ordered, int ports, std::set<int> used) {
+LengthStrength StrongestLongestBridge(Memo2* memo,
+                                      const std::vector<Converter>& ordered,
+                                      int ports, std::set<int> used) {
   auto memo_key = std::make_pair(ports, used);
   if (auto it = memo->find(memo_key); it != memo->end()) {
     return it->second;
   }
 
   LengthStrength ret = {0, 0};
+  // TODO(@monkeynova): We should have an index on the ports to avoid a full
+  // linear scan.
   for (int i = 0; i < ordered.size(); ++i) {
     if (auto it = used.find(i); it != used.end()) continue;
     LengthStrength next = {-1, -1};
@@ -103,18 +111,17 @@ LengthStrength StrongestLongestBridge(Memo2* memo, const std::vector<Converter>&
     }
   }
 
-  VLOG(1) << "StrongestBridge(" << ports << ", " << absl::StrJoin(used, ",") << ") = " << ret.length << ", " << ret.strength;
+  VLOG(1) << "StrongestBridge(" << ports << ", " << absl::StrJoin(used, ",")
+          << ") = " << ret.length << ", " << ret.strength;
 
   (*memo)[memo_key] = ret;
   return ret;
 }
 
-
 LengthStrength StrongestLongestBridge(const std::vector<Converter>& ordered) {
   Memo2 memo;
-  return StrongestLongestBridge(&memo, ordered, 0,  std::set<int>{});
+  return StrongestLongestBridge(&memo, ordered, 0, std::set<int>{});
 }
-
 
 }  // namespace
 
@@ -128,8 +135,6 @@ absl::StatusOr<std::vector<std::string>> Day24_2017::Part1(
     }
     convs.push_back(c);
   }
-  // TODO(@monkeynova): This sort isn't helpful. And index would be.
-  std::sort(convs.begin(), convs.end());
   return IntReturn(StrongestBridge(convs));
 }
 
@@ -143,7 +148,6 @@ absl::StatusOr<std::vector<std::string>> Day24_2017::Part2(
     }
     convs.push_back(c);
   }
-  std::sort(convs.begin(), convs.end());
   return IntReturn(StrongestLongestBridge(convs).strength);
 }
 
