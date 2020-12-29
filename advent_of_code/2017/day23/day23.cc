@@ -11,6 +11,75 @@
 
 namespace advent_of_code {
 
+/*
+Scratch space working with the input.
+
+b = 65;
+c = b;
+if (a != 0) {
+  b *= 100;
+  b += 100000;  // 106500
+  c = b;
+  c += 17000    // 123500
+  f = 1;        // 1
+}
+while (true) {
+  for (d = 2; d != b; ++d) {
+    for (e = 2; e != b; ++e) {
+      if (d * e == b) f = 0;
+    }
+  }
+
+  if (f == 0) ++h;
+  if (b == c) break;
+  b += 17;
+}
+
+set b 65
+set c b
+jnz a 2 {
+  jnz 1 5 {
+    mul b 100
+    sub b -100000
+    set c b
+    sub c -17000
+  }
+}
+{
+  set f 1
+  set d 2
+  {
+    set e 2
+    {
+      set g d 
+      mul g e
+      sub g b
+      jnz g 2 {       
+        set f 0 
+      }
+      sub e -1
+      set g e
+      sub g b
+      jnz g -8
+    }
+    sub d -1
+    set g d
+    sub g b
+    jnz g -13
+  }
+  jnz f 2 {
+    sub h -1
+  }
+  set g b
+  sub g c
+  jnz g 2 {
+    jnz 1 3    // term
+  }
+  sub b -17
+  jnz 1 -23
+}
+
+*/
 namespace {
 
 struct Instruction {
@@ -74,7 +143,13 @@ class VM {
     return ret;
   }
 
-  void set_program_id(int id) { registers_["p"] = id; }
+  int get_register(absl::string_view r) {
+    return registers_[r];
+  }
+
+  void set_register(absl::string_view r, int id) {
+    registers_[r] = id;
+  }
 
   void ExecuteToRecv() {
     bool recv = false;
@@ -194,7 +269,29 @@ absl::StatusOr<std::vector<std::string>> Day23_2017::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day23_2017::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+
+  // Hand converted, then optimized form of the assembly.
+  int b = 65;
+  int c = b;
+  b *= 100;
+  b += 100000;
+  c = b;
+  c += 17000;
+  int h = 0;
+  for (; true; b += 17) {
+    bool f = true;
+    for (int d = 2; d != b; ++d) {
+      if (b % d == 0) f = false;
+      /*
+      for (e = 2; e != b; ++e) {
+        if (d * e == b) f = 0;
+      }
+      */
+    }
+    if (!f) ++h;
+    if (b == c) break;
+  }
+  return IntReturn(h);
 }
 
 }  // namespace advent_of_code
