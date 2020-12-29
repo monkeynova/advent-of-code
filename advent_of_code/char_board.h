@@ -35,9 +35,6 @@ struct CharBoard {
   CharBoard(const CharBoard&) = default;
   CharBoard& operator=(const CharBoard&) = default;
 
-  bool operator==(const CharBoard& o) const { return rows == o.rows; }
-  bool operator!=(const CharBoard& o) const { return !operator==(o); }
-
   int height() const { return rows.size(); }
   int width() const { return rows[0].size(); }
 
@@ -72,12 +69,20 @@ struct CharBoard {
     return true;
   }
 
+  template <typename H>
+  friend H AbslHashValue(H h, const CharBoard& b) {
+    return H::combine(std::move(h), b.rows);
+  }
+
+  bool operator==(const CharBoard& o) const { return rows == o.rows; }
+  bool operator!=(const CharBoard& o) const { return !operator==(o); }
+
+  friend std::ostream& operator<<(std::ostream& out, const CharBoard& b) {
+    return out << b.DebugString();
+  }
+
   std::vector<std::string> rows;
 };
-
-std::ostream& operator<<(std::ostream& out, const CharBoard& b) {
-  return out << b.DebugString();
-}
 
 }  // namespace advent_of_code
 
