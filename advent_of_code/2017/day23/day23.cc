@@ -51,11 +51,11 @@ jnz a 2 {
   {
     set e 2
     {
-      set g d 
+      set g d
       mul g e
       sub g b
-      jnz g 2 {       
-        set f 0 
+      jnz g 2 {
+        set f 0
       }
       sub e -1
       set g e
@@ -143,13 +143,9 @@ class VM {
     return ret;
   }
 
-  int get_register(absl::string_view r) {
-    return registers_[r];
-  }
+  int get_register(absl::string_view r) { return registers_[r]; }
 
-  void set_register(absl::string_view r, int id) {
-    registers_[r] = id;
-  }
+  void set_register(absl::string_view r, int id) { registers_[r] = id; }
 
   void ExecuteToRecv() {
     bool recv = false;
@@ -269,7 +265,6 @@ absl::StatusOr<std::vector<std::string>> Day23_2017::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day23_2017::Part2(
     absl::Span<absl::string_view> input) const {
-
   // Hand converted, then optimized form of the assembly.
   int b = 65;
   int c = b;
