@@ -24,15 +24,17 @@ std::ostream& operator<<(std::ostream& o, const Particle& p) {
   return o << "p:" << p.p << ", v:" << p.v << ", a:" << p.a;
 }
 
-absl::StatusOr<std::vector<Particle>> Parse(absl::Span<absl::string_view> input) {
+absl::StatusOr<std::vector<Particle>> Parse(
+    absl::Span<absl::string_view> input) {
   std::vector<Particle> particles;
   for (absl::string_view row : input) {
     Particle p;
-    if (!RE2::FullMatch(row,
-                        "p=<(-?\\d+),(-?\\d+),(-?\\d+)>, v=<(-?\\d+),(-?\\d+),(-?\\d+)>, "
-                        "a=<(-?\\d+),(-?\\d+),(-?\\d+)>",
-                        &p.p.x, &p.p.y, &p.p.z, &p.v.x, &p.v.y, &p.v.z,
-                        &p.a.x, &p.a.y, &p.a.z)) {
+    if (!RE2::FullMatch(
+            row,
+            "p=<(-?\\d+),(-?\\d+),(-?\\d+)>, v=<(-?\\d+),(-?\\d+),(-?\\d+)>, "
+            "a=<(-?\\d+),(-?\\d+),(-?\\d+)>",
+            &p.p.x, &p.p.y, &p.p.z, &p.v.x, &p.v.y, &p.v.z, &p.a.x, &p.a.y,
+            &p.a.z)) {
       return AdventDay::Error("Bad line: ", row);
     }
     particles.push_back(p);
@@ -41,9 +43,12 @@ absl::StatusOr<std::vector<Particle>> Parse(absl::Span<absl::string_view> input)
 }
 
 bool SameDir(int a, int b) {
-  if (a == 0) return b == 0;
-  else if (a > 0) return b > 0;
-  else return b < 0;
+  if (a == 0)
+    return b == 0;
+  else if (a > 0)
+    return b > 0;
+  else
+    return b < 0;
 }
 
 bool SameDir(Point3 a, Point3 b) {
@@ -69,8 +74,7 @@ absl::StatusOr<std::vector<std::string>> Day20_2017::Part1(
       min_acc = p.a.dist();
       min_vec = (p.a - p.v).dist();
       min_idx = i;
-    } else if (p.a.dist() == min_acc &&
-               (p.a - p.v).dist() < min_vec) {
+    } else if (p.a.dist() == min_acc && (p.a - p.v).dist() < min_vec) {
       min_acc = p.a.dist();
       min_vec = (p.a - p.v).dist();
       min_idx = i;
@@ -93,7 +97,7 @@ absl::StatusOr<std::vector<std::string>> Day20_2017::Part2(
     absl::flat_hash_map<Point3, int> position_to_count;
     bool to_remove = false;
     for (const Particle& p : alive) {
-      if (++position_to_count[p.p] > 1) to_remove = true; 
+      if (++position_to_count[p.p] > 1) to_remove = true;
     }
     if (to_remove) {
       std::vector<Particle> new_alive;
