@@ -44,12 +44,15 @@ absl::StatusOr<WalkRet> WalkBoard(const CharBoard& b) {
         next = p + dir;
       }
       if (!b.OnBoard(next) || b[next] == ' ') {
-        if (b[p] == '+') return AdventDay::Error("Erroneously marked end @", p.DebugString());
+        if (b[p] == '+')
+          return AdventDay::Error("Erroneously marked end @", p.DebugString());
         break;
       }
-      if (b[p] != '+') return AdventDay::Error("Turning at non-intersection @", p.DebugString());
+      if (b[p] != '+')
+        return AdventDay::Error("Turning at non-intersection @",
+                                p.DebugString());
     }
-    if (b[next] == '+' ||b[next] == '|' || b[next] == '-') {
+    if (b[next] == '+' || b[next] == '|' || b[next] == '-') {
       // Still on path. Keep going.
       // Don't verify direction because '+' is only used for turns and
       // intersections exist with one of '|' or '-'.
