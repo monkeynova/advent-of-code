@@ -13,13 +13,183 @@ namespace advent_of_code {
 
 namespace {
 
-// Helper methods go here.
+struct Instruction {
+  enum {
+    kSnd = 1,
+    kSet = 2,
+    kAdd = 3,
+    kMul = 4,
+    kMod = 5,
+    kRcv = 6,
+    kJgz = 7,
+    kSub = 8,
+    kJnz = 9,
+  } op_code;
+  absl::string_view arg1;
+  absl::string_view arg2;
+
+  static absl::StatusOr<Instruction> Parse(absl::string_view str) {
+    Instruction ret;
+    if (RE2::FullMatch(str, "snd (-?\\d+|[a-z])", &ret.arg1)) {
+      ret.op_code = Instruction::kSnd;
+    } else if (RE2::FullMatch(str, "set ([a-z]) (-?\\d+|[a-z])", &ret.arg1,
+                              &ret.arg2)) {
+      ret.op_code = Instruction::kSet;
+    } else if (RE2::FullMatch(str, "sub ([a-z]) (-?\\d+|[a-z])", &ret.arg1,
+                              &ret.arg2)) {
+      ret.op_code = Instruction::kSub;
+    } else if (RE2::FullMatch(str, "add ([a-z]) (-?\\d+|[a-z])", &ret.arg1,
+                              &ret.arg2)) {
+      ret.op_code = Instruction::kAdd;
+    } else if (RE2::FullMatch(str, "mul ([a-z]) (-?\\d+|[a-z])", &ret.arg1,
+                              &ret.arg2)) {
+      ret.op_code = Instruction::kMul;
+    } else if (RE2::FullMatch(str, "mod ([a-z]) (-?\\d+|[a-z])", &ret.arg1,
+                              &ret.arg2)) {
+      ret.op_code = Instruction::kMod;
+    } else if (RE2::FullMatch(str, "rcv (-?\\d+|[a-z])", &ret.arg1)) {
+      ret.op_code = Instruction::kRcv;
+    } else if (RE2::FullMatch(str, "jgz (-?\\d+|[a-z]) (-?\\d+|[a-z])",
+                              &ret.arg1, &ret.arg2)) {
+      ret.op_code = Instruction::kJgz;
+    } else if (RE2::FullMatch(str, "jnz (-?\\d+|[a-z]) (-?\\d+|[a-z])",
+                              &ret.arg1, &ret.arg2)) {
+      ret.op_code = Instruction::kJnz;
+    } else {
+      return AdventDay::Error("Bad instruction: ", str);
+    }
+    return ret;
+  }
+};
+
+class VM {
+ public:
+  static absl::StatusOr<VM> Parse(absl::Span<absl::string_view> input) {
+    VM ret;
+    for (absl::string_view ins : input) {
+      absl::StatusOr<Instruction> next = Instruction::Parse(ins);
+      if (!next.ok()) return next.status();
+      ret.instructions_.push_back(*next);
+    }
+    return ret;
+  }
+
+  void set_program_id(int id) { registers_["p"] = id; }
+
+  void ExecuteToRecv() {
+    bool recv = false;
+    while (!recv && ip_ < instructions_.size() && ip_ >= 0) {
+      bool jumped = false;
+      const Instruction& i = instructions_[ip_];
+      switch (i.op_code) {
+        case Instruction::kSnd: {
+          send_queue_.push_back(GetValue(i.arg1));
+          break;
+        }
+        case Instruction::kSet: {
+          registers_[i.arg1] = GetValue(i.arg2);
+          break;
+        }
+        case Instruction::kAdd: {
+          registers_[i.arg1] += GetValue(i.arg2);
+          break;
+        }
+        case Instruction::kSub: {
+          registers_[i.arg1] -= GetValue(i.arg2);
+          break;
+        }
+        case Instruction::kMul: {
+          ++mul_count_;
+          registers_[i.arg1] *= GetValue(i.arg2);
+          break;
+        }
+        case Instruction::kMod: {
+          registers_[i.arg1] %= GetValue(i.arg2);
+          break;
+        }
+        case Instruction::kRcv: {
+          if (!recv_queue_.empty()) {
+            registers_[i.arg1] = recv_queue_.front();
+            recv_queue_.pop_front();
+          } else {
+            if (!part1_ || GetValue(i.arg1) != 0) {
+              recv = true;
+              // Don't advance IP. Come back here.
+              jumped = true;
+            }
+          }
+          break;
+        }
+        case Instruction::kJgz: {
+          if (GetValue(i.arg1) > 0) {
+            ip_ += GetValue(i.arg2);
+            jumped = true;
+          }
+          break;
+        }
+        case Instruction::kJnz: {
+          if (GetValue(i.arg1) != 0) {
+            ip_ += GetValue(i.arg2);
+            jumped = true;
+          }
+          break;
+        }
+      }
+      if (!jumped) ++ip_;
+    }
+  }
+
+  bool done() { return done_; }
+
+  std::vector<int> ConsumeSendQueue() {
+    std::vector<int> ret = send_queue_;
+    send_queue_.clear();
+    return ret;
+  }
+
+  void AddRecvQueue(std::vector<int> in) {
+    recv_queue_.insert(recv_queue_.end(), in.begin(), in.end());
+  }
+
+  void set_part1() { part1_ = true; }
+  int mul_count() const { return mul_count_; }
+
+ private:
+  VM() {
+    absl::string_view reg_names = "abcdefghijklmnopqrstuvwxyz";
+    for (int i = 0; i < reg_names.size(); ++i) {
+      registers_[reg_names.substr(i, 1)] = 0;
+    }
+  }
+
+  int GetValue(absl::string_view name) const {
+    if (auto it = registers_.find(name); it != registers_.end())
+      return it->second;
+    int n;
+    CHECK(absl::SimpleAtoi(name, &n));
+    return n;
+  }
+
+  std::vector<Instruction> instructions_;
+  int ip_ = 0;
+  absl::flat_hash_map<std::string_view, int64_t> registers_;
+  std::vector<int> send_queue_;
+  std::deque<int> recv_queue_;
+  bool done_ = false;
+  bool part1_ = false;
+  int mul_count_ = 0;
+};
 
 }  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day23_2017::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<VM> vm = VM::Parse(input);
+  if (!vm.ok()) return vm.status();
+
+  vm->ExecuteToRecv();
+
+  return IntReturn(vm->mul_count());
 }
 
 absl::StatusOr<std::vector<std::string>> Day23_2017::Part2(

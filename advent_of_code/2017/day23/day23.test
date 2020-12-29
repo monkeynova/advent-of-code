@@ -1,7 +1,7 @@
 [part=1]
 @include{advent_of_code/2017/day23/input.txt}
 --
-ERROR: Could not run test: Not implemented
+3969
 ==
 
 [part=2]
