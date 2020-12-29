@@ -25,7 +25,7 @@ absl::StatusOr<std::vector<std::string>> Day17_2017::Part1(
   int pos = 0;
   std::vector<int> buf = {0};
   for (int i = 0; i < 2017; ++i) {
-    VLOG(1) << absl::StrJoin(buf, ",");
+    VLOG(1) << absl::StrJoin(absl::MakeSpan(buf).subspan(0, 20), ",");
     pos = (pos + n) % buf.size();
     buf.push_back(0);
     ++pos;
@@ -39,7 +39,19 @@ absl::StatusOr<std::vector<std::string>> Day17_2017::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day17_2017::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 1) return Error("Bad size");
+  int n;
+  if (!absl::SimpleAtoi(input[0], &n)) return Error("Bad int:", input[0]);
+  int pos = 0;
+  int buf_size = 1;
+  int last_after_zero = 0;
+  for (int i = 0; i < 50'000'000; ++i) {
+    pos = (pos + n) % buf_size;
+    ++buf_size;
+    ++pos;
+    if (pos == 1) last_after_zero = i + 1;
+  }
+  return IntReturn(last_after_zero);
 }
 
 }  // namespace advent_of_code
