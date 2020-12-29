@@ -14,7 +14,55 @@ namespace advent_of_code {
 
 namespace {
 
-// Helper methods go here.
+struct WalkRet {
+  std::string sequence;
+  int num_steps = 0;
+};
+
+absl::StatusOr<WalkRet> WalkBoard(const CharBoard& b) {
+  VLOG(1) << "Board:\n" << b;
+  Point start{-1, -1};
+  Point dir = Cardinal::kSouth;
+  for (Point p = {0, 0}; p != Point{b.width(), 0}; p += {1, 0}) {
+    if (b[p] == '|') {
+      if (start != Point{-1, -1}) return AdventDay::Error("Two starts");
+      start = p;
+    }
+  }
+  VLOG(1) << "start=" << start;
+  Point p = start;
+  WalkRet ret;
+  while (true) {
+    ++ret.num_steps;
+    VLOG(2) << "@" << p << " D:" << dir;
+    Point next = p + dir;
+    if (!b.OnBoard(next) || b[next] == ' ') {
+      dir = dir.rotate_left();
+      next = p + dir;
+      if (!b.OnBoard(next) || b[next] == ' ') {
+        dir = dir.rotate_right().rotate_right();
+        next = p + dir;
+      }
+      if (!b.OnBoard(next) || b[next] == ' ') {
+        if (b[p] == '+') return AdventDay::Error("Erroneously marked end @", p.DebugString());
+        break;
+      }
+      if (b[p] != '+') return AdventDay::Error("Turning at non-intersection @", p.DebugString());
+    }
+    if (b[next] == '+' ||b[next] == '|' || b[next] == '-') {
+      // Still on path. Keep going.
+      // Don't verify direction because '+' is only used for turns and
+      // intersections exist with one of '|' or '-'.
+    } else if (b[next] >= 'A' && b[next] <= 'Z') {
+      VLOG(1) << "Appending: " << b[next] << " to " << ret.sequence;
+      ret.sequence.append(1, b[next]);
+    } else {
+      return AdventDay::Error("Bad token @", next.DebugString());
+    }
+    p = next;
+  }
+  return ret;
+}
 
 }  // namespace
 
@@ -26,47 +74,9 @@ absl::StatusOr<std::vector<std::string>> Day19_2017::Part1(
   }
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
-  VLOG(1) << "Board:\n" << *b;
-  Point start{-1, -1};
-  Point dir = Cardinal::kSouth;
-  for (Point p = {0, 0}; p != Point{b->width(), 0}; p += {1, 0}) {
-    if ((*b)[p] == '|') {
-      if (start != Point{-1, -1}) return Error("Two starts");
-      start = p;
-    }
-  }
-  VLOG(1) << "start=" << start;
-  Point p = start;
-  std::string sequence;
-  while (true) {
-    VLOG(2) << "@" << p << " D:" << dir;
-    Point next = p + dir;
-    if (!b->OnBoard(next) || b->at(next) == ' ') {
-      dir = dir.rotate_left();
-      next = p + dir;
-      if (!b->OnBoard(next) || b->at(next) == ' ') {
-        dir = dir.rotate_right().rotate_right();
-        next = p + dir;
-      }
-      if (!b->OnBoard(next) || b->at(next) == ' ') {
-        if (b->at(p) == '+') return Error("Erroneously marked end @", p.DebugString());
-        break;
-      }
-      if (b->at(p) != '+') return Error("Turning at non-intersection @", p.DebugString());
-    }
-    if (b->at(next) == '+' || b->at(next) == '|' || b->at(next) == '-') {
-      // Still on path. Keep going.
-      // Don't verify direction because '+' is only used for turns and
-      // intersections exist with one of '|' or '-'.
-    } else if (b->at(next) >= 'A' && b->at(next) <= 'Z') {
-      VLOG(1) << "Appending: " << b->at(next) << " to " << sequence;
-      sequence.append(1, b->at(next));
-    } else {
-      return Error("Bad token @", next.DebugString());
-    }
-    p = next;
-  }
-  return std::vector<std::string>{sequence};
+  absl::StatusOr<WalkRet> walk_ret = WalkBoard(*b);
+  if (!walk_ret.ok()) return walk_ret.status();
+  return std::vector<std::string>{walk_ret->sequence};
 }
 
 absl::StatusOr<std::vector<std::string>> Day19_2017::Part2(
@@ -77,49 +87,9 @@ absl::StatusOr<std::vector<std::string>> Day19_2017::Part2(
   }
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
-  VLOG(1) << "Board:\n" << *b;
-  Point start{-1, -1};
-  Point dir = Cardinal::kSouth;
-  for (Point p = {0, 0}; p != Point{b->width(), 0}; p += {1, 0}) {
-    if ((*b)[p] == '|') {
-      if (start != Point{-1, -1}) return Error("Two starts");
-      start = p;
-    }
-  }
-  VLOG(1) << "start=" << start;
-  Point p = start;
-  std::string sequence;
-  int walk_size = 0;
-  while (true) {
-    ++walk_size;
-    VLOG(2) << "@" << p << " D:" << dir;
-    Point next = p + dir;
-    if (!b->OnBoard(next) || b->at(next) == ' ') {
-      dir = dir.rotate_left();
-      next = p + dir;
-      if (!b->OnBoard(next) || b->at(next) == ' ') {
-        dir = dir.rotate_right().rotate_right();
-        next = p + dir;
-      }
-      if (!b->OnBoard(next) || b->at(next) == ' ') {
-        if (b->at(p) == '+') return Error("Erroneously marked end @", p.DebugString());
-        break;
-      }
-      if (b->at(p) != '+') return Error("Turning at non-intersection @", p.DebugString());
-    }
-    if (b->at(next) == '+' || b->at(next) == '|' || b->at(next) == '-') {
-      // Still on path. Keep going.
-      // Don't verify direction because '+' is only used for turns and
-      // intersections exist with one of '|' or '-'.
-    } else if (b->at(next) >= 'A' && b->at(next) <= 'Z') {
-      VLOG(1) << "Appending: " << b->at(next) << " to " << sequence;
-      sequence.append(1, b->at(next));
-    } else {
-      return Error("Bad token @", next.DebugString());
-    }
-    p = next;
-  }
-  return IntReturn(walk_size);
+  absl::StatusOr<WalkRet> walk_ret = WalkBoard(*b);
+  if (!walk_ret.ok()) return walk_ret.status();
+  return IntReturn(walk_ret->num_steps);
 }
 
 }  // namespace advent_of_code
