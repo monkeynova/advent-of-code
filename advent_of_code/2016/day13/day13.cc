@@ -55,7 +55,7 @@ class PathWalkToEnd : public BFSInterface<PathWalkToEnd, Point> {
 
   bool IsFinal() override { return cur_ == end_; }
 
-  Point identifier() const { return cur_; }
+  Point identifier() const override { return cur_; }
 
  private:
   const SparseBoard& board_;
@@ -84,7 +84,7 @@ class PathWalkToDistance : public BFSInterface<PathWalkToDistance, Point> {
     }
   }
 
-  Point identifier() const { return cur_; }
+  Point identifier() const override { return cur_; }
 
   bool IsFinal() override { return false; }
 

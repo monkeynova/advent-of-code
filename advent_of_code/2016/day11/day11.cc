@@ -34,7 +34,7 @@ class ElevatorState : public BFSInterface<ElevatorState> {
  public:
   static absl::StatusOr<ElevatorState> Parse(absl::Span<absl::string_view> input);
 
-  const ElevatorState& identifier() const { return *this; }
+  const ElevatorState& identifier() const override { return *this; }
 
   void AddElementAtFloor0(absl::string_view element_name) {
     int e_index = elements.size();

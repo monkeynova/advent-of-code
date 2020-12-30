@@ -19,12 +19,25 @@ class AStarGT {
   }
 };
 
+template <typename T>
+struct BFSInterfaceTraits { using RefType = const T&; };
+
+template <>
+struct BFSInterfaceTraits<absl::string_view> { using RefType = absl::string_view; };
+
+struct Point;
+
+template <>
+struct BFSInterfaceTraits<Point> { using RefType = Point; };
+
 template <typename BFSImpl, typename HistType = BFSImpl>
 class BFSInterface {
  public:
   class State;
 
   virtual ~BFSInterface() = default;
+
+  virtual typename BFSInterfaceTraits<HistType>::RefType identifier() const = 0;
   virtual void AddNextSteps(State* state) = 0;
   virtual bool IsFinal() = 0;
 
