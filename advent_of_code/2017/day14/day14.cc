@@ -23,7 +23,7 @@ class PathWalk : public BFSInterface<PathWalk, Point> {
   int CountGroups() {
     absl::flat_hash_set<Point> to_find;
     for (Point p : board_.range()) {
-      if (board_[p] == '#') to_find.insert(p);
+      if (board_[p] == '.') to_find.insert(p);
     }
     to_find_ = &to_find;
     int groups = 0;
@@ -44,7 +44,7 @@ class PathWalk : public BFSInterface<PathWalk, Point> {
     for (Point dir : Cardinal::kFourDirs) {
       Point next_cur = cur_ + dir;
       if (!board_.OnBoard(next_cur)) continue;
-      if (board_[next_cur] != '#') continue;
+      if (board_[next_cur] == '#') continue;
 
       PathWalk next = *this;
       next.cur_ = next_cur;
@@ -60,7 +60,7 @@ class PathWalk : public BFSInterface<PathWalk, Point> {
 
 absl::StatusOr<CharBoard> BuildBoard(absl::string_view input) {
   CharBoard board(128, 128);
-  for (Point p : board.range()) board[p] = '.';
+  for (Point p : board.range()) board[p] = '#';
   for (int y = 0; y < 128; ++y) {
     std::string hash = KnotHash(absl::StrCat(input, "-", y));
     for (int i = 0; i < hash.size(); ++i) {
@@ -71,10 +71,10 @@ absl::StatusOr<CharBoard> BuildBoard(absl::string_view input) {
         c -= '0';
       else
         return AdventDay::Error("Bad hash char: ", hash);
-      if (c & 8) board[{i * 4 + 0, y}] = '#';
-      if (c & 4) board[{i * 4 + 1, y}] = '#';
-      if (c & 2) board[{i * 4 + 2, y}] = '#';
-      if (c & 1) board[{i * 4 + 3, y}] = '#';
+      if (c & 8) board[{i * 4 + 0, y}] = '.';
+      if (c & 4) board[{i * 4 + 1, y}] = '.';
+      if (c & 2) board[{i * 4 + 2, y}] = '.';
+      if (c & 1) board[{i * 4 + 3, y}] = '.';
     }
   }
   return board;
@@ -89,8 +89,9 @@ absl::StatusOr<std::vector<std::string>> Day14_2017::Part1(
   if (!board.ok()) return board.status();
   VLOG(1) << "Board:\n" << board->DebugString();
   int count = 0;
-  for (Point p : board->range())
-    if ((*board)[p] == '#') ++count;
+  for (Point p : board->range()) {
+    if ((*board)[p] == '.') ++count;
+  }
   return IntReturn(count);
 }
 
