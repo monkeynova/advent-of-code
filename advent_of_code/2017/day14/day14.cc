@@ -35,7 +35,7 @@ class PathWalk : public BFSInterface<PathWalk, Point> {
     return groups;
   }
 
-  Point identifier() { return cur_; }
+  Point identifier() const { return cur_; }
 
   bool IsFinal() { return false; }
 

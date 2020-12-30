@@ -70,7 +70,7 @@ class PathWalk : public BFSInterface<PathWalk, absl::string_view> {
     }
   }
 
-  absl::string_view identifier() { return cur_; }
+  absl::string_view identifier() const { return cur_; }
 
  private:
   const DAG<bool>& graph_;
