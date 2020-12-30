@@ -6,6 +6,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/bfs.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 
@@ -29,22 +30,57 @@ H AbslHashValue(H h, const Floor& f) {
   return H::combine(std::move(h), f.generators_bv, f.microchips_bv);
 }
 
-struct State {
+class ElevatorState : public BFSInterface<ElevatorState> {
+ public:
+  static absl::StatusOr<ElevatorState> Parse(absl::Span<absl::string_view> input);
+
+  const ElevatorState& identifier() { return *this; }
+
+  void AddElementAtFloor0(absl::string_view element_name) {
+    int e_index = elements.size();
+    elements.push_back(element_name);
+    floors[0].generators_bv |= (1 << e_index);
+    floors[0].microchips_bv |= (1 << e_index);
+  }
+
+  void AddNextSteps(State* s) override;
+
+  bool IsValid() const {
+    for (const Floor& f : floors) {
+      if (f.generators_bv != 0) {
+        if (f.microchips_bv & ~f.generators_bv) return false;
+      }
+    }
+    return true;
+  }
+
+  bool IsFinal() override {
+    for (int idx = 0; idx < floors.size() - 1; ++idx) {
+      if (floors[idx].microchips_bv != 0) return false;
+      if (floors[idx].generators_bv != 0) return false;
+    }
+    return true;
+  }
+
+  bool operator==(const ElevatorState& o) const {
+    return cur_floor == o.cur_floor && floors == o.floors;
+  }
+
+  template <typename H>
+  friend H AbslHashValue(H h, const ElevatorState& s) {
+    return H::combine(std::move(h), s.cur_floor, s.floors);
+  }
+
+  friend std::ostream& operator<<(std::ostream& out, const ElevatorState& s);
+
+ private:
   int cur_floor = 0;
   int steps = 0;
   std::vector<Floor> floors;
   std::vector<absl::string_view> elements;
-  bool operator==(const State& o) const {
-    return cur_floor == o.cur_floor && floors == o.floors;
-  }
 };
 
-template <typename H>
-H AbslHashValue(H h, const State& s) {
-  return H::combine(std::move(h), s.cur_floor, s.floors);
-}
-
-std::ostream& operator<<(std::ostream& out, const State& s) {
+std::ostream& operator<<(std::ostream& out, const ElevatorState& s) {
   for (int i = 0; i < s.floors.size(); ++i) {
     out << "F" << i + 1 << (s.cur_floor == i ? " E" : "  ") << ":";
     out << " G{";
@@ -67,25 +103,24 @@ std::ostream& operator<<(std::ostream& out, const State& s) {
   return out;
 }
 
-std::vector<State> NextStates(const State& state) {
-  int cur_floor_num = state.cur_floor;
+void ElevatorState::AddNextSteps(State* state) {
+  int cur_floor_num = cur_floor;
   std::vector<int> next_floors;
   if (cur_floor_num - 1 >= 0) next_floors.push_back(cur_floor_num - 1);
-  if (cur_floor_num + 1 < state.floors.size())
+  if (cur_floor_num + 1 < floors.size())
     next_floors.push_back(cur_floor_num + 1);
-  const Floor& cur_floor = state.floors[cur_floor_num];
+  const Floor& cur_floor = floors[cur_floor_num];
 
-  std::vector<State> ret;
   for (int bit_index = 0; (1 << bit_index) <= cur_floor.generators_bv;
        ++bit_index) {
     if (!(cur_floor.generators_bv & (1 << bit_index))) continue;
     for (int next_floor : next_floors) {
-      State next = state;
+      ElevatorState next = *this;
       ++next.steps;
       next.cur_floor = next_floor;
       next.floors[next_floor].generators_bv |= (1 << bit_index);
       next.floors[cur_floor_num].generators_bv &= ~(1 << bit_index);
-      ret.push_back(next);
+      if (next.IsValid()) state->AddNextStep(next);
     }
   }
   for (int bit_index1 = 0; (1 << bit_index1) <= cur_floor.generators_bv;
@@ -94,14 +129,14 @@ std::vector<State> NextStates(const State& state) {
     for (int bit_index2 = 0; bit_index2 < bit_index1; ++bit_index2) {
       if (!(cur_floor.generators_bv & (1 << bit_index2))) continue;
       for (int next_floor : next_floors) {
-        State next = state;
+        ElevatorState next = *this;
         ++next.steps;
         next.cur_floor = next_floor;
         next.floors[next_floor].generators_bv |= (1 << bit_index1);
         next.floors[cur_floor_num].generators_bv &= ~(1 << bit_index1);
         next.floors[next_floor].generators_bv |= (1 << bit_index2);
         next.floors[cur_floor_num].generators_bv &= ~(1 << bit_index2);
-        ret.push_back(next);
+        if (next.IsValid()) state->AddNextStep(next);
       }
     }
   }
@@ -109,12 +144,12 @@ std::vector<State> NextStates(const State& state) {
        ++bit_index) {
     if (!(cur_floor.microchips_bv & (1 << bit_index))) continue;
     for (int next_floor : next_floors) {
-      State next = state;
+      ElevatorState next = *this;
       ++next.steps;
       next.cur_floor = next_floor;
       next.floors[next_floor].microchips_bv |= (1 << bit_index);
       next.floors[cur_floor_num].microchips_bv &= ~(1 << bit_index);
-      ret.push_back(next);
+      if (next.IsValid()) state->AddNextStep(next);
     }
   }
   for (int bit_index1 = 0; (1 << bit_index1) <= cur_floor.microchips_bv;
@@ -123,14 +158,14 @@ std::vector<State> NextStates(const State& state) {
     for (int bit_index2 = 0; bit_index2 < bit_index1; ++bit_index2) {
       if (!(cur_floor.microchips_bv & (1 << bit_index2))) continue;
       for (int next_floor : next_floors) {
-        State next = state;
+        ElevatorState next = *this;
         ++next.steps;
         next.cur_floor = next_floor;
         next.floors[next_floor].microchips_bv |= (1 << bit_index1);
         next.floors[cur_floor_num].microchips_bv &= ~(1 << bit_index1);
         next.floors[next_floor].microchips_bv |= (1 << bit_index2);
         next.floors[cur_floor_num].microchips_bv &= ~(1 << bit_index2);
-        ret.push_back(next);
+        if (next.IsValid()) state->AddNextStep(next);
       }
     }
   }
@@ -141,66 +176,22 @@ std::vector<State> NextStates(const State& state) {
          ++bit_index2) {
       if (!(cur_floor.generators_bv & (1 << bit_index2))) continue;
       for (int next_floor : next_floors) {
-        State next = state;
+        ElevatorState next = *this;
         ++next.steps;
         next.cur_floor = next_floor;
         next.floors[next_floor].microchips_bv |= (1 << bit_index1);
         next.floors[cur_floor_num].microchips_bv &= ~(1 << bit_index1);
         next.floors[next_floor].generators_bv |= (1 << bit_index2);
         next.floors[cur_floor_num].generators_bv &= ~(1 << bit_index2);
-        ret.push_back(next);
+        if (next.IsValid()) state->AddNextStep(next);
       }
     }
   }
-  return ret;
 }
 
-bool ValidState(const State& state) {
-  for (const Floor& f : state.floors) {
-    if (f.generators_bv != 0) {
-      if (f.microchips_bv & ~f.generators_bv) return false;
-    }
-  }
-  return true;
-}
-
-bool FinalState(const State& state) {
-  for (int idx = 0; idx < state.floors.size() - 1; ++idx) {
-    if (state.floors[idx].microchips_bv != 0) return false;
-    if (state.floors[idx].generators_bv != 0) return false;
-  }
-  return true;
-}
-
-absl::StatusOr<int> StepsToAllOnFourthFloor(State start) {
-  std::deque<State> frontier = {start};
-  int last_steps = -1;
-  absl::flat_hash_set<State> hist;
-  while (!frontier.empty()) {
-    State s = frontier.front();
-    if (s.steps != last_steps) {
-      VLOG(1) << "Cur state: (" << s.steps << ")\n" << s;
-      last_steps = s.steps;
-    }
-    VLOG(2) << "Cur state:\n" << s;
-    frontier.pop_front();
-    std::vector<State> states = NextStates(s);
-    for (const State& next : states) {
-      VLOG(3) << "Next state:\n" << next;
-      if (!hist.contains(next) && ValidState(next)) {
-        VLOG(3) << "  Valid!";
-        hist.insert(next);
-        if (FinalState(next)) return next.steps;
-        frontier.push_back(next);
-      }
-    }
-  }
-  return AdventDay::Error("No path found");
-}
-
-absl::StatusOr<State> ParseInitialState(absl::Span<absl::string_view> input) {
+absl::StatusOr<ElevatorState> ElevatorState::Parse(absl::Span<absl::string_view> input) {
   if (input.size() != 4) return AdventDay::Error("Bad input size");
-  State s;
+  ElevatorState s;
   s.floors.resize(4);
   int floor = 0;
   absl::string_view kFloorNames[] = {"first", "second", "third", "fourth"};
@@ -250,25 +241,18 @@ absl::StatusOr<State> ParseInitialState(absl::Span<absl::string_view> input) {
 
 absl::StatusOr<std::vector<std::string>> Day11_2016::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<State> s = ParseInitialState(input);
+  absl::StatusOr<ElevatorState> s = ElevatorState::Parse(input);
   if (!s.ok()) return s.status();
-  return IntReturn(StepsToAllOnFourthFloor(*s));
+  return IntReturn(s->FindMinSteps());
 }
 
 absl::StatusOr<std::vector<std::string>> Day11_2016::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<State> s = ParseInitialState(input);
-  std::string elerium = "elerium";
-  std::string dilithium = "dilithium";
-  int e_index = s->elements.size();
-  s->elements.push_back(elerium);
-  s->floors[0].generators_bv |= (1 << e_index);
-  s->floors[0].microchips_bv |= (1 << e_index);
-  int d_index = s->elements.size();
-  s->elements.push_back(dilithium);
-  s->floors[0].generators_bv |= (1 << d_index);
-  s->floors[0].microchips_bv |= (1 << d_index);
-  return IntReturn(StepsToAllOnFourthFloor(*s));
+  absl::StatusOr<ElevatorState> s = ElevatorState::Parse(input);
+  s->AddElementAtFloor0("elerium");
+  s->AddElementAtFloor0("dilithium");
+
+  return IntReturn(s->FindMinSteps());
 }
 
 }  // namespace advent_of_code

@@ -7,7 +7,7 @@ The fourth floor contains nothing relevant.
 11
 ==
 
-[long=10s (2s opt) 2020.12.21]
+[long=10s (1s opt) 2020.12.21]
 [part=1]
 @include{advent_of_code/2016/day11/input.txt}
 --
@@ -15,7 +15,7 @@ The fourth floor contains nothing relevant.
 ==
 
 # Long for no-opt is a guess. I didn't acutally let it go.
-[long=60m (2m opt) 2020.12.21]
+[long=60m (1m opt) 2020.12.21]
 [part=2]
 @include{advent_of_code/2016/day11/input.txt}
 --
