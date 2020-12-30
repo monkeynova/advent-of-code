@@ -43,6 +43,31 @@ class ElevatorState : public BFSInterface<ElevatorState> {
     floors[0].microchips_bv |= (1 << e_index);
   }
 
+  int min_steps_to_final() const override {
+    // As of 2020.12.29, the AStar version which uses this method is actually 
+    // a bit slower, so it appears that the path pruning isn't big enough to
+    // overcome the costs of the priority queue.
+    if (min_steps_to_final_ == -1) {
+      min_steps_to_final_ = 0;
+      int floor_items = 0;
+      for (int i = 0; i < floors.size() - 1; ++i) {
+        int or_bv = floors[i].generators_bv | floors[i].microchips_bv;
+        for (int bv = 1; (1<<bv) <= or_bv; ++bv) {
+          if (floors[i].generators_bv & (1<<bv)) {
+            ++floor_items;
+          }
+          if (floors[i].microchips_bv & (1<<bv)) {
+            ++floor_items;
+          }
+        }
+        // To move floor_items up one floor we have to move up two and down
+        // with one to come back.
+        min_steps_to_final_ += std::max(floor_items - 1, 0);
+      }
+    }
+    return min_steps_to_final_;
+  }
+
   void AddNextSteps(State* s) override;
 
   bool IsValid() const {
@@ -78,6 +103,8 @@ class ElevatorState : public BFSInterface<ElevatorState> {
   int steps = 0;
   std::vector<Floor> floors;
   std::vector<absl::string_view> elements;
+  // Memoized value for min_steps_to_final().
+  mutable int min_steps_to_final_ = -1;
 };
 
 std::ostream& operator<<(std::ostream& out, const ElevatorState& s) {
