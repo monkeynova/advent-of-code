@@ -19,7 +19,11 @@ namespace {
 
 absl::StatusOr<std::vector<std::string>> Day01_2018::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
+  if (!list.ok()) return list.status();
+  int sum = 0;
+  for (int64_t i : *list) sum += i;
+  return IntReturn(sum);
 }
 
 absl::StatusOr<std::vector<std::string>> Day01_2018::Part2(
