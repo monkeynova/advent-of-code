@@ -86,6 +86,8 @@ absl::StatusOr<std::vector<absl::string_view>> DirectedGraph<Storage>::DAGSort()
       }
     }
     if (to_remove.empty()) return absl::InvalidArgumentError("Not a DAG");
+    // TODO(@monkeynova): Pass in comparator.
+    std::sort(to_remove.begin(), to_remove.end());
     for (absl::string_view node : to_remove) {
       out.push_back(node);
       VLOG(2) << "Removing: " << node;
@@ -97,6 +99,7 @@ absl::StatusOr<std::vector<absl::string_view>> DirectedGraph<Storage>::DAGSort()
           --name_to_dep_count[sub_node];
         }
       }
+      break;
     }
   }
   return out;
