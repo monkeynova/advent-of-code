@@ -22,7 +22,7 @@ class Maze {
   Maze(absl::Span<absl::string_view> input) : input_(input) {}
 
   absl::Status Initialize() {
-    if (input_[0] != "Buffer") {
+    if (input_[0] != "HACK: Ignore Starting Whitespace") {
       return absl::InvalidArgumentError(
           "Add buffer to avoid FBTD killing useful whitespace");
     }

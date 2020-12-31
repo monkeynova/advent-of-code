@@ -1,5 +1,5 @@
 [part=1]
-Buffer
+HACK: Ignore Starting Whitespace
          A           
          A           
   #######.#########  
@@ -23,7 +23,7 @@ FG..#########.....#
 23
 ==
 [part=1]
-Buffer
+HACK: Ignore Starting Whitespace
                    A               
                    A               
   #################.#############  
@@ -66,14 +66,14 @@ YN......#               VT..#....QG
 ==
 
 [part=1]
-Buffer
+HACK: Ignore Starting Whitespace
 @include{advent_of_code/2019/day20/input.txt}
 --
 556
 ==
 
 [part=2]
-Buffer
+HACK: Ignore Starting Whitespace
          A           
          A           
   #######.#########  
@@ -98,7 +98,7 @@ FG..#########.....#
 ==
 
 [part=2]
-Buffer
+HACK: Ignore Starting Whitespace
              Z L X W       C                 
              Z P Q B       K                 
   ###########.#.#.#.#######.###############  
@@ -142,7 +142,7 @@ RE....#.#                           #......RF
 
 [part=2]
 [long=14s (1s opt) 2020.12.06]
-Buffer
+HACK: Ignore Starting Whitespace
 @include{advent_of_code/2019/day20/input.txt}
 --
 6532
