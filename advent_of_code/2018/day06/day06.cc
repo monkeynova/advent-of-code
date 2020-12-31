@@ -73,7 +73,25 @@ absl::StatusOr<std::vector<std::string>> Day06_2018::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day06_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  std::vector<Point> points;
+  PointRectangle r{{0, 0}, {0, 0}};
+  for (absl::string_view row : input) {
+    Point p;
+    if (!RE2::FullMatch(row, "(\\d+), (\\d+)", &p.x, &p.y)) {
+      return Error("Bad point: ", row);
+    }
+    points.push_back(p);
+    r.ExpandInclude(p);
+  }
+  int count;
+  for (Point p : r) {
+    int total_dist = 0;
+    for (int i = 0; i < points.size(); ++i) {
+      total_dist += (points[i] - p).dist();
+    }
+    if (total_dist < 10'000) ++count;
+  }
+  return IntReturn(count);
 }
 
 }  // namespace advent_of_code

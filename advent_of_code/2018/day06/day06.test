@@ -19,4 +19,4 @@
 [part=2]
 @include{advent_of_code/2018/day06/input.txt}
 --
-ERROR: Could not run test: Not implemented
+44667
