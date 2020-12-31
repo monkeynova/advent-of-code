@@ -5,7 +5,7 @@
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
-#include "advent_of_code/dag.h"
+#include "advent_of_code/directed_graph.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 
@@ -16,8 +16,8 @@ struct BagRule {
   absl::flat_hash_map<absl::string_view, int> bag_to_count;
 };
 
-absl::StatusOr<DAG<BagRule>> Parse(absl::Span<absl::string_view> input) {
-  DAG<BagRule> ret;
+absl::StatusOr<DirectedGraph<BagRule>> Parse(absl::Span<absl::string_view> input) {
+  DirectedGraph<BagRule> ret;
   for (absl::string_view str : input) {
     std::vector<absl::string_view> pieces =
         absl::StrSplit(str, " bags contain ");
@@ -46,7 +46,7 @@ absl::StatusOr<DAG<BagRule>> Parse(absl::Span<absl::string_view> input) {
   return ret;
 }
 
-int CountContainingBags(const DAG<BagRule>& bags, absl::string_view bag) {
+int CountContainingBags(const DirectedGraph<BagRule>& bags, absl::string_view bag) {
   absl::flat_hash_set<absl::string_view> can_contain;
   absl::flat_hash_set<absl::string_view> added = {bag};
   while (!added.empty()) {
@@ -66,7 +66,7 @@ int CountContainingBags(const DAG<BagRule>& bags, absl::string_view bag) {
   return can_contain.size();
 }
 
-absl::StatusOr<int> CountContainedBags(const DAG<BagRule>& bags,
+absl::StatusOr<int> CountContainedBags(const DirectedGraph<BagRule>& bags,
                                        absl::string_view bag) {
   const BagRule* bag_rule = bags.GetData(bag);
   if (bag_rule == nullptr) {
@@ -92,7 +92,7 @@ absl::StatusOr<int> CountContainedBags(const DAG<BagRule>& bags,
 
 absl::StatusOr<std::vector<std::string>> Day07_2020::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<DAG<BagRule>> bags = Parse(input);
+  absl::StatusOr<DirectedGraph<BagRule>> bags = Parse(input);
   if (!bags.ok()) return bags.status();
   VLOG(1) << bags->nodes().size();
   return IntReturn(CountContainingBags(*bags, "shiny gold"));
@@ -100,7 +100,7 @@ absl::StatusOr<std::vector<std::string>> Day07_2020::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day07_2020::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<DAG<BagRule>> bags = Parse(input);
+  absl::StatusOr<DirectedGraph<BagRule>> bags = Parse(input);
   if (!bags.ok()) return bags.status();
 
   absl::StatusOr<int> contained_bags = CountContainedBags(*bags, "shiny gold");

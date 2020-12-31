@@ -6,7 +6,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
-#include "advent_of_code/dag.h"
+#include "advent_of_code/directed_graph.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 
@@ -14,7 +14,7 @@ namespace advent_of_code {
 
 namespace {
 
-absl::optional<int> FindBadWeight(absl::string_view root, const DAG<int>& dag,
+absl::optional<int> FindBadWeight(absl::string_view root, const DirectedGraph<int>& dag,
                                   int* this_weight_out = nullptr) {
   const int* weight = dag.GetData(root);
   CHECK(weight != nullptr);
@@ -61,8 +61,8 @@ absl::optional<int> FindBadWeight(absl::string_view root, const DAG<int>& dag,
   return absl::nullopt;
 }
 
-absl::StatusOr<DAG<int>> Parse(absl::Span<absl::string_view> input) {
-  DAG<int> dag;
+absl::StatusOr<DirectedGraph<int>> Parse(absl::Span<absl::string_view> input) {
+  DirectedGraph<int> dag;
   for (absl::string_view str : input) {
     std::vector<absl::string_view> p_and_c_list = absl::StrSplit(str, " -> ");
     if (p_and_c_list.size() > 2) return AdventDay::Error("Bad input: ", str);
@@ -86,7 +86,7 @@ absl::StatusOr<DAG<int>> Parse(absl::Span<absl::string_view> input) {
 
 absl::StatusOr<std::vector<std::string>> Day07_2017::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<DAG<int>> dag = Parse(input);
+  absl::StatusOr<DirectedGraph<int>> dag = Parse(input);
   if (!dag.ok()) return dag.status();
   absl::string_view root;
   for (absl::string_view node : dag->nodes()) {
@@ -101,7 +101,7 @@ absl::StatusOr<std::vector<std::string>> Day07_2017::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day07_2017::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<DAG<int>> dag = Parse(input);
+  absl::StatusOr<DirectedGraph<int>> dag = Parse(input);
   if (!dag.ok()) return dag.status();
   absl::string_view root;
   for (absl::string_view node : dag->nodes()) {

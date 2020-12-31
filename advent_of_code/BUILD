@@ -84,8 +84,8 @@ cc_library(
 )
 
 cc_library(
-    name = "dag",
-    hdrs = ["dag.h"],
+    name = "directed_graph",
+    hdrs = ["directed_graph.h"],
     visibility = [
         "//visibility:public",
     ],

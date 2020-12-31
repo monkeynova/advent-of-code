@@ -7,7 +7,7 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/bfs.h"
-#include "advent_of_code/dag.h"
+#include "advent_of_code/directed_graph.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 
@@ -15,8 +15,8 @@ namespace advent_of_code {
 
 namespace {
 
-absl::StatusOr<DAG<bool>> Parse(absl::Span<absl::string_view> input) {
-  DAG<bool> ret;
+absl::StatusOr<DirectedGraph<bool>> Parse(absl::Span<absl::string_view> input) {
+  DirectedGraph<bool> ret;
   for (absl::string_view str : input) {
     std::vector<absl::string_view> node_and_cons = absl::StrSplit(str, " <-> ");
     if (node_and_cons.size() != 2) return AdventDay::Error("Bad line: ", str);
@@ -32,7 +32,7 @@ absl::StatusOr<DAG<bool>> Parse(absl::Span<absl::string_view> input) {
 
 class PathWalk : public BFSInterface<PathWalk, absl::string_view> {
  public:
-  PathWalk(const DAG<bool>& graph, absl::string_view start)
+  PathWalk(const DirectedGraph<bool>& graph, absl::string_view start)
       : graph_(graph), cur_(start) {}
 
   int FindReachable() {
@@ -73,7 +73,7 @@ class PathWalk : public BFSInterface<PathWalk, absl::string_view> {
   absl::string_view identifier() const override { return cur_; }
 
  private:
-  const DAG<bool>& graph_;
+  const DirectedGraph<bool>& graph_;
   absl::string_view cur_;
   int* reachable_ = nullptr;
   absl::flat_hash_set<absl::string_view>* to_see_ = nullptr;
@@ -83,7 +83,7 @@ class PathWalk : public BFSInterface<PathWalk, absl::string_view> {
 
 absl::StatusOr<std::vector<std::string>> Day12_2017::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<DAG<bool>> graph = Parse(input);
+  absl::StatusOr<DirectedGraph<bool>> graph = Parse(input);
   if (!graph.ok()) return graph.status();
 
   return IntReturn(PathWalk(*graph, "0").FindReachable());
@@ -91,7 +91,7 @@ absl::StatusOr<std::vector<std::string>> Day12_2017::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day12_2017::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<DAG<bool>> graph = Parse(input);
+  absl::StatusOr<DirectedGraph<bool>> graph = Parse(input);
   if (!graph.ok()) return graph.status();
 
   return IntReturn(PathWalk(*graph, "0").CountGroups());

@@ -1,5 +1,5 @@
-#ifndef ADVENT_OF_CODE_DAG_H
-#define ADVENT_OF_CODE_DAG_H
+#ifndef ADVENT_OF_CODE_DIRECTED_GRAPH_H
+#define ADVENT_OF_CODE_DIRECTED_GRAPH_H
 
 #include <vector>
 
@@ -10,9 +10,9 @@
 namespace advent_of_code {
 
 template <typename Storage>
-class DAG {
+class DirectedGraph {
  public:
-  DAG() = default;
+  DirectedGraph() = default;
 
   void AddNode(absl::string_view node_name, Storage s) {
     storage_[node_name] = std::move(s);
@@ -59,7 +59,7 @@ class DAG {
 };
 
 template <typename Storage>
-absl::StatusOr<std::vector<absl::string_view>> DAG<Storage>::DAGSort() const {
+absl::StatusOr<std::vector<absl::string_view>> DirectedGraph<Storage>::DAGSort() const {
   absl::flat_hash_map<absl::string_view, int> name_to_dep_count;
   for (const auto& node : nodes_) {
     auto it = node_to_incoming_.find(node);
@@ -103,4 +103,4 @@ absl::StatusOr<std::vector<absl::string_view>> DAG<Storage>::DAGSort() const {
 
 }  // namespace advent_of_code
 
-#endif  // ADVENT_OF_CODE_DAG_H
+#endif  // ADVENT_OF_CODE_DIRECTED_GRAPH_H

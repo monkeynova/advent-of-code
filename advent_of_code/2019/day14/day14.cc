@@ -6,7 +6,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
-#include "advent_of_code/dag.h"
+#include "advent_of_code/directed_graph.h"
 #include "glog/logging.h"
 
 namespace advent_of_code {
@@ -18,8 +18,8 @@ struct Rule {
   absl::flat_hash_map<absl::string_view, int> in;
 };
 
-absl::StatusOr<DAG<Rule>> ParseRuleSet(absl::Span<absl::string_view> input) {
-  DAG<Rule> rule_set;
+absl::StatusOr<DirectedGraph<Rule>> ParseRuleSet(absl::Span<absl::string_view> input) {
+  DirectedGraph<Rule> rule_set;
   for (absl::string_view rule_str : input) {
     std::vector<absl::string_view> in_out = absl::StrSplit(rule_str, " => ");
     if (in_out.size() != 2) return absl::InvalidArgumentError("Bad rule");
@@ -58,7 +58,7 @@ absl::StatusOr<DAG<Rule>> ParseRuleSet(absl::Span<absl::string_view> input) {
 }
 
 absl::StatusOr<int64_t> ComputeOreNeedForFuel(
-    const DAG<Rule>& rule_set,
+    const DirectedGraph<Rule>& rule_set,
     const std::vector<absl::string_view>& ordered_ingredients,
     int64_t fuel_needed) {
   // TODO(@monkeynova): Remember this ordering...
@@ -91,7 +91,7 @@ absl::StatusOr<int64_t> ComputeOreNeedForFuel(
   return needs.begin()->second;
 }
 
-absl::StatusOr<int64_t> ComputeOreNeedForFuel(const DAG<Rule>& rule_set) {
+absl::StatusOr<int64_t> ComputeOreNeedForFuel(const DirectedGraph<Rule>& rule_set) {
   absl::StatusOr<std::vector<absl::string_view>> ordered_ingredients =
       rule_set.DAGSort();
   if (!ordered_ingredients.ok()) return ordered_ingredients.status();
@@ -104,7 +104,7 @@ absl::StatusOr<int64_t> ComputeOreNeedForFuel(const DAG<Rule>& rule_set) {
   return ComputeOreNeedForFuel(rule_set, *ordered_ingredients, 1);
 }
 
-absl::StatusOr<int> FuelFromOre(const DAG<Rule>& rule_set,
+absl::StatusOr<int> FuelFromOre(const DirectedGraph<Rule>& rule_set,
                                 uint64_t ore_supply) {
   absl::StatusOr<std::vector<absl::string_view>> ordered_ingredients =
       rule_set.DAGSort();
@@ -148,7 +148,7 @@ absl::StatusOr<int> FuelFromOre(const DAG<Rule>& rule_set,
 
 absl::StatusOr<std::vector<std::string>> Day14_2019::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<DAG<Rule>> rule_set = ParseRuleSet(input);
+  absl::StatusOr<DirectedGraph<Rule>> rule_set = ParseRuleSet(input);
   if (!rule_set.ok()) return rule_set.status();
 
   return IntReturn(ComputeOreNeedForFuel(*rule_set));
@@ -156,7 +156,7 @@ absl::StatusOr<std::vector<std::string>> Day14_2019::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day14_2019::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<DAG<Rule>> rule_set = ParseRuleSet(input);
+  absl::StatusOr<DirectedGraph<Rule>> rule_set = ParseRuleSet(input);
   if (!rule_set.ok()) return rule_set.status();
 
   return IntReturn(FuelFromOre(*rule_set, 1000000000000));
