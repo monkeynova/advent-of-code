@@ -39,7 +39,8 @@ absl::StatusOr<std::vector<std::string>> Day04_2018::Part1(
       cur_sleep_window.start = min;
     } else if (RE2::PartialMatch(row, "00:(\\d+)\\) wakes up", &min)) {
       if (cur_guard == -1) return Error("No guard: ", row);
-      if (cur_sleep_window.start == -1) return Error("Sleep end (no start): ", row);
+      if (cur_sleep_window.start == -1)
+        return Error("Sleep end (no start): ", row);
       if (cur_sleep_window.end != -1) return Error("Sleep end: ", row);
       cur_sleep_window.end = min;
       schedule[cur_guard].push_back(cur_sleep_window);
@@ -106,7 +107,8 @@ absl::StatusOr<std::vector<std::string>> Day04_2018::Part2(
       cur_sleep_window.start = min;
     } else if (RE2::PartialMatch(row, "00:(\\d+)\\) wakes up", &min)) {
       if (cur_guard == -1) return Error("No guard: ", row);
-      if (cur_sleep_window.start == -1) return Error("Sleep end (no start): ", row);
+      if (cur_sleep_window.start == -1)
+        return Error("Sleep end (no start): ", row);
       if (cur_sleep_window.end != -1) return Error("Sleep end: ", row);
       cur_sleep_window.end = min;
       schedule[cur_guard].push_back(cur_sleep_window);
@@ -154,7 +156,8 @@ absl::StatusOr<std::vector<std::string>> Day04_2018::Part2(
   LOG(INFO) << "Guard: " << max_guard_id;
   LOG(INFO) << "Minute: " << max_sleep_minute;
   if (bad_guards.contains(max_guard_id)) {
-    return Error("Bad best minute calculation for selected guard: ", max_guard_id);
+    return Error("Bad best minute calculation for selected guard: ",
+                 max_guard_id);
   }
   if (guard_dupes != 1) return Error("Bad guard calculation: ", guard_dupes);
   return IntReturn(max_guard_id * max_sleep_minute);
