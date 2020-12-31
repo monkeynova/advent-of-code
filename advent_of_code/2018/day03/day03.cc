@@ -50,7 +50,45 @@ absl::StatusOr<std::vector<std::string>> Day03_2018::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day03_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  std::vector<PointRectangle> claims;
+  for (int i = 0; i < input.size(); ++i) {
+    absl::string_view row = input[i];
+    PointRectangle r;
+    int idx;
+    if (!RE2::FullMatch(row, "#(\\d+) @ (\\d+),(\\d+): (\\d+)x(\\d+)",
+                        &idx, &r.min.x, &r.min.y, &r.max.x, &r.max.y)) {
+      return Error("Bad input: ", row);
+    }
+    if (idx != i + 1) return Error("Bad numbering");
+    r.max.x += r.min.x - 1;
+    r.max.y += r.min.y - 1;
+    claims.push_back(r);
+  }
+
+  int clean_id = -1;
+  for (int i = 0; i < claims.size(); ++i) {
+    const PointRectangle& r1 = claims[i];
+    bool overlap = false;
+    for (int j = 0; j < claims.size(); ++j) {
+      if (i == j) continue;
+      const PointRectangle& r2 = claims[j];
+      PointRectangle intersect;
+      intersect.min.x = std::max(r1.min.x, r2.min.x);
+      intersect.min.y = std::max(r1.min.y, r2.min.y);
+      intersect.max.x = std::min(r1.max.x, r2.max.x);
+      intersect.max.y = std::min(r1.max.y, r2.max.y);
+      if (intersect.min.x <= intersect.max.x &&
+          intersect.min.y <= intersect.max.y) {
+        overlap = true;
+        break;
+      }
+    }
+    if (!overlap) {
+      if (clean_id != -1) return Error("Dupe clean");
+      clean_id = i + 1;
+    }
+  }
+  return IntReturn(clean_id);
 }
 
 }  // namespace advent_of_code
