@@ -19,6 +19,7 @@ namespace {
 
 absl::StatusOr<std::vector<std::string>> Day04_2018::Part1(
     absl::Span<absl::string_view> input) const {
+  if (!input.empty() && input[0] == "HACK: Stop option parsing") input = input.subspan(1);
   std::vector<absl::string_view> sorted(input.begin(), input.end());
   std::sort(sorted.begin(), sorted.end());
   int cur_guard = -1;
@@ -33,11 +34,11 @@ absl::StatusOr<std::vector<std::string>> Day04_2018::Part1(
     VLOG(1) << row;
     if (RE2::PartialMatch(row, "Guard \\#(\\d+) begins shift", &cur_guard)) {
       // Handled.
-    } else if (RE2::PartialMatch(row, "00:(\\d+)\\) falls asleep", &min)) {
+    } else if (RE2::PartialMatch(row, "00:(\\d+)\\] falls asleep", &min)) {
       if (cur_guard == -1) return Error("No guard: ", row);
       if (cur_sleep_window.start != -1) return Error("Sleep start: ", row);
       cur_sleep_window.start = min;
-    } else if (RE2::PartialMatch(row, "00:(\\d+)\\) wakes up", &min)) {
+    } else if (RE2::PartialMatch(row, "00:(\\d+)\\] wakes up", &min)) {
       if (cur_guard == -1) return Error("No guard: ", row);
       if (cur_sleep_window.start == -1)
         return Error("Sleep end (no start): ", row);
@@ -87,6 +88,7 @@ absl::StatusOr<std::vector<std::string>> Day04_2018::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day04_2018::Part2(
     absl::Span<absl::string_view> input) const {
+  if (!input.empty() && input[0] == "HACK: Stop option parsing") input = input.subspan(1);
   std::vector<absl::string_view> sorted(input.begin(), input.end());
   std::sort(sorted.begin(), sorted.end());
   int cur_guard = -1;
@@ -101,11 +103,11 @@ absl::StatusOr<std::vector<std::string>> Day04_2018::Part2(
     VLOG(1) << row;
     if (RE2::PartialMatch(row, "Guard \\#(\\d+) begins shift", &cur_guard)) {
       // Handled.
-    } else if (RE2::PartialMatch(row, "00:(\\d+)\\) falls asleep", &min)) {
+    } else if (RE2::PartialMatch(row, "00:(\\d+)\\] falls asleep", &min)) {
       if (cur_guard == -1) return Error("No guard: ", row);
       if (cur_sleep_window.start != -1) return Error("Sleep start: ", row);
       cur_sleep_window.start = min;
-    } else if (RE2::PartialMatch(row, "00:(\\d+)\\) wakes up", &min)) {
+    } else if (RE2::PartialMatch(row, "00:(\\d+)\\] wakes up", &min)) {
       if (cur_guard == -1) return Error("No guard: ", row);
       if (cur_sleep_window.start == -1)
         return Error("Sleep end (no start): ", row);
