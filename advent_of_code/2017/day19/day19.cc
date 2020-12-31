@@ -72,7 +72,7 @@ absl::StatusOr<WalkRet> WalkBoard(const CharBoard& b) {
 absl::StatusOr<std::vector<std::string>> Day19_2017::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.empty()) return Error("Bad input");
-  if (RE2::PartialMatch(input[0], "Ignore")) {
+  if (RE2::PartialMatch(input[0], "HACK:")) {
     input = input.subspan(1);
   }
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
@@ -85,7 +85,7 @@ absl::StatusOr<std::vector<std::string>> Day19_2017::Part1(
 absl::StatusOr<std::vector<std::string>> Day19_2017::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.empty()) return Error("Bad input");
-  if (RE2::PartialMatch(input[0], "Ignore")) {
+  if (RE2::PartialMatch(input[0], "HACK:")) {
     input = input.subspan(1);
   }
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);

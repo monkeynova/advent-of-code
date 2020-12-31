@@ -1,5 +1,5 @@
 [part=1]
-Ignore Starting Whitespace
+HACK: Ignore Starting Whitespace
      |          
      |  +--+    
      A  |  C    
@@ -11,14 +11,14 @@ ABCDEF
 ==
 
 [part=1]
-Ignore Starting Whitespace
+HACK: Ignore Starting Whitespace
 @include{advent_of_code/2017/day19/input.txt}
 --
 ITSZCJNMUO
 ==
 
 [part=2]
-Ignore Starting Whitespace
+HACK: Ignore Starting Whitespace
      |          
      |  +--+    
      A  |  C    
@@ -30,7 +30,7 @@ Ignore Starting Whitespace
 ==
 
 [part=2]
-Ignore Starting Whitespace
+HACK: Ignore Starting Whitespace
 @include{advent_of_code/2017/day19/input.txt}
 --
 17420
