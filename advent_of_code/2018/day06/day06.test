@@ -1,7 +1,19 @@
 [part=1]
+1, 1
+1, 6
+8, 3
+3, 4
+5, 5
+8, 9
+--
+17
+==
+
+# 9669 (high)
+[part=1]
 @include{advent_of_code/2018/day06/input.txt}
 --
-ERROR: Could not run test: Not implemented
+3871
 ==
 
 [part=2]
