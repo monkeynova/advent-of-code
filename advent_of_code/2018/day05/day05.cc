@@ -13,13 +13,43 @@ namespace advent_of_code {
 
 namespace {
 
-// Helper methods go here.
+std::string React(std::string in) {
+  std::string ret;
+  ret.resize(in.size());
+  int out = 0;
+  for (int i = 0; i < in.size(); ++i) {
+    bool remove = false;
+    if (i < in.size() - 1) {
+      if (in[i] == in[i + 1] + 'a' - 'A') {
+        remove = true;
+      }
+      if (in[i] == in[i + 1] + 'A' - 'a') {
+        remove = true;
+      }
+    }
+    if (remove) {
+      ++i;
+    } else {
+      ret[out++] = in[i];
+    }
+  }
+  ret.resize(out);
+  return ret;
+}
 
 }  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day05_2018::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 1) return Error("Bad input size");
+  std::string comp = std::string(input[0]);
+  while (true) {
+    VLOG(1) << comp;
+    std::string new_comp = React(comp);
+    if (new_comp.size() == comp.size()) return IntReturn(new_comp.size());
+    comp = std::move(new_comp);
+  }
+  return Error("left infinite loop");
 }
 
 absl::StatusOr<std::vector<std::string>> Day05_2018::Part2(
