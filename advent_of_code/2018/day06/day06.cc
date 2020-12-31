@@ -83,7 +83,7 @@ absl::StatusOr<std::vector<std::string>> Day06_2018::Part2(
     points.push_back(p);
     r.ExpandInclude(p);
   }
-  int count;
+  int count = 0;
   for (Point p : r) {
     int total_dist = 0;
     for (int i = 0; i < points.size(); ++i) {
