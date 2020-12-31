@@ -16,7 +16,8 @@ struct BagRule {
   absl::flat_hash_map<absl::string_view, int> bag_to_count;
 };
 
-absl::StatusOr<DirectedGraph<BagRule>> Parse(absl::Span<absl::string_view> input) {
+absl::StatusOr<DirectedGraph<BagRule>> Parse(
+    absl::Span<absl::string_view> input) {
   DirectedGraph<BagRule> ret;
   for (absl::string_view str : input) {
     std::vector<absl::string_view> pieces =
@@ -46,7 +47,8 @@ absl::StatusOr<DirectedGraph<BagRule>> Parse(absl::Span<absl::string_view> input
   return ret;
 }
 
-int CountContainingBags(const DirectedGraph<BagRule>& bags, absl::string_view bag) {
+int CountContainingBags(const DirectedGraph<BagRule>& bags,
+                        absl::string_view bag) {
   absl::flat_hash_set<absl::string_view> can_contain;
   absl::flat_hash_set<absl::string_view> added = {bag};
   while (!added.empty()) {

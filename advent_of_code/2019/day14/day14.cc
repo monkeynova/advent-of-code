@@ -18,7 +18,8 @@ struct Rule {
   absl::flat_hash_map<absl::string_view, int> in;
 };
 
-absl::StatusOr<DirectedGraph<Rule>> ParseRuleSet(absl::Span<absl::string_view> input) {
+absl::StatusOr<DirectedGraph<Rule>> ParseRuleSet(
+    absl::Span<absl::string_view> input) {
   DirectedGraph<Rule> rule_set;
   for (absl::string_view rule_str : input) {
     std::vector<absl::string_view> in_out = absl::StrSplit(rule_str, " => ");
@@ -91,7 +92,8 @@ absl::StatusOr<int64_t> ComputeOreNeedForFuel(
   return needs.begin()->second;
 }
 
-absl::StatusOr<int64_t> ComputeOreNeedForFuel(const DirectedGraph<Rule>& rule_set) {
+absl::StatusOr<int64_t> ComputeOreNeedForFuel(
+    const DirectedGraph<Rule>& rule_set) {
   absl::StatusOr<std::vector<absl::string_view>> ordered_ingredients =
       rule_set.DAGSort();
   if (!ordered_ingredients.ok()) return ordered_ingredients.status();

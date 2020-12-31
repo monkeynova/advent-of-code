@@ -32,7 +32,8 @@ H AbslHashValue(H h, const Floor& f) {
 
 class ElevatorState : public BFSInterface<ElevatorState> {
  public:
-  static absl::StatusOr<ElevatorState> Parse(absl::Span<absl::string_view> input);
+  static absl::StatusOr<ElevatorState> Parse(
+      absl::Span<absl::string_view> input);
 
   const ElevatorState& identifier() const override { return *this; }
 
@@ -44,7 +45,7 @@ class ElevatorState : public BFSInterface<ElevatorState> {
   }
 
   int min_steps_to_final() const override {
-    // As of 2020.12.29, the AStar version which uses this method is actually 
+    // As of 2020.12.29, the AStar version which uses this method is actually
     // a bit slower, so it appears that the path pruning isn't big enough to
     // overcome the costs of the priority queue.
     if (min_steps_to_final_ == -1) {
@@ -52,11 +53,11 @@ class ElevatorState : public BFSInterface<ElevatorState> {
       int floor_items = 0;
       for (int i = 0; i < floors.size() - 1; ++i) {
         int or_bv = floors[i].generators_bv | floors[i].microchips_bv;
-        for (int bv = 1; (1<<bv) <= or_bv; ++bv) {
-          if (floors[i].generators_bv & (1<<bv)) {
+        for (int bv = 1; (1 << bv) <= or_bv; ++bv) {
+          if (floors[i].generators_bv & (1 << bv)) {
             ++floor_items;
           }
-          if (floors[i].microchips_bv & (1<<bv)) {
+          if (floors[i].microchips_bv & (1 << bv)) {
             ++floor_items;
           }
         }
@@ -216,7 +217,8 @@ void ElevatorState::AddNextSteps(State* state) {
   }
 }
 
-absl::StatusOr<ElevatorState> ElevatorState::Parse(absl::Span<absl::string_view> input) {
+absl::StatusOr<ElevatorState> ElevatorState::Parse(
+    absl::Span<absl::string_view> input) {
   if (input.size() != 4) return AdventDay::Error("Bad input size");
   ElevatorState s;
   s.floors.resize(4);

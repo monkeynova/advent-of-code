@@ -14,7 +14,8 @@ namespace advent_of_code {
 
 namespace {
 
-absl::optional<int> FindBadWeight(absl::string_view root, const DirectedGraph<int>& dag,
+absl::optional<int> FindBadWeight(absl::string_view root,
+                                  const DirectedGraph<int>& dag,
                                   int* this_weight_out = nullptr) {
   const int* weight = dag.GetData(root);
   CHECK(weight != nullptr);

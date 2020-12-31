@@ -59,7 +59,8 @@ class DirectedGraph {
 };
 
 template <typename Storage>
-absl::StatusOr<std::vector<absl::string_view>> DirectedGraph<Storage>::DAGSort() const {
+absl::StatusOr<std::vector<absl::string_view>> DirectedGraph<Storage>::DAGSort()
+    const {
   absl::flat_hash_map<absl::string_view, int> name_to_dep_count;
   for (const auto& node : nodes_) {
     auto it = node_to_incoming_.find(node);

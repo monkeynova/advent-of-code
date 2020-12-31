@@ -15,20 +15,26 @@ class AStarGT {
  public:
   bool operator()(const BFSImpl& a, const BFSImpl& b) {
     return a.num_steps_ + a.min_steps_to_final() >
-      b.num_steps_ + b.min_steps_to_final();
+           b.num_steps_ + b.min_steps_to_final();
   }
 };
 
 template <typename T>
-struct BFSInterfaceTraits { using RefType = const T&; };
+struct BFSInterfaceTraits {
+  using RefType = const T&;
+};
 
 template <>
-struct BFSInterfaceTraits<absl::string_view> { using RefType = absl::string_view; };
+struct BFSInterfaceTraits<absl::string_view> {
+  using RefType = absl::string_view;
+};
 
 struct Point;
 
 template <>
-struct BFSInterfaceTraits<Point> { using RefType = Point; };
+struct BFSInterfaceTraits<Point> {
+  using RefType = Point;
+};
 
 template <typename BFSImpl, typename HistType = BFSImpl>
 class BFSInterface {
@@ -61,9 +67,7 @@ class BFSInterface {
 template <typename BFSImpl, typename HistType>
 class BFSInterface<BFSImpl, HistType>::State {
  public:
-  explicit State(const BFSImpl& start) {
-    hist_.insert(start.identifier());
-  }
+  explicit State(const BFSImpl& start) { hist_.insert(start.identifier()); }
 
   void AddNextStep(BFSImpl next) {
     ++next.num_steps_;
@@ -85,9 +89,13 @@ template <typename BFSImpl, typename HistType>
 class DequeState : public BFSInterface<BFSImpl, HistType>::State {
  public:
   explicit DequeState(BFSImpl start)
-  : BFSInterface<BFSImpl, HistType>::State(start) { AddToFrontier(start); }
+      : BFSInterface<BFSImpl, HistType>::State(start) {
+    AddToFrontier(start);
+  }
 
-  void AddToFrontier(BFSImpl next) final { frontier_.push_back(std::move(next)); }
+  void AddToFrontier(BFSImpl next) final {
+    frontier_.push_back(std::move(next));
+  }
 
  private:
   std::deque<BFSImpl> frontier_;
@@ -98,12 +106,15 @@ template <typename BFSImpl, typename HistType>
 class QueueState : public BFSInterface<BFSImpl, HistType>::State {
  public:
   explicit QueueState(BFSImpl start)
-   : BFSInterface<BFSImpl, HistType>::State(start) { AddToFrontier(start); }
+      : BFSInterface<BFSImpl, HistType>::State(start) {
+    AddToFrontier(start);
+  }
 
   void AddToFrontier(BFSImpl next) final { frontier_.push(std::move(next)); }
 
  private:
-  std::priority_queue<BFSImpl, std::vector<BFSImpl>, AStarGT<BFSImpl>> frontier_;
+  std::priority_queue<BFSImpl, std::vector<BFSImpl>, AStarGT<BFSImpl>>
+      frontier_;
   friend class BFSInterface<BFSImpl, HistType>;
 };
 
@@ -136,7 +147,6 @@ absl::optional<int> BFSInterface<BFSImpl, HistType>::FindMinStepsAStar() {
   }
   return absl::nullopt;
 }
-
 
 }  // namespace advent_of_code
 
