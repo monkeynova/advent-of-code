@@ -54,7 +54,32 @@ absl::StatusOr<std::vector<std::string>> Day05_2018::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day05_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 1) return Error("Bad input size");
+  int min_size = std::numeric_limits<int>::max();
+  for (char c = 'a'; c <= 'z'; ++c) {
+    std::string comp = std::string(input[0]);
+    std::string removed;
+    removed.resize(comp.size());
+    int out = 0;
+    for (int i = 0; i < comp.size(); ++i) {
+      if (comp[i] == c || comp[i] == c + 'A' - 'a') {
+        // Skip.
+      } else {
+        removed[out++] = comp[i];
+      }
+    }
+    removed.resize(out);
+    comp = std::move(removed);
+    VLOG(1) << comp;
+    while (true) {
+      std::string new_comp = React(comp);
+      if (new_comp.size() == comp.size()) break;
+      comp = std::move(new_comp);
+    }
+    VLOG(1) << comp;
+    min_size = std::min<int>(min_size, comp.size());
+  }
+  return IntReturn(min_size);
 }
 
 }  // namespace advent_of_code
