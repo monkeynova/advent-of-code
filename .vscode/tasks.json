@@ -87,9 +87,8 @@
           "description": "Which year ?",
           "options": [
             "2018",
-            "2017",
           ],
-          "default": "2017"
+          "default": "2018"
         },
         {
             "type": "pickString",
