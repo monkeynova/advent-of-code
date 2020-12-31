@@ -38,7 +38,17 @@ absl::StatusOr<std::vector<std::string>> Day02_2018::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day02_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  for (int i = 0; i < input.size(); ++i) {
+    for (int j = 0; j < i; ++j) {
+      if (input[i].size() != input[j].size()) return Error("Bad length");
+      std::string tmp;
+      for (int c = 0; c < input[i].size(); ++c) {
+        if (input[i][c] == input[j][c]) tmp.append(input[i].substr(c, 1));
+      }
+      if (tmp.size() == input[i].size() - 1) return std::vector<std::string>{tmp};
+    }
+  }
+  return Error("Not found");
 }
 
 }  // namespace advent_of_code
