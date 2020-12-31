@@ -19,7 +19,21 @@ namespace {
 
 absl::StatusOr<std::vector<std::string>> Day02_2018::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  int twos = 0;
+  int threes = 0;
+  for (absl::string_view row : input) {
+    absl::flat_hash_map<char, int> counts;
+    for (char c : row) ++counts[c];
+    int has_two = false;
+    int has_three = false;
+    for (const auto& [_, count] : counts) {
+      if (count == 2) has_two = true;
+      if (count == 3) has_three = true;
+    }
+    if (has_two) ++twos;
+    if (has_three) ++threes;
+  }
+  return IntReturn(twos * threes);
 }
 
 absl::StatusOr<std::vector<std::string>> Day02_2018::Part2(
