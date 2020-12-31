@@ -95,7 +95,7 @@ absl::StatusOr<std::pair<Transform, Transform>> CreateTransform(
 absl::StatusOr<std::vector<std::string>> Day22_2019::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::pair<Transform, Transform>> pair =
-      CreateTransform(input, /*deck_size=*/10007);
+      CreateTransform(input, /*deck_size=*/10'007);
   if (!pair.ok()) return pair.status();
 
   auto [t, _] = *pair;
@@ -104,9 +104,9 @@ absl::StatusOr<std::vector<std::string>> Day22_2019::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day22_2019::Part2(
     absl::Span<absl::string_view> input) const {
-  int64_t run_count = 101741582076661;
+  int64_t run_count = 101'741'582'076'661;
   absl::StatusOr<std::pair<Transform, Transform>> pair =
-      CreateTransform(input, /*deck_size=*/119315717514047);
+      CreateTransform(input, /*deck_size=*/119'315'717'514'047);
   if (!pair.ok()) return pair.status();
 
   auto [_, inv_t] = *pair;

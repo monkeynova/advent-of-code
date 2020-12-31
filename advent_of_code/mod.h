@@ -18,11 +18,13 @@ T PowerMod(T base, T exp, T mod) {
 
 template <typename T>
 T InverseMod(T n, T mod) {
+  // Inverse only exists if GCD is one. This method of calculating the inverse
+  // is only valid if mod is prime.
+  // If 'mod' is prime, n ** (mod - 1) == 1, which means
+  // n ** -1 == n ** (mod - 2).
   // TODO(@monkeynova): Better checking if GCD as well as handling cases
   //                    where these values aren't relatively prime.
   CHECK(std::gcd(static_cast<int64_t>(n), static_cast<int64_t>(mod)) == 1);
-  // If 'n' and 'mod' are relatively prime, n ** (mod - 1) == 1, which means
-  // n ** -1 == n ** (mod - 2).
   return PowerMod<T>(n, mod - 2, mod);
 }
 
