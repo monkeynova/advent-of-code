@@ -28,7 +28,18 @@ absl::StatusOr<std::vector<std::string>> Day01_2018::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day01_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
+  if (!list.ok()) return list.status();
+  absl::flat_hash_set<int> hist;
+  int sum = 0;
+  while (true) {
+    for (int64_t i : *list) {
+      if (hist.contains(sum)) return IntReturn(sum);
+      hist.insert(sum);
+      sum += i;
+    }
+  }
+  return Error("Exited infinite loop");
 }
 
 }  // namespace advent_of_code
