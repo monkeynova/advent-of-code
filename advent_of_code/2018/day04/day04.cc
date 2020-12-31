@@ -19,7 +19,8 @@ namespace {
 
 absl::StatusOr<std::vector<std::string>> Day04_2018::Part1(
     absl::Span<absl::string_view> input) const {
-  if (!input.empty() && input[0] == "HACK: Stop option parsing") input = input.subspan(1);
+  if (!input.empty() && input[0] == "HACK: Stop option parsing")
+    input = input.subspan(1);
   std::vector<absl::string_view> sorted(input.begin(), input.end());
   std::sort(sorted.begin(), sorted.end());
   int cur_guard = -1;
@@ -88,7 +89,8 @@ absl::StatusOr<std::vector<std::string>> Day04_2018::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day04_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  if (!input.empty() && input[0] == "HACK: Stop option parsing") input = input.subspan(1);
+  if (!input.empty() && input[0] == "HACK: Stop option parsing")
+    input = input.subspan(1);
   std::vector<absl::string_view> sorted(input.begin(), input.end());
   std::sort(sorted.begin(), sorted.end());
   int cur_guard = -1;
