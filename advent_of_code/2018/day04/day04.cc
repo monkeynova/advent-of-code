@@ -86,7 +86,78 @@ absl::StatusOr<std::vector<std::string>> Day04_2018::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day04_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  std::vector<absl::string_view> sorted(input.begin(), input.end());
+  std::sort(sorted.begin(), sorted.end());
+  int cur_guard = -1;
+  struct SleepWindow {
+    int start;
+    int end;
+  };
+  absl::flat_hash_map<int, std::vector<SleepWindow>> schedule;
+  SleepWindow cur_sleep_window = {-1, -1};
+  for (absl::string_view row : sorted) {
+    int min;
+    VLOG(1) << row;
+    if (RE2::PartialMatch(row, "Guard \\#(\\d+) begins shift", &cur_guard)) {
+      // Handled.
+    } else if (RE2::PartialMatch(row, "00:(\\d+)\\) falls asleep", &min)) {
+      if (cur_guard == -1) return Error("No guard: ", row);
+      if (cur_sleep_window.start != -1) return Error("Sleep start: ", row);
+      cur_sleep_window.start = min;
+    } else if (RE2::PartialMatch(row, "00:(\\d+)\\) wakes up", &min)) {
+      if (cur_guard == -1) return Error("No guard: ", row);
+      if (cur_sleep_window.start == -1) return Error("Sleep end (no start): ", row);
+      if (cur_sleep_window.end != -1) return Error("Sleep end: ", row);
+      cur_sleep_window.end = min;
+      schedule[cur_guard].push_back(cur_sleep_window);
+      cur_sleep_window = {-1, -1};
+    } else {
+      return Error("Bad line: ", row);
+    }
+  }
+  int max_sleep_count = -1;
+  int max_sleep_minute = -1;
+  int max_guard_id = -1;
+  int guard_dupes = 0;
+  absl::flat_hash_set<int> bad_guards;
+  for (const auto& [guard_id, sleeps] : schedule) {
+    absl::flat_hash_map<int, int> sleep_min;
+    for (SleepWindow w : sleeps) {
+      for (int i = w.start; i < w.end; ++i) {
+        ++sleep_min[i];
+      }
+    }
+    int this_max_sleep_minute = -1;
+    int this_max_sleep_count = -1;
+    int dupes = 0;
+    for (const auto& [minute, count] : sleep_min) {
+      if (this_max_sleep_count < count) {
+        dupes = 1;
+        this_max_sleep_count = count;
+        this_max_sleep_minute = minute;
+      } else if (this_max_sleep_count == count) {
+        ++dupes;
+      }
+    }
+    if (dupes != 1) {
+      bad_guards.insert(guard_id);
+    }
+    if (this_max_sleep_count > max_sleep_count) {
+      guard_dupes = 1;
+      max_sleep_count = this_max_sleep_count;
+      max_sleep_minute = this_max_sleep_minute;
+      max_guard_id = guard_id;
+    } else if (this_max_sleep_count == max_sleep_count) {
+      ++guard_dupes;
+    }
+  }
+  LOG(INFO) << "Guard: " << max_guard_id;
+  LOG(INFO) << "Minute: " << max_sleep_minute;
+  if (bad_guards.contains(max_guard_id)) {
+    return Error("Bad best minute calculation for selected guard: ", max_guard_id);
+  }
+  if (guard_dupes != 1) return Error("Bad guard calculation: ", guard_dupes);
+  return IntReturn(max_guard_id * max_sleep_minute);
 }
 
 }  // namespace advent_of_code
