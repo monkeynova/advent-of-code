@@ -14,22 +14,22 @@ namespace advent_of_code {
 namespace {
 
 std::string Advance(
-  const absl::flat_hash_map<absl::string_view, absl::string_view>& rules,
-  absl::string_view cur_view, int64_t* offset) {
+    const absl::flat_hash_map<absl::string_view, absl::string_view>& rules,
+    absl::string_view cur_view, int64_t* offset) {
   constexpr absl::string_view kEmpty = ".....";
   std::string next;
   int cur_size = cur_view.size();  // Not an unsigned int!
   for (int j = -4; j < cur_size; ++j) {
     int start_need = -std::min(j, 0);
     int end_need = std::max(j + 5 - cur_size, 0);
-    std::string test = absl::StrCat(
-      kEmpty.substr(0, start_need),
-      cur_view.substr(std::max(j, 0), 5 - start_need - end_need),
-      kEmpty.substr(0, end_need));
+    std::string test =
+        absl::StrCat(kEmpty.substr(0, start_need),
+                     cur_view.substr(std::max(j, 0), 5 - start_need - end_need),
+                     kEmpty.substr(0, end_need));
     CHECK(test.size() == 5);
     auto it = rules.find(test);
     if (it == rules.end()) {
-      //return Error("No rule for: ", test);
+      // return Error("No rule for: ", test);
       next.append(std::string(kEmpty.substr(0, 1)));
     } else {
       next.append(std::string(it->second));
@@ -42,7 +42,8 @@ std::string Advance(
     ++*offset;
     next_view = next_view.substr(1);
   }
-  while (next_view.back() == '.') next_view = next_view.substr(0, next_view.size() - 1);
+  while (next_view.back() == '.')
+    next_view = next_view.substr(0, next_view.size() - 1);
   return std::string(next_view);
 }
 
