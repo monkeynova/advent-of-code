@@ -29,6 +29,9 @@ class DirectedGraph {
 
   absl::StatusOr<std::vector<absl::string_view>> DAGSort() const;
 
+  template <typename Comparator>
+  absl::StatusOr<std::vector<absl::string_view>> DAGSort(Comparator cmp) const;
+
   const absl::flat_hash_set<absl::string_view>& nodes() const { return nodes_; }
 
   const std::vector<absl::string_view>* Outgoing(absl::string_view node) const {
@@ -86,8 +89,6 @@ absl::StatusOr<std::vector<absl::string_view>> DirectedGraph<Storage>::DAGSort()
       }
     }
     if (to_remove.empty()) return absl::InvalidArgumentError("Not a DAG");
-    // TODO(@monkeynova): Pass in comparator.
-    std::sort(to_remove.begin(), to_remove.end());
     for (absl::string_view node : to_remove) {
       out.push_back(node);
       VLOG(2) << "Removing: " << node;
@@ -99,11 +100,54 @@ absl::StatusOr<std::vector<absl::string_view>> DirectedGraph<Storage>::DAGSort()
           --name_to_dep_count[sub_node];
         }
       }
-      break;
     }
   }
   return out;
 }
+
+template <typename Storage>
+template <typename Comparator>
+absl::StatusOr<std::vector<absl::string_view>> DirectedGraph<Storage>::DAGSort(
+    Comparator cmp) const {
+  absl::flat_hash_map<absl::string_view, int> name_to_dep_count;
+  for (const auto& node : nodes_) {
+    auto it = node_to_incoming_.find(node);
+    if (it == node_to_incoming_.end()) {
+      name_to_dep_count[node] = 0;
+    } else {
+      name_to_dep_count[node] = it->second.size();
+    }
+  }
+  std::vector<absl::string_view> out;
+  while (!name_to_dep_count.empty()) {
+    VLOG(2) << absl::StrJoin(
+        name_to_dep_count, ",",
+        [](std::string* out,
+           const std::pair<absl::string_view, int>& name_count) {
+          absl::StrAppend(out, name_count.first, ":", name_count.second);
+        });
+    absl::string_view to_remove;
+    for (const auto& [name, deps] : name_to_dep_count) {
+      if (deps < 0) return absl::InvalidArgumentError("Bad Deps");
+      if (deps == 0 && (to_remove.empty() || cmp(name, to_remove))) {
+        to_remove = name;
+      }
+    }
+    if (to_remove.empty()) return absl::InvalidArgumentError("Not a DAG");
+    out.push_back(to_remove);
+    VLOG(2) << "Removing: " << to_remove;
+    name_to_dep_count.erase(to_remove);
+    const std::vector<absl::string_view>* outgoing = Outgoing(to_remove);
+    if (outgoing != nullptr) {
+      for (absl::string_view sub_node : *outgoing) {
+        VLOG(2) << "  Decrementing: " << sub_node;
+        --name_to_dep_count[sub_node];
+      }
+    }
+  }
+  return out;
+}
+
 
 }  // namespace advent_of_code
 
