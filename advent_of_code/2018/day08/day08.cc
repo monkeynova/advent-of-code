@@ -31,6 +31,35 @@ absl::StatusOr<int> SumMetadata(absl::Span<int64_t>& range) {
   return metadata;
 }
 
+absl::StatusOr<int> NodeValue(absl::Span<int64_t>& range) {
+  if (range.size() < 2) return AdventDay::Error("Bad range size");
+  int num_children = range[0];
+  int num_metadata = range[1];
+  range = range.subspan(2);
+  std::vector<int> sub_values(num_children, 0);
+  for (int i = 0; i < num_children; ++i) {
+    absl::StatusOr<int> this_sub_value = NodeValue(range);
+    if (!this_sub_value.ok()) return this_sub_value.status();
+    sub_values[i] = *this_sub_value;
+  }
+  int value = 0;
+  if (num_children == 0) {
+    for (int m : range.subspan(0, num_metadata)) {
+      value += m;
+    }
+  } else {
+    for (int m : range.subspan(0, num_metadata)) {
+      if (m < 0) return AdventDay::Error("Negative metadata");
+      if (m == 0) continue;
+      if (m > sub_values.size()) continue;
+      value += sub_values[m - 1];
+    }
+  }
+  range = range.subspan(num_metadata);
+  return value;
+}
+
+
 // Helper methods go here.
 
 }  // namespace
@@ -50,7 +79,15 @@ absl::StatusOr<std::vector<std::string>> Day08_2018::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day08_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 1) return Error("Bad size");
+  std::vector<absl::string_view> int_strs = absl::StrSplit(input[0], " ");
+  absl::StatusOr<std::vector<int64_t>> ints = ParseAsInts(int_strs);
+  if (!ints.ok()) return ints.status();
+  absl::Span<int64_t> int_span = absl::MakeSpan(*ints);
+  absl::StatusOr<int> ret = NodeValue(int_span);
+  if (!ret.ok()) return ret.status();
+  if (!int_span.empty()) return Error("Bad parse");
+  return IntReturn(*ret);
 }
 
 }  // namespace advent_of_code
