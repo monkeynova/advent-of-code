@@ -29,9 +29,9 @@ int PowerLevel(int serial, Point p) {
 
 absl::StatusOr<std::vector<std::string>> Day11_2018::Part1(
     absl::Span<absl::string_view> input) const {
-  if (PowerLevel(57, Point{122,79}) != -5) return Error("Integrity check 1");
-  if (PowerLevel(39, Point{217,196}) != 0) return Error("Integrity check 2");
-  if (PowerLevel(71, Point{101,153}) != 4) return Error("Integrity check 3");
+  if (PowerLevel(57, Point{122, 79}) != -5) return Error("Integrity check 1");
+  if (PowerLevel(39, Point{217, 196}) != 0) return Error("Integrity check 2");
+  if (PowerLevel(71, Point{101, 153}) != 4) return Error("Integrity check 3");
   if (input.size() != 1) return Error("Bad size");
   int serial;
   if (!absl::SimpleAtoi(input[0], &serial)) return Error("Not an int");
@@ -76,8 +76,8 @@ absl::StatusOr<std::vector<std::string>> Day11_2018::Part2(
       if (s == 0) {
         power_sum = power[p];
       } else {
-        if (!prev_sums.contains(p + Point{1,1})) return Error("prev_sums");
-        power_sum = prev_sums[p + Point{1,1}];
+        if (!prev_sums.contains(p + Point{1, 1})) return Error("prev_sums");
+        power_sum = prev_sums[p + Point{1, 1}];
         for (Point p2 : PointRectangle{p, p + Point{s, 0}}) {
           power_sum += power[p2];
         }
