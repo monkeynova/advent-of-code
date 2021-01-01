@@ -28,14 +28,18 @@ absl::StatusOr<std::vector<std::string>> Day10_2018::Part1(
   std::vector<Light> lights;
   for (absl::string_view row : input) {
     Light l;
-    if (!RE2::FullMatch(row, "position=<\\s*(-?\\d+),\\s*(-?\\d+)> velocity=<\\s*(-?\\d+),\\s*(-?\\d+)>", &l.p.x, &l.p.y, &l.v.x, &l.v.y)) {
+    if (!RE2::FullMatch(row,
+                        "position=<\\s*(-?\\d+),\\s*(-?\\d+)> "
+                        "velocity=<\\s*(-?\\d+),\\s*(-?\\d+)>",
+                        &l.p.x, &l.p.y, &l.v.x, &l.v.y)) {
       return Error("Bad row: ", row);
     }
     lights.push_back(l);
   }
   int last_dist = -1;
   for (int i = 0; true; ++i) {
-    PointRectangle r = {{lights[0].p.x, lights[0].p.y}, {lights[0].p.x, lights[0].p.y}};
+    PointRectangle r = {{lights[0].p.x, lights[0].p.y},
+                        {lights[0].p.x, lights[0].p.y}};
     for (Light l : lights) r.ExpandInclude(l.p);
     if (last_dist != -1 && (r.max - r.min).dist() > last_dist) {
       break;
@@ -45,11 +49,12 @@ absl::StatusOr<std::vector<std::string>> Day10_2018::Part1(
   }
   // Back up one step.
   for (Light& l : lights) l.p -= l.v;
-  PointRectangle r = {{lights[0].p.x, lights[0].p.y}, {lights[0].p.x, lights[0].p.y}};
+  PointRectangle r = {{lights[0].p.x, lights[0].p.y},
+                      {lights[0].p.x, lights[0].p.y}};
   for (Light l : lights) r.ExpandInclude(l.p);
   CharBoard b(r.max.x - r.min.x + 1, r.max.y - r.min.y + 1);
   for (Light l : lights) b[l.p - r.min] = '#';
-  
+
   return b.rows;
 }
 
@@ -59,7 +64,10 @@ absl::StatusOr<std::vector<std::string>> Day10_2018::Part2(
   std::vector<Light> lights;
   for (absl::string_view row : input) {
     Light l;
-    if (!RE2::FullMatch(row, "position=<\\s*(-?\\d+),\\s*(-?\\d+)> velocity=<\\s*(-?\\d+),\\s*(-?\\d+)>", &l.p.x, &l.p.y, &l.v.x, &l.v.y)) {
+    if (!RE2::FullMatch(row,
+                        "position=<\\s*(-?\\d+),\\s*(-?\\d+)> "
+                        "velocity=<\\s*(-?\\d+),\\s*(-?\\d+)>",
+                        &l.p.x, &l.p.y, &l.v.x, &l.v.y)) {
       return Error("Bad row: ", row);
     }
     lights.push_back(l);
@@ -67,7 +75,8 @@ absl::StatusOr<std::vector<std::string>> Day10_2018::Part2(
   int last_dist = -1;
   int i;
   for (i = 0; true; ++i) {
-    PointRectangle r = {{lights[0].p.x, lights[0].p.y}, {lights[0].p.x, lights[0].p.y}};
+    PointRectangle r = {{lights[0].p.x, lights[0].p.y},
+                        {lights[0].p.x, lights[0].p.y}};
     for (Light l : lights) r.ExpandInclude(l.p);
     if (last_dist != -1 && (r.max - r.min).dist() > last_dist) {
       break;
@@ -78,11 +87,12 @@ absl::StatusOr<std::vector<std::string>> Day10_2018::Part2(
   // Back up one step.
   --i;
   for (Light& l : lights) l.p -= l.v;
-  PointRectangle r = {{lights[0].p.x, lights[0].p.y}, {lights[0].p.x, lights[0].p.y}};
+  PointRectangle r = {{lights[0].p.x, lights[0].p.y},
+                      {lights[0].p.x, lights[0].p.y}};
   for (Light l : lights) r.ExpandInclude(l.p);
   CharBoard b(r.max.x - r.min.x + 1, r.max.y - r.min.y + 1);
   for (Light l : lights) b[l.p - r.min] = '#';
-  
+
   return IntReturn(i);
 }
 
