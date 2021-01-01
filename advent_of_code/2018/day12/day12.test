@@ -25,7 +25,9 @@ initial state: #..#.#..##......###...###
 2823
 ==
 
+# 897077114 (low) <-- blew out int32
+# 2900000001914 (high) <-- Off by one on skip forward
 [part=2]
 @include{advent_of_code/2018/day12/input.txt}
 --
-ERROR: Could not run test: Not implemented
+2900000001856
