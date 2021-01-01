@@ -1,10 +1,25 @@
 [part=1]
+HACK: Ignore whitespace
+\/->-\        
+\|   |  /----\
+\| /-+--+-\  |
+\| | |  | v  |
+\\-+-/  \-+--/
+\  \------/   
+--
+{7,3}
+==
+
+# 100,0
+[part=1]
+HACK: Ignore whitespace
 @include{advent_of_code/2018/day13/input.txt}
 --
-ERROR: Could not run test: Not implemented
+{14,42}
 ==
 
 [part=2]
+HACK: Ignore whitespace
 @include{advent_of_code/2018/day13/input.txt}
 --
 ERROR: Could not run test: Not implemented

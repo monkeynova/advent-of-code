@@ -47,7 +47,7 @@ struct CharBoard {
     if (rows.empty()) return absl::OkStatus();
     for (absl::string_view r : rows) {
       if (r.size() != width()) {
-        return absl::InternalError("Bad row size");
+        return absl::InternalError(absl::StrCat("Bad row size: ", r));
       }
     }
     return absl::OkStatus();
