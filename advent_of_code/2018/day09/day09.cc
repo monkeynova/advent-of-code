@@ -44,6 +44,27 @@ struct GameState {
       cur_position = marbles.size() - 1;
     }
   }
+
+  std::string DebugString() {
+    std::string out;
+    int marble_idx = 0;
+    for (int j = 0; j < 30; ++j) {
+      if (j > 0) absl::StrAppend(&out, ",");
+      if (marble_idx == cur_position) {
+        absl::StrAppend(&out, "(", marbles[marble_idx].score, ")");
+      } else {
+        absl::StrAppend(&out, marbles[marble_idx].score);
+      }
+      if (marbles[marbles[marble_idx].next].prev != marble_idx) {
+        LOG(ERROR) << "Integrity check!";
+      }
+      marble_idx = marbles[marble_idx].next;
+      // Looped before size.
+      if (marble_idx == 0) break;
+    }
+    if (marble_idx != 0) absl::StrAppend(&out, ",...");
+    return out;
+  }
   
   void IntegrityCheck() {
     int marble_idx = cur_position;
@@ -66,25 +87,7 @@ int64_t HighScore(int num_players, int num_marbles) {
   state.scores = std::vector<int64_t>(num_players, 0);
   state.marbles = {{0, 0, 0}};
   for (int64_t i = 1; i <= num_marbles; ++i) {
-    if (VLOG_IS_ON(2)) {
-      std::string out;
-      int marble_idx = 0;
-      for (int j = 0; j < 30; ++j) {
-        if (j > 0) absl::StrAppend(&out, ",");
-        if (marble_idx == state.cur_position) {
-          absl::StrAppend(&out, "(", state.marbles[marble_idx].score, ")");
-        } else {
-          absl::StrAppend(&out, state.marbles[marble_idx].score);
-        }
-        if (state.marbles[state.marbles[marble_idx].next].prev != marble_idx) {
-          LOG(ERROR) << "Integrity check!";
-        }
-        marble_idx = state.marbles[marble_idx].next;
-        // Looped before size.
-        if (marble_idx == 0) break;
-      }
-      VLOG(2) << out;
-    }
+    VLOG(2) << state.DebugString();
     // state.IntegrityCheck();
     state.AddMarble(i);
   }
