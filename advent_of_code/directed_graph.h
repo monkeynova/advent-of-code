@@ -148,7 +148,6 @@ absl::StatusOr<std::vector<absl::string_view>> DirectedGraph<Storage>::DAGSort(
   return out;
 }
 
-
 }  // namespace advent_of_code
 
 #endif  // ADVENT_OF_CODE_DIRECTED_GRAPH_H

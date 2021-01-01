@@ -85,7 +85,8 @@ int FindMinPathAssignWork(WorkState* work) {
     }
   }
 
-  VLOG(1) << "Can assign @" << work->time << ": " << absl::StrJoin(work->available, ",");
+  VLOG(1) << "Can assign @" << work->time << ": "
+          << absl::StrJoin(work->available, ",");
 
   int min_to_complete = std::numeric_limits<int>::max();
   for (absl::string_view next : work->available) {
@@ -120,13 +121,15 @@ absl::StatusOr<std::vector<std::string>> Day07_2018::Part1(
   for (absl::string_view row : input) {
     absl::string_view src;
     absl::string_view dst;
-    if (!RE2::FullMatch(row, "Step (.*) must be finished before step (.*) can begin.", &src, &dst)) {
+    if (!RE2::FullMatch(
+            row, "Step (.*) must be finished before step (.*) can begin.", &src,
+            &dst)) {
       return Error("Bad input: ", row);
     }
     graph.AddEdge(src, dst);
   }
   absl::StatusOr<std::vector<absl::string_view>> ordered =
-    graph.DAGSort(std::less<absl::string_view>());
+      graph.DAGSort(std::less<absl::string_view>());
   if (!ordered.ok()) return ordered.status();
   return std::vector<std::string>{absl::StrJoin(*ordered, "")};
 }
@@ -137,7 +140,9 @@ absl::StatusOr<std::vector<std::string>> Day07_2018::Part2(
   for (absl::string_view row : input) {
     absl::string_view src;
     absl::string_view dst;
-    if (!RE2::FullMatch(row, "Step (.*) must be finished before step (.*) can begin.", &src, &dst)) {
+    if (!RE2::FullMatch(
+            row, "Step (.*) must be finished before step (.*) can begin.", &src,
+            &dst)) {
       return Error("Bad input: ", row);
     }
     graph.AddEdge(src, dst);
