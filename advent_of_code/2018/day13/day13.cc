@@ -18,6 +18,7 @@ struct Cart {
   Point pos;
   Point dir;
   int turns;
+  bool to_remove = false;
   bool operator<(const Cart& o) const {
     if (pos.y != o.pos.y) return pos.y < o.pos.y;
     return pos.x < o.pos.x;
@@ -50,8 +51,13 @@ struct State {
       c.pos += c.dir;
       if (!board.OnBoard(c.pos)) return AdventDay::Error("Off board");
       if (cart_locations.contains(c.pos)) {
-        if (ret) return AdventDay::Error("duplicate crash");
+        // if (ret) return AdventDay::Error("duplicate crash");
         ret = c.pos;
+        for (Cart& c2 : carts) {
+          if (c.pos == c2.pos) {
+            c2.to_remove = true;
+          }
+        }
       } else {
         cart_locations.insert(c.pos);
       }
@@ -96,6 +102,13 @@ struct State {
         }
         default: return AdventDay::Error("Bad board value");
       }
+    }
+    if (ret) {
+      std::vector<Cart> new_carts;
+      for (const Cart& c : carts) {
+        if (!c.to_remove) new_carts.push_back(c);
+      }
+      carts = std::move(new_carts);
     }
     return ret;
   }
@@ -164,7 +177,21 @@ absl::StatusOr<std::vector<std::string>> Day13_2018::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day13_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.empty()) return Error("bad input");
+  if (RE2::PartialMatch(input[0], "^HACK:")) input = input.subspan(1);
+  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
+  if (!b.ok()) return b.status();
+
+  absl::StatusOr<State> state = FindKarts(*b);
+  if (!state.ok()) return state.status();
+
+  while (state->carts.size() > 1) {
+    VLOG(1) << "State:\n" << state->DebugString();
+    absl::StatusOr<absl::optional<Point>> collision = state->RunStep();
+    if (!collision.ok()) return collision.status();
+  }
+
+  return std::vector<std::string>{state->carts[0].pos.DebugString()};
 }
 
 }  // namespace advent_of_code
