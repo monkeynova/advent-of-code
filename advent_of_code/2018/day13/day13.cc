@@ -32,11 +32,16 @@ struct State {
   std::string DebugString() {
     CharBoard tmp = board;
     for (const Cart& c : carts) {
-      if (c.dir == Cardinal::kNorth) tmp[c.pos] = '^';
-      else if (c.dir == Cardinal::kSouth) tmp[c.pos] = 'v';
-      else if (c.dir == Cardinal::kWest) tmp[c.pos] = '<';
-      else if (c.dir == Cardinal::kEast) tmp[c.pos] = '>';
-      else tmp[c.pos] = '?';
+      if (c.dir == Cardinal::kNorth)
+        tmp[c.pos] = '^';
+      else if (c.dir == Cardinal::kSouth)
+        tmp[c.pos] = 'v';
+      else if (c.dir == Cardinal::kWest)
+        tmp[c.pos] = '<';
+      else if (c.dir == Cardinal::kEast)
+        tmp[c.pos] = '>';
+      else
+        tmp[c.pos] = '?';
     }
     return tmp.DebugString();
   }
@@ -75,32 +80,49 @@ struct State {
           break;
         }
         case '/': {
-          if (c.dir == Cardinal::kEast) c.dir = Cardinal::kNorth;
-          else if (c.dir == Cardinal::kNorth) c.dir = Cardinal::kEast;
-          else if (c.dir == Cardinal::kSouth) c.dir = Cardinal::kWest;
-          else if (c.dir == Cardinal::kWest) c.dir = Cardinal::kSouth;
-          else return AdventDay::Error("Bad dir on '/'");
+          if (c.dir == Cardinal::kEast)
+            c.dir = Cardinal::kNorth;
+          else if (c.dir == Cardinal::kNorth)
+            c.dir = Cardinal::kEast;
+          else if (c.dir == Cardinal::kSouth)
+            c.dir = Cardinal::kWest;
+          else if (c.dir == Cardinal::kWest)
+            c.dir = Cardinal::kSouth;
+          else
+            return AdventDay::Error("Bad dir on '/'");
           break;
         }
         case '\\': {
-          if (c.dir == Cardinal::kEast) c.dir = Cardinal::kSouth;
-          else if (c.dir == Cardinal::kSouth) c.dir = Cardinal::kEast;
-          else if (c.dir == Cardinal::kNorth) c.dir = Cardinal::kWest;
-          else if (c.dir == Cardinal::kWest) c.dir = Cardinal::kNorth;
-          else return AdventDay::Error("Bad dir on '\\'");
+          if (c.dir == Cardinal::kEast)
+            c.dir = Cardinal::kSouth;
+          else if (c.dir == Cardinal::kSouth)
+            c.dir = Cardinal::kEast;
+          else if (c.dir == Cardinal::kNorth)
+            c.dir = Cardinal::kWest;
+          else if (c.dir == Cardinal::kWest)
+            c.dir = Cardinal::kNorth;
+          else
+            return AdventDay::Error("Bad dir on '\\'");
           break;
         }
         case '+': {
           switch (c.turns % 3) {
-            case 0: c.dir = c.dir.rotate_left(); break;
-            case 1: /* straight */ break;
-            case 2: c.dir = c.dir.rotate_right(); break;
-            default: return AdventDay::Error("Bad mod");
+            case 0:
+              c.dir = c.dir.rotate_left();
+              break;
+            case 1: /* straight */
+              break;
+            case 2:
+              c.dir = c.dir.rotate_right();
+              break;
+            default:
+              return AdventDay::Error("Bad mod");
           }
           ++c.turns;
           break;
         }
-        default: return AdventDay::Error("Bad board value");
+        default:
+          return AdventDay::Error("Bad board value");
       }
     }
     if (ret) {
@@ -147,7 +169,8 @@ absl::StatusOr<State> FindKarts(const CharBoard& b) {
         state.board[p] = '-';
         break;
       }
-      default: return AdventDay::Error("Bad char @", p.DebugString());
+      default:
+        return AdventDay::Error("Bad char @", p.DebugString());
     }
   }
   return state;
@@ -169,7 +192,8 @@ absl::StatusOr<std::vector<std::string>> Day13_2018::Part1(
     VLOG(1) << "State:\n" << state->DebugString();
     absl::StatusOr<absl::optional<Point>> collision = state->RunStep();
     if (!collision.ok()) return collision.status();
-    if (*collision) return std::vector<std::string>{(*collision)->DebugString()};
+    if (*collision)
+      return std::vector<std::string>{(*collision)->DebugString()};
   }
 
   return Error("Left infinite loop");
