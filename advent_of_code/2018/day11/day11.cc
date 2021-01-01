@@ -58,7 +58,45 @@ absl::StatusOr<std::vector<std::string>> Day11_2018::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day11_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 1) return Error("Bad size");
+  int serial;
+  if (!absl::SimpleAtoi(input[0], &serial)) return Error("Not an int");
+  absl::flat_hash_map<Point, int> power;
+  PointRectangle r{{1, 1}, {300, 300}};
+  for (Point p : r) power[p] = PowerLevel(serial, p);
+  int max_power = std::numeric_limits<int>::min();
+  Point3 max_power_point;
+  absl::flat_hash_map<Point, int> prev_sums;
+  for (int s = 0; s < 300; s++) {
+    absl::flat_hash_map<Point, int> this_sums;
+    PointRectangle search = r;
+    search.max -= Point{s, s};
+    for (Point p : search) {
+      int power_sum = 0;
+      if (s == 0) {
+        power_sum = power[p];
+      } else {
+        if (!prev_sums.contains(p + Point{1,1})) return Error("prev_sums");
+        power_sum = prev_sums[p + Point{1,1}];
+        for (Point p2 : PointRectangle{p, p + Point{s, 0}}) {
+          power_sum += power[p2];
+        }
+        for (Point p2 : PointRectangle{p + Point{0, 1}, p + Point{0, s}}) {
+          power_sum += power[p2];
+        }
+      }
+      this_sums[p] = power_sum;
+      if (power_sum > max_power) {
+        max_power = power_sum;
+        max_power_point.x = p.x;
+        max_power_point.y = p.y;
+        max_power_point.z = s + 1;
+      }
+    }
+    prev_sums = std::move(this_sums);
+  }
+
+  return std::vector<std::string>{max_power_point.DebugString()};
 }
 
 }  // namespace advent_of_code
