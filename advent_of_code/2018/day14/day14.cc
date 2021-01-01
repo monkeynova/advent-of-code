@@ -43,7 +43,30 @@ absl::StatusOr<std::vector<std::string>> Day14_2018::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day14_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<std::vector<int64_t>> ints = ParseAsInts(input);
+  if (!ints.ok()) return ints.status();
+  if (ints->size() != 1) return Error("Bad size");
+  int rounds = ints->back();
+
+  std::string needle = absl::StrCat(rounds);
+
+  std::string tmp = "37";
+  int elf1_pos = 0;
+  int elf2_pos = 1;
+  while (true) {
+    int sum = tmp[elf1_pos] + tmp[elf2_pos] - 2 * '0';
+    if (sum >= 100) return Error("Bad sum!");
+    if (sum >= 10) {
+      tmp.append(1, (sum / 10) + '0');
+    }
+    tmp.append(1, (sum % 10) + '0');
+    elf1_pos = (elf1_pos + 1 + tmp[elf1_pos] - '0') % tmp.size();
+    elf2_pos = (elf2_pos + 1 + tmp[elf2_pos] - '0') % tmp.size();
+    size_t off = tmp.find(needle, tmp.size() - 2 * needle.size());
+    if (off != std::string::npos) return IntReturn(off);
+  }
+
+  return Error("Left infinite loop");;
 }
 
 }  // namespace advent_of_code
