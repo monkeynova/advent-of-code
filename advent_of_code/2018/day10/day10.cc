@@ -6,6 +6,8 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/char_board.h"
+#include "advent_of_code/point.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 
@@ -13,13 +15,42 @@ namespace advent_of_code {
 
 namespace {
 
-// Helper methods go here.
+struct Light {
+  Point p;
+  Point v;
+};
 
 }  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day10_2018::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.empty()) return Error("No input");
+  std::vector<Light> lights;
+  for (absl::string_view row : input) {
+    Light l;
+    if (!RE2::FullMatch(row, "position=<\\s*(-?\\d+),\\s*(-?\\d+)> velocity=<\\s*(-?\\d+),\\s*(-?\\d+)>", &l.p.x, &l.p.y, &l.v.x, &l.v.y)) {
+      return Error("Bad row: ", row);
+    }
+    lights.push_back(l);
+  }
+  int last_dist = -1;
+  for (int i = 0; true; ++i) {
+    PointRectangle r = {{lights[0].p.x, lights[0].p.y}, {lights[0].p.x, lights[0].p.y}};
+    for (Light l : lights) r.ExpandInclude(l.p);
+    if (last_dist != -1 && (r.max - r.min).dist() > last_dist) {
+      break;
+    }
+    last_dist = (r.max - r.min).dist();
+    for (Light& l : lights) l.p += l.v;
+  }
+  // Back up one step.
+  for (Light& l : lights) l.p -= l.v;
+  PointRectangle r = {{lights[0].p.x, lights[0].p.y}, {lights[0].p.x, lights[0].p.y}};
+  for (Light l : lights) r.ExpandInclude(l.p);
+  CharBoard b(r.max.x - r.min.x + 1, r.max.y - r.min.y + 1);
+  for (Light l : lights) b[l.p - r.min] = '#';
+  
+  return b.rows;
 }
 
 absl::StatusOr<std::vector<std::string>> Day10_2018::Part2(
