@@ -1,7 +1,19 @@
 [part=1]
+18
+--
+{33,45}
+==
+
+[part=1]
+42
+--
+{21,61}
+==
+
+[part=1]
 @include{advent_of_code/2018/day11/input.txt}
 --
-ERROR: Could not run test: Not implemented
+{21,41}
 ==
 
 [part=2]
