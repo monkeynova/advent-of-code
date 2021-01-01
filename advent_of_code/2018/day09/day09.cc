@@ -65,7 +65,7 @@ struct GameState {
     if (marble_idx != 0) absl::StrAppend(&out, ",...");
     return out;
   }
-  
+
   void IntegrityCheck() {
     int marble_idx = cur_position;
     int start = marble_idx;
@@ -108,7 +108,9 @@ absl::StatusOr<std::vector<std::string>> Day09_2018::Part1(
   if (input.size() != 1) return Error("Bad input size");
   int players;
   int marbles;
-  if (!RE2::FullMatch(input[0], "(\\d+) players; last marble is worth (\\d+) points", &players, &marbles)) {
+  if (!RE2::FullMatch(input[0],
+                      "(\\d+) players; last marble is worth (\\d+) points",
+                      &players, &marbles)) {
     return Error("Bad input");
   }
   return IntReturn(HighScore(players, marbles));
@@ -119,7 +121,9 @@ absl::StatusOr<std::vector<std::string>> Day09_2018::Part2(
   if (input.size() != 1) return Error("Bad input size");
   int players;
   int marbles;
-  if (!RE2::FullMatch(input[0], "(\\d+) players; last marble is worth (\\d+) points", &players, &marbles)) {
+  if (!RE2::FullMatch(input[0],
+                      "(\\d+) players; last marble is worth (\\d+) points",
+                      &players, &marbles)) {
     return Error("Bad input");
   }
   return IntReturn(HighScore(players, 100 * marbles));
