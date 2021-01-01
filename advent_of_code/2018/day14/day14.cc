@@ -66,7 +66,8 @@ absl::StatusOr<std::vector<std::string>> Day14_2018::Part2(
     if (off != std::string::npos) return IntReturn(off);
   }
 
-  return Error("Left infinite loop");;
+  return Error("Left infinite loop");
+  ;
 }
 
 }  // namespace advent_of_code
