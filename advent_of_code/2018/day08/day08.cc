@@ -59,7 +59,6 @@ absl::StatusOr<int> NodeValue(absl::Span<int64_t>& range) {
   return value;
 }
 
-
 // Helper methods go here.
 
 }  // namespace
