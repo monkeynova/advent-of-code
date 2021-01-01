@@ -16,12 +16,14 @@
 {21,41}
 ==
 
+[long=3m (23s opt) 2021.01.01]
 [part=2]
 18
 --
 {90,269,16}
 ==
 
+[long=3m (23s opt) 2021.01.01]
 [part=2]
 42
 --
@@ -30,7 +32,8 @@
 
 # 235,203,11 <- Stupid bug on Box calculation
 # 226,199,20 <- Double counted upper left
+[long=3m (23s opt) 2021.01.01]
 [part=2]
 @include{advent_of_code/2018/day11/input.txt}
 --
-227,199,19
+{227,199,19}
