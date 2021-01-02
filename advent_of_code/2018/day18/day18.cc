@@ -43,7 +43,8 @@ CharBoard Update(const CharBoard& in) {
         }
         break;
       }
-      default: LOG(FATAL) << "Bad board char @" << p << ": " << in[p];
+      default:
+        LOG(FATAL) << "Bad board char @" << p << ": " << in[p];
     }
   }
   return ret;
