@@ -72,13 +72,14 @@
 18740
 ==
 
-# 268065 (high)
-# 226464 (low)
-# 235788 (low)
+# 268065 (high) <-- Missed ties on attack HP
+# 226464 (low) <-- Missed ties on distance
+# 235788 (low) <-- Bug that allowed moving to a
+#                  dead space to get an extra turn
 [part=1]
 @include{advent_of_code/2018/day15/input.txt}
 --
-235788
+237996
 ==
 
 [part=2]

@@ -113,13 +113,7 @@ class GameBoard {
     return total_hp;
   }
 
-  enum AttackResult {
-    kNoAttack = 0,
-    kAttack = 1,
-    kAttackAndDeath = 2,
-  };
-
-  absl::StatusOr<AttackResult> TryAttack(Point p) {
+  absl::StatusOr<Point> TryAttack(Point p) {
     char find = '\0';
     if (board_[p] == 'G') find = 'E';
     else if (board_[p] == 'E') find = 'G';
@@ -138,7 +132,7 @@ class GameBoard {
       }
     }
     if (fewest_hp == std::numeric_limits<int>::max()) {
-      return kNoAttack;
+      return Point{-1, -1};
     }
 
     auto it = hit_points_.find(fewest_hp_location);
@@ -148,11 +142,11 @@ class GameBoard {
       // Opponent died.
       board_[fewest_hp_location] = '.';
       hit_points_.erase(it);
-      return kAttackAndDeath;
+      return fewest_hp_location;
     }
 
     hit_points_[fewest_hp_location] -= 3;
-    return kAttack;
+    return Point{-1, -1};
   }
 
   absl::StatusOr<Point> TryMove(Point p) {
@@ -198,12 +192,11 @@ class GameBoard {
 
     std::vector<Point> actors;
     for (const auto& [p, _] : hit_points_) actors.push_back(p);
-    bool saw_death = false;
+    absl::flat_hash_set<Point> dead;
     for (Point p : actors) {
-      if (saw_death && hit_points_.find(p) == hit_points_.end()) {
-        // Assume this actor died and its OK.
-        // TODO(@monkeynova): Better check that this was the death.
-        continue;
+      if (dead.contains(p)) continue;
+      if (hit_points_.find(p) == hit_points_.end()) {
+        return AdventDay::Error("Integrity check (actor)");
       }
       if (!EnemyExists()) {
         done = true;
@@ -211,10 +204,10 @@ class GameBoard {
       }
       absl::StatusOr<Point> moved = TryMove(p);
       if (!moved.ok()) return moved.status();
-      absl::StatusOr<AttackResult> attacked = TryAttack(*moved);
-      if (!attacked.ok()) return attacked.status();
-      if (*attacked == kAttackAndDeath) {
-        saw_death = true;
+      absl::StatusOr<Point> died_at = TryAttack(*moved);
+      if (!died_at.ok()) return died_at.status();
+      if (*died_at != Point{-1, -1}) {
+        dead.insert(*died_at);
       }
     }
 
