@@ -15,7 +15,8 @@ namespace advent_of_code {
 
 namespace {
 
-constexpr Point kOrderedDirs[] = {Cardinal::kNorth, Cardinal::kWest, Cardinal::kEast, Cardinal::kSouth};
+constexpr Point kOrderedDirs[] = {Cardinal::kNorth, Cardinal::kWest,
+                                  Cardinal::kEast, Cardinal::kSouth};
 
 struct PointLT {
   bool operator()(Point p1, Point p2) const {
@@ -27,7 +28,7 @@ struct PointLT {
 class PathWalk : public BFSInterface<PathWalk, Point> {
  public:
   PathWalk(const CharBoard& b, Point start, Point end)
-   : board_(b), cur_(start), end_(end) {}
+      : board_(b), cur_(start), end_(end) {}
 
   Point identifier() const override { return cur_; }
 
@@ -62,15 +63,16 @@ class FindEnemyAdjacent : public BFSInterface<FindEnemyAdjacent, Point> {
     }
   };
 
-  FindEnemyAdjacent(const CharBoard& b, Point start, char find, PointAndDistance* ret)
-   : board_(b), cur_(start), ret_(ret), find_(find) {}
-  
+  FindEnemyAdjacent(const CharBoard& b, Point start, char find,
+                    PointAndDistance* ret)
+      : board_(b), cur_(start), ret_(ret), find_(find) {}
+
   Point identifier() const override { return cur_; }
-  
+
   bool IsFinal() override { return false; }
 
   void AddNextSteps(State* state) override {
-    // Stop exploring if we've found a match. 
+    // Stop exploring if we've found a match.
     // if (num_steps() > ret_->d) return;
 
     for (Point dir : kOrderedDirs) {
@@ -98,8 +100,8 @@ class FindEnemyAdjacent : public BFSInterface<FindEnemyAdjacent, Point> {
 
 class GameBoard {
  public:
-  explicit GameBoard(CharBoard board, int elf_attack = 3) 
-   : board_(std::move(board)), elf_attack_(elf_attack) {
+  explicit GameBoard(CharBoard board, int elf_attack = 3)
+      : board_(std::move(board)), elf_attack_(elf_attack) {
     for (Point p : board_.range()) {
       if (board_[p] == 'G' || board_[p] == 'E') {
         hit_points_[p] = 200;
@@ -131,15 +133,16 @@ class GameBoard {
     } else if (board_[p] == 'E') {
       find = 'G';
       attack = elf_attack_;
-    }
-    else return AdventDay::Error("HP at bad location (attack): ", p.DebugString());
+    } else
+      return AdventDay::Error("HP at bad location (attack): ", p.DebugString());
     int fewest_hp = std::numeric_limits<int>::max();
     Point fewest_hp_location;
     for (Point dir : kOrderedDirs) {
       Point check = p + dir;
       if (board_.OnBoard(check) && board_[check] == find) {
         auto it = hit_points_.find(check);
-        if (it == hit_points_.end()) return AdventDay::Error("No HP at location");
+        if (it == hit_points_.end())
+          return AdventDay::Error("No HP at location");
         if (it->second < fewest_hp) {
           fewest_hp = it->second;
           fewest_hp_location = check;
@@ -166,9 +169,12 @@ class GameBoard {
 
   absl::StatusOr<Point> TryMove(Point p) {
     char find = '\0';
-    if (board_[p] == 'G') find = 'E';
-    else if (board_[p] == 'E') find = 'G';
-    else return AdventDay::Error("HP at bad location (move): ", p.DebugString());
+    if (board_[p] == 'G')
+      find = 'E';
+    else if (board_[p] == 'E')
+      find = 'G';
+    else
+      return AdventDay::Error("HP at bad location (move): ", p.DebugString());
 
     FindEnemyAdjacent::PointAndDistance p_and_d;
     (void)FindEnemyAdjacent(board_, p, find, &p_and_d).FindMinSteps();
@@ -176,22 +182,24 @@ class GameBoard {
     if (p_and_d.d == 0) return move_to;
     if (p_and_d.d == std::numeric_limits<int>::max()) return move_to;
 
-    VLOG(1) << "Nearest enemy from " << board_[p] << " @" << p
-            << " is " << p_and_d.d << " away adjacent-to-" << p_and_d.p;
+    VLOG(1) << "Nearest enemy from " << board_[p] << " @" << p << " is "
+            << p_and_d.d << " away adjacent-to-" << p_and_d.p;
     int min_path_length = std::numeric_limits<int>::max();
     for (Point dir : kOrderedDirs) {
       Point check = p + dir;
       if (!board_.OnBoard(check) || board_[check] != '.') continue;
-      absl::optional<int> dist = PathWalk(board_, check, p_and_d.p).FindMinSteps();
+      absl::optional<int> dist =
+          PathWalk(board_, check, p_and_d.p).FindMinSteps();
       if (dist && *dist < min_path_length) {
         min_path_length = *dist;
         move_to = check;
       }
     }
-    if (min_path_length != p_and_d.d - 1) return AdventDay::Error("Distance integrity check");
+    if (min_path_length != p_and_d.d - 1)
+      return AdventDay::Error("Distance integrity check");
     if (move_to == p) {
-      return AdventDay::Error("Can't find path from ", p.DebugString(),
-                              " to ", p_and_d.p.DebugString());
+      return AdventDay::Error("Can't find path from ", p.DebugString(), " to ",
+                              p_and_d.p.DebugString());
     }
     VLOG(1) << "Moving " << board_[p] << " from " << p << " to " << move_to;
     board_[move_to] = board_[p];
@@ -238,13 +246,14 @@ class GameBoard {
     return types.size() == 2;
   }
 
-  std::string DebugString() { 
+  std::string DebugString() {
     return absl::StrCat(
-      absl::StrJoin(hit_points_, "",
-                    [](std::string* out, const std::pair<Point, int>& pair) {
-                      absl::StrAppend(out, "  ", pair.second, " @", pair.first.DebugString(), "\n");
-                    }),
-      board_.DebugString());
+        absl::StrJoin(hit_points_, "",
+                      [](std::string* out, const std::pair<Point, int>& pair) {
+                        absl::StrAppend(out, "  ", pair.second, " @",
+                                        pair.first.DebugString(), "\n");
+                      }),
+        board_.DebugString());
   }
 
  private:
@@ -294,7 +303,8 @@ absl::StatusOr<std::vector<std::string>> Day15_2018::Part2(
       done = *game_ended;
     }
     int end_elves = game.CountElves();
-    LOG(INFO) << "elf_attack: " << elf_attack << ": " << start_elves << " => " << end_elves;
+    LOG(INFO) << "elf_attack: " << elf_attack << ": " << start_elves << " => "
+              << end_elves;
     if (start_elves == end_elves) {
       LOG(INFO) << "State: [" << game.rounds() << "]\n" << game.DebugString();
       return IntReturn(game.TotalHitPoints() * game.rounds());
