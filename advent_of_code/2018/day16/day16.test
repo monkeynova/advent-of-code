@@ -1,10 +1,18 @@
 [part=1]
+Before: [3, 2, 1, 1]
+9 2 1 2
+After:  [3, 2, 2, 1]
+--
+1
+==
+
+[part=1]
 @include{advent_of_code/2018/day16/input.txt}
 --
-ERROR: Could not run test: Not implemented
+542
 ==
 
 [part=2]
 @include{advent_of_code/2018/day16/input.txt}
 --
-ERROR: Could not run test: Not implemented
+575
