@@ -32,9 +32,7 @@ class PathWalk : public BFSInterface<PathWalk, Point> {
 
   Point identifier() const override { return cur_; }
 
-  int min_steps_to_final() const override {
-    return (end_ - cur_).dist();
-  }
+  int min_steps_to_final() const override { return (end_ - cur_).dist(); }
 
   bool IsFinal() override { return cur_ == end_; }
 
@@ -312,7 +310,7 @@ absl::StatusOr<std::vector<std::string>> Day15_2018::Part2(
     }
     int end_elves = game.CountElves();
     VLOG(1) << "elf_attack: " << elf_attack << ": " << start_elves << " => "
-              << end_elves;
+            << end_elves;
     if (start_elves == end_elves) {
       VLOG(1) << "State: [" << game.rounds() << "]\n" << game.DebugString();
       return IntReturn(game.TotalHitPoints() * game.rounds());

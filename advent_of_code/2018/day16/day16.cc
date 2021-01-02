@@ -32,7 +32,8 @@ enum OpCode {
   kEqrr = 16,
 };
 
-std::vector<int> ApplyOpcode(OpCode op_code, std::vector<int> op, std::vector<int> registers) {
+std::vector<int> ApplyOpcode(OpCode op_code, std::vector<int> op,
+                             std::vector<int> registers) {
   CHECK_EQ(op.size(), 4);
   CHECK_EQ(registers.size(), 4);
   switch (op_code) {
@@ -72,31 +73,31 @@ std::vector<int> ApplyOpcode(OpCode op_code, std::vector<int> op, std::vector<in
       registers[op[3]] = registers[op[1]];
       break;
     }
-    case OpCode::kSeti : {
+    case OpCode::kSeti: {
       registers[op[3]] = op[1];
       break;
     }
-    case OpCode::kGtir : {
+    case OpCode::kGtir: {
       registers[op[3]] = op[1] > registers[op[2]] ? 1 : 0;
       break;
     }
-    case OpCode::kGtri : {
+    case OpCode::kGtri: {
       registers[op[3]] = registers[op[1]] > op[2] ? 1 : 0;
       break;
     }
-    case OpCode::kGtrr : {
+    case OpCode::kGtrr: {
       registers[op[3]] = registers[op[1]] > registers[op[2]] ? 1 : 0;
       break;
     }
-    case OpCode::kEqir : {
+    case OpCode::kEqir: {
       registers[op[3]] = op[1] == registers[op[2]] ? 1 : 0;
       break;
     }
-    case OpCode::kEqri : {
+    case OpCode::kEqri: {
       registers[op[3]] = registers[op[1]] == op[2] ? 1 : 0;
       break;
     }
-    case OpCode::kEqrr : {
+    case OpCode::kEqrr: {
       registers[op[3]] = registers[op[1]] == registers[op[2]] ? 1 : 0;
       break;
     }
@@ -104,7 +105,9 @@ std::vector<int> ApplyOpcode(OpCode op_code, std::vector<int> op, std::vector<in
   return registers;
 }
 
-absl::flat_hash_set<OpCode> CheckAllOpcodes(std::vector<int> registers_in, std::vector<int> op, std::vector<int> registers_out) {
+absl::flat_hash_set<OpCode> CheckAllOpcodes(std::vector<int> registers_in,
+                                            std::vector<int> op,
+                                            std::vector<int> registers_out) {
   CHECK_EQ(registers_in.size(), 4);
   CHECK_EQ(registers_out.size(), 4);
   absl::flat_hash_set<OpCode> possible;
@@ -130,7 +133,8 @@ absl::StatusOr<absl::flat_hash_map<int, OpCode>> ComputeMap(
       if (set.size() == 1) {
         OpCode assign = *set.begin();
         if (map.contains(op_int)) return AdventDay::Error("Dupe in map");
-        if (reverse.contains(assign)) return AdventDay::Error("Dupe in reverse");
+        if (reverse.contains(assign))
+          return AdventDay::Error("Dupe in reverse");
         assigned.push_back(assign);
         map[op_int] = assign;
         reverse[assign] = op_int;
@@ -161,13 +165,16 @@ absl::StatusOr<std::vector<std::string>> Day16_2018::Part1(
   for (absl::string_view row : input) {
     if (!row.empty()) empty_count = 0;
     if (RE2::FullMatch(row, "Before: \\[(\\d+), (\\d+), (\\d+), (\\d+)\\]",
-                             &register_in[0], &register_in[1], &register_in[2], &register_in[3])) {
+                       &register_in[0], &register_in[1], &register_in[2],
+                       &register_in[3])) {
       // OK.
-    } else if (RE2::FullMatch(row, "(\\d+) (\\d+) (\\d+) (\\d+)",
-                              &op[0], &op[1], &op[2], &op[3])) {
+    } else if (RE2::FullMatch(row, "(\\d+) (\\d+) (\\d+) (\\d+)", &op[0],
+                              &op[1], &op[2], &op[3])) {
       // OK.
-    } else if (RE2::FullMatch(row, "After:  \\[(\\d+), (\\d+), (\\d+), (\\d+)\\]",
-                             &register_out[0], &register_out[1], &register_out[2], &register_out[3])) {
+    } else if (RE2::FullMatch(row,
+                              "After:  \\[(\\d+), (\\d+), (\\d+), (\\d+)\\]",
+                              &register_out[0], &register_out[1],
+                              &register_out[2], &register_out[3])) {
       if (CheckAllOpcodes(register_in, op, register_out).size() >= 3) ++count;
     } else if (row.empty()) {
       ++empty_count;
@@ -190,20 +197,24 @@ absl::StatusOr<std::vector<std::string>> Day16_2018::Part2(
   for (absl::string_view row : input) {
     if (!row.empty()) empty_count = 0;
     if (RE2::FullMatch(row, "Before: \\[(\\d+), (\\d+), (\\d+), (\\d+)\\]",
-                             &register_in[0], &register_in[1], &register_in[2], &register_in[3])) {
+                       &register_in[0], &register_in[1], &register_in[2],
+                       &register_in[3])) {
       if (!map.empty()) return Error("'Before' line after building map");
-    } else if (RE2::FullMatch(row, "(\\d+) (\\d+) (\\d+) (\\d+)",
-                              &op[0], &op[1], &op[2], &op[3])) {
+    } else if (RE2::FullMatch(row, "(\\d+) (\\d+) (\\d+) (\\d+)", &op[0],
+                              &op[1], &op[2], &op[3])) {
       if (!map.empty()) {
         if (!map.contains(op[0])) return Error("Bad op: ", op[0]);
         register_in = ApplyOpcode(map[op[0]], op, register_in);
       } else {
         // OK.
       }
-    } else if (RE2::FullMatch(row, "After:  \\[(\\d+), (\\d+), (\\d+), (\\d+)\\]",
-                             &register_out[0], &register_out[1], &register_out[2], &register_out[3])) {
+    } else if (RE2::FullMatch(row,
+                              "After:  \\[(\\d+), (\\d+), (\\d+), (\\d+)\\]",
+                              &register_out[0], &register_out[1],
+                              &register_out[2], &register_out[3])) {
       if (!map.empty()) return Error("'After' line after building map");
-      absl::flat_hash_set<OpCode> this_possible = CheckAllOpcodes(register_in, op, register_out);
+      absl::flat_hash_set<OpCode> this_possible =
+          CheckAllOpcodes(register_in, op, register_out);
       if (!possible.contains(op[0])) {
         possible[op[0]].insert(this_possible.begin(), this_possible.end());
       } else {
@@ -221,7 +232,8 @@ absl::StatusOr<std::vector<std::string>> Day16_2018::Part2(
       if (!map.empty()) return Error("'Empty' line after building map");
       ++empty_count;
       if (empty_count == 3) {
-        absl::StatusOr<absl::flat_hash_map<int, OpCode>> computed_map = ComputeMap(possible);
+        absl::StatusOr<absl::flat_hash_map<int, OpCode>> computed_map =
+            ComputeMap(possible);
         if (!computed_map.ok()) return computed_map.status();
         map = std::move(*computed_map);
         if (map.size() != 16) return Error("Missing opcodes");

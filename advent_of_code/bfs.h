@@ -146,8 +146,8 @@ absl::optional<int> BFSInterface<BFSImpl, HistType>::FindMinStepsAStar() {
   QueueState<BFSImpl, HistType> state(*dynamic_cast<BFSImpl*>(this));
   while (!state.frontier_.empty()) {
     BFSImpl cur = state.frontier_.top();
-    VLOG(3) << "  Next: " << cur.identifier() << " (" << cur.num_steps()
-            << "+" << cur.min_steps_to_final() << ")";
+    VLOG(3) << "  Next: " << cur.identifier() << " (" << cur.num_steps() << "+"
+            << cur.min_steps_to_final() << ")";
     state.frontier_.pop();
     cur.AddNextSteps(&state);
     if (state.ret) return *state.ret;
