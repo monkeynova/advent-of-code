@@ -98,12 +98,21 @@ class FindEnemyAdjacent : public BFSInterface<FindEnemyAdjacent, Point> {
 
 class GameBoard {
  public:
-  explicit GameBoard(CharBoard board) : board_(std::move(board)) {
+  explicit GameBoard(CharBoard board, int elf_attack = 3) 
+   : board_(std::move(board)), elf_attack_(elf_attack) {
     for (Point p : board_.range()) {
       if (board_[p] == 'G' || board_[p] == 'E') {
         hit_points_[p] = 200;
       }
     }
+  }
+
+  int CountElves() {
+    int count = 0;
+    for (const auto& [p, _] : hit_points_) {
+      if (board_[p] == 'E') ++count;
+    }
+    return count;
   }
 
   int rounds() { return rounds_; }
@@ -115,8 +124,14 @@ class GameBoard {
 
   absl::StatusOr<Point> TryAttack(Point p) {
     char find = '\0';
-    if (board_[p] == 'G') find = 'E';
-    else if (board_[p] == 'E') find = 'G';
+    int attack;
+    if (board_[p] == 'G') {
+      find = 'E';
+      attack = 3;
+    } else if (board_[p] == 'E') {
+      find = 'G';
+      attack = elf_attack_;
+    }
     else return AdventDay::Error("HP at bad location (attack): ", p.DebugString());
     int fewest_hp = std::numeric_limits<int>::max();
     Point fewest_hp_location;
@@ -137,7 +152,7 @@ class GameBoard {
 
     auto it = hit_points_.find(fewest_hp_location);
     if (it == hit_points_.end()) return AdventDay::Error("No HP at location");
-    if (it->second <= 3) {
+    if (it->second <= attack) {
       LOG(INFO) << "Opponent " << find << " @" << fewest_hp_location << " died";
       // Opponent died.
       board_[fewest_hp_location] = '.';
@@ -145,7 +160,7 @@ class GameBoard {
       return fewest_hp_location;
     }
 
-    hit_points_[fewest_hp_location] -= 3;
+    hit_points_[fewest_hp_location] -= attack;
     return Point{-1, -1};
   }
 
@@ -236,6 +251,7 @@ class GameBoard {
   CharBoard board_;
   int rounds_ = 0;
   std::map<Point, int, PointLT> hit_points_;
+  int elf_attack_;
 };
 
 }  // namespace
@@ -262,7 +278,30 @@ absl::StatusOr<std::vector<std::string>> Day15_2018::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day15_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
+  if (!b.ok()) return b.status();
+
+  for (int elf_attack = 3; true; ++elf_attack) {
+    // TODO(@monkeynova): Binary search.
+    GameBoard game(std::move(*b), elf_attack);
+    int start_elves = game.CountElves();
+    bool done = false;
+    while (!done) {
+      VLOG(1) << "State: [" << game.rounds() << "]";
+      VLOG(2) << "\n" << game.DebugString();
+      absl::StatusOr<bool> game_ended = game.RunStep();
+      if (!game_ended.ok()) return game_ended.status();
+      done = *game_ended;
+    }
+    int end_elves = game.CountElves();
+    LOG(INFO) << "elf_attack: " << elf_attack << ": " << start_elves << " => " << end_elves;
+    if (start_elves == end_elves) {
+      LOG(INFO) << "State: [" << game.rounds() << "]\n" << game.DebugString();
+      return IntReturn(game.TotalHitPoints() * game.rounds());
+    }
+  }
+
+  return Error("Left infinite loop");
 }
 
 }  // namespace advent_of_code
