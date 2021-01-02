@@ -122,6 +122,7 @@ template <typename BFSImpl, typename HistType>
 absl::optional<int> BFSInterface<BFSImpl, HistType>::FindMinSteps() {
   static_assert(std::is_base_of<BFSInterface<BFSImpl, HistType>, BFSImpl>(),
                 "BFSInterface must be templated with a subclass");
+  if (IsFinal()) return 0;
   DequeState<BFSImpl, HistType> state(*dynamic_cast<BFSImpl*>(this));
   while (!state.frontier_.empty()) {
     BFSImpl& cur = state.frontier_.front();
@@ -137,6 +138,7 @@ template <typename BFSImpl, typename HistType>
 absl::optional<int> BFSInterface<BFSImpl, HistType>::FindMinStepsAStar() {
   static_assert(std::is_base_of<BFSInterface<BFSImpl, HistType>, BFSImpl>(),
                 "BFSInterface must be templated with a subclass");
+  if (IsFinal()) return 0;
   QueueState<BFSImpl, HistType> state(*dynamic_cast<BFSImpl*>(this));
   while (!state.frontier_.empty()) {
     BFSImpl cur = state.frontier_.top();
