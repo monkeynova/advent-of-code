@@ -36,7 +36,8 @@ absl::Status DropFrom(CharBoard& b, Point start) {
       // Need to fill, fall through to work.
       break;
     }
-    default: return AdventDay::Error("Drop to unhandled");
+    default:
+      return AdventDay::Error("Drop to unhandled");
   }
   cur -= Point{0, 1};
   VLOG(1) << "Drop to: " << cur;
@@ -92,7 +93,7 @@ absl::Status DropFrom(CharBoard& b, Point start) {
     if (filling) {
       cur -= Point{0, 1};
       if (cur.y < start.y) {
-        filling = false; 
+        filling = false;
       }
     }
   }
@@ -109,7 +110,8 @@ absl::Status FillWithWater(CharBoard& b) {
   return DropFrom(b, start + Point{0, 1});
 }
 
-absl::StatusOr<CharBoard> Parse(absl::Span<absl::string_view> input, int* min_y) {
+absl::StatusOr<CharBoard> Parse(absl::Span<absl::string_view> input,
+                                int* min_y) {
   std::vector<PointRectangle> strips;
   PointRectangle grid = {{500, 0}, {500, 0}};
   *min_y = std::numeric_limits<int>::max();
@@ -118,11 +120,13 @@ absl::StatusOr<CharBoard> Parse(absl::Span<absl::string_view> input, int* min_y)
     int r1;
     int r2;
     PointRectangle next;
-    if (RE2::FullMatch(row, "x=(\\d+), y=(\\d+)\\.\\.(\\d+)", &fixed, &r1, &r2)) {
+    if (RE2::FullMatch(row, "x=(\\d+), y=(\\d+)\\.\\.(\\d+)", &fixed, &r1,
+                       &r2)) {
       next = {{fixed, r1}, {fixed, r2}};
       *min_y = std::min(*min_y, r1);
       *min_y = std::min(*min_y, r2);
-    } else if (RE2::FullMatch(row, "y=(\\d+), x=(\\d+)\\.\\.(\\d+)", &fixed, &r1, &r2)) {
+    } else if (RE2::FullMatch(row, "y=(\\d+), x=(\\d+)\\.\\.(\\d+)", &fixed,
+                              &r1, &r2)) {
       next = {{r1, fixed}, {r2, fixed}};
       *min_y = std::min(*min_y, fixed);
     } else {
@@ -134,8 +138,7 @@ absl::StatusOr<CharBoard> Parse(absl::Span<absl::string_view> input, int* min_y)
   }
   --grid.min.x;
   ++grid.max.x;
-  CharBoard b(grid.max.x - grid.min.x + 1,
-              grid.max.y - grid.min.y + 1);
+  CharBoard b(grid.max.x - grid.min.x + 1, grid.max.y - grid.min.y + 1);
   for (Point p : b.range()) b[p] = '.';
   b[Point{500, 0} - grid.min] = '+';
   for (PointRectangle r : strips) {
