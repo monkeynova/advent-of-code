@@ -72,7 +72,39 @@ absl::StatusOr<std::vector<std::string>> Day18_2018::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day18_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<CharBoard> in = CharBoard::Parse(input);
+  if (!in.ok()) return in.status();
+  CharBoard step = *in;
+  constexpr int kNumSteps = 1'000'000'000;
+  absl::flat_hash_map<CharBoard, int> hist;
+  for (int i = 0; i < kNumSteps; ++i) {
+    if (hist.contains(step)) {
+      int loop_size = i - hist[step];
+      int loop_offset = hist[step];
+      LOG(INFO) << "Found loop at " << loop_offset << " of size " << loop_size;
+      int final_idx = (kNumSteps - loop_offset) % loop_size + loop_offset;
+      bool found = false;
+      for (const auto& [board, idx] : hist) {
+        if (idx == final_idx) {
+          step = board;
+          found = true;
+          break;
+        }
+      }
+      if (!found) return Error("Could not find loop value!");
+      break;
+    }
+    hist[step] = i;
+    VLOG(1) << "Step [" << i << "]:\n" << step.DebugString();
+    step = Update(step);
+  }
+  int trees = 0;
+  int lumber = 0;
+  for (Point p : step.range()) {
+    if (step[p] == '|') ++trees;
+    if (step[p] == '#') ++lumber;
+  }
+  return IntReturn(trees * lumber);
 }
 
 }  // namespace advent_of_code
