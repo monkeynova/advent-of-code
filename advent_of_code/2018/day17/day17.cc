@@ -109,134 +109,93 @@ absl::Status FillWithWater(CharBoard& b) {
   return DropFrom(b, start + Point{0, 1});
 }
 
+absl::StatusOr<CharBoard> Parse(absl::Span<absl::string_view> input, int* min_y) {
+  std::vector<PointRectangle> strips;
+  PointRectangle grid = {{500, 0}, {500, 0}};
+  *min_y = std::numeric_limits<int>::max();
+  for (absl::string_view row : input) {
+    int fixed;
+    int r1;
+    int r2;
+    PointRectangle next;
+    if (RE2::FullMatch(row, "x=(\\d+), y=(\\d+)\\.\\.(\\d+)", &fixed, &r1, &r2)) {
+      next = {{fixed, r1}, {fixed, r2}};
+      *min_y = std::min(*min_y, r1);
+      *min_y = std::min(*min_y, r2);
+    } else if (RE2::FullMatch(row, "y=(\\d+), x=(\\d+)\\.\\.(\\d+)", &fixed, &r1, &r2)) {
+      next = {{r1, fixed}, {r2, fixed}};
+      *min_y = std::min(*min_y, fixed);
+    } else {
+      return AdventDay::Error("Bad input: ", row);
+    }
+    grid.ExpandInclude(next.min);
+    grid.ExpandInclude(next.max);
+    strips.push_back(next);
+  }
+  --grid.min.x;
+  ++grid.max.x;
+  CharBoard b(grid.max.x - grid.min.x + 1,
+              grid.max.y - grid.min.y + 1);
+  for (Point p : b.range()) b[p] = '.';
+  b[Point{500, 0} - grid.min] = '+';
+  for (PointRectangle r : strips) {
+    for (Point p : r) {
+      b[p - grid.min] = '#';
+    }
+  }
+  return b;
+}
 // Helper methods go here.
 
 }  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day17_2018::Part1(
     absl::Span<absl::string_view> input) const {
-  std::vector<PointRectangle> strips;
-  PointRectangle grid = {{500, 0}, {500, 0}};
-  int min_y = std::numeric_limits<int>::max();
-  for (absl::string_view row : input) {
-    int fixed;
-    int r1;
-    int r2;
-    PointRectangle next;
-    if (RE2::FullMatch(row, "x=(\\d+), y=(\\d+)\\.\\.(\\d+)", &fixed, &r1, &r2)) {
-      next = {{fixed, r1}, {fixed, r2}};
-      min_y = std::min(min_y, r1);
-      min_y = std::min(min_y, r2);
-    } else if (RE2::FullMatch(row, "y=(\\d+), x=(\\d+)\\.\\.(\\d+)", &fixed, &r1, &r2)) {
-      next = {{r1, fixed}, {r2, fixed}};
-      min_y = std::min(min_y, fixed);
-    } else {
-      return Error("Bad input: ", row);
-    }
-    grid.ExpandInclude(next.min);
-    grid.ExpandInclude(next.max);
-    strips.push_back(next);
-  }
-  --grid.min.x;
-  ++grid.max.x;
-  CharBoard b(grid.max.x - grid.min.x + 1,
-              grid.max.y - grid.min.y + 1);
-  for (Point p : b.range()) b[p] = '.';
-  b[Point{500, 0} - grid.min] = '+';
-  for (PointRectangle r : strips) {
-    for (Point p : r) {
-      b[p - grid.min] = '#';
-    }
-  }
-  VLOG_IF(1, b.height() < 100) << "Init:\n" << b.DebugString();
-  if (VLOG_IS_ON(2) && b.height() >= 100) {
+  int min_y;
+  absl::StatusOr<CharBoard> b = Parse(input, &min_y);
+  if (!b.ok()) return b.status();
+  VLOG_IF(1, b->height() < 100) << "Init:\n" << b->DebugString();
+  if (VLOG_IS_ON(2) && b->height() >= 100) {
     VLOG(2) << "Init:";
-    for (absl::string_view row : b.rows) {
+    for (absl::string_view row : b->rows) {
       VLOG(2) << row;
     }
   }
-  if (absl::Status st = FillWithWater(b); !st.ok()) {
+  if (absl::Status st = FillWithWater(*b); !st.ok()) {
     VLOG(2) << "Final:";
-    for (absl::string_view row : b.rows) {
+    for (absl::string_view row : b->rows) {
       VLOG(2) << row;
     }
     return st;
   }
-  VLOG_IF(1, b.height() < 100) << "Final:\n" << b.DebugString();
-  if (VLOG_IS_ON(2) && b.height() >= 100) {
+  VLOG_IF(1, b->height() < 100) << "Final:\n" << b->DebugString();
+  if (VLOG_IS_ON(2) && b->height() >= 100) {
     VLOG(2) << "Final:";
-    for (absl::string_view row : b.rows) {
+    for (absl::string_view row : b->rows) {
       VLOG(2) << row;
     }
   }
   int count = 0;
-  for (Point p : b.range()) {
+  for (Point p : b->range()) {
     if (p.y < min_y) continue;
-    if (b[p] == '~' || b[p] == '|') ++count;
+    if ((*b)[p] == '~' || (*b)[p] == '|') ++count;
   }
   return IntReturn(count);
 }
 
 absl::StatusOr<std::vector<std::string>> Day17_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  std::vector<PointRectangle> strips;
-  PointRectangle grid = {{500, 0}, {500, 0}};
-  int min_y = std::numeric_limits<int>::max();
-  for (absl::string_view row : input) {
-    int fixed;
-    int r1;
-    int r2;
-    PointRectangle next;
-    if (RE2::FullMatch(row, "x=(\\d+), y=(\\d+)\\.\\.(\\d+)", &fixed, &r1, &r2)) {
-      next = {{fixed, r1}, {fixed, r2}};
-      min_y = std::min(min_y, r1);
-      min_y = std::min(min_y, r2);
-    } else if (RE2::FullMatch(row, "y=(\\d+), x=(\\d+)\\.\\.(\\d+)", &fixed, &r1, &r2)) {
-      next = {{r1, fixed}, {r2, fixed}};
-      min_y = std::min(min_y, fixed);
-    } else {
-      return Error("Bad input: ", row);
-    }
-    grid.ExpandInclude(next.min);
-    grid.ExpandInclude(next.max);
-    strips.push_back(next);
-  }
-  --grid.min.x;
-  ++grid.max.x;
-  CharBoard b(grid.max.x - grid.min.x + 1,
-              grid.max.y - grid.min.y + 1);
-  for (Point p : b.range()) b[p] = '.';
-  b[Point{500, 0} - grid.min] = '+';
-  for (PointRectangle r : strips) {
-    for (Point p : r) {
-      b[p - grid.min] = '#';
-    }
-  }
-  VLOG_IF(1, b.height() < 100) << "Init:\n" << b.DebugString();
-  if (VLOG_IS_ON(2) && b.height() >= 100) {
-    VLOG(2) << "Init:";
-    for (absl::string_view row : b.rows) {
-      VLOG(2) << row;
-    }
-  }
-  if (absl::Status st = FillWithWater(b); !st.ok()) {
-    VLOG(2) << "Final:";
-    for (absl::string_view row : b.rows) {
-      VLOG(2) << row;
-    }
+  int min_y;
+  absl::StatusOr<CharBoard> b = Parse(input, &min_y);
+  if (!b.ok()) return b.status();
+
+  if (absl::Status st = FillWithWater(*b); !st.ok()) {
     return st;
   }
-  VLOG_IF(1, b.height() < 100) << "Final:\n" << b.DebugString();
-  if (VLOG_IS_ON(2) && b.height() >= 100) {
-    VLOG(2) << "Final:";
-    for (absl::string_view row : b.rows) {
-      VLOG(2) << row;
-    }
-  }
   int count = 0;
-  for (Point p : b.range()) {
+  for (Point p : b->range()) {
     if (p.y < min_y) continue;
-    if (b[p] == '~') ++count;
+    if ((*b)[p] == '~') ++count;
   }
   return IntReturn(count);
 }
