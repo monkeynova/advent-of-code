@@ -28,17 +28,21 @@ struct PointLT {
 class PathWalk : public BFSInterface<PathWalk, Point> {
  public:
   PathWalk(const CharBoard& b, Point start, Point end)
-      : board_(b), cur_(start), end_(end) {}
+      : board_(&b), cur_(start), end_(end) {}
 
   Point identifier() const override { return cur_; }
+
+  int min_steps_to_final() const override {
+    return (end_ - cur_).dist();
+  }
 
   bool IsFinal() override { return cur_ == end_; }
 
   void AddNextSteps(State* state) override {
     for (Point dir : kOrderedDirs) {
       Point next = cur_ + dir;
-      if (!board_.OnBoard(next)) continue;
-      if (board_[next] == '.') {
+      if (!board_->OnBoard(next)) continue;
+      if ((*board_)[next] == '.') {
         PathWalk add = *this;
         add.cur_ = next;
         state->AddNextStep(add);
@@ -47,7 +51,9 @@ class PathWalk : public BFSInterface<PathWalk, Point> {
   }
 
  private:
-  const CharBoard& board_;
+  // Pointer rather than reference to be swap'able for AStar's use of a
+  // priority queue.
+  const CharBoard* board_;
   Point cur_;
   Point end_;
 };
@@ -156,7 +162,7 @@ class GameBoard {
     auto it = hit_points_.find(fewest_hp_location);
     if (it == hit_points_.end()) return AdventDay::Error("No HP at location");
     if (it->second <= attack) {
-      LOG(INFO) << "Opponent " << find << " @" << fewest_hp_location << " died";
+      VLOG(1) << "Opponent " << find << " @" << fewest_hp_location << " died";
       // Opponent died.
       board_[fewest_hp_location] = '.';
       hit_points_.erase(it);
@@ -188,6 +194,8 @@ class GameBoard {
     for (Point dir : kOrderedDirs) {
       Point check = p + dir;
       if (!board_.OnBoard(check) || board_[check] != '.') continue;
+      // TODO(@monkeynova): Switching to FindMinStepsAStar hits the distance
+      //                    integrity check indicating a bug in AStar.
       absl::optional<int> dist =
           PathWalk(board_, check, p_and_d.p).FindMinSteps();
       if (dist && *dist < min_path_length) {
@@ -195,8 +203,10 @@ class GameBoard {
         move_to = check;
       }
     }
-    if (min_path_length != p_and_d.d - 1)
-      return AdventDay::Error("Distance integrity check");
+    if (min_path_length != p_and_d.d - 1) {
+      return AdventDay::Error("Distance integrity check: ", min_path_length,
+                              " != ", p_and_d.d - 1);
+    }
     if (move_to == p) {
       return AdventDay::Error("Can't find path from ", p.DebugString(), " to ",
                               p_and_d.p.DebugString());
@@ -280,7 +290,7 @@ absl::StatusOr<std::vector<std::string>> Day15_2018::Part1(
     done = *game_ended;
   }
 
-  LOG(INFO) << "State: [" << game.rounds() << "]\n" << game.DebugString();
+  VLOG(1) << "State: [" << game.rounds() << "]\n" << game.DebugString();
 
   return IntReturn(game.TotalHitPoints() * game.rounds());
 }
@@ -303,10 +313,10 @@ absl::StatusOr<std::vector<std::string>> Day15_2018::Part2(
       done = *game_ended;
     }
     int end_elves = game.CountElves();
-    LOG(INFO) << "elf_attack: " << elf_attack << ": " << start_elves << " => "
+    VLOG(1) << "elf_attack: " << elf_attack << ": " << start_elves << " => "
               << end_elves;
     if (start_elves == end_elves) {
-      LOG(INFO) << "State: [" << game.rounds() << "]\n" << game.DebugString();
+      VLOG(1) << "State: [" << game.rounds() << "]\n" << game.DebugString();
       return IntReturn(game.TotalHitPoints() * game.rounds());
     }
   }
