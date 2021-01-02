@@ -14,8 +14,11 @@ template <typename BFSImpl>
 class AStarGT {
  public:
   bool operator()(const BFSImpl& a, const BFSImpl& b) {
-    return a.num_steps_ + a.min_steps_to_final() >
-           b.num_steps_ + b.min_steps_to_final();
+    // Tie break with num_steps sp we can't add to the history a backtrack.
+    int a_steps = a.num_steps_ + a.min_steps_to_final();
+    int b_steps = b.num_steps_ + b.min_steps_to_final();
+    if (a_steps != b_steps) return a_steps > b_steps;
+    return a.num_steps_ > b.num_steps_;
   }
 };
 

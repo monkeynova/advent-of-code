@@ -194,10 +194,8 @@ class GameBoard {
     for (Point dir : kOrderedDirs) {
       Point check = p + dir;
       if (!board_.OnBoard(check) || board_[check] != '.') continue;
-      // TODO(@monkeynova): Switching to FindMinStepsAStar hits the distance
-      //                    integrity check indicating a bug in AStar.
       absl::optional<int> dist =
-          PathWalk(board_, check, p_and_d.p).FindMinSteps();
+          PathWalk(board_, check, p_and_d.p).FindMinStepsAStar();
       if (dist && *dist < min_path_length) {
         min_path_length = *dist;
         move_to = check;
