@@ -2,6 +2,7 @@
 #define ADVENT_OF_CODE_2018_VM_H
 
 #include "absl/container/flat_hash_map.h"
+#include "absl/container/flat_hash_set.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/str_join.h"
 #include "glog/logging.h"
@@ -30,11 +31,16 @@ enum OpCode {
 
 struct Op {
   static const absl::flat_hash_map<absl::string_view, OpCode> kNameMap;
+  static const std::vector<absl::string_view> kCodeMap;
 
   OpCode op_code;
-  int arg1;
-  int arg2;
-  int arg3;
+  int32_t arg1;
+  int32_t arg2;
+  int32_t arg3;
+
+  friend std::ostream& operator<<(std::ostream& out, const Op& op) {
+    return out << kCodeMap[op.op_code] << ": " << op.arg1 << ", " << op.arg2 << ", " << op.arg3;
+  }
 
   static absl::StatusOr<Op> Parse(absl::string_view str) {
     Op op;
@@ -51,7 +57,7 @@ struct Op {
     return op;
   }
 
-  absl::Status Apply(std::vector<int>& registers) {
+  absl::Status Apply(std::vector<int32_t>& registers) {
     switch (op_code) {
       case OpCode::kAddr: {
         registers[arg3] = registers[arg1] + registers[arg2];
@@ -129,11 +135,30 @@ struct Op {
 const absl::flat_hash_map<absl::string_view, OpCode> Op::kNameMap = {
     {"addr", OpCode::kAddr}, {"addi", OpCode::kAddi}, {"mulr", OpCode::kMulr},
     {"muli", OpCode::kMuli}, {"banr", OpCode::kBanr}, {"bani", OpCode::kBani},
-    {"borr", OpCode::kBorr}, {"bori", OpCode::kBorr}, {"setr", OpCode::kSetr},
+    {"borr", OpCode::kBorr}, {"bori", OpCode::kBori}, {"setr", OpCode::kSetr},
     {"seti", OpCode::kSeti}, {"gtir", OpCode::kGtir}, {"gtri", OpCode::kGtri},
     {"gtrr", OpCode::kGtrr}, {"eqrr", OpCode::kEqrr}, {"eqir", OpCode::kEqir},
     {"eqri", OpCode::kEqri},
 };
+
+const std::vector<absl::string_view> Op::kCodeMap = {
+  "<NONE>",
+  "kAddr",
+  "kAddi",
+  "kMulr",
+  "kMuli",
+  "kBanr",
+  "kBani",
+  "kBorr",
+  "kBori",
+  "kSetr",
+  "kSeti",
+  "kGtir",
+  "kGtri",
+  "kGtrr",
+  "kEqir",
+  "kEqri",
+  "kEqrr"};
 
 class VM {
  public:
@@ -155,11 +180,9 @@ class VM {
   }
 
   absl::Status Execute() {
-    int* ip = &registers_[ip_register_];
+    int32_t* ip = &registers_[ip_register_];
     while (*ip >= 0 && *ip < ops_.size()) {
-      if (*ip == 1 || *ip == 2) {
-        LOG(INFO) << *ip << ": " << absl::StrJoin(registers_, ",");
-      }
+      VLOG(4) << *ip << ": " << absl::StrJoin(registers_, ",");
       if (absl::Status st = ops_[*ip].Apply(registers_); !st.ok()) {
         return st;
       }
@@ -168,11 +191,30 @@ class VM {
     return absl::OkStatus();
   }
 
-  int register_value(int register_number) const {
+  absl::StatusOr<int> ExecuteAndCount(int max_count) {
+    int32_t* ip = &registers_[ip_register_];
+    int instructions = 0;
+    while (*ip >= 0 && *ip < ops_.size()) {
+      ++instructions;
+      if (instructions > max_count) break;
+      if (*ip == 28) {
+        VLOG(1) << *ip << ": " << absl::StrJoin(registers_, ",");
+        VLOG(1) << ops_[*ip];
+      }
+      VLOG(4) << *ip << ": " << absl::StrJoin(registers_, ",");
+      if (absl::Status st = ops_[*ip].Apply(registers_); !st.ok()) {
+        return st;
+      }
+      ++*ip;
+    }
+    return instructions;
+  }
+
+  int32_t register_value(int register_number) const {
     return registers_[register_number];
   }
 
-  void set_register_value(int register_number, int value) {
+  void set_register_value(int register_number, int32_t value) {
     registers_[register_number] = value;
   }
 
@@ -181,7 +223,7 @@ class VM {
 
   std::vector<Op> ops_;
   int ip_register_;
-  std::vector<int> registers_;
+  std::vector<int32_t> registers_;
 };
 
 }  // namespace advent_of_code

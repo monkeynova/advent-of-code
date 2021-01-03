@@ -1,7 +1,8 @@
+# 10626258 (low) <-- Had a bug where bori was running borr
 [part=1]
 @include{advent_of_code/2018/day21/input.txt}
 --
-ERROR: Could not run test: Not implemented
+10961197
 ==
 
 [part=2]
