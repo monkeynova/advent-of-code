@@ -29,11 +29,12 @@ struct ParsedRE {
     std::string sub_prefix = prefix;
     sub_prefix.append(2, ' ');
     return absl::StrCat(
-      prefix, type == kBranch ? "<branch>\n" : "<sequence\n",
-      absl::StrJoin(children, "\n",
-                    [sub_prefix](std::string* out, const std::unique_ptr<ParsedRE>& p) {
-                      absl::StrAppend(out, p->DebugString(sub_prefix));
-                    }));
+        prefix, type == kBranch ? "<branch>\n" : "<sequence\n",
+        absl::StrJoin(
+            children, "\n",
+            [sub_prefix](std::string* out, const std::unique_ptr<ParsedRE>& p) {
+              absl::StrAppend(out, p->DebugString(sub_prefix));
+            }));
   }
 };
 
@@ -110,11 +111,20 @@ absl::StatusOr<absl::flat_hash_set<Point>> WalkAllPaths(
       for (char c : re.val) {
         Point dir;
         switch (c) {
-          case 'N': dir = Cardinal::kNorth; break;
-          case 'S': dir = Cardinal::kSouth; break;
-          case 'W': dir = Cardinal::kWest; break;
-          case 'E': dir = Cardinal::kEast; break;
-          default: return AdventDay::Error("Bad direction in: ", re.val);
+          case 'N':
+            dir = Cardinal::kNorth;
+            break;
+          case 'S':
+            dir = Cardinal::kSouth;
+            break;
+          case 'W':
+            dir = Cardinal::kWest;
+            break;
+          case 'E':
+            dir = Cardinal::kEast;
+            break;
+          default:
+            return AdventDay::Error("Bad direction in: ", re.val);
         }
         // Advance twice to include door.
         cur += dir;
@@ -133,7 +143,8 @@ absl::StatusOr<absl::flat_hash_set<Point>> WalkAllPaths(
       for (const auto& child : re.children) {
         absl::flat_hash_set<Point> next;
         for (Point p : ret) {
-          absl::StatusOr<absl::flat_hash_set<Point>> this_next = WalkAllPaths(*child, p, sparse_board);
+          absl::StatusOr<absl::flat_hash_set<Point>> this_next =
+              WalkAllPaths(*child, p, sparse_board);
           if (!this_next.ok()) return this_next.status();
           for (Point p : *this_next) next.insert(p);
         }
@@ -147,18 +158,21 @@ absl::StatusOr<absl::flat_hash_set<Point>> WalkAllPaths(
       }
       ret = {};
       for (const auto& child : re.children) {
-        absl::StatusOr<absl::flat_hash_set<Point>> this_next = WalkAllPaths(*child, cur, sparse_board);
+        absl::StatusOr<absl::flat_hash_set<Point>> this_next =
+            WalkAllPaths(*child, cur, sparse_board);
         if (!this_next.ok()) return this_next.status();
         for (Point p : *this_next) ret.insert(p);
       }
       break;
     }
-    default: return AdventDay::Error("Bad type: ", re.type);
+    default:
+      return AdventDay::Error("Bad type: ", re.type);
   }
   return ret;
 }
 
-absl::StatusOr<CharBoard> ConstructRoom(absl::string_view re, Point* start_ret) {
+absl::StatusOr<CharBoard> ConstructRoom(absl::string_view re,
+                                        Point* start_ret) {
   Point start = {0, 0};
 
   absl::StatusOr<ParsedRE> parsed_re = Parse(re);
@@ -168,7 +182,7 @@ absl::StatusOr<CharBoard> ConstructRoom(absl::string_view re, Point* start_ret) 
 
   absl::flat_hash_set<Point> sparse_board = {start};
   absl::StatusOr<absl::flat_hash_set<Point>> final_points =
-    WalkAllPaths(*parsed_re, start, &sparse_board);
+      WalkAllPaths(*parsed_re, start, &sparse_board);
   if (!final_points.ok()) return final_points.status();
 
   PointRectangle grid = {start, start};
@@ -190,7 +204,8 @@ absl::StatusOr<CharBoard> ConstructRoom(absl::string_view re, Point* start_ret) 
       } else if (test_point.x % 2 == 0 && test_point.y % 2) {
         board[p] = '-';
       } else {
-        return AdventDay::Error("Sparse board contains corner: ", test_point.DebugString());
+        return AdventDay::Error("Sparse board contains corner: ",
+                                test_point.DebugString());
       }
     } else {
       board[p] = '#';
@@ -200,11 +215,10 @@ absl::StatusOr<CharBoard> ConstructRoom(absl::string_view re, Point* start_ret) 
   return board;
 }
 
-
 class RoomWalk : public BFSInterface<RoomWalk, Point> {
  public:
   RoomWalk(const CharBoard& b, Point start, int* max_dist)
-   : board_(b), max_dist_(max_dist), cur_(start) {}
+      : board_(b), max_dist_(max_dist), cur_(start) {}
 
   Point identifier() const override { return cur_; }
   bool IsFinal() override { return false; }
@@ -232,7 +246,9 @@ class RoomWalk : public BFSInterface<RoomWalk, Point> {
 class RoomWalkPast : public BFSInterface<RoomWalkPast, Point> {
  public:
   RoomWalkPast(const CharBoard& b, Point start, int min_dist, int* count)
-   : board_(b), min_dist_(min_dist), count_(count), cur_(start) { *count_ = 0; }
+      : board_(b), min_dist_(min_dist), count_(count), cur_(start) {
+    *count_ = 0;
+  }
 
   Point identifier() const override { return cur_; }
   bool IsFinal() override { return false; }
@@ -275,7 +291,8 @@ absl::StatusOr<std::vector<std::string>> Day20_2018::Part1(
   VLOG(1) << "Start @" << start << " in Room:\n" << *room;
 
   int max_path = -1;
-  absl::optional<int> null_dist = RoomWalk(*room, start, &max_path).FindMinSteps();
+  absl::optional<int> null_dist =
+      RoomWalk(*room, start, &max_path).FindMinSteps();
   if (null_dist) return Error("Path walk terminated?!?");
 
   return IntReturn(max_path);
@@ -296,7 +313,8 @@ absl::StatusOr<std::vector<std::string>> Day20_2018::Part2(
   VLOG(1) << "Start @" << start << " in Room:\n" << *room;
 
   int count = -1;
-  absl::optional<int> null_dist = RoomWalkPast(*room, start, 1000, &count).FindMinSteps();
+  absl::optional<int> null_dist =
+      RoomWalkPast(*room, start, 1000, &count).FindMinSteps();
   if (null_dist) return Error("Path walk terminated?!?");
 
   return IntReturn(count);
