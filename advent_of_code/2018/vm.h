@@ -191,15 +191,20 @@ class VM {
     return absl::OkStatus();
   }
 
-  absl::StatusOr<int> ExecuteAndCount(int max_count) {
+  absl::StatusOr<int> ExecuteAndCount(int64_t max_count) {
     int32_t* ip = &registers_[ip_register_];
     int instructions = 0;
+    absl::flat_hash_set<int> seen;
     while (*ip >= 0 && *ip < ops_.size()) {
       ++instructions;
       if (instructions > max_count) break;
       if (*ip == 28) {
         VLOG(1) << *ip << ": " << absl::StrJoin(registers_, ",");
         VLOG(1) << ops_[*ip];
+        if (seen.contains(registers_[4])) {
+          return -1;
+        }
+        seen.insert(registers_[4]);
       }
       VLOG(4) << *ip << ": " << absl::StrJoin(registers_, ",");
       if (absl::Status st = ops_[*ip].Apply(registers_); !st.ok()) {

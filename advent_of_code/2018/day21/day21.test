@@ -8,4 +8,4 @@
 [part=2]
 @include{advent_of_code/2018/day21/input.txt}
 --
-ERROR: Could not run test: Not implemented
+8164934

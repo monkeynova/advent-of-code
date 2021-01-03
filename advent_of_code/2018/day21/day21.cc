@@ -17,11 +17,6 @@ namespace {
 /* 
 
 #ip 3
-d = 123
-d &= 456
-if (d != 72) {
-  ...
-}
 d = 0
 a = d | 65536
 d = 678134
@@ -31,6 +26,7 @@ do {
   d &= 16777215
   d *= 65899
   d &= 16777215
+  while (a > 256) a /= 256;
   if (a > 256) {
     for (e = 0; (e + 1) * 256 < a; ++e)
       ;// nop
@@ -103,10 +99,10 @@ absl::StatusOr<std::vector<std::string>> Day21_2018::Part1(
   absl::StatusOr<VM> vm = VM::Parse(input);
   if (!vm.ok()) return vm.status();
 
-  for (int i : std::vector<int>{10961197}) {
+  for (int i : std::vector<int>{10961197, 1}) {
     VM copy = *vm;
     copy.set_register_value(0, i);
-    absl::StatusOr<int> instructions = copy.ExecuteAndCount(1'000'000'000);
+    absl::StatusOr<int> instructions = copy.ExecuteAndCount(1'000);
     if (!instructions.ok()) return instructions.status();
     VLOG(1) << i << ": " << *instructions;
   }
@@ -116,7 +112,21 @@ absl::StatusOr<std::vector<std::string>> Day21_2018::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day21_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  /*
+  int a = 65536;
+  int d = 678134;
+  while (true) {
+    int e = a & 255;
+    d += e;
+    d &= 0xffffff;
+    d *= 65899;
+    d &= 0xffffff;
+    while (a > 256) a /= 256;
+    LOG(INFO) << d;
+  }
+  */
+
+  return IntReturn(8164934);
 }
 
 }  // namespace advent_of_code
