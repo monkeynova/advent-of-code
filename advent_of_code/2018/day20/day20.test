@@ -34,7 +34,8 @@
 4025
 ==
 
+# 9876 (high) <-- Mis read as >= 100 doors.
 [part=2]
 @include{advent_of_code/2018/day20/input.txt}
 --
-ERROR: Could not run test: Not implemented
+8186

@@ -167,10 +167,8 @@ absl::StatusOr<CharBoard> ConstructRoom(absl::string_view re, Point* start_ret) 
   VLOG(1) << parsed_re->DebugString();
 
   absl::flat_hash_set<Point> sparse_board = {start};
-  LOG(INFO) << "Walking paths...";
   absl::StatusOr<absl::flat_hash_set<Point>> final_points =
     WalkAllPaths(*parsed_re, start, &sparse_board);
-  LOG(INFO) << "  ...Done";
   if (!final_points.ok()) return final_points.status();
 
   PointRectangle grid = {start, start};
@@ -231,6 +229,35 @@ class RoomWalk : public BFSInterface<RoomWalk, Point> {
   Point cur_;
 };
 
+class RoomWalkPast : public BFSInterface<RoomWalkPast, Point> {
+ public:
+  RoomWalkPast(const CharBoard& b, Point start, int min_dist, int* count)
+   : board_(b), min_dist_(min_dist), count_(count), cur_(start) { *count_ = 0; }
+
+  Point identifier() const override { return cur_; }
+  bool IsFinal() override { return false; }
+
+  void AddNextSteps(State* state) override {
+    if (num_steps() >= min_dist_) ++*count_;
+
+    for (Point dir : Cardinal::kFourDirs) {
+      Point door_p = cur_ + dir;
+      if (board_.OnBoard(door_p) &&
+          (board_[door_p] == '|' || board_[door_p] == '-')) {
+        RoomWalkPast next = *this;
+        next.cur_ = cur_ + 2 * dir;
+        state->AddNextStep(next);
+      }
+    }
+  }
+
+ private:
+  const CharBoard& board_;
+  int min_dist_;
+  int* count_;
+  Point cur_;
+};
+
 }  // namespace
 
 absl::StatusOr<std::vector<std::string>> Day20_2018::Part1(
@@ -256,7 +283,23 @@ absl::StatusOr<std::vector<std::string>> Day20_2018::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day20_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  if (input.size() != 1) return Error("Bad size");
+  if (input[0][0] != '^') return Error("No front anchor");
+  input[0] = input[0].substr(1);
+  if (input[0][input[0].size() - 1] != '$') return Error("No back anchor");
+  input[0] = input[0].substr(0, input[0].size() - 1);
+
+  Point start;
+  absl::StatusOr<CharBoard> room = ConstructRoom(input[0], &start);
+  if (!room.ok()) return room.status();
+
+  VLOG(1) << "Start @" << start << " in Room:\n" << *room;
+
+  int count = -1;
+  absl::optional<int> null_dist = RoomWalkPast(*room, start, 1000, &count).FindMinSteps();
+  if (null_dist) return Error("Path walk terminated?!?");
+
+  return IntReturn(count);
 }
 
 }  // namespace advent_of_code
