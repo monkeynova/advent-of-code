@@ -48,7 +48,7 @@ Scratch analysis of input.
 28: mulr 3 5 3   // [3] *= [5] # [3] = 27 * 28
 29: addr 5 3 3   // [3] += [5] # [3] = 27 * 28 + 29
 30: mulr 5 3 3   // [3] *= [5] # [3] = 30 * (27 * 28 + 29)
-31: muli 3 14 3  // [3] *= 14 # [3] = 14 * 30 * (27 * 28 + 29) 
+31: muli 3 14 3  // [3] *= 14 # [3] = 14 * 30 * (27 * 28 + 29)
 32: mulr 3 5 3   // [3] *= [5] # [3] = 32 * 14 * 30 * (27 * 28 + 29)
 33: addr 1 3 1   // [1] += [3]
 34: seti 0 4 0   // [0] = 0
@@ -56,7 +56,7 @@ Scratch analysis of input.
 
   a += 2;
   a *= a; // 4
-  a *= 19; 
+  a *= 19;
   a *= 11;  // 836
   c += 7;
   c *= 22;
@@ -105,8 +105,8 @@ struct Op {
   static absl::StatusOr<Op> Parse(absl::string_view str) {
     Op op;
     absl::string_view op_name;
-    if (!RE2::FullMatch(str, "([a-z]+) (-?\\d+) (-?\\d+) (-?\\d+)",
-                        &op_name, &op.arg1, &op.arg2, &op.arg3)) {
+    if (!RE2::FullMatch(str, "([a-z]+) (-?\\d+) (-?\\d+) (-?\\d+)", &op_name,
+                        &op.arg1, &op.arg2, &op.arg3)) {
       return AdventDay::Error("Bad instruction: ", str);
     }
     auto it = kNameMap.find(op_name);
@@ -183,7 +183,8 @@ struct Op {
         registers[arg3] = registers[arg1] == registers[arg2] ? 1 : 0;
         break;
       }
-      default: return AdventDay::Error("Bad op_code: ", op_code);
+      default:
+        return AdventDay::Error("Bad op_code: ", op_code);
     }
     return absl::OkStatus();
   }
@@ -191,14 +192,12 @@ struct Op {
 
 // static
 const absl::flat_hash_map<absl::string_view, OpCode> Op::kNameMap = {
-  {"addr", OpCode::kAddr}, {"addi", OpCode::kAddi},
-  {"mulr", OpCode::kMulr}, {"muli", OpCode::kMuli},
-  {"banr", OpCode::kBanr}, {"bani", OpCode::kBani},
-  {"borr", OpCode::kBorr}, {"bori", OpCode::kBorr},
-  {"setr", OpCode::kSetr}, {"seti", OpCode::kSeti},
-  {"gtir", OpCode::kGtir}, {"gtri", OpCode::kGtri},
-  {"gtrr", OpCode::kGtrr}, {"eqrr", OpCode::kEqrr},
-  {"eqir", OpCode::kEqir}, {"eqri", OpCode::kEqri},
+    {"addr", OpCode::kAddr}, {"addi", OpCode::kAddi}, {"mulr", OpCode::kMulr},
+    {"muli", OpCode::kMuli}, {"banr", OpCode::kBanr}, {"bani", OpCode::kBani},
+    {"borr", OpCode::kBorr}, {"bori", OpCode::kBorr}, {"setr", OpCode::kSetr},
+    {"seti", OpCode::kSeti}, {"gtir", OpCode::kGtir}, {"gtri", OpCode::kGtri},
+    {"gtrr", OpCode::kGtrr}, {"eqrr", OpCode::kEqrr}, {"eqir", OpCode::kEqir},
+    {"eqri", OpCode::kEqri},
 };
 
 class VM {
@@ -248,7 +247,6 @@ class VM {
   int ip_register_;
   std::vector<int> registers_;
 };
-
 
 }  // namespace
 
