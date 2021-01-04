@@ -118,7 +118,7 @@ class QueueState : public BFSInterface<BFSImpl, HistType>::State {
   }
 
   void AddToFrontier(BFSImpl next) final {
-    VLOG(4) << "    Add: " << next.identifier() << " (" << next.num_steps() 
+    VLOG(4) << "    Add: " << next.identifier() << " (" << next.num_steps()
             << "+" << next.min_steps_to_final() << ")";
     frontier_.push(std::move(next));
   }
@@ -159,7 +159,6 @@ absl::optional<int> BFSInterface<BFSImpl, HistType>::FindMinStepsAStar() {
             << cur.min_steps_to_final() << ")";
     state.frontier_.pop();
     cur.AddNextSteps(&state);
-    //if (state.ret) return *state.ret;
   }
   return absl::nullopt;
 }
