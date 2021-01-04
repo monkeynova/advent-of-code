@@ -29,9 +29,7 @@ struct Group {
   absl::flat_hash_set<absl::string_view> immune;
   absl::flat_hash_set<absl::string_view> weak;
 
-  int effective_power() const {
-    return units * attack;
-  }
+  int effective_power() const { return units * attack; }
 
   int DamageTo(const Group& o) const {
     if (type == o.type) return 0;
@@ -42,12 +40,12 @@ struct Group {
 };
 
 std::ostream& operator<<(std::ostream& o, const Group& g) {
-  return o << g.id << "{" << g.units << " of " 
-          << (g.type == Group::kImmune ? "immune" : "infection")
-          << " hp=" << g.per_unit_hit_points << " init=" << g.initiative
-          << " a=" << g.attack << " ('" << g.attack_type << "')"
-          << " i={'" << absl::StrJoin(g.immune, "','") << "'}"
-          << " w={'" << absl::StrJoin(g.weak, "','") << "'}"
+  return o << g.id << "{" << g.units << " of "
+           << (g.type == Group::kImmune ? "immune" : "infection")
+           << " hp=" << g.per_unit_hit_points << " init=" << g.initiative
+           << " a=" << g.attack << " ('" << g.attack_type << "')"
+           << " i={'" << absl::StrJoin(g.immune, "','") << "'}"
+           << " w={'" << absl::StrJoin(g.weak, "','") << "'}"
            << "}";
 }
 
@@ -64,11 +62,14 @@ absl::StatusOr<std::vector<Group>> Parse(absl::Span<absl::string_view> input) {
       cur_type = Group::kImmune;
     } else if (row == "Infection:") {
       cur_type = Group::kInfection;
-    // 17 units each with 5390 hit points (weak to radiation, bludgeoning) with an attack that does 4507 fire damage at initiative 2
-    } else if (RE2::FullMatch(row, "(\\d+) units each with (\\d+) hit points "
-                              "\\(?(.*?)\\)? ?with an attack that does (\\d+) (.*) damage at initiative (\\d+)", 
-                              &g.units, &g.per_unit_hit_points,
-                              &special, &g.attack, &g.attack_type, &g.initiative)) {
+      // 17 units each with 5390 hit points (weak to radiation, bludgeoning)
+      // with an attack that does 4507 fire damage at initiative 2
+    } else if (RE2::FullMatch(row,
+                              "(\\d+) units each with (\\d+) hit points "
+                              "\\(?(.*?)\\)? ?with an attack that does (\\d+) "
+                              "(.*) damage at initiative (\\d+)",
+                              &g.units, &g.per_unit_hit_points, &special,
+                              &g.attack, &g.attack_type, &g.initiative)) {
       g.type = cur_type;
       g.id = groups.size();
       if (!special.empty()) {
@@ -103,7 +104,8 @@ int CountTypes(const std::vector<Group>& groups) {
   return seen;
 }
 
-const absl::flat_hash_map<int, int>& SelectTargets(const std::vector<Group>& groups) {
+const absl::flat_hash_map<int, int>& SelectTargets(
+    const std::vector<Group>& groups) {
   std::vector<int> group_order(groups.size());
   std::iota(group_order.begin(), group_order.end(), 0);
 
@@ -127,21 +129,25 @@ const absl::flat_hash_map<int, int>& SelectTargets(const std::vector<Group>& gro
   selected.clear();
   for (int i : group_order) {
     const Group& attack_group = groups[i];
-    VLOG(2) << "Selecting targets for " << attack_group.id << "; " << attack_group.effective_power();
+    VLOG(2) << "Selecting targets for " << attack_group.id << "; "
+            << attack_group.effective_power();
     int max_damage = 0;
     int max_damage_group = -1;
     for (int j = 0; j < groups.size(); ++j) {
       const Group& defend_group = groups[j];
       if (selected.contains(j)) continue;
       int damage = attack_group.DamageTo(defend_group);
-      VLOG(3) << attack_group.id << " would deal " << damage << " to " << defend_group.id;
+      VLOG(3) << attack_group.id << " would deal " << damage << " to "
+              << defend_group.id;
       bool replace = false;
       if (damage > max_damage) {
         replace = true;
       } else if (damage == max_damage) {
-        if (defend_group.effective_power() > groups[max_damage_group].effective_power()) {
+        if (defend_group.effective_power() >
+            groups[max_damage_group].effective_power()) {
           replace = true;
-        } else if (defend_group.effective_power() == groups[max_damage_group].effective_power()) {
+        } else if (defend_group.effective_power() ==
+                   groups[max_damage_group].effective_power()) {
           if (defend_group.initiative > groups[max_damage_group].initiative) {
             replace = true;
           }
@@ -186,8 +192,9 @@ std::vector<Group> RunAttack(std::vector<Group> groups,
     if (it == targets.end()) continue;
     Group& defend_group = groups[it->second];
     int damage = attack_group.DamageTo(defend_group);
-    VLOG(2) << "  " << attack_group.id << " deals " << damage << " to " << defend_group.id
-            << " killing " << damage / defend_group.per_unit_hit_points;
+    VLOG(2) << "  " << attack_group.id << " deals " << damage << " to "
+            << defend_group.id << " killing "
+            << damage / defend_group.per_unit_hit_points;
     CHECK(damage > 0);
     int killed = damage / defend_group.per_unit_hit_points;
     if (killed > 0) {
@@ -218,7 +225,7 @@ std::vector<Group> RunRound(std::vector<Group> groups, bool* change = nullptr) {
 
 std::vector<Group> Fight(const std::vector<Group>& start) {
   std::vector<Group> combat = start;
-  
+
   for (int round = 0; CountTypes(combat) > 1; ++round) {
     if (VLOG_IS_ON(2)) {
       VLOG(2) << "Round: " << round;
@@ -236,7 +243,7 @@ int ImmuneLeftAfterFightWithBoost(const std::vector<Group>& start, int boost) {
   for (Group& g : combat) {
     if (g.type == Group::kImmune) g.attack += boost;
   }
-  
+
   bool change = true;
   for (int round = 0; change && CountTypes(combat) > 1; ++round) {
     if (VLOG_IS_ON(2)) {
@@ -252,14 +259,13 @@ int ImmuneLeftAfterFightWithBoost(const std::vector<Group>& start, int boost) {
   if (!change) return 0;
 
   if (combat[0].type != Group::kImmune) return 0;
-  
+
   int units = 0;
   for (const Group& g : combat) {
     units += g.units;
   }
   return units;
 }
-
 
 }  // namespace
 
