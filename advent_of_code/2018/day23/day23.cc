@@ -18,9 +18,7 @@ struct NanoBot {
   Point3 p;
   int64_t r;
 
-  bool operator==(const NanoBot& o) const {
-    return p == o.p && r == o.r;
-  }
+  bool operator==(const NanoBot& o) const { return p == o.p && r == o.r; }
 
   template <typename H>
   friend H AbslHashValue(H h, const NanoBot& b) {
@@ -28,7 +26,8 @@ struct NanoBot {
   }
 };
 
-absl::StatusOr<std::vector<NanoBot>> Parse(absl::Span<absl::string_view> input) {
+absl::StatusOr<std::vector<NanoBot>> Parse(
+    absl::Span<absl::string_view> input) {
   std::vector<NanoBot> ret;
   for (absl::string_view row : input) {
     NanoBot nb;
@@ -51,8 +50,8 @@ struct CubeHits {
   absl::flat_hash_set<NanoBot> bots;
 };
 
-absl::flat_hash_set<NanoBot> FindBots(
-    const Cube& cube, const absl::flat_hash_set<NanoBot>& in) {
+absl::flat_hash_set<NanoBot> FindBots(const Cube& cube,
+                                      const absl::flat_hash_set<NanoBot>& in) {
   absl::flat_hash_set<NanoBot> out;
   for (const NanoBot& test : in) {
     Point3 closest_in_cube = test.p;
@@ -70,7 +69,8 @@ absl::flat_hash_set<NanoBot> FindBots(
 }
 
 std::vector<CubeHits> SplitCube(const CubeHits& in, int candidate_size) {
-  VLOG(2) << "SplitCube({" << in.range.min << "-" << in.range.max <<"}, " << candidate_size << ")";
+  VLOG(2) << "SplitCube({" << in.range.min << "-" << in.range.max << "}, "
+          << candidate_size << ")";
   std::vector<CubeHits> split;
   int64_t split_x = (in.range.max.x + in.range.min.x) / 2;
   int64_t split_y = (in.range.max.y + in.range.min.y) / 2;
@@ -106,7 +106,8 @@ std::vector<CubeHits> SplitCube(const CubeHits& in, int candidate_size) {
 
         CubeHits test = {tmp, {}};
         test.bots = FindBots(tmp, in.bots);
-        VLOG(3) << "  {" << x_split << "," << y_split << "," << z_split << "} = " << test.bots.size();
+        VLOG(3) << "  {" << x_split << "," << y_split << "," << z_split
+                << "} = " << test.bots.size();
         if (candidate_size < test.bots.size()) {
           split.clear();
           candidate_size = test.bots.size();
@@ -125,7 +126,7 @@ absl::StatusOr<Point3> FindBest(std::vector<NanoBot> bots_in) {
   CubeHits hits;
   hits.range.min = bots_in.begin()->p;
   hits.range.max = hits.range.min;
-  for (const NanoBot &nb : bots_in) {
+  for (const NanoBot& nb : bots_in) {
     hits.range.min.x = std::min(hits.range.min.x, nb.p.x);
     hits.range.min.y = std::min(hits.range.min.y, nb.p.y);
     hits.range.min.z = std::min(hits.range.min.z, nb.p.z);
@@ -137,8 +138,10 @@ absl::StatusOr<Point3> FindBest(std::vector<NanoBot> bots_in) {
   std::vector<CubeHits> candidates = {hits};
   std::vector<CubeHits> final;
   while (!candidates.empty()) {
-    VLOG(1) << candidates.size() << "; " << (candidates[0].range.max - candidates[0].range.min).dist()
-            << "; " << candidates[0].range.min << "-" << candidates[0].range.max;
+    VLOG(1) << candidates.size() << "; "
+            << (candidates[0].range.max - candidates[0].range.min).dist()
+            << "; " << candidates[0].range.min << "-"
+            << candidates[0].range.max;
     std::vector<CubeHits> new_candidates;
     int candidate_size = 0;
     for (const CubeHits& cube_hit : candidates) {
@@ -200,7 +203,7 @@ absl::StatusOr<Point3> FindBest(std::vector<NanoBot> bots_in) {
           best = p;
         }
       }
-    } 
+    }
   }
 
   return best;
@@ -214,7 +217,7 @@ absl::StatusOr<std::vector<std::string>> Day23_2018::Part1(
   absl::StatusOr<std::vector<NanoBot>> bots = Parse(input);
   if (!bots.ok()) return bots.status();
   if (bots->empty()) return Error("No bots");
- 
+
   NanoBot strongest = *bots->begin();
   for (const NanoBot& nb : *bots) {
     if (nb.r > strongest.r) strongest = nb;
