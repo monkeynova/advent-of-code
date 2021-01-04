@@ -146,7 +146,17 @@ absl::StatusOr<std::vector<std::string>> Day10_2016::Part1(
     }
   }
 
-  return IntReturn(FindCmp(&bots, 17, 61));
+  bool saw_61 = false;
+  for (const auto& [_, bot] : bots) {
+    for (const Input& i : bot.inputs) {
+      if (i.value == 61) saw_61 = true;
+    }
+  }
+
+  if (saw_61) {
+    return IntReturn(FindCmp(&bots, 17, 61));
+  }
+  return IntReturn(FindCmp(&bots, 2, 5));
 }
 
 absl::StatusOr<std::vector<std::string>> Day10_2016::Part2(
