@@ -102,8 +102,8 @@ absl::StatusOr<std::vector<std::string>> Day21_2018::Part1(
   int watch_register = -1;
   int watch_ip = -1;
   for (int i = 0; i < vm->ops().size(); ++i) {
-    const Op& op = vm->ops()[i];
-    if (op.op_code == OpCode::kEqrr && (op.arg1 == 0 || op.arg2 == 0)) {
+    const VM::Op& op = vm->ops()[i];
+    if (op.op_code == VM::OpCode::kEqrr && (op.arg1 == 0 || op.arg2 == 0)) {
       watch_ip = i;
       watch_register = op.arg1 == 0 ? op.arg2 : op.arg1;
     }
@@ -111,7 +111,7 @@ absl::StatusOr<std::vector<std::string>> Day21_2018::Part1(
   if (watch_ip == -1) return Error("Could not find equality test");
 
   int first_test = -1;
-  absl::Status st = vm->ExecuteAndWatch([&](int ip) {
+  absl::Status st = vm->Execute([&](int ip) {
     if (ip == watch_ip) {
       first_test = vm->register_value(watch_register);
       return true;
@@ -131,8 +131,8 @@ absl::StatusOr<std::vector<std::string>> Day21_2018::Part2(
   int watch_register = -1;
   int watch_ip = -1;
   for (int i = 0; i < vm->ops().size(); ++i) {
-    const Op& op = vm->ops()[i];
-    if (op.op_code == OpCode::kEqrr && (op.arg1 == 0 || op.arg2 == 0)) {
+    const VM::Op& op = vm->ops()[i];
+    if (op.op_code == VM::OpCode::kEqrr && (op.arg1 == 0 || op.arg2 == 0)) {
       watch_ip = i;
       watch_register = op.arg1 == 0 ? op.arg2 : op.arg1;
     }
@@ -141,7 +141,7 @@ absl::StatusOr<std::vector<std::string>> Day21_2018::Part2(
 
   int last_new = -1;
   absl::flat_hash_set<int> hist;
-  absl::Status st = vm->ExecuteAndWatch([&](int ip) {
+  absl::Status st = vm->Execute([&](int ip) {
     if (ip == watch_ip) {
       int watch_value = vm->register_value(watch_register);
       if (hist.contains(watch_value)) return true;
