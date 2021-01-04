@@ -18,7 +18,7 @@
         }
       },
       {
-        "label": "Bazel test (opt; long=20s) ...",
+        "label": "Bazel test (opt; long=30s) ...",
         "type": "shell",
         "command": "bazel",
         "args": [
@@ -26,7 +26,7 @@
           "-c",
           "opt",
           "...",
-          "--test_arg=--run_long_tests=20s"
+          "--test_arg=--run_long_tests=30s"
         ],
         "problemMatcher": [],
         "group": {
