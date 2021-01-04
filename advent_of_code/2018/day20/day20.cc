@@ -279,13 +279,14 @@ class RoomWalkPast : public BFSInterface<RoomWalkPast, Point> {
 absl::StatusOr<std::vector<std::string>> Day20_2018::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
-  if (input[0][0] != '^') return Error("No front anchor");
-  input[0] = input[0].substr(1);
-  if (input[0][input[0].size() - 1] != '$') return Error("No back anchor");
-  input[0] = input[0].substr(0, input[0].size() - 1);
+  absl::string_view re = input[0];
+  if (re[0] != '^') return Error("No front anchor: ", re);
+  re = re.substr(1);
+  if (re[re.size() - 1] != '$') return Error("No back anchor");
+  re = re.substr(0, re.size() - 1);
 
   Point start;
-  absl::StatusOr<CharBoard> room = ConstructRoom(input[0], &start);
+  absl::StatusOr<CharBoard> room = ConstructRoom(re, &start);
   if (!room.ok()) return room.status();
 
   VLOG(1) << "Start @" << start << " in Room:\n" << *room;
@@ -301,13 +302,14 @@ absl::StatusOr<std::vector<std::string>> Day20_2018::Part1(
 absl::StatusOr<std::vector<std::string>> Day20_2018::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
-  if (input[0][0] != '^') return Error("No front anchor");
-  input[0] = input[0].substr(1);
-  if (input[0][input[0].size() - 1] != '$') return Error("No back anchor");
-  input[0] = input[0].substr(0, input[0].size() - 1);
+  absl::string_view re = input[0];
+  if (re[0] != '^') return Error("No front anchor: ", re);
+  re = re.substr(1);
+  if (re[re.size() - 1] != '$') return Error("No back anchor");
+  re = re.substr(0, re.size() - 1);
 
   Point start;
-  absl::StatusOr<CharBoard> room = ConstructRoom(input[0], &start);
+  absl::StatusOr<CharBoard> room = ConstructRoom(re, &start);
   if (!room.ok()) return room.status();
 
   VLOG(1) << "Start @" << start << " in Room:\n" << *room;
