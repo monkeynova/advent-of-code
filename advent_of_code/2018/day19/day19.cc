@@ -89,6 +89,7 @@ absl::StatusOr<std::vector<std::string>> Day19_2018::Part1(
 absl::StatusOr<std::vector<std::string>> Day19_2018::Part2(
     absl::Span<absl::string_view> input) const {
   // Identified another prime factorization assembly code.
+  // TODO(@monkeynova): Try to identify and alter with code.
   int a = 10551398;
   int z = 0;
   for (int d = 1; d <= a; ++d) {

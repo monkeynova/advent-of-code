@@ -266,6 +266,7 @@ absl::StatusOr<std::vector<std::string>> Day23_2017::Part1(
 absl::StatusOr<std::vector<std::string>> Day23_2017::Part2(
     absl::Span<absl::string_view> input) const {
   // Hand converted, then optimized form of the assembly.
+  // TODO(@monkeynova): Can we identify and optimize this?
   int b = 65;
   int c = b;
   b *= 100;

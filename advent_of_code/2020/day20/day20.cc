@@ -374,7 +374,6 @@ absl::StatusOr<int> CountNonSeaMonster(const CharBoard& board) {
   const int kSeaMonsterOn = 15;
   int on = 0;
   for (Point p : board.range()) {
-    // TODO(@monkeynova): Remove sea monsters.
     if (board[p] == '#') ++on;
   }
   absl::optional<int> sea_monster_count;

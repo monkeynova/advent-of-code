@@ -176,38 +176,8 @@ absl::StatusOr<Point3> FindBest(std::vector<NanoBot> bots_in) {
       best = hit.range.min;
     }
   }
-  return best;
-
-  /*
-  // Brute Force!
-  Point3 best;
-  int in_range = 0;
-  Point3 p = min;
-  VLOG(1) << "Searching: " << min << " to " << max;
-  for (p.z = min.z; p.z <= max.z; ++p.z) {
-    for (p.y = min.y; p.y <= max.y; ++p.y) {
-      for (p.x = min.x; p.x <= max.x; ++p.x) {
-        int this_in_range = 0;
-        for (const NanoBot& b : bots_in) {
-          if ((b.p - p).dist() <= b.r) {
-            ++this_in_range;
-          }
-        }
-        if (this_in_range > in_range) {
-          VLOG(2) << "  Found: " << this_in_range << " @" << p;
-          in_range = this_in_range;
-          best = p;
-        } else if (this_in_range == in_range && p.dist() < best.dist()) {
-          VLOG(2) << "  Found: " << this_in_range << " @" << p;
-          in_range = this_in_range;
-          best = p;
-        }
-      }
-    }
-  }
 
   return best;
-  */
 }
 
 }  // namespace
