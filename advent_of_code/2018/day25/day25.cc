@@ -71,7 +71,7 @@ absl::StatusOr<std::vector<std::string>> Day25_2018::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day25_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  return std::vector<std::string>{"Merry Christmas!"};
 }
 
 }  // namespace advent_of_code
