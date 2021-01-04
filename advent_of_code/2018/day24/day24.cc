@@ -93,16 +93,21 @@ absl::StatusOr<std::vector<Group>> Parse(absl::Span<absl::string_view> input) {
 }
 
 int CountTypes(const std::vector<Group>& groups) {
-  absl::flat_hash_set<Group::Type> types;
-  for (const Group& g : groups) types.insert(g.type);
-  return types.size();
+  int types[3] = {0, 0, 0};
+  int seen = 0;
+  for (const Group& g : groups) {
+    if (++types[g.type] == 1) {
+      if (++seen > 1) break;
+    }
+  }
+  return seen;
 }
 
-absl::flat_hash_map<int, int> SelectTargets(const std::vector<Group>& groups) {
+const absl::flat_hash_map<int, int>& SelectTargets(const std::vector<Group>& groups) {
   std::vector<int> group_order(groups.size());
   std::iota(group_order.begin(), group_order.end(), 0);
 
-  VLOG(1) << absl::StrJoin(group_order, ", ");
+  VLOG(2) << absl::StrJoin(group_order, ", ");
 
   std::sort(group_order.begin(), group_order.end(),
             [groups](int a_idx, int b_idx) {
@@ -116,8 +121,10 @@ absl::flat_hash_map<int, int> SelectTargets(const std::vector<Group>& groups) {
               return a.initiative > b.initiative;
             });
 
-  absl::flat_hash_map<int, int> targets;
-  absl::flat_hash_set<int> selected;
+  static absl::flat_hash_map<int, int> targets;
+  static absl::flat_hash_set<int> selected;
+  targets.clear();
+  selected.clear();
   for (int i : group_order) {
     const Group& attack_group = groups[i];
     VLOG(2) << "Selecting targets for " << attack_group.id << "; " << attack_group.effective_power();
@@ -157,8 +164,10 @@ absl::flat_hash_map<int, int> SelectTargets(const std::vector<Group>& groups) {
 }
 
 std::vector<Group> RunAttack(std::vector<Group> groups,
-                             const absl::flat_hash_map<int, int>& targets) {
+                             const absl::flat_hash_map<int, int>& targets,
+                             bool* change) {
   bool any_died = false;
+  if (change != nullptr) *change = false;
 
   std::vector<int> group_order(groups.size());
   std::iota(group_order.begin(), group_order.end(), 0);
@@ -180,8 +189,12 @@ std::vector<Group> RunAttack(std::vector<Group> groups,
     VLOG(2) << "  " << attack_group.id << " deals " << damage << " to " << defend_group.id
             << " killing " << damage / defend_group.per_unit_hit_points;
     CHECK(damage > 0);
-    defend_group.units -= damage / defend_group.per_unit_hit_points;
-    if (defend_group.units <= 0) any_died = true;
+    int killed = damage / defend_group.per_unit_hit_points;
+    if (killed > 0) {
+      if (change != nullptr) *change = true;
+      defend_group.units -= damage / defend_group.per_unit_hit_points;
+      if (defend_group.units <= 0) any_died = true;
+    }
   }
 
   if (any_died) {
@@ -197,26 +210,56 @@ std::vector<Group> RunAttack(std::vector<Group> groups,
   return groups;
 }
 
-std::vector<Group> RunRound(std::vector<Group> groups) {
+std::vector<Group> RunRound(std::vector<Group> groups, bool* change = nullptr) {
   absl::flat_hash_map<int, int> targets = SelectTargets(groups);
 
-  return RunAttack(groups, targets);
+  return RunAttack(std::move(groups), targets, change);
 }
 
 std::vector<Group> Fight(const std::vector<Group>& start) {
   std::vector<Group> combat = start;
   
   for (int round = 0; CountTypes(combat) > 1; ++round) {
-    if (VLOG_IS_ON(1)) {
+    if (VLOG_IS_ON(2)) {
+      VLOG(2) << "Round: " << round;
+      for (const Group& g : combat) {
+        VLOG(3) << "  " << g;
+      }
+    }
+    combat = RunRound(std::move(combat));
+  }
+  return combat;
+}
+
+int ImmuneLeftAfterFightWithBoost(const std::vector<Group>& start, int boost) {
+  std::vector<Group> combat = start;
+  for (Group& g : combat) {
+    if (g.type == Group::kImmune) g.attack += boost;
+  }
+  
+  bool change = true;
+  for (int round = 0; change && CountTypes(combat) > 1; ++round) {
+    if (VLOG_IS_ON(2)) {
       VLOG(1) << "Round: " << round;
       for (const Group& g : combat) {
         VLOG(2) << "  " << g;
       }
     }
-    combat = RunRound(combat);
+    combat = RunRound(std::move(combat), &change);
   }
-  return combat;
+
+  // Stalemate isn't a win.
+  if (!change) return 0;
+
+  if (combat[0].type != Group::kImmune) return 0;
+  
+  int units = 0;
+  for (const Group& g : combat) {
+    units += g.units;
+  }
+  return units;
 }
+
 
 }  // namespace
 
@@ -237,7 +280,41 @@ absl::StatusOr<std::vector<std::string>> Day24_2018::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day24_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<std::vector<Group>> groups = Parse(input);
+  if (!groups.ok()) return groups.status();
+
+  int min = 1;
+  int max = 0;
+  int immunity_units_left;
+  while (min != max) {
+    if (max == 0) {
+      int boost = 2 * min;
+      VLOG(1) << "Trying boost: " << boost;
+      int this_units_left = ImmuneLeftAfterFightWithBoost(*groups, boost);
+      if (this_units_left > 0) {
+        VLOG(1) << "  Immunity won";
+        immunity_units_left = this_units_left;
+        max = 2 * min;
+      } else {
+        VLOG(1) << "  Infection won";
+        min = 2 * min;
+      }
+    } else {
+      int boost = (max + min) / 2;
+      VLOG(1) << "Trying boost: " << boost;
+      int this_units_left = ImmuneLeftAfterFightWithBoost(*groups, boost);
+      if (this_units_left > 0) {
+        VLOG(1) << "  Immunity won";
+        immunity_units_left = this_units_left;
+        max = boost;
+      } else {
+        VLOG(1) << "  Infection won";
+        min = boost + 1;
+      }
+    }
+  }
+
+  return IntReturn(immunity_units_left);
 }
 
 }  // namespace advent_of_code
