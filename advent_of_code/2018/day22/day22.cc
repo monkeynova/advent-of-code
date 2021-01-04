@@ -32,10 +32,17 @@ class Map {
     for (Point p : ret.range()) {
       Terrain terrain = GetTerrain(p);
       switch (terrain) {
-        case Terrain::kRocky: ret[p] = '.'; break;
-        case Terrain::kWet: ret[p] = '='; break;
-        case Terrain::kNarrow: ret[p] = '|'; break;
-        default: LOG(FATAL) << "Bad mod";
+        case Terrain::kRocky:
+          ret[p] = '.';
+          break;
+        case Terrain::kWet:
+          ret[p] = '=';
+          break;
+        case Terrain::kNarrow:
+          ret[p] = '|';
+          break;
+        default:
+          LOG(FATAL) << "Bad mod";
       }
     }
     return ret;
@@ -46,7 +53,8 @@ class Map {
     if (p == target_) return 0;
     if (p.y == 0) return p.x * 16807;
     if (p.x == 0) return p.y * 48271;
-    return ErosionLevel(p + Cardinal::kWest) * ErosionLevel(p + Cardinal::kNorth);
+    return ErosionLevel(p + Cardinal::kWest) *
+           ErosionLevel(p + Cardinal::kNorth);
   }
 
   Terrain GetTerrain(Point p) {
@@ -74,9 +82,10 @@ class MapWalk : public BFSInterface<MapWalk> {
     kNothing = 0,
     kTorch = 1,
     kGear = 2,
-  }; 
-  
-  explicit MapWalk(Map* map) : map_(map), cur_(Point{0, 0}), equipped_(kTorch) {}
+  };
+
+  explicit MapWalk(Map* map)
+      : map_(map), cur_(Point{0, 0}), equipped_(kTorch) {}
 
   const MapWalk& identifier() const override { return *this; }
 
@@ -97,11 +106,13 @@ class MapWalk : public BFSInterface<MapWalk> {
       state->AddNextStep(next);
     }
 
-    absl::flat_hash_set<Equipment> this_need = NeedEquip(map_->GetTerrain(cur_));
+    absl::flat_hash_set<Equipment> this_need =
+        NeedEquip(map_->GetTerrain(cur_));
     for (Point dir : Cardinal::kFourDirs) {
       Point check = cur_ + dir;
       if (check.x < 0 || check.y < 0) continue;
-      absl::flat_hash_set<Equipment> next_need = NeedEquip(map_->GetTerrain(check));
+      absl::flat_hash_set<Equipment> next_need =
+          NeedEquip(map_->GetTerrain(check));
       for (Equipment e : next_need) {
         if (!this_need.contains(e)) continue;
         MapWalk next = *this;
@@ -117,9 +128,12 @@ class MapWalk : public BFSInterface<MapWalk> {
 
   absl::flat_hash_set<Equipment> NeedEquip(Map::Terrain terrain) {
     switch (terrain) {
-      case Map::Terrain::kRocky: return {kGear, kTorch};
-      case Map::Terrain::kWet: return {kGear, kNothing};
-      case Map::Terrain::kNarrow: return {kNothing, kTorch};
+      case Map::Terrain::kRocky:
+        return {kGear, kTorch};
+      case Map::Terrain::kWet:
+        return {kGear, kNothing};
+      case Map::Terrain::kNarrow:
+        return {kNothing, kTorch};
     }
     LOG(FATAL) << "Bad enum";
   }
@@ -153,7 +167,8 @@ absl::StatusOr<std::vector<std::string>> Day22_2018::Part1(
     return Error("No depth");
   }
   Point target;
-  if (!RE2::FullMatch(input[1], "target: (\\d+),(\\d+)", &target.x, &target.y)) {
+  if (!RE2::FullMatch(input[1], "target: (\\d+),(\\d+)", &target.x,
+                      &target.y)) {
     return Error("No target");
   }
   Map map(depth, target);
@@ -161,8 +176,8 @@ absl::StatusOr<std::vector<std::string>> Day22_2018::Part1(
   // VLOG(1) << "Map:\n" << b;
   int risk = 0;
   for (Point p : b.range()) {
-   if (b[p] == '=') ++risk;
-   if (b[p] == '|') risk += 2;
+    if (b[p] == '=') ++risk;
+    if (b[p] == '|') risk += 2;
   }
   return IntReturn(risk);
 }
@@ -175,7 +190,8 @@ absl::StatusOr<std::vector<std::string>> Day22_2018::Part2(
     return Error("No depth");
   }
   Point target;
-  if (!RE2::FullMatch(input[1], "target: (\\d+),(\\d+)", &target.x, &target.y)) {
+  if (!RE2::FullMatch(input[1], "target: (\\d+),(\\d+)", &target.x,
+                      &target.y)) {
     return Error("No target");
   }
   Map map(depth, target);
