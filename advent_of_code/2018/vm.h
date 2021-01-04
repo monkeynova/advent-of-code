@@ -191,28 +191,17 @@ class VM {
     return absl::OkStatus();
   }
 
-  absl::StatusOr<int> ExecuteAndCount(int64_t max_count) {
+  absl::Status ExecuteAndWatch(std::function<bool(int)> watcher) {
     int32_t* ip = &registers_[ip_register_];
-    int instructions = 0;
-    absl::flat_hash_set<int> seen;
     while (*ip >= 0 && *ip < ops_.size()) {
-      ++instructions;
-      if (instructions > max_count) break;
-      if (*ip == 28) {
-        VLOG(1) << *ip << ": " << absl::StrJoin(registers_, ",");
-        VLOG(1) << ops_[*ip];
-        if (seen.contains(registers_[4])) {
-          return -1;
-        }
-        seen.insert(registers_[4]);
-      }
+      if (watcher(*ip)) break;
       VLOG(4) << *ip << ": " << absl::StrJoin(registers_, ",");
       if (absl::Status st = ops_[*ip].Apply(registers_); !st.ok()) {
         return st;
       }
       ++*ip;
     }
-    return instructions;
+    return absl::OkStatus();
   }
 
   int32_t register_value(int register_number) const {
@@ -222,6 +211,8 @@ class VM {
   void set_register_value(int register_number, int32_t value) {
     registers_[register_number] = value;
   }
+
+  const std::vector<Op>& ops() const { return ops_; }
 
  private:
   VM() : registers_(6, 0) {}

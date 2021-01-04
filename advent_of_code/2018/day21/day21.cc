@@ -99,34 +99,66 @@ absl::StatusOr<std::vector<std::string>> Day21_2018::Part1(
   absl::StatusOr<VM> vm = VM::Parse(input);
   if (!vm.ok()) return vm.status();
 
-  for (int i : std::vector<int>{10961197, 1}) {
-    VM copy = *vm;
-    copy.set_register_value(0, i);
-    absl::StatusOr<int> instructions = copy.ExecuteAndCount(1'000);
-    if (!instructions.ok()) return instructions.status();
-    VLOG(1) << i << ": " << *instructions;
+  int watch_register = -1;
+  int watch_ip = -1;
+  for (int i = 0; i < vm->ops().size(); ++i) {
+    const Op& op = vm->ops()[i];
+    if (op.op_code == OpCode::kEqrr &&
+        (op.arg1 == 0 || op.arg2 == 0)) {
+      watch_ip = i;
+      watch_register = op.arg1 == 0 ? op.arg2 : op.arg1;
+    }
   }
+  if (watch_ip == -1) return Error("Could not find equality test");
 
-  return IntReturn(10961197);
+  int first_test = -1;
+  absl::Status st = vm->ExecuteAndWatch(
+    [&](int ip) {
+      if (ip == watch_ip) {
+        first_test = vm->register_value(watch_register);
+        return true;
+      }
+      return false;
+    });
+  if (!st.ok()) return st;
+
+  return IntReturn(first_test);
 }
 
 absl::StatusOr<std::vector<std::string>> Day21_2018::Part2(
     absl::Span<absl::string_view> input) const {
-  /*
-  int a = 65536;
-  int d = 678134;
-  while (true) {
-    int e = a & 255;
-    d += e;
-    d &= 0xffffff;
-    d *= 65899;
-    d &= 0xffffff;
-    while (a > 256) a /= 256;
-    LOG(INFO) << d;
-  }
-  */
+  absl::StatusOr<VM> vm = VM::Parse(input);
+  if (!vm.ok()) return vm.status();
 
-  return IntReturn(8164934);
+  int watch_register = -1;
+  int watch_ip = -1;
+  for (int i = 0; i < vm->ops().size(); ++i) {
+    const Op& op = vm->ops()[i];
+    if (op.op_code == OpCode::kEqrr &&
+        (op.arg1 == 0 || op.arg2 == 0)) {
+      watch_ip = i;
+      watch_register = op.arg1 == 0 ? op.arg2 : op.arg1;
+    }
+  }
+  if (watch_ip == -1) return Error("Could not find equality test");
+
+  int last_new = -1;
+  absl::flat_hash_set<int> hist;
+  absl::Status st = vm->ExecuteAndWatch(
+    [&](int ip) {
+      if (ip == watch_ip) {
+        int watch_value = vm->register_value(watch_register);
+        if (hist.contains(watch_value)) return true;
+        VLOG_IF(1, hist.size() % 777 == 0)
+          << "Value: " << watch_value << " of " << hist.size();
+        hist.insert(watch_value);
+        last_new = watch_value;
+      }
+      return false;
+    });
+  if (!st.ok()) return st;
+
+  return IntReturn(last_new);
 }
 
 }  // namespace advent_of_code

@@ -5,6 +5,7 @@
 10961197
 ==
 
+[long=60m (1m opt) 2020.01.02]
 [part=2]
 @include{advent_of_code/2018/day21/input.txt}
 --
