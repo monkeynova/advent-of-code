@@ -39,7 +39,8 @@ struct Op {
   int32_t arg3;
 
   friend std::ostream& operator<<(std::ostream& out, const Op& op) {
-    return out << kCodeMap[op.op_code] << ": " << op.arg1 << ", " << op.arg2 << ", " << op.arg3;
+    return out << kCodeMap[op.op_code] << ": " << op.arg1 << ", " << op.arg2
+               << ", " << op.arg3;
   }
 
   static absl::StatusOr<Op> Parse(absl::string_view str) {
@@ -142,23 +143,9 @@ const absl::flat_hash_map<absl::string_view, OpCode> Op::kNameMap = {
 };
 
 const std::vector<absl::string_view> Op::kCodeMap = {
-  "<NONE>",
-  "kAddr",
-  "kAddi",
-  "kMulr",
-  "kMuli",
-  "kBanr",
-  "kBani",
-  "kBorr",
-  "kBori",
-  "kSetr",
-  "kSeti",
-  "kGtir",
-  "kGtri",
-  "kGtrr",
-  "kEqir",
-  "kEqri",
-  "kEqrr"};
+    "<NONE>", "kAddr", "kAddi", "kMulr", "kMuli", "kBanr",
+    "kBani",  "kBorr", "kBori", "kSetr", "kSeti", "kGtir",
+    "kGtri",  "kGtrr", "kEqir", "kEqri", "kEqrr"};
 
 class VM {
  public:
