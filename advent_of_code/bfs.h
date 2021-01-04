@@ -55,10 +55,12 @@ class BFSInterface {
   absl::optional<int> FindMinSteps();
   absl::optional<int> FindMinStepsAStar();
 
+  int num_steps() const { return num_steps_; }
+
  protected:
   BFSInterface() = default;
 
-  int num_steps() const { return num_steps_; }
+  void add_steps(int num_steps) { num_steps_ += num_steps; }
 
  private:
   int num_steps_ = 0;
@@ -70,20 +72,22 @@ class BFSInterface {
 template <typename BFSImpl, typename HistType>
 class BFSInterface<BFSImpl, HistType>::State {
  public:
-  explicit State(const BFSImpl& start) { hist_.insert(start.identifier()); }
+  explicit State(const BFSImpl& start) { hist_[start.identifier()] = 0; }
 
   void AddNextStep(BFSImpl next) {
     ++next.num_steps_;
     if (next.IsFinal()) ret = next.num_steps_;
-    if (hist_.contains(next.identifier())) return;
-    hist_.insert(next.identifier());
-    AddToFrontier(std::move(next));
+    auto it = hist_.find(next.identifier());
+    if (it == hist_.end() || it->second > next.num_steps()) {
+      hist_[next.identifier()] = next.num_steps();
+      AddToFrontier(std::move(next));
+    }
   }
 
   virtual void AddToFrontier(BFSImpl next) = 0;
 
  private:
-  absl::flat_hash_set<HistType> hist_;
+  absl::flat_hash_map<HistType, int> hist_;
   absl::optional<int> ret;
   friend class BFSInterface;
 };
@@ -113,7 +117,11 @@ class QueueState : public BFSInterface<BFSImpl, HistType>::State {
     AddToFrontier(start);
   }
 
-  void AddToFrontier(BFSImpl next) final { frontier_.push(std::move(next)); }
+  void AddToFrontier(BFSImpl next) final {
+    VLOG(4) << "    Add: " << next.identifier() << " (" << next.num_steps() 
+            << "+" << next.min_steps_to_final() << ")";
+    frontier_.push(std::move(next));
+  }
 
  private:
   std::priority_queue<BFSImpl, std::vector<BFSImpl>, AStarGT<BFSImpl>>
@@ -146,11 +154,12 @@ absl::optional<int> BFSInterface<BFSImpl, HistType>::FindMinStepsAStar() {
   QueueState<BFSImpl, HistType> state(*dynamic_cast<BFSImpl*>(this));
   while (!state.frontier_.empty()) {
     BFSImpl cur = state.frontier_.top();
+    if (cur.IsFinal()) return cur.num_steps();
     VLOG(3) << "  Next: " << cur.identifier() << " (" << cur.num_steps() << "+"
             << cur.min_steps_to_final() << ")";
     state.frontier_.pop();
     cur.AddNextSteps(&state);
-    if (state.ret) return *state.ret;
+    //if (state.ret) return *state.ret;
   }
   return absl::nullopt;
 }

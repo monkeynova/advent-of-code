@@ -193,7 +193,7 @@ class GameBoard {
       Point check = p + dir;
       if (!board_.OnBoard(check) || board_[check] != '.') continue;
       absl::optional<int> dist =
-          PathWalk(board_, check, p_and_d.p).FindMinStepsAStar();
+          PathWalk(board_, check, p_and_d.p).FindMinSteps();
       if (dist && *dist < min_path_length) {
         min_path_length = *dist;
         move_to = check;

@@ -12,6 +12,13 @@ target: 10,10
 ==
 
 [part=2]
+depth: 510
+target: 10,10
+--
+45
+==
+
+[part=2]
 @include{advent_of_code/2018/day22/input.txt}
 --
-ERROR: Could not run test: Not implemented
+1068
