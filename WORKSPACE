@@ -11,7 +11,7 @@ git_repository(
 git_repository(
     name = "com_google_absl",
     remote = "git://github.com/abseil/abseil-cpp.git",
-    # Do not advance; https://github.com/abseil/abseil-cpp/issues/848
+    # no_update = "https://github.com/abseil/abseil-cpp/issues/848"
     commit = "e9b9e38f67a008d66133535a72ada843bd66013f",
 )
 

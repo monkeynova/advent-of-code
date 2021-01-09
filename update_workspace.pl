@@ -11,8 +11,12 @@ my %commit_map;
 my $workspace = join '', <>;
 while ($workspace =~ m{git_repository\(([^)]+)\)}sg) {
   my $repository = $1;
-  my %args = $repository =~ /([a-z]+)\s*=\s*\"(.*?)(?!<\")\"/g;
+  my %args = $repository =~ /([a-z_]+)\s*=\s*\"(.*?)(?!<\")\"/g;
   next if $commit_map{$args{commit}};
+  if ($args{no_update}) {
+    warn "Not updating $args{remote}: $args{no_update}\n";
+    next;
+  }
   
   if ($args{remote} =~ m{git://github.com/(.*)\.git}) {
     my $github_name = $1;
@@ -25,10 +29,14 @@ while ($workspace =~ m{git_repository\(([^)]+)\)}sg) {
     }
     my $sha = $json->{sha};
     if ($sha) {
-        print STDERR "updating $args{name} ($github_name) => $sha\n";
-        $commit_map{$args{commit}} = $sha;
+        if ($args{commit} ne $sha) {
+          warn "updating $args{name} ($github_name) => $sha\n";
+          $commit_map{$args{commit}} = $sha;
+        } else {
+          warn "unchanged $args{name}\n";
+        }
     } else {
-        print STDERR "cannot update $args{name} ($github_name)!\n";
+        warn "cannot update $args{name} ($github_name)!\n";
     }
   }
 }
