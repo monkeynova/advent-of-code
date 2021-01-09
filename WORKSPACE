@@ -5,25 +5,26 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 git_repository(
     name = "com_google_googletest",
     remote = "git://github.com/google/googletest.git",
-    commit = "a4621888650aaae118de93f9faf8ef5a18cab303",
+    commit = "389cb68b87193358358ae87cc56d257fd0d80189",
 )
 
 git_repository(
     name = "com_google_absl",
     remote = "git://github.com/abseil/abseil-cpp.git",
-    commit = "60d00a5822bb98f18e40b294554f91ca14fb793a",
+    # Do not advance; https://github.com/abseil/abseil-cpp/issues/848
+    commit = "e9b9e38f67a008d66133535a72ada843bd66013f",
 )
 
 git_repository(
     name = "com_github_gflags_gflags",
     remote = "git://github.com/gflags/gflags.git",
-    commit = "5d5a6c550100fa9d19f18861b61be9343e94dbcb",
+    commit = "827c769e5fc98e0f2a34c47cef953cc6328abced",
 )
 
 git_repository(
     name = "com_google_benchmark",
     remote = "git://github.com/google/benchmark.git",
-    commit = "af72911f2fe6b8114564614d2db17a449f8c4af0",
+    commit = "8df87f6c879cbcabd17c5cfcec7b89687df36953",
 )
 
 git_repository(
@@ -41,12 +42,12 @@ git_repository(
 git_repository(
     name = "com_googlesource_code_re2",
     remote = "git://github.com/google/re2.git",
-    # Must be on branch 'abseil'.
-    commit = "f39e808e2cc26a61abe0853b20bb2b079e150818",
+    # branch = "abseil"
+    commit = "29e204fb8dccb2c1b5c957f2d23ed403cc5a92dc",
 )
 
 git_repository(
     name = "com_google_file_based_test_driver",
     remote = "git://github.com/google/file-based-test-driver.git",
-    commit = "2f80560ea1264349cf2fab5ebc002d44b104afad",
+    commit = "5074f48f03c6a892edafab55410addc43f4a0546",
 )
