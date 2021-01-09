@@ -7,10 +7,14 @@
 
 namespace advent_of_code {
 
-void KnotHashRunLoop(absl::string_view lengths,
-                     std::vector<unsigned char>* loop, int round_count = 1);
+class KnotHash {
+ public:
+  std::string DigestHex(absl::string_view input);
 
-std::string KnotHash(absl::string_view input);
+  void RunLoop(absl::string_view lengths, std::vector<unsigned char>* loop,
+               int round_count = 1);
+};
+
 
 }  // namespace advent_of_code
 

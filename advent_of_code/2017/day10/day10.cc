@@ -19,7 +19,7 @@ absl::StatusOr<std::vector<std::string>> Day10_2017::Part1(
     const char kTmpStr[] = {3, 4, 1, 5, '\0'};
     std::vector<unsigned char> loop(5);
     for (int i = 0; i < loop.size(); ++i) loop[i] = i;
-    KnotHashRunLoop(kTmpStr, &loop);
+    KnotHash().RunLoop(kTmpStr, &loop);
     if (loop[0] * loop[1] != 12) {
       return Error("Test case failed");
     }
@@ -38,7 +38,7 @@ absl::StatusOr<std::vector<std::string>> Day10_2017::Part1(
   }
   std::vector<unsigned char> loop(256);
   for (int i = 0; i < loop.size(); ++i) loop[i] = i;
-  KnotHashRunLoop(lengths, &loop);
+  KnotHash().RunLoop(lengths, &loop);
 
   return IntReturn(loop[0] * loop[1]);
 }
@@ -47,7 +47,7 @@ absl::StatusOr<std::vector<std::string>> Day10_2017::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
 
-  return std::vector<std::string>{KnotHash(input[0])};
+  return std::vector<std::string>{KnotHash().DigestHex(input[0])};
 }
 
 }  // namespace advent_of_code

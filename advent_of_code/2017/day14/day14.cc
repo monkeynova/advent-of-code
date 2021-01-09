@@ -61,8 +61,9 @@ class PathWalk : public BFSInterface<PathWalk, Point> {
 absl::StatusOr<CharBoard> BuildBoard(absl::string_view input) {
   CharBoard board(128, 128);
   for (Point p : board.range()) board[p] = '#';
+  KnotHash digest;
   for (int y = 0; y < 128; ++y) {
-    std::string hash = KnotHash(absl::StrCat(input, "-", y));
+    std::string hash = digest.DigestHex(absl::StrCat(input, "-", y));
     for (int i = 0; i < hash.size(); ++i) {
       char c = hash[i];
       if (c >= 'a' && c <= 'f')

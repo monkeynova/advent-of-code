@@ -6,8 +6,8 @@
 
 namespace advent_of_code {
 
-void KnotHashRunLoop(absl::string_view lengths,
-                     std::vector<unsigned char>* loop, int round_count) {
+void KnotHash::RunLoop(absl::string_view lengths,
+                       std::vector<unsigned char>* loop, int round_count) {
   int position = 0;
   int skip_size = 0;
   const int loop_size = loop->size();
@@ -44,14 +44,14 @@ void KnotHashRunLoop(absl::string_view lengths,
           << absl::StrJoin(loop_span.subspan(position + 1), ",");
 }
 
-std::string KnotHash(absl::string_view input) {
+std::string KnotHash::DigestHex(absl::string_view input) {
   std::string lengths = std::string(input);
   const char kSuffix[] = {17, 31, 73, 47, 23, '\0'};
   lengths.append(kSuffix);
 
   std::vector<unsigned char> loop(256);
   for (int i = 0; i < loop.size(); ++i) loop[i] = i;
-  KnotHashRunLoop(lengths, &loop, 64);
+  RunLoop(lengths, &loop, 64);
 
   std::string dense_hash;
   absl::string_view kHexStr = "0123456789abcdef";
