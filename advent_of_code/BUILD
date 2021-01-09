@@ -90,6 +90,23 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
+        "@com_google_absl//absl/container:flat_hash_map",
+        "@com_google_absl//absl/container:flat_hash_set",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings",
         "@com_google_glog//:glog",
     ],
 )
+
+cc_library(
+    name = "dag_sort",
+    hdrs = ["dag_sort.h"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        ":directed_graph",
+        "@com_google_glog//:glog",
+    ],
+)
+

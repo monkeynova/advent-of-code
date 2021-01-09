@@ -6,6 +6,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/dag_sort.h"
 #include "advent_of_code/directed_graph.h"
 #include "glog/logging.h"
 
@@ -95,7 +96,7 @@ absl::StatusOr<int64_t> ComputeOreNeedForFuel(
 absl::StatusOr<int64_t> ComputeOreNeedForFuel(
     const DirectedGraph<Rule>& rule_set) {
   absl::StatusOr<std::vector<absl::string_view>> ordered_ingredients =
-      rule_set.DAGSort();
+      DAGSort(rule_set);
   if (!ordered_ingredients.ok()) return ordered_ingredients.status();
   if (ordered_ingredients->at(0) != "FUEL") {
     return AdventDay::Error("Not a DAG rooted at FUEL");
@@ -109,7 +110,7 @@ absl::StatusOr<int64_t> ComputeOreNeedForFuel(
 absl::StatusOr<int> FuelFromOre(const DirectedGraph<Rule>& rule_set,
                                 uint64_t ore_supply) {
   absl::StatusOr<std::vector<absl::string_view>> ordered_ingredients =
-      rule_set.DAGSort();
+      DAGSort(rule_set);
   if (!ordered_ingredients.ok()) return ordered_ingredients.status();
   if (ordered_ingredients->at(0) != "FUEL") {
     return AdventDay::Error("Not a DAG rooted at FUEL");

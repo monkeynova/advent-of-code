@@ -6,6 +6,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/dag_sort.h"
 #include "advent_of_code/directed_graph.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
@@ -129,7 +130,7 @@ absl::StatusOr<std::vector<std::string>> Day07_2018::Part1(
     graph.AddEdge(src, dst);
   }
   absl::StatusOr<std::vector<absl::string_view>> ordered =
-      graph.DAGSort(std::less<absl::string_view>());
+      DAGSort(graph, std::less<absl::string_view>());
   if (!ordered.ok()) return ordered.status();
   return std::vector<std::string>{absl::StrJoin(*ordered, "")};
 }
