@@ -5,13 +5,13 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 git_repository(
     name = "com_google_googletest",
     remote = "git://github.com/google/googletest.git",
-    commit = "389cb68b87193358358ae87cc56d257fd0d80189",
+    commit = "d128fc8252d53baad6ea456fa08cbf9028d255f4",
 )
 
 git_repository(
     name = "com_google_absl",
     remote = "git://github.com/abseil/abseil-cpp.git",
-    commit = "322ae2420d27fc96d0a8ab1167d7de33671048df",
+    commit = "ff361eb3aac20f08ec7b1ccfdd3204b0aa6cbe33",
 )
 
 git_repository(
