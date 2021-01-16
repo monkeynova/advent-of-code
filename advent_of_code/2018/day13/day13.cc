@@ -110,7 +110,7 @@ struct State {
             case 0:
               c.dir = c.dir.rotate_left();
               break;
-            case 1: 
+            case 1:
               // Straight through. No dir change.
               break;
             case 2:

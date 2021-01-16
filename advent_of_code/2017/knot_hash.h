@@ -15,7 +15,6 @@ class KnotHash {
                int round_count = 1);
 };
 
-
 }  // namespace advent_of_code
 
 #endif  // ADVENT_OF_CODE_2017_KNOT_HASH_H

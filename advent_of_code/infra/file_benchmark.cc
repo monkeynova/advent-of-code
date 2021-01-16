@@ -102,8 +102,8 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
       return BM_Day_SetError(state, long_duration.status().message());
     }
     if (absl::GetFlag(FLAGS_run_long_tests) < *long_duration) {
-      state.SetLabel(absl::StrCat("Part: ", part, "; *** SKIPPED (long=",
-                                  long_option, ") ****"));
+      state.SetLabel(absl::StrCat(
+          "Part: ", part, "; *** SKIPPED (long=", long_option, ") ****"));
       for (auto _ : state) {
       }
       return;

@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "advent_of_code/directed_graph.h"
 #include "absl/status/statusor.h"
+#include "advent_of_code/directed_graph.h"
 
 namespace advent_of_code {
 

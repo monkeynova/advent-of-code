@@ -109,4 +109,3 @@ cc_library(
         "@com_google_glog//:glog",
     ],
 )
-
