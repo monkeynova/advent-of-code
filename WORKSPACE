@@ -3,6 +3,13 @@ workspace(name="com_monkeynova_advent_of_code")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
+   name = "com_monkeynova_base_workspace",
+   remote = "git://github.com/monkeynova/base-workspace.git",
+   # branch = "main",
+   commit = "4cee9e04fe6ed61bb9c3a653a2d8ca23d987abc2",
+)
+
+git_repository(
     name = "com_google_googletest",
     remote = "git://github.com/google/googletest.git",
     commit = "d128fc8252d53baad6ea456fa08cbf9028d255f4",
