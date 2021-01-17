@@ -102,7 +102,9 @@ void AuditSums(SumRangeState* state) {
 }
 
 std::string RunPhase(int phase, absl::string_view input, int min_position) {
-  SumRangeState sum_range{input};
+  absl::string_view sub_input = input.substr(min_position);
+
+  SumRangeState sum_range{sub_input};
   BuildAlignedSums(&sum_range);
   AuditSums(&sum_range);
   std::string ret;
@@ -111,9 +113,9 @@ std::string RunPhase(int phase, absl::string_view input, int min_position) {
     int stride = i + 1;
     bool negate = false;
     int64_t sum = 0;
-    for (int j = i; j < input.size(); j += stride * 2) {
+    for (int j = i - min_position; j < sub_input.size(); j += stride * 2) {
       int delta =
-          SumRange(&sum_range, j, std::min<int>(j + stride, input.size()));
+          SumRange(&sum_range, j, std::min<int>(j + stride, sub_input.size()));
       if (negate) {
         sum -= delta;
       } else {

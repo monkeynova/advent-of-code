@@ -43,7 +43,7 @@
 53553731
 ==
 
-[long=3m (20s opt) 2020.12.04]
+[long=3m (11s opt) 2021.01.16]
 [part=2]
 @include{advent_of_code/2019/day16/input.txt}
 --
