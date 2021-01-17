@@ -66,26 +66,32 @@ absl::StatusOr<std::vector<std::string>> Day11_2018::Part2(
   for (Point p : r) power[p] = PowerLevel(serial, p);
   int max_power = std::numeric_limits<int>::min();
   Point3 max_power_point;
-  absl::flat_hash_map<Point, int> prev_sums;
+  absl::flat_hash_map<Point3, int> sums;
   for (int s = 0; s < 300; s++) {
-    absl::flat_hash_map<Point, int> this_sums;
+    // absl::flat_hash_map<Point, int> this_sums;
     PointRectangle search = r;
     search.max -= Point{s, s};
     for (Point p : search) {
       int power_sum = 0;
       if (s == 0) {
         power_sum = power[p];
+      } else if ((s + 1) % 2 == 0) {
+        int half_s = (s + 1) / 2;
+        power_sum += sums[{p.x, p.y, half_s}];
+        power_sum += sums[{p.x + half_s, p.y, half_s}];
+        power_sum += sums[{p.x, p.y + half_s, half_s}];
+        power_sum += sums[{p.x + half_s, p.y + half_s, half_s}];
       } else {
-        if (!prev_sums.contains(p + Point{1, 1})) return Error("prev_sums");
-        power_sum = prev_sums[p + Point{1, 1}];
-        for (Point p2 : PointRectangle{p, p + Point{s, 0}}) {
-          power_sum += power[p2];
-        }
-        for (Point p2 : PointRectangle{p + Point{0, 1}, p + Point{0, s}}) {
-          power_sum += power[p2];
-        }
+        // Round down.
+        int half_s = (s + 1) / 2;
+        power_sum += sums[{p.x, p.y, half_s + 1}];
+        power_sum += sums[{p.x + half_s + 1, p.y, half_s}];
+        power_sum += sums[{p.x, p.y + half_s + 1, half_s}];
+        power_sum += sums[{p.x + half_s, p.y + half_s, half_s + 1}];
+        // Was included in upper left and lower right.
+        power_sum -= power[p + Point{half_s, half_s}];
       }
-      this_sums[p] = power_sum;
+      sums[{p.x, p.y, s + 1}] = power_sum;
       if (power_sum > max_power) {
         max_power = power_sum;
         max_power_point.x = p.x;
@@ -93,7 +99,7 @@ absl::StatusOr<std::vector<std::string>> Day11_2018::Part2(
         max_power_point.z = s + 1;
       }
     }
-    prev_sums = std::move(this_sums);
+    // prev_sums = std::move(this_sums);
   }
 
   return std::vector<std::string>{max_power_point.DebugString()};
