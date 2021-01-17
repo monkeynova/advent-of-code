@@ -23,90 +23,93 @@ int CalcSumRange(absl::string_view input, int begin, int end) {
   return ret;
 }
 
-struct SumRangeState {
-  absl::string_view input;
-  std::vector<std::vector<int>> sums;
-};
+class SumRangeState {
+ public:
+  SumRangeState(absl::string_view input) : input_(input) {}
 
-void BuildAlignedSums(SumRangeState* state) {
-  for (int length = state->input.size() / 2; length; length /= 2) {
-    std::vector<int> next_sums;
-    next_sums.resize(length);
-    if (length == state->input.size() / 2) {
-      for (int i = 0; i < length; ++i) {
-        next_sums[i] =
-            state->input[2 * i] + state->input[2 * i + 1] - '0' - '0';
+  int SumRange(int begin, int end) const {
+    return SumRangeUnaligned(begin, end);
+  }
+
+  void Build() {
+    for (int length = input_.size() / 2; length; length /= 2) {
+      std::vector<int> next_sums;
+      next_sums.resize(length);
+      if (length == input_.size() / 2) {
+        for (int i = 0; i < length; ++i) {
+          next_sums[i] = input_[2 * i] + input_[2 * i + 1] - '0' - '0';
+        }
+      } else {
+        for (int i = 0; i < length; ++i) {
+          next_sums[i] = sums_.back()[2 * i] + sums_.back()[2 * i + 1];
+        }
       }
+      sums_.push_back(std::move(next_sums));
+      next_sums.clear();
+    }
+
+    AuditSums();
+  }
+
+ private:
+  void AuditSums() const {
+    for (int shift = 0; (1 << shift) < input_.length(); ++shift) {
+      int stride = (1 << shift);
+      for (int begin = 0; begin < input_.length(); begin += stride) {
+        if (begin + stride > input_.length()) break;
+        int a_sum = SumRangeAligned(begin, shift);
+        int b_sum = CalcSumRange(input_, begin, begin + stride);
+        if (a_sum != b_sum) {
+          LOG(WARNING) << begin << "+" << stride << "; " << a_sum
+                       << " != " << b_sum;
+        }
+      }
+    }
+  }
+
+  int SumRangeUnaligned(int begin, int end) const {
+    VLOG(2) << "UnAligned: " << begin << "-" << end;
+    int ret = 0;
+    int low_bit = 1;
+    int shift = 0;
+    while (begin + low_bit <= end) {
+      VLOG(3) << "  " << begin << "/" << low_bit;
+      if (begin & low_bit) {
+        ret += SumRangeAligned(begin, shift);
+        begin += low_bit;
+      }
+      low_bit <<= 1;
+      ++shift;
+    }
+    while (low_bit) {
+      VLOG(3) << "  " << begin << "/" << low_bit;
+      if (begin + low_bit <= end) {
+        ret += SumRangeAligned(begin, shift);
+        begin += low_bit;
+      }
+      low_bit >>= 1;
+      --shift;
+    }
+    return ret;
+  }
+
+  inline int SumRangeAligned(int begin, int sums_idx) const {
+    if (sums_idx == 0) {
+      return input_[begin] - '0';
     } else {
-      for (int i = 0; i < length; ++i) {
-        next_sums[i] =
-            state->sums.back()[2 * i] + state->sums.back()[2 * i + 1];
-      }
-    }
-    state->sums.push_back(std::move(next_sums));
-    next_sums.clear();
-  }
-}
-
-inline int SumRangeAligned(SumRangeState* state, int begin, int sums_idx) {
-  if (sums_idx == 0) {
-    return state->input[begin] - '0';
-  } else {
-    return state->sums[sums_idx - 1][begin / (1 << sums_idx)];
-  }
-}
-
-int SumRangeUnaligned(SumRangeState* state, int begin, int end) {
-  VLOG(2) << "UnAligned: " << begin << "-" << end;
-  int ret = 0;
-  int low_bit = 1;
-  int shift = 0;
-  while (begin + low_bit <= end) {
-    VLOG(3) << "  " << begin << "/" << low_bit;
-    if (begin & low_bit) {
-      ret += SumRangeAligned(state, begin, shift);
-      begin += low_bit;
-    }
-    low_bit <<= 1;
-    ++shift;
-  }
-  while (low_bit) {
-    VLOG(3) << "  " << begin << "/" << low_bit;
-    if (begin + low_bit <= end) {
-      ret += SumRangeAligned(state, begin, shift);
-      begin += low_bit;
-    }
-    low_bit >>= 1;
-    --shift;
-  }
-  return ret;
-}
-
-int SumRange(SumRangeState* state, int begin, int end) {
-  return SumRangeUnaligned(state, begin, end);
-}
-
-void AuditSums(SumRangeState* state) {
-  for (int shift = 0; (1 << shift) < state->input.length(); ++shift) {
-    int stride = (1 << shift);
-    for (int begin = 0; begin < state->input.length(); begin += stride) {
-      if (begin + stride > state->input.length()) break;
-      int a_sum = SumRangeAligned(state, begin, shift);
-      int b_sum = CalcSumRange(state->input, begin, begin + stride);
-      if (a_sum != b_sum) {
-        LOG(WARNING) << begin << "+" << stride << "; " << a_sum
-                     << " != " << b_sum;
-      }
+      return sums_[sums_idx - 1][begin / (1 << sums_idx)];
     }
   }
-}
+
+  absl::string_view input_;
+  std::vector<std::vector<int>> sums_;
+};
 
 std::string RunPhase(int phase, absl::string_view input, int min_position) {
   absl::string_view sub_input = input.substr(min_position);
 
-  SumRangeState sum_range{sub_input};
-  BuildAlignedSums(&sum_range);
-  AuditSums(&sum_range);
+  SumRangeState sum_range(sub_input);
+  sum_range.Build();
   std::string ret;
   ret.resize(input.size());
   for (int i = min_position; i < input.size(); ++i) {
@@ -114,14 +117,14 @@ std::string RunPhase(int phase, absl::string_view input, int min_position) {
     bool negate = false;
     int64_t sum = 0;
     for (int j = i - min_position; j < sub_input.size(); j += stride * 2) {
-      int delta =
-          SumRange(&sum_range, j, std::min<int>(j + stride, sub_input.size()));
+      int range_end = std::min<int>(j + stride, sub_input.size());
       if (negate) {
-        sum -= delta;
+        sum -= sum_range.SumRange(j, range_end);
+        negate = false;
       } else {
-        sum += delta;
+        sum += sum_range.SumRange(j, range_end);
+        negate = true;
       }
-      negate = !negate;
     }
     ret[i] = (abs(sum) % 10) + '0';
   }
