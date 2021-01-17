@@ -73,11 +73,21 @@ absl::StatusOr<std::vector<std::string>> Day14_2016::Part2(
 
   std::vector<std::string> window;
   int found = 0;
+  absl::flat_hash_map<char, std::set<int>> has_5ple;
+  MD5 digest;
   for (int index = 0; true; ++index) {
     std::string str = absl::StrCat(input[0], index);
     for (int i = 0; i < 2017; ++i) {
-      MD5 digest;
       str = std::string(digest.DigestHex(str));
+    }
+
+    for (int i = 0; i + 4 < str.size(); ++i) {
+      if (str[i] == str[i + 1] && str[i] == str[i + 2] &&
+          str[i] == str[i + 3] && str[i] == str[i + 4]) {
+        VLOG(2) << "Found 5-ple of " << str.substr(i, 1) << " in " << str
+                << " @" << index << "," << i;
+        has_5ple[str[i]].insert(index);
+      }
     }
 
     window.push_back(str);
@@ -86,37 +96,25 @@ absl::StatusOr<std::vector<std::string>> Day14_2016::Part2(
     if (window.size() != index + 1) return Error("Bad append");
 
     int test_index = index - 1000;
-    absl::flat_hash_set<char> hunt_set;
+    char hunt = '\0';
     {
       absl::string_view test = window[test_index];
       for (int i = 0; i + 2 < test.size(); ++i) {
         if (test[i] == test[i + 1] && test[i] == test[i + 2]) {
           VLOG(2) << "Found 3-ple of " << test.substr(i, 1) << " in " << test
                   << " @" << test_index << "," << i;
-          hunt_set.insert(test[i]);
+          hunt = test[i];
           break;
         }
       }
     }
-    for (char hunt : hunt_set) {
-      bool found_5ple = false;
-      for (int j = 1; j <= 1000; ++j) {
-        absl::string_view test = window[test_index + j];
-        for (int i = 0; i + 4 < test.size(); ++i) {
-          if (test[i] == hunt && test[i] == test[i + 1] &&
-              test[i] == test[i + 2] && test[i] == test[i + 3] &&
-              test[i] == test[i + 4]) {
-            VLOG(2) << "Found 5-ple of " << test.substr(i, 1) << " in " << test
-                    << " @" << test_index + j << "," << i;
-            found_5ple = true;
-          }
-        }
-      }
-      if (found_5ple) {
+    if (hunt != '\0') {
+      const std::set<int>& haystack = has_5ple[hunt];
+      auto it = std::upper_bound(haystack.begin(), haystack.end(), test_index + 1);
+      if (it != haystack.end() && *it <= test_index + 1000) {
         ++found;
         VLOG(1) << "Found Key #" << found << " @" << test_index;
         if (found == 64) return IntReturn(test_index);
-        break;
       }
     }
   }
