@@ -12,9 +12,6 @@
 namespace advent_of_code {
 namespace {
 
-// Problem could be solved with a sparse matrix multiply and expontentiation.
-// 100 = 64 + 32 + 4. M^2^2^2^2^2^2 * M^2^2^2^2^2 * M^2^2.
-
 int CalcSumRange(absl::string_view input, int begin, int end) {
   int ret = 0;
   for (int i = begin; i < end; ++i) {
@@ -25,12 +22,17 @@ int CalcSumRange(absl::string_view input, int begin, int end) {
 
 class SumRangeState {
  public:
-  SumRangeState(absl::string_view input) : input_(input) {}
+  SumRangeState(absl::string_view input) : input_(input) {
+    Build();
+    Audit();
+  }
 
+  // Returns CalcSumRange(input_, begin, end) in O(log(end - begin)) time.
   int SumRange(int begin, int end) const {
     return SumRangeUnaligned(begin, end);
   }
 
+ private:
   void Build() {
     for (int length = input_.size() / 2; length; length /= 2) {
       std::vector<int> next_sums;
@@ -47,12 +49,9 @@ class SumRangeState {
       sums_.push_back(std::move(next_sums));
       next_sums.clear();
     }
-
-    AuditSums();
   }
 
- private:
-  void AuditSums() const {
+  void Audit() const {
     for (int shift = 0; (1 << shift) < input_.length(); ++shift) {
       int stride = (1 << shift);
       for (int begin = 0; begin < input_.length(); begin += stride) {
@@ -102,6 +101,7 @@ class SumRangeState {
   }
 
   absl::string_view input_;
+  // sums_[a][b] stores CalcSumRange(input_, b * (2 ** a), (b + 1) * (2 ** a)).
   std::vector<std::vector<int>> sums_;
 };
 
@@ -109,7 +109,6 @@ std::string RunPhase(int phase, absl::string_view input, int min_position) {
   absl::string_view sub_input = input.substr(min_position);
 
   SumRangeState sum_range(sub_input);
-  sum_range.Build();
   std::string ret;
   ret.resize(input.size());
   for (int i = min_position; i < input.size(); ++i) {
