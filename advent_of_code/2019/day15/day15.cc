@@ -8,6 +8,7 @@
 #include "absl/strings/str_split.h"
 #include "advent_of_code/2019/int_code.h"
 #include "advent_of_code/bfs.h"
+#include "advent_of_code/char_board.h"
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 
@@ -98,16 +99,12 @@ class Droid : public IntCode::IOModule {
   absl::optional<int> DistanceToO2() {
     class PathWalk : public BFSInterface<PathWalk, Point> {
      public:
-      PathWalk(const absl::flat_hash_map<Point, int>& board, Point start)
-       : board_(board), cur_(start) {}
+      PathWalk(const absl::flat_hash_map<Point, int>& board, Point start, Point end)
+       : board_(board), cur_(start), end_(end) {}
 
       Point identifier() const override { return cur_; }
 
-      bool IsFinal() override {
-        auto it = board_.find(cur_);
-        CHECK(it != board_.end());
-        return it->second == 2;
-      }
+      bool IsFinal() override { return cur_ == end_; }
 
       void AddNextSteps(State* state) override {
         for (Point dir : Cardinal::kFourDirs) {
@@ -124,8 +121,9 @@ class Droid : public IntCode::IOModule {
      private:
       const absl::flat_hash_map<Point, int>& board_;
       Point cur_;
+      Point end_;
     };
-    return PathWalk(board_, Cardinal::kOrigin).FindMinSteps();
+    return PathWalk(board_, Cardinal::kOrigin, o2_pos_).FindMinSteps();
   }
 
   absl::StatusOr<int> GreatestDistanceFromO2() {
@@ -179,10 +177,7 @@ class Droid : public IntCode::IOModule {
     if (val == 2) {
       o2_pos_ = p;
     }
-    min_.x = std::min(min_.x, p.x);
-    min_.y = std::min(min_.y, p.y);
-    max_.x = std::max(max_.x, p.x);
-    max_.y = std::max(max_.y, p.y);
+    range_.ExpandInclude(p);
   }
 
   absl::Status Put(int64_t val) override {
@@ -199,42 +194,30 @@ class Droid : public IntCode::IOModule {
     if (val != 0) {
       pos_ += dir_;
     }
-    VLOG(2) << "Board:" << DebugBoard();
+    VLOG(2) << "Board:\n" << DebugBoard();
     return absl::OkStatus();
   }
 
   std::string DebugBoard() const {
     char render[] = {'#', ' ', '*'};
-    std::string ret;
-    ret.resize((max_.y - min_.y + 1) * (max_.x - min_.x + 4));
-    int mark = 0;
-    ret[mark++] = '\n';
-    ret[mark++] = '|';
-    for (int y = min_.y; y <= max_.y; ++y) {
-      for (int x = min_.x; x <= max_.x; ++x) {
-        Point p{.x = x, .y = y};
-        char c;
-        if (p == Point{.x = 0, .y = 0}) {
-          c = '+';
-        } else if (p == pos_) {
-          c = 'R';
-        } else {
-          auto it = board_.find(p);
-          c = it == board_.end() ? '?' : render[it->second];
-        }
-        ret[mark++] = c;
+    CharBoard board(range_.max.x - range_.min.x + 1, range_.max.y - range_.min.y + 1);
+    for (Point p : range_) {
+      char c;
+      if (p == Cardinal::kOrigin) {
+        c = '+';
+      } else if (p == pos_) {
+        c = 'R';
+      } else {
+        auto it = board_.find(p);
+        c = it == board_.end() ? '?' : render[it->second];
       }
-      ret[mark++] = '|';
-      if (y != max_.y) {
-        ret[mark++] = '\n';
-        ret[mark++] = '|';
-      }
+      board[p - range_.min] = c;
     }
-    return ret;
+    return board.DebugString();;
   }
 
-  Point min() const { return min_; }
-  Point max() const { return max_; }
+  Point min() const { return range_.min; }
+  Point max() const { return range_.max; }
 
  private:
   absl::BitGen bitgen_;
@@ -248,10 +231,7 @@ class Droid : public IntCode::IOModule {
       Cardinal::kOrigin, Cardinal::kNorth, Cardinal::kSouth, Cardinal::kWest,
       Cardinal::kEast};
 
-  Point min_ = {.x = std::numeric_limits<int>::max(),
-                .y = std::numeric_limits<int>::max()};
-  Point max_ = {.x = std::numeric_limits<int>::min(),
-                .y = std::numeric_limits<int>::min()};
+  PointRectangle range_ = PointRectangle::Null();
   absl::flat_hash_map<Point, int> board_;
 };
 
@@ -266,8 +246,8 @@ absl::StatusOr<std::vector<std::string>> Day15_2019::Part1(
   if (absl::Status st = codes->Run(&droid); !st.ok()) {
     return st;
   }
-  VLOG(1) << droid.min() << "-" << droid.max();
-  VLOG(1) << droid.DebugBoard();
+  VLOG(1) << droid.min() << "-" << droid.max() << "\n"
+          << droid.DebugBoard();
 
   return IntReturn(droid.DistanceToO2());
 }
@@ -281,8 +261,8 @@ absl::StatusOr<std::vector<std::string>> Day15_2019::Part2(
   if (absl::Status st = codes->Run(&droid); !st.ok()) {
     return st;
   }
-  VLOG(1) << droid.min() << "-" << droid.max();
-  VLOG(1) << droid.DebugBoard();
+  VLOG(1) << droid.min() << "-" << droid.max() << "\n"
+          << droid.DebugBoard();
 
   return IntReturn(droid.GreatestDistanceFromO2());
 }
