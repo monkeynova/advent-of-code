@@ -137,13 +137,11 @@ class Droid : public IntCode::IOModule {
       Point identifier() const override { return cur_; }
 
       bool IsFinal() override {
+        *max_dist_ = std::max(*max_dist_, num_steps());
         return false;
       }
 
       void AddNextSteps(State* state) override {
-        // TODO(@monkeynova): Move max_dist check to IsFinal once BFSInterface
-        // checks history before calling IsFinal.
-        *max_dist_ = std::max(*max_dist_, num_steps());
         for (Point dir : Cardinal::kFourDirs) {
           Point next_cur = cur_ + dir;
           auto it = board_.find(next_cur);
