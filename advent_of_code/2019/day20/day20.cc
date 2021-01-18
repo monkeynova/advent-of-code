@@ -6,6 +6,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/bfs.h"
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
@@ -93,7 +94,7 @@ class Maze {
     return absl::OkStatus();
   }
 
-  bool CanStand(Point p) {
+  bool CanStand(Point p) const {
     if (p.x < 0) return false;
     if (p.y < 0) return false;
     if (p.y >= board_.size()) return false;
@@ -101,7 +102,7 @@ class Maze {
     return board_[p.y][p.x] == '.';
   }
 
-  bool OnEdge(Point p) {
+  bool OnEdge(Point p) const {
     if (p.x == 0) return true;
     if (p.y == 0) return true;
     if (p.y == board_.size() - 1) return true;
@@ -109,70 +110,76 @@ class Maze {
     return false;
   }
 
-  absl::StatusOr<int> FindPath() {
-    struct Path {
-      Point pos;
-      int steps = 0;
+  absl::optional<int> FindPath() {
+    class PathWalk : public BFSInterface<PathWalk, Point> {
+     public:
+      PathWalk(const Maze& maze, Point start, Point end)
+       : maze_(maze), cur_(start), end_(end) {}
+
+      Point identifier() const override { return cur_; }
+      bool IsFinal() override { return cur_ == end_; }
+
+      void AddNextSteps(State* state) override {
+        for (Point dir : Cardinal::kFourDirs) {
+          Point next_cur = cur_ + dir;
+          if (maze_.CanStand(next_cur)) {
+            PathWalk next = *this;
+            next.cur_ = next_cur;
+            state->AddNextStep(next);
+          }
+        }
+        if (auto it = maze_.portals().find(cur_); it != maze_.portals().end()) {
+          PathWalk next = *this;
+          next.cur_ = it->second;
+          state->AddNextStep(next);
+        }
+      }
+
+     private:
+      const Maze& maze_;
+      Point cur_;
+      Point end_;
     };
-    absl::flat_hash_set<Point> hist;
-    std::deque<Path> frontier;
-    frontier.push_back(Path{.pos = start_, .steps = 0});
-    while (!frontier.empty()) {
-      const Path& cur = frontier.front();
-      if (cur.pos == end_) return cur.steps;
-      hist.insert(cur.pos);
-      for (Point dir : Cardinal::kFourDirs) {
-        Point next = cur.pos + dir;
-        if (hist.contains(next)) continue;
-        if (CanStand(next)) {
-          frontier.push_back(Path{.pos = next, .steps = cur.steps + 1});
-        }
-      }
-      if (auto it = portals_.find(cur.pos); it != portals_.end()) {
-        Point next = it->second;
-        if (!hist.contains(next)) {
-          frontier.push_back(Path{.pos = next, .steps = cur.steps + 1});
-        }
-      }
-      frontier.pop_front();
-    }
-    return absl::InvalidArgumentError("Could not find path");
+    return PathWalk(*this, start_, end_).FindMinSteps();
   }
 
-  absl::StatusOr<int> FindRecursivePath() {
-    struct Path {
-      Point pos;
-      int steps = 0;
-      int level = 0;
+  absl::optional<int> FindRecursivePath() {
+    class PathWalk : public BFSInterface<PathWalk, Point3> {
+     public:
+      PathWalk(const Maze& maze, Point start, Point end)
+       : maze_(maze), cur_({start.x, start.y, 0}), end_({end.x, end.y, 0}) {}
+
+      Point3 identifier() const override { return cur_; }
+      bool IsFinal() override { return cur_ == end_; }
+
+      void AddNextSteps(State* state) override {
+        for (Point dir : Cardinal::kFourDirs) {
+          Point3 next_cur = cur_ + Point3{dir.x, dir.y, 0};
+          if (maze_.CanStand({next_cur.x, next_cur.y})) {
+            PathWalk next = *this;
+            next.cur_ = next_cur;
+            state->AddNextStep(next);
+          }
+        }
+        if (auto it = maze_.portals().find({cur_.x, cur_.y}); it != maze_.portals().end()) {
+          PathWalk next = *this;
+          next.cur_ = {it->second.x, it->second.y,
+                       cur_.z + (maze_.OnEdge({cur_.x, cur_.y}) ? -1 : +1)};
+          if (next.cur_.z >= 0) {
+            state->AddNextStep(next);
+          }
+        }
+      }
+
+     private:
+      const Maze& maze_;
+      Point3 cur_;
+      Point3 end_;
     };
-    absl::flat_hash_set<std::pair<int, Point>> hist;
-    std::deque<Path> frontier;
-    frontier.push_back(Path{.pos = start_});
-    while (!frontier.empty()) {
-      const Path& cur = frontier.front();
-      if (cur.pos == end_ && cur.level == 0) return cur.steps;
-      hist.insert(std::make_pair(cur.level, cur.pos));
-      for (Point dir : Cardinal::kFourDirs) {
-        Point next = cur.pos + dir;
-        if (hist.contains(std::make_pair(cur.level, next))) continue;
-        if (CanStand(next)) {
-          frontier.push_back(
-              Path{.pos = next, .steps = cur.steps + 1, .level = cur.level});
-        }
-      }
-      if (auto it = portals_.find(cur.pos); it != portals_.end()) {
-        Point next = it->second;
-        int next_level = cur.level + (OnEdge(cur.pos) ? -1 : +1);
-        if (next_level >= 0 &&
-            !hist.contains(std::make_pair(next_level, next))) {
-          frontier.push_back(
-              Path{.pos = next, .steps = cur.steps + 1, .level = next_level});
-        }
-      }
-      frontier.pop_front();
-    }
-    return absl::InvalidArgumentError("Could not find path");
+    return PathWalk(*this, start_, end_).FindMinSteps();
   }
+
+  const absl::flat_hash_map<Point, Point>& portals() const { return portals_; }
 
  private:
   const absl::Span<absl::string_view> input_;

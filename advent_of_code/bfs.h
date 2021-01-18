@@ -28,16 +28,13 @@ struct BFSInterfaceTraits {
 };
 
 template <>
-struct BFSInterfaceTraits<absl::string_view> {
-  using RefType = absl::string_view;
-};
+struct BFSInterfaceTraits<absl::string_view> { using RefType = absl::string_view; };
 
 struct Point;
+template <> struct BFSInterfaceTraits<Point> { using RefType = Point; };
 
-template <>
-struct BFSInterfaceTraits<Point> {
-  using RefType = Point;
-};
+struct Point3;
+template <> struct BFSInterfaceTraits<Point3> { using RefType = Point3; };
 
 template <typename BFSImpl, typename HistType = BFSImpl>
 class BFSInterface {
