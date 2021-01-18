@@ -79,7 +79,7 @@ struct PointRectangle {
 
   struct iterator {
     Point cur = Point{0, 0};
-    PointRectangle* base = nullptr;
+    const PointRectangle* base = nullptr;
 
     iterator operator++() {
       if (++cur.x > base->max.x) {
@@ -110,8 +110,8 @@ struct PointRectangle {
     max.y = std::max(max.y, p.y);
   }
 
-  iterator begin() { return iterator{.cur = min, .base = this}; }
-  iterator end() { return iterator{}; }
+  iterator begin() const { return iterator{.cur = min, .base = this}; }
+  iterator end() const { return iterator{}; }
 };
 
 std::ostream& operator<<(std::ostream& out, const PointRectangle& r) {
