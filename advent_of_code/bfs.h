@@ -76,6 +76,9 @@ class BFSInterface<BFSImpl, HistType>::State {
 
   void AddNextStep(BFSImpl next) {
     ++next.num_steps_;
+    // TODO(@monkeynova): This IsFinal check should be performed after the
+    // historic check. This API doesn't allow one to do something like
+    // calculate a maximum distance in the IsFinal method.
     if (next.IsFinal()) ret = next.num_steps_;
     auto it = hist_.find(next.identifier());
     if (it == hist_.end() || it->second > next.num_steps()) {
