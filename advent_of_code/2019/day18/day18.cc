@@ -6,6 +6,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/char_board.h"
 #include "advent_of_code/opt_cmp.h"
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
@@ -13,8 +14,6 @@
 
 namespace advent_of_code {
 namespace {
-
-// TODO(@monkeynova): Use CharBoard for storage.
 
 static void CharJoin(std::string* out, char c) { out->append(1, c); }
 
@@ -32,40 +31,31 @@ H AbslHashValue(H h, const NKeyState& key_state) {
 
 class Board {
  public:
-  Board(absl::Span<absl::string_view> board) : board_(board){};
+  Board(const CharBoard& board) : board_(board){};
 
   absl::Status InitializeBoard() {
-    for (int y = 0; y < board_.size(); ++y) {
-      for (int x = 0; x < board_[y].size(); ++x) {
-        Point cur_point = Point{.x = x, .y = y};
-        if (board_[y][x] == '@') {
-          robots_.push_back(cur_point);
-        } else if (board_[y][x] >= 'a' && board_[y][x] <= 'z') {
-          keys_[board_[y][x]] = cur_point;
-        }
+    for (Point cur_point : board_.range()) {
+      if (board_[cur_point] == '@') {
+        robots_.push_back(cur_point);
+      } else if (board_[cur_point] >= 'a' && board_[cur_point] <= 'z') {
+        keys_[board_[cur_point]] = cur_point;
       }
     }
     return absl::OkStatus();
   }
 
   bool CanAdvance(Point p, const absl::flat_hash_set<char>& have_keys) {
-    if (p.y < 0) return false;
-    if (p.y >= board_.size()) return false;
-    if (p.x < 0) return false;
-    if (p.x >= board_[p.y].size()) return false;
-    if (board_[p.y][p.x] == '#') return false;
-    if (board_[p.y][p.x] >= 'A' && board_[p.y][p.x] <= 'Z') {
-      return have_keys.contains(board_[p.y][p.x] - 'A' + 'a');
+    if (!board_.OnBoard(p)) return false;
+    if (board_[p] == '#') return false;
+    if (board_[p] >= 'A' && board_[p] <= 'Z') {
+      return have_keys.contains(board_[p] - 'A' + 'a');
     }
     return true;
   }
 
   bool CanAdvanceAllKeys(Point p) {
-    if (p.y < 0) return false;
-    if (p.y >= board_.size()) return false;
-    if (p.x < 0) return false;
-    if (p.x >= board_[p.y].size()) return false;
-    if (board_[p.y][p.x] == '#') return false;
+    if (!board_.OnBoard(p)) return false;
+    if (board_[p] == '#') return false;
     return true;
   }
 
@@ -129,7 +119,7 @@ class Board {
           KeyPath next = cur;
           next.to = next_to;
           ++next.steps;
-          char board_char = board_[next_to.y][next_to.x];
+          char board_char = board_[next_to];
           if (board_char >= 'a' && board_char <= 'z') {
             next.to_key = board_char;
             ret.push_back(next);
@@ -220,7 +210,7 @@ class Board {
   }
 
  private:
-  const absl::Span<absl::string_view> board_;
+  const CharBoard& board_;
   std::vector<Point> robots_;
   absl::flat_hash_map<char, Point> keys_;
 };
@@ -229,7 +219,9 @@ class Board {
 
 absl::StatusOr<std::vector<std::string>> Day18_2019::Part1(
     absl::Span<absl::string_view> input) const {
-  Board b(input);
+  absl::StatusOr<CharBoard> char_board = CharBoard::Parse(input);
+  if (!char_board.ok()) return char_board.status();
+  Board b(*char_board);
   if (absl::Status st = b.InitializeBoard(); !st.ok()) return st;
   absl::StatusOr<absl::optional<int>> steps = b.MinStepsToAllKeys();
   if (!steps.ok()) return steps.status();
@@ -239,37 +231,35 @@ absl::StatusOr<std::vector<std::string>> Day18_2019::Part1(
 
 absl::StatusOr<std::vector<std::string>> Day18_2019::Part2(
     absl::Span<absl::string_view> input) const {
-  std::vector<std::string> altered_input;
-  for (absl::string_view str : input) {
-    altered_input.push_back(std::string(str));
-  }
+  absl::StatusOr<CharBoard> char_board = CharBoard::Parse(input);
+  if (!char_board.ok()) return char_board.status();
+
   bool found = false;
-  for (int y = 1; !found && y < altered_input.size() - 1; ++y) {
-    for (int x = 1; !found && x < altered_input[y].size() - 1; ++x) {
-      if (altered_input[y][x] == '@') {
-        found = true;
-        altered_input[y - 1][x - 1] = '@';
-        altered_input[y + 1][x - 1] = '@';
-        altered_input[y - 1][x + 1] = '@';
-        altered_input[y + 1][x + 1] = '@';
-        altered_input[y - 1][x] = '#';
-        altered_input[y + 1][x] = '#';
-        altered_input[y][x - 1] = '#';
-        altered_input[y][x + 1] = '#';
-        altered_input[y][x] = '#';
-      }
+  Point robot;
+  for (Point p : char_board->range()) {
+    if (!char_board->OnBoard(p + Cardinal::kNorthWest)) continue;
+    if (!char_board->OnBoard(p + Cardinal::kSouthEast)) continue;
+    if ((*char_board)[p] == '@') {
+      if (found) return Error("Multiple starting robots");
+      found = true;
+      robot = p;
     }
   }
   if (!found) return absl::InvalidArgumentError("Could not edit board");
 
-  std::vector<absl::string_view> altered_input_view;
-  for (const std::string& str : altered_input) {
-    altered_input_view.push_back(str);
-  }
+  (*char_board)[robot] = '#';
+  (*char_board)[robot + Cardinal::kNorth] = '#';
+  (*char_board)[robot + Cardinal::kSouth] = '#';
+  (*char_board)[robot + Cardinal::kWest] = '#';
+  (*char_board)[robot + Cardinal::kEast] = '#';
+  (*char_board)[robot + Cardinal::kNorthEast] = '@';
+  (*char_board)[robot + Cardinal::kNorthWest] = '@';
+  (*char_board)[robot + Cardinal::kSouthEast] = '@';
+  (*char_board)[robot + Cardinal::kSouthWest] = '@';
 
-  VLOG(1) << "\n" << absl::StrJoin(altered_input_view, "\n");
+  VLOG(1) << "\n" << char_board->DebugString();
 
-  Board b(absl::MakeSpan(altered_input_view));
+  Board b(*char_board);
   if (absl::Status st = b.InitializeBoard(); !st.ok()) return st;
 
   absl::StatusOr<absl::optional<int>> steps = b.MinStepsToAllKeys();
