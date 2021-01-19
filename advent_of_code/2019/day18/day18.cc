@@ -20,18 +20,20 @@ static void CharJoin(std::string* out, char c) { out->append(1, c); }
 struct NKeyState {
   std::string robot_key;
   int have_key_bv;
+
   bool operator==(const NKeyState& other) const {
     return robot_key == other.robot_key && have_key_bv == other.have_key_bv;
   }
+
+  template <typename H>
+  friend H AbslHashValue(H h, const NKeyState& key_state) {
+    return H::combine(std::move(h), key_state.robot_key, key_state.have_key_bv);
+  }
 };
-template <typename H>
-H AbslHashValue(H h, const NKeyState& key_state) {
-  return H::combine(std::move(h), key_state.robot_key, key_state.have_key_bv);
-}
 
 class Board {
  public:
-  Board(const CharBoard& board) : board_(board){};
+  Board(const CharBoard& board) : board_(board) {};
 
   absl::Status InitializeBoard() {
     for (Point cur_point : board_.range()) {
@@ -67,6 +69,14 @@ class Board {
     int required_keys_bv = 0;
     char from_key;
     char to_key;
+
+    bool operator<(const KeyPath& o) const {
+      if (required_keys.size() != o.required_keys.size()) {
+        return required_keys.size() < o.required_keys.size();
+      }
+      return steps < o.steps;
+    }
+
     std::string DebugString() const {
       char from_key_str[] = {from_key, '\0'};
       char to_key_str[] = {to_key, '\0'};
@@ -88,14 +98,7 @@ class Board {
       to_add = FindAllKeysFrom(key_and_pos.first, key_and_pos.second);
       paths.insert(paths.end(), to_add.begin(), to_add.end());
     }
-    std::sort(paths.begin(), paths.end(),
-              [](const KeyPath& a, const KeyPath& b) {
-                if (a.required_keys.size() < b.required_keys.size())
-                  return true;
-                if (b.required_keys.size() < a.required_keys.size())
-                  return false;
-                return a.steps < b.steps;
-              });
+    std::sort(paths.begin(), paths.end());
     return paths;
   }
 
@@ -135,7 +138,7 @@ class Board {
     return ret;
   };
 
-  absl::StatusOr<absl::optional<int>> MinStepsToAllKeys() {
+  absl::optional<int> MinStepsToAllKeys() {
     std::vector<KeyPath> all_paths = AllKeyPaths();
     absl::flat_hash_map<char, std::vector<KeyPath>> all_paths_idx_by_key;
     for (KeyPath& path : all_paths) {
@@ -149,7 +152,7 @@ class Board {
     return MinStepsRobotDP(all_paths_idx_by_key);
   }
 
-  absl::StatusOr<absl::optional<int>> MinStepsRobotDP(
+  absl::optional<int> MinStepsRobotDP(
       const absl::flat_hash_map<char, std::vector<KeyPath>>& all_paths_idx) {
     absl::flat_hash_map<NKeyState, int> states =
         AllMinStatesForRobotsNKeys(all_paths_idx, keys_.size());
@@ -223,10 +226,7 @@ absl::StatusOr<std::vector<std::string>> Day18_2019::Part1(
   if (!char_board.ok()) return char_board.status();
   Board b(*char_board);
   if (absl::Status st = b.InitializeBoard(); !st.ok()) return st;
-  absl::StatusOr<absl::optional<int>> steps = b.MinStepsToAllKeys();
-  if (!steps.ok()) return steps.status();
-  if (!*steps) return absl::InvalidArgumentError("No Path found");
-  return IntReturn(**steps);
+  return IntReturn(b.MinStepsToAllKeys());
 }
 
 absl::StatusOr<std::vector<std::string>> Day18_2019::Part2(
@@ -262,10 +262,7 @@ absl::StatusOr<std::vector<std::string>> Day18_2019::Part2(
   Board b(*char_board);
   if (absl::Status st = b.InitializeBoard(); !st.ok()) return st;
 
-  absl::StatusOr<absl::optional<int>> steps = b.MinStepsToAllKeys();
-  if (!steps.ok()) return steps.status();
-  if (!*steps) return absl::InvalidArgumentError("No Path found");
-  return IntReturn(**steps);
+  return IntReturn(b.MinStepsToAllKeys());
 }
 
 }  // namespace advent_of_code
