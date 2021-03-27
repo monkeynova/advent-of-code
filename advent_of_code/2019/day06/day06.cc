@@ -53,13 +53,13 @@ TransferRet FindTransfer(
     const absl::flat_hash_map<std::string, std::vector<std::string>>& orbits,
     absl::string_view cur, absl::string_view from, absl::string_view to) {
   if (cur == from) {
-    return {.from_depth = 0, .transfer_size = -1, .to_depth = -1};
+    return {.transfer_size = -1, .from_depth = 0, .to_depth = -1};
   }
   if (cur == to) {
-    return {.to_depth = 0, .transfer_size = -1, .from_depth = -1};
+    return {.transfer_size = -1, .from_depth = -1, .to_depth = 0};
   }
 
-  TransferRet ret{.from_depth = -1, .transfer_size = -1, .to_depth = -1};
+  TransferRet ret{.transfer_size = -1, .from_depth = -1, .to_depth = -1};
   auto it = orbits.find(cur);
   if (it == orbits.end()) return ret;
 

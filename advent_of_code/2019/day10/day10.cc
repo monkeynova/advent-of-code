@@ -129,7 +129,7 @@ absl::StatusOr<std::vector<std::string>> Day10_2019::Part2(
       theta += 8 * atan2(1, 1) /* 2 * pi */;
     }
     ordered_destruct.push_back(
-        {.p = p, .count = ObscureCount(*board, origin, p), .theta = theta});
+        {.p = p, .theta = theta, .count = ObscureCount(*board, origin, p)});
   }
   std::sort(ordered_destruct.begin(), ordered_destruct.end());
   int ret = ordered_destruct[199].p.x * 100 + ordered_destruct[199].p.y;

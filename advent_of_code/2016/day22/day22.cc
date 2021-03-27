@@ -60,7 +60,7 @@ H AbslHashValue(H h, const State& s) {
 
 absl::StatusOr<int> FindMinPath(absl::flat_hash_map<Point, Node> grid) {
   State initial_state{
-      .data_loc = {0, 0}, .grid = grid, .grid_end = {0, 0}, .num_steps = 0};
+      .grid = grid, .data_loc = {0, 0}, .grid_end = {0, 0}, .num_steps = 0};
   for (const auto& [p, _] : grid) {
     if (p.y == 0 && p.x > initial_state.data_loc.x) {
       initial_state.data_loc = p;
