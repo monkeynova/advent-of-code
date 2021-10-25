@@ -12,13 +12,13 @@ git_repository(
 git_repository(
     name = "com_google_googletest",
     remote = "git://github.com/google/googletest.git",
-    commit = "df7fee587d442b372ef43bd66c6a2f5c9af8c5eb",
+    commit = "16f637fbf4ffc3f7a01fa4eceb7906634565242f",
 )
 
 git_repository(
     name = "com_google_absl",
     remote = "git://github.com/abseil/abseil-cpp.git",
-    commit = "a09b5de0d57d7b2179210989ab63361c3c1894f5",
+    commit = "ddb842f583e560bbde497bc96cfebe25f9089e11",
 )
 
 git_repository(
@@ -30,13 +30,13 @@ git_repository(
 git_repository(
     name = "com_google_benchmark",
     remote = "git://github.com/google/benchmark.git",
-    commit = "cc9abfc8f12577ea83b2d093693ba70c3c0fd2c7",
+    commit = "e991355c02b93fe17713efe04cbc2e278e00fdbd",
 )
 
 git_repository(
     name = "com_google_glog",
     remote = "git://github.com/google/glog.git",
-    commit = "d4e8ebab7e295f20f86cae9557da0d5087a02f73",
+    commit = "9cf0eb7c98f6f611c185c5a611d6b104c612ec0e",
 )
 
 git_repository(
@@ -49,11 +49,11 @@ git_repository(
     name = "com_googlesource_code_re2",
     remote = "git://github.com/google/re2.git",
     # branch = "abseil"
-    commit = "72f110e82ccf3a9ae1c9418bfb447c3ba1cf95c2",
+    commit = "6993f422809ae4ecdc02eb8a988220cdcad9e6b7",
 )
 
 git_repository(
     name = "com_google_file_based_test_driver",
     remote = "git://github.com/google/file-based-test-driver.git",
-    commit = "77e24638ad40ec67dcbf6e37fd57e20c5d98976e",
+    commit = "fd7661b168f640f68da39f97dad26e426eb6c339",
 )
