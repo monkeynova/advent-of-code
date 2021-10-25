@@ -1,5 +1,5 @@
-#ifndef ADVENT_OF_CODE_2019_POINT_H
-#define ADVENT_OF_CODE_2019_POINT_H
+#ifndef ADVENT_OF_CODE_POINT_H
+#define ADVENT_OF_CODE_POINT_H
 
 #include <array>
 #include <iostream>
@@ -311,4 +311,4 @@ struct Cardinal4 {
 
 }  // namespace advent_of_code
 
-#endif  // ADVENT_OF_CODE_2019_POINT_H
+#endif  // ADVENT_OF_CODE_POINT_H

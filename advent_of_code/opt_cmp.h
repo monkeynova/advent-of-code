@@ -1,5 +1,5 @@
-#ifndef ADVENT_OF_CODE_2019_OPT_CMP_H
-#define ADVENT_OF_CODE_2019_OPT_CMP_H
+#ifndef ADVENT_OF_CODE_OPT_CMP_H
+#define ADVENT_OF_CODE_OPT_CMP_H
 
 namespace advent_of_code {
 
@@ -42,4 +42,4 @@ absl::optional<T> opt_add(absl::optional<T> a, T d) {
 
 }  // namespace advent_of_code
 
-#endif  // ADVENT_OF_CODE_2019_OPT_CMP_H
+#endif  // ADVENT_OF_CODE_OPT_CMP_H
