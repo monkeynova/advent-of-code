@@ -5,7 +5,7 @@
 
 namespace advent_of_code {
 
-using DayTest = FileTest<Day18_2020>;
+using DayTest = FileTest<Day_2020_18>;
 
 TEST_F(DayTest, FileBasedTest) { EXPECT_TRUE(RunTest()); }
 

@@ -60,7 +60,7 @@ bool SameDir(Point3 a, Point3 b) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day20_2017::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2017_20::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<Particle>> particles = Parse(input);
   if (!particles.ok()) return particles.status();
@@ -84,7 +84,7 @@ absl::StatusOr<std::vector<std::string>> Day20_2017::Part1(
   return IntReturn(min_idx);
 }
 
-absl::StatusOr<std::vector<std::string>> Day20_2017::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2017_20::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<Particle>> particles = Parse(input);
   if (!particles.ok()) return particles.status();

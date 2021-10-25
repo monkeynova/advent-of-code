@@ -160,7 +160,7 @@ bool MatchRuleSetWalk(const absl::flat_hash_map<int, Rule>& rule_set,
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day19_2020::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2020_19::Part1(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<int, Rule> rule_set;
   bool parse_rules = true;
@@ -192,7 +192,7 @@ absl::StatusOr<std::vector<std::string>> Day19_2020::Part1(
   return IntReturn(match_count);
 }
 
-absl::StatusOr<std::vector<std::string>> Day19_2020::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2020_19::Part2(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<int, Rule> rule_set;
   bool parse_rules = true;

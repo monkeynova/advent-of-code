@@ -255,7 +255,7 @@ absl::Status RunReverseTest() {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day21_2016::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2016_21::Part1(
     absl::Span<absl::string_view> input) const {
   if (absl::Status st = RunTest(); !st.ok()) return st;
 
@@ -271,7 +271,7 @@ absl::StatusOr<std::vector<std::string>> Day21_2016::Part1(
   return std::vector<std::string>{pw};
 }
 
-absl::StatusOr<std::vector<std::string>> Day21_2016::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2016_21::Part2(
     absl::Span<absl::string_view> input) const {
   if (absl::Status st = RunReverseTest(); !st.ok()) return st;
 

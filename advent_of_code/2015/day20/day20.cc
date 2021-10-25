@@ -56,7 +56,7 @@ int PresentCountPart2(int house_num) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day20_2015::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2015_20::Part1(
     absl::Span<absl::string_view> input) const {
   std::vector<std::pair<int, int>> test_suite = {
       {1, 10}, {2, 30}, {6, 120}, {8, 150}};
@@ -79,7 +79,7 @@ absl::StatusOr<std::vector<std::string>> Day20_2015::Part1(
   return Error("Not found");
 }
 
-absl::StatusOr<std::vector<std::string>> Day20_2015::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2015_20::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> present_count_list = ParseAsInts(input);
   if (!present_count_list.ok()) return present_count_list.status();

@@ -244,7 +244,7 @@ class Droid : public IntCode::IOModule {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day15_2019::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2019_15::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
@@ -258,7 +258,7 @@ absl::StatusOr<std::vector<std::string>> Day15_2019::Part1(
   return IntReturn(droid.DistanceToO2());
 }
 
-absl::StatusOr<std::vector<std::string>> Day15_2019::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2019_15::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();

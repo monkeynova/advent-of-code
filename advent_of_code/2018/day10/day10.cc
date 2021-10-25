@@ -22,7 +22,7 @@ struct Light {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day10_2018::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2018_10::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.empty()) return Error("No input");
   std::vector<Light> lights;
@@ -58,7 +58,7 @@ absl::StatusOr<std::vector<std::string>> Day10_2018::Part1(
   return b.rows;
 }
 
-absl::StatusOr<std::vector<std::string>> Day10_2018::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2018_10::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.empty()) return Error("No input");
   std::vector<Light> lights;

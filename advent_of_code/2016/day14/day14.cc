@@ -14,7 +14,7 @@ namespace advent_of_code {
 
 namespace {}  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day14_2016::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2016_14::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
 
@@ -67,7 +67,7 @@ absl::StatusOr<std::vector<std::string>> Day14_2016::Part1(
   return Error("Impossible");
 }
 
-absl::StatusOr<std::vector<std::string>> Day14_2016::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2016_14::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
 

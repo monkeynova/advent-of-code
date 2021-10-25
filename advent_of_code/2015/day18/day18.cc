@@ -66,7 +66,7 @@ int CountOn(const CharBoard& in) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day18_2015::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2015_18::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
@@ -78,7 +78,7 @@ absl::StatusOr<std::vector<std::string>> Day18_2015::Part1(
   return IntReturn(CountOn(cur));
 }
 
-absl::StatusOr<std::vector<std::string>> Day18_2015::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2015_18::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();

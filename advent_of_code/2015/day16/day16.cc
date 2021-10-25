@@ -12,7 +12,7 @@
 namespace advent_of_code {
 namespace {}  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day16_2015::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2015_16::Part1(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<absl::string_view, int> features = {
       {"children", 3}, {"cats", 7},    {"samoyeds", 2}, {"pomeranians", 3},
@@ -38,7 +38,7 @@ absl::StatusOr<std::vector<std::string>> Day16_2015::Part1(
   return IntReturn(*aunts.begin());
 }
 
-absl::StatusOr<std::vector<std::string>> Day16_2015::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2015_16::Part2(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<absl::string_view, int> features = {
       {"children", 3}, {"cats", 7},    {"samoyeds", 2}, {"pomeranians", 3},

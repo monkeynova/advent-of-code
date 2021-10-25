@@ -17,7 +17,7 @@ namespace {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day01_2017::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2017_01::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   int sum = 0;
@@ -30,7 +30,7 @@ absl::StatusOr<std::vector<std::string>> Day01_2017::Part1(
   return IntReturn(sum);
 }
 
-absl::StatusOr<std::vector<std::string>> Day01_2017::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2017_01::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   int sum = 0;

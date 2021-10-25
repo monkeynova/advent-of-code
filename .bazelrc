@@ -1,9 +1,10 @@
 # We have win/linux/mac specific options in this config so we allow processing
 # them by default. 
 build --enable_platform_specific_config
+build -c opt
 
 # file_based_test_driver requires C++ 17 idioms.
-build:linux --cxxopt=-std=c++1z
+build:linux --cxxopt=-std=c++1z --cxxopt=-Wno-sign-compare
 build:macos --cxxopt=-std=c++1z
 build:windows --cxxopt=/std:c++17
 
@@ -12,3 +13,16 @@ build:windows --cxxopt=/std:c++17
 # object files are present as a pair. absl fails to link properly with .sos as
 # a result.
 build:macos --features=-supports_dynamic_linker
+
+test:v1 --test_arg=--logtostderr --test_arg=--v=1 --test_output=streamed --nocache_test_results
+run:v1 -- --logtostderr --v=1
+
+run:v2 -- --logtostderr --v=2
+test:v2 --test_arg=--logtostderr --test_arg=--v=2 --test_output=streamed --nocache_test_results
+
+run:v3 -- --logtostderr --v=3
+test:v3 --test_arg=--logtostderr --test_arg=--v=3 --test_output=streamed --nocache_test_results
+
+build:dcheck --copt=-UNDEBUG
+run:dcheck --copt=-UNDEBUG
+test:dcheck --copt=-UNDEBUG

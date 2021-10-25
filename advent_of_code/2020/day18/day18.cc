@@ -187,7 +187,7 @@ absl::StatusOr<std::unique_ptr<ExprTree>> Parse2(absl::string_view str) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day18_2020::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2020_18::Part1(
     absl::Span<absl::string_view> input) const {
   int64_t sum = 0;
   for (absl::string_view expr : input) {
@@ -198,7 +198,7 @@ absl::StatusOr<std::vector<std::string>> Day18_2020::Part1(
   return IntReturn(sum);
 }
 
-absl::StatusOr<std::vector<std::string>> Day18_2020::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2020_18::Part2(
     absl::Span<absl::string_view> input) const {
   int64_t sum = 0;
   for (absl::string_view expr : input) {

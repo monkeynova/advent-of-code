@@ -13,7 +13,7 @@
 namespace advent_of_code {
 namespace {}  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day03_2015::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2015_03::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
   absl::flat_hash_map<Point, int> visit;
@@ -40,7 +40,7 @@ absl::StatusOr<std::vector<std::string>> Day03_2015::Part1(
   return IntReturn(visit.size());
 }
 
-absl::StatusOr<std::vector<std::string>> Day03_2015::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2015_03::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
   if (input[0].size() % 2 != 0)

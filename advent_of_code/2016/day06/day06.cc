@@ -17,7 +17,7 @@ namespace {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day06_2016::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2016_06::Part1(
     absl::Span<absl::string_view> input) const {
   std::vector<absl::flat_hash_map<char, int>> freqs;
   if (input.empty()) return Error("Bad Input");
@@ -44,7 +44,7 @@ absl::StatusOr<std::vector<std::string>> Day06_2016::Part1(
   return std::vector<std::string>{out};
 }
 
-absl::StatusOr<std::vector<std::string>> Day06_2016::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2016_06::Part2(
     absl::Span<absl::string_view> input) const {
   std::vector<absl::flat_hash_map<char, int>> freqs;
   if (input.empty()) return Error("Bad Input");

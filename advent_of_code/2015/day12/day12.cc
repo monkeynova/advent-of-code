@@ -87,7 +87,7 @@ absl::StatusOr<int> ParseAndCountNonRed(absl::string_view* json,
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day12_2015::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2015_12::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   absl::string_view json = input[0];
@@ -99,7 +99,7 @@ absl::StatusOr<std::vector<std::string>> Day12_2015::Part1(
   return IntReturn(sum);
 }
 
-absl::StatusOr<std::vector<std::string>> Day12_2015::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2015_12::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   absl::string_view json = input[0];

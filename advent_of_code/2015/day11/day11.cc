@@ -51,7 +51,7 @@ bool IsValid(absl::string_view password) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day11_2015::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2015_11::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   std::string password = std::string(input[0]);
@@ -62,7 +62,7 @@ absl::StatusOr<std::vector<std::string>> Day11_2015::Part1(
   return std::vector<std::string>{password};
 }
 
-absl::StatusOr<std::vector<std::string>> Day11_2015::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2015_11::Part2(
     absl::Span<absl::string_view> input) const {
   std::string password = std::string(input[0]);
   do {

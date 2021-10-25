@@ -54,7 +54,7 @@ int CountConstellations(const std::vector<Point4>& points) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day25_2018::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2018_25::Part1(
     absl::Span<absl::string_view> input) const {
   std::vector<Point4> points;
   for (absl::string_view row : input) {
@@ -69,7 +69,7 @@ absl::StatusOr<std::vector<std::string>> Day25_2018::Part1(
   return IntReturn(CountConstellations(points));
 }
 
-absl::StatusOr<std::vector<std::string>> Day25_2018::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2018_25::Part2(
     absl::Span<absl::string_view> input) const {
   return std::vector<std::string>{"Merry Christmas!"};
 }

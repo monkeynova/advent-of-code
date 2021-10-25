@@ -268,14 +268,14 @@ absl::StatusOr<ElevatorState> ElevatorState::Parse(
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day11_2016::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2016_11::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<ElevatorState> s = ElevatorState::Parse(input);
   if (!s.ok()) return s.status();
   return IntReturn(s->FindMinSteps());
 }
 
-absl::StatusOr<std::vector<std::string>> Day11_2016::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2016_11::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<ElevatorState> s = ElevatorState::Parse(input);
   s->AddElementAtFloor0("elerium");

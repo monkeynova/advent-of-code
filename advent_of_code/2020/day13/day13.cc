@@ -12,7 +12,7 @@
 namespace advent_of_code {
 namespace {}  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day13_2020::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2020_13::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 2) return Error("Bad input");
   int start;
@@ -32,7 +32,7 @@ absl::StatusOr<std::vector<std::string>> Day13_2020::Part1(
   return IntReturn(min_delta * min_id);
 }
 
-absl::StatusOr<std::vector<std::string>> Day13_2020::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2020_13::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 2) return Error("Bad input");
   int start;

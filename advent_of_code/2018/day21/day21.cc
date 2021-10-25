@@ -94,7 +94,7 @@ do {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day21_2018::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2018_21::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<VM> vm = VM::Parse(input);
   if (!vm.ok()) return vm.status();
@@ -123,7 +123,7 @@ absl::StatusOr<std::vector<std::string>> Day21_2018::Part1(
   return IntReturn(first_test);
 }
 
-absl::StatusOr<std::vector<std::string>> Day21_2018::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2018_21::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<VM> vm = VM::Parse(input);
   if (!vm.ok()) return vm.status();

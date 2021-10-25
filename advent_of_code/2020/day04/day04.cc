@@ -75,7 +75,7 @@ absl::Status Valid2(absl::flat_hash_map<std::string, std::string> passport) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day04_2020::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2020_04::Part1(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<std::string, std::string> passport;
   int valid = 0;
@@ -102,7 +102,7 @@ absl::StatusOr<std::vector<std::string>> Day04_2020::Part1(
   return IntReturn(valid);
 }
 
-absl::StatusOr<std::vector<std::string>> Day04_2020::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2020_04::Part2(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<std::string, std::string> passport;
   int valid = 0;

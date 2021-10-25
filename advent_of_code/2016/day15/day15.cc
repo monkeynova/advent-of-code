@@ -23,7 +23,7 @@ struct Disc {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day15_2016::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2016_15::Part1(
     absl::Span<absl::string_view> input) const {
   std::vector<Disc> discs;
   for (absl::string_view str : input) {
@@ -53,7 +53,7 @@ absl::StatusOr<std::vector<std::string>> Day15_2016::Part1(
   return IntReturn(start);
 }
 
-absl::StatusOr<std::vector<std::string>> Day15_2016::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2016_15::Part2(
     absl::Span<absl::string_view> input) const {
   std::vector<Disc> discs;
   for (absl::string_view str : input) {

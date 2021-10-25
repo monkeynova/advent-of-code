@@ -97,7 +97,7 @@ class PathWalkToDistance : public BFSInterface<PathWalkToDistance, Point> {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day13_2016::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2016_13::Part1(
     absl::Span<absl::string_view> input) const {
   SparseBoard test_board(10);
   absl::optional<int> test_dist =
@@ -112,7 +112,7 @@ absl::StatusOr<std::vector<std::string>> Day13_2016::Part1(
   return IntReturn(PathWalkToEnd(board, {1, 1}, {31, 39}).FindMinSteps());
 }
 
-absl::StatusOr<std::vector<std::string>> Day13_2016::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2016_13::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
   int v;

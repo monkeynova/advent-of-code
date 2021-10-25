@@ -88,7 +88,7 @@ absl::StatusOr<absl::flat_hash_map<Point, bool>> RunStep(
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day24_2020::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2020_24::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<Point, bool>> grid = ParseGrid(input);
   if (!grid.ok()) return grid.status();
@@ -99,7 +99,7 @@ absl::StatusOr<std::vector<std::string>> Day24_2020::Part1(
   return IntReturn(black_count);
 }
 
-absl::StatusOr<std::vector<std::string>> Day24_2020::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2020_24::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<Point, bool>> grid = ParseGrid(input);
   if (!grid.ok()) return grid.status();

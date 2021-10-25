@@ -269,7 +269,7 @@ int ImmuneLeftAfterFightWithBoost(const std::vector<Group>& start, int boost) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day24_2018::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2018_24::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<Group>> groups = Parse(input);
   if (!groups.ok()) return groups.status();
@@ -284,7 +284,7 @@ absl::StatusOr<std::vector<std::string>> Day24_2018::Part1(
   return IntReturn(units);
 }
 
-absl::StatusOr<std::vector<std::string>> Day24_2018::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2018_24::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<Group>> groups = Parse(input);
   if (!groups.ok()) return groups.status();

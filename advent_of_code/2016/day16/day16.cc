@@ -78,14 +78,14 @@ std::string RunPart1(absl::string_view input, int size) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day16_2016::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2016_16::Part1(
     absl::Span<absl::string_view> input) const {
   if (RunPart1("10000", 20) != "01100") return Error("Bad code");
   if (input.size() != 1) return Error("Bad input size");
   return std::vector<std::string>{RunPart1(input[0], 272)};
 }
 
-absl::StatusOr<std::vector<std::string>> Day16_2016::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2016_16::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
   return std::vector<std::string>{RunPart1(input[0], 35651584)};

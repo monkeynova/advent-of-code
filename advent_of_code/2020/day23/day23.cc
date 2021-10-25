@@ -67,7 +67,7 @@ void RunMove2(Cups* cups) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day23_2020::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2020_23::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   Cups cups;
@@ -94,7 +94,7 @@ absl::StatusOr<std::vector<std::string>> Day23_2020::Part1(
   return std::vector<std::string>{ret};
 }
 
-absl::StatusOr<std::vector<std::string>> Day23_2020::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2020_23::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   Cups cups;

@@ -33,6 +33,6 @@ system("perl", "-spi", "-e",
        join(" ", ("s{new_day_path}{$year/day$day}g;",
                   "s{new_day}{day$day}g;",
                   "s{NEW_DAY}{${year}_DAY$day}g;",
-                  "s{NewDay}{Day${day}_$year}g")),
+                  "s{NewDay}{Day_${year}_${day}}g")),
         map { "advent_of_code/$year/day$day/$_" } values %renames)
   and die $!;

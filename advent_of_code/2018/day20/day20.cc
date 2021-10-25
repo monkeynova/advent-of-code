@@ -276,7 +276,7 @@ class RoomWalkPast : public BFSInterface<RoomWalkPast, Point> {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day20_2018::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2018_20::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   absl::string_view re = input[0];
@@ -299,7 +299,7 @@ absl::StatusOr<std::vector<std::string>> Day20_2018::Part1(
   return IntReturn(max_path);
 }
 
-absl::StatusOr<std::vector<std::string>> Day20_2018::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2018_20::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   absl::string_view re = input[0];

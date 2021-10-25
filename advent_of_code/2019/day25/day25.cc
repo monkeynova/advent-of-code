@@ -49,7 +49,7 @@ class Terminal : public IntCode::IOModule {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day25_2019::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2019_25::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
@@ -112,7 +112,7 @@ absl::StatusOr<std::vector<std::string>> Day25_2019::Part1(
   return absl::InternalError("Not found");
 }
 
-absl::StatusOr<std::vector<std::string>> Day25_2019::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2019_25::Part2(
     absl::Span<absl::string_view> input) const {
   return std::vector<std::string>({"Merry Christmas"});
 }

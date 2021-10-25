@@ -190,7 +190,7 @@ class TractorSearch {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day19_2019::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2019_19::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
@@ -200,7 +200,7 @@ absl::StatusOr<std::vector<std::string>> Day19_2019::Part1(
   return IntReturn(search.ScanRange(Point{0, 0}, Point{50, 50}));
 }
 
-absl::StatusOr<std::vector<std::string>> Day19_2019::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2019_19::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();

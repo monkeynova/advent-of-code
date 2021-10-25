@@ -101,7 +101,7 @@ absl::StatusOr<int> FindCmp(absl::flat_hash_map<int, Bot>* bots, int test_v1,
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day10_2016::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2016_10::Part1(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<int, Bot> bots;
   for (absl::string_view ins : input) {
@@ -159,7 +159,7 @@ absl::StatusOr<std::vector<std::string>> Day10_2016::Part1(
   return IntReturn(FindCmp(&bots, 2, 5));
 }
 
-absl::StatusOr<std::vector<std::string>> Day10_2016::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2016_10::Part2(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<int, Bot> bots;
   absl::flat_hash_map<int, Input> outputs;

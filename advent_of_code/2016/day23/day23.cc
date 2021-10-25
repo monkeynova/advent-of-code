@@ -12,7 +12,7 @@
 
 namespace advent_of_code {
 
-absl::StatusOr<std::vector<std::string>> Day23_2016::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2016_23::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<AssemBunny> vm = AssemBunny::Parse(input);
   if (!vm.ok()) return vm.status();
@@ -21,7 +21,7 @@ absl::StatusOr<std::vector<std::string>> Day23_2016::Part1(
   return IntReturn(vm->registers().a);
 }
 
-absl::StatusOr<std::vector<std::string>> Day23_2016::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2016_23::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<AssemBunny> vm = AssemBunny::Parse(input);
   if (!vm.ok()) return vm.status();

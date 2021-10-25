@@ -18,7 +18,7 @@ namespace {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day02_2016::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2016_02::Part1(
     absl::Span<absl::string_view> input) const {
   std::string code;
   Point p = {1, 1};
@@ -57,7 +57,7 @@ absl::StatusOr<std::vector<std::string>> Day02_2016::Part1(
   return std::vector<std::string>{code};
 }
 
-absl::StatusOr<std::vector<std::string>> Day02_2016::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2016_02::Part2(
     absl::Span<absl::string_view> input) const {
   std::string code;
   Point p = {0, 2};

@@ -73,7 +73,7 @@ absl::StatusOr<absl::flat_hash_map<int, VM::OpCode>> ComputeMap(
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day16_2018::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2018_16::Part1(
     absl::Span<absl::string_view> input) const {
   std::vector<int> register_in(4, 0);
   std::vector<int> op(4, 0);
@@ -104,7 +104,7 @@ absl::StatusOr<std::vector<std::string>> Day16_2018::Part1(
   return IntReturn(count);
 }
 
-absl::StatusOr<std::vector<std::string>> Day16_2018::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2018_16::Part2(
     absl::Span<absl::string_view> input) const {
   std::vector<int> register_in(4, 0);
   std::vector<int> op(4, 0);

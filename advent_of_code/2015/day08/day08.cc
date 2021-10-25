@@ -12,7 +12,7 @@
 namespace advent_of_code {
 namespace {}  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day08_2015::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2015_08::Part1(
     absl::Span<absl::string_view> input) const {
   int delta = 0;
   for (absl::string_view str : input) {
@@ -34,7 +34,7 @@ absl::StatusOr<std::vector<std::string>> Day08_2015::Part1(
   return IntReturn(delta);
 }
 
-absl::StatusOr<std::vector<std::string>> Day08_2015::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2015_08::Part2(
     absl::Span<absl::string_view> input) const {
   int delta = 0;
   for (absl::string_view str : input) {

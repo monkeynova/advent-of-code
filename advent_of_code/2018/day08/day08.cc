@@ -63,7 +63,7 @@ absl::StatusOr<int> NodeValue(absl::Span<int64_t>& range) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day08_2018::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2018_08::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   std::vector<absl::string_view> int_strs = absl::StrSplit(input[0], " ");
@@ -76,7 +76,7 @@ absl::StatusOr<std::vector<std::string>> Day08_2018::Part1(
   return IntReturn(*ret);
 }
 
-absl::StatusOr<std::vector<std::string>> Day08_2018::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2018_08::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   std::vector<absl::string_view> int_strs = absl::StrSplit(input[0], " ");

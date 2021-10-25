@@ -14,7 +14,7 @@ TEST(DayBenchmarkTest, Consistency) {
   EXPECT_EQ(kMaxTestCount, *test_count);
 }
 
-BENCHMARK_TEMPLATE(BM_Day, Day22_2018)->DenseRange(0, kMaxTestCount - 1);
+BENCHMARK_TEMPLATE(BM_Day, Day_2018_22)->DenseRange(0, kMaxTestCount - 1);
 
 }  // namespace advent_of_code
 }  // namespace advent_of_code

@@ -125,7 +125,7 @@ LengthStrength StrongestLongestBridge(const std::vector<Converter>& ordered) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day24_2017::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2017_24::Part1(
     absl::Span<absl::string_view> input) const {
   std::vector<Converter> convs;
   for (absl::string_view row : input) {
@@ -138,7 +138,7 @@ absl::StatusOr<std::vector<std::string>> Day24_2017::Part1(
   return IntReturn(StrongestBridge(convs));
 }
 
-absl::StatusOr<std::vector<std::string>> Day24_2017::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2017_24::Part2(
     absl::Span<absl::string_view> input) const {
   std::vector<Converter> convs;
   for (absl::string_view row : input) {

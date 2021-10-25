@@ -49,7 +49,7 @@ Point FromPosition(int position) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day03_2017::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2017_03::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> nums = ParseAsInts(input);
   if (!nums.ok()) return nums.status();
@@ -57,7 +57,7 @@ absl::StatusOr<std::vector<std::string>> Day03_2017::Part1(
   return IntReturn(FromPosition(nums->at(0)).dist());
 }
 
-absl::StatusOr<std::vector<std::string>> Day03_2017::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2017_03::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> nums = ParseAsInts(input);
   if (!nums.ok()) return nums.status();

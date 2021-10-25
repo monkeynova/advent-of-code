@@ -9,7 +9,7 @@
 namespace advent_of_code {
 namespace {}  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day01_2020::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2020_01::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
   if (!list.ok()) return list.status();
@@ -27,7 +27,7 @@ absl::StatusOr<std::vector<std::string>> Day01_2020::Part1(
   return IntReturn(res);
 }
 
-absl::StatusOr<std::vector<std::string>> Day01_2020::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2020_01::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
   if (!list.ok()) return list.status();

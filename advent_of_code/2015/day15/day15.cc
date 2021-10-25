@@ -96,7 +96,7 @@ int64_t FindBestScoreRequiredCalories(absl::Span<Ingredient> ingredients,
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day15_2015::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2015_15::Part1(
     absl::Span<absl::string_view> input) const {
   // Sprinkles: capacity 5, durability -1, flavor 0, texture 0, calories 5
   std::vector<Ingredient> ingredients;
@@ -115,7 +115,7 @@ absl::StatusOr<std::vector<std::string>> Day15_2015::Part1(
   return IntReturn(FindBestScore(absl::MakeSpan(ingredients), 100));
 }
 
-absl::StatusOr<std::vector<std::string>> Day15_2015::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2015_15::Part2(
     absl::Span<absl::string_view> input) const {
   // Sprinkles: capacity 5, durability -1, flavor 0, texture 0, calories 5
   std::vector<Ingredient> ingredients;

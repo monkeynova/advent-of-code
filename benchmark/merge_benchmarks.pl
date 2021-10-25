@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 
-my @lines = <>;
-my %line_to_problem = map { /Day(\d+)_(\d+)/ ? ($_ => $2 * 100 + $1) : () } @lines;
-@lines = sort { ($line_to_problem{$a} // 0) <=> ($line_to_problem{$b} // 0) } @lines;
+my @lines = sort <>;
+#my %line_to_problem = map { /Day(\d+)_(\d+)/ ? ($_ => $2 * 100 + $1) : () } @lines;
+#@lines = sort { ($line_to_problem{$a} // 0) <=> ($line_to_problem{$b} // 0) } @lines;
 my @column_sizes;
 # Break columns on space except for "1235 ns".
 my $col_split_re = '\s+(?!ns)';

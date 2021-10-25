@@ -193,7 +193,7 @@ class Maze {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day20_2019::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2019_20::Part1(
     absl::Span<absl::string_view> input) const {
   Maze maze(input);
   if (absl::Status st = maze.Initialize(); !st.ok()) return st;
@@ -201,7 +201,7 @@ absl::StatusOr<std::vector<std::string>> Day20_2019::Part1(
   return IntReturn(maze.FindPath());
 }
 
-absl::StatusOr<std::vector<std::string>> Day20_2019::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2019_20::Part2(
     absl::Span<absl::string_view> input) const {
   Maze maze(input);
   if (absl::Status st = maze.Initialize(); !st.ok()) return st;

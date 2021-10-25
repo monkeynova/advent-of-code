@@ -8,7 +8,7 @@
 namespace advent_of_code {
 namespace {}  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day08_2019::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2019_08::Part1(
     absl::Span<absl::string_view> input) const {
   const int kWidth = 25;
   const int kHeight = 6;
@@ -47,7 +47,7 @@ absl::StatusOr<std::vector<std::string>> Day08_2019::Part1(
   return IntReturn(num_ones * num_twos);
 }
 
-absl::StatusOr<std::vector<std::string>> Day08_2019::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2019_08::Part2(
     absl::Span<absl::string_view> input) const {
   const int kWidth = 25;
   const int kHeight = 6;

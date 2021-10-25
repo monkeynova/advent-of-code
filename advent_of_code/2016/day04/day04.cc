@@ -59,7 +59,7 @@ std::string Decrypt(absl::string_view name, int sector) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day04_2016::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2016_04::Part1(
     absl::Span<absl::string_view> input) const {
   int sector_sum = 0;
   for (absl::string_view in : input) {
@@ -77,7 +77,7 @@ absl::StatusOr<std::vector<std::string>> Day04_2016::Part1(
   return IntReturn(sector_sum);
 }
 
-absl::StatusOr<std::vector<std::string>> Day04_2016::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2016_04::Part2(
     absl::Span<absl::string_view> input) const {
   std::vector<std::string> ret;
   for (absl::string_view in : input) {

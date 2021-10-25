@@ -301,7 +301,7 @@ class ViewPort : public IntCode::IOModule {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day17_2019::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2019_17::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
@@ -314,7 +314,7 @@ absl::StatusOr<std::vector<std::string>> Day17_2019::Part1(
   return IntReturn(view_port.ComputeAlignment());
 }
 
-absl::StatusOr<std::vector<std::string>> Day17_2019::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2019_17::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();

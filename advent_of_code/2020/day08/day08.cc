@@ -81,7 +81,7 @@ absl::StatusOr<bool> BootCode::Execute() {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day08_2020::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2020_08::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<BootCode> boot_code = BootCode::Parse(input);
   if (!boot_code.ok()) return boot_code.status();
@@ -92,7 +92,7 @@ absl::StatusOr<std::vector<std::string>> Day08_2020::Part1(
   return IntReturn(boot_code->accumulator());
 }
 
-absl::StatusOr<std::vector<std::string>> Day08_2020::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2020_08::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<BootCode> boot_code = BootCode::Parse(input);
   if (!boot_code.ok()) return boot_code.status();

@@ -17,7 +17,7 @@ namespace {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day01_2018::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2018_01::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
   if (!list.ok()) return list.status();
@@ -26,7 +26,7 @@ absl::StatusOr<std::vector<std::string>> Day01_2018::Part1(
   return IntReturn(sum);
 }
 
-absl::StatusOr<std::vector<std::string>> Day01_2018::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2018_01::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
   if (!list.ok()) return list.status();

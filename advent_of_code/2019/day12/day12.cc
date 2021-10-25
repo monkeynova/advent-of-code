@@ -50,7 +50,7 @@ int TotalEnergy(const std::vector<Moon>& moons) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day12_2019::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2019_12::Part1(
     absl::Span<absl::string_view> input) const {
   RE2 pattern{"<x=(-?\\d+), y=(-?\\d+), z=(-?\\d+)>"};
   std::vector<Moon> moons;
@@ -76,7 +76,7 @@ absl::StatusOr<std::vector<std::string>> Day12_2019::Part1(
   return IntReturn(TotalEnergy(moons));
 }
 
-absl::StatusOr<std::vector<std::string>> Day12_2019::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2019_12::Part2(
     absl::Span<absl::string_view> input) const {
   RE2 pattern{"<x=(-?\\d+), y=(-?\\d+), z=(-?\\d+)>"};
   std::vector<Moon> moons;

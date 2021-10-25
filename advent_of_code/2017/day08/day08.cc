@@ -17,7 +17,7 @@ namespace {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day08_2017::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2017_08::Part1(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<absl::string_view, int> registers;
   for (absl::string_view in : input) {
@@ -61,7 +61,7 @@ absl::StatusOr<std::vector<std::string>> Day08_2017::Part1(
   return IntReturn(max);
 }
 
-absl::StatusOr<std::vector<std::string>> Day08_2017::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2017_08::Part2(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<absl::string_view, int> registers;
   int max = std::numeric_limits<int>::min();

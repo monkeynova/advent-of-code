@@ -179,7 +179,7 @@ absl::StatusOr<State> FindKarts(const CharBoard& b) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day13_2018::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2018_13::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.empty()) return Error("bad input");
   if (RE2::PartialMatch(input[0], "^HACK:")) input = input.subspan(1);
@@ -200,7 +200,7 @@ absl::StatusOr<std::vector<std::string>> Day13_2018::Part1(
   return Error("Left infinite loop");
 }
 
-absl::StatusOr<std::vector<std::string>> Day13_2018::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2018_13::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.empty()) return Error("bad input");
   if (RE2::PartialMatch(input[0], "^HACK:")) input = input.subspan(1);

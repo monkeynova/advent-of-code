@@ -92,7 +92,7 @@ absl::StatusOr<int> CountContainedBags(const DirectedGraph<BagRule>& bags,
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day07_2020::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2020_07::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<DirectedGraph<BagRule>> bags = Parse(input);
   if (!bags.ok()) return bags.status();
@@ -100,7 +100,7 @@ absl::StatusOr<std::vector<std::string>> Day07_2020::Part1(
   return IntReturn(CountContainingBags(*bags, "shiny gold"));
 }
 
-absl::StatusOr<std::vector<std::string>> Day07_2020::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2020_07::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<DirectedGraph<BagRule>> bags = Parse(input);
   if (!bags.ok()) return bags.status();

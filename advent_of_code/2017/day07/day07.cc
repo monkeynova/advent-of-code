@@ -85,7 +85,7 @@ absl::StatusOr<DirectedGraph<int>> Parse(absl::Span<absl::string_view> input) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day07_2017::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2017_07::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<DirectedGraph<int>> dag = Parse(input);
   if (!dag.ok()) return dag.status();
@@ -100,7 +100,7 @@ absl::StatusOr<std::vector<std::string>> Day07_2017::Part1(
   return std::vector<std::string>{std::string(root)};
 }
 
-absl::StatusOr<std::vector<std::string>> Day07_2017::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2017_07::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<DirectedGraph<int>> dag = Parse(input);
   if (!dag.ok()) return dag.status();

@@ -112,7 +112,7 @@ class TuringMachine {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day25_2017::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2017_25::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<TuringMachine> tm = TuringMachine::Parse(input);
   if (!tm.ok()) return tm.status();
@@ -122,7 +122,7 @@ absl::StatusOr<std::vector<std::string>> Day25_2017::Part1(
   return IntReturn(tm->Checksum());
 }
 
-absl::StatusOr<std::vector<std::string>> Day25_2017::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2017_25::Part2(
     absl::Span<absl::string_view> input) const {
   return std::vector<std::string>{"Merry Christmas"};
 }

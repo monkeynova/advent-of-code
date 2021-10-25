@@ -27,7 +27,7 @@ std::string LookAndSay(absl::string_view input) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day10_2015::Part1(
+absl::StatusOr<std::vector<std::string>> Day_2015_10::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   std::string str = std::string(input[0]);
@@ -38,7 +38,7 @@ absl::StatusOr<std::vector<std::string>> Day10_2015::Part1(
   return IntReturn(str.size());
 }
 
-absl::StatusOr<std::vector<std::string>> Day10_2015::Part2(
+absl::StatusOr<std::vector<std::string>> Day_2015_10::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   std::string str = std::string(input[0]);
