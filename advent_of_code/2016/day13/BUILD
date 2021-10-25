@@ -39,6 +39,7 @@ cc_test(
         "day13.test",
         "input.txt",
     ],
+    tags = ["benchmark"],
     deps = [
         ":day13",
         "//advent_of_code/infra:file_benchmark",
