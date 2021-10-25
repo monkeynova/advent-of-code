@@ -110,7 +110,8 @@ absl::StatusOr<std::vector<std::string>> Day14_2016::Part2(
     }
     if (hunt != '\0') {
       const std::set<int>& haystack = has_5ple[hunt];
-      auto it = std::upper_bound(haystack.begin(), haystack.end(), test_index + 1);
+      auto it =
+          std::upper_bound(haystack.begin(), haystack.end(), test_index + 1);
       if (it != haystack.end() && *it <= test_index + 1000) {
         ++found;
         VLOG(1) << "Found Key #" << found << " @" << test_index;

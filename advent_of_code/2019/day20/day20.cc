@@ -114,7 +114,7 @@ class Maze {
     class PathWalk : public BFSInterface<PathWalk, Point> {
      public:
       PathWalk(const Maze& maze, Point start, Point end)
-       : maze_(maze), cur_(start), end_(end) {}
+          : maze_(maze), cur_(start), end_(end) {}
 
       Point identifier() const override { return cur_; }
       bool IsFinal() override { return cur_ == end_; }
@@ -147,7 +147,7 @@ class Maze {
     class PathWalk : public BFSInterface<PathWalk, Point3> {
      public:
       PathWalk(const Maze& maze, Point start, Point end)
-       : maze_(maze), cur_({start.x, start.y, 0}), end_({end.x, end.y, 0}) {}
+          : maze_(maze), cur_({start.x, start.y, 0}), end_({end.x, end.y, 0}) {}
 
       Point3 identifier() const override { return cur_; }
       bool IsFinal() override { return cur_ == end_; }
@@ -161,7 +161,8 @@ class Maze {
             state->AddNextStep(next);
           }
         }
-        if (auto it = maze_.portals().find({cur_.x, cur_.y}); it != maze_.portals().end()) {
+        if (auto it = maze_.portals().find({cur_.x, cur_.y});
+            it != maze_.portals().end()) {
           PathWalk next = *this;
           next.cur_ = {it->second.x, it->second.y,
                        cur_.z + (maze_.OnEdge({cur_.x, cur_.y}) ? -1 : +1)};

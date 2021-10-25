@@ -52,14 +52,15 @@ class Droid : public IntCode::IOModule {
      public:
       PathWalk(const absl::flat_hash_map<Point, int>& board, Point start,
                std::deque<InputDirection>* out_directions)
-       : board_(board), cur_(start), out_directions_(out_directions) {}
+          : board_(board), cur_(start), out_directions_(out_directions) {}
 
       Point identifier() const override { return cur_; }
 
       bool IsFinal() override {
         if (board_.contains(cur_)) return false;
         out_directions_->clear();
-        out_directions_->insert(out_directions_->end(), directions_.begin(), directions_.end());
+        out_directions_->insert(out_directions_->end(), directions_.begin(),
+                                directions_.end());
         return true;
       }
 
@@ -68,7 +69,8 @@ class Droid : public IntCode::IOModule {
              {InputDirection::kNorthInput, InputDirection::kSouthInput,
               InputDirection::kWestInput, InputDirection::kEastInput}) {
           Point new_location = cur_ + kInputDirectionMap[static_cast<int>(dir)];
-          if (auto it = board_.find(new_location); it != board_.end() && it->second == 0) {
+          if (auto it = board_.find(new_location);
+              it != board_.end() && it->second == 0) {
             // Wall.
             continue;
           }
@@ -99,8 +101,9 @@ class Droid : public IntCode::IOModule {
   absl::optional<int> DistanceToO2() {
     class PathWalk : public BFSInterface<PathWalk, Point> {
      public:
-      PathWalk(const absl::flat_hash_map<Point, int>& board, Point start, Point end)
-       : board_(board), cur_(start), end_(end) {}
+      PathWalk(const absl::flat_hash_map<Point, int>& board, Point start,
+               Point end)
+          : board_(board), cur_(start), end_(end) {}
 
       Point identifier() const override { return cur_; }
 
@@ -117,7 +120,7 @@ class Droid : public IntCode::IOModule {
           state->AddNextStep(next);
         }
       }
-      
+
      private:
       const absl::flat_hash_map<Point, int>& board_;
       Point cur_;
@@ -129,8 +132,9 @@ class Droid : public IntCode::IOModule {
   absl::StatusOr<int> GreatestDistanceFromO2() {
     class PathWalk : public BFSInterface<PathWalk, Point> {
      public:
-      PathWalk(const absl::flat_hash_map<Point, int>& board, Point start, int* max_dist)
-       : board_(board), cur_(start), max_dist_(max_dist) {}
+      PathWalk(const absl::flat_hash_map<Point, int>& board, Point start,
+               int* max_dist)
+          : board_(board), cur_(start), max_dist_(max_dist) {}
 
       Point identifier() const override { return cur_; }
 
@@ -150,7 +154,7 @@ class Droid : public IntCode::IOModule {
           state->AddNextStep(next);
         }
       }
-      
+
      private:
       const absl::flat_hash_map<Point, int>& board_;
       Point cur_;
@@ -161,7 +165,8 @@ class Droid : public IntCode::IOModule {
     absl::optional<int> should_be_empty =
         PathWalk(board_, o2_pos_, &max_dist).FindMinSteps();
     if (should_be_empty) {
-      return AdventDay::Error("Internal error: GreatestDistanceFromO2 (found path)");
+      return AdventDay::Error(
+          "Internal error: GreatestDistanceFromO2 (found path)");
     }
     return max_dist;
   }
@@ -200,7 +205,8 @@ class Droid : public IntCode::IOModule {
 
   std::string DebugBoard() const {
     char render[] = {'#', ' ', '*'};
-    CharBoard board(range_.max.x - range_.min.x + 1, range_.max.y - range_.min.y + 1);
+    CharBoard board(range_.max.x - range_.min.x + 1,
+                    range_.max.y - range_.min.y + 1);
     for (Point p : range_) {
       char c;
       if (p == Cardinal::kOrigin) {
@@ -213,7 +219,8 @@ class Droid : public IntCode::IOModule {
       }
       board[p - range_.min] = c;
     }
-    return board.DebugString();;
+    return board.DebugString();
+    ;
   }
 
   Point min() const { return range_.min; }
@@ -246,8 +253,7 @@ absl::StatusOr<std::vector<std::string>> Day15_2019::Part1(
   if (absl::Status st = codes->Run(&droid); !st.ok()) {
     return st;
   }
-  VLOG(1) << droid.min() << "-" << droid.max() << "\n"
-          << droid.DebugBoard();
+  VLOG(1) << droid.min() << "-" << droid.max() << "\n" << droid.DebugBoard();
 
   return IntReturn(droid.DistanceToO2());
 }
@@ -261,8 +267,7 @@ absl::StatusOr<std::vector<std::string>> Day15_2019::Part2(
   if (absl::Status st = codes->Run(&droid); !st.ok()) {
     return st;
   }
-  VLOG(1) << droid.min() << "-" << droid.max() << "\n"
-          << droid.DebugBoard();
+  VLOG(1) << droid.min() << "-" << droid.max() << "\n" << droid.DebugBoard();
 
   return IntReturn(droid.GreatestDistanceFromO2());
 }
