@@ -38,7 +38,7 @@ absl::StatusOr<std::string> Day_2018_14::Part1(
     elf2_pos = (elf2_pos + 1 + tmp[elf2_pos] - '0') % tmp.size();
   }
 
-  return StringReturn(tmp.substr(rounds, 10));
+  return tmp.substr(rounds, 10);
 }
 
 absl::StatusOr<std::string> Day_2018_14::Part2(

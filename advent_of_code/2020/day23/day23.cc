@@ -91,7 +91,7 @@ absl::StatusOr<std::string> Day_2020_23::Part1(
     ret[ret_i] = cups.cups[idx].val + '0';
     ++ret_i;
   }
-  return StringReturn(ret);
+  return ret;
 }
 
 absl::StatusOr<std::string> Day_2020_23::Part2(

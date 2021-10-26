@@ -79,7 +79,7 @@ absl::StatusOr<std::string> Day_2017_19::Part1(
   if (!b.ok()) return b.status();
   absl::StatusOr<WalkRet> walk_ret = WalkBoard(*b);
   if (!walk_ret.ok()) return walk_ret.status();
-  return StringReturn(walk_ret->sequence);
+  return walk_ret->sequence;
 }
 
 absl::StatusOr<std::string> Day_2017_19::Part2(

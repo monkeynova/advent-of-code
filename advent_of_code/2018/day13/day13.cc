@@ -194,7 +194,7 @@ absl::StatusOr<std::string> Day_2018_13::Part1(
     absl::StatusOr<absl::optional<Point>> collision = state->RunStep();
     if (!collision.ok()) return collision.status();
     if (*collision)
-      return StringReturn((*collision)->DebugString());
+      return (*collision)->DebugString();
   }
 
   return Error("Left infinite loop");
@@ -216,7 +216,7 @@ absl::StatusOr<std::string> Day_2018_13::Part2(
     if (!collision.ok()) return collision.status();
   }
 
-  return StringReturn(state->carts[0].pos.DebugString());
+  return state->carts[0].pos.DebugString();
 }
 
 }  // namespace advent_of_code

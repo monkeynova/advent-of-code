@@ -30,7 +30,7 @@ absl::StatusOr<std::string> Day_2016_05::Part1(
     }
   }
 
-  return StringReturn(out);
+  return out;
 }
 
 absl::StatusOr<std::string> Day_2016_05::Part2(
@@ -56,7 +56,7 @@ absl::StatusOr<std::string> Day_2016_05::Part2(
     }
   }
 
-  return StringReturn(out);
+  return out;
 }
 
 }  // namespace advent_of_code

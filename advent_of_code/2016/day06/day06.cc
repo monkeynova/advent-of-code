@@ -41,7 +41,7 @@ absl::StatusOr<std::string> Day_2016_06::Part1(
     }
     out[i] = max_char;
   }
-  return StringReturn(out);
+  return out;
 }
 
 absl::StatusOr<std::string> Day_2016_06::Part2(
@@ -68,7 +68,7 @@ absl::StatusOr<std::string> Day_2016_06::Part2(
     }
     out[i] = min_char;
   }
-  return StringReturn(out);
+  return out;
 }
 
 }  // namespace advent_of_code

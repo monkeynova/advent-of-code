@@ -59,7 +59,7 @@ absl::StatusOr<std::string> Day_2015_11::Part1(
     Increment(&password);
   } while (!IsValid(password));
 
-  return StringReturn(password);
+  return password;
 }
 
 absl::StatusOr<std::string> Day_2015_11::Part2(
@@ -72,7 +72,7 @@ absl::StatusOr<std::string> Day_2015_11::Part2(
     Increment(&password);
   } while (!IsValid(password));
 
-  return StringReturn(password);
+  return password;
 }
 
 }  // namespace advent_of_code

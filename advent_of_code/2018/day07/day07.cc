@@ -132,7 +132,7 @@ absl::StatusOr<std::string> Day_2018_07::Part1(
   absl::StatusOr<std::vector<absl::string_view>> ordered =
       DAGSort(graph, std::less<absl::string_view>());
   if (!ordered.ok()) return ordered.status();
-  return StringReturn(absl::StrJoin(*ordered, ""));
+  return absl::StrJoin(*ordered, "");
 }
 
 absl::StatusOr<std::string> Day_2018_07::Part2(

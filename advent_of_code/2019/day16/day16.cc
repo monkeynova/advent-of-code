@@ -143,7 +143,7 @@ absl::StatusOr<std::string> Day_2019_16::Part1(
   }
   ret = ret.substr(0, 8);
 
-  return StringReturn(ret);
+  return ret;
 }
 
 absl::StatusOr<std::string> Day_2019_16::Part2(
@@ -166,7 +166,7 @@ absl::StatusOr<std::string> Day_2019_16::Part2(
     return absl::InvalidArgumentError("can't extract value");
   ret = ret.substr(offset, 8);
 
-  return StringReturn(ret);
+  return ret;
 }
 
 }  // namespace advent_of_code

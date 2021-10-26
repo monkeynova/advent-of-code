@@ -268,7 +268,7 @@ absl::StatusOr<std::string> Day_2016_21::Part1(
     pw = std::move(*next);
     VLOG(2) << pw;
   }
-  return StringReturn(pw);
+  return pw;
 }
 
 absl::StatusOr<std::string> Day_2016_21::Part2(
@@ -286,7 +286,7 @@ absl::StatusOr<std::string> Day_2016_21::Part2(
     pw = std::move(*next);
     VLOG(2) << pw;
   }
-  return StringReturn(pw);
+  return pw;
 }
 
 }  // namespace advent_of_code

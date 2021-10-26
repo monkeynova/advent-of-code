@@ -53,7 +53,7 @@ absl::StatusOr<std::string> Day_2018_11::Part1(
     }
   }
 
-  return StringReturn(max_power_point.DebugString());
+  return max_power_point.DebugString();
 }
 
 absl::StatusOr<std::string> Day_2018_11::Part2(
@@ -102,7 +102,7 @@ absl::StatusOr<std::string> Day_2018_11::Part2(
     // prev_sums = std::move(this_sums);
   }
 
-  return StringReturn(max_power_point.DebugString());
+  return max_power_point.DebugString();
 }
 
 }  // namespace advent_of_code

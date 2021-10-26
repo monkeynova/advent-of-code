@@ -87,7 +87,7 @@ absl::StatusOr<std::string> Day_2016_17::Part1(
   if (!PathWalk(input[0], &path, true).FindMinSteps()) {
     return Error("Path not found");
   }
-  return StringReturn(path);
+  return path;
 }
 
 absl::StatusOr<std::string> Day_2016_17::Part2(

@@ -54,7 +54,7 @@ absl::StatusOr<std::string> Day_2016_02::Part1(
     if (it == codes.end()) return Error("Bad point: ", p.DebugString());
     code += it->second;
   }
-  return StringReturn(code);
+  return code;
 }
 
 absl::StatusOr<std::string> Day_2016_02::Part2(
@@ -94,7 +94,7 @@ absl::StatusOr<std::string> Day_2016_02::Part2(
     if (it == codes.end()) return Error("Bad point: ", p.DebugString());
     code += it->second;
   }
-  return StringReturn(code);
+  return code;
 }
 
 }  // namespace advent_of_code

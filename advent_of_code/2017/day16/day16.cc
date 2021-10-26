@@ -86,7 +86,7 @@ absl::StatusOr<std::string> Day_2017_16::Part1(
   if (!moves.ok()) return moves.status();
   Line line;
   RunDance(*moves, &line);
-  return StringReturn(line.vals);
+  return line.vals;
 }
 
 absl::StatusOr<std::string> Day_2017_16::Part2(
@@ -119,7 +119,7 @@ absl::StatusOr<std::string> Day_2017_16::Part2(
     }
     line = new_line;
   }
-  return StringReturn(line.vals);
+  return line.vals;
 }
 
 }  // namespace advent_of_code

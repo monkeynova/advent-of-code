@@ -46,7 +46,7 @@ absl::StatusOr<std::string> Day_2018_02::Part2(
         if (input[i][c] == input[j][c]) tmp.append(input[i].substr(c, 1));
       }
       if (tmp.size() == input[i].size() - 1)
-        return StringReturn(tmp);
+        return tmp;
     }
   }
   return Error("Not found");
