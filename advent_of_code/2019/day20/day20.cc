@@ -7,6 +7,7 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/bfs.h"
+#include "advent_of_code/char_board.h"
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
@@ -14,50 +15,52 @@
 namespace advent_of_code {
 namespace {
 
-// TODO(@monkeynova): Move to CharBoard.
-
 bool IsCapAlpha(char c) { return c >= 'A' && c <= 'Z'; }
 
 class Maze {
  public:
-  Maze(absl::Span<absl::string_view> input) : input_(input) {}
+  Maze(absl::Span<absl::string_view> input)
+    : input_(input), board_(0, 0) {}
 
   absl::Status Initialize() {
-    if (input_[0] != "HACK: Ignore Starting Whitespace") {
-      return absl::InvalidArgumentError(
-          "Add buffer to avoid FBTD killing useful whitespace");
+    absl::Span<absl::string_view> to_parse = input_;
+    if (to_parse[0] == "HACK: Ignore Starting Whitespace") {
+      to_parse = to_parse.subspan(1);
     }
+    while (!to_parse.empty() && to_parse.back() == "") {
+      to_parse = to_parse.subspan(0, to_parse.size() - 1); 
+    }
+    absl::StatusOr<CharBoard> with_portals = CharBoard::Parse(to_parse);
+    if (!with_portals.ok()) return with_portals.status();
+
+    board_ = CharBoard(with_portals->width() - 4, with_portals->height() - 4);
+
     absl::flat_hash_map<std::string, std::vector<Point>> portals;
-    board_.clear();
-    for (int y = 3; y < input_.size() - 2; ++y) {
-      std::string next_line;
-      next_line.resize(input_[y].size() - 4, ' ');
-      for (int x = 2; x < input_[y].size() - 2; ++x) {
-        next_line[x - 2] = input_[y][x];
-        if (input_[y][x] == '.') {
-          if (IsCapAlpha(input_[y - 1][x])) {
-            char portal_name[] = {input_[y - 2][x], input_[y - 1][x], '\0'};
-            portals[std::string(portal_name)].push_back(
-                Point{.x = x - 2, .y = y - 3});
-          }
-          if (IsCapAlpha(input_[y + 1][x])) {
-            char portal_name[] = {input_[y + 1][x], input_[y + 2][x], '\0'};
-            portals[std::string(portal_name)].push_back(
-                Point{.x = x - 2, .y = y - 3});
-          }
-          if (IsCapAlpha(input_[y][x - 1])) {
-            char portal_name[] = {input_[y][x - 2], input_[y][x - 1], '\0'};
-            portals[std::string(portal_name)].push_back(
-                Point{.x = x - 2, .y = y - 3});
-          }
-          if (IsCapAlpha(input_[y][x + 1])) {
-            char portal_name[] = {input_[y][x + 1], input_[y][x + 2], '\0'};
-            portals[std::string(portal_name)].push_back(
-                Point{.x = x - 2, .y = y - 3});
-          }
+
+    PointRectangle range = with_portals->range();
+    range.min += Point{2, 2};
+    range.max -= Point{2, 2};
+
+    for (Point p : range) {
+      board_[p - Point{2, 2}] = with_portals->at(p);
+      if (with_portals->at(p) == '.') {
+        if (IsCapAlpha(with_portals->at(p + Point{0, -1}))) {
+          char portal_name[] = {with_portals->at(p + Point{0, -2}), with_portals->at(p + Point{0, -1}), '\0'};
+          portals[std::string(portal_name)].push_back(p - Point{2, 2});
+        }
+        if (IsCapAlpha(with_portals->at(p + Point{0, 1}))) {
+          char portal_name[] = {with_portals->at(p + Point{0, 1}), with_portals->at(p + Point{0, 2}), '\0'};
+          portals[std::string(portal_name)].push_back(p - Point{2, 2});
+        }
+        if (IsCapAlpha(with_portals->at(p + Point{-1, 0}))) {
+          char portal_name[] = {with_portals->at(p + Point{-2, 0}), with_portals->at(p + Point{-1, 0}), '\0'};
+          portals[std::string(portal_name)].push_back(p - Point{2, 2});
+        }
+        if (IsCapAlpha(with_portals->at(p + Point{1, 0}))) {
+          char portal_name[] = {with_portals->at(p + Point{1, 0}), with_portals->at(p + Point{2, 0}), '\0'};
+          portals[std::string(portal_name)].push_back(p - Point{2, 2});
         }
       }
-      board_.push_back(std::move(next_line));
     }
     {
       auto it = portals.find("AA");
@@ -82,8 +85,8 @@ class Maze {
       portals_.emplace(points[1], points[0]);
     }
 
-    VLOG(1) << "\nBoard:\n"
-            << absl::StrJoin(board_, "\n") << "\nStart: " << start_
+    VLOG(1) << "\nBoard:\n" << board_
+            << "\nStart: " << start_
             << "; End: " << end_ << "\nPortals:\n"
             << absl::StrJoin(
                    portals_, "\n",
@@ -95,18 +98,15 @@ class Maze {
   }
 
   bool CanStand(Point p) const {
-    if (p.x < 0) return false;
-    if (p.y < 0) return false;
-    if (p.y >= board_.size()) return false;
-    if (p.x >= board_[0].size()) return false;
-    return board_[p.y][p.x] == '.';
+    if (!board_.OnBoard(p)) return false;
+    return board_[p] == '.';
   }
 
   bool OnEdge(Point p) const {
     if (p.x == 0) return true;
     if (p.y == 0) return true;
-    if (p.y == board_.size() - 1) return true;
-    if (p.x == board_[0].size() - 1) return true;
+    if (p.y == board_.height() - 1) return true;
+    if (p.x == board_.width() - 1) return true;
     return false;
   }
 
@@ -185,7 +185,7 @@ class Maze {
  private:
   const absl::Span<absl::string_view> input_;
 
-  std::vector<std::string> board_;
+  CharBoard board_;
   absl::flat_hash_map<Point, Point> portals_;
   Point start_;
   Point end_;
