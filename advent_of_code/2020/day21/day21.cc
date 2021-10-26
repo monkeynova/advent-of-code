@@ -138,8 +138,7 @@ absl::StatusOr<std::vector<std::string>> Day_2020_21::Part2(
                                   [](std::string* out, const IandA& ianda) {
                                     absl::StrAppend(out, ianda.i);
                                   });
-  return std::vector<std::string>{out};
-  ;
+  return StringReturn(out);
 }
 
 }  // namespace advent_of_code

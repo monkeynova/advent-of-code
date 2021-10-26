@@ -47,7 +47,7 @@ absl::StatusOr<std::vector<std::string>> Day_2017_10::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
 
-  return std::vector<std::string>{KnotHash().DigestHex(input[0])};
+  return StringReturn(KnotHash().DigestHex(input[0]));
 }
 
 }  // namespace advent_of_code

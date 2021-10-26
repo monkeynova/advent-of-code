@@ -32,6 +32,10 @@ class AdventDay {
     return absl::InvalidArgumentError(absl::StrCat(args...));
   }
 
+  absl::StatusOr<std::vector<std::string>> StringReturn(std::string str) const {
+    return std::vector<std::string>{std::move(str)};
+  }
+
   absl::StatusOr<std::vector<std::string>> IntReturn(int64_t val) const {
     return std::vector<std::string>{absl::StrCat(val)};
   }

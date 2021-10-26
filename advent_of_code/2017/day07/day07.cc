@@ -97,7 +97,7 @@ absl::StatusOr<std::vector<std::string>> Day_2017_07::Part1(
       root = node;
     }
   }
-  return std::vector<std::string>{std::string(root)};
+  return StringReturn(std::string(root));
 }
 
 absl::StatusOr<std::vector<std::string>> Day_2017_07::Part2(
