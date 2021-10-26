@@ -62,9 +62,7 @@ absl::Status HandleTestIncludes(std::string* test_case) {
   RE2 include_pattern{"@include{([^}]*)}"};
   while (RE2::PartialMatch(*test_case, include_pattern, &include_fname)) {
     std::string contents;
-    // TODO(@monkeynova): This is terrible. Both in terms of using the
-    // ::internal namespace (though we're using the same fetching code as
-    // the rest of FBTD this way) as well as the need for the ./ without
+    // TODO(@monkeynova): This is terrible in the need for the ./ without
     // which the load fails.
     if (absl::Status st =
             GetContents(absl::StrCat("./", include_fname), &contents);
