@@ -32,24 +32,20 @@ class AdventDay {
     return absl::InvalidArgumentError(absl::StrCat(args...));
   }
 
-  absl::StatusOr<std::string> StringReturn(std::string str) const {
-    return std::string{std::move(str)};
-  }
-
   absl::StatusOr<std::string> IntReturn(int64_t val) const {
-    return std::string{absl::StrCat(val)};
+    return absl::StrCat(val);
   }
 
   absl::StatusOr<std::string> IntReturn(
       absl::StatusOr<int64_t> val) const {
     if (!val.ok()) return val.status();
-    return std::string{absl::StrCat(*val)};
+    return absl::StrCat(*val);
   }
 
   absl::StatusOr<std::string> IntReturn(
       absl::optional<int64_t> val) const {
     if (!val) return absl::NotFoundError("Not found");
-    return std::string{absl::StrCat(*val)};
+    return absl::StrCat(*val);
   }
 
   virtual absl::StatusOr<std::string> Part1(
