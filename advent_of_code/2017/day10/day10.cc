@@ -12,7 +12,7 @@
 
 namespace advent_of_code {
 
-absl::StatusOr<std::vector<std::string>> Day_2017_10::Part1(
+absl::StatusOr<std::string> Day_2017_10::Part1(
     absl::Span<absl::string_view> input) const {
   {
     // TODO(@monkeynova): Move to knot_hash_test.cc?
@@ -43,7 +43,7 @@ absl::StatusOr<std::vector<std::string>> Day_2017_10::Part1(
   return IntReturn(loop[0] * loop[1]);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2017_10::Part2(
+absl::StatusOr<std::string> Day_2017_10::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
 

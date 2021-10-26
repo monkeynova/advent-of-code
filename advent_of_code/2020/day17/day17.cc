@@ -88,7 +88,7 @@ class Grid4 {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2020_17::Part1(
+absl::StatusOr<std::string> Day_2020_17::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<CharBoard> initial = CharBoard::Parse(input);
   if (!initial.ok()) return initial.status();
@@ -99,7 +99,7 @@ absl::StatusOr<std::vector<std::string>> Day_2020_17::Part1(
   return IntReturn(grid.CountTiles());
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2020_17::Part2(
+absl::StatusOr<std::string> Day_2020_17::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<CharBoard> initial = CharBoard::Parse(input);
   if (!initial.ok()) return initial.status();

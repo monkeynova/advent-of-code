@@ -78,7 +78,7 @@ Scratch analysis of input.
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2018_19::Part1(
+absl::StatusOr<std::string> Day_2018_19::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<VM> vm = VM::Parse(input);
   if (!vm.ok()) return vm.status();
@@ -86,7 +86,7 @@ absl::StatusOr<std::vector<std::string>> Day_2018_19::Part1(
   return IntReturn(vm->register_value(0));
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2018_19::Part2(
+absl::StatusOr<std::string> Day_2018_19::Part2(
     absl::Span<absl::string_view> input) const {
   // Identified another prime factorization assembly code.
   // TODO(@monkeynova): Try to identify and alter with code.

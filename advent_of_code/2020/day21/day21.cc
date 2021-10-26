@@ -91,7 +91,7 @@ FindAllergens(const std::vector<Food>& foods) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2020_21::Part1(
+absl::StatusOr<std::string> Day_2020_21::Part1(
     absl::Span<absl::string_view> input) const {
   std::vector<Food> foods;
   for (absl::string_view in : input) {
@@ -112,7 +112,7 @@ absl::StatusOr<std::vector<std::string>> Day_2020_21::Part1(
   return IntReturn(count);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2020_21::Part2(
+absl::StatusOr<std::string> Day_2020_21::Part2(
     absl::Span<absl::string_view> input) const {
   std::vector<Food> foods;
   for (absl::string_view in : input) {

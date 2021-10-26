@@ -179,7 +179,7 @@ absl::StatusOr<State> FindKarts(const CharBoard& b) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2018_13::Part1(
+absl::StatusOr<std::string> Day_2018_13::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.empty()) return Error("bad input");
   if (RE2::PartialMatch(input[0], "^HACK:")) input = input.subspan(1);
@@ -194,13 +194,13 @@ absl::StatusOr<std::vector<std::string>> Day_2018_13::Part1(
     absl::StatusOr<absl::optional<Point>> collision = state->RunStep();
     if (!collision.ok()) return collision.status();
     if (*collision)
-      return std::vector<std::string>{(*collision)->DebugString()};
+      return StringReturn((*collision)->DebugString());
   }
 
   return Error("Left infinite loop");
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2018_13::Part2(
+absl::StatusOr<std::string> Day_2018_13::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.empty()) return Error("bad input");
   if (RE2::PartialMatch(input[0], "^HACK:")) input = input.subspan(1);
@@ -216,7 +216,7 @@ absl::StatusOr<std::vector<std::string>> Day_2018_13::Part2(
     if (!collision.ok()) return collision.status();
   }
 
-  return std::vector<std::string>{state->carts[0].pos.DebugString()};
+  return StringReturn(state->carts[0].pos.DebugString());
 }
 
 }  // namespace advent_of_code

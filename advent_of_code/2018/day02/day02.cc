@@ -17,7 +17,7 @@ namespace {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2018_02::Part1(
+absl::StatusOr<std::string> Day_2018_02::Part1(
     absl::Span<absl::string_view> input) const {
   int twos = 0;
   int threes = 0;
@@ -36,7 +36,7 @@ absl::StatusOr<std::vector<std::string>> Day_2018_02::Part1(
   return IntReturn(twos * threes);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2018_02::Part2(
+absl::StatusOr<std::string> Day_2018_02::Part2(
     absl::Span<absl::string_view> input) const {
   for (int i = 0; i < input.size(); ++i) {
     for (int j = 0; j < i; ++j) {

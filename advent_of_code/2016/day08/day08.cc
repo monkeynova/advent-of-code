@@ -19,7 +19,7 @@ namespace {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2016_08::Part1(
+absl::StatusOr<std::string> Day_2016_08::Part1(
     absl::Span<absl::string_view> input) const {
   CharBoard display(50, 6);
   for (absl::string_view ins : input) {
@@ -56,7 +56,7 @@ absl::StatusOr<std::vector<std::string>> Day_2016_08::Part1(
   return IntReturn(count);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2016_08::Part2(
+absl::StatusOr<std::string> Day_2016_08::Part2(
     absl::Span<absl::string_view> input) const {
   CharBoard display(50, 6);
   for (absl::string_view ins : input) {
@@ -85,7 +85,7 @@ absl::StatusOr<std::vector<std::string>> Day_2016_08::Part2(
     VLOG(1) << "Ins: " << ins;
     VLOG(1) << "Board:\n" << display.DebugString();
   }
-  return display.rows;
+  return absl::StrJoin(display.rows, "\n");
 }
 
 }  // namespace advent_of_code

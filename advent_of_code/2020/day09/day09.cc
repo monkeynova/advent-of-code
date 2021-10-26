@@ -56,14 +56,14 @@ absl::StatusOr<int> FindContiguousRangeMinMaxSum(
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2020_09::Part1(
+absl::StatusOr<std::string> Day_2020_09::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> vals = ParseAsInts(input);
   if (!vals.ok()) return vals.status();
   return IntReturn(FindMissingXMASPair(*vals));
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2020_09::Part2(
+absl::StatusOr<std::string> Day_2020_09::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> vals = ParseAsInts(input);
   if (!vals.ok()) return vals.status();

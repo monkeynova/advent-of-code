@@ -17,7 +17,7 @@ namespace {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2017_15::Part1(
+absl::StatusOr<std::string> Day_2017_15::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 2) return Error("Bad size");
   int64_t a_mult = 16807;
@@ -40,7 +40,7 @@ absl::StatusOr<std::vector<std::string>> Day_2017_15::Part1(
   return IntReturn(count);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2017_15::Part2(
+absl::StatusOr<std::string> Day_2017_15::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 2) return Error("Bad size");
   int64_t a_mult = 16807;

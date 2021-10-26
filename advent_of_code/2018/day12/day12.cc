@@ -49,7 +49,7 @@ std::string Advance(
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2018_12::Part1(
+absl::StatusOr<std::string> Day_2018_12::Part1(
     absl::Span<absl::string_view> input) const {
   absl::string_view initial_state;
   absl::flat_hash_map<absl::string_view, absl::string_view> rules;
@@ -84,7 +84,7 @@ absl::StatusOr<std::vector<std::string>> Day_2018_12::Part1(
   return IntReturn(count);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2018_12::Part2(
+absl::StatusOr<std::string> Day_2018_12::Part2(
     absl::Span<absl::string_view> input) const {
   absl::string_view initial_state;
   absl::flat_hash_map<absl::string_view, absl::string_view> rules;

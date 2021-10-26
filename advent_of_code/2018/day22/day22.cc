@@ -159,7 +159,7 @@ class MapWalk : public BFSInterface<MapWalk> {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2018_22::Part1(
+absl::StatusOr<std::string> Day_2018_22::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 2) return Error("Bad size");
   int depth;
@@ -182,7 +182,7 @@ absl::StatusOr<std::vector<std::string>> Day_2018_22::Part1(
   return IntReturn(risk);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2018_22::Part2(
+absl::StatusOr<std::string> Day_2018_22::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 2) return Error("Bad size");
   int depth;

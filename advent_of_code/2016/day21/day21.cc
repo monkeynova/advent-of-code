@@ -255,7 +255,7 @@ absl::Status RunReverseTest() {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2016_21::Part1(
+absl::StatusOr<std::string> Day_2016_21::Part1(
     absl::Span<absl::string_view> input) const {
   if (absl::Status st = RunTest(); !st.ok()) return st;
 
@@ -268,10 +268,10 @@ absl::StatusOr<std::vector<std::string>> Day_2016_21::Part1(
     pw = std::move(*next);
     VLOG(2) << pw;
   }
-  return std::vector<std::string>{pw};
+  return StringReturn(pw);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2016_21::Part2(
+absl::StatusOr<std::string> Day_2016_21::Part2(
     absl::Span<absl::string_view> input) const {
   if (absl::Status st = RunReverseTest(); !st.ok()) return st;
 
@@ -286,7 +286,7 @@ absl::StatusOr<std::vector<std::string>> Day_2016_21::Part2(
     pw = std::move(*next);
     VLOG(2) << pw;
   }
-  return std::vector<std::string>{pw};
+  return StringReturn(pw);
 }
 
 }  // namespace advent_of_code

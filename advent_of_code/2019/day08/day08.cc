@@ -2,13 +2,14 @@
 
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
+#include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "glog/logging.h"
 
 namespace advent_of_code {
 namespace {}  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2019_08::Part1(
+absl::StatusOr<std::string> Day_2019_08::Part1(
     absl::Span<absl::string_view> input) const {
   const int kWidth = 25;
   const int kHeight = 6;
@@ -47,7 +48,7 @@ absl::StatusOr<std::vector<std::string>> Day_2019_08::Part1(
   return IntReturn(num_ones * num_twos);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2019_08::Part2(
+absl::StatusOr<std::string> Day_2019_08::Part2(
     absl::Span<absl::string_view> input) const {
   const int kWidth = 25;
   const int kHeight = 6;
@@ -78,7 +79,7 @@ absl::StatusOr<std::vector<std::string>> Day_2019_08::Part2(
     ret.push_back(std::string(render.substr(i * kWidth, kWidth)));
   }
 
-  return ret;
+  return absl::StrJoin(ret, "\n");
 }
 
 }  // namespace advent_of_code

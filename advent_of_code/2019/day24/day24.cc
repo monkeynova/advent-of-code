@@ -285,10 +285,10 @@ int64_t CountBugs(absl::flat_hash_map<int, Board> depth_to_board) {
 
 }  // namespace
 
-absl::StatusOr<Board> Day_2019_24::Part1(
+absl::StatusOr<std::string> Day_2019_24::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<Board> board = ParseBoard(input);
-  if (!board.ok()) return board;
+  if (!board.ok()) return board.status();
 
   Board cur = *board;
   absl::flat_hash_set<Board> hist;
@@ -301,10 +301,10 @@ absl::StatusOr<Board> Day_2019_24::Part1(
   return IntReturn(BioDiversity(cur));
 }
 
-absl::StatusOr<Board> Day_2019_24::Part2(
+absl::StatusOr<std::string> Day_2019_24::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<Board> cur = ParseBoard(input);
-  if (!cur.ok()) return cur;
+  if (!cur.ok()) return cur.status();
 
   absl::flat_hash_map<int, Board> level_to_board;
   level_to_board[0] = *cur;

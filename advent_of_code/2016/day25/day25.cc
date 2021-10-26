@@ -41,7 +41,7 @@ class OutputWatch : public AssemBunny::OutputInterface,
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2016_25::Part1(
+absl::StatusOr<std::string> Day_2016_25::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<AssemBunny> vm = AssemBunny::Parse(input);
   if (!vm.ok()) return vm.status();
@@ -65,9 +65,9 @@ absl::StatusOr<std::vector<std::string>> Day_2016_25::Part1(
   return Error("Impossible");
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2016_25::Part2(
+absl::StatusOr<std::string> Day_2016_25::Part2(
     absl::Span<absl::string_view> input) const {
-  return std::vector<std::string>{"Merry Christmas"};
+  return StringReturn("Merry Christmas");
 }
 
 }  // namespace advent_of_code

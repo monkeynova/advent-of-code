@@ -116,7 +116,7 @@ int FindMinPath(const DirectedGraph<bool>& graph, int num_workers) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2018_07::Part1(
+absl::StatusOr<std::string> Day_2018_07::Part1(
     absl::Span<absl::string_view> input) const {
   DirectedGraph<bool> graph;
   for (absl::string_view row : input) {
@@ -132,10 +132,10 @@ absl::StatusOr<std::vector<std::string>> Day_2018_07::Part1(
   absl::StatusOr<std::vector<absl::string_view>> ordered =
       DAGSort(graph, std::less<absl::string_view>());
   if (!ordered.ok()) return ordered.status();
-  return std::vector<std::string>{absl::StrJoin(*ordered, "")};
+  return StringReturn(absl::StrJoin(*ordered, ""));
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2018_07::Part2(
+absl::StatusOr<std::string> Day_2018_07::Part2(
     absl::Span<absl::string_view> input) const {
   DirectedGraph<bool> graph;
   for (absl::string_view row : input) {

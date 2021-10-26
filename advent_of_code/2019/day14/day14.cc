@@ -149,7 +149,7 @@ absl::StatusOr<int> FuelFromOre(const DirectedGraph<Rule>& rule_set,
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2019_14::Part1(
+absl::StatusOr<std::string> Day_2019_14::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<DirectedGraph<Rule>> rule_set = ParseRuleSet(input);
   if (!rule_set.ok()) return rule_set.status();
@@ -157,7 +157,7 @@ absl::StatusOr<std::vector<std::string>> Day_2019_14::Part1(
   return IntReturn(ComputeOreNeedForFuel(*rule_set));
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2019_14::Part2(
+absl::StatusOr<std::string> Day_2019_14::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<DirectedGraph<Rule>> rule_set = ParseRuleSet(input);
   if (!rule_set.ok()) return rule_set.status();

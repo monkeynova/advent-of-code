@@ -69,7 +69,7 @@ class Painter : public IntCode::IOModule {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2019_11::Part1(
+absl::StatusOr<std::string> Day_2019_11::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
@@ -80,7 +80,7 @@ absl::StatusOr<std::vector<std::string>> Day_2019_11::Part1(
   return IntReturn(painter.UniquePanelsPainted());
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2019_11::Part2(
+absl::StatusOr<std::string> Day_2019_11::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
@@ -89,7 +89,7 @@ absl::StatusOr<std::vector<std::string>> Day_2019_11::Part2(
   painter.Set({.x = 0, .y = 0}, 1);
   if (absl::Status st = codes->Run(&painter); !st.ok()) return st;
 
-  return painter.Panels().rows;
+  return absl::StrJoin(painter.Panels().rows, "\n");
 }
 
 }  // namespace advent_of_code

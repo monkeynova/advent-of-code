@@ -12,7 +12,7 @@
 namespace advent_of_code {
 namespace {}  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2020_14::Part1(
+absl::StatusOr<std::string> Day_2020_14::Part1(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<int64_t, int64_t> mem;
   int64_t mask = 0;
@@ -59,7 +59,7 @@ absl::StatusOr<std::vector<std::string>> Day_2020_14::Part1(
   return IntReturn(sum);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2020_14::Part2(
+absl::StatusOr<std::string> Day_2020_14::Part2(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<int64_t, int64_t> mem;
   int64_t mask = 0;

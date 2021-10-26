@@ -12,7 +12,7 @@
 namespace advent_of_code {
 namespace {}  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2020_03::Part1(
+absl::StatusOr<std::string> Day_2020_03::Part1(
     absl::Span<absl::string_view> input) const {
   int product = 1;
   for (Point dir : {Point{3, 1}}) {
@@ -26,7 +26,7 @@ absl::StatusOr<std::vector<std::string>> Day_2020_03::Part1(
   return IntReturn(product);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2020_03::Part2(
+absl::StatusOr<std::string> Day_2020_03::Part2(
     absl::Span<absl::string_view> input) const {
   int64_t product = 1;
   for (Point dir :

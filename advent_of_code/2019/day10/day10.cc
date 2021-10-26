@@ -83,7 +83,7 @@ absl::StatusOr<Board> ParseBoard(absl::Span<absl::string_view> input) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2019_10::Part1(
+absl::StatusOr<std::string> Day_2019_10::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<Board> asteroids = ParseBoard(input);
   if (!asteroids.ok()) return asteroids.status();
@@ -106,7 +106,7 @@ struct OrderedDestruct {
   }
 };
 
-absl::StatusOr<std::vector<std::string>> Day_2019_10::Part2(
+absl::StatusOr<std::string> Day_2019_10::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<Board> board = ParseBoard(input);
   if (!board.ok()) return board.status();

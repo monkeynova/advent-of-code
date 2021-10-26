@@ -22,7 +22,7 @@ bool IsValid(int t1[3]) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2016_03::Part1(
+absl::StatusOr<std::string> Day_2016_03::Part1(
     absl::Span<absl::string_view> input) const {
   int count = 0;
   for (absl::string_view in : input) {
@@ -36,7 +36,7 @@ absl::StatusOr<std::vector<std::string>> Day_2016_03::Part1(
   return IntReturn(count);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2016_03::Part2(
+absl::StatusOr<std::string> Day_2016_03::Part2(
     absl::Span<absl::string_view> input) const {
   int count = 0;
   if (input.size() % 3 != 0) return Error("Bad size");

@@ -80,7 +80,7 @@ void RunTestCase(const AdventDay* advent_day,
   while (!lines.empty() && lines.back().empty()) {
     lines.pop_back();
   }
-  absl::StatusOr<std::vector<std::string>> output;
+  absl::StatusOr<std::string> output;
   switch (options.GetInt64(kPartOption)) {
     case 1: {
       output = advent_day->Part1(absl::MakeSpan(lines));
@@ -101,7 +101,7 @@ void RunTestCase(const AdventDay* advent_day,
         absl::StrCat("ERROR: Could not run test: ", output.status().message()));
     return;
   }
-  test_result->AddTestOutput(absl::StrJoin(*output, "\n"));
+  test_result->AddTestOutput(*output);
 }
 
 bool TestSingleDay(AdventDay* solver) {

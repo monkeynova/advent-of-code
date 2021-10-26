@@ -59,7 +59,7 @@ std::string Decrypt(absl::string_view name, int sector) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2016_04::Part1(
+absl::StatusOr<std::string> Day_2016_04::Part1(
     absl::Span<absl::string_view> input) const {
   int sector_sum = 0;
   for (absl::string_view in : input) {
@@ -77,9 +77,9 @@ absl::StatusOr<std::vector<std::string>> Day_2016_04::Part1(
   return IntReturn(sector_sum);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2016_04::Part2(
+absl::StatusOr<std::string> Day_2016_04::Part2(
     absl::Span<absl::string_view> input) const {
-  std::vector<std::string> ret;
+  std::string ret;
   for (absl::string_view in : input) {
     absl::string_view room;
     int sector;
@@ -91,7 +91,8 @@ absl::StatusOr<std::vector<std::string>> Day_2016_04::Part2(
     if (!Validate(room, sum)) continue;
     std::string decryped_room = Decrypt(room, sector);
     if (input.size() < 10 || RE2::PartialMatch(decryped_room, "northpole")) {
-      ret.push_back(absl::StrCat(sector, ": ", decryped_room));
+      if (!ret.empty()) return Error("Mutiple matching rooms");
+      ret = absl::StrCat(sector, ": ", decryped_room);
     }
   }
   return ret;

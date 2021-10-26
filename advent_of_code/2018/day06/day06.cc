@@ -18,7 +18,7 @@ namespace {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2018_06::Part1(
+absl::StatusOr<std::string> Day_2018_06::Part1(
     absl::Span<absl::string_view> input) const {
   std::vector<Point> points;
   PointRectangle r{{0, 0}, {0, 0}};
@@ -71,7 +71,7 @@ absl::StatusOr<std::vector<std::string>> Day_2018_06::Part1(
   return IntReturn(max_count);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2018_06::Part2(
+absl::StatusOr<std::string> Day_2018_06::Part2(
     absl::Span<absl::string_view> input) const {
   std::vector<Point> points;
   PointRectangle r{{0, 0}, {0, 0}};

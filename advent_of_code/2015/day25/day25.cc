@@ -37,7 +37,7 @@ int64_t ComputeCodePosition(int row, int col) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2015_25::Part1(
+absl::StatusOr<std::string> Day_2015_25::Part1(
     absl::Span<absl::string_view> input) const {
   struct TestVal {
     int row;
@@ -70,9 +70,9 @@ absl::StatusOr<std::vector<std::string>> Day_2015_25::Part1(
   return IntReturn(ComputeCodeValue(ComputeCodePosition(row, col)));
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2015_25::Part2(
+absl::StatusOr<std::string> Day_2015_25::Part2(
     absl::Span<absl::string_view> input) const {
-  return std::vector<std::string>{"Merry Christmas"};
+  return StringReturn("Merry Christmas");
 }
 
 }  // namespace advent_of_code

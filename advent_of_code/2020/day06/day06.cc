@@ -11,7 +11,7 @@
 namespace advent_of_code {
 namespace {}  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2020_06::Part1(
+absl::StatusOr<std::string> Day_2020_06::Part1(
     absl::Span<absl::string_view> input) const {
   int group_sum = 0;
   absl::flat_hash_set<char> hist;
@@ -28,7 +28,7 @@ absl::StatusOr<std::vector<std::string>> Day_2020_06::Part1(
   return IntReturn(group_sum);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2020_06::Part2(
+absl::StatusOr<std::string> Day_2020_06::Part2(
     absl::Span<absl::string_view> input) const {
   int group_sum = 0;
   absl::flat_hash_map<char, int> hist;

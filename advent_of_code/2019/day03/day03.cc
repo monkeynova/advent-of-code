@@ -147,7 +147,7 @@ absl::StatusOr<std::vector<Point>> Intersect(std::vector<Line> wire1,
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2019_03::Part1(
+absl::StatusOr<std::string> Day_2019_03::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 2) {
     return absl::InvalidArgumentError("input does not contain 2 lines");
@@ -199,7 +199,7 @@ absl::StatusOr<int> CostToOverlap(Point intersect,
   return absl::InvalidArgumentError("Point not found on wire");
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2019_03::Part2(
+absl::StatusOr<std::string> Day_2019_03::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 2) {
     return absl::InvalidArgumentError("input does not contain 2 lines");

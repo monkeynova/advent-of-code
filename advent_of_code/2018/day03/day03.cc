@@ -18,7 +18,7 @@ namespace {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2018_03::Part1(
+absl::StatusOr<std::string> Day_2018_03::Part1(
     absl::Span<absl::string_view> input) const {
   // #1372 @ 119,13: 29x16
   CharBoard board(1'000, 1'000);
@@ -48,7 +48,7 @@ absl::StatusOr<std::vector<std::string>> Day_2018_03::Part1(
   return IntReturn(dupes);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2018_03::Part2(
+absl::StatusOr<std::string> Day_2018_03::Part2(
     absl::Span<absl::string_view> input) const {
   std::vector<PointRectangle> claims;
   for (int i = 0; i < input.size(); ++i) {

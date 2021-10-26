@@ -69,7 +69,7 @@ absl::StatusOr<WalkRet> WalkBoard(const CharBoard& b) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2017_19::Part1(
+absl::StatusOr<std::string> Day_2017_19::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.empty()) return Error("Bad input");
   if (RE2::PartialMatch(input[0], "HACK:")) {
@@ -79,10 +79,10 @@ absl::StatusOr<std::vector<std::string>> Day_2017_19::Part1(
   if (!b.ok()) return b.status();
   absl::StatusOr<WalkRet> walk_ret = WalkBoard(*b);
   if (!walk_ret.ok()) return walk_ret.status();
-  return std::vector<std::string>{walk_ret->sequence};
+  return StringReturn(walk_ret->sequence);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2017_19::Part2(
+absl::StatusOr<std::string> Day_2017_19::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.empty()) return Error("Bad input");
   if (RE2::PartialMatch(input[0], "HACK:")) {

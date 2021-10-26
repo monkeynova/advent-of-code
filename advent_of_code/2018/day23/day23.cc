@@ -182,7 +182,7 @@ absl::StatusOr<Point3> FindBest(std::vector<NanoBot> bots_in) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2018_23::Part1(
+absl::StatusOr<std::string> Day_2018_23::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<NanoBot>> bots = Parse(input);
   if (!bots.ok()) return bots.status();
@@ -202,7 +202,7 @@ absl::StatusOr<std::vector<std::string>> Day_2018_23::Part1(
   return IntReturn(in_range);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2018_23::Part2(
+absl::StatusOr<std::string> Day_2018_23::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<NanoBot>> bots = Parse(input);
   if (!bots.ok()) return bots.status();

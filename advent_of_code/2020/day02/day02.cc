@@ -9,7 +9,7 @@
 namespace advent_of_code {
 namespace {}  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2020_02::Part1(
+absl::StatusOr<std::string> Day_2020_02::Part1(
     absl::Span<absl::string_view> input) const {
   static LazyRE2 pattern{"(\\d+)-(\\d+) (.): (.*)"};
   int valid = 0;
@@ -32,7 +32,7 @@ absl::StatusOr<std::vector<std::string>> Day_2020_02::Part1(
   return IntReturn(valid);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2020_02::Part2(
+absl::StatusOr<std::string> Day_2020_02::Part2(
     absl::Span<absl::string_view> input) const {
   static LazyRE2 pattern{"(\\d+)-(\\d+) (.): (.*)"};
   int valid = 0;

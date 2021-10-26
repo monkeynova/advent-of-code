@@ -131,7 +131,7 @@ absl::StatusOr<absl::flat_hash_map<CharBoard, CharBoard>> Parse(
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2017_21::Part1(
+absl::StatusOr<std::string> Day_2017_21::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<CharBoard, CharBoard>> patterns =
       Parse(input);
@@ -156,7 +156,7 @@ absl::StatusOr<std::vector<std::string>> Day_2017_21::Part1(
   return IntReturn(count);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2017_21::Part2(
+absl::StatusOr<std::string> Day_2017_21::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<CharBoard, CharBoard>> patterns =
       Parse(input);

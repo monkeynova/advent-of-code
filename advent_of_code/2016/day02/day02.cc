@@ -18,7 +18,7 @@ namespace {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2016_02::Part1(
+absl::StatusOr<std::string> Day_2016_02::Part1(
     absl::Span<absl::string_view> input) const {
   std::string code;
   Point p = {1, 1};
@@ -54,10 +54,10 @@ absl::StatusOr<std::vector<std::string>> Day_2016_02::Part1(
     if (it == codes.end()) return Error("Bad point: ", p.DebugString());
     code += it->second;
   }
-  return std::vector<std::string>{code};
+  return StringReturn(code);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2016_02::Part2(
+absl::StatusOr<std::string> Day_2016_02::Part2(
     absl::Span<absl::string_view> input) const {
   std::string code;
   Point p = {0, 2};
@@ -94,7 +94,7 @@ absl::StatusOr<std::vector<std::string>> Day_2016_02::Part2(
     if (it == codes.end()) return Error("Bad point: ", p.DebugString());
     code += it->second;
   }
-  return std::vector<std::string>{code};
+  return StringReturn(code);
 }
 
 }  // namespace advent_of_code

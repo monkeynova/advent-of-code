@@ -285,7 +285,7 @@ absl::StatusOr<int> MatchFromFrontRnAr(
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2015_19::Part1(
+absl::StatusOr<std::string> Day_2015_19::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() < 3) return Error("Bad input");
   absl::string_view final = input.back();
@@ -302,7 +302,7 @@ absl::StatusOr<std::vector<std::string>> Day_2015_19::Part1(
   return IntReturn(RunStep(map, final).size());
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2015_19::Part2(
+absl::StatusOr<std::string> Day_2015_19::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() < 3) return Error("Bad input");
   absl::string_view final = input.back();

@@ -80,7 +80,7 @@ int GarbageCount(absl::string_view str) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2017_09::Part1(
+absl::StatusOr<std::string> Day_2017_09::Part1(
     absl::Span<absl::string_view> input) const {
   std::vector<std::pair<absl::string_view, int>> tests = {
       {"{}", 1},
@@ -98,7 +98,7 @@ absl::StatusOr<std::vector<std::string>> Day_2017_09::Part1(
   return IntReturn(TotalGroupScore(input[0]));
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2017_09::Part2(
+absl::StatusOr<std::string> Day_2017_09::Part2(
     absl::Span<absl::string_view> input) const {
   std::vector<std::pair<absl::string_view, int>> tests = {
       {"<>", 0},

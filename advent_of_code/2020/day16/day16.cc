@@ -84,7 +84,7 @@ bool CheckRange(int v, OrRange or_range) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2020_16::Part1(
+absl::StatusOr<std::string> Day_2020_16::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<ParseResult> parse = Parse(input);
   if (!parse.ok()) return parse.status();
@@ -187,7 +187,7 @@ std::vector<absl::string_view> FindFieldOrder(const ParseResult& parse) {
   return ret;
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2020_16::Part2(
+absl::StatusOr<std::string> Day_2020_16::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<ParseResult> parse = Parse(input);
   if (!parse.ok()) return parse.status();

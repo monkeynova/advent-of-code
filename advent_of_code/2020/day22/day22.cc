@@ -91,7 +91,7 @@ int ScoreDeck(const std::deque<int>& deck) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2020_22::Part1(
+absl::StatusOr<std::string> Day_2020_22::Part1(
     absl::Span<absl::string_view> input) const {
   std::deque<int> deck1;
   std::deque<int> deck2;
@@ -124,7 +124,7 @@ absl::StatusOr<std::vector<std::string>> Day_2020_22::Part1(
   return Error("Can't find empty deck");
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2020_22::Part2(
+absl::StatusOr<std::string> Day_2020_22::Part2(
     absl::Span<absl::string_view> input) const {
   std::deque<int> deck1;
   std::deque<int> deck2;

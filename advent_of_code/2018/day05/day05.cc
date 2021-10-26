@@ -39,7 +39,7 @@ std::string React(std::string in) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2018_05::Part1(
+absl::StatusOr<std::string> Day_2018_05::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
   std::string comp = std::string(input[0]);
@@ -52,7 +52,7 @@ absl::StatusOr<std::vector<std::string>> Day_2018_05::Part1(
   return Error("left infinite loop");
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2018_05::Part2(
+absl::StatusOr<std::string> Day_2018_05::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
   int min_size = std::numeric_limits<int>::max();

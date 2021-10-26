@@ -193,7 +193,7 @@ absl::StatusOr<int64_t> FindMinPartition4(const WeightsSet& weights_set) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2015_24::Part1(
+absl::StatusOr<std::string> Day_2015_24::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> weights = ParseAsInts(input);
   WeightsSet weights_set;
@@ -206,7 +206,7 @@ absl::StatusOr<std::vector<std::string>> Day_2015_24::Part1(
   return IntReturn(FindMinPartition3(weights_set));
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2015_24::Part2(
+absl::StatusOr<std::string> Day_2015_24::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> weights = ParseAsInts(input);
   WeightsSet weights_set;

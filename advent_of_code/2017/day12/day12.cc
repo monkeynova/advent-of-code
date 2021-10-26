@@ -81,7 +81,7 @@ class PathWalk : public BFSInterface<PathWalk, absl::string_view> {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2017_12::Part1(
+absl::StatusOr<std::string> Day_2017_12::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<DirectedGraph<bool>> graph = Parse(input);
   if (!graph.ok()) return graph.status();
@@ -89,7 +89,7 @@ absl::StatusOr<std::vector<std::string>> Day_2017_12::Part1(
   return IntReturn(PathWalk(*graph, "0").FindReachable());
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2017_12::Part2(
+absl::StatusOr<std::string> Day_2017_12::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<DirectedGraph<bool>> graph = Parse(input);
   if (!graph.ok()) return graph.status();

@@ -17,7 +17,7 @@ namespace {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2017_02::Part1(
+absl::StatusOr<std::string> Day_2017_02::Part1(
     absl::Span<absl::string_view> input) const {
   int checksum = 0;
   for (absl::string_view row : input) {
@@ -35,7 +35,7 @@ absl::StatusOr<std::vector<std::string>> Day_2017_02::Part1(
   return IntReturn(checksum);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2017_02::Part2(
+absl::StatusOr<std::string> Day_2017_02::Part2(
     absl::Span<absl::string_view> input) const {
   int checksum = 0;
   for (absl::string_view row : input) {

@@ -13,7 +13,7 @@
 namespace advent_of_code {
 namespace {}  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2020_12::Part1(
+absl::StatusOr<std::string> Day_2020_12::Part1(
     absl::Span<absl::string_view> input) const {
   Point p{0, 0};
   Point dir = Cardinal::kEast;
@@ -81,7 +81,7 @@ absl::StatusOr<std::vector<std::string>> Day_2020_12::Part1(
   return IntReturn(p.dist());
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2020_12::Part2(
+absl::StatusOr<std::string> Day_2020_12::Part2(
     absl::Span<absl::string_view> input) const {
   Point ship{0, 0};
   Point waypoint = 10 * Cardinal::kEast + Cardinal::kNorth;

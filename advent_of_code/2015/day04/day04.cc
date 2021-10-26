@@ -13,7 +13,7 @@
 namespace advent_of_code {
 namespace {}  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2015_04::Part1(
+absl::StatusOr<std::string> Day_2015_04::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
   for (int i = 0;; ++i) {
@@ -32,7 +32,7 @@ absl::StatusOr<std::vector<std::string>> Day_2015_04::Part1(
   return absl::InvalidArgumentError("Unreachable");
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2015_04::Part2(
+absl::StatusOr<std::string> Day_2015_04::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
   for (int i = 0;; ++i) {

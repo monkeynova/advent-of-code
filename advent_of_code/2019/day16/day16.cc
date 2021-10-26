@@ -132,7 +132,7 @@ std::string RunPhase(int phase, absl::string_view input, int min_position) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2019_16::Part1(
+absl::StatusOr<std::string> Day_2019_16::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Need only 1 line");
 
@@ -143,10 +143,10 @@ absl::StatusOr<std::vector<std::string>> Day_2019_16::Part1(
   }
   ret = ret.substr(0, 8);
 
-  return std::vector<std::string>{ret};
+  return StringReturn(ret);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2019_16::Part2(
+absl::StatusOr<std::string> Day_2019_16::Part2(
     absl::Span<absl::string_view> input) const {
   // TODO(@monkeynova): This model still takes way too long. There aught
   // to sitll be opportunities to improve the runtime.
@@ -166,7 +166,7 @@ absl::StatusOr<std::vector<std::string>> Day_2019_16::Part2(
     return absl::InvalidArgumentError("can't extract value");
   ret = ret.substr(offset, 8);
 
-  return std::vector<std::string>{ret};
+  return StringReturn(ret);
 }
 
 }  // namespace advent_of_code

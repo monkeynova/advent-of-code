@@ -80,7 +80,7 @@ class PathWalk : public BFSInterface<PathWalk> {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2016_17::Part1(
+absl::StatusOr<std::string> Day_2016_17::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Input size");
   std::string path;
@@ -90,7 +90,7 @@ absl::StatusOr<std::vector<std::string>> Day_2016_17::Part1(
   return StringReturn(path);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2016_17::Part2(
+absl::StatusOr<std::string> Day_2016_17::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Input size");
   std::string path;

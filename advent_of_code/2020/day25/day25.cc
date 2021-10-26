@@ -12,7 +12,7 @@
 
 namespace advent_of_code {
 
-absl::StatusOr<std::vector<std::string>> Day_2020_25::Part1(
+absl::StatusOr<std::string> Day_2020_25::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 2) return Error("Bad size");
   absl::StatusOr<std::vector<int64_t>> ints = ParseAsInts(input);
@@ -30,7 +30,7 @@ absl::StatusOr<std::vector<std::string>> Day_2020_25::Part1(
   return Error("No value found");
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2020_25::Part2(
+absl::StatusOr<std::string> Day_2020_25::Part2(
     absl::Span<absl::string_view> input) const {
   return StringReturn("Merry Christmas");
 }

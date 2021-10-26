@@ -17,12 +17,12 @@ namespace {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> NewDay::Part1(
+absl::StatusOr<std::string> NewDay::Part1(
     absl::Span<absl::string_view> input) const {
   return Error("Not implemented");
 }
 
-absl::StatusOr<std::vector<std::string>> NewDay::Part2(
+absl::StatusOr<std::string> NewDay::Part2(
     absl::Span<absl::string_view> input) const {
   return Error("Not implemented");
 }

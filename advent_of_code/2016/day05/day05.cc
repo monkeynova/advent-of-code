@@ -14,7 +14,7 @@ namespace advent_of_code {
 
 namespace {}  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2016_05::Part1(
+absl::StatusOr<std::string> Day_2016_05::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
   std::string out;
@@ -30,10 +30,10 @@ absl::StatusOr<std::vector<std::string>> Day_2016_05::Part1(
     }
   }
 
-  return std::vector<std::string>{out};
+  return StringReturn(out);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2016_05::Part2(
+absl::StatusOr<std::string> Day_2016_05::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
   std::string out;
@@ -56,7 +56,7 @@ absl::StatusOr<std::vector<std::string>> Day_2016_05::Part2(
     }
   }
 
-  return std::vector<std::string>{out};
+  return StringReturn(out);
 }
 
 }  // namespace advent_of_code

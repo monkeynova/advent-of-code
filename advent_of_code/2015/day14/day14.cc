@@ -47,7 +47,7 @@ RaceResult RunRace(const std::vector<Flight>& flights, int time) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2015_14::Part1(
+absl::StatusOr<std::string> Day_2015_14::Part1(
     absl::Span<absl::string_view> input) const {
   static LazyRE2 parse = {
       "(.*) can fly (\\d+) km/s for (\\d+) seconds, but then "
@@ -65,7 +65,7 @@ absl::StatusOr<std::vector<std::string>> Day_2015_14::Part1(
   return IntReturn(RunRace(flights, 2503).dist);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2015_14::Part2(
+absl::StatusOr<std::string> Day_2015_14::Part2(
     absl::Span<absl::string_view> input) const {
   static LazyRE2 parse = {
       "(.*) can fly (\\d+) km/s for (\\d+) seconds, but then "

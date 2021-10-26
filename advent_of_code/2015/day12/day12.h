@@ -7,9 +7,9 @@ namespace advent_of_code {
 
 class Day_2015_12 : public AdventDay {
  public:
-  absl::StatusOr<std::vector<std::string>> Part1(
+  absl::StatusOr<std::string> Part1(
       absl::Span<absl::string_view> input) const override;
-  absl::StatusOr<std::vector<std::string>> Part2(
+  absl::StatusOr<std::string> Part2(
       absl::Span<absl::string_view> input) const override;
 };
 

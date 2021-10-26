@@ -84,7 +84,7 @@ CharBoard Update2(CharBoard in, const VisMap& vis_map) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2020_11::Part1(
+absl::StatusOr<std::string> Day_2020_11::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<CharBoard> parsed = CharBoard::Parse(input);
   if (!parsed.ok()) return parsed.status();
@@ -99,7 +99,7 @@ absl::StatusOr<std::vector<std::string>> Day_2020_11::Part1(
   return IntReturn(CountSeats(cur));
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2020_11::Part2(
+absl::StatusOr<std::string> Day_2020_11::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<CharBoard> parsed = CharBoard::Parse(input);
   if (!parsed.ok()) return parsed.status();

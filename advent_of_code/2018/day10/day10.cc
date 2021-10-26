@@ -22,7 +22,7 @@ struct Light {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2018_10::Part1(
+absl::StatusOr<std::string> Day_2018_10::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.empty()) return Error("No input");
   std::vector<Light> lights;
@@ -55,10 +55,10 @@ absl::StatusOr<std::vector<std::string>> Day_2018_10::Part1(
   CharBoard b(r.max.x - r.min.x + 1, r.max.y - r.min.y + 1);
   for (Light l : lights) b[l.p - r.min] = '#';
 
-  return b.rows;
+  return absl::StrJoin(b.rows, "\n");
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2018_10::Part2(
+absl::StatusOr<std::string> Day_2018_10::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.empty()) return Error("No input");
   std::vector<Light> lights;

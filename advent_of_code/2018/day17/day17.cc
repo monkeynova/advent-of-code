@@ -152,7 +152,7 @@ absl::StatusOr<CharBoard> Parse(absl::Span<absl::string_view> input,
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2018_17::Part1(
+absl::StatusOr<std::string> Day_2018_17::Part1(
     absl::Span<absl::string_view> input) const {
   int min_y;
   absl::StatusOr<CharBoard> b = Parse(input, &min_y);
@@ -186,7 +186,7 @@ absl::StatusOr<std::vector<std::string>> Day_2018_17::Part1(
   return IntReturn(count);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2018_17::Part2(
+absl::StatusOr<std::string> Day_2018_17::Part2(
     absl::Span<absl::string_view> input) const {
   int min_y;
   absl::StatusOr<CharBoard> b = Parse(input, &min_y);

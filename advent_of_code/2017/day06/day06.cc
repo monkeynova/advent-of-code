@@ -37,7 +37,7 @@ std::vector<int64_t> RunStep(std::vector<int64_t> in) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2017_06::Part1(
+absl::StatusOr<std::string> Day_2017_06::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   std::vector<absl::string_view> split = absl::StrSplit(input[0], "\t");
@@ -53,7 +53,7 @@ absl::StatusOr<std::vector<std::string>> Day_2017_06::Part1(
   return IntReturn(hist.size());
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2017_06::Part2(
+absl::StatusOr<std::string> Day_2017_06::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   std::vector<absl::string_view> split = absl::StrSplit(input[0], "\t");

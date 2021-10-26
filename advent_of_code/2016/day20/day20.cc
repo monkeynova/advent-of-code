@@ -24,7 +24,7 @@ struct Block {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2016_20::Part1(
+absl::StatusOr<std::string> Day_2016_20::Part1(
     absl::Span<absl::string_view> input) const {
   std::vector<Block> blocks;
   for (absl::string_view s : input) {
@@ -48,7 +48,7 @@ absl::StatusOr<std::vector<std::string>> Day_2016_20::Part1(
   return Error("Not found");
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2016_20::Part2(
+absl::StatusOr<std::string> Day_2016_20::Part2(
     absl::Span<absl::string_view> input) const {
   std::vector<Block> blocks;
   for (absl::string_view s : input) {

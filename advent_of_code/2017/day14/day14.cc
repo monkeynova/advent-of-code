@@ -83,7 +83,7 @@ absl::StatusOr<CharBoard> BuildBoard(absl::string_view input) {
 
 }  // namespace
 
-absl::StatusOr<std::vector<std::string>> Day_2017_14::Part1(
+absl::StatusOr<std::string> Day_2017_14::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   absl::StatusOr<CharBoard> board = BuildBoard(input[0]);
@@ -96,7 +96,7 @@ absl::StatusOr<std::vector<std::string>> Day_2017_14::Part1(
   return IntReturn(count);
 }
 
-absl::StatusOr<std::vector<std::string>> Day_2017_14::Part2(
+absl::StatusOr<std::string> Day_2017_14::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   absl::StatusOr<CharBoard> board = BuildBoard(input[0]);
