@@ -1,4 +1,10 @@
 [part=1]
+Example input
+--
+ERROR: Could not run test: Not implemented
+==
+
+[part=1]
 @include{advent_of_code/new_day_path/input.txt}
 --
 ERROR: Could not run test: Not implemented
