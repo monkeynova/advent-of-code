@@ -20,9 +20,6 @@ bool IsCapAlpha(char c) { return c >= 'A' && c <= 'Z'; }
 class Maze {
  public:
   static absl::StatusOr<Maze> Create(absl::Span<absl::string_view> input) {
-    if (input[0] == "HACK: Ignore Starting Whitespace") {
-      input = input.subspan(1);
-    }
     while (!input.empty() && input.back() == "") {
       input = input.subspan(0, input.size() - 1); 
     }

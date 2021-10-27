@@ -77,17 +77,23 @@ void RunTestCase(const AdventDay* advent_day,
   }
 
   std::vector<absl::string_view> lines = absl::StrSplit(test_case, "\n");
-  while (!lines.empty() && lines.back().empty()) {
-    lines.pop_back();
+  absl::Span<absl::string_view> lines_span = absl::MakeSpan(lines);
+  // Pull off HACK: prefix lines from the front...
+  while (!lines_span.empty() && absl::StartsWith(lines_span[0], "HACK: ")) {
+    lines_span = lines_span.subspan(1);
+  }
+  // ... and empty lines from the end.
+  while (!lines_span.empty() && lines_span.back().empty()) {
+    lines_span = lines_span.subspan(0, lines_span.size() - 1);
   }
   absl::StatusOr<std::string> output;
   switch (options.GetInt64(kPartOption)) {
     case 1: {
-      output = advent_day->Part1(absl::MakeSpan(lines));
+      output = advent_day->Part1(lines_span);
       break;
     }
     case 2: {
-      output = advent_day->Part2(absl::MakeSpan(lines));
+      output = advent_day->Part2(lines_span);
       break;
     }
     default: {
