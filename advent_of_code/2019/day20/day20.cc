@@ -19,21 +19,15 @@ bool IsCapAlpha(char c) { return c >= 'A' && c <= 'Z'; }
 
 class Maze {
  public:
-  Maze(absl::Span<absl::string_view> input)
-    : input_(input), board_(0, 0) {}
-
-  absl::Status Initialize() {
-    absl::Span<absl::string_view> to_parse = input_;
-    if (to_parse[0] == "HACK: Ignore Starting Whitespace") {
-      to_parse = to_parse.subspan(1);
+  static absl::StatusOr<Maze> Create(absl::Span<absl::string_view> input) {
+    if (input[0] == "HACK: Ignore Starting Whitespace") {
+      input = input.subspan(1);
     }
-    while (!to_parse.empty() && to_parse.back() == "") {
-      to_parse = to_parse.subspan(0, to_parse.size() - 1); 
+    while (!input.empty() && input.back() == "") {
+      input = input.subspan(0, input.size() - 1); 
     }
-    absl::StatusOr<CharBoard> with_portals = CharBoard::Parse(to_parse);
+    absl::StatusOr<CharBoard> with_portals = CharBoard::Parse(input);
     if (!with_portals.ok()) return with_portals.status();
-
-    board_ = CharBoard(with_portals->width() - 4, with_portals->height() - 4);
 
     absl::flat_hash_map<std::string, std::vector<Point>> portals;
 
@@ -41,8 +35,9 @@ class Maze {
     range.min += Point{2, 2};
     range.max -= Point{2, 2};
 
+    Maze ret(with_portals->width() - 4, with_portals->height() - 4);
     for (Point p : range) {
-      board_[p - Point{2, 2}] = with_portals->at(p);
+      ret.board_[p - Point{2, 2}] = with_portals->at(p);
       if (with_portals->at(p) == '.') {
         if (IsCapAlpha(with_portals->at(p + Point{0, -1}))) {
           char portal_name[] = {with_portals->at(p + Point{0, -2}), with_portals->at(p + Point{0, -1}), '\0'};
@@ -67,34 +62,34 @@ class Maze {
       if (it == portals.end()) return absl::InvalidArgumentError("No start");
       if (it->second.size() != 1)
         return absl::InvalidArgumentError("Bad start");
-      start_ = it->second[0];
+      ret.start_ = it->second[0];
       portals.erase(it);
     }
     {
       auto it = portals.find("ZZ");
       if (it == portals.end()) return absl::InvalidArgumentError("No end");
       if (it->second.size() != 1) return absl::InvalidArgumentError("Bad end");
-      end_ = it->second[0];
+      ret.end_ = it->second[0];
       portals.erase(it);
     }
     for (const auto& name_to_points : portals) {
       const std::vector<Point>& points = name_to_points.second;
       if (points.size() != 2)
         return absl::InvalidArgumentError("Portal not connected right");
-      portals_.emplace(points[0], points[1]);
-      portals_.emplace(points[1], points[0]);
+      ret.portals_.emplace(points[0], points[1]);
+      ret.portals_.emplace(points[1], points[0]);
     }
 
-    VLOG(1) << "\nBoard:\n" << board_
-            << "\nStart: " << start_
-            << "; End: " << end_ << "\nPortals:\n"
+    VLOG(1) << "\nBoard:\n" << ret.board_
+            << "\nStart: " << ret.start_
+            << "; End: " << ret.end_ << "\nPortals:\n"
             << absl::StrJoin(
-                   portals_, "\n",
+                   ret.portals_, "\n",
                    [](std::string* out, const std::pair<Point, Point>& portal) {
                      absl::StrAppend(out, portal.first.DebugString(), "<->",
                                      portal.second.DebugString());
                    });
-    return absl::OkStatus();
+    return ret;
   }
 
   bool CanStand(Point p) const {
@@ -183,7 +178,7 @@ class Maze {
   const absl::flat_hash_map<Point, Point>& portals() const { return portals_; }
 
  private:
-  const absl::Span<absl::string_view> input_;
+  Maze(int width, int height) : board_(width, height) {}
 
   CharBoard board_;
   absl::flat_hash_map<Point, Point> portals_;
@@ -195,18 +190,18 @@ class Maze {
 
 absl::StatusOr<std::string> Day_2019_20::Part1(
     absl::Span<absl::string_view> input) const {
-  Maze maze(input);
-  if (absl::Status st = maze.Initialize(); !st.ok()) return st;
+  absl::StatusOr<Maze> maze = Maze::Create(input);
+  if (!maze.ok()) return maze.status();
 
-  return IntReturn(maze.FindPath());
+  return IntReturn(maze->FindPath());
 }
 
 absl::StatusOr<std::string> Day_2019_20::Part2(
     absl::Span<absl::string_view> input) const {
-  Maze maze(input);
-  if (absl::Status st = maze.Initialize(); !st.ok()) return st;
+  absl::StatusOr<Maze> maze = Maze::Create(input);
+  if (!maze.ok()) return maze.status();
 
-  return IntReturn(maze.FindRecursivePath());
+  return IntReturn(maze->FindRecursivePath());
 }
 
 }  // namespace advent_of_code
