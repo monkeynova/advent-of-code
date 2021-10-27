@@ -72,7 +72,7 @@ absl::StatusOr<std::string> Day_2015_18::Part1(
   if (!board.ok()) return board.status();
   CharBoard cur = *board;
   for (int i = 0; i < 100; ++i) {
-    VLOG(1) << cur.DebugString();
+    VLOG(1) << cur;
     cur = RunStep(cur);
   }
   return IntReturn(CountOn(cur));
@@ -84,7 +84,7 @@ absl::StatusOr<std::string> Day_2015_18::Part2(
   if (!board.ok()) return board.status();
   CharBoard cur = *board;
   for (int i = 0; i < 100; ++i) {
-    VLOG(1) << cur.DebugString();
+    VLOG(1) << cur;
     cur = RunStep2(cur);
   }
   return IntReturn(CountOn(cur));

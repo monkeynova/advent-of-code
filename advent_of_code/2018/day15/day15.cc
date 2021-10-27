@@ -259,7 +259,7 @@ class GameBoard {
                         absl::StrAppend(out, "  ", pair.second, " @",
                                         pair.first.DebugString(), "\n");
                       }),
-        board_.DebugString());
+        board_.AsString());
   }
 
  private:

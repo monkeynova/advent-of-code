@@ -59,7 +59,7 @@ absl::StatusOr<std::string> Day_2018_18::Part1(
   if (!in.ok()) return in.status();
   CharBoard step = *in;
   for (int i = 0; i < 10; ++i) {
-    VLOG(1) << "Step [" << i << "]:\n" << step.DebugString();
+    VLOG(1) << "Step [" << i << "]:\n" << step;
     step = Update(step);
   }
   int trees = 0;
@@ -96,7 +96,7 @@ absl::StatusOr<std::string> Day_2018_18::Part2(
       break;
     }
     hist[step] = i;
-    VLOG(1) << "Step [" << i << "]:\n" << step.DebugString();
+    VLOG(1) << "Step [" << i << "]:\n" << step;
     step = Update(step);
   }
   int trees = 0;

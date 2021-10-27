@@ -54,7 +54,7 @@ class CharBoard {
   char operator[](Point p) const { return rows_[p.y][p.x]; }
   char& operator[](Point p) { return rows_[p.y][p.x]; }
 
-  std::string DebugString() const { return absl::StrJoin(rows_, "\n"); }
+  std::string AsString() const { return absl::StrJoin(rows_, "\n"); }
 
   bool OnBoard(Point p) const {
     if (p.y < 0) return false;
@@ -73,7 +73,10 @@ class CharBoard {
   bool operator!=(const CharBoard& o) const { return !operator==(o); }
 
   friend std::ostream& operator<<(std::ostream& out, const CharBoard& b) {
-    return out << b.DebugString();
+    for (absl::string_view s : b.rows_) {
+      out << s << std::endl;
+    }
+    return out;
   }
 
  private:

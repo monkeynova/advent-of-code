@@ -43,7 +43,7 @@ absl::Status DropFrom(CharBoard& b, Point start) {
   VLOG(1) << "Drop to: " << cur;
   bool filling = true;
   while (filling) {
-    VLOG(3) << b.DebugString();
+    VLOG(3) << b;
     PointRectangle fill = {cur, cur};
     while (b[fill.min - Point{1, 0}] != '#') {
       if (b[fill.min + Point{0, 1}] == '.') {
@@ -157,7 +157,7 @@ absl::StatusOr<std::string> Day_2018_17::Part1(
   int min_y;
   absl::StatusOr<CharBoard> b = Parse(input, &min_y);
   if (!b.ok()) return b.status();
-  VLOG_IF(1, b->height() < 100) << "Init:\n" << b->DebugString();
+  VLOG_IF(1, b->height() < 100) << "Init:\n" << *b;
   if (VLOG_IS_ON(2) && b->height() >= 100) {
     VLOG(2) << "Init:" << *b;
   }
@@ -165,7 +165,7 @@ absl::StatusOr<std::string> Day_2018_17::Part1(
     VLOG(2) << "Final:" << *b;
     return st;
   }
-  VLOG_IF(1, b->height() < 100) << "Final:\n" << b->DebugString();
+  VLOG_IF(1, b->height() < 100) << "Final:\n" << *b;
   if (VLOG_IS_ON(2) && b->height() >= 100) {
     VLOG(2) << "Final:" << *b;
   }

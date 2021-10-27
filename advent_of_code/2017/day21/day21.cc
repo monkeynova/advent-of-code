@@ -39,6 +39,7 @@ std::vector<std::function<Point(Point)>> Transforms(PointRectangle range) {
   return ret;
 }
 
+// TODO(@monkeynova): Move to CharBoard interface.
 CharBoard SubBoard(const CharBoard& in, PointRectangle sub_range) {
   CharBoard out(sub_range.max.x - sub_range.min.x + 1,
                 sub_range.max.y - sub_range.min.y + 1);
@@ -90,7 +91,7 @@ absl::StatusOr<CharBoard> RunIteration(
       VLOG(2) << "Slice @" << slice_at;
       CharBoard slice = SubBoard(
           in, PointRectangle{slice_at, slice_at + stride - Point{1, 1}});
-      VLOG(2) << "Slice:\n" << slice.DebugString();
+      VLOG(2) << "Slice:\n" << slice;
       absl::StatusOr<CharBoard> new_slice = FindPattern(slice, patterns);
       if (!new_slice.ok()) return new_slice.status();
       if (new_slice->width() != stride.x + 1)
@@ -141,12 +142,12 @@ absl::StatusOr<std::string> Day_2017_21::Part1(
   absl::StatusOr<CharBoard> tmp = CharBoard::Parse(absl::MakeSpan(init));
   if (!tmp.ok()) return tmp.status();
 
-  VLOG(1) << "tmp=\n" << tmp->DebugString();
+  VLOG(1) << "tmp=\n" << *tmp;
   for (int i = 0; i < 5; ++i) {
     absl::StatusOr<CharBoard> next = RunIteration(*tmp, *patterns);
     if (!next.ok()) return next.status();
     tmp = std::move(next);
-    VLOG(1) << "tmp=\n" << tmp->DebugString();
+    VLOG(1) << "tmp=\n" << *tmp;
   }
 
   int count = 0;
@@ -166,12 +167,12 @@ absl::StatusOr<std::string> Day_2017_21::Part2(
   absl::StatusOr<CharBoard> tmp = CharBoard::Parse(absl::MakeSpan(init));
   if (!tmp.ok()) return tmp.status();
 
-  VLOG(1) << "tmp=\n" << tmp->DebugString();
+  VLOG(1) << "tmp=\n" << *tmp;
   for (int i = 0; i < 18; ++i) {
     absl::StatusOr<CharBoard> next = RunIteration(*tmp, *patterns);
     if (!next.ok()) return next.status();
     tmp = std::move(next);
-    VLOG(1) << "tmp=\n" << tmp->DebugString();
+    VLOG(1) << "tmp=\n" << *tmp;
   }
 
   int count = 0;

@@ -159,7 +159,7 @@ absl::StatusOr<int> RunHacks(const absl::flat_hash_map<Point, Node>& grid) {
   LOG(INFO) << "Empty at " << empty;
   LOG(INFO) << "Used: (" << min_used << "," << max_used << ") out of ("
             << min_space << "," << max_space << ")";
-  LOG(INFO) << "Board:\n" << board.DebugString();
+  LOG(INFO) << "Board:\n" << board;
 
   std::deque<PathState> frontier = {{.b = board, .num_steps = 0}};
   absl::flat_hash_set<PathState> hist;

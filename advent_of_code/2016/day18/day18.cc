@@ -39,7 +39,7 @@ absl::StatusOr<std::string> Day_2016_18::Part1(
       b[p] = next_traps.contains(prev_traps) ? '^' : '.';
     }
   }
-  LOG(INFO) << "Board:\n" << b.DebugString();
+  LOG(INFO) << "Board:\n" << b;
   int safe_count = 0;
   for (Point p : b.range()) {
     if (b[p] == '.') ++safe_count;
@@ -68,7 +68,7 @@ absl::StatusOr<std::string> Day_2016_18::Part2(
       b[p] = next_traps.contains(prev_traps) ? '^' : '.';
     }
   }
-  VLOG(2) << "Board:\n" << b.DebugString();
+  VLOG(2) << "Board:\n" << b;
   int safe_count = 0;
   for (Point p : b.range()) {
     if (b[p] == '.') ++safe_count;

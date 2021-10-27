@@ -219,8 +219,7 @@ class Droid : public IntCode::IOModule {
       }
       board[p - range_.min] = c;
     }
-    return board.DebugString();
-    ;
+    return board.AsString();
   }
 
   Point min() const { return range_.min; }

@@ -124,12 +124,12 @@ class TileMerger {
         if (absl::Status st = FindAndInsertTile(&merged, tile_x, tile_y);
             !st.ok())
           return st;
-        VLOG(2) << "Merging board\n" << merged.DebugString();
+        VLOG(2) << "Merging board\n" << merged;
       }
     }
-    VLOG(1) << "Board with boarders:\n" << merged.DebugString();
+    VLOG(1) << "Board with boarders:\n" << merged;
     CharBoard no_borders = RemoveBorder(merged);
-    VLOG(1) << "Board without boarders:\n" << no_borders.DebugString();
+    VLOG(1) << "Board without boarders:\n" << no_borders;
     return no_borders;
   }
 
@@ -301,10 +301,10 @@ class TileMerger {
       return AdventDay::Error("Can't find tile: ", *tile_num);
     const CharBoard& tile = tile_it->second;
 
-    VLOG(3) << "  tile\n" << tile.DebugString();
+    VLOG(3) << "  tile\n" << tile;
     for (std::function<Point(Point)> t : Transforms(tile.range())) {
       CharBoard tmp = Transform(tile, t);
-      VLOG(4) << "Oriented to\n" << tmp.DebugString();
+      VLOG(4) << "Oriented to\n" << tmp;
 
       std::string x_edge =
           EdgeString(tmp, {0, 0}, {tmp.width() - 1, 0}, {1, 0});
@@ -379,7 +379,7 @@ absl::StatusOr<int> CountNonSeaMonster(const CharBoard& board) {
   absl::optional<int> sea_monster_count;
   for (std::function<Point(Point)> t : Transforms(board.range())) {
     CharBoard tmp = Transform(board, t);
-    LOG(INFO) << "Looking for monsters in\n" << tmp.DebugString();
+    LOG(INFO) << "Looking for monsters in\n" << tmp;
     int this_sea_monster_count = 0;
     for (Point p : tmp.range()) {
       if (IsSeaMonster(tmp, p)) {
@@ -451,7 +451,7 @@ absl::StatusOr<std::string> Day_2020_20::Part2(
   absl::StatusOr<CharBoard> merged = TileMerger(tiles).Merge();
   if (!merged.ok()) return merged.status();
 
-  VLOG(1) << "Merged Board:\n" << merged->DebugString();
+  VLOG(1) << "Merged Board:\n" << *merged;
 
   return IntReturn(CountNonSeaMonster(*merged));
 }

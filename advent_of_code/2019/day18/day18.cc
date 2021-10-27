@@ -257,7 +257,7 @@ absl::StatusOr<std::string> Day_2019_18::Part2(
   (*char_board)[robot + Cardinal::kSouthEast] = '@';
   (*char_board)[robot + Cardinal::kSouthWest] = '@';
 
-  VLOG(1) << "\n" << char_board->DebugString();
+  VLOG(1) << "\n" << *char_board;
 
   Board b(*char_board);
   if (absl::Status st = b.InitializeBoard(); !st.ok()) return st;

@@ -46,9 +46,9 @@ absl::StatusOr<std::string> Day_2016_08::Part1(
       return Error("Bad instruction: ", ins);
     }
     VLOG(1) << "Ins: " << ins;
-    VLOG(1) << "Board:\n" << display.DebugString();
+    VLOG(1) << "Board:\n" << display;
   }
-  LOG(INFO) << "Board:\n" << display.DebugString();
+  LOG(INFO) << "Board:\n" << display;
   int count = 0;
   for (Point p : display.range()) {
     if (display[p] == '#') ++count;
@@ -83,9 +83,9 @@ absl::StatusOr<std::string> Day_2016_08::Part2(
       return Error("Bad instruction: ", ins);
     }
     VLOG(1) << "Ins: " << ins;
-    VLOG(1) << "Board:\n" << display.DebugString();
+    VLOG(1) << "Board:\n" << display;
   }
-  return display.DebugString();
+  return display.AsString();
 }
 
 }  // namespace advent_of_code

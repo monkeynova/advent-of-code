@@ -43,7 +43,7 @@ struct State {
       else
         tmp[c.pos] = '?';
     }
-    return tmp.DebugString();
+    return tmp.AsString();
   }
 
   absl::StatusOr<absl::optional<Point>> RunStep() {

@@ -88,7 +88,7 @@ absl::StatusOr<std::string> Day_2017_14::Part1(
   if (input.size() != 1) return Error("Bad size");
   absl::StatusOr<CharBoard> board = BuildBoard(input[0]);
   if (!board.ok()) return board.status();
-  VLOG(1) << "Board:\n" << board->DebugString();
+  VLOG(1) << "Board:\n" << *board;
   int count = 0;
   for (Point p : board->range()) {
     if ((*board)[p] == '.') ++count;
