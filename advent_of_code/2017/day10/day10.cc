@@ -14,17 +14,6 @@ namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2017_10::Part1(
     absl::Span<absl::string_view> input) const {
-  {
-    // TODO(@monkeynova): Move to knot_hash_test.cc?
-    const char kTmpStr[] = {3, 4, 1, 5, '\0'};
-    std::vector<unsigned char> loop(5);
-    for (int i = 0; i < loop.size(); ++i) loop[i] = i;
-    KnotHash().RunLoop(kTmpStr, &loop);
-    if (loop[0] * loop[1] != 12) {
-      return Error("Test case failed");
-    }
-  }
-
   if (input.size() != 1) return Error("Bad size");
   std::vector<absl::string_view> length_strs = absl::StrSplit(input[0], ",");
   absl::StatusOr<std::vector<int64_t>> lengths_long = ParseAsInts(length_strs);
