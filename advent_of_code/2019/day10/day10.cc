@@ -58,7 +58,6 @@ MostVisible FindMostVisible(const Board& board) {
 }
 
 absl::StatusOr<Board> ParseBoard(absl::Span<absl::string_view> input) {
-  // TODO(@monkeynova): Use CharBoard.
   absl::StatusOr<CharBoard> char_board = CharBoard::Parse(input);
   if (!char_board.ok()) return char_board.status();
 
