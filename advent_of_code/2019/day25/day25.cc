@@ -114,7 +114,7 @@ absl::StatusOr<std::string> Day_2019_25::Part1(
 
 absl::StatusOr<std::string> Day_2019_25::Part2(
     absl::Span<absl::string_view> input) const {
-  return "Merry Christmas";
+  return "Merry Christmas!";
 }
 
 }  // namespace advent_of_code
