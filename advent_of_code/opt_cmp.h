@@ -40,6 +40,13 @@ absl::optional<T> opt_add(absl::optional<T> a, T d) {
   return opt_add(d, a);
 }
 
+template <typename K, typename Container>
+auto opt_find(const Container& c, const K& k) -> absl::optional<std::remove_reference_t<decltype(c.find(k)->second)>> {
+  auto it = c.find(k);
+  if (it == c.end()) return absl::nullopt;
+  return it->second;
+}
+
 }  // namespace advent_of_code
 
 #endif  // ADVENT_OF_CODE_OPT_CMP_H

@@ -7,6 +7,7 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/char_board.h"
+#include "advent_of_code/opt_cmp.h"
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
@@ -183,14 +184,8 @@ absl::flat_hash_map<int, CharBoard> StepGameOfLineRecursive(
     int depth = depth_and_board.first;
     const CharBoard& in_board = depth_and_board.second;
     CharBoard out_board = in_board;
-    absl::optional<CharBoard> board_minus_one = absl::nullopt;
-    if (auto it = depth_to_board.find(depth - 1); it != depth_to_board.end()) {
-      board_minus_one = it->second;
-    }
-    absl::optional<CharBoard> board_plus_one = absl::nullopt;
-    if (auto it = depth_to_board.find(depth + 1); it != depth_to_board.end()) {
-      board_plus_one = it->second;
-    }
+    absl::optional<CharBoard> board_minus_one = opt_find(depth_to_board, depth - 1);
+    absl::optional<CharBoard> board_plus_one = opt_find(depth_to_board, depth + 1);
     for (Point p : in_board.range()) {
       if (p == Point{2, 2}) {
         if (!board_plus_one) {
