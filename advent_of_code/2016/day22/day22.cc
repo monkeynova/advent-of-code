@@ -120,7 +120,7 @@ struct PathState {
 
 template <typename H>
 H AbslHashValue(H h, const PathState& s) {
-  return H::combine(std::move(h), s.b.rows);
+  return H::combine(std::move(h), s.b);
 }
 
 absl::StatusOr<int> RunHacks(const absl::flat_hash_map<Point, Node>& grid) {

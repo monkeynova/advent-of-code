@@ -10,24 +10,19 @@
 
 namespace advent_of_code {
 
-struct CharBoard {
-  static absl::StatusOr<CharBoard> Parse(absl::Span<absl::string_view> in) {
+class CharBoard {
+ public:
+  template <typename Container>
+  static absl::StatusOr<CharBoard> Parse(const Container& in) {
     CharBoard ret(0, 0);
     for (absl::string_view line : in) {
-      ret.rows.push_back(std::string(line));
+      ret.rows_.push_back(std::string(line));
     }
     if (absl::Status st = ret.Validate(); !st.ok()) return st;
     return ret;
   }
 
-  CharBoard(int width, int height) {
-    std::string empty_row;
-    empty_row.resize(width, '.');
-    rows.reserve(height);
-    for (int i = 0; i < height; ++i) {
-      rows.push_back(empty_row);
-    }
-  }
+  CharBoard(int width, int height) : rows_(height, std::string(width, '.')) {}
 
   explicit CharBoard(PointRectangle r)
       : CharBoard(r.max.x - r.min.x + 1, r.max.y - r.min.y + 1) {}
@@ -35,8 +30,8 @@ struct CharBoard {
   CharBoard(const CharBoard&) = default;
   CharBoard& operator=(const CharBoard&) = default;
 
-  int height() const { return rows.size(); }
-  int width() const { return rows[0].size(); }
+  int height() const { return rows_.size(); }
+  int width() const { return rows_[0].size(); }
 
   PointRectangle range() const {
     return PointRectangle{.min = {.x = 0, .y = 0},
@@ -44,8 +39,8 @@ struct CharBoard {
   }
 
   absl::Status Validate() const {
-    if (rows.empty()) return absl::OkStatus();
-    for (absl::string_view r : rows) {
+    if (rows_.empty()) return absl::OkStatus();
+    for (absl::string_view r : rows_) {
       if (r.size() != width()) {
         return absl::InternalError(absl::StrCat("Bad row size: ", r));
       }
@@ -53,35 +48,36 @@ struct CharBoard {
     return absl::OkStatus();
   }
 
-  char at(Point p) const { return rows[p.y][p.x]; }
-  void set(Point p, char c) { rows[p.y][p.x] = c; }
+  char at(Point p) const { return rows_[p.y][p.x]; }
+  void set(Point p, char c) { rows_[p.y][p.x] = c; }
 
-  char operator[](Point p) const { return rows[p.y][p.x]; }
-  char& operator[](Point p) { return rows[p.y][p.x]; }
+  char operator[](Point p) const { return rows_[p.y][p.x]; }
+  char& operator[](Point p) { return rows_[p.y][p.x]; }
 
-  std::string DebugString() const { return absl::StrJoin(rows, "\n"); }
+  std::string DebugString() const { return absl::StrJoin(rows_, "\n"); }
 
   bool OnBoard(Point p) const {
     if (p.y < 0) return false;
-    if (p.y >= rows.size()) return false;
+    if (p.y >= height()) return false;
     if (p.x < 0) return false;
-    if (p.x >= rows[0].size()) return false;
+    if (p.x >= width()) return false;
     return true;
   }
 
   template <typename H>
   friend H AbslHashValue(H h, const CharBoard& b) {
-    return H::combine(std::move(h), b.rows);
+    return H::combine(std::move(h), b.rows_);
   }
 
-  bool operator==(const CharBoard& o) const { return rows == o.rows; }
+  bool operator==(const CharBoard& o) const { return rows_ == o.rows_; }
   bool operator!=(const CharBoard& o) const { return !operator==(o); }
 
   friend std::ostream& operator<<(std::ostream& out, const CharBoard& b) {
     return out << b.DebugString();
   }
 
-  std::vector<std::string> rows;
+ private:
+  std::vector<std::string> rows_;
 };
 
 }  // namespace advent_of_code

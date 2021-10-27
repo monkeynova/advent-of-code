@@ -85,7 +85,7 @@ absl::StatusOr<std::string> Day_2016_08::Part2(
     VLOG(1) << "Ins: " << ins;
     VLOG(1) << "Board:\n" << display.DebugString();
   }
-  return absl::StrJoin(display.rows, "\n");
+  return display.DebugString();
 }
 
 }  // namespace advent_of_code

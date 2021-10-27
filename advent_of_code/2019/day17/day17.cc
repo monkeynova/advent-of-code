@@ -132,7 +132,7 @@ class ViewPort : public IntCode::IOModule {
   }
 
   absl::StatusOr<int> ComputeAlignment() {
-    VLOG(1) << "\n" << board_.DebugString();
+    VLOG(1) << "\n" << board_;
     int ret = 0;
     for (Point p : board_.range()) {
       if (IsIntersection(p, board_)) {
@@ -243,7 +243,7 @@ class ViewPort : public IntCode::IOModule {
     }
     command.resize(command.size() - 1);
 
-    VLOG(1) << "\n" << board_.DebugString();
+    VLOG(1) << "\n" << board_;
     VLOG(1) << "Robot@" << robot;
     VLOG(1) << "Full Path: " << command;
     program_ = FindProgram(command);
@@ -279,7 +279,10 @@ class ViewPort : public IntCode::IOModule {
         current_output_pos_ = 0;
       } else {
         if (!current_input_.empty()) {
-          board_.rows.push_back(std::move(current_input_));
+          board_build_.push_back(std::move(current_input_));
+          absl::StatusOr<CharBoard> next_board = CharBoard::Parse(board_build_);
+          if (!next_board.ok()) return next_board.status();
+          board_ = std::move(*next_board);
         }
       }
       current_input_ = "";
@@ -295,6 +298,7 @@ class ViewPort : public IntCode::IOModule {
   int current_output_pos_;
 
   std::string current_input_;
+  std::vector<std::string> board_build_;
   CharBoard board_{0, 0};
   int64_t dust_collected_ = -1;
 };

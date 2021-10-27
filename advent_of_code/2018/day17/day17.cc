@@ -159,24 +159,15 @@ absl::StatusOr<std::string> Day_2018_17::Part1(
   if (!b.ok()) return b.status();
   VLOG_IF(1, b->height() < 100) << "Init:\n" << b->DebugString();
   if (VLOG_IS_ON(2) && b->height() >= 100) {
-    VLOG(2) << "Init:";
-    for (absl::string_view row : b->rows) {
-      VLOG(2) << row;
-    }
+    VLOG(2) << "Init:" << *b;
   }
   if (absl::Status st = FillWithWater(*b); !st.ok()) {
-    VLOG(2) << "Final:";
-    for (absl::string_view row : b->rows) {
-      VLOG(2) << row;
-    }
+    VLOG(2) << "Final:" << *b;
     return st;
   }
   VLOG_IF(1, b->height() < 100) << "Final:\n" << b->DebugString();
   if (VLOG_IS_ON(2) && b->height() >= 100) {
-    VLOG(2) << "Final:";
-    for (absl::string_view row : b->rows) {
-      VLOG(2) << row;
-    }
+    VLOG(2) << "Final:" << *b;
   }
   int count = 0;
   for (Point p : b->range()) {
