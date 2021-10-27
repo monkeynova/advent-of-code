@@ -62,10 +62,7 @@ absl::Status HandleTestIncludes(std::string* test_case) {
   RE2 include_pattern{"@include{([^}]*)}"};
   while (RE2::PartialMatch(*test_case, include_pattern, &include_fname)) {
     std::string contents;
-    // TODO(@monkeynova): This is terrible in the need for the ./ without
-    // which the load fails.
-    if (absl::Status st =
-            GetContents(absl::StrCat("./", include_fname), &contents);
+    if (absl::Status st = GetContents(absl::StrCat(include_fname), &contents);
         !st.ok()) {
       return absl::InvalidArgumentError(absl::StrCat(
           "Unable to include file \"", include_fname, "\": ", st.message()));
