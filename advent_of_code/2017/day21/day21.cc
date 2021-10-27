@@ -39,16 +39,6 @@ std::vector<std::function<Point(Point)>> Transforms(PointRectangle range) {
   return ret;
 }
 
-// TODO(@monkeynova): Move to CharBoard interface.
-CharBoard SubBoard(const CharBoard& in, PointRectangle sub_range) {
-  CharBoard out(sub_range.max.x - sub_range.min.x + 1,
-                sub_range.max.y - sub_range.min.y + 1);
-  for (Point p : sub_range) {
-    out[p - sub_range.min] = in[p];
-  }
-  return out;
-}
-
 absl::StatusOr<CharBoard> FindPattern(
     const CharBoard& in,
     const absl::flat_hash_map<CharBoard, CharBoard>& patterns) {
@@ -89,8 +79,8 @@ absl::StatusOr<CharBoard> RunIteration(
     for (int x = 0; x < in.width() / stride.x; ++x) {
       Point slice_at = {x * stride.x, y * stride.y};
       VLOG(2) << "Slice @" << slice_at;
-      CharBoard slice = SubBoard(
-          in, PointRectangle{slice_at, slice_at + stride - Point{1, 1}});
+      CharBoard slice = in.SubBoard(
+          PointRectangle{slice_at, slice_at + stride - Point{1, 1}});
       VLOG(2) << "Slice:\n" << slice;
       absl::StatusOr<CharBoard> new_slice = FindPattern(slice, patterns);
       if (!new_slice.ok()) return new_slice.status();

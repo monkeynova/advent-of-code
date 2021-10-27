@@ -33,8 +33,8 @@ class Maze {
     range.max -= Point{2, 2};
 
     Maze ret(with_portals->width() - 4, with_portals->height() - 4);
+    ret.board_ = with_portals->SubBoard(range);
     for (Point p : range) {
-      ret.board_[p - Point{2, 2}] = with_portals->at(p);
       if (with_portals->at(p) == '.') {
         if (IsCapAlpha(with_portals->at(p + Point{0, -1}))) {
           char portal_name[] = {with_portals->at(p + Point{0, -2}), with_portals->at(p + Point{0, -1}), '\0'};

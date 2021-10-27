@@ -64,6 +64,16 @@ class CharBoard {
     return true;
   }
 
+  CharBoard SubBoard(PointRectangle sub_range) const {
+    // TODO(@monkeynova): Just string-copy ranges in.
+    CharBoard out(sub_range.max.x - sub_range.min.x + 1,
+                  sub_range.max.y - sub_range.min.y + 1);
+    for (Point p : sub_range) {
+      out[p - sub_range.min] = at(p);
+    }
+    return out;
+  }
+
   template <typename H>
   friend H AbslHashValue(H h, const CharBoard& b) {
     return H::combine(std::move(h), b.rows_);
@@ -80,6 +90,7 @@ class CharBoard {
   }
 
  private:
+  // TODO(@monkeynova): Migrate to a single flat-buffer string.
   std::vector<std::string> rows_;
 };
 
