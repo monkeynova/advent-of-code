@@ -73,7 +73,7 @@
         "type": "shell",
         "command": "perl",
         "args": [
-          "new_day.pl",
+          "tools/new_day.pl",
           "${input:year}",
           "${input:day}"
         ],
