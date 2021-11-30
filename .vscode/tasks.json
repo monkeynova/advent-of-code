@@ -6,7 +6,7 @@
       {
         "label": "Bazel test ...",
         "type": "shell",
-        "command": "bazel",
+        "command": "bazelisk",
         "args": [
           "test",
           "..."
@@ -20,7 +20,7 @@
       {
         "label": "Bazel test (opt; long=5s) ...",
         "type": "shell",
-        "command": "bazel",
+        "command": "bazelisk",
         "args": [
           "test",
           "-c",
@@ -51,7 +51,7 @@
       {
         "label": "Test current day",
         "type": "shell",
-        "command": "bazel",
+        "command": "bazelisk",
         "args": [
           "test",
           "${relativeFileDirname}/..."
@@ -65,7 +65,7 @@
       {
         "label": "cleanup",
         "type": "shell",
-        "command": "bazel run :cleanup",
+        "command": "bazelisk run :cleanup",
         "problemMatcher": []
       },
       {
