@@ -1,0 +1,16 @@
+[part=1]
+Example input
+--
+ERROR: Could not run test: Not implemented
+==
+
+[part=1]
+@include{advent_of_code/2021/day01/input.txt}
+--
+ERROR: Could not run test: Not implemented
+==
+
+[part=2]
+@include{advent_of_code/2021/day01/input.txt}
+--
+ERROR: Could not run test: Not implemented
