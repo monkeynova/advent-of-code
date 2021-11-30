@@ -34,6 +34,6 @@ $cookies->set_cookie(
 );
 my $ua = LWP::UserAgent->new(cookie_jar => $cookies);
 my $response = $ua->get($input_url, ':content_file' => $out_file);
-die $response->u unless $response->is_success;
+die $response->status_line unless $response->is_success;
 print "   ... success.\n";
 
