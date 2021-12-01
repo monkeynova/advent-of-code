@@ -19,12 +19,34 @@ namespace {
 
 absl::StatusOr<std::string> Day_2021_01::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
+  if (!list.ok()) return list.status();
+
+  int64_t count = 0;
+  for (int i = 0; i < list->size() - 1; ++i) {
+    if ((*list)[i] < (*list)[i + 1]) ++count;
+  }
+
+  return IntReturn(count);
 }
 
 absl::StatusOr<std::string> Day_2021_01::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
+  if (!list.ok()) return list.status();
+
+  int64_t count = 0;
+  for (int i = 0; i < list->size() - 3; ++i) {
+    int64_t s1 = 0;
+    int64_t s2 = 0;
+    for (int j = 0; j < 3; ++j) {
+      s1 += (*list)[i + j];
+      s2 += (*list)[i + j + 1];
+    }
+    if (s1 < s2) ++count;
+  }
+
+  return IntReturn(count);
 }
 
 }  // namespace advent_of_code

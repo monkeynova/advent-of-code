@@ -1,16 +1,41 @@
 [part=1]
-Example input
+199
+200
+208
+210
+200
+207
+240
+269
+260
+263
 --
-ERROR: Could not run test: Not implemented
+7
 ==
 
 [part=1]
 @include{advent_of_code/2021/day01/input.txt}
 --
-ERROR: Could not run test: Not implemented
+1715
 ==
 
 [part=2]
+199
+200
+208
+210
+200
+207
+240
+269
+260
+263
+--
+5
+==
+
+# 1691
+[part=2]
 @include{advent_of_code/2021/day01/input.txt}
 --
-ERROR: Could not run test: Not implemented
+1739
