@@ -37,13 +37,7 @@ absl::StatusOr<std::string> Day_2021_01::Part2(
 
   int64_t count = 0;
   for (int i = 0; i < list->size() - 3; ++i) {
-    int64_t s1 = 0;
-    int64_t s2 = 0;
-    for (int j = 0; j < 3; ++j) {
-      s1 += (*list)[i + j];
-      s2 += (*list)[i + j + 1];
-    }
-    if (s1 < s2) ++count;
+    if ((*list)[i] < (*list)[i + 3]) ++count;
   }
 
   return IntReturn(count);
