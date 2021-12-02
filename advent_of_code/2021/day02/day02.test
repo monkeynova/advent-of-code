@@ -1,22 +1,32 @@
 [part=1]
-Example input
+forward 5
+down 5
+forward 8
+up 3
+down 8
+forward 2
 --
-ERROR: Could not run test: Not implemented
+150
 ==
 
 [part=1]
 @include{advent_of_code/2021/day02/input.txt}
 --
-ERROR: Could not run test: Not implemented
+1488669
 ==
 
 [part=2]
-Example input
+forward 5
+down 5
+forward 8
+up 3
+down 8
+forward 2
 --
-ERROR: Could not run test: Not implemented
+900
 ==
 
 [part=2]
 @include{advent_of_code/2021/day02/input.txt}
 --
-ERROR: Could not run test: Not implemented
+1176514794
