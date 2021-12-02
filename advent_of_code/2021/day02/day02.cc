@@ -38,16 +38,17 @@ absl::StatusOr<std::string> Day_2021_02::Part1(
 
 absl::StatusOr<std::string> Day_2021_02::Part2(
     absl::Span<absl::string_view> input) const {
-  Point3 p{0, 0, 0};
+  Point p{0, 0};
+  int64_t aim = 0;
   for (absl::string_view line : input) {
     int64_t delta = 0;
     if (RE2::FullMatch(line, "forward (\\d+)", &delta)) {
       p.x += delta;
-      p.y += p.z * delta;
+      p.y += aim * delta;
     } else if (RE2::FullMatch(line, "up (\\d+)", &delta)) {
-      p.z -= delta;
+      aim -= delta;
     } else if (RE2::FullMatch(line, "down (\\d+)", &delta)) {
-      p.z += delta;
+      aim += delta;
     } else {
       return Error("Bad line: ", line);
     }
