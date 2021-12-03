@@ -44,55 +44,55 @@ absl::StatusOr<std::string> Day_2021_03::Part1(
 
 absl::StatusOr<std::string> Day_2021_03::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::flat_hash_set<absl::string_view> most(input.begin(), input.end());
+  absl::flat_hash_set<absl::string_view> o2_set(input.begin(), input.end());
   for (int i = 0; i < input[0].size(); ++i) {
     int64_t ones = 0;
     int64_t zeros = 0;
-    for (absl::string_view rec : most) {
+    for (absl::string_view rec : o2_set) {
       if (rec.size() <= i) return Error("Bad line: ", rec);
       if (rec[i] == '1') ++ones;
       else if (rec[i] == '0') ++zeros;
       else return Error("Bad bit");
     }
     char delete_char = ones >= zeros ? '0' : '1';
-    for (auto it = most.begin(); it != most.end();) {
-      if ((*it)[i] == delete_char) most.erase(it++);
+    for (auto it = o2_set.begin(); it != o2_set.end();) {
+      if ((*it)[i] == delete_char) o2_set.erase(it++);
       else ++it;
     }
 
-    if (most.size() == 1) break;    
+    if (o2_set.size() == 1) break;    
   }
-  if (most.size() != 1) return Error("Cannot find most");
+  if (o2_set.size() != 1) return Error("Cannot find o2_set");
 
-  absl::flat_hash_set<absl::string_view> least(input.begin(), input.end());
+  absl::flat_hash_set<absl::string_view> co2_set(input.begin(), input.end());
   for (int i = 0; i < input[0].size(); ++i) {
     int64_t ones = 0;
     int64_t zeros = 0;
-    for (absl::string_view rec : least) {
+    for (absl::string_view rec : co2_set) {
       if (rec.size() <= i) return Error("Bad line: ", rec);
       if (rec[i] == '1') ++ones;
       else if (rec[i] == '0') ++zeros;
       else return Error("Bad bit");
     }
     char delete_char = ones >= zeros ? '1' : '0';
-    for (auto it = least.begin(); it != least.end();) {
-      if ((*it)[i] == delete_char) least.erase(it++);
+    for (auto it = co2_set.begin(); it != co2_set.end();) {
+      if ((*it)[i] == delete_char) co2_set.erase(it++);
       else ++it;
     }
 
-    if (least.size() == 1) break;    
+    if (co2_set.size() == 1) break;    
   }
-  if (least.size() != 1) return Error("Cannot find least");
+  if (co2_set.size() != 1) return Error("Cannot find co2_set");
 
-  int64_t most_val = 0;
-  for (char c : *most.begin()) {
-    most_val = most_val * 2 + (c == '1' ? 1 : 0);
+  int64_t o2_val = 0;
+  for (char c : *o2_set.begin()) {
+    o2_val = o2_val * 2 + (c == '1' ? 1 : 0);
   }
-  int64_t least_val = 0;
-  for (char c : *least.begin()) {
-    least_val = least_val * 2 + (c == '1' ? 1 : 0);
+  int64_t co2_val = 0;
+  for (char c : *co2_set.begin()) {
+    co2_val = co2_val * 2 + (c == '1' ? 1 : 0);
   }
-  return IntReturn(most_val * least_val);
+  return IntReturn(o2_val * co2_val);
 }
 
 }  // namespace advent_of_code
