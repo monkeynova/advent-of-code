@@ -1,22 +1,44 @@
 [part=1]
-Example input
+00100
+11110
+10110
+10111
+10101
+01111
+00111
+11100
+10000
+11001
+00010
+01010
 --
-ERROR: Could not run test: Not implemented
+198
 ==
 
 [part=1]
 @include{advent_of_code/2021/day03/input.txt}
 --
-ERROR: Could not run test: Not implemented
+3901196
 ==
 
 [part=2]
-Example input
+00100
+11110
+10110
+10111
+10101
+01111
+00111
+11100
+10000
+11001
+00010
+01010
 --
-ERROR: Could not run test: Not implemented
+230
 ==
 
 [part=2]
 @include{advent_of_code/2021/day03/input.txt}
 --
-ERROR: Could not run test: Not implemented
+4412188
