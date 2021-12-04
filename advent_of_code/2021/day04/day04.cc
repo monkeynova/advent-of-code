@@ -1,5 +1,6 @@
 #include "advent_of_code/2021/day04/day04.h"
 
+#include "absl/algorithm/container.h"
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
 #include "absl/strings/numbers.h"
@@ -18,16 +19,13 @@ class Board {
   static absl::StatusOr<Board> Parse(absl::Span<absl::string_view> data) {
     Board build;
     if (data.size() != 5) return AdventDay::Error("Bad size");
-    absl::string_view line_re =
-        "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*";
+    RE2 line_re("\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*");
     for (int i = 0; i < 5; ++i) {
       if (!RE2::FullMatch(data[i], line_re, &build.board_[i][0],
                           &build.board_[i][1], &build.board_[i][2],
                           &build.board_[i][3], &build.board_[i][4])) {
         return AdventDay::Error("Bad board line: ", data[i]);
       }
-    }
-    for (int i = 0; i < 5; ++i) {
       for (int j = 0; j < 5; ++j) {
         build.selected_[i][j] = false;
       }
@@ -59,40 +57,37 @@ class Board {
     return score;
   }
 
-  void Mark(int64_t val) {
+  absl::Status Mark(int64_t val) {
+    bool found = false;
     for (int i = 0; i < 5; ++i) {
       for (int j = 0; j < 5; ++j) {
         if (board_[i][j] == val) {
+          if (found) return AdventDay::Error("Multi-value");
+          found = true;
           selected_[i][j] = true;
         }
       }
     }
+    return absl::OkStatus();
   }
 
   bool IsWin() const {
-    for (int i = 0; i < 5; ++i) {
-      bool all_row = true;
-      for (int j = 0; j < 5; ++j) {
-        if (!selected_[i][j]) {
-          all_row = false;
-          break;
-        }
+    static constexpr std::array<int, 5> kIdxList = {0, 1, 2, 3, 4};
+    for (int i : kIdxList) {
+      if (absl::c_all_of(kIdxList, [&](int j) { return selected_[i][j]; })) {
+        return true;
       }
-      if (all_row) return true;
-      bool all_col = true;
-      for (int j = 0; j < 5; ++j) {
-        if (!selected_[j][i]) {
-          all_col = false;
-          break;
-        }
+      if (absl::c_all_of(kIdxList, [&](int j) { return selected_[j][i]; })) {
+        return true;
       }
-      if (all_col) return true;
     }
     // diagonals don't count.
     return false;
   }
 
  private:
+  Board() = default;
+
   std::array<std::array<int64_t, 5>, 5> board_;
   std::array<std::array<bool, 5>, 5> selected_;
 };
@@ -119,7 +114,7 @@ absl::StatusOr<std::string> Day_2021_04::Part1(
 
   for (int64_t num : numbers) {
     for (Board& b : boards) {
-      b.Mark(num);
+      if (auto st = b.Mark(num); !st.ok()) return st;
     }
     for (const Board& b : boards) {
       if (b.IsWin()) {
@@ -151,7 +146,7 @@ absl::StatusOr<std::string> Day_2021_04::Part2(
 
   for (int64_t num : numbers) {
     for (Board& b : boards) {
-      b.Mark(num);
+      if (auto st = b.Mark(num); !st.ok()) return st;
     }
     std::vector<Board> new_boards;
     for (const Board& b : boards) {
