@@ -1,21 +1,21 @@
 
-BM_Day<Day_2021_01>/0      964 ns      963 ns  704105        Part: 1
-BM_Day<Day_2021_01>/1    29678 ns    29653 ns   23157        Part: 1
-BM_Day<Day_2021_01>/2      962 ns      961 ns  730758        Part: 2
-BM_Day<Day_2021_01>/3    29378 ns    29360 ns   22363        Part: 2
-BM_Day<Day_2021_02>/0   172894 ns   172730 ns    4069        Part: 1
-BM_Day<Day_2021_02>/1 31023968 ns 31006522 ns      23        Part: 1
-BM_Day<Day_2021_02>/2   163785 ns   163754 ns    4186        Part: 2
-BM_Day<Day_2021_02>/3 29407631 ns 29400042 ns      24        Part: 2
-BM_Day<Day_2021_03>/0      106 ns      105 ns 6718044        Part: 1
-BM_Day<Day_2021_03>/1    61782 ns    58854 ns   12435        Part: 1
-BM_Day<Day_2021_03>/2     1357 ns     1354 ns  483579        Part: 2
-BM_Day<Day_2021_03>/3   143042 ns   142749 ns    4912        Part: 2
-BM_Day<Day_2021_04>/0   157806 ns   157702 ns    4508        Part: 1
-BM_Day<Day_2021_04>/1  4925997 ns  4924558 ns     138        Part: 1
-BM_Day<Day_2021_04>/2   160915 ns   160840 ns    4332        Part: 2
-BM_Day<Day_2021_04>/3  5538527 ns  5529831 ns     136        Part: 2
-BM_Day<Day_2021_05>/0       ERROR   OCCURRED:    'Not implemented'
-BM_Day<Day_2021_05>/1       ERROR   OCCURRED:    'Not implemented'
-BM_Day<Day_2021_05>/2       ERROR   OCCURRED:    'Not implemented'
-BM_Day<Day_2021_05>/3       ERROR   OCCURRED:    'Not implemented'
+BM_Day<Day_2021_01>/0    1069 ns    1068 ns  692117        Part: 1
+BM_Day<Day_2021_01>/1   29575 ns   29524 ns   22728        Part: 1
+BM_Day<Day_2021_01>/2     993 ns     993 ns  755246        Part: 2
+BM_Day<Day_2021_01>/3   29632 ns   29620 ns   23791        Part: 2
+BM_Day<Day_2021_02>/0    1286 ns    1284 ns  545966        Part: 1
+BM_Day<Day_2021_02>/1  212431 ns  211837 ns    3289        Part: 1
+BM_Day<Day_2021_02>/2    1198 ns    1197 ns  590518        Part: 2
+BM_Day<Day_2021_02>/3  211958 ns  211842 ns    3278        Part: 2
+BM_Day<Day_2021_03>/0     106 ns     106 ns 6695617        Part: 1
+BM_Day<Day_2021_03>/1   55584 ns   55530 ns   11709        Part: 1
+BM_Day<Day_2021_03>/2    1340 ns    1339 ns  482722        Part: 2
+BM_Day<Day_2021_03>/3  144271 ns  144191 ns    4665        Part: 2
+BM_Day<Day_2021_04>/0  171117 ns  169012 ns    4240        Part: 1
+BM_Day<Day_2021_04>/1 5687098 ns 5610382 ns     110        Part: 1
+BM_Day<Day_2021_04>/2  169569 ns  169484 ns    4028        Part: 2
+BM_Day<Day_2021_04>/3 5722344 ns 5720374 ns     115        Part: 2
+BM_Day<Day_2021_05>/0      ERROR  OCCURRED:    'Not implemented'
+BM_Day<Day_2021_05>/1      ERROR  OCCURRED:    'Not implemented'
+BM_Day<Day_2021_05>/2      ERROR  OCCURRED:    'Not implemented'
+BM_Day<Day_2021_05>/3      ERROR  OCCURRED:    'Not implemented'

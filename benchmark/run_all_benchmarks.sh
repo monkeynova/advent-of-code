@@ -11,7 +11,7 @@ else
 fi
 
 echo > $TMP_FILE
-for t in `bazelisk query 'attr("tags", "benchmark", '${BAZEL_TARGETS}'l)'`
+for t in `bazelisk query 'attr("tags", "benchmark", '${BAZEL_TARGETS}')'`
 do
   bazelisk run -c opt $t -- --benchmark --run_long_tests=1m | grep BM_ >> $TMP_FILE
 done

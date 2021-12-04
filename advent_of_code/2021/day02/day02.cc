@@ -20,14 +20,17 @@ namespace {
 
 absl::StatusOr<std::string> Day_2021_02::Part1(
     absl::Span<absl::string_view> input) const {
+  static const RE2 kForwardRE("forward (\\d+)");
+  static const RE2 kUpRE("up (\\d+)");
+  static const RE2 kDownRE("down (\\d+)");
   Point p{0, 0};
   for (absl::string_view line : input) {
     int64_t delta = 0;
-    if (RE2::FullMatch(line, "forward (\\d+)", &delta)) {
+    if (RE2::FullMatch(line, kForwardRE, &delta)) {
       p.x += delta;
-    } else if (RE2::FullMatch(line, "up (\\d+)", &delta)) {
+    } else if (RE2::FullMatch(line, kUpRE, &delta)) {
       p.y -= delta;
-    } else if (RE2::FullMatch(line, "down (\\d+)", &delta)) {
+    } else if (RE2::FullMatch(line, kDownRE, &delta)) {
       p.y += delta;
     } else {
       return Error("Bad line: ", line);
@@ -38,16 +41,19 @@ absl::StatusOr<std::string> Day_2021_02::Part1(
 
 absl::StatusOr<std::string> Day_2021_02::Part2(
     absl::Span<absl::string_view> input) const {
+  static const RE2 kForwardRE("forward (\\d+)");
+  static const RE2 kUpRE("up (\\d+)");
+  static const RE2 kDownRE("down (\\d+)");
   Point p{0, 0};
   int64_t aim = 0;
   for (absl::string_view line : input) {
     int64_t delta = 0;
-    if (RE2::FullMatch(line, "forward (\\d+)", &delta)) {
+    if (RE2::FullMatch(line, kForwardRE, &delta)) {
       p.x += delta;
       p.y += aim * delta;
-    } else if (RE2::FullMatch(line, "up (\\d+)", &delta)) {
+    } else if (RE2::FullMatch(line, kUpRE, &delta)) {
       aim -= delta;
-    } else if (RE2::FullMatch(line, "down (\\d+)", &delta)) {
+    } else if (RE2::FullMatch(line, kDownRE, &delta)) {
       aim += delta;
     } else {
       return Error("Bad line: ", line);
