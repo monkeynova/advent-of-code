@@ -1,10 +1,18 @@
 #!/bin/sh
  
 TMP_FILE=/tmp/benchmark_out.txt.$$
+# SUBPATH="advent_of_code/2021"
+if [ -z "$SUBPATH" ]
+then
+  SUBPATH="."
+  BAZEL_TARGETS="..."
+else
+  BAZEL_TARGETS="${SUBPATH}/..."
+fi
 
 echo > $TMP_FILE
-for t in `bazel query 'attr("tags", "benchmark", ...)'`
+for t in `bazelisk query 'attr("tags", "benchmark", '${BAZEL_TARGETS}'l)'`
 do
-  bazel run -c opt $t -- --benchmark --run_long_tests=1m | grep BM_ >> $TMP_FILE
+  bazelisk run -c opt $t -- --benchmark --run_long_tests=1m | grep BM_ >> $TMP_FILE
 done
-benchmark/merge_benchmarks.pl < $TMP_FILE > benchmark/benchmark_`hostname -s`.txt
+benchmark/merge_benchmarks.pl < $TMP_FILE > ${SUBPATH}/benchmark/benchmark_`hostname -s`.txt
