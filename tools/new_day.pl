@@ -37,3 +37,10 @@ system("perl", "-spi", "-e",
                   "s{NewDay}{Day_${year}_${day}}g")),
         map { "advent_of_code/$year/day$day/$_" } values %renames)
   and die $!;
+
+# Non-fatal if clang-format isn't present.
+system("find advent_of_code/$year/day$day -name '*.h' -o -name '*.cc' | " .
+       "xargs clang-format --style=Google -i");
+
+# Non-fatal if buildifier isn't present.
+system("find advent_of_code/$year/day$day -name BUILD | xargs buildifier");
