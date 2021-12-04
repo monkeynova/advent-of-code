@@ -1,7 +1,9 @@
+// clang-format off
 #include "advent_of_code/new_day_path/new_day.h"
 
 #include "advent_of_code/infra/file_benchmark.h"
 #include "gmock/gmock.h"
+// clang-format on
 
 namespace advent_of_code {
 
