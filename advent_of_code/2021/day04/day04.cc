@@ -13,10 +13,8 @@ namespace advent_of_code {
 
 namespace {
 
-struct Board {
-  std::array<std::array<int64_t, 5>, 5> board;
-  std::array<std::array<bool, 5>, 5> selected;
-
+class Board {
+ public:
   static absl::StatusOr<Board> Parse(
       absl::Span<absl::string_view> data) {
     Board build;
@@ -24,15 +22,15 @@ struct Board {
     absl::string_view line_re =
         "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*";
     for (int i = 0; i < 5; ++i) {
-      if (!RE2::FullMatch(data[i], line_re, &build.board[i][0],
-                          &build.board[i][1], &build.board[i][2],
-                          &build.board[i][3], &build.board[i][4])) {
+      if (!RE2::FullMatch(data[i], line_re, &build.board_[i][0],
+                          &build.board_[i][1], &build.board_[i][2],
+                          &build.board_[i][3], &build.board_[i][4])) {
         return AdventDay::Error("Bad board line: ", data[i]);
       }
     }
     for (int i = 0; i < 5; ++i) {
       for (int j = 0; j < 5; ++j) {
-        build.selected[i][j] = false;
+        build.selected_[i][j] = false;
       }
     }
     return build;
@@ -41,8 +39,8 @@ struct Board {
   friend std::ostream& operator<<(std::ostream& o, const Board& b) {
     for (int i = 0; i < 5; ++i) {
       for (int j = 0; j < 5; ++j) {
-        o << b.board[i][j] << " ";
-        if (b.selected[i][j]) {
+        o << b.board_[i][j] << " ";
+        if (b.selected_[i][j]) {
           o << "* ";
         }
       }
@@ -55,8 +53,8 @@ struct Board {
     int64_t score = 0;
     for (int i = 0; i < 5; ++i) {
       for (int j = 0; j < 5; ++j) {
-        if (selected[i][j]) continue;
-        score += board[i][j];
+        if (selected_[i][j]) continue;
+        score += board_[i][j];
       }
     }
     return score;
@@ -65,8 +63,8 @@ struct Board {
   void Mark(int64_t val) {
     for (int i = 0; i < 5; ++i) {
       for (int j = 0; j < 5; ++j) {
-        if (board[i][j] == val) {
-          selected[i][j] = true;
+        if (board_[i][j] == val) {
+          selected_[i][j] = true;
         }
       }
     }
@@ -76,7 +74,7 @@ struct Board {
     for (int i = 0; i < 5; ++i) {
       bool all_row = true;
       for (int j = 0; j < 5; ++j) {
-        if (!selected[i][j]) {
+        if (!selected_[i][j]) {
           all_row = false;
           break;
         }
@@ -84,7 +82,7 @@ struct Board {
       if (all_row) return true;
       bool all_col = true;
       for (int j = 0; j < 5; ++j) {
-        if (!selected[j][i]) {
+        if (!selected_[j][i]) {
           all_col = false;
           break;
         }
@@ -94,6 +92,10 @@ struct Board {
     // diagonals don't count.
     return false;
   }
+
+ private:
+  std::array<std::array<int64_t, 5>, 5> board_;
+  std::array<std::array<bool, 5>, 5> selected_;
 };
 
 }  // namespace
