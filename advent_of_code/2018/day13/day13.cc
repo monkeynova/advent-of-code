@@ -192,8 +192,7 @@ absl::StatusOr<std::string> Day_2018_13::Part1(
     VLOG(1) << "State:\n" << state->DebugString();
     absl::StatusOr<absl::optional<Point>> collision = state->RunStep();
     if (!collision.ok()) return collision.status();
-    if (*collision)
-      return (*collision)->DebugString();
+    if (*collision) return (*collision)->DebugString();
   }
 
   return Error("Left infinite loop");

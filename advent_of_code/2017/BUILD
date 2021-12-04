@@ -21,5 +21,5 @@ cc_test(
         ":knot_hash",
         "@com_google_googletest//:gtest",
         "@com_monkeynova_gunit_main//:test_main",
-    ]
+    ],
 )

@@ -184,8 +184,10 @@ absl::flat_hash_map<int, CharBoard> StepGameOfLineRecursive(
     int depth = depth_and_board.first;
     const CharBoard& in_board = depth_and_board.second;
     CharBoard out_board = in_board;
-    absl::optional<CharBoard> board_minus_one = opt_find(depth_to_board, depth - 1);
-    absl::optional<CharBoard> board_plus_one = opt_find(depth_to_board, depth + 1);
+    absl::optional<CharBoard> board_minus_one =
+        opt_find(depth_to_board, depth - 1);
+    absl::optional<CharBoard> board_plus_one =
+        opt_find(depth_to_board, depth + 1);
     for (Point p : in_board.range()) {
       if (p == Point{2, 2}) {
         if (!board_plus_one) {

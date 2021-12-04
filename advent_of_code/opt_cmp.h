@@ -41,7 +41,8 @@ absl::optional<T> opt_add(absl::optional<T> a, T d) {
 }
 
 template <typename K, typename Container>
-auto opt_find(const Container& c, const K& k) -> absl::optional<std::remove_reference_t<decltype(c.find(k)->second)>> {
+auto opt_find(const Container& c, const K& k)
+    -> absl::optional<std::remove_reference_t<decltype(c.find(k)->second)>> {
   auto it = c.find(k);
   if (it == c.end()) return absl::nullopt;
   return it->second;

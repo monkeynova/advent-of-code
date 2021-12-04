@@ -21,7 +21,7 @@ class Maze {
  public:
   static absl::StatusOr<Maze> Parse(absl::Span<absl::string_view> input) {
     while (!input.empty() && input.back() == "") {
-      input = input.subspan(0, input.size() - 1); 
+      input = input.subspan(0, input.size() - 1);
     }
     absl::StatusOr<CharBoard> with_portals = CharBoard::Parse(input);
     if (!with_portals.ok()) return with_portals.status();
@@ -37,19 +37,23 @@ class Maze {
     for (Point p : range) {
       if (with_portals->at(p) == '.') {
         if (IsCapAlpha(with_portals->at(p + Point{0, -1}))) {
-          char portal_name[] = {with_portals->at(p + Point{0, -2}), with_portals->at(p + Point{0, -1}), '\0'};
+          char portal_name[] = {with_portals->at(p + Point{0, -2}),
+                                with_portals->at(p + Point{0, -1}), '\0'};
           portals[std::string(portal_name)].push_back(p - Point{2, 2});
         }
         if (IsCapAlpha(with_portals->at(p + Point{0, 1}))) {
-          char portal_name[] = {with_portals->at(p + Point{0, 1}), with_portals->at(p + Point{0, 2}), '\0'};
+          char portal_name[] = {with_portals->at(p + Point{0, 1}),
+                                with_portals->at(p + Point{0, 2}), '\0'};
           portals[std::string(portal_name)].push_back(p - Point{2, 2});
         }
         if (IsCapAlpha(with_portals->at(p + Point{-1, 0}))) {
-          char portal_name[] = {with_portals->at(p + Point{-2, 0}), with_portals->at(p + Point{-1, 0}), '\0'};
+          char portal_name[] = {with_portals->at(p + Point{-2, 0}),
+                                with_portals->at(p + Point{-1, 0}), '\0'};
           portals[std::string(portal_name)].push_back(p - Point{2, 2});
         }
         if (IsCapAlpha(with_portals->at(p + Point{1, 0}))) {
-          char portal_name[] = {with_portals->at(p + Point{1, 0}), with_portals->at(p + Point{2, 0}), '\0'};
+          char portal_name[] = {with_portals->at(p + Point{1, 0}),
+                                with_portals->at(p + Point{2, 0}), '\0'};
           portals[std::string(portal_name)].push_back(p - Point{2, 2});
         }
       }
@@ -77,9 +81,9 @@ class Maze {
       ret.portals_.emplace(points[1], points[0]);
     }
 
-    VLOG(1) << "\nBoard:\n" << ret.board_
-            << "\nStart: " << ret.start_
-            << "; End: " << ret.end_ << "\nPortals:\n"
+    VLOG(1) << "\nBoard:\n"
+            << ret.board_ << "\nStart: " << ret.start_ << "; End: " << ret.end_
+            << "\nPortals:\n"
             << absl::StrJoin(
                    ret.portals_, "\n",
                    [](std::string* out, const std::pair<Point, Point>& portal) {

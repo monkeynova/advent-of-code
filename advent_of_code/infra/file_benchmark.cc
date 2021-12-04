@@ -122,8 +122,7 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
   switch (part) {
     case 1: {
       for (auto _ : state) {
-        absl::StatusOr<std::string> st =
-            day->Part1(lines_span);
+        absl::StatusOr<std::string> st = day->Part1(lines_span);
         if (!st.ok()) {
           return BM_Day_SetError(state, st.status().message());
         }
@@ -132,8 +131,7 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
     }
     case 2: {
       for (auto _ : state) {
-        absl::StatusOr<std::string> st =
-            day->Part2(lines_span);
+        absl::StatusOr<std::string> st = day->Part2(lines_span);
         if (!st.ok()) {
           return BM_Day_SetError(state, st.status().message());
         }

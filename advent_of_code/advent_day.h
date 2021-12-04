@@ -36,14 +36,12 @@ class AdventDay {
     return absl::StrCat(val);
   }
 
-  absl::StatusOr<std::string> IntReturn(
-      absl::StatusOr<int64_t> val) const {
+  absl::StatusOr<std::string> IntReturn(absl::StatusOr<int64_t> val) const {
     if (!val.ok()) return val.status();
     return absl::StrCat(*val);
   }
 
-  absl::StatusOr<std::string> IntReturn(
-      absl::optional<int64_t> val) const {
+  absl::StatusOr<std::string> IntReturn(absl::optional<int64_t> val) const {
     if (!val) return absl::NotFoundError("Not found");
     return absl::StrCat(*val);
   }

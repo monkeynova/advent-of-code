@@ -15,8 +15,7 @@ namespace {
 
 class Board {
  public:
-  static absl::StatusOr<Board> Parse(
-      absl::Span<absl::string_view> data) {
+  static absl::StatusOr<Board> Parse(absl::Span<absl::string_view> data) {
     Board build;
     if (data.size() != 5) return AdventDay::Error("Bad size");
     absl::string_view line_re =

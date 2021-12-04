@@ -26,9 +26,12 @@ absl::StatusOr<std::string> Day_2021_03::Part1(
     int64_t zeros = 0;
     for (absl::string_view rec : input) {
       if (rec.size() <= i) return Error("Bad line: ", rec);
-      if (rec[i] == '1') ++ones;
-      else if (rec[i] == '0') ++zeros;
-      else return Error("Bad bit");
+      if (rec[i] == '1')
+        ++ones;
+      else if (rec[i] == '0')
+        ++zeros;
+      else
+        return Error("Bad bit");
     }
     if (ones == zeros) return Error("Same rate");
     if (ones > zeros) {
@@ -50,17 +53,22 @@ absl::StatusOr<std::string> Day_2021_03::Part2(
     int64_t zeros = 0;
     for (absl::string_view rec : o2_set) {
       if (rec.size() <= i) return Error("Bad line: ", rec);
-      if (rec[i] == '1') ++ones;
-      else if (rec[i] == '0') ++zeros;
-      else return Error("Bad bit");
+      if (rec[i] == '1')
+        ++ones;
+      else if (rec[i] == '0')
+        ++zeros;
+      else
+        return Error("Bad bit");
     }
     char delete_char = ones >= zeros ? '0' : '1';
     for (auto it = o2_set.begin(); it != o2_set.end();) {
-      if ((*it)[i] == delete_char) o2_set.erase(it++);
-      else ++it;
+      if ((*it)[i] == delete_char)
+        o2_set.erase(it++);
+      else
+        ++it;
     }
 
-    if (o2_set.size() == 1) break;    
+    if (o2_set.size() == 1) break;
   }
   if (o2_set.size() != 1) return Error("Cannot find o2_set");
 
@@ -70,17 +78,22 @@ absl::StatusOr<std::string> Day_2021_03::Part2(
     int64_t zeros = 0;
     for (absl::string_view rec : co2_set) {
       if (rec.size() <= i) return Error("Bad line: ", rec);
-      if (rec[i] == '1') ++ones;
-      else if (rec[i] == '0') ++zeros;
-      else return Error("Bad bit");
+      if (rec[i] == '1')
+        ++ones;
+      else if (rec[i] == '0')
+        ++zeros;
+      else
+        return Error("Bad bit");
     }
     char delete_char = ones >= zeros ? '1' : '0';
     for (auto it = co2_set.begin(); it != co2_set.end();) {
-      if ((*it)[i] == delete_char) co2_set.erase(it++);
-      else ++it;
+      if ((*it)[i] == delete_char)
+        co2_set.erase(it++);
+      else
+        ++it;
     }
 
-    if (co2_set.size() == 1) break;    
+    if (co2_set.size() == 1) break;
   }
   if (co2_set.size() != 1) return Error("Cannot find co2_set");
 
