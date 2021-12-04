@@ -14,17 +14,29 @@ namespace advent_of_code {
 namespace {
 
 struct Board {
-  Board() {
-    for (int i = 0; i < 5; ++i) {
-      for (int j = 0; j < 5; ++j) {
-        board[i][j] = -1;
-        selected[i][j] = false;
-      }
-    }
-  }
-
   std::array<std::array<int64_t, 5>, 5> board;
   std::array<std::array<bool, 5>, 5> selected;
+
+  static absl::StatusOr<Board> Parse(
+      absl::Span<absl::string_view> data) {
+    Board build;
+    if (data.size() != 5) return AdventDay::Error("Bad size");
+    absl::string_view line_re =
+        "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*";
+    for (int i = 0; i < 5; ++i) {
+      if (!RE2::FullMatch(data[i], line_re, &build.board[i][0],
+                          &build.board[i][1], &build.board[i][2],
+                          &build.board[i][3], &build.board[i][4])) {
+        return AdventDay::Error("Bad board line: ", data[i]);
+      }
+    }
+    for (int i = 0; i < 5; ++i) {
+      for (int j = 0; j < 5; ++j) {
+        build.selected[i][j] = false;
+      }
+    }
+    return build;
+  }
 
   friend std::ostream& operator<<(std::ostream& o, const Board& b) {
     for (int i = 0; i < 5; ++i) {
@@ -79,24 +91,8 @@ struct Board {
       }
       if (all_col) return true;
     }
-    return false;
     // diagonals don't count.
-    bool all_diag = true;
-    for (int i = 0; i < 5; ++i) {
-      if (!selected[i][i]) {
-        all_diag = false;
-        break;
-      }
-    }
-    if (all_diag) return true;
-    all_diag = true;
-    for (int i = 0; i < 5; ++i) {
-      if (!selected[i][4 - i]) {
-        all_diag = false;
-        break;
-      }
-    }
-    return all_diag;
+    return false;
   }
 };
 
@@ -114,14 +110,10 @@ absl::StatusOr<std::string> Day_2021_04::Part1(
 
   std::vector<Board> boards;
   for (int64_t lidx = 2; lidx < input.size(); lidx += 6) {
-    Board build;
-    for (int i = 0; i < 5; ++i) {
-      if (!RE2::FullMatch(input[lidx + i], "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*",
-                          &build.board[i][0], &build.board[i][1], &build.board[i][2], &build.board[i][3], &build.board[i][4])) {
-        return Error("Bad board line: ", input[lidx]);
-      }
-    }
-    boards.push_back(build);
+    if (!input[lidx - 1].empty()) return Error("Bad spacer");
+    absl::StatusOr<Board> board = Board::Parse(input.subspan(lidx, 5));
+    if (!board.ok()) return board.status();
+    boards.push_back(*board);
   }
 
   for (int64_t num : numbers) {
@@ -134,7 +126,6 @@ absl::StatusOr<std::string> Day_2021_04::Part1(
       }
     }
   }
-
 
   return Error("No board found");
 }
@@ -151,14 +142,10 @@ absl::StatusOr<std::string> Day_2021_04::Part2(
 
   std::vector<Board> boards;
   for (int64_t lidx = 2; lidx < input.size(); lidx += 6) {
-    Board build;
-    for (int i = 0; i < 5; ++i) {
-      if (!RE2::FullMatch(input[lidx + i], "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*",
-                          &build.board[i][0], &build.board[i][1], &build.board[i][2], &build.board[i][3], &build.board[i][4])) {
-        return Error("Bad board line: ", input[lidx]);
-      }
-    }
-    boards.push_back(build);
+    if (!input[lidx - 1].empty()) return Error("Bad spacer");
+    absl::StatusOr<Board> board = Board::Parse(input.subspan(lidx, 5));
+    if (!board.ok()) return board.status();
+    boards.push_back(*board);
   }
 
   for (int64_t num : numbers) {
@@ -177,7 +164,6 @@ absl::StatusOr<std::string> Day_2021_04::Part2(
     }
     boards = std::move(new_boards);
   }
-
 
   return Error("No board found");
 }
