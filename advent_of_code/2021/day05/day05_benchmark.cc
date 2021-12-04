@@ -1,5 +1,4 @@
 #include "advent_of_code/2021/day05/day05.h"
-
 #include "advent_of_code/infra/file_benchmark.h"
 #include "gmock/gmock.h"
 
