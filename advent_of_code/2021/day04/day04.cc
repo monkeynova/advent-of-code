@@ -149,17 +149,12 @@ absl::StatusOr<std::string> Day_2021_04::Part2(
     for (Board& b : boards) {
       if (auto st = b.Mark(num); !st.ok()) return st;
     }
-    std::vector<Board> new_boards;
-    for (const Board& b : boards) {
-      if (!b.IsWin()) {
-        new_boards.push_back(b);
-      }
-    }
-    if (new_boards.empty()) {
+    auto it = std::remove_if(boards.begin(), boards.end(), [](const Board& b) { return b.IsWin(); });
+    if (it == boards.begin()) {
       if (boards.size() != 1) return Error("Non unique");
       return IntReturn(boards[0].Score() * num);
     }
-    boards = std::move(new_boards);
+    boards.erase(it, boards.end());
   }
 
   return Error("No board found");
