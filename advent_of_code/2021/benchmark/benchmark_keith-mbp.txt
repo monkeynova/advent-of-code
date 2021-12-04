@@ -1,20 +1,20 @@
 
-BM_Day<Day_2021_01>/0    1069 ns    1068 ns  692117        Part: 1
-BM_Day<Day_2021_01>/1   29575 ns   29524 ns   22728        Part: 1
-BM_Day<Day_2021_01>/2     993 ns     993 ns  755246        Part: 2
-BM_Day<Day_2021_01>/3   29632 ns   29620 ns   23791        Part: 2
-BM_Day<Day_2021_02>/0    1286 ns    1284 ns  545966        Part: 1
-BM_Day<Day_2021_02>/1  212431 ns  211837 ns    3289        Part: 1
-BM_Day<Day_2021_02>/2    1198 ns    1197 ns  590518        Part: 2
-BM_Day<Day_2021_02>/3  211958 ns  211842 ns    3278        Part: 2
-BM_Day<Day_2021_03>/0     106 ns     106 ns 6695617        Part: 1
-BM_Day<Day_2021_03>/1   55584 ns   55530 ns   11709        Part: 1
-BM_Day<Day_2021_03>/2    1340 ns    1339 ns  482722        Part: 2
-BM_Day<Day_2021_03>/3  144271 ns  144191 ns    4665        Part: 2
-BM_Day<Day_2021_04>/0  171117 ns  169012 ns    4240        Part: 1
-BM_Day<Day_2021_04>/1 5687098 ns 5610382 ns     110        Part: 1
-BM_Day<Day_2021_04>/2  169569 ns  169484 ns    4028        Part: 2
-BM_Day<Day_2021_04>/3 5722344 ns 5720374 ns     115        Part: 2
+BM_Day<Day_2021_01>/0    1041 ns    1040 ns  701459        Part: 1
+BM_Day<Day_2021_01>/1   30445 ns   30426 ns   22171        Part: 1
+BM_Day<Day_2021_01>/2     993 ns     992 ns  714709        Part: 2
+BM_Day<Day_2021_01>/3   29545 ns   29529 ns   23233        Part: 2
+BM_Day<Day_2021_02>/0    1280 ns    1279 ns  549977        Part: 1
+BM_Day<Day_2021_02>/1  221650 ns  221517 ns    3026        Part: 1
+BM_Day<Day_2021_02>/2    1277 ns    1276 ns  566581        Part: 2
+BM_Day<Day_2021_02>/3  221710 ns  221619 ns    3253        Part: 2
+BM_Day<Day_2021_03>/0     106 ns     106 ns 6219679        Part: 1
+BM_Day<Day_2021_03>/1   56100 ns   56079 ns   12336        Part: 1
+BM_Day<Day_2021_03>/2    1314 ns    1311 ns  500501        Part: 2
+BM_Day<Day_2021_03>/3  149223 ns  149002 ns    4805        Part: 2
+BM_Day<Day_2021_04>/0   24673 ns   24654 ns   27958        Part: 1
+BM_Day<Day_2021_04>/1  742615 ns  742272 ns     887        Part: 1
+BM_Day<Day_2021_04>/2   31018 ns   30993 ns   22311        Part: 2
+BM_Day<Day_2021_04>/3 1227581 ns 1227007 ns     589        Part: 2
 BM_Day<Day_2021_05>/0      ERROR  OCCURRED:    'Not implemented'
 BM_Day<Day_2021_05>/1      ERROR  OCCURRED:    'Not implemented'
 BM_Day<Day_2021_05>/2      ERROR  OCCURRED:    'Not implemented'

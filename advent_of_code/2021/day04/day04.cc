@@ -19,7 +19,8 @@ class Board {
   static absl::StatusOr<Board> Parse(absl::Span<absl::string_view> data) {
     Board build;
     if (data.size() != 5) return AdventDay::Error("Bad size");
-    RE2 line_re("\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*");
+    static const RE2 line_re(
+        "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*");
     for (int i = 0; i < 5; ++i) {
       if (!RE2::FullMatch(data[i], line_re, &build.board_[i][0],
                           &build.board_[i][1], &build.board_[i][2],
