@@ -64,6 +64,9 @@ absl::StatusOr<std::string> Day_2021_05::Part2(
       return Error("Bad line: ", line);
     }
     Point dir = p2 - p1;
+    if (dir.x != 0 && dir.y != 0 && dir.x != dir.y && dir.x != -dir.y) {
+      return Error("Found non-0/45/90 degree slope: ", dir.DebugString());
+    }
     dir.x = dir.x > 0 ? 1 : dir.x < 0 ? -1 : 0;
     dir.y = dir.y > 0 ? 1 : dir.y < 0 ? -1 : 0;
     for (Point p = p1; p != p2; p += dir) {
