@@ -26,8 +26,8 @@ absl::StatusOr<std::string> Day_2018_03::Part1(
   int dupes = 0;
   for (absl::string_view row : input) {
     PointRectangle r;
-    if (!RE2::FullMatch(row, "#\\d+ @ (\\d+,\\d+): (\\d+x\\d+)", r.min.Capture(),
-                        r.max.Capture())) {
+    if (!RE2::FullMatch(row, "#\\d+ @ (\\d+,\\d+): (\\d+x\\d+)",
+                        r.min.Capture(), r.max.Capture())) {
       return Error("Bad input: ", row);
     }
     r.max.x += r.min.x - 1;
@@ -55,8 +55,8 @@ absl::StatusOr<std::string> Day_2018_03::Part2(
     absl::string_view row = input[i];
     PointRectangle r;
     int idx = -1;
-    if (!RE2::FullMatch(row, "#\\d+ @ (\\d+,\\d+): (\\d+x\\d+)", r.min.Capture(),
-                        r.max.Capture())) {
+    if (!RE2::FullMatch(row, "#\\d+ @ (\\d+,\\d+): (\\d+x\\d+)",
+                        r.min.Capture(), r.max.Capture())) {
       return Error("Bad input: ", row);
     }
     if (idx != i + 1) return Error("Bad numbering");

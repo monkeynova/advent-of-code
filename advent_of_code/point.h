@@ -16,16 +16,14 @@ struct Point {
   int y;
 
   static bool RE2Parse(const char* str, size_t n, void* dest) {
-    std::pair<absl::string_view, absl::string_view> coord_str =
-      absl::StrSplit(absl::string_view(str, n), absl::MaxSplits(absl::ByAnyChar(",x"), 2));
+    std::pair<absl::string_view, absl::string_view> coord_str = absl::StrSplit(
+        absl::string_view(str, n), absl::MaxSplits(absl::ByAnyChar(",x"), 2));
     if (!absl::SimpleAtoi(coord_str.first, &((Point*)dest)->x)) return false;
     if (!absl::SimpleAtoi(coord_str.second, &((Point*)dest)->y)) return false;
     return true;
   }
 
-  RE2::Arg Capture() {
-    return RE2::Arg(this, RE2Parse);
-  }
+  RE2::Arg Capture() { return RE2::Arg(this, RE2Parse); }
 
   constexpr Point operator*(int s) const { return {.x = s * x, .y = s * y}; }
 
