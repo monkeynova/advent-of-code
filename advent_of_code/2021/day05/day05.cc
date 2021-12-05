@@ -30,22 +30,12 @@ absl::StatusOr<std::string> Day_2021_05::Part1(
                         &p2.x, &p2.y)) {
       return Error("Bad line: ", line);
     }
-    if (p1.x == p2.x) {
-      if (p1.y > p2.y) {
-        std::swap(p1, p2);
-      }
-      for (int y = p1.y; y <= p2.y; ++y) {
-        ++counts[{p1.x, y}];
-      }
+    Point dir = (p2 - p1).min_step();
+    if (dir.dist() > 1) continue;
+    for (Point p = p1; p != p2; p += dir) {
+      ++counts[p];
     }
-    if (p1.y == p2.y) {
-      if (p1.x > p2.x) {
-        std::swap(p1, p2);
-      }
-      for (int x = p1.x; x <= p2.x; ++x) {
-        ++counts[{x, p1.y}];
-      }
-    }
+    ++counts[p2];
   }
   int64_t ret = 0;
   for (const auto& [_, count] : counts) {
