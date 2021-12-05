@@ -21,13 +21,12 @@ namespace {
 
 absl::StatusOr<std::string> Day_2021_05::Part1(
     absl::Span<absl::string_view> input) const {
-  RE2 line_re("(\\d+),(\\d+) -> (\\d+),(\\d+)");
+  RE2 line_re("(\\d+,\\d+) -> (\\d+,\\d+)");
   absl::flat_hash_map<Point, int64_t> counts;
   for (absl::string_view line : input) {
     Point p1;
     Point p2;
-    if (!RE2::FullMatch(line, line_re, &p1.x, &p1.y,
-                        &p2.x, &p2.y)) {
+    if (!RE2::FullMatch(line, line_re, p1.Capture(), p2.Capture())) {
       return Error("Bad line: ", line);
     }
     Point dir = (p2 - p1).min_step();
@@ -46,12 +45,12 @@ absl::StatusOr<std::string> Day_2021_05::Part1(
 
 absl::StatusOr<std::string> Day_2021_05::Part2(
     absl::Span<absl::string_view> input) const {
-  RE2 line_re("(\\d+),(\\d+) -> (\\d+),(\\d+)");
+  RE2 line_re("(\\d+,\\d+) -> (\\d+,\\d+)");
   absl::flat_hash_map<Point, int64_t> counts;
   for (absl::string_view line : input) {
     Point p1;
     Point p2;
-    if (!RE2::FullMatch(line, line_re, &p1.x, &p1.y, &p2.x, &p2.y)) {
+    if (!RE2::FullMatch(line, line_re, p1.Capture(), p2.Capture())) {
       return Error("Bad line: ", line);
     }
     Point dir = (p2 - p1).min_step();

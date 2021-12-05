@@ -167,8 +167,7 @@ absl::StatusOr<std::string> Day_2018_22::Part1(
     return Error("No depth");
   }
   Point target;
-  if (!RE2::FullMatch(input[1], "target: (\\d+),(\\d+)", &target.x,
-                      &target.y)) {
+  if (!RE2::FullMatch(input[1], "target: (\\d+,\\d+)", target.Capture())) {
     return Error("No target");
   }
   Map map(depth, target);
@@ -190,8 +189,7 @@ absl::StatusOr<std::string> Day_2018_22::Part2(
     return Error("No depth");
   }
   Point target;
-  if (!RE2::FullMatch(input[1], "target: (\\d+),(\\d+)", &target.x,
-                      &target.y)) {
+  if (!RE2::FullMatch(input[1], "target: (\\d+,\\d+)", target.Capture())) {
     return Error("No target");
   }
   Map map(depth, target);
