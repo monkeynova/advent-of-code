@@ -153,6 +153,18 @@ struct Point3 {
   int y;
   int z;
 
+  static bool RE2Parse(const char* str, size_t n, void* dest) {
+    std::vector<absl::string_view> coord_str = absl::StrSplit(
+        absl::string_view(str, n), absl::MaxSplits(absl::ByAnyChar(",x"), 3));
+    if (coord_str.size() != 3) return false;
+    if (!absl::SimpleAtoi(coord_str[0], &((Point3*)dest)->x)) return false;
+    if (!absl::SimpleAtoi(coord_str[1], &((Point3*)dest)->y)) return false;
+    if (!absl::SimpleAtoi(coord_str[2], &((Point3*)dest)->z)) return false;
+    return true;
+  }
+
+  RE2::Arg Capture() { return RE2::Arg(this, RE2Parse); }
+
   constexpr Point3 operator*(int s) const {
     return {.x = s * x, .y = s * y, .z = s * z};
   }
@@ -234,6 +246,19 @@ struct Point4 {
   int y;
   int z;
   int w;
+
+  static bool RE2Parse(const char* str, size_t n, void* dest) {
+    std::vector<absl::string_view> coord_str = absl::StrSplit(
+        absl::string_view(str, n), absl::MaxSplits(absl::ByAnyChar(",x"), 4));
+    if (coord_str.size() != 4) return false;
+    if (!absl::SimpleAtoi(coord_str[0], &((Point4*)dest)->x)) return false;
+    if (!absl::SimpleAtoi(coord_str[1], &((Point4*)dest)->y)) return false;
+    if (!absl::SimpleAtoi(coord_str[2], &((Point4*)dest)->z)) return false;
+    if (!absl::SimpleAtoi(coord_str[3], &((Point4*)dest)->w)) return false;
+    return true;
+  }
+
+  RE2::Arg Capture() { return RE2::Arg(this, RE2Parse); }
 
   constexpr Point4 operator*(int s) const {
     return {.x = s * x, .y = s * y, .z = s * z, .w = s * w};

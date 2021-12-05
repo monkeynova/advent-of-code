@@ -31,10 +31,9 @@ absl::StatusOr<std::vector<Particle>> Parse(
     Particle p;
     if (!RE2::FullMatch(
             row,
-            "p=<(-?\\d+),(-?\\d+),(-?\\d+)>, v=<(-?\\d+),(-?\\d+),(-?\\d+)>, "
-            "a=<(-?\\d+),(-?\\d+),(-?\\d+)>",
-            &p.p.x, &p.p.y, &p.p.z, &p.v.x, &p.v.y, &p.v.z, &p.a.x, &p.a.y,
-            &p.a.z)) {
+            "p=<(-?\\d+,-?\\d+,-?\\d+)>, v=<(-?\\d+,-?\\d+,-?\\d+)>, "
+            "a=<(-?\\d+,-?\\d+,-?\\d+)>",
+            p.p.Capture(), p.v.Capture(), p.a.Capture())) {
       return AdventDay::Error("Bad line: ", row);
     }
     particles.push_back(p);

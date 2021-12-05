@@ -24,7 +24,7 @@ absl::StatusOr<std::string> Day_2018_06::Part1(
   PointRectangle r{{0, 0}, {0, 0}};
   for (absl::string_view row : input) {
     Point p;
-    if (!RE2::FullMatch(row, "(\\d+), (\\d+)", &p.x, &p.y)) {
+    if (!RE2::FullMatch(row, "(\\d+, \\d+)", p.Capture())) {
       return Error("Bad point: ", row);
     }
     points.push_back(p);
@@ -77,7 +77,7 @@ absl::StatusOr<std::string> Day_2018_06::Part2(
   PointRectangle r{{0, 0}, {0, 0}};
   for (absl::string_view row : input) {
     Point p;
-    if (!RE2::FullMatch(row, "(\\d+), (\\d+)", &p.x, &p.y)) {
+    if (!RE2::FullMatch(row, "(\\d+, \\d+)", p.Capture())) {
       return Error("Bad point: ", row);
     }
     points.push_back(p);

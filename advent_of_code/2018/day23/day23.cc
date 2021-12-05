@@ -31,8 +31,8 @@ absl::StatusOr<std::vector<NanoBot>> Parse(
   std::vector<NanoBot> ret;
   for (absl::string_view row : input) {
     NanoBot nb;
-    if (!RE2::FullMatch(row, "pos=<(-?\\d+),(-?\\d+),(-?\\d+)>, r=(-?\\d+)",
-                        &nb.p.x, &nb.p.y, &nb.p.z, &nb.r)) {
+    if (!RE2::FullMatch(row, "pos=<(-?\\d+,-?\\d+,-?\\d+)>, r=(-?\\d+)",
+                        nb.p.Capture(), &nb.r)) {
       return AdventDay::Error("Bad input: ", row);
     }
     ret.push_back(nb);

@@ -29,9 +29,9 @@ absl::StatusOr<std::string> Day_2018_10::Part1(
   for (absl::string_view row : input) {
     Light l;
     if (!RE2::FullMatch(row,
-                        "position=<\\s*(-?\\d+),\\s*(-?\\d+)> "
-                        "velocity=<\\s*(-?\\d+),\\s*(-?\\d+)>",
-                        &l.p.x, &l.p.y, &l.v.x, &l.v.y)) {
+                        "position=<\\s*(-?\\d+,\\s*-?\\d+)> "
+                        "velocity=<\\s*(-?\\d+,\\s*-?\\d+)>",
+                        l.p.Capture(), l.v.Capture())) {
       return Error("Bad row: ", row);
     }
     lights.push_back(l);
@@ -65,9 +65,9 @@ absl::StatusOr<std::string> Day_2018_10::Part2(
   for (absl::string_view row : input) {
     Light l;
     if (!RE2::FullMatch(row,
-                        "position=<\\s*(-?\\d+),\\s*(-?\\d+)> "
-                        "velocity=<\\s*(-?\\d+),\\s*(-?\\d+)>",
-                        &l.p.x, &l.p.y, &l.v.x, &l.v.y)) {
+                        "position=<\\s*(-?\\d+,\\s*-?\\d+)> "
+                        "velocity=<\\s*(-?\\d+,\\s*-?\\d+)>",
+                        l.p.Capture(), l.v.Capture())) {
       return Error("Bad row: ", row);
     }
     lights.push_back(l);
