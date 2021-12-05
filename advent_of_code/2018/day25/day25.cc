@@ -59,8 +59,7 @@ absl::StatusOr<std::string> Day_2018_25::Part1(
   std::vector<Point4> points;
   for (absl::string_view row : input) {
     Point4 p;
-    if (!RE2::FullMatch(row, "(-?\\d+),(-?\\d+),(-?\\d+),(-?\\d+)", &p.x, &p.y,
-                        &p.z, &p.w)) {
+    if (!RE2::FullMatch(row, "(-?\\d+,-?\\d+,-?\\d+,-?\\d+)", p.Capture())) {
       return Error("Bad input: ", row);
     }
     points.push_back(p);
