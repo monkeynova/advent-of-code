@@ -55,7 +55,7 @@ absl::StatusOr<std::string> Day_2018_03::Part2(
     absl::string_view row = input[i];
     PointRectangle r;
     int idx = -1;
-    if (!RE2::FullMatch(row, "#\\d+ @ (\\d+,\\d+): (\\d+x\\d+)",
+    if (!RE2::FullMatch(row, "#(\\d+) @ (\\d+,\\d+): (\\d+x\\d+)", &idx,
                         r.min.Capture(), r.max.Capture())) {
       return Error("Bad input: ", row);
     }
