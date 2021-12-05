@@ -25,7 +25,8 @@ absl::StatusOr<std::string> Day_2021_05::Part1(
   for (absl::string_view line : input) {
     Point p1;
     Point p2;
-    if (!RE2::FullMatch(line, "(\\d+),(\\d+) -> (\\d+),(\\d+)", &p1.x, &p1.y, &p2.x, &p2.y)) {
+    if (!RE2::FullMatch(line, "(\\d+),(\\d+) -> (\\d+),(\\d+)", &p1.x, &p1.y,
+                        &p2.x, &p2.y)) {
       return Error("Bad line: ", line);
     }
     if (p1.x == p2.x) {
@@ -58,7 +59,8 @@ absl::StatusOr<std::string> Day_2021_05::Part2(
   for (absl::string_view line : input) {
     Point p1;
     Point p2;
-    if (!RE2::FullMatch(line, "(\\d+),(\\d+) -> (\\d+),(\\d+)", &p1.x, &p1.y, &p2.x, &p2.y)) {
+    if (!RE2::FullMatch(line, "(\\d+),(\\d+) -> (\\d+),(\\d+)", &p1.x, &p1.y,
+                        &p2.x, &p2.y)) {
       return Error("Bad line: ", line);
     }
     Point dir = p2 - p1;
