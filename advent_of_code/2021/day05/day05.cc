@@ -64,12 +64,10 @@ absl::StatusOr<std::string> Day_2021_05::Part2(
     if (!RE2::FullMatch(line, line_re, &p1.x, &p1.y, &p2.x, &p2.y)) {
       return Error("Bad line: ", line);
     }
-    Point dir = p2 - p1;
-    if (dir.x != 0 && dir.y != 0 && dir.x != dir.y && dir.x != -dir.y) {
+    Point dir = (p2 - p1).min_step();
+    if (dir.dist() > 2) {
       return Error("Found non-0/45/90 degree slope: ", dir.DebugString());
     }
-    dir.x = dir.x > 0 ? 1 : dir.x < 0 ? -1 : 0;
-    dir.y = dir.y > 0 ? 1 : dir.y < 0 ? -1 : 0;
     for (Point p = p1; p != p2; p += dir) {
       ++counts[p];
     }
