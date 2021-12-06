@@ -16,7 +16,6 @@ namespace {
 
 int64_t SimulateBrute(std::vector<int64_t> fish, int64_t steps) {
   for (int day = 0; day < steps; ++day) {
-    VLOG(1) << day << ": " << fish.size();
     int64_t to_add = 0;
     for (int64_t& n : fish) {
       --n;
@@ -34,20 +33,15 @@ int64_t SimulateBrute(std::vector<int64_t> fish, int64_t steps) {
 }
 
 int64_t PerFish(int64_t start, int64_t steps) {
-  if (steps == 0) return 1;
+  // Fish doesn't get a chance to breed.
+  if (steps <= start) return 1;
 
   static absl::flat_hash_map<std::pair<int64_t, int64_t>, int64_t> memo;
   auto key = std::make_pair(start, steps);
   if (auto it = memo.find(key); it != memo.end()) return it->second;
 
-  int64_t ret = 0;
-  if (start == 0) {
-    ret += PerFish(6, steps - 1) + PerFish(8, steps - 1);
-  } else {
-    ret += PerFish(start - 1, steps - 1);
-  }
-
-  return memo[key] = ret;
+  // Count descendents after next breeding step.
+  return memo[key] = PerFish(6, steps - start - 1) + PerFish(8, steps - start - 1);
 }
 
 int64_t SimulateMemo(std::vector<int64_t> fish, int64_t steps) {
