@@ -28,11 +28,12 @@ int64_t CountPopulationAfterBrute(std::vector<int64_t> fish, int64_t steps) {
       fish.push_back(8);
     }
   }
-    
+
   return fish.size();
 }
 
-int64_t CountPopulationAfterUniquePop(std::vector<int64_t> fish, int64_t steps) {
+int64_t CountPopulationAfterUniquePop(std::vector<int64_t> fish,
+                                      int64_t steps) {
   absl::flat_hash_map<int64_t, int64_t> population;
   for (int64_t f : fish) ++population[f];
   for (int day = 0; day < steps; ++day) {
@@ -48,7 +49,7 @@ int64_t CountPopulationAfterUniquePop(std::vector<int64_t> fish, int64_t steps) 
     population = std::move(new_pop);
   }
 
-  int64_t total_count = 0;   
+  int64_t total_count = 0;
   for (const auto& [_, count] : population) {
     total_count += count;
   }
@@ -64,7 +65,8 @@ int64_t PerFish(int64_t start, int64_t steps) {
   if (auto it = memo.find(key); it != memo.end()) return it->second;
 
   // Count descendents after next breeding step.
-  return memo[key] = PerFish(6, steps - start - 1) + PerFish(8, steps - start - 1);
+  return memo[key] =
+             PerFish(6, steps - start - 1) + PerFish(8, steps - start - 1);
 }
 
 int64_t CountPopulationAfterMemo(std::vector<int64_t> fish, int64_t steps) {
@@ -93,10 +95,12 @@ absl::StatusOr<std::string> Day_2021_06::Part1(
 
   constexpr int64_t kDays = 80;
 
-  if (CountPopulationAfter(nums, kDays) != CountPopulationAfterBrute(nums, kDays)) {
+  if (CountPopulationAfter(nums, kDays) !=
+      CountPopulationAfterBrute(nums, kDays)) {
     return Error("Bad brute");
   }
-  if (CountPopulationAfter(nums, kDays) != CountPopulationAfterUniquePop(nums, kDays)) {
+  if (CountPopulationAfter(nums, kDays) !=
+      CountPopulationAfterUniquePop(nums, kDays)) {
     return Error("Bad brute");
   }
 
@@ -115,7 +119,8 @@ absl::StatusOr<std::string> Day_2021_06::Part2(
 
   constexpr int64_t kDays = 256;
 
-  if (CountPopulationAfter(nums, kDays) != CountPopulationAfterUniquePop(nums, kDays)) {
+  if (CountPopulationAfter(nums, kDays) !=
+      CountPopulationAfterUniquePop(nums, kDays)) {
     return Error("Bad brute");
   }
 
