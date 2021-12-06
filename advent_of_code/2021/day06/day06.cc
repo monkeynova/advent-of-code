@@ -56,7 +56,7 @@ int64_t CountPopulationAfterUniquePop(std::vector<int64_t> fish,
   return total_count;
 }
 
-int64_t PerFish(int64_t start, int64_t steps) {
+int64_t CountFishDescendentsAfter(int64_t start, int64_t steps) {
   // Fish doesn't get a chance to breed.
   if (steps <= start) return 1;
 
@@ -65,14 +65,14 @@ int64_t PerFish(int64_t start, int64_t steps) {
   if (auto it = memo.find(key); it != memo.end()) return it->second;
 
   // Count descendents after next breeding step.
-  return memo[key] =
-             PerFish(6, steps - start - 1) + PerFish(8, steps - start - 1);
+  return memo[key] = CountFishDescendentsAfter(6, steps - start - 1) +
+                     CountFishDescendentsAfter(8, steps - start - 1);
 }
 
 int64_t CountPopulationAfterMemo(std::vector<int64_t> fish, int64_t steps) {
   int64_t sum = 0;
   for (int64_t start : fish) {
-    sum += PerFish(start, steps);
+    sum += CountFishDescendentsAfter(start, steps);
   }
   return sum;
 }
@@ -97,11 +97,11 @@ absl::StatusOr<std::string> Day_2021_06::Part1(
 
   if (CountPopulationAfter(nums, kDays) !=
       CountPopulationAfterBrute(nums, kDays)) {
-    return Error("Bad brute");
+    return Error("Bad Brute");
   }
   if (CountPopulationAfter(nums, kDays) !=
       CountPopulationAfterUniquePop(nums, kDays)) {
-    return Error("Bad brute");
+    return Error("Bad UniquePop");
   }
 
   return IntReturn(CountPopulationAfter(nums, kDays));
@@ -121,7 +121,7 @@ absl::StatusOr<std::string> Day_2021_06::Part2(
 
   if (CountPopulationAfter(nums, kDays) !=
       CountPopulationAfterUniquePop(nums, kDays)) {
-    return Error("Bad brute");
+    return Error("Bad UniquePop");
   }
 
   return IntReturn(CountPopulationAfter(nums, kDays));
