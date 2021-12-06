@@ -20,6 +20,8 @@ ABSL_FLAG(std::string, test_file, "",
 ABSL_FLAG(absl::Duration, run_long_tests, absl::Seconds(0),
           "Unless true, tests marked [long=$reason] will be ignored");
 
+ABSL_FLAG(int64_t, part_filter, 0, "If non-zero, only runs the specified part");
+
 namespace advent_of_code {
 
 std::string TestCaseFileName() { return absl::GetFlag(FLAGS_test_file); }
@@ -87,6 +89,11 @@ void RunTestCase(const AdventDay* advent_day,
     lines_span = lines_span.subspan(0, lines_span.size() - 1);
   }
   absl::StatusOr<std::string> output;
+  int64_t part_filter = absl::GetFlag(FLAGS_part_filter);
+  if (part_filter && part_filter != options.GetInt64(kPartOption)) {
+    test_result->set_ignore_test_output(true);
+    return;
+  }
   switch (options.GetInt64(kPartOption)) {
     case 1: {
       output = advent_day->Part1(lines_span);
