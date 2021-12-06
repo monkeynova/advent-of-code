@@ -14,7 +14,7 @@ namespace advent_of_code {
 
 namespace {
 
-int64_t SimulateBrute(std::vector<int64_t> fish, int64_t steps) {
+int64_t CountPopulationAfterBrute(std::vector<int64_t> fish, int64_t steps) {
   for (int day = 0; day < steps; ++day) {
     int64_t to_add = 0;
     for (int64_t& n : fish) {
@@ -32,6 +32,29 @@ int64_t SimulateBrute(std::vector<int64_t> fish, int64_t steps) {
   return fish.size();
 }
 
+int64_t CountPopulationAfterUniquePop(std::vector<int64_t> fish, int64_t steps) {
+  absl::flat_hash_map<int64_t, int64_t> population;
+  for (int64_t f : fish) ++population[f];
+  for (int day = 0; day < steps; ++day) {
+    absl::flat_hash_map<int64_t, int64_t> new_pop;
+    for (const auto& [n, count] : population) {
+      if (n == 0) {
+        new_pop[6] += count;
+        new_pop[8] += count;
+      } else {
+        new_pop[n - 1] += count;
+      }
+    }
+    population = std::move(new_pop);
+  }
+
+  int64_t total_count = 0;   
+  for (const auto& [_, count] : population) {
+    total_count += count;
+  }
+  return total_count;
+}
+
 int64_t PerFish(int64_t start, int64_t steps) {
   // Fish doesn't get a chance to breed.
   if (steps <= start) return 1;
@@ -44,7 +67,7 @@ int64_t PerFish(int64_t start, int64_t steps) {
   return memo[key] = PerFish(6, steps - start - 1) + PerFish(8, steps - start - 1);
 }
 
-int64_t SimulateMemo(std::vector<int64_t> fish, int64_t steps) {
+int64_t CountPopulationAfterMemo(std::vector<int64_t> fish, int64_t steps) {
   int64_t sum = 0;
   for (int64_t start : fish) {
     sum += PerFish(start, steps);
@@ -52,6 +75,9 @@ int64_t SimulateMemo(std::vector<int64_t> fish, int64_t steps) {
   return sum;
 }
 
+int64_t CountPopulationAfter(std::vector<int64_t> fish, int64_t steps) {
+  return CountPopulationAfterMemo(fish, steps);
+}
 
 }  // namespace
 
@@ -65,8 +91,16 @@ absl::StatusOr<std::string> Day_2021_06::Part1(
     nums.push_back(num);
   }
 
-  return IntReturn(SimulateBrute(nums, 80));
+  constexpr int64_t kDays = 80;
 
+  if (CountPopulationAfter(nums, kDays) != CountPopulationAfterBrute(nums, kDays)) {
+    return Error("Bad brute");
+  }
+  if (CountPopulationAfter(nums, kDays) != CountPopulationAfterUniquePop(nums, kDays)) {
+    return Error("Bad brute");
+  }
+
+  return IntReturn(CountPopulationAfter(nums, kDays));
 }
 
 absl::StatusOr<std::string> Day_2021_06::Part2(
@@ -79,7 +113,13 @@ absl::StatusOr<std::string> Day_2021_06::Part2(
     nums.push_back(num);
   }
 
-  return IntReturn(SimulateMemo(nums, 256));
+  constexpr int64_t kDays = 256;
+
+  if (CountPopulationAfter(nums, kDays) != CountPopulationAfterUniquePop(nums, kDays)) {
+    return Error("Bad brute");
+  }
+
+  return IntReturn(CountPopulationAfter(nums, kDays));
 }
 
 }  // namespace advent_of_code
