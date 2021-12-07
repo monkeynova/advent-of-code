@@ -25,21 +25,16 @@ absl::StatusOr<std::string> Day_2021_07::Part1(
       ParseAsInts(absl::StrSplit(input[0], ","));
   if (!nums.ok()) return nums.status();
 
-  const auto& [min_it, max_it] = absl::c_minmax_element(*nums);
-  int64_t best_cost = std::numeric_limits<int64_t>::max();
-  for (int i = *min_it; i <= *max_it; ++i) {
-    int64_t cost = 0;
-    for (int64_t n : *nums) {
-      cost += abs(n - i);
-    }
-    if (cost < best_cost) {
-      best_cost = cost;
-    }
-    // Cost curve is concave up. Once we bounce, stop.
-    if (cost > best_cost) break;
+  // Median minimizes cost function. And if median is between two values any
+  // point between the two values is valid, so we don't need to worry about
+  // odd vs even size for `nums`.
+  absl::c_sort(*nums);
+  int64_t dest = nums->at((nums->size() + 1) / 2);
+  int64_t cost = 0;
+  for (int64_t n : *nums) {
+    cost += abs(n - dest);
   }
-
-  return IntReturn(best_cost);
+  return IntReturn(cost);
 }
 
 absl::StatusOr<std::string> Day_2021_07::Part2(
