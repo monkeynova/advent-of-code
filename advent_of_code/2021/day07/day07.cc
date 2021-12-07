@@ -21,7 +21,8 @@ namespace {
 absl::StatusOr<std::string> Day_2021_07::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  absl::StatusOr<std::vector<int64_t>> nums = ParseAsInts(absl::StrSplit(input[0], ","));
+  absl::StatusOr<std::vector<int64_t>> nums =
+      ParseAsInts(absl::StrSplit(input[0], ","));
   if (!nums.ok()) return nums.status();
 
   const auto& [min_it, max_it] = absl::c_minmax_element(*nums);
@@ -37,14 +38,15 @@ absl::StatusOr<std::string> Day_2021_07::Part1(
     // Cost curve is concave up. Once we bounce, stop.
     if (cost > best_cost) break;
   }
-  
+
   return IntReturn(best_cost);
 }
 
 absl::StatusOr<std::string> Day_2021_07::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  absl::StatusOr<std::vector<int64_t>> nums = ParseAsInts(absl::StrSplit(input[0], ","));
+  absl::StatusOr<std::vector<int64_t>> nums =
+      ParseAsInts(absl::StrSplit(input[0], ","));
   if (!nums.ok()) return nums.status();
 
   const auto& [min_it, max_it] = absl::c_minmax_element(*nums);
@@ -61,7 +63,7 @@ absl::StatusOr<std::string> Day_2021_07::Part2(
     // Cost curve is concave up. Once we bounce, stop.
     if (cost > best_cost) break;
   }
-  
+
   return IntReturn(best_cost);
 }
 
