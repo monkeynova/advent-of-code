@@ -1,22 +1,22 @@
 [part=1]
-Example input
+16,1,2,0,4,2,7,1,2,14
 --
-ERROR: Could not run test: Not implemented
+37
 ==
 
 [part=1]
 @include{advent_of_code/2021/day07/input.txt}
 --
-ERROR: Could not run test: Not implemented
+339321
 ==
 
 [part=2]
-Example input
+16,1,2,0,4,2,7,1,2,14
 --
-ERROR: Could not run test: Not implemented
+168
 ==
 
 [part=2]
 @include{advent_of_code/2021/day07/input.txt}
 --
-ERROR: Could not run test: Not implemented
+95476244
