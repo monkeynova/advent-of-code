@@ -119,17 +119,19 @@ absl::StatusOr<absl::flat_hash_map<char, char>> FindMap(
   for (const auto& [c1, set] : possible) {
     if (set.size() == 1) definitive.insert(*set.begin());
   }
-  bool did_work = true;
-  while (did_work) {
-    did_work = false;
+  bool more_work = true;
+  while (more_work) {
+    more_work = false;
     for (auto& [c1, set] : possible) {
       if (set.size() > 1) {
-        did_work = true;
         absl::flat_hash_set<char> new_set;
         for (char c : set) {
           if (!definitive.contains(c)) new_set.insert(c);
         }
         set = std::move(new_set);
+        if (set.size() > 1) {
+          more_work = true;
+        }
       }
     }
   }
