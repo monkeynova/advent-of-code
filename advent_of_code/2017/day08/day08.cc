@@ -21,40 +21,41 @@ absl::StatusOr<std::string> Day_2017_08::Part1(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<absl::string_view, int> registers;
   for (absl::string_view in : input) {
-    std::vector<absl::string_view> op_and_cond = absl::StrSplit(in, " if ");
-    if (op_and_cond.size() != 2) return Error("Bad if");
+    const auto [op, cond] = AdventDay::PairSplit(in, " if ");
     absl::string_view reg;
-    absl::string_view op;
+    absl::string_view fn;
     int num;
-    if (!RE2::FullMatch(op_and_cond[1], "([a-z]+) (<|>|<=|>=|==|!=) (-?\\d+)",
-                        &reg, &op, &num)) {
-      return Error("Bad cond: ", op_and_cond[1]);
+    if (!RE2::FullMatch(cond, "([a-z]+) (<|>|<=|>=|==|!=) (-?\\d+)",
+                        &reg, &fn, &num)) {
+      return Error("Bad cond: ", cond);
     }
-    if (op == "==") {
+    if (fn == "==") {
       if (registers[reg] != num) continue;
-    } else if (op == "!=") {
+    } else if (fn == "!=") {
       if (registers[reg] == num) continue;
-    } else if (op == "<") {
+    } else if (fn == "<") {
       if (registers[reg] >= num) continue;
-    } else if (op == ">") {
+    } else if (fn == ">") {
       if (registers[reg] <= num) continue;
-    } else if (op == ">=") {
+    } else if (fn == ">=") {
       if (registers[reg] < num) continue;
-    } else if (op == "<=") {
+    } else if (fn == "<=") {
       if (registers[reg] > num) continue;
-    } else
-      return Error("Bad cond: ", op);
-
-    if (!RE2::FullMatch(op_and_cond[0], "([a-z]+) (inc|dec) (-?\\d+)", &reg,
-                        &op, &num)) {
-      return Error("Bad op: ", op_and_cond[0]);
+    } else {
+      return Error("Bad fn: ", fn);
     }
-    if (op == "inc")
-      registers[reg] += num;
-    else if (op == "dec")
-      registers[reg] -= num;
-    else
+
+    if (!RE2::FullMatch(op, "([a-z]+) (inc|dec) (-?\\d+)", &reg,
+                        &fn, &num)) {
       return Error("Bad op: ", op);
+    }
+    if (fn == "inc") {
+      registers[reg] += num;
+    } else if (fn == "dec") {
+      registers[reg] -= num;
+    } else {
+      return Error("Bad fn: ", fn);
+    }
   }
   int max = std::numeric_limits<int>::min();
   for (const auto& [_, val] : registers) max = std::max(max, val);
@@ -66,42 +67,43 @@ absl::StatusOr<std::string> Day_2017_08::Part2(
   absl::flat_hash_map<absl::string_view, int> registers;
   int max = std::numeric_limits<int>::min();
   for (absl::string_view in : input) {
-    std::vector<absl::string_view> op_and_cond = absl::StrSplit(in, " if ");
-    if (op_and_cond.size() != 2) return Error("Bad if");
+    const auto [op, cond] = AdventDay::PairSplit(in, " if ");
     absl::string_view reg;
-    absl::string_view op;
+    absl::string_view fn;
     int num;
-    if (!RE2::FullMatch(op_and_cond[1], "([a-z]+) (<|>|<=|>=|==|!=) (-?\\d+)",
-                        &reg, &op, &num)) {
-      return Error("Bad cond: ", op_and_cond[1]);
+    if (!RE2::FullMatch(cond, "([a-z]+) (<|>|<=|>=|==|!=) (-?\\d+)",
+                        &reg, &fn, &num)) {
+      return Error("Bad cond: ", cond);
     }
-    if (op == "==") {
+    if (fn == "==") {
       if (registers[reg] != num) continue;
-    } else if (op == "!=") {
+    } else if (fn == "!=") {
       if (registers[reg] == num) continue;
-    } else if (op == "<") {
+    } else if (fn == "<") {
       if (registers[reg] >= num) continue;
-    } else if (op == ">") {
+    } else if (fn == ">") {
       if (registers[reg] <= num) continue;
-    } else if (op == ">=") {
+    } else if (fn == ">=") {
       if (registers[reg] < num) continue;
-    } else if (op == "<=") {
+    } else if (fn == "<=") {
       if (registers[reg] > num) continue;
-    } else
-      return Error("Bad cond: ", op);
-
-    if (!RE2::FullMatch(op_and_cond[0], "([a-z]+) (inc|dec) (-?\\d+)", &reg,
-                        &op, &num)) {
-      return Error("Bad op: ", op_and_cond[0]);
+    } else {
+      return Error("Bad fn: ", fn);
     }
-    if (op == "inc") {
+
+    if (!RE2::FullMatch(op, "([a-z]+) (inc|dec) (-?\\d+)", &reg,
+                        &fn, &num)) {
+      return Error("Bad op: ", op);
+    }
+    if (fn == "inc") {
       registers[reg] += num;
       max = std::max(max, registers[reg]);
-    } else if (op == "dec") {
+    } else if (fn == "dec") {
       registers[reg] -= num;
       max = std::max(max, registers[reg]);
-    } else
-      return Error("Bad op: ", op);
+    } else {
+      return Error("Bad fn: ", fn);
+    }
   }
   return IntReturn(max);
 }

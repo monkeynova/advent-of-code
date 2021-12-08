@@ -18,12 +18,8 @@ namespace {
 absl::StatusOr<DirectedGraph<bool>> Parse(absl::Span<absl::string_view> input) {
   DirectedGraph<bool> ret;
   for (absl::string_view str : input) {
-    std::vector<absl::string_view> node_and_cons = absl::StrSplit(str, " <-> ");
-    if (node_and_cons.size() != 2) return AdventDay::Error("Bad line: ", str);
-    absl::string_view node = node_and_cons[0];
-    std::vector<absl::string_view> cons =
-        absl::StrSplit(node_and_cons[1], ", ");
-    for (absl::string_view con : cons) {
+    const auto [node, cons] = AdventDay::PairSplit(str, " <-> ");
+    for (absl::string_view con : absl::StrSplit(cons, ", ")) {
       ret.AddEdge(node, con);
     }
   }

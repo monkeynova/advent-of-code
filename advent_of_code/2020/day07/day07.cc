@@ -20,18 +20,16 @@ absl::StatusOr<DirectedGraph<BagRule>> Parse(
     absl::Span<absl::string_view> input) {
   DirectedGraph<BagRule> ret;
   for (absl::string_view str : input) {
-    std::vector<absl::string_view> pieces =
-        absl::StrSplit(str, " bags contain ");
-    if (pieces.size() != 2) return absl::InvalidArgumentError("contains");
-    if (ret.GetData(pieces[0]) != nullptr) {
-      return AdventDay::Error("color dupe: ", pieces[0]);
+    const auto [outer, inner] = AdventDay::PairSplit(str, " bags contain ");
+    if (ret.GetData(outer) != nullptr) {
+      return AdventDay::Error("color dupe: ", outer);
     }
-    if (pieces[1] == "no other bags.") {
+    if (inner == "no other bags.") {
       // OK for the rule to be empty.
-      ret.AddNode(pieces[0], BagRule{});
+      ret.AddNode(outer, BagRule{});
     } else {
       BagRule bag_rule;
-      for (absl::string_view bag_rule_str : absl::StrSplit(pieces[1], ", ")) {
+      for (absl::string_view bag_rule_str : absl::StrSplit(inner, ", ")) {
         static LazyRE2 bag_pattern{"(\\d+) (.*) bags?\\.?"};
         int count;
         absl::string_view color;
@@ -39,9 +37,9 @@ absl::StatusOr<DirectedGraph<BagRule>> Parse(
           return AdventDay::Error("bag rule: ", bag_rule_str);
         }
         bag_rule.bag_to_count.emplace(color, count);
-        ret.AddEdge(pieces[0], color);
+        ret.AddEdge(outer, color);
       }
-      ret.AddNode(pieces[0], std::move(bag_rule));
+      ret.AddNode(outer, std::move(bag_rule));
     }
   }
   return ret;

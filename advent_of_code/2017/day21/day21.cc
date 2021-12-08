@@ -101,15 +101,12 @@ absl::StatusOr<absl::flat_hash_map<CharBoard, CharBoard>> Parse(
     absl::Span<absl::string_view> input) {
   absl::flat_hash_map<CharBoard, CharBoard> ret;
   for (absl::string_view rule : input) {
-    std::vector<absl::string_view> in_out = absl::StrSplit(rule, " => ");
-    if (in_out.size() != 2) return AdventDay::Error("Bad rule: ", rule);
+    const auto [in, out] = AdventDay::PairSplit(rule, " => ");
 
-    std::vector<absl::string_view> in = absl::StrSplit(in_out[0], "/");
-    absl::StatusOr<CharBoard> board_in = CharBoard::Parse(absl::MakeSpan(in));
+    absl::StatusOr<CharBoard> board_in = CharBoard::Parse(absl::StrSplit(in, "/"));
     if (!board_in.ok()) return board_in.status();
 
-    std::vector<absl::string_view> out = absl::StrSplit(in_out[1], "/");
-    absl::StatusOr<CharBoard> board_out = CharBoard::Parse(absl::MakeSpan(out));
+    absl::StatusOr<CharBoard> board_out = CharBoard::Parse(absl::StrSplit(out, "/"));
     if (!board_out.ok()) return board_out.status();
 
     if (ret.contains(*board_in)) return AdventDay::Error("Duplicate pattern");

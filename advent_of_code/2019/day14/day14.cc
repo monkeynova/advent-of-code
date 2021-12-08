@@ -23,32 +23,21 @@ absl::StatusOr<DirectedGraph<Rule>> ParseRuleSet(
     absl::Span<absl::string_view> input) {
   DirectedGraph<Rule> rule_set;
   for (absl::string_view rule_str : input) {
-    std::vector<absl::string_view> in_out = absl::StrSplit(rule_str, " => ");
-    if (in_out.size() != 2) return absl::InvalidArgumentError("Bad rule");
-    std::vector<absl::string_view> inputs = absl::StrSplit(in_out[0], ", ");
+    const auto [inputs, output] = AdventDay::PairSplit(rule_str, " => ");
 
     Rule rule;
-    std::vector<absl::string_view> quantity_name =
-        absl::StrSplit(in_out[1], " ");
-    absl::string_view src = quantity_name[1];
+    const auto [src_q, src] = AdventDay::PairSplit(output, " ");
     if (rule_set.GetData(src) != nullptr) {
       return absl::InvalidArgumentError("Duplicate rule");
     }
-    if (quantity_name.size() != 2) {
-      return absl::InvalidArgumentError("Bad ingredient");
-    }
-    if (!absl::SimpleAtoi(quantity_name[0], &rule.quantity_out)) {
+    if (!absl::SimpleAtoi(src_q, &rule.quantity_out)) {
       return absl::InvalidArgumentError("Bad quantity");
     }
 
-    for (absl::string_view in : inputs) {
-      std::vector<absl::string_view> quantity_name = absl::StrSplit(in, " ");
-      if (quantity_name.size() != 2) {
-        return absl::InvalidArgumentError("Bad ingredient");
-      }
-      absl::string_view dest = quantity_name[1];
+    for (absl::string_view in : absl::StrSplit(inputs, ", ")) {
+      const auto [dest_q, dest] = AdventDay::PairSplit(in, " ");
       int quantity;
-      if (!absl::SimpleAtoi(quantity_name[0], &quantity)) {
+      if (!absl::SimpleAtoi(dest_q, &quantity)) {
         return absl::InvalidArgumentError("Bad quantity");
       }
       rule.in.emplace(dest, quantity);

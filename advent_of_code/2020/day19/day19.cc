@@ -17,31 +17,21 @@ namespace {
 struct Rule {
   int rule_num;
   char token;
-  std::vector<std::vector<int>> sub_rules;
+  std::vector<std::vector<int64_t>> sub_rules;
 };
 
 absl::StatusOr<Rule> ParseRule(absl::string_view in) {
   Rule ret = {0, '\0', {}};
-  std::vector<absl::string_view> rule_and_dest = absl::StrSplit(in, ": ");
-  if (rule_and_dest.size() != 2) {
-    return AdventDay::Error("Bad rule: ", in);
+  const auto [rule, dest] = AdventDay::PairSplit(in, ": ");
+  if (!absl::SimpleAtoi(rule, &ret.rule_num)) {
+    return AdventDay::Error("Bad number: ", rule);
   }
-  if (!absl::SimpleAtoi(rule_and_dest[0], &ret.rule_num)) {
-    return AdventDay::Error("Bad number: ", rule_and_dest[0]);
-  }
-  if (!RE2::FullMatch(rule_and_dest[1], "\"(.)\"", &ret.token)) {
-    std::vector<absl::string_view> pieces =
-        absl::StrSplit(rule_and_dest[1], " | ");
-    for (absl::string_view piece : pieces) {
-      std::vector<absl::string_view> rule_order = absl::StrSplit(piece, " ");
-      std::vector<int> sub_rule;
-      for (absl::string_view sub_rule_num : rule_order) {
-        sub_rule.push_back(0);
-        if (!absl::SimpleAtoi(sub_rule_num, &sub_rule.back())) {
-          return AdventDay::Error("Bad number: [", sub_rule_num, "]");
-        }
-      }
-      ret.sub_rules.push_back(sub_rule);
+  if (!RE2::FullMatch(dest, "\"(.)\"", &ret.token)) {
+    for (absl::string_view piece : absl::StrSplit(dest, " | ")) {
+      absl::StatusOr<std::vector<int64_t>> sub_rule =
+        AdventDay::ParseAsInts(absl::StrSplit(piece, " "));
+      if (!sub_rule.ok()) return sub_rule.status();
+      ret.sub_rules.push_back(*sub_rule);
     }
   }
 
@@ -60,7 +50,7 @@ bool MatchRulePartial(const absl::flat_hash_map<int, Rule>& rule_set,
     return true;
   }
 
-  for (const std::vector<int>& sub_rule : r.sub_rules) {
+  for (const std::vector<int64_t>& sub_rule : r.sub_rules) {
     absl::string_view tmp = *str;
     bool match_all = true;
     for (int rule_num : sub_rule) {
@@ -146,7 +136,7 @@ bool MatchRuleSetWalk(const absl::flat_hash_map<int, Rule>& rule_set,
       continue;
     }
 
-    for (const std::vector<int>& sub_rules : r.sub_rules) {
+    for (const std::vector<int64_t>& sub_rules : r.sub_rules) {
       State new_state = state;
       new_state.rule_chain.insert(new_state.rule_chain.end(),
                                   sub_rules.rbegin(), sub_rules.rend());

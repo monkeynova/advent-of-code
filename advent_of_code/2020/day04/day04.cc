@@ -86,14 +86,10 @@ absl::StatusOr<std::string> Day_2020_04::Part1(
       }
       passport.clear();
     }
-    std::vector<absl::string_view> records = absl::StrSplit(line, " ");
-    for (absl::string_view r : records) {
+    for (absl::string_view r : absl::StrSplit(line, " ")) {
       if (r.empty()) continue;
-      std::vector<absl::string_view> kv = absl::StrSplit(r, ":");
-      if (kv.size() != 2) {
-        return absl::InvalidArgumentError(absl::StrCat("bad k/v: ", r));
-      }
-      passport[kv[0]] = kv[1];
+      const auto [it, inserted] = passport.emplace(PairSplit(r, ":"));
+      if (!inserted) return Error("Duplicate key: ", r);
     }
   }
   if (Valid(passport).ok()) {
@@ -113,14 +109,10 @@ absl::StatusOr<std::string> Day_2020_04::Part2(
       }
       passport.clear();
     }
-    std::vector<absl::string_view> records = absl::StrSplit(line, " ");
-    for (absl::string_view r : records) {
+    for (absl::string_view r : absl::StrSplit(line, " ")) {
       if (r.empty()) continue;
-      std::vector<absl::string_view> kv = absl::StrSplit(r, ":");
-      if (kv.size() != 2) {
-        return absl::InvalidArgumentError(absl::StrCat("bad k/v: ", r));
-      }
-      passport[kv[0]] = kv[1];
+      const auto [it, inserted] = passport.emplace(PairSplit(r, ":"));
+      if (!inserted) return Error("Duplicate key: ", r);
     }
   }
   if (Valid2(passport).ok()) {

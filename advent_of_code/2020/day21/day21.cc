@@ -20,19 +20,16 @@ struct Food {
 };
 
 absl::StatusOr<Food> ParseFood(absl::string_view txt) {
-  Food food;
-  std::vector<absl::string_view> ingredients_and_allergens =
-      absl::StrSplit(txt, " (contains ");
-  if (ingredients_and_allergens.size() != 2) {
-    return AdventDay::Error("Bad input: ", txt);
-  }
-  absl::string_view& allergen_list = ingredients_and_allergens[1];
-  if (allergen_list[allergen_list.size() - 1] != ')') {
+  if (txt[txt.size() - 1] != ')') {
     return AdventDay::Error("Bad input(2): ", txt);
   }
-  allergen_list = allergen_list.substr(0, allergen_list.size() - 1);
+  txt = txt.substr(0, txt.size() - 1);
 
-  food.ingredients = absl::StrSplit(ingredients_and_allergens[0], " ");
+  Food food;
+  const auto [ingredients, allergen_list] =
+      AdventDay::PairSplit(txt, " (contains ");
+
+  food.ingredients = absl::StrSplit(ingredients, " ");
   food.allergens = absl::StrSplit(allergen_list, ", ");
   VLOG(2) << "Parsed: {{" << absl::StrJoin(food.ingredients, ",") << "},{"
           << absl::StrJoin(food.allergens, ",") << "}}";

@@ -83,32 +83,31 @@ absl::StatusOr<absl::flat_hash_map<std::string, Operation>> Parse(
   absl::flat_hash_map<std::string, Operation> ops_by_dest;
 
   for (absl::string_view str : input) {
-    std::vector<absl::string_view> op_and_dest = absl::StrSplit(str, " -> ");
-    if (op_and_dest.size() != 2) return AdventDay::Error("Bad input: ", str);
+    const auto [op_str, dest] = AdventDay::PairSplit(str, " -> ");
     Operation op;
-    op.dest = op_and_dest[1];
-    if (RE2::FullMatch(op_and_dest[0], "(\\d+|[a-z]+)", &op.arg1)) {
+    op.dest = dest;
+    if (RE2::FullMatch(op_str, "(\\d+|[a-z]+)", &op.arg1)) {
       op.operation = "";
-    } else if (RE2::FullMatch(op_and_dest[0], "(\\d+|[a-z]+)", &op.arg1)) {
+    } else if (RE2::FullMatch(op_str, "(\\d+|[a-z]+)", &op.arg1)) {
       op.operation = "";
-    } else if (RE2::FullMatch(op_and_dest[0], "NOT (\\d+|[a-z]+)", &op.arg1)) {
+    } else if (RE2::FullMatch(op_str, "NOT (\\d+|[a-z]+)", &op.arg1)) {
       op.operation = "NOT";
-    } else if (RE2::FullMatch(op_and_dest[0], "(\\d+|[a-z]+) AND (\\d+|[a-z]+)",
+    } else if (RE2::FullMatch(op_str, "(\\d+|[a-z]+) AND (\\d+|[a-z]+)",
                               &op.arg1, &op.arg2)) {
       op.operation = "AND";
-    } else if (RE2::FullMatch(op_and_dest[0], "(\\d+|[a-z]+) OR (\\d+|[a-z]+)",
+    } else if (RE2::FullMatch(op_str, "(\\d+|[a-z]+) OR (\\d+|[a-z]+)",
                               &op.arg1, &op.arg2)) {
       op.operation = "OR";
-    } else if (RE2::FullMatch(op_and_dest[0],
+    } else if (RE2::FullMatch(op_str,
                               "(\\d+|[a-z]+) LSHIFT (\\d+|[a-z]+)", &op.arg1,
                               &op.arg2)) {
       op.operation = "LSHIFT";
-    } else if (RE2::FullMatch(op_and_dest[0],
+    } else if (RE2::FullMatch(op_str,
                               "(\\d+|[a-z]+) RSHIFT (\\d+|[a-z]+)", &op.arg1,
                               &op.arg2)) {
       op.operation = "RSHIFT";
     } else {
-      return AdventDay::Error("Bad op: ", op_and_dest[0]);
+      return AdventDay::Error("Bad op: ", op_str);
     }
     ops_by_dest[op.dest] = op;
   }
