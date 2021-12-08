@@ -20,7 +20,8 @@ std::string DebugSet(const absl::flat_hash_set<char>& possible) {
   return ret;
 }
 
-absl::flat_hash_set<char> Restrict(const absl::flat_hash_set<char>& possible, absl::string_view set) {
+absl::flat_hash_set<char> Restrict(const absl::flat_hash_set<char>& possible,
+                                   absl::string_view set) {
   absl::flat_hash_set<char> new_possible;
   for (char c : set) {
     if (possible.contains(c)) new_possible.insert(c);
@@ -29,25 +30,28 @@ absl::flat_hash_set<char> Restrict(const absl::flat_hash_set<char>& possible, ab
 }
 
 static const absl::flat_hash_map<std::string, int64_t> kLookup = {
-  {"abcefg", 0}, {"cf", 1}, {"acdeg", 2}, {"acdfg", 3}, {"bcdf", 4},
-  {"abdfg", 5}, {"abdefg", 6}, {"acf", 7}, {"abcdefg", 8}, {"abcdfg", 9},
+    {"abcefg", 0}, {"cf", 1},     {"acdeg", 2}, {"acdfg", 3},   {"bcdf", 4},
+    {"abdfg", 5},  {"abdefg", 6}, {"acf", 7},   {"abcdefg", 8}, {"abcdfg", 9},
 };
 
-absl::StatusOr<int64_t> Decode(absl::string_view digit, const absl::flat_hash_map<char, char>& map) {
+absl::StatusOr<int64_t> Decode(absl::string_view digit,
+                               const absl::flat_hash_map<char, char>& map) {
   std::string digit_copy(digit);
   for (char& c : digit_copy) {
     auto it = map.find(c);
-    if (it == map.end()) return AdventDay::Error("Could not find digit: ", digit_copy);
+    if (it == map.end())
+      return AdventDay::Error("Could not find digit: ", digit_copy);
     c = it->second;
   }
   absl::c_sort(digit_copy);
   auto it = kLookup.find(digit_copy);
-  if (it == kLookup.end()) return AdventDay::Error("Could not lookup digit_copy: ", digit_copy);
+  if (it == kLookup.end())
+    return AdventDay::Error("Could not lookup digit_copy: ", digit_copy);
   return it->second;
 }
 
-bool TryMap(
-    absl::flat_hash_map<char, char>& map, char next, const std::vector<absl::string_view>& digits) {
+bool TryMap(absl::flat_hash_map<char, char>& map, char next,
+            const std::vector<absl::string_view>& digits) {
   if (next == 'h') {
     for (absl::string_view d : digits) {
       absl::StatusOr<int64_t> v = Decode(d, map);
@@ -65,11 +69,12 @@ bool TryMap(
   return false;
 }
 
-absl::StatusOr<absl::flat_hash_map<char, char>> FindMap(const std::vector<absl::string_view>& left) {
+absl::StatusOr<absl::flat_hash_map<char, char>> FindMap(
+    const std::vector<absl::string_view>& left) {
   if (left.size() != 10) return AdventDay::Error("Bad exemplars");
 
   absl::flat_hash_map<int64_t, absl::flat_hash_set<char>> countToSegments = {
-    {8, {'a', 'c'}}, {6, {'b'}}, {7, {'d', 'g'}}, {4, {'e'}}, {9, {'f'}},
+      {8, {'a', 'c'}}, {6, {'b'}}, {7, {'d', 'g'}}, {4, {'e'}}, {9, {'f'}},
   };
 
   absl::flat_hash_map<char, int64_t> observed;
@@ -142,15 +147,16 @@ absl::StatusOr<std::string> Day_2021_08::Part1(
     absl::Span<absl::string_view> input) const {
   int64_t count = 0;
   for (absl::string_view line : input) {
-    std::pair<absl::string_view, absl::string_view> split = absl::StrSplit(line, " | ");
+    std::pair<absl::string_view, absl::string_view> split =
+        absl::StrSplit(line, " | ");
     for (absl::string_view segment : absl::StrSplit(split.second, " ")) {
       switch (segment.size()) {
         case 2:
         case 3:
         case 4:
         case 7:
-        ++count;
-        break;
+          ++count;
+          break;
       }
     }
   }
@@ -161,11 +167,14 @@ absl::StatusOr<std::string> Day_2021_08::Part2(
     absl::Span<absl::string_view> input) const {
   int64_t sum = 0;
   for (absl::string_view line : input) {
-    std::pair<absl::string_view, absl::string_view> split = absl::StrSplit(line, " | ");
+    std::pair<absl::string_view, absl::string_view> split =
+        absl::StrSplit(line, " | ");
     std::vector<absl::string_view> left = absl::StrSplit(split.first, " ");
     std::vector<absl::string_view> right = absl::StrSplit(split.second, " ");
     absl::StatusOr<absl::flat_hash_map<char, char>> map = FindMap(left);
-    if (!map.ok()) return Error("Could not make map ", map.status().message(), " for ", line);
+    if (!map.ok())
+      return Error("Could not make map ", map.status().message(), " for ",
+                   line);
     int64_t right_val = 0;
     for (absl::string_view digit : right) {
       absl::StatusOr<int64_t> v = Decode(digit, *map);
