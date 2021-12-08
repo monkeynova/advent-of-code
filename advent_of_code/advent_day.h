@@ -6,6 +6,7 @@
 
 #include "absl/status/statusor.h"
 #include "absl/strings/str_cat.h"
+#include "absl/strings/str_split.h"
 #include "absl/types/span.h"
 
 namespace advent_of_code {
@@ -25,6 +26,12 @@ class AdventDay {
       vals.push_back(v);
     }
     return vals;
+  }
+
+  static std::pair<absl::string_view, absl::string_view> PairSplit(
+      absl::string_view in, absl::string_view delim) {
+    return std::pair<absl::string_view, absl::string_view>(
+      absl::StrSplit(in, absl::MaxSplits(delim, 2)));
   }
 
   template <class... Args>

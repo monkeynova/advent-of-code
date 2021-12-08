@@ -142,9 +142,8 @@ absl::StatusOr<std::string> Day_2021_08::Part1(
   int64_t count = 0;
   absl::flat_hash_set<int64_t> find_sizes = {2, 3, 4, 7};
   for (absl::string_view line : input) {
-    std::pair<absl::string_view, absl::string_view> split =
-        absl::StrSplit(line, absl::MaxSplits(" | ", 2));
-    for (absl::string_view segment : absl::StrSplit(split.second, " ")) {
+    const auto& [_, find] = PairSplit(line, " | ");
+    for (absl::string_view segment : absl::StrSplit(find, " ")) {
       if (find_sizes.contains(segment.size())) ++count;
     }
   }
@@ -155,17 +154,15 @@ absl::StatusOr<std::string> Day_2021_08::Part2(
     absl::Span<absl::string_view> input) const {
   int64_t sum = 0;
   for (absl::string_view line : input) {
-    std::pair<absl::string_view, absl::string_view> split =
-        absl::StrSplit(line, absl::MaxSplits(" | ", 2));
-    std::vector<absl::string_view> exemplars = absl::StrSplit(split.first, " ");
-    absl::StatusOr<absl::flat_hash_map<char, char>> map = FindMap(exemplars);
+    const auto& [exemplars, decode] = PairSplit(line, " | ");
+    absl::StatusOr<absl::flat_hash_map<char, char>> map =
+      FindMap(absl::StrSplit(exemplars, " "));
     if (!map.ok()) {
       return Error("Could not make map ", map.status().message(), " for ",
-                   split.first);
+                   exemplars);
     }
-    std::vector<absl::string_view> decode = absl::StrSplit(split.second, " ");
     int64_t decode_val = 0;
-    for (absl::string_view digit : decode) {
+    for (absl::string_view digit : absl::StrSplit(decode, " ")) {
       absl::StatusOr<int64_t> v = Decode(digit, *map);
       if (!v.ok()) return v.status();
       decode_val = decode_val * 10 + *v;
