@@ -1,22 +1,31 @@
 [part=1]
-Example input
+2199943210
+3987894921
+9856789892
+8767896789
+9899965678
 --
-ERROR: Could not run test: Not implemented
+15
 ==
 
+# 1640
 [part=1]
 @include{advent_of_code/2021/day09/input.txt}
 --
-ERROR: Could not run test: Not implemented
+600
 ==
 
 [part=2]
-Example input
+2199943210
+3987894921
+9856789892
+8767896789
+9899965678
 --
-ERROR: Could not run test: Not implemented
+1134
 ==
 
 [part=2]
 @include{advent_of_code/2021/day09/input.txt}
 --
-ERROR: Could not run test: Not implemented
+987840
