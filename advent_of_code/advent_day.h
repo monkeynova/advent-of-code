@@ -31,7 +31,7 @@ class AdventDay {
   static std::pair<absl::string_view, absl::string_view> PairSplit(
       absl::string_view in, absl::string_view delim) {
     return std::pair<absl::string_view, absl::string_view>(
-      absl::StrSplit(in, absl::MaxSplits(delim, 2)));
+        absl::StrSplit(in, absl::MaxSplits(delim, 2)));
   }
 
   template <class... Args>

@@ -29,7 +29,7 @@ absl::StatusOr<Rule> ParseRule(absl::string_view in) {
   if (!RE2::FullMatch(dest, "\"(.)\"", &ret.token)) {
     for (absl::string_view piece : absl::StrSplit(dest, " | ")) {
       absl::StatusOr<std::vector<int64_t>> sub_rule =
-        AdventDay::ParseAsInts(absl::StrSplit(piece, " "));
+          AdventDay::ParseAsInts(absl::StrSplit(piece, " "));
       if (!sub_rule.ok()) return sub_rule.status();
       ret.sub_rules.push_back(*sub_rule);
     }

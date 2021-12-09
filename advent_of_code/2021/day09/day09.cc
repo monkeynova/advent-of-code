@@ -37,7 +37,8 @@ std::vector<Point> FindLow(const CharBoard& board) {
 
 int64_t BasinSize(const CharBoard& board, Point p) {
   absl::flat_hash_set<Point> history = {p};
-  for (std::deque<Point> frontier = {p}; !frontier.empty(); frontier.pop_front()) {
+  for (std::deque<Point> frontier = {p}; !frontier.empty();
+       frontier.pop_front()) {
     Point cur = frontier.front();
     for (Point d : Cardinal::kFourDirs) {
       Point n = cur + d;
@@ -50,7 +51,6 @@ int64_t BasinSize(const CharBoard& board, Point p) {
   }
   return history.size();
 }
-
 
 }  // namespace
 

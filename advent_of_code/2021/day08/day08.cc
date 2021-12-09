@@ -98,9 +98,15 @@ absl::StatusOr<absl::flat_hash_map<char, char>> FindMap(
   for (absl::string_view test : left) {
     absl::string_view allowed = "";
     switch (test.size()) {
-      case 2: allowed = "cf"; break;
-      case 3: allowed = "acf"; break;
-      case 4: allowed = "bcdf"; break;
+      case 2:
+        allowed = "cf";
+        break;
+      case 3:
+        allowed = "acf";
+        break;
+      case 4:
+        allowed = "bcdf";
+        break;
     }
     if (allowed.empty()) continue;
     for (char c : test) {
@@ -156,7 +162,7 @@ absl::StatusOr<std::string> Day_2021_08::Part2(
   for (absl::string_view line : input) {
     const auto& [exemplars, decode] = PairSplit(line, " | ");
     absl::StatusOr<absl::flat_hash_map<char, char>> map =
-      FindMap(absl::StrSplit(exemplars, " "));
+        FindMap(absl::StrSplit(exemplars, " "));
     if (!map.ok()) {
       return Error("Could not make map ", map.status().message(), " for ",
                    exemplars);

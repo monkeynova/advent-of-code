@@ -98,13 +98,11 @@ absl::StatusOr<absl::flat_hash_map<std::string, Operation>> Parse(
     } else if (RE2::FullMatch(op_str, "(\\d+|[a-z]+) OR (\\d+|[a-z]+)",
                               &op.arg1, &op.arg2)) {
       op.operation = "OR";
-    } else if (RE2::FullMatch(op_str,
-                              "(\\d+|[a-z]+) LSHIFT (\\d+|[a-z]+)", &op.arg1,
-                              &op.arg2)) {
+    } else if (RE2::FullMatch(op_str, "(\\d+|[a-z]+) LSHIFT (\\d+|[a-z]+)",
+                              &op.arg1, &op.arg2)) {
       op.operation = "LSHIFT";
-    } else if (RE2::FullMatch(op_str,
-                              "(\\d+|[a-z]+) RSHIFT (\\d+|[a-z]+)", &op.arg1,
-                              &op.arg2)) {
+    } else if (RE2::FullMatch(op_str, "(\\d+|[a-z]+) RSHIFT (\\d+|[a-z]+)",
+                              &op.arg1, &op.arg2)) {
       op.operation = "RSHIFT";
     } else {
       return AdventDay::Error("Bad op: ", op_str);

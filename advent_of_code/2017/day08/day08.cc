@@ -25,8 +25,8 @@ absl::StatusOr<std::string> Day_2017_08::Part1(
     absl::string_view reg;
     absl::string_view fn;
     int num;
-    if (!RE2::FullMatch(cond, "([a-z]+) (<|>|<=|>=|==|!=) (-?\\d+)",
-                        &reg, &fn, &num)) {
+    if (!RE2::FullMatch(cond, "([a-z]+) (<|>|<=|>=|==|!=) (-?\\d+)", &reg, &fn,
+                        &num)) {
       return Error("Bad cond: ", cond);
     }
     if (fn == "==") {
@@ -45,8 +45,7 @@ absl::StatusOr<std::string> Day_2017_08::Part1(
       return Error("Bad fn: ", fn);
     }
 
-    if (!RE2::FullMatch(op, "([a-z]+) (inc|dec) (-?\\d+)", &reg,
-                        &fn, &num)) {
+    if (!RE2::FullMatch(op, "([a-z]+) (inc|dec) (-?\\d+)", &reg, &fn, &num)) {
       return Error("Bad op: ", op);
     }
     if (fn == "inc") {
@@ -71,8 +70,8 @@ absl::StatusOr<std::string> Day_2017_08::Part2(
     absl::string_view reg;
     absl::string_view fn;
     int num;
-    if (!RE2::FullMatch(cond, "([a-z]+) (<|>|<=|>=|==|!=) (-?\\d+)",
-                        &reg, &fn, &num)) {
+    if (!RE2::FullMatch(cond, "([a-z]+) (<|>|<=|>=|==|!=) (-?\\d+)", &reg, &fn,
+                        &num)) {
       return Error("Bad cond: ", cond);
     }
     if (fn == "==") {
@@ -91,8 +90,7 @@ absl::StatusOr<std::string> Day_2017_08::Part2(
       return Error("Bad fn: ", fn);
     }
 
-    if (!RE2::FullMatch(op, "([a-z]+) (inc|dec) (-?\\d+)", &reg,
-                        &fn, &num)) {
+    if (!RE2::FullMatch(op, "([a-z]+) (inc|dec) (-?\\d+)", &reg, &fn, &num)) {
       return Error("Bad op: ", op);
     }
     if (fn == "inc") {
