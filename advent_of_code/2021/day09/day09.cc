@@ -80,8 +80,7 @@ absl::StatusOr<std::string> Day_2021_09::Part2(
   for (Point start : basins) {
     sizes.push_back(BasinSize(*board, start));
   }
-  absl::c_sort(sizes);
-  absl::c_reverse(sizes);
+  absl::c_sort(sizes, [](int64_t a, int64_t b) { return b < a; });
 
   return IntReturn(sizes[0] * sizes[1] * sizes[2]);
 }
