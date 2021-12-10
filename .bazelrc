@@ -14,16 +14,22 @@ build:windows --cxxopt=/std:c++17
 # a result.
 build:macos --features=-supports_dynamic_linker
 
-run:compete -- --file_based_test_driver_generate_test_output=false --file_based_test_driver_log_ignored_test=false --file_based_test_driver_individual_tests=false --logtostderr --v=1
+run:compete --  --logtostderr --v=1 \
+  --file_based_test_driver_generate_test_output=false \
+  --file_based_test_driver_log_ignored_test=false \
+  --file_based_test_driver_individual_tests=false
 
-test:v1 --test_arg=--logtostderr --test_arg=--v=1 --test_output=streamed --nocache_test_results
+test:v1 --test_arg=--logtostderr --test_arg=--v=1 --test_output=streamed \
+  --nocache_test_results
 run:v1 -- --logtostderr --v=1
 
 run:v2 -- --logtostderr --v=2
-test:v2 --test_arg=--logtostderr --test_arg=--v=2 --test_output=streamed --nocache_test_results
+test:v2 --test_arg=--logtostderr --test_arg=--v=2 --test_output=streamed \
+  --nocache_test_results
 
 run:v3 -- --logtostderr --v=3
-test:v3 --test_arg=--logtostderr --test_arg=--v=3 --test_output=streamed --nocache_test_results
+test:v3 --test_arg=--logtostderr --test_arg=--v=3 --test_output=streamed \
+  --nocache_test_results
 
 build:dcheck --copt=-UNDEBUG
 run:dcheck --copt=-UNDEBUG
