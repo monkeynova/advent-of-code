@@ -14,7 +14,7 @@ build:windows --cxxopt=/std:c++17
 # a result.
 build:macos --features=-supports_dynamic_linker
 
-run:compete -- --file_based_test_driver_generate_test_output=false --file_based_test_driver_log_ignored_test=false --logtostderr --v=1
+run:compete -- --file_based_test_driver_generate_test_output=false --file_based_test_driver_log_ignored_test=false --file_based_test_driver_individual_tests=false --logtostderr --v=1
 
 test:v1 --test_arg=--logtostderr --test_arg=--v=1 --test_output=streamed --nocache_test_results
 run:v1 -- --logtostderr --v=1
