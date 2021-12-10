@@ -20,19 +20,19 @@ namespace {
 
 absl::StatusOr<std::string> Day_2021_10::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::flat_hash_map<char, int64_t> scores = {
+  static const absl::flat_hash_map<char, int64_t> kScoreMap = {
     {')', 3}, {']', 57}, {'}', 1197}, {'>', 25137}
   };
-  absl::flat_hash_map<char, char> pair = {
+  static const absl::flat_hash_map<char, char> kPairMap = {
     {'}', '{'}, {']', '['}, {')', '('}, {'>', '<'}
   };
+
   int64_t total_score = 0;
   for (absl::string_view line : input) {
-    if (line == "HACK:") continue;
     std::vector<char> stack;
     for (char c : line) {
-      auto it = pair.find(c);
-      if (it == pair.end()) {
+      auto it = kPairMap.find(c);
+      if (it == kPairMap.end()) {
         stack.push_back(c);
         continue;
       } 
@@ -40,8 +40,8 @@ absl::StatusOr<std::string> Day_2021_10::Part1(
       if (stack.back() == it->second) {
         stack.pop_back();
       } else {
-        auto it = scores.find(c);
-        if (it == scores.end()) return Error("Bad score: ", line);
+        auto it = kScoreMap.find(c);
+        if (it == kScoreMap.end()) return Error("Bad score: ", line);
         total_score += it->second;
         break;
       }
@@ -52,24 +52,20 @@ absl::StatusOr<std::string> Day_2021_10::Part1(
 
 absl::StatusOr<std::string> Day_2021_10::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::flat_hash_map<char, int64_t> scores1 = {
-    {')', 3}, {']', 57}, {'}', 1197}, {'>', 25137}
-  };
-  absl::flat_hash_map<char, int64_t> scores2 = {
+  static const absl::flat_hash_map<char, int64_t> kScoreMap = {
     {'(', 1}, {'[', 2}, {'{', 3}, {'<', 4}
   };
-  absl::flat_hash_map<char, char> pair = {
+  static const absl::flat_hash_map<char, char> kPairMap = {
     {'}', '{'}, {']', '['}, {')', '('}, {'>', '<'}
   };
-  int64_t total_score = 0;
+
   std::vector<int64_t> scores;
   for (absl::string_view line : input) {
-    if (line == "HACK:") continue;
     std::vector<char> stack;
     bool corrupted = false;
     for (char c : line) {
-      auto it = pair.find(c);
-      if (it == pair.end()) {
+      auto it = kPairMap.find(c);
+      if (it == kPairMap.end()) {
         stack.push_back(c);
         continue;
       }
@@ -77,8 +73,8 @@ absl::StatusOr<std::string> Day_2021_10::Part2(
       if (stack.back() == it->second) {
         stack.pop_back();
       } else {
-        auto it = scores1.find(c);
-        if (it == scores1.end()) return Error("Bad score: ", line);
+        auto it = kPairMap.find(c);
+        if (it == kPairMap.end()) return Error("Bad score: ", line);
         corrupted = true;
         break;
       }
@@ -87,8 +83,8 @@ absl::StatusOr<std::string> Day_2021_10::Part2(
     absl::c_reverse(stack);
     int64_t score = 0;
     for (char c : stack) {
-      auto it = scores2.find(c);
-      if (it == scores2.end()) return Error("Bad score2: ", line);
+      auto it = kScoreMap.find(c);
+      if (it == kScoreMap.end()) return Error("Bad score2: ", line);
       score = score * 5 + it->second;
     }
     scores.push_back(score);
