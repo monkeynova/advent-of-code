@@ -35,14 +35,13 @@ absl::StatusOr<std::string> Day_2021_10::Part1(
         continue;
       }
       if (stack.empty()) return Error("Bad line: ", line);
-      if (stack.back() == it->second) {
-        stack.pop_back();
-      } else {
+      if (stack.back() != it->second) {
         auto it = kScoreMap.find(c);
         if (it == kScoreMap.end()) return Error("Bad score: ", line);
         total_score += it->second;
         break;
       }
+      stack.pop_back();
     }
   }
   return IntReturn(total_score);
@@ -66,21 +65,18 @@ absl::StatusOr<std::string> Day_2021_10::Part2(
         continue;
       }
       if (stack.empty()) return Error("Bad line: ", line);
-      if (stack.back() == it->second) {
-        stack.pop_back();
-      } else {
-        auto it = kPairMap.find(c);
-        if (it == kPairMap.end()) return Error("Bad score: ", line);
+      if (stack.back() != it->second) {
         corrupted = true;
         break;
       }
+      stack.pop_back();
     }
     if (corrupted) continue;
     absl::c_reverse(stack);
     int64_t score = 0;
     for (char c : stack) {
       auto it = kScoreMap.find(c);
-      if (it == kScoreMap.end()) return Error("Bad score2: ", line);
+      if (it == kScoreMap.end()) return Error("Bad score: ", line);
       score = score * 5 + it->second;
     }
     scores.push_back(score);
@@ -88,7 +84,7 @@ absl::StatusOr<std::string> Day_2021_10::Part2(
   absl::c_sort(scores);
   if (scores.size() % 2 != 1) return Error("Bad median");
 
-  return IntReturn(scores[(scores.size() + 1) / 2 - 1]);
+  return IntReturn(scores[scores.size() / 2]);
 }
 
 }  // namespace advent_of_code
