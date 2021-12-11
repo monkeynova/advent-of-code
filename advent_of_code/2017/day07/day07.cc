@@ -66,12 +66,12 @@ absl::StatusOr<DirectedGraph<int>> Parse(absl::Span<absl::string_view> input) {
   DirectedGraph<int> dag;
   for (absl::string_view str : input) {
     std::vector<absl::string_view> p_and_c_list = absl::StrSplit(str, " -> ");
-    if (p_and_c_list.size() > 2) return AdventDay::Error("Bad input: ", str);
+    if (p_and_c_list.size() > 2) return Error("Bad input: ", str);
     absl::string_view parent;
     int weight;
     if (!RE2::FullMatch(p_and_c_list[0], "(.*) \\((\\d+)\\)", &parent,
                         &weight)) {
-      return AdventDay::Error("Bad parent: ", p_and_c_list[0]);
+      return Error("Bad parent: ", p_and_c_list[0]);
     }
     dag.AddNode(parent, weight);
 

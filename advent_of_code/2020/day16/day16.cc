@@ -35,32 +35,30 @@ absl::StatusOr<ParseResult> Parse(absl::Span<absl::string_view> input) {
                         &or_range.min1, &or_range.max1, &or_range.min2,
                         &or_range.max2))
       break;
-    if (res.rules.contains(col))
-      return AdventDay::Error("Duplicate rule: ", col);
+    if (res.rules.contains(col)) return Error("Duplicate rule: ", col);
     res.rules.emplace(col, or_range);
   }
-  if (!input[i].empty()) return AdventDay::Error("Not empty line: ", input[i]);
+  if (!input[i].empty()) return Error("Not empty line: ", input[i]);
   ++i;
-  if (input[i] != "your ticket:")
-    return AdventDay::Error("Not 'your ticket' ", input[i]);
+  if (input[i] != "your ticket:") return Error("Not 'your ticket' ", input[i]);
   ++i;
   std::vector<absl::string_view> my_ticket_str = absl::StrSplit(input[i], ",");
   absl::StatusOr<std::vector<int64_t>> my_ticket =
-      AdventDay::ParseAsInts(absl::MakeSpan(my_ticket_str));
+      ParseAsInts(absl::MakeSpan(my_ticket_str));
   if (!my_ticket.ok()) return my_ticket.status();
   res.my_ticket = *my_ticket;
   ++i;
 
-  if (!input[i].empty()) return AdventDay::Error("Not empty line: ", input[i]);
+  if (!input[i].empty()) return Error("Not empty line: ", input[i]);
   ++i;
   if (input[i] != "nearby tickets:")
-    return AdventDay::Error("Not 'nearby tickets' ", input[i]);
+    return Error("Not 'nearby tickets' ", input[i]);
   ++i;
   for (; i < input.size(); ++i) {
     std::vector<absl::string_view> other_ticket_str =
         absl::StrSplit(input[i], ",");
     absl::StatusOr<std::vector<int64_t>> other_ticket =
-        AdventDay::ParseAsInts(absl::MakeSpan(other_ticket_str));
+        ParseAsInts(absl::MakeSpan(other_ticket_str));
     if (!other_ticket.ok()) return other_ticket.status();
     res.other_tickets.push_back(*other_ticket);
   }

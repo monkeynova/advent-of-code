@@ -38,12 +38,12 @@ absl::StatusOr<std::string> ApplyRule(absl::string_view rule,
             break;
           }
         }
-        if (!sub_found) return AdventDay::Error("Could not find b");
+        if (!sub_found) return Error("Could not find b");
         found = true;
         break;
       }
     }
-    if (!found) return AdventDay::Error("Could not find a");
+    if (!found) return Error("Could not find a");
     return ret;
   }
   if (RE2::FullMatch(rule, "rotate left (\\d+) steps?", &x)) {
@@ -68,7 +68,7 @@ absl::StatusOr<std::string> ApplyRule(absl::string_view rule,
         break;
       }
     }
-    if (x == -1) return AdventDay::Error("Not found for rotation");
+    if (x == -1) return Error("Not found for rotation");
     int right_rotate = (x + ((x >= 4) ? 2 : 1)) % str.size();
     std::string ret = std::string(str);
     for (int i = 0; i < ret.size(); ++i) {
@@ -97,7 +97,7 @@ absl::StatusOr<std::string> ApplyRule(absl::string_view rule,
     return ret;
   }
 
-  return AdventDay::Error("Bad rule: ", rule);
+  return Error("Bad rule: ", rule);
 }
 
 absl::StatusOr<std::string> ApplyRuleReverse(absl::string_view rule,
@@ -125,12 +125,12 @@ absl::StatusOr<std::string> ApplyRuleReverse(absl::string_view rule,
             break;
           }
         }
-        if (!sub_found) return AdventDay::Error("Could not find b");
+        if (!sub_found) return Error("Could not find b");
         found = true;
         break;
       }
     }
-    if (!found) return AdventDay::Error("Could not find a");
+    if (!found) return Error("Could not find a");
     return ret;
   }
   if (RE2::FullMatch(rule, "rotate left (\\d+) steps?", &x)) {
@@ -155,18 +155,17 @@ absl::StatusOr<std::string> ApplyRuleReverse(absl::string_view rule,
         break;
       }
     }
-    if (x == -1) return AdventDay::Error("Not found for rotation");
+    if (x == -1) return Error("Not found for rotation");
     int left_rotate = -1;
     for (int src_pos = 0; src_pos < str.size(); ++src_pos) {
       int right_rotate = (src_pos + ((src_pos >= 4) ? 2 : 1)) % str.size();
       if ((src_pos + right_rotate) % str.size() == x) {
-        // if (left_rotate != -1) return AdventDay::Error("Inverse rotation not
+        // if (left_rotate != -1) return Error("Inverse rotation not
         // unique");
         left_rotate = right_rotate;
       }
     }
-    if (left_rotate == -1)
-      return AdventDay::Error("Not found for inverse rotation");
+    if (left_rotate == -1) return Error("Not found for inverse rotation");
     std::string ret = std::string(str);
     for (int i = 0; i < ret.size(); ++i) {
       ret[i] = str[(i + left_rotate) % ret.size()];
@@ -195,7 +194,7 @@ absl::StatusOr<std::string> ApplyRuleReverse(absl::string_view rule,
     return ret;
   }
 
-  return AdventDay::Error("Bad rule: ", rule);
+  return Error("Bad rule: ", rule);
 }
 
 absl::Status RunTest() {
@@ -219,7 +218,7 @@ absl::Status RunTest() {
     VLOG(1) << "Test: " << pw;
   }
   if (pw != "decab") {
-    return AdventDay::Error("wrong result: ", pw);
+    return Error("wrong result: ", pw);
   }
   return absl::OkStatus();
 }
@@ -248,7 +247,7 @@ absl::Status RunReverseTest() {
     VLOG(1) << "Test: " << pw;
   }
   if (pw != "abcde") {
-    return AdventDay::Error("wrong result: ", pw);
+    return Error("wrong result: ", pw);
   }
   return absl::OkStatus();
 }

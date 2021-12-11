@@ -58,7 +58,7 @@ absl::StatusOr<ParsedRE> Parse(absl::string_view re) {
   ret.type = ParsedRE::kSequence;
   std::vector<ParsedRE*> stack = {&ret};
   for (absl::string_view tok : tokens) {
-    if (stack.empty()) return AdventDay::Error("Empty stack");
+    if (stack.empty()) return Error("Empty stack");
     if (tok == "(") {
       auto next = absl::make_unique<ParsedRE>();
       next->type = ParsedRE::kBranch;
@@ -70,20 +70,20 @@ absl::StatusOr<ParsedRE> Parse(absl::string_view re) {
       stack.push_back(stack.back()->children.back().get());
     } else if (tok == ")") {
       if (stack.back()->type != ParsedRE::kSequence) {
-        return AdventDay::Error("Bad type at ')'");
+        return Error("Bad type at ')'");
       }
       stack.pop_back();
-      if (stack.empty()) return AdventDay::Error("Empty stack");
+      if (stack.empty()) return Error("Empty stack");
       if (stack.back()->type != ParsedRE::kBranch) {
-        return AdventDay::Error("Bad type at ')' (2)");
+        return Error("Bad type at ')' (2)");
       }
       stack.pop_back();
     } else if (tok == "|") {
       if (stack.back()->type != ParsedRE::kSequence) {
-        return AdventDay::Error("Bad type at ')'");
+        return Error("Bad type at ')'");
       }
       stack.pop_back();
-      if (stack.empty()) return AdventDay::Error("Empty stack");
+      if (stack.empty()) return Error("Empty stack");
       auto next = absl::make_unique<ParsedRE>();
       next->type = ParsedRE::kSequence;
       stack.back()->children.push_back(std::move(next));
@@ -95,8 +95,8 @@ absl::StatusOr<ParsedRE> Parse(absl::string_view re) {
       stack.back()->children.push_back(std::move(next));
     }
   }
-  if (stack.size() != 1) return AdventDay::Error("Bad parse");
-  if (stack.back() != &ret) return AdventDay::Error("Bad parse 2");
+  if (stack.size() != 1) return Error("Bad parse");
+  if (stack.back() != &ret) return Error("Bad parse 2");
   return ret;
 }
 
@@ -106,7 +106,7 @@ absl::StatusOr<absl::flat_hash_set<Point>> WalkAllPaths(
   switch (re.type) {
     case ParsedRE::kLiteral: {
       if (re.children.size() != 0) {
-        return AdventDay::Error("Literal with non-empty children");
+        return Error("Literal with non-empty children");
       }
       for (char c : re.val) {
         Point dir;
@@ -124,7 +124,7 @@ absl::StatusOr<absl::flat_hash_set<Point>> WalkAllPaths(
             dir = Cardinal::kEast;
             break;
           default:
-            return AdventDay::Error("Bad direction in: ", re.val);
+            return Error("Bad direction in: ", re.val);
         }
         // Advance twice to include door.
         cur += dir;
@@ -137,7 +137,7 @@ absl::StatusOr<absl::flat_hash_set<Point>> WalkAllPaths(
     }
     case ParsedRE::kSequence: {
       if (!re.val.empty()) {
-        return AdventDay::Error("Sequence with non-empty value");
+        return Error("Sequence with non-empty value");
       }
       ret = {cur};
       for (const auto& child : re.children) {
@@ -154,7 +154,7 @@ absl::StatusOr<absl::flat_hash_set<Point>> WalkAllPaths(
     }
     case ParsedRE::kBranch: {
       if (!re.val.empty()) {
-        return AdventDay::Error("Branch with non-empty value");
+        return Error("Branch with non-empty value");
       }
       ret = {};
       for (const auto& child : re.children) {
@@ -166,7 +166,7 @@ absl::StatusOr<absl::flat_hash_set<Point>> WalkAllPaths(
       break;
     }
     default:
-      return AdventDay::Error("Bad type: ", re.type);
+      return Error("Bad type: ", re.type);
   }
   return ret;
 }
@@ -204,8 +204,8 @@ absl::StatusOr<CharBoard> ConstructRoom(absl::string_view re,
       } else if (test_point.x % 2 == 0 && test_point.y % 2) {
         board[p] = '-';
       } else {
-        return AdventDay::Error("Sparse board contains corner: ",
-                                test_point.DebugString());
+        return Error("Sparse board contains corner: ",
+                     test_point.DebugString());
       }
     } else {
       board[p] = '#';

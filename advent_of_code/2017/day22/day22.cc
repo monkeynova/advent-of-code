@@ -23,8 +23,8 @@ absl::StatusOr<absl::flat_hash_set<Point>> Parse(
     absl::Span<absl::string_view> input) {
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
-  if (b->width() % 2 != 1) return AdventDay::Error("Bad width");
-  if (b->height() % 2 != 1) return AdventDay::Error("Bad width");
+  if (b->width() % 2 != 1) return Error("Bad width");
+  if (b->height() % 2 != 1) return Error("Bad width");
 
   Point center = {b->width() / 2, b->height() / 2};
 
@@ -62,8 +62,8 @@ absl::StatusOr<absl::flat_hash_map<Point, State>> Parse2(
     absl::Span<absl::string_view> input) {
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
-  if (b->width() % 2 != 1) return AdventDay::Error("Bad width");
-  if (b->height() % 2 != 1) return AdventDay::Error("Bad width");
+  if (b->width() % 2 != 1) return Error("Bad width");
+  if (b->height() % 2 != 1) return Error("Bad width");
 
   Point center = {b->width() / 2, b->height() / 2};
 

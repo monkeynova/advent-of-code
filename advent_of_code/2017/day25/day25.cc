@@ -38,32 +38,32 @@ class TuringMachine {
         cur_rule.in_state = str;
       } else if (RE2::FullMatch(row, "  If the current value is ([01]):", &n)) {
         if (cur_rule.in_state.empty())
-          return AdventDay::Error("Current value with no state");
+          return Error("Current value with no state");
         if (n == 0) {
           cur_if = &cur_rule.if0;
         } else if (n == 1) {
           cur_if = &cur_rule.if1;
         } else {
-          return AdventDay::Error("Bad current value: ", row);
+          return Error("Bad current value: ", row);
         }
       } else if (RE2::FullMatch(row, "    - Write the value ([01]).", &n)) {
-        if (cur_if == nullptr) return AdventDay::Error("Write with no current");
+        if (cur_if == nullptr) return Error("Write with no current");
         cur_if->write = n;
       } else if (RE2::FullMatch(row, "    - Move one slot to the (left|right).",
                                 &str)) {
-        if (cur_if == nullptr) return AdventDay::Error("Write with no current");
+        if (cur_if == nullptr) return Error("Write with no current");
         if (str == "left") {
           cur_if->dir = -1;
         } else {
           cur_if->dir = 1;
         }
       } else if (RE2::FullMatch(row, "    - Continue with state (.*).", &str)) {
-        if (cur_if == nullptr) return AdventDay::Error("Write with no current");
+        if (cur_if == nullptr) return Error("Write with no current");
         cur_if->next_state = str;
       } else if (row.empty()) {
         // OK.
       } else {
-        return AdventDay::Error("Bad line: ", row);
+        return Error("Bad line: ", row);
       }
     }
     if (!cur_rule.in_state.empty()) {
@@ -75,8 +75,7 @@ class TuringMachine {
   absl::Status Run() {
     for (int step = 0; step < stop_steps_; ++step) {
       auto it = state_to_rule_.find(cur_state_);
-      if (it == state_to_rule_.end())
-        return AdventDay::Error("Bad state: ", cur_state_);
+      if (it == state_to_rule_.end()) return Error("Bad state: ", cur_state_);
       const Rule& r = it->second;
       const Rule::If& rif = tape_.contains(head_pos_) ? r.if1 : r.if0;
       if (rif.write)

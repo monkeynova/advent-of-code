@@ -29,7 +29,7 @@ absl::StatusOr<int> EvaluateMemo(
   if (!absl::SimpleAtoi(dest, &ret)) {
     auto it = ops_by_dest.find(dest);
     if (it == ops_by_dest.end()) {
-      return AdventDay::Error("No ", dest);
+      return Error("No ", dest);
     }
     const Operation& op = it->second;
     if (op.operation == "") {
@@ -83,7 +83,7 @@ absl::StatusOr<absl::flat_hash_map<std::string, Operation>> Parse(
   absl::flat_hash_map<std::string, Operation> ops_by_dest;
 
   for (absl::string_view str : input) {
-    const auto [op_str, dest] = AdventDay::PairSplit(str, " -> ");
+    const auto [op_str, dest] = PairSplit(str, " -> ");
     Operation op;
     op.dest = dest;
     if (RE2::FullMatch(op_str, "(\\d+|[a-z]+)", &op.arg1)) {
@@ -105,7 +105,7 @@ absl::StatusOr<absl::flat_hash_map<std::string, Operation>> Parse(
                               &op.arg1, &op.arg2)) {
       op.operation = "RSHIFT";
     } else {
-      return AdventDay::Error("Bad op: ", op_str);
+      return Error("Bad op: ", op_str);
     }
     ops_by_dest[op.dest] = op;
   }

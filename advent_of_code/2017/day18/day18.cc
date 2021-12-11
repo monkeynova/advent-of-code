@@ -48,7 +48,7 @@ struct Instruction {
                               &ret.arg1, &ret.arg2)) {
       ret.op_code = Instruction::kJgz;
     } else {
-      return AdventDay::Error("Bad instruction: ", str);
+      return Error("Bad instruction: ", str);
     }
     return ret;
   }

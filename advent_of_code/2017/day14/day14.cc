@@ -71,7 +71,7 @@ absl::StatusOr<CharBoard> BuildBoard(absl::string_view input) {
       else if (c >= '0' && c <= '9')
         c -= '0';
       else
-        return AdventDay::Error("Bad hash char: ", hash);
+        return Error("Bad hash char: ", hash);
       if (c & 8) board[{i * 4 + 0, y}] = '.';
       if (c & 4) board[{i * 4 + 1, y}] = '.';
       if (c & 2) board[{i * 4 + 2, y}] = '.';

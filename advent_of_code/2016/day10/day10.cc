@@ -35,7 +35,7 @@ absl::StatusOr<int> Eval(absl::flat_hash_map<int, Bot>* bots, int bot_num,
   if (in->value != -1) return in->value;
 
   auto it = bots->find(in->bot_num);
-  if (it == bots->end()) return AdventDay::Error("No bot: ", in->bot_num);
+  if (it == bots->end()) return Error("No bot: ", in->bot_num);
   Bot& in_bot = it->second;
 
   absl::StatusOr<int> v1 = Eval(bots, in->bot_num, &in_bot.inputs[0]);
@@ -48,7 +48,7 @@ absl::StatusOr<int> Eval(absl::flat_hash_map<int, Bot>* bots, int bot_num,
   } else if (in_bot.high_bot_num == bot_num) {
     in->value = std::max(*v1, *v2);
   } else {
-    return AdventDay::Error("Bot is neither high nor low");
+    return Error("Bot is neither high nor low");
   }
 
   VLOG(1) << "Assigning: " << in->value << " to " << bot_num;
@@ -62,7 +62,7 @@ absl::StatusOr<int> EvalOutput(absl::flat_hash_map<int, Bot>* bots,
   if (in->value != -1) return in->value;
 
   auto it = bots->find(in->bot_num);
-  if (it == bots->end()) return AdventDay::Error("No bot: ", in->bot_num);
+  if (it == bots->end()) return Error("No bot: ", in->bot_num);
   Bot& in_bot = it->second;
 
   absl::StatusOr<int> v1 = Eval(bots, in->bot_num, &in_bot.inputs[0]);
@@ -75,7 +75,7 @@ absl::StatusOr<int> EvalOutput(absl::flat_hash_map<int, Bot>* bots,
   } else if (in_bot.high_output_num == output_num) {
     in->value = std::max(*v1, *v2);
   } else {
-    return AdventDay::Error("Bot is neither high nor low");
+    return Error("Bot is neither high nor low");
   }
 
   VLOG(1) << "Assigning: " << in->value << " to O:" << output_num;
@@ -86,7 +86,7 @@ absl::StatusOr<int> FindCmp(absl::flat_hash_map<int, Bot>* bots, int test_v1,
                             int test_v2) {
   for (auto& [bot_num, bot] : *bots) {
     if (bot.inputs.size() != 2) {
-      return AdventDay::Error("Bad input: ", bot_num, ": ", bot.inputs.size());
+      return Error("Bad input: ", bot_num, ": ", bot.inputs.size());
     }
     absl::StatusOr<int> v1 = Eval(bots, bot_num, &bot.inputs[0]);
     if (!v1.ok()) return v1.status();
@@ -96,7 +96,7 @@ absl::StatusOr<int> FindCmp(absl::flat_hash_map<int, Bot>* bots, int test_v1,
     if (*v2 == test_v1 && *v1 == test_v2) return bot_num;
   }
 
-  return AdventDay::Error("Not found");
+  return Error("Not found");
 }
 
 }  // namespace

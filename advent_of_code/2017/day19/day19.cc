@@ -25,7 +25,7 @@ absl::StatusOr<WalkRet> WalkBoard(const CharBoard& b) {
   Point dir = Cardinal::kSouth;
   for (Point p = {0, 0}; p != Point{b.width(), 0}; p += {1, 0}) {
     if (b[p] == '|') {
-      if (start != Point{-1, -1}) return AdventDay::Error("Two starts");
+      if (start != Point{-1, -1}) return Error("Two starts");
       start = p;
     }
   }
@@ -45,12 +45,11 @@ absl::StatusOr<WalkRet> WalkBoard(const CharBoard& b) {
       }
       if (!b.OnBoard(next) || b[next] == ' ') {
         if (b[p] == '+')
-          return AdventDay::Error("Erroneously marked end @", p.DebugString());
+          return Error("Erroneously marked end @", p.DebugString());
         break;
       }
       if (b[p] != '+')
-        return AdventDay::Error("Turning at non-intersection @",
-                                p.DebugString());
+        return Error("Turning at non-intersection @", p.DebugString());
     }
     if (b[next] == '+' || b[next] == '|' || b[next] == '-') {
       // Still on path. Keep going.
@@ -60,7 +59,7 @@ absl::StatusOr<WalkRet> WalkBoard(const CharBoard& b) {
       VLOG(1) << "Appending: " << b[next] << " to " << ret.sequence;
       ret.sequence.append(1, b[next]);
     } else {
-      return AdventDay::Error("Bad token @", next.DebugString());
+      return Error("Bad token @", next.DebugString());
     }
     p = next;
   }

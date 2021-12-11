@@ -23,10 +23,10 @@ absl::StatusOr<DirectedGraph<Rule>> ParseRuleSet(
     absl::Span<absl::string_view> input) {
   DirectedGraph<Rule> rule_set;
   for (absl::string_view rule_str : input) {
-    const auto [inputs, output] = AdventDay::PairSplit(rule_str, " => ");
+    const auto [inputs, output] = PairSplit(rule_str, " => ");
 
     Rule rule;
-    const auto [src_q, src] = AdventDay::PairSplit(output, " ");
+    const auto [src_q, src] = PairSplit(output, " ");
     if (rule_set.GetData(src) != nullptr) {
       return absl::InvalidArgumentError("Duplicate rule");
     }
@@ -35,7 +35,7 @@ absl::StatusOr<DirectedGraph<Rule>> ParseRuleSet(
     }
 
     for (absl::string_view in : absl::StrSplit(inputs, ", ")) {
-      const auto [dest_q, dest] = AdventDay::PairSplit(in, " ");
+      const auto [dest_q, dest] = PairSplit(in, " ");
       int quantity;
       if (!absl::SimpleAtoi(dest_q, &quantity)) {
         return absl::InvalidArgumentError("Bad quantity");
@@ -58,7 +58,7 @@ absl::StatusOr<int64_t> ComputeOreNeedForFuel(
   for (absl::string_view node : ordered_ingredients) {
     if (node == "ORE") continue;
     const Rule* rule = rule_set.GetData(node);
-    if (rule == nullptr) return AdventDay::Error("Cannot find ", node);
+    if (rule == nullptr) return Error("Cannot find ", node);
     VLOG(1) << absl::StrJoin(
         needs, ", ",
         [](std::string* out, const std::pair<absl::string_view, int>& need) {
@@ -88,10 +88,10 @@ absl::StatusOr<int64_t> ComputeOreNeedForFuel(
       DAGSort(rule_set);
   if (!ordered_ingredients.ok()) return ordered_ingredients.status();
   if (ordered_ingredients->at(0) != "FUEL") {
-    return AdventDay::Error("Not a DAG rooted at FUEL");
+    return Error("Not a DAG rooted at FUEL");
   }
   if (ordered_ingredients->back() != "ORE") {
-    return AdventDay::Error("Not a DAG with leaf at ORE");
+    return Error("Not a DAG with leaf at ORE");
   }
   return ComputeOreNeedForFuel(rule_set, *ordered_ingredients, 1);
 }
@@ -102,10 +102,10 @@ absl::StatusOr<int> FuelFromOre(const DirectedGraph<Rule>& rule_set,
       DAGSort(rule_set);
   if (!ordered_ingredients.ok()) return ordered_ingredients.status();
   if (ordered_ingredients->at(0) != "FUEL") {
-    return AdventDay::Error("Not a DAG rooted at FUEL");
+    return Error("Not a DAG rooted at FUEL");
   }
   if (ordered_ingredients->back() != "ORE") {
-    return AdventDay::Error("Not a DAG with leaf at ORE");
+    return Error("Not a DAG with leaf at ORE");
   }
   int64_t guess = 1;
   absl::StatusOr<int64_t> ore_needed = 0;

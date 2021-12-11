@@ -24,8 +24,7 @@ absl::StatusOr<int> ParseAndCountNonRed(absl::string_view* json,
     }
     absl::string_view num = json->substr(0, len);
     int val;
-    if (!absl::SimpleAtoi(num, &val))
-      return AdventDay::Error("Not numeric: ", *json);
+    if (!absl::SimpleAtoi(num, &val)) return Error("Not numeric: ", *json);
     *json = json->substr(len);
     return val;
   }
@@ -49,10 +48,10 @@ absl::StatusOr<int> ParseAndCountNonRed(absl::string_view* json,
       if ((*json)[0] == ',') {
         *json = json->substr(1);
       } else if ((*json)[0] != ']') {
-        return AdventDay::Error("Bad array: ", *json);
+        return Error("Bad array: ", *json);
       }
     }
-    if (json->empty()) return AdventDay::Error("Truncated array");
+    if (json->empty()) return Error("Truncated array");
     *json = json->substr(1);
     return ret;
   }
@@ -64,8 +63,7 @@ absl::StatusOr<int> ParseAndCountNonRed(absl::string_view* json,
       absl::StatusOr<int> next = ParseAndCountNonRed(json);
       if (!next.ok()) return next.status();
       ret += *next;
-      if ((*json)[0] != ':')
-        return AdventDay::Error("Missing k/v break: ", *json);
+      if ((*json)[0] != ':') return Error("Missing k/v break: ", *json);
       *json = json->substr(1);
       bool is_red;
       next = ParseAndCountNonRed(json, &is_red);
@@ -75,14 +73,14 @@ absl::StatusOr<int> ParseAndCountNonRed(absl::string_view* json,
       if ((*json)[0] == ',') {
         *json = json->substr(1);
       } else if ((*json)[0] != '}') {
-        return AdventDay::Error("Bad map: ", *json);
+        return Error("Bad map: ", *json);
       }
     }
-    if (json->empty()) return AdventDay::Error("Truncated map");
+    if (json->empty()) return Error("Truncated map");
     *json = json->substr(1);
     return has_red ? 0 : ret;
   }
-  return AdventDay::Error("Cannot handle: ", *json);
+  return Error("Cannot handle: ", *json);
 }
 
 }  // namespace

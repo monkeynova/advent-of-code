@@ -40,14 +40,14 @@ absl::StatusOr<int64_t> Decode(absl::string_view digit,
   for (char& c : digit_copy) {
     auto it = map.find(c);
     if (it == map.end()) {
-      return AdventDay::Error("Could not find digit: ", digit_copy);
+      return Error("Could not find digit: ", digit_copy);
     }
     c = it->second;
   }
   absl::c_sort(digit_copy);
   auto it = kLookup.find(digit_copy);
   if (it == kLookup.end()) {
-    return AdventDay::Error("Could not lookup digit_copy: ", digit_copy);
+    return Error("Could not lookup digit_copy: ", digit_copy);
   }
   return it->second;
 }
@@ -73,7 +73,7 @@ bool TryMap(absl::flat_hash_map<char, char>& map, char next,
 
 absl::StatusOr<absl::flat_hash_map<char, char>> FindMap(
     const std::vector<absl::string_view>& left) {
-  if (left.size() != 10) return AdventDay::Error("Bad exemplars");
+  if (left.size() != 10) return Error("Bad exemplars");
 
   absl::flat_hash_map<int64_t, absl::flat_hash_set<char>> countToSegments = {
       {8, {'a', 'c'}}, {6, {'b'}}, {7, {'d', 'g'}}, {4, {'e'}}, {9, {'f'}},
@@ -90,9 +90,9 @@ absl::StatusOr<absl::flat_hash_map<char, char>> FindMap(
 
   for (char c1 : {'a', 'b', 'c', 'd', 'e', 'f', 'g'}) {
     auto it = observed.find(c1);
-    if (it == observed.end()) return AdventDay::Error("Bad observed");
+    if (it == observed.end()) return Error("Bad observed");
     auto it2 = countToSegments.find(it->second);
-    if (it2 == countToSegments.end()) return AdventDay::Error("Bad count");
+    if (it2 == countToSegments.end()) return Error("Bad count");
     possible[c1] = it2->second;
   }
   for (absl::string_view test : left) {
@@ -135,7 +135,7 @@ absl::StatusOr<absl::flat_hash_map<char, char>> FindMap(
   }
   absl::flat_hash_map<char, char> ret;
   for (const auto& [c, set] : possible) {
-    if (set.size() != 1) return AdventDay::Error("Bad possible");
+    if (set.size() != 1) return Error("Bad possible");
     ret[c] = *set.begin();
   }
   return ret;

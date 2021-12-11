@@ -11,33 +11,33 @@
 
 namespace advent_of_code {
 
+template <class... Args>
+inline absl::Status Error(Args... args) {
+  return absl::InvalidArgumentError(absl::StrCat(args...));
+}
+
+template <class Container>
+inline absl::StatusOr<std::vector<int64_t>> ParseAsInts(Container input) {
+  std::vector<int64_t> vals;
+  for (absl::string_view in : input) {
+    int64_t v;
+    if (!absl::SimpleAtoi(in, &v)) {
+      return Error("parse as int: ", in);
+    }
+    vals.push_back(v);
+  }
+  return vals;
+}
+
+inline std::pair<absl::string_view, absl::string_view> PairSplit(
+    absl::string_view in, absl::string_view delim) {
+  return std::pair<absl::string_view, absl::string_view>(
+      absl::StrSplit(in, absl::MaxSplits(delim, 2)));
+}
+
 class AdventDay {
  public:
   virtual ~AdventDay() = default;
-
-  template <class Container>
-  static absl::StatusOr<std::vector<int64_t>> ParseAsInts(Container input) {
-    std::vector<int64_t> vals;
-    for (absl::string_view in : input) {
-      int64_t v;
-      if (!absl::SimpleAtoi(in, &v)) {
-        return Error("parse as int: ", in);
-      }
-      vals.push_back(v);
-    }
-    return vals;
-  }
-
-  static std::pair<absl::string_view, absl::string_view> PairSplit(
-      absl::string_view in, absl::string_view delim) {
-    return std::pair<absl::string_view, absl::string_view>(
-        absl::StrSplit(in, absl::MaxSplits(delim, 2)));
-  }
-
-  template <class... Args>
-  static absl::Status Error(Args... args) {
-    return absl::InvalidArgumentError(absl::StrCat(args...));
-  }
 
   absl::StatusOr<std::string> IntReturn(int64_t val) const {
     return absl::StrCat(val);

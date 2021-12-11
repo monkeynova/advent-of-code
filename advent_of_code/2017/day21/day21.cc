@@ -51,7 +51,7 @@ absl::StatusOr<CharBoard> FindPattern(
       // return Transform(it->second, out_transforms[i]);
     }
   }
-  return AdventDay::Error("No Patter found");
+  return Error("No Patter found");
 }
 
 void SpliceBoard(CharBoard* out, const CharBoard& in, Point splice_at) {
@@ -64,13 +64,13 @@ absl::StatusOr<CharBoard> RunIteration(
     const CharBoard& in,
     const absl::flat_hash_map<CharBoard, CharBoard>& patterns) {
   Point stride;
-  if (in.width() != in.height()) return AdventDay::Error("Not square");
+  if (in.width() != in.height()) return Error("Not square");
   if (in.width() % 2 == 0) {
     stride = Point{2, 2};
   } else if (in.width() % 3 == 0) {
     stride = Point{3, 3};
   } else {
-    return AdventDay::Error("Can't expand non mod-2, non mod-3 squares");
+    return Error("Can't expand non mod-2, non mod-3 squares");
   }
   VLOG(2) << stride;
   CharBoard out(in.width() * (stride.x + 1) / stride.x,
@@ -84,10 +84,8 @@ absl::StatusOr<CharBoard> RunIteration(
       VLOG(2) << "Slice:\n" << slice;
       absl::StatusOr<CharBoard> new_slice = FindPattern(slice, patterns);
       if (!new_slice.ok()) return new_slice.status();
-      if (new_slice->width() != stride.x + 1)
-        return AdventDay::Error("Bad pattern: x");
-      if (new_slice->height() != stride.y + 1)
-        return AdventDay::Error("Bad pattern: y");
+      if (new_slice->width() != stride.x + 1) return Error("Bad pattern: x");
+      if (new_slice->height() != stride.y + 1) return Error("Bad pattern: y");
 
       Point splice_at = {x * (stride.x + 1), y * (stride.y + 1)};
       VLOG(2) << "Splice @" << splice_at;
@@ -101,7 +99,7 @@ absl::StatusOr<absl::flat_hash_map<CharBoard, CharBoard>> Parse(
     absl::Span<absl::string_view> input) {
   absl::flat_hash_map<CharBoard, CharBoard> ret;
   for (absl::string_view rule : input) {
-    const auto [in, out] = AdventDay::PairSplit(rule, " => ");
+    const auto [in, out] = PairSplit(rule, " => ");
 
     absl::StatusOr<CharBoard> board_in =
         CharBoard::Parse(absl::StrSplit(in, "/"));
@@ -111,7 +109,7 @@ absl::StatusOr<absl::flat_hash_map<CharBoard, CharBoard>> Parse(
         CharBoard::Parse(absl::StrSplit(out, "/"));
     if (!board_out.ok()) return board_out.status();
 
-    if (ret.contains(*board_in)) return AdventDay::Error("Duplicate pattern");
+    if (ret.contains(*board_in)) return Error("Duplicate pattern");
     // TODO(@monkeynova): Verify no rotations.
 
     ret.emplace(*board_in, *board_out);

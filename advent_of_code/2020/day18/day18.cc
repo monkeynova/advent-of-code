@@ -65,13 +65,13 @@ class Add : public ExprTree {
 absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree(absl::string_view* str);
 
 absl::StatusOr<std::unique_ptr<ExprTree>> ParseValue(absl::string_view* str) {
-  if (str->empty()) return AdventDay::Error("No value");
+  if (str->empty()) return Error("No value");
   while ((*str)[0] == ' ') *str = str->substr(1);
   if ((*str)[0] == '(') {
     *str = str->substr(1);
     absl::StatusOr<std::unique_ptr<ExprTree>> ret = ParseOpTree(str);
     if (!ret.ok()) return ret.status();
-    if ((*str)[0] != ')') return AdventDay::Error("No matching ')'");
+    if ((*str)[0] != ')') return Error("No matching ')'");
     *str = str->substr(1);
     while ((*str)[0] == ' ') *str = str->substr(1);
     return ret;
@@ -84,7 +84,7 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseValue(absl::string_view* str) {
     while ((*str)[0] == ' ') *str = str->substr(1);
     return absl::make_unique<Val>(val);
   }
-  return AdventDay::Error("can't get value from: ", *str);
+  return Error("can't get value from: ", *str);
 }
 
 absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree(absl::string_view* str) {
@@ -108,7 +108,7 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree(absl::string_view* str) {
         break;
       }
       default:
-        return AdventDay::Error("Bad op: ", *str);
+        return Error("Bad op: ", *str);
     }
   }
   return last_val;
@@ -116,20 +116,20 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree(absl::string_view* str) {
 
 absl::StatusOr<std::unique_ptr<ExprTree>> Parse(absl::string_view str) {
   absl::StatusOr<std::unique_ptr<ExprTree>> ret = ParseOpTree(&str);
-  if (!str.empty()) return AdventDay::Error("Bad parse remain=", str);
+  if (!str.empty()) return Error("Bad parse remain=", str);
   return ret;
 }
 
 absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree2(absl::string_view* str);
 
 absl::StatusOr<std::unique_ptr<ExprTree>> ParseValue2(absl::string_view* str) {
-  if (str->empty()) return AdventDay::Error("No value");
+  if (str->empty()) return Error("No value");
   while ((*str)[0] == ' ') *str = str->substr(1);
   if ((*str)[0] == '(') {
     *str = str->substr(1);
     absl::StatusOr<std::unique_ptr<ExprTree>> ret = ParseOpTree2(str);
     if (!ret.ok()) return ret.status();
-    if ((*str)[0] != ')') return AdventDay::Error("No matching ')'");
+    if ((*str)[0] != ')') return Error("No matching ')'");
     *str = str->substr(1);
     while ((*str)[0] == ' ') *str = str->substr(1);
     return ret;
@@ -142,7 +142,7 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseValue2(absl::string_view* str) {
     while ((*str)[0] == ' ') *str = str->substr(1);
     return absl::make_unique<Val>(val);
   }
-  return AdventDay::Error("can't get value from: ", *str);
+  return Error("can't get value from: ", *str);
 }
 
 absl::StatusOr<std::unique_ptr<ExprTree>> ParseAddTree(absl::string_view* str) {
@@ -151,7 +151,7 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseAddTree(absl::string_view* str) {
   while (!str->empty()) {
     char op = (*str)[0];
     if (op == ')' || op == '*') break;
-    if (op != '+') return AdventDay::Error("Not add: ", *str);
+    if (op != '+') return Error("Not add: ", *str);
     *str = str->substr(1);
     absl::StatusOr<std::unique_ptr<ExprTree>> next_val = ParseValue2(str);
     last_val =
@@ -166,7 +166,7 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseMulTree(absl::string_view* str) {
   while (!str->empty()) {
     char op = (*str)[0];
     if (op == ')') break;
-    if (op != '*') return AdventDay::Error("Not mult: ", *str);
+    if (op != '*') return Error("Not mult: ", *str);
     *str = str->substr(1);
     absl::StatusOr<std::unique_ptr<ExprTree>> next_val = ParseAddTree(str);
     last_val =
@@ -181,7 +181,7 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree2(absl::string_view* str) {
 
 absl::StatusOr<std::unique_ptr<ExprTree>> Parse2(absl::string_view str) {
   absl::StatusOr<std::unique_ptr<ExprTree>> ret = ParseOpTree2(&str);
-  if (!str.empty()) return AdventDay::Error("Bad parse remain=", str);
+  if (!str.empty()) return Error("Bad parse remain=", str);
   return ret;
 }
 

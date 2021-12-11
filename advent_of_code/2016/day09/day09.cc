@@ -22,7 +22,7 @@ absl::StatusOr<std::string> DecompressV1(absl::string_view in) {
       absl::string_view skip;
       if (!RE2::FullMatch(in.substr(i), "(\\((\\d+)x(\\d+)\\)).*", &skip, &len,
                           &count)) {
-        return AdventDay::Error("Bad parse: ", in.substr(i));
+        return Error("Bad parse: ", in.substr(i));
       }
       for (int j = 0; j < count; ++j) {
         ret.append(std::string(in.substr(i + skip.size(), len)));
@@ -44,7 +44,7 @@ absl::StatusOr<std::string> DecompressV2(absl::string_view in) {
       absl::string_view skip;
       if (!RE2::FullMatch(in.substr(i), "(\\((\\d+)x(\\d+)\\)).*", &skip, &len,
                           &count)) {
-        return AdventDay::Error("Bad parse: ", in.substr(i));
+        return Error("Bad parse: ", in.substr(i));
       }
       absl::StatusOr<std::string> tmp =
           DecompressV2(in.substr(i + skip.size(), len));
@@ -69,7 +69,7 @@ absl::StatusOr<int64_t> DecompressV2NonWhitespaceLen(absl::string_view in) {
       absl::string_view skip;
       if (!RE2::FullMatch(in.substr(i), "(\\((\\d+)x(\\d+)\\)).*", &skip, &len,
                           &count)) {
-        return AdventDay::Error("Bad parse: ", in.substr(i));
+        return Error("Bad parse: ", in.substr(i));
       }
       absl::StatusOr<int64_t> sub_len =
           DecompressV2NonWhitespaceLen(in.substr(i + skip.size(), len));

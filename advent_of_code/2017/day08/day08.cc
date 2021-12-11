@@ -21,7 +21,7 @@ absl::StatusOr<std::string> Day_2017_08::Part1(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_map<absl::string_view, int> registers;
   for (absl::string_view in : input) {
-    const auto [op, cond] = AdventDay::PairSplit(in, " if ");
+    const auto [op, cond] = PairSplit(in, " if ");
     absl::string_view reg;
     absl::string_view fn;
     int num;
@@ -66,7 +66,7 @@ absl::StatusOr<std::string> Day_2017_08::Part2(
   absl::flat_hash_map<absl::string_view, int> registers;
   int max = std::numeric_limits<int>::min();
   for (absl::string_view in : input) {
-    const auto [op, cond] = AdventDay::PairSplit(in, " if ");
+    const auto [op, cond] = PairSplit(in, " if ");
     absl::string_view reg;
     absl::string_view fn;
     int num;

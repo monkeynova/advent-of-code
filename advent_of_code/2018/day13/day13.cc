@@ -54,9 +54,9 @@ struct State {
     for (Cart& c : carts) {
       cart_locations.erase(c.pos);
       c.pos += c.dir;
-      if (!board.OnBoard(c.pos)) return AdventDay::Error("Off board");
+      if (!board.OnBoard(c.pos)) return Error("Off board");
       if (cart_locations.contains(c.pos)) {
-        // if (ret) return AdventDay::Error("duplicate crash");
+        // if (ret) return Error("duplicate crash");
         ret = c.pos;
         for (Cart& c2 : carts) {
           if (c.pos == c2.pos) {
@@ -69,13 +69,13 @@ struct State {
       switch (board[c.pos]) {
         case '-': {
           if (c.dir != Cardinal::kWest && c.dir != Cardinal::kEast) {
-            return AdventDay::Error("Bad dir on '-'");
+            return Error("Bad dir on '-'");
           }
           break;
         }
         case '|': {
           if (c.dir != Cardinal::kNorth && c.dir != Cardinal::kSouth) {
-            return AdventDay::Error("Bad dir on '-'");
+            return Error("Bad dir on '-'");
           }
           break;
         }
@@ -89,7 +89,7 @@ struct State {
           else if (c.dir == Cardinal::kWest)
             c.dir = Cardinal::kSouth;
           else
-            return AdventDay::Error("Bad dir on '/'");
+            return Error("Bad dir on '/'");
           break;
         }
         case '\\': {
@@ -102,7 +102,7 @@ struct State {
           else if (c.dir == Cardinal::kWest)
             c.dir = Cardinal::kNorth;
           else
-            return AdventDay::Error("Bad dir on '\\'");
+            return Error("Bad dir on '\\'");
           break;
         }
         case '+': {
@@ -117,13 +117,13 @@ struct State {
               c.dir = c.dir.rotate_right();
               break;
             default:
-              return AdventDay::Error("Bad mod");
+              return Error("Bad mod");
           }
           ++c.turns;
           break;
         }
         default:
-          return AdventDay::Error("Bad board value");
+          return Error("Bad board value");
       }
     }
     if (ret) {
@@ -171,7 +171,7 @@ absl::StatusOr<State> FindKarts(const CharBoard& b) {
         break;
       }
       default:
-        return AdventDay::Error("Bad char @", p.DebugString());
+        return Error("Bad char @", p.DebugString());
     }
   }
   return state;

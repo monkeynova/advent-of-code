@@ -20,9 +20,9 @@ absl::StatusOr<DirectedGraph<BagRule>> Parse(
     absl::Span<absl::string_view> input) {
   DirectedGraph<BagRule> ret;
   for (absl::string_view str : input) {
-    const auto [outer, inner] = AdventDay::PairSplit(str, " bags contain ");
+    const auto [outer, inner] = PairSplit(str, " bags contain ");
     if (ret.GetData(outer) != nullptr) {
-      return AdventDay::Error("color dupe: ", outer);
+      return Error("color dupe: ", outer);
     }
     if (inner == "no other bags.") {
       // OK for the rule to be empty.
@@ -34,7 +34,7 @@ absl::StatusOr<DirectedGraph<BagRule>> Parse(
         int count;
         absl::string_view color;
         if (!RE2::FullMatch(bag_rule_str, *bag_pattern, &count, &color)) {
-          return AdventDay::Error("bag rule: ", bag_rule_str);
+          return Error("bag rule: ", bag_rule_str);
         }
         bag_rule.bag_to_count.emplace(color, count);
         ret.AddEdge(outer, color);
@@ -70,7 +70,7 @@ absl::StatusOr<int> CountContainedBags(const DirectedGraph<BagRule>& bags,
                                        absl::string_view bag) {
   const BagRule* bag_rule = bags.GetData(bag);
   if (bag_rule == nullptr) {
-    return AdventDay::Error("Cannot find bag: ", bag);
+    return Error("Cannot find bag: ", bag);
   }
   const std::vector<absl::string_view>* outgoing = bags.Outgoing(bag);
   int bag_count = 1;
@@ -80,7 +80,7 @@ absl::StatusOr<int> CountContainedBags(const DirectedGraph<BagRule>& bags,
       if (!sub_bags.ok()) return sub_bags.status();
       auto sub_bag_count_it = bag_rule->bag_to_count.find(sub_bag);
       if (sub_bag_count_it == bag_rule->bag_to_count.end()) {
-        return AdventDay::Error("Cannot find bag count: ", sub_bag);
+        return Error("Cannot find bag count: ", sub_bag);
       }
       bag_count += sub_bag_count_it->second * *sub_bags;
     }
