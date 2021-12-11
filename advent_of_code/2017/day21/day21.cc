@@ -99,7 +99,7 @@ absl::StatusOr<absl::flat_hash_map<CharBoard, CharBoard>> Parse(
     absl::Span<absl::string_view> input) {
   absl::flat_hash_map<CharBoard, CharBoard> ret;
   for (absl::string_view rule : input) {
-    const auto [in, out] = AdventDay::PairSplit(rule, " => ");
+    const auto [in, out] = PairSplit(rule, " => ");
 
     absl::StatusOr<CharBoard> board_in =
         CharBoard::Parse(absl::StrSplit(in, "/"));

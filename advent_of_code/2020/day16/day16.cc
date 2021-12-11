@@ -44,7 +44,7 @@ absl::StatusOr<ParseResult> Parse(absl::Span<absl::string_view> input) {
   ++i;
   std::vector<absl::string_view> my_ticket_str = absl::StrSplit(input[i], ",");
   absl::StatusOr<std::vector<int64_t>> my_ticket =
-      AdventDay::ParseAsInts(absl::MakeSpan(my_ticket_str));
+      ParseAsInts(absl::MakeSpan(my_ticket_str));
   if (!my_ticket.ok()) return my_ticket.status();
   res.my_ticket = *my_ticket;
   ++i;
@@ -58,7 +58,7 @@ absl::StatusOr<ParseResult> Parse(absl::Span<absl::string_view> input) {
     std::vector<absl::string_view> other_ticket_str =
         absl::StrSplit(input[i], ",");
     absl::StatusOr<std::vector<int64_t>> other_ticket =
-        AdventDay::ParseAsInts(absl::MakeSpan(other_ticket_str));
+        ParseAsInts(absl::MakeSpan(other_ticket_str));
     if (!other_ticket.ok()) return other_ticket.status();
     res.other_tickets.push_back(*other_ticket);
   }

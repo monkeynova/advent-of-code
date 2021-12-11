@@ -18,7 +18,7 @@ namespace {
 absl::StatusOr<DirectedGraph<bool>> Parse(absl::Span<absl::string_view> input) {
   DirectedGraph<bool> ret;
   for (absl::string_view str : input) {
-    const auto [node, cons] = AdventDay::PairSplit(str, " <-> ");
+    const auto [node, cons] = PairSplit(str, " <-> ");
     for (absl::string_view con : absl::StrSplit(cons, ", ")) {
       ret.AddEdge(node, con);
     }

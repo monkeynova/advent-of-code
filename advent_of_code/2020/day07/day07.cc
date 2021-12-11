@@ -20,7 +20,7 @@ absl::StatusOr<DirectedGraph<BagRule>> Parse(
     absl::Span<absl::string_view> input) {
   DirectedGraph<BagRule> ret;
   for (absl::string_view str : input) {
-    const auto [outer, inner] = AdventDay::PairSplit(str, " bags contain ");
+    const auto [outer, inner] = PairSplit(str, " bags contain ");
     if (ret.GetData(outer) != nullptr) {
       return Error("color dupe: ", outer);
     }

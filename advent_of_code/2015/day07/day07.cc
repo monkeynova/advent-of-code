@@ -83,7 +83,7 @@ absl::StatusOr<absl::flat_hash_map<std::string, Operation>> Parse(
   absl::flat_hash_map<std::string, Operation> ops_by_dest;
 
   for (absl::string_view str : input) {
-    const auto [op_str, dest] = AdventDay::PairSplit(str, " -> ");
+    const auto [op_str, dest] = PairSplit(str, " -> ");
     Operation op;
     op.dest = dest;
     if (RE2::FullMatch(op_str, "(\\d+|[a-z]+)", &op.arg1)) {

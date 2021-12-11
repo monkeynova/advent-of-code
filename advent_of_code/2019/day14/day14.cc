@@ -23,10 +23,10 @@ absl::StatusOr<DirectedGraph<Rule>> ParseRuleSet(
     absl::Span<absl::string_view> input) {
   DirectedGraph<Rule> rule_set;
   for (absl::string_view rule_str : input) {
-    const auto [inputs, output] = AdventDay::PairSplit(rule_str, " => ");
+    const auto [inputs, output] = PairSplit(rule_str, " => ");
 
     Rule rule;
-    const auto [src_q, src] = AdventDay::PairSplit(output, " ");
+    const auto [src_q, src] = PairSplit(output, " ");
     if (rule_set.GetData(src) != nullptr) {
       return absl::InvalidArgumentError("Duplicate rule");
     }
@@ -35,7 +35,7 @@ absl::StatusOr<DirectedGraph<Rule>> ParseRuleSet(
     }
 
     for (absl::string_view in : absl::StrSplit(inputs, ", ")) {
-      const auto [dest_q, dest] = AdventDay::PairSplit(in, " ");
+      const auto [dest_q, dest] = PairSplit(in, " ");
       int quantity;
       if (!absl::SimpleAtoi(dest_q, &quantity)) {
         return absl::InvalidArgumentError("Bad quantity");

@@ -27,7 +27,7 @@ absl::StatusOr<Food> ParseFood(absl::string_view txt) {
 
   Food food;
   const auto [ingredients, allergen_list] =
-      AdventDay::PairSplit(txt, " (contains ");
+      PairSplit(txt, " (contains ");
 
   food.ingredients = absl::StrSplit(ingredients, " ");
   food.allergens = absl::StrSplit(allergen_list, ", ");
