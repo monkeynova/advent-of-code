@@ -1,22 +1,40 @@
 [part=1]
-Example input
+5483143223
+2745854711
+5264556173
+6141336146
+6357385478
+4167524645
+2176841721
+6882881134
+4846848554
+5283751526
 --
-ERROR: Could not run test: Not implemented
+1656
 ==
 
 [part=1]
 @include{advent_of_code/2021/day11/input.txt}
 --
-ERROR: Could not run test: Not implemented
+1702
 ==
 
 [part=2]
-Example input
+5483143223
+2745854711
+5264556173
+6141336146
+6357385478
+4167524645
+2176841721
+6882881134
+4846848554
+5283751526
 --
-ERROR: Could not run test: Not implemented
+195
 ==
 
 [part=2]
 @include{advent_of_code/2021/day11/input.txt}
 --
-ERROR: Could not run test: Not implemented
+251
