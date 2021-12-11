@@ -37,7 +37,7 @@ absl::StatusOr<std::vector<DanceMove>> Parse(absl::string_view in) {
     } else if (RE2::FullMatch(i, "p([a-p])/([a-p])", &next.c1, &next.c2)) {
       next.op = DanceMove::kPartner;
     } else {
-      return AdventDay::Error("Bad instruction");
+      return Error("Bad instruction");
     }
     ret.push_back(next);
   }

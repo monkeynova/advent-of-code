@@ -33,7 +33,7 @@ absl::StatusOr<std::vector<NanoBot>> Parse(
     NanoBot nb;
     if (!RE2::FullMatch(row, "pos=<(-?\\d+,-?\\d+,-?\\d+)>, r=(-?\\d+)",
                         nb.p.Capture(), &nb.r)) {
-      return AdventDay::Error("Bad input: ", row);
+      return Error("Bad input: ", row);
     }
     ret.push_back(nb);
   }
@@ -154,7 +154,7 @@ absl::StatusOr<Point3> FindBest(std::vector<NanoBot> bots_in) {
       }
       for (CubeHits& hit : split) {
         if (hit.bots.size() != candidate_size) {
-          return AdventDay::Error("Bad candidate size");
+          return Error("Bad candidate size");
         }
         if (hit.range.min == hit.range.max) {
           final.push_back(std::move(hit));
@@ -166,11 +166,11 @@ absl::StatusOr<Point3> FindBest(std::vector<NanoBot> bots_in) {
     candidates = std::move(new_candidates);
   }
 
-  if (final.empty()) return AdventDay::Error("No final results");
+  if (final.empty()) return Error("No final results");
   Point3 best = final[0].range.min;
   for (const CubeHits& hit : final) {
     if (hit.range.min != hit.range.max) {
-      return AdventDay::Error("Integrity check");
+      return Error("Integrity check");
     }
     if (best.dist() > hit.range.min.dist()) {
       best = hit.range.min;

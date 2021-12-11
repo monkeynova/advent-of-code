@@ -138,15 +138,14 @@ class GameBoard {
       find = 'G';
       attack = elf_attack_;
     } else
-      return AdventDay::Error("HP at bad location (attack): ", p.DebugString());
+      return Error("HP at bad location (attack): ", p.DebugString());
     int fewest_hp = std::numeric_limits<int>::max();
     Point fewest_hp_location;
     for (Point dir : kOrderedDirs) {
       Point check = p + dir;
       if (board_.OnBoard(check) && board_[check] == find) {
         auto it = hit_points_.find(check);
-        if (it == hit_points_.end())
-          return AdventDay::Error("No HP at location");
+        if (it == hit_points_.end()) return Error("No HP at location");
         if (it->second < fewest_hp) {
           fewest_hp = it->second;
           fewest_hp_location = check;
@@ -158,7 +157,7 @@ class GameBoard {
     }
 
     auto it = hit_points_.find(fewest_hp_location);
-    if (it == hit_points_.end()) return AdventDay::Error("No HP at location");
+    if (it == hit_points_.end()) return Error("No HP at location");
     if (it->second <= attack) {
       VLOG(1) << "Opponent " << find << " @" << fewest_hp_location << " died";
       // Opponent died.
@@ -178,7 +177,7 @@ class GameBoard {
     else if (board_[p] == 'E')
       find = 'G';
     else
-      return AdventDay::Error("HP at bad location (move): ", p.DebugString());
+      return Error("HP at bad location (move): ", p.DebugString());
 
     FindEnemyAdjacent::PointAndDistance p_and_d;
     (void)FindEnemyAdjacent(board_, p, find, &p_and_d).FindMinSteps();
@@ -200,12 +199,12 @@ class GameBoard {
       }
     }
     if (min_path_length != p_and_d.d - 1) {
-      return AdventDay::Error("Distance integrity check: ", min_path_length,
-                              " != ", p_and_d.d - 1);
+      return Error("Distance integrity check: ", min_path_length,
+                   " != ", p_and_d.d - 1);
     }
     if (move_to == p) {
-      return AdventDay::Error("Can't find path from ", p.DebugString(), " to ",
-                              p_and_d.p.DebugString());
+      return Error("Can't find path from ", p.DebugString(), " to ",
+                   p_and_d.p.DebugString());
     }
     VLOG(1) << "Moving " << board_[p] << " from " << p << " to " << move_to;
     board_[move_to] = board_[p];
@@ -225,7 +224,7 @@ class GameBoard {
     for (Point p : actors) {
       if (dead.contains(p)) continue;
       if (hit_points_.find(p) == hit_points_.end()) {
-        return AdventDay::Error("Integrity check (actor)");
+        return Error("Integrity check (actor)");
       }
       if (!EnemyExists()) {
         done = true;

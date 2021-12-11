@@ -53,7 +53,7 @@ absl::StatusOr<std::string> Day_2021_11::Part1(
   for (int i = 0; i < 100; ++i) {
     flashes += RunStep(*board);
   }
-  
+
   return IntReturn(flashes);
 }
 
@@ -69,7 +69,7 @@ absl::StatusOr<std::string> Day_2021_11::Part2(
       return IntReturn(i);
     }
   }
-  
+
   return Error("No end?");
 }
 

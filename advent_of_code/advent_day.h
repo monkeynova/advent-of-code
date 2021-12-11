@@ -11,6 +11,11 @@
 
 namespace advent_of_code {
 
+template <class... Args>
+absl::Status Error(Args... args) {
+  return absl::InvalidArgumentError(absl::StrCat(args...));
+}
+
 class AdventDay {
  public:
   virtual ~AdventDay() = default;
@@ -32,11 +37,6 @@ class AdventDay {
       absl::string_view in, absl::string_view delim) {
     return std::pair<absl::string_view, absl::string_view>(
         absl::StrSplit(in, absl::MaxSplits(delim, 2)));
-  }
-
-  template <class... Args>
-  static absl::Status Error(Args... args) {
-    return absl::InvalidArgumentError(absl::StrCat(args...));
   }
 
   absl::StatusOr<std::string> IntReturn(int64_t val) const {

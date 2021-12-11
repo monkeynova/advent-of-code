@@ -50,15 +50,14 @@ absl::StatusOr<absl::flat_hash_map<int, VM::OpCode>> ComputeMap(
     for (const auto& [op_int, set] : possible) {
       if (set.size() == 1) {
         VM::OpCode assign = *set.begin();
-        if (map.contains(op_int)) return AdventDay::Error("Dupe in map");
-        if (reverse.contains(assign))
-          return AdventDay::Error("Dupe in reverse");
+        if (map.contains(op_int)) return Error("Dupe in map");
+        if (reverse.contains(assign)) return Error("Dupe in reverse");
         assigned.push_back(assign);
         map[op_int] = assign;
         reverse[assign] = op_int;
       }
     }
-    if (assigned.empty()) return AdventDay::Error("Can't determine map");
+    if (assigned.empty()) return Error("Can't determine map");
     std::vector<int> to_clear;
     for (VM::OpCode op : assigned) {
       for (auto& [op_int, set] : possible) {

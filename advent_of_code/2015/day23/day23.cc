@@ -34,7 +34,7 @@ class VM {
                                 &ins.literal)) {
         ins.op = OpCode::kJio;
       } else {
-        return AdventDay::Error("Bad instruction: ", ins_str);
+        return Error("Bad instruction: ", ins_str);
       }
       ret.instructions_.push_back(ins);
     }

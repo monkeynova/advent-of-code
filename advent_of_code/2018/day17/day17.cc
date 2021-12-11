@@ -17,7 +17,7 @@ namespace {
 absl::Status DropFrom(CharBoard& b, Point start) {
   VLOG(1) << "Drop From: " << start;
   Point cur = start;
-  if (b[cur] != '.') return AdventDay::Error("Drop from non-soil");
+  if (b[cur] != '.') return Error("Drop from non-soil");
   while (b[cur] == '.') {
     b[cur] = '|';
     cur += Point{0, 1};
@@ -37,7 +37,7 @@ absl::Status DropFrom(CharBoard& b, Point start) {
       break;
     }
     default:
-      return AdventDay::Error("Drop to unhandled");
+      return Error("Drop to unhandled");
   }
   cur -= Point{0, 1};
   VLOG(1) << "Drop to: " << cur;
@@ -62,7 +62,7 @@ absl::Status DropFrom(CharBoard& b, Point start) {
         break;
       }
       fill.min -= Point{1, 0};
-      if (!b.OnBoard(fill.min)) return AdventDay::Error("Off edge");
+      if (!b.OnBoard(fill.min)) return Error("Off edge");
     }
     while (b[fill.max + Point{1, 0}] != '#') {
       if (b[fill.max + Point{0, 1}] == '.') {
@@ -81,7 +81,7 @@ absl::Status DropFrom(CharBoard& b, Point start) {
         break;
       }
       fill.max += Point{1, 0};
-      if (!b.OnBoard(fill.max)) return AdventDay::Error("Off edge");
+      if (!b.OnBoard(fill.max)) return Error("Off edge");
     }
     if (filling) {
       VLOG(1) << "Fill range: " << fill.min << "-" << fill.max;
@@ -106,7 +106,7 @@ absl::Status FillWithWater(CharBoard& b) {
     start = Point{x, 0};
     if (b[start] == '+') break;
   }
-  if (!b.OnBoard(start)) return AdventDay::Error("Can't find spring");
+  if (!b.OnBoard(start)) return Error("Can't find spring");
   return DropFrom(b, start + Point{0, 1});
 }
 
@@ -130,7 +130,7 @@ absl::StatusOr<CharBoard> Parse(absl::Span<absl::string_view> input,
       next = {{r1, fixed}, {r2, fixed}};
       *min_y = std::min(*min_y, fixed);
     } else {
-      return AdventDay::Error("Bad input: ", row);
+      return Error("Bad input: ", row);
     }
     grid.ExpandInclude(next.min);
     grid.ExpandInclude(next.max);

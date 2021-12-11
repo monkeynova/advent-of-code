@@ -125,7 +125,7 @@ absl::StatusOr<int64_t> FindMinPartition3(const WeightsSet& weights_set) {
   int total_weight = 0;
   for (int w : weights_set.weights) total_weight += w;
   if (total_weight % 3 != 0) {
-    return AdventDay::Error("Total weight isn't partitionable: ", total_weight);
+    return Error("Total weight isn't partitionable: ", total_weight);
   }
   int partition_weight = total_weight / 3;
   VLOG(1) << "Target partition weight = " << partition_weight;
@@ -142,9 +142,8 @@ absl::StatusOr<int64_t> FindMinPartition3(const WeightsSet& weights_set) {
             << first_partition_size;
     for (const Partition& p : p_list) {
       if (p.weights.size() != first_partition_size) {
-        return AdventDay::Error(
-            "Bad partition size (expected=", first_partition_size,
-            "): ", absl::StrJoin(p.weights, ","));
+        return Error("Bad partition size (expected=", first_partition_size,
+                     "): ", absl::StrJoin(p.weights, ","));
       }
       VLOG(1) << "Testing partition: " << absl::StrJoin(p.weights, ",");
       if (CanPartitionRemainder(weights_set, p, partition_weight)) {
@@ -160,7 +159,7 @@ absl::StatusOr<int64_t> FindMinPartition4(const WeightsSet& weights_set) {
   int total_weight = 0;
   for (int w : weights_set.weights) total_weight += w;
   if (total_weight % 4 != 0) {
-    return AdventDay::Error("Total weight isn't partitionable: ", total_weight);
+    return Error("Total weight isn't partitionable: ", total_weight);
   }
   int partition_weight = total_weight / 4;
   VLOG(1) << "Target partition weight = " << partition_weight;
@@ -177,9 +176,8 @@ absl::StatusOr<int64_t> FindMinPartition4(const WeightsSet& weights_set) {
             << first_partition_size;
     for (const Partition& p : p_list) {
       if (p.weights.size() != first_partition_size) {
-        return AdventDay::Error(
-            "Bad partition size (expected=", first_partition_size,
-            "): ", absl::StrJoin(p.weights, ","));
+        return Error("Bad partition size (expected=", first_partition_size,
+                     "): ", absl::StrJoin(p.weights, ","));
       }
       VLOG(1) << "Testing partition: " << absl::StrJoin(p.weights, ",");
       if (CanPartitionRemainder2(weights_set, p, partition_weight)) {

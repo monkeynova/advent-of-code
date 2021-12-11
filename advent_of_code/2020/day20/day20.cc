@@ -71,11 +71,11 @@ absl::StatusOr<int64_t> AlignTileCorners(
     } else if (edge_count == 0) {
       // Middle.
     } else {
-      return AdventDay::Error("Bad edge count");
+      return Error("Bad edge count");
     }
   }
   if (corners != 4) {
-    return AdventDay::Error("Not 4 corners: ", corners);
+    return Error("Not 4 corners: ", corners);
   }
   return ret;
 }
@@ -140,7 +140,7 @@ class TileMerger {
          ++side_tile_count_) {
     }
     if (side_tile_count_ * side_tile_count_ != tiles_.size()) {
-      return AdventDay::Error("Tiles aren't square-able: ", tiles_.size());
+      return Error("Tiles aren't square-able: ", tiles_.size());
     }
     VLOG(1) << "Final board is " << side_tile_count_ << "x" << side_tile_count_
             << " tiles";
@@ -150,14 +150,14 @@ class TileMerger {
   absl::Status BuildEdgeMap() {
     tile_edge_size_ = tiles_.begin()->second.width();
     if (tile_edge_size_ != tiles_.begin()->second.height()) {
-      return AdventDay::Error("Tile isn't square");
+      return Error("Tile isn't square");
     }
     for (const auto& [num, tile] : tiles_) {
       if (tile.width() != tile_edge_size_) {
-        return AdventDay::Error("Widths aren't consistent");
+        return Error("Widths aren't consistent");
       }
       if (tile.height() != tile_edge_size_) {
-        return AdventDay::Error("Heights aren't consistent");
+        return Error("Heights aren't consistent");
       }
       PointRectangle range = tile.range();
       AddEdge(tile, num, range.min, {range.max.x, range.min.y}, {1, 0},
@@ -191,7 +191,7 @@ class TileMerger {
       } else if (edge_count == 0) {
         middles_.insert(tile);
       } else {
-        return AdventDay::Error("Bad edge count");
+        return Error("Bad edge count");
       }
     }
     return absl::OkStatus();
@@ -241,12 +241,11 @@ class TileMerger {
     absl::optional<int> tile_num;
     if (x_align.empty() && y_align.empty()) {
       // First corner. Pick arbitrarily.
-      if (corners_.empty()) return AdventDay::Error("No corners?");
+      if (corners_.empty()) return Error("No corners?");
       tile_num = *corners_.begin();
     } else if (y_align.empty()) {
       auto x_it = edge_to_tile_.find(x_align);
-      if (x_it == edge_to_tile_.end())
-        return AdventDay::Error("Can't find x: ", x_align);
+      if (x_it == edge_to_tile_.end()) return Error("Can't find x: ", x_align);
       absl::flat_hash_set<int> in_y;
       for (int y_tile : corners_) {
         in_y.insert(y_tile);
@@ -256,14 +255,13 @@ class TileMerger {
       }
       for (int x_tile : x_it->second) {
         if (in_y.contains(x_tile) && !used_tiles_.contains(x_tile)) {
-          if (tile_num) return AdventDay::Error("Tile not unique");
+          if (tile_num) return Error("Tile not unique");
           tile_num = x_tile;
         }
       }
     } else if (x_align.empty()) {
       auto y_it = edge_to_tile_.find(y_align);
-      if (y_it == edge_to_tile_.end())
-        return AdventDay::Error("Can't find y: ", y_align);
+      if (y_it == edge_to_tile_.end()) return Error("Can't find y: ", y_align);
       absl::flat_hash_set<int> in_x;
       for (int x_tile : corners_) {
         in_x.insert(x_tile);
@@ -273,32 +271,31 @@ class TileMerger {
       }
       for (int y_tile : y_it->second) {
         if (in_x.contains(y_tile) && !used_tiles_.contains(y_tile)) {
-          if (tile_num) return AdventDay::Error("Tile not unique");
+          if (tile_num) return Error("Tile not unique");
           tile_num = y_tile;
         }
       }
     } else {
       auto x_it = edge_to_tile_.find(x_align);
-      if (x_it == edge_to_tile_.end()) return AdventDay::Error("Can't find x");
+      if (x_it == edge_to_tile_.end()) return Error("Can't find x");
       auto y_it = edge_to_tile_.find(y_align);
-      if (y_it == edge_to_tile_.end()) return AdventDay::Error("Can't find y");
+      if (y_it == edge_to_tile_.end()) return Error("Can't find y");
       absl::flat_hash_set<int> in_x;
       for (int x_tile : x_it->second) in_x.insert(x_tile);
       for (int y_tile : y_it->second) {
         if (in_x.contains(y_tile) && !used_tiles_.contains(y_tile)) {
-          if (tile_num) return AdventDay::Error("Tile not unique");
+          if (tile_num) return Error("Tile not unique");
           tile_num = y_tile;
         }
       }
     }
 
     if (!tile_num) {
-      return AdventDay::Error("Not supported");
+      return Error("Not supported");
     }
     auto tile_it = tiles_.find(*tile_num);
     used_tiles_.insert(*tile_num);
-    if (tile_it == tiles_.end())
-      return AdventDay::Error("Can't find tile: ", *tile_num);
+    if (tile_it == tiles_.end()) return Error("Can't find tile: ", *tile_num);
     const CharBoard& tile = tile_it->second;
 
     VLOG(3) << "  tile\n" << tile;
@@ -322,7 +319,7 @@ class TileMerger {
       return tmp;
     }
 
-    return AdventDay::Error("Could not orient board");
+    return Error("Could not orient board");
   }
 
   CharBoard RemoveBorder(const CharBoard& in) {
@@ -388,12 +385,12 @@ absl::StatusOr<int> CountNonSeaMonster(const CharBoard& board) {
       }
     }
     if (sea_monster_count && this_sea_monster_count > 0) {
-      return AdventDay::Error("Multiple sea monster orientations");
+      return Error("Multiple sea monster orientations");
     } else if (this_sea_monster_count > 0) {
       sea_monster_count = this_sea_monster_count;
     }
   }
-  if (!sea_monster_count) return AdventDay::Error("No monsters found");
+  if (!sea_monster_count) return Error("No monsters found");
   return on - *sea_monster_count * kSeaMonsterOn;
 }
 

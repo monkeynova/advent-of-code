@@ -21,7 +21,7 @@ struct Food {
 
 absl::StatusOr<Food> ParseFood(absl::string_view txt) {
   if (txt[txt.size() - 1] != ')') {
-    return AdventDay::Error("Bad input(2): ", txt);
+    return Error("Bad input(2): ", txt);
   }
   txt = txt.substr(0, txt.size() - 1);
 
@@ -71,7 +71,7 @@ FindAllergens(const std::vector<Food>& foods) {
       for (int idx : food_idx_list) {
         Intersect(&in, foods[idx].ingredients, assigned_ingredients);
       }
-      if (in.empty()) return AdventDay::Error("No assignment for ", allergen);
+      if (in.empty()) return Error("No assignment for ", allergen);
       if (in.size() == 1) {
         absl::string_view food = *in.begin();
         allergen_to_ingredient[allergen] = food;
@@ -80,7 +80,7 @@ FindAllergens(const std::vector<Food>& foods) {
         assigned = true;
       }
     }
-    if (!assigned) return AdventDay::Error("Can't find an assignment");
+    if (!assigned) return Error("Can't find an assignment");
   }
 
   return ingredient_to_allergen;

@@ -219,7 +219,7 @@ void ElevatorState::AddNextSteps(State* state) {
 
 absl::StatusOr<ElevatorState> ElevatorState::Parse(
     absl::Span<absl::string_view> input) {
-  if (input.size() != 4) return AdventDay::Error("Bad input size");
+  if (input.size() != 4) return Error("Bad input size");
   ElevatorState s;
   s.floors.resize(4);
   int floor = 0;
@@ -229,7 +229,7 @@ absl::StatusOr<ElevatorState> ElevatorState::Parse(
     std::string prefix =
         absl::StrCat("The ", kFloorNames[floor], " floor contains ");
     if (in.substr(0, prefix.size()) != prefix) {
-      return AdventDay::Error("Bad prefix: ", in, " !~ ", prefix);
+      return Error("Bad prefix: ", in, " !~ ", prefix);
     }
     in = in.substr(prefix.size());
     if (in == "nothing relevant.") continue;
@@ -256,7 +256,7 @@ absl::StatusOr<ElevatorState> ElevatorState::Parse(
         }
         s.floors[floor].microchips_bv |= (1 << element_to_id[e]);
       } else {
-        return AdventDay::Error("Bad component: ", comp);
+        return Error("Bad component: ", comp);
       }
     }
     ++floor;

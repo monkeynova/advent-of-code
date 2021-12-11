@@ -80,13 +80,13 @@ absl::StatusOr<std::vector<Group>> Parse(absl::Span<absl::string_view> input) {
           } else if (absl::ConsumePrefix(&p, "immune to ")) {
             g.immune = absl::StrSplit(p, ", ");
           } else {
-            return AdventDay::Error("Bad piece: ", p);
+            return Error("Bad piece: ", p);
           }
         }
       }
       groups.push_back(g);
     } else {
-      return AdventDay::Error("Bad line: ", row);
+      return Error("Bad line: ", row);
     }
   }
 

@@ -27,29 +27,27 @@ absl::StatusOr<absl::flat_hash_map<Point, bool>> ParseGrid(
       } else if (str[i] == 'e') {
         p += 2 * Cardinal::kEast;
       } else if (str[i] == 'n') {
-        if (i + 1 == str.size())
-          return AdventDay::Error("Bad sequence (@", i, "): ", str);
+        if (i + 1 == str.size()) return Error("Bad sequence (@", i, "): ", str);
         if (str[i + 1] == 'w') {
           p += Cardinal::kNorthWest;
         } else if (str[i + 1] == 'e') {
           p += Cardinal::kNorthEast;
         } else {
-          return AdventDay::Error("Bad sequence (@", i, "): ", str);
+          return Error("Bad sequence (@", i, "): ", str);
         }
         ++i;
       } else if (str[i] == 's') {
-        if (i + 1 == str.size())
-          return AdventDay::Error("Bad sequence (@", i, "): ", str);
+        if (i + 1 == str.size()) return Error("Bad sequence (@", i, "): ", str);
         if (str[i + 1] == 'w') {
           p += Cardinal::kSouthWest;
         } else if (str[i + 1] == 'e') {
           p += Cardinal::kSouthEast;
         } else {
-          return AdventDay::Error("Bad sequence (@", i, "): ", str);
+          return Error("Bad sequence (@", i, "): ", str);
         }
         ++i;
       } else {
-        return AdventDay::Error("Bad sequence (@", i, "): ", str);
+        return Error("Bad sequence (@", i, "): ", str);
       }
     }
     grid[p] = !grid[p];

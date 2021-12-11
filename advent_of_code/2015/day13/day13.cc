@@ -26,14 +26,14 @@ using CostMap =
 absl::StatusOr<int> PairDelta(const CostMap& cost_map, absl::string_view from,
                               absl::string_view to) {
   auto it1 = cost_map.find(from);
-  if (it1 == cost_map.end()) return AdventDay::Error("Can't find: ", from);
+  if (it1 == cost_map.end()) return Error("Can't find: ", from);
   auto it2 = it1->second.find(to);
-  if (it2 == it1->second.end()) return AdventDay::Error("Can't find: ", to);
+  if (it2 == it1->second.end()) return Error("Can't find: ", to);
 
   auto it3 = cost_map.find(to);
-  if (it3 == cost_map.end()) return AdventDay::Error("Can't find: ", to);
+  if (it3 == cost_map.end()) return Error("Can't find: ", to);
   auto it4 = it3->second.find(from);
-  if (it4 == it3->second.end()) return AdventDay::Error("Can't find: ", from);
+  if (it4 == it3->second.end()) return Error("Can't find: ", from);
 
   VLOG(2) << "  PairDelta(" << from << ", " << to
           << "): " << it2->second.happiness + it4->second.happiness;
@@ -79,7 +79,7 @@ absl::StatusOr<int> BestFillRemainingSeats(
     seating->pop_back();
   }
 
-  if (!max_happiness) return AdventDay::Error("Not found");
+  if (!max_happiness) return Error("Not found");
   return *max_happiness;
 }
 

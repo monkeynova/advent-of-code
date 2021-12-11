@@ -18,14 +18,14 @@ class Board {
  public:
   static absl::StatusOr<Board> Parse(absl::Span<absl::string_view> data) {
     Board build;
-    if (data.size() != 5) return AdventDay::Error("Bad size");
+    if (data.size() != 5) return Error("Bad size");
     static const RE2 line_re(
         "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(\\d+)\\s*");
     for (int i = 0; i < 5; ++i) {
       if (!RE2::FullMatch(data[i], line_re, &build.board_[i][0],
                           &build.board_[i][1], &build.board_[i][2],
                           &build.board_[i][3], &build.board_[i][4])) {
-        return AdventDay::Error("Bad board line: ", data[i]);
+        return Error("Bad board line: ", data[i]);
       }
       for (int j = 0; j < 5; ++j) {
         build.selected_[i][j] = false;
@@ -63,7 +63,7 @@ class Board {
     for (int i = 0; i < 5; ++i) {
       for (int j = 0; j < 5; ++j) {
         if (board_[i][j] == val) {
-          if (found) return AdventDay::Error("Multi-value");
+          if (found) return Error("Multi-value");
           found = true;
           selected_[i][j] = true;
         }

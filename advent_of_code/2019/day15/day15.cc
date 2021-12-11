@@ -165,8 +165,7 @@ class Droid : public IntCode::IOModule {
     absl::optional<int> should_be_empty =
         PathWalk(board_, o2_pos_, &max_dist).FindMinSteps();
     if (should_be_empty) {
-      return AdventDay::Error(
-          "Internal error: GreatestDistanceFromO2 (found path)");
+      return Error("Internal error: GreatestDistanceFromO2 (found path)");
     }
     return max_dist;
   }

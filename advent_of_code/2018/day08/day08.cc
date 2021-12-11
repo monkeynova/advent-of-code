@@ -14,7 +14,7 @@ namespace advent_of_code {
 namespace {
 
 absl::StatusOr<int> SumMetadata(absl::Span<int64_t>& range) {
-  if (range.size() < 2) return AdventDay::Error("Bad range size");
+  if (range.size() < 2) return Error("Bad range size");
   int num_children = range[0];
   int num_metadata = range[1];
   range = range.subspan(2);
@@ -32,7 +32,7 @@ absl::StatusOr<int> SumMetadata(absl::Span<int64_t>& range) {
 }
 
 absl::StatusOr<int> NodeValue(absl::Span<int64_t>& range) {
-  if (range.size() < 2) return AdventDay::Error("Bad range size");
+  if (range.size() < 2) return Error("Bad range size");
   int num_children = range[0];
   int num_metadata = range[1];
   range = range.subspan(2);
@@ -49,7 +49,7 @@ absl::StatusOr<int> NodeValue(absl::Span<int64_t>& range) {
     }
   } else {
     for (int m : range.subspan(0, num_metadata)) {
-      if (m < 0) return AdventDay::Error("Negative metadata");
+      if (m < 0) return Error("Negative metadata");
       if (m == 0) continue;
       if (m > sub_values.size()) continue;
       value += sub_values[m - 1];

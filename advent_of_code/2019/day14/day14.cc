@@ -58,7 +58,7 @@ absl::StatusOr<int64_t> ComputeOreNeedForFuel(
   for (absl::string_view node : ordered_ingredients) {
     if (node == "ORE") continue;
     const Rule* rule = rule_set.GetData(node);
-    if (rule == nullptr) return AdventDay::Error("Cannot find ", node);
+    if (rule == nullptr) return Error("Cannot find ", node);
     VLOG(1) << absl::StrJoin(
         needs, ", ",
         [](std::string* out, const std::pair<absl::string_view, int>& need) {
@@ -88,10 +88,10 @@ absl::StatusOr<int64_t> ComputeOreNeedForFuel(
       DAGSort(rule_set);
   if (!ordered_ingredients.ok()) return ordered_ingredients.status();
   if (ordered_ingredients->at(0) != "FUEL") {
-    return AdventDay::Error("Not a DAG rooted at FUEL");
+    return Error("Not a DAG rooted at FUEL");
   }
   if (ordered_ingredients->back() != "ORE") {
-    return AdventDay::Error("Not a DAG with leaf at ORE");
+    return Error("Not a DAG with leaf at ORE");
   }
   return ComputeOreNeedForFuel(rule_set, *ordered_ingredients, 1);
 }
@@ -102,10 +102,10 @@ absl::StatusOr<int> FuelFromOre(const DirectedGraph<Rule>& rule_set,
       DAGSort(rule_set);
   if (!ordered_ingredients.ok()) return ordered_ingredients.status();
   if (ordered_ingredients->at(0) != "FUEL") {
-    return AdventDay::Error("Not a DAG rooted at FUEL");
+    return Error("Not a DAG rooted at FUEL");
   }
   if (ordered_ingredients->back() != "ORE") {
-    return AdventDay::Error("Not a DAG with leaf at ORE");
+    return Error("Not a DAG with leaf at ORE");
   }
   int64_t guess = 1;
   absl::StatusOr<int64_t> ore_needed = 0;

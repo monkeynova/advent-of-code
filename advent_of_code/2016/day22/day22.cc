@@ -109,7 +109,7 @@ absl::StatusOr<int> FindMinPath(absl::flat_hash_map<Point, Node> grid) {
       }
     }
   }
-  return AdventDay::Error("No path found;");
+  return Error("No path found;");
 }
 
 struct PathState {
@@ -153,8 +153,8 @@ absl::StatusOr<int> RunHacks(const absl::flat_hash_map<Point, Node>& grid) {
       max_space = std::max(max_space, n.used + n.avail);
     }
   }
-  if (2 * min_used < min_space) return AdventDay::Error("Invalid assumption");
-  if (max_used > min_space) return AdventDay::Error("Invalid assumption");
+  if (2 * min_used < min_space) return Error("Invalid assumption");
+  if (max_used > min_space) return Error("Invalid assumption");
   board[goal_loc] = 'G';
   LOG(INFO) << "Empty at " << empty;
   LOG(INFO) << "Used: (" << min_used << "," << max_used << ") out of ("
@@ -187,7 +187,7 @@ absl::StatusOr<int> RunHacks(const absl::flat_hash_map<Point, Node>& grid) {
     frontier.pop_front();
   }
 
-  return AdventDay::Error("No path found");
+  return Error("No path found");
 }
 
 // Helper methods go here.

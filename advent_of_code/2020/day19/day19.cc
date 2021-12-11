@@ -24,7 +24,7 @@ absl::StatusOr<Rule> ParseRule(absl::string_view in) {
   Rule ret = {0, '\0', {}};
   const auto [rule, dest] = AdventDay::PairSplit(in, ": ");
   if (!absl::SimpleAtoi(rule, &ret.rule_num)) {
-    return AdventDay::Error("Bad number: ", rule);
+    return Error("Bad number: ", rule);
   }
   if (!RE2::FullMatch(dest, "\"(.)\"", &ret.token)) {
     for (absl::string_view piece : absl::StrSplit(dest, " | ")) {

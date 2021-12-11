@@ -250,7 +250,7 @@ absl::StatusOr<int> MatchFromFrontRnAr(
                               std::vector<absl::string_view>>& map) {
   absl::string_view first_elem = FirstElement(str);
   absl::string_view second_elem = FirstElement(str.substr(first_elem.size()));
-  if (second_elem != "Rn") return AdventDay::Error("Not XRn");
+  if (second_elem != "Rn") return Error("Not XRn");
   std::string replaced_string;
   int replace_steps = 0;
   for (int off = first_elem.size() + second_elem.size(); off < str.size();) {
@@ -274,13 +274,13 @@ absl::StatusOr<int> MatchFromFrontRnAr(
       str = replaced_string;
       off = next_start.size();
       absl::string_view check_rn = FirstElement(str.substr(off));
-      if (check_rn != "Rn") return AdventDay::Error("Not XRn");
+      if (check_rn != "Rn") return Error("Not XRn");
     } else {
       off += next_elem.size();
     }
   }
 
-  return AdventDay::Error("Nothing to return");
+  return Error("Nothing to return");
 }
 
 }  // namespace
