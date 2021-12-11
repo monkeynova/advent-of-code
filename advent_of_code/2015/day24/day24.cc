@@ -17,7 +17,7 @@ namespace {
 
 struct Partition {
   absl::flat_hash_set<int> weights;
-  int64_t entanglement;
+  int64_t entanglement = 0;
   bool operator<(const Partition& o) const {
     return entanglement < o.entanglement;
   }
@@ -25,7 +25,7 @@ struct Partition {
 
 struct WeightsSet {
   absl::flat_hash_set<int> weights;
-  int max_weight;
+  int max_weight = 0;
 };
 
 std::vector<Partition> FindPartitions(const WeightsSet& weights_set, int size,
