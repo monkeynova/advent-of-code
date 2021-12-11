@@ -1,42 +1,8 @@
-# We have win/linux/mac specific options in this config so we allow processing
-# them by default. 
-build --enable_platform_specific_config
+import "%workspace%/base-bazelrc"
+
 build -c opt
-
-# file_based_test_driver requires C++ 17 idioms.
-build:linux --cxxopt=-std=c++1z --cxxopt=-Wno-sign-compare
-build:macos --cxxopt=-std=c++1z
-build:windows --cxxopt=/std:c++17
-
-# https://github.com/abseil/abseil-cpp/issues/848
-# Bazel (as of 3.3.0) has difficulty recognizing the fact that mac shared
-# object files are present as a pair. absl fails to link properly with .sos as
-# a result.
-build:macos --features=-supports_dynamic_linker
 
 run:compete -- --logtostderr --v=1
 run:compete --file_based_test_driver_generate_test_output=false
 run:compete --file_based_test_driver_log_ignored_test=false
 run:compete --file_based_test_driver_individual_tests=false
-
-run:v1 -- --logtostderr --v=1
-test:v1 --test_arg=--logtostderr
-test:v1 --test_arg=--v=1
-test:v1 --test_output=streamed
-test:v1 --nocache_test_results
-
-run:v2 -- --logtostderr --v=2
-test:v2 --test_arg=--logtostderr
-test:v2 --test_arg=--v=2
-test:v2 --test_output=streamed
-test:v2 --nocache_test_results
-
-run:v3 -- --logtostderr --v=3
-test:v3 --test_arg=--logtostderr
-test:v3 --test_arg=--v=3 
-test:v3 --test_output=streamed
-test:v3 --nocache_test_results
-
-build:dcheck --copt=-UNDEBUG
-run:dcheck --copt=-UNDEBUG
-test:dcheck --copt=-UNDEBUG
