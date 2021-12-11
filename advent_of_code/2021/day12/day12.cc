@@ -20,12 +20,13 @@ namespace {
 
 absl::StatusOr<std::string> Day_2021_12::Part1(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+
+  return absl::UnimplementedError("Problem not known");
 }
 
 absl::StatusOr<std::string> Day_2021_12::Part2(
     absl::Span<absl::string_view> input) const {
-  return Error("Not implemented");
+  return absl::UnimplementedError("Problem not known");
 }
 
 }  // namespace advent_of_code

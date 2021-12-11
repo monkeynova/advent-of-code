@@ -13,7 +13,7 @@ namespace advent_of_code {
 
 template <class... Args>
 inline absl::Status Error(Args... args) {
-  return absl::InvalidArgumentError(absl::StrCat(args...));
+  return absl::InternalError(absl::StrCat(args...));
 }
 
 template <class Container>
@@ -22,7 +22,7 @@ inline absl::StatusOr<std::vector<int64_t>> ParseAsInts(Container input) {
   for (absl::string_view in : input) {
     int64_t v;
     if (!absl::SimpleAtoi(in, &v)) {
-      return Error("parse as int: ", in);
+      return absl::InvalidArgumentError(absl::StrCat("parse as int: ", in));
     }
     vals.push_back(v);
   }

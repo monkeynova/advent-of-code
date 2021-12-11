@@ -47,13 +47,13 @@ void RunTestCase(const AdventDay* advent_day,
 
   std::string test_case = std::string(test_case_with_options);
   if (absl::Status st = HandleTestIncludes(&test_case); !st.ok()) {
-    test_result->AddTestOutput(absl::StrCat("ERROR: ", st.message()));
+    test_result->AddTestOutput(absl::StrCat("ERROR: ", st.ToString()));
     return;
   }
 
   if (absl::Status st = options.ParseTestCaseOptions(&test_case); !st.ok()) {
     test_result->AddTestOutput(
-        absl::StrCat("ERROR: Could not parse options: ", st.message()));
+        absl::StrCat("ERROR: Could not parse options: ", st.ToString()));
     return;
   }
 
@@ -69,7 +69,7 @@ void RunTestCase(const AdventDay* advent_day,
     if (!long_duration.ok()) {
       test_result->AddTestOutput(
           absl::StrCat("ERROR: Could not parse 'long' option: ",
-                       long_duration.status().message()));
+                       long_duration.status().ToString()));
       return;
     }
     if (absl::GetFlag(FLAGS_run_long_tests) < *long_duration) {
@@ -111,7 +111,7 @@ void RunTestCase(const AdventDay* advent_day,
   }
   if (!output.ok()) {
     test_result->AddTestOutput(
-        absl::StrCat("ERROR: Could not run test: ", output.status().message()));
+        absl::StrCat("ERROR: ", output.status().ToString()));
     return;
   }
   test_result->AddTestOutput(*output);

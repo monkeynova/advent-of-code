@@ -1,22 +1,22 @@
 [part=1]
 Day 12
 --
-ERROR: Could not run test: Not implemented
+ERROR: UNIMPLEMENTED: Problem not known
 ==
 
 [part=1]
 @include{advent_of_code/2021/day12/input.txt}
 --
-ERROR: Could not run test: Not implemented
+ERROR: UNIMPLEMENTED: Problem not known
 ==
 
 [part=2]
 Day 12
 --
-ERROR: Could not run test: Not implemented
+ERROR: UNIMPLEMENTED: Problem not known
 ==
 
 [part=2]
 @include{advent_of_code/2021/day12/input.txt}
 --
-ERROR: Could not run test: Not implemented
+ERROR: UNIMPLEMENTED: Problem not known
