@@ -56,6 +56,15 @@ class DirectedGraph {
   absl::flat_hash_map<absl::string_view, Storage> storage_;
 };
 
+template <typename Storage>
+class Graph : public DirectedGraph<Storage> {
+ public:
+  void AddEdge(absl::string_view a, absl::string_view b) {
+    DirectedGraph<Storage>::AddEdge(a, b);
+    DirectedGraph<Storage>::AddEdge(b, a);
+  }
+};
+
 }  // namespace advent_of_code
 
 #endif  // ADVENT_OF_CODE_DIRECTED_GRAPH_H
