@@ -1,22 +1,80 @@
 [part=1]
-Day 12
+start-A
+start-b
+A-c
+A-b
+b-d
+A-end
+b-end
 --
-ERROR: UNIMPLEMENTED: Problem not known
+10
+==
+
+[part=1]
+fs-end
+he-DX
+fs-he
+start-DX
+pj-DX
+end-zg
+zg-sl
+zg-pj
+pj-he
+RW-he
+fs-DX
+pj-RW
+zg-RW
+start-pj
+he-WI
+zg-he
+pj-fs
+start-RW
+--
+226
 ==
 
 [part=1]
 @include{advent_of_code/2021/day12/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+3292
 ==
 
 [part=2]
-Day 12
+start-A
+start-b
+A-c
+A-b
+b-d
+A-end
+b-end
 --
-ERROR: UNIMPLEMENTED: Problem not known
+36
+==
+
+[part=2]
+fs-end
+he-DX
+fs-he
+start-DX
+pj-DX
+end-zg
+zg-sl
+zg-pj
+pj-he
+RW-he
+fs-DX
+pj-RW
+zg-RW
+start-pj
+he-WI
+zg-he
+pj-fs
+start-RW
+--
+3509
 ==
 
 [part=2]
 @include{advent_of_code/2021/day12/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+89592
