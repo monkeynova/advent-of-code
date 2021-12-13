@@ -37,7 +37,7 @@
       {
         "label": "Update benchmarks",
         "type": "shell",
-        "command": "benchmark/run_all_benchmarks.sh",
+        "command": "tools/run_all_benchmarks.sh",
         "args": [],
         "options": {
           "cwd": "${workspaceFolder}"
