@@ -16,13 +16,32 @@ namespace advent_of_code {
 
 namespace {
 
-// Helper methods go here.
+absl::StatusOr<absl::flat_hash_set<Point>> Fold(
+    absl::flat_hash_set<Point> points, absl::string_view axis, int64_t val) {
+      absl::flat_hash_set<Point> new_points;
+  for (Point p : points) {
+    if (axis == "x") {
+      if (p.x > val) {
+        if (p.x > 2 * val) return Error("Bad x: ", p.x);
+        p.x = 2 * val - p.x;
+      }
+    } else {
+      if (axis != "y") return Error("Bad axis");
+      if (p.y > val) {
+        if (p.y > 2 * val) return Error("Bad y: ", p.y);
+        p.y = 2 * val - p.y;
+      }
+    }        
+    new_points.insert(p);
+  }
+  return new_points;
+}
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_13::Part1(
     absl::Span<absl::string_view> input) const {
-  std::vector<Point> points;
+  absl::flat_hash_set<Point> points;
   bool folds = false;
   for (absl::string_view p_str: input) {
     if (p_str.empty()) {
@@ -35,27 +54,16 @@ absl::StatusOr<std::string> Day_2021_13::Part1(
       if (!RE2::FullMatch(p_str, "fold along (x|y)=(\\d+)", &axis, &val)) {
         return Error("Bad fold");
       }
-      absl::flat_hash_set<Point> fold_set;
-      for (Point p : points) {
-        if (axis == "x") {
-          if (p.x > val) {
-            p.x = 2 * val - p.x;
-          }
-        } else {
-          if (axis != "y") return Error("Bad axis");
-          if (p.y > val) {
-            p.y = 2 * val - p.y;
-          }
-        }
-        fold_set.insert(p);
-      }
-      return IntReturn(fold_set.size());
+      absl::StatusOr<absl::flat_hash_set<Point>> folded =
+        Fold(std::move(points), axis, val);
+      if (!folded.ok()) return folded.status();
+      return IntReturn(folded->size());
     } else {
       Point p;
       if (!RE2::FullMatch(p_str, "(\\d+,\\d+)", p.Capture())) {
         return Error("Bad line: ", p_str);
       }
-      points.push_back(p);
+      points.insert(p);
     }
   }
   return Error("Should not arrive");
@@ -63,9 +71,9 @@ absl::StatusOr<std::string> Day_2021_13::Part1(
 
 absl::StatusOr<std::string> Day_2021_13::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::flat_hash_set<Point>  points;
+  absl::flat_hash_set<Point> points;
   bool folds = false;
-  for (absl::string_view p_str: input) {
+  for (absl::string_view p_str : input) {
     if (p_str.empty()) {
       folds = true;
       continue;
@@ -76,21 +84,10 @@ absl::StatusOr<std::string> Day_2021_13::Part2(
       if (!RE2::FullMatch(p_str, "fold along (x|y)=(\\d+)", &axis, &val)) {
         return Error("Bad fold");
       }
-      absl::flat_hash_set<Point> new_points;
-      for (Point p : points) {
-        if (axis == "x") {
-          if (p.x > val) {
-            p.x = 2 * val - p.x;
-          }
-        } else {
-          if (axis != "y") return Error("Bad axis");
-          if (p.y > val) {
-            p.y = 2 * val - p.y;
-          }
-        }        
-        new_points.insert(p);
-      }
-      points = new_points;
+      absl::StatusOr<absl::flat_hash_set<Point>> folded =
+        Fold(std::move(points), axis, val);
+      if (!folded.ok()) return folded.status();
+      points = std::move(*folded);
     } else {
       Point p;
       if (!RE2::FullMatch(p_str, "(\\d+,\\d+)", p.Capture())) {
