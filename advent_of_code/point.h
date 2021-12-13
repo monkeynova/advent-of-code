@@ -12,8 +12,8 @@
 namespace advent_of_code {
 
 struct Point {
-  int x;
-  int y;
+  int x = 0;
+  int y = 0;
 
   static bool RE2Parse(const char* str, size_t n, void* dest) {
     std::pair<absl::string_view, absl::string_view> coord_str = absl::StrSplit(

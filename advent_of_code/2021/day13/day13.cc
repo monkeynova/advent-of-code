@@ -96,7 +96,7 @@ absl::StatusOr<std::string> Day_2021_13::Part2(
       points.insert(p);
     }
   }
-  PointRectangle r{{0,0}, {0,0}};
+  PointRectangle r;
   for (Point p : points) { r.ExpandInclude(p); }
   CharBoard b(r);
   for (Point p : points) {
