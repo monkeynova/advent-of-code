@@ -36,7 +36,7 @@ for my $t (@targets) {
 {
   open my $fh, '>', "${subpath}/benchmark/benchmark_${hostname}.json"
     or die "Cannot write to merged json";
-  print {$fh} encode_json($merged_json);
+  print {$fh} JSON->new->utf8(1)->canonical(1)->pretty(1)->encode($merged_json);
   close $fh;
 }
 system("benchmark/merge_benchmarks.pl < ${tmp_file} " .
@@ -49,7 +49,7 @@ sub merge_json {
   scalar keys %$in_merged;
   while (my ($k, $v) = each %$in_merged) {
     if (ref($v) eq 'ARRAY') {
-      push @$v, $new->{$k};
+      push @$v, @{$new->{$k}};
     }
     delete $new->{$k};
   }
