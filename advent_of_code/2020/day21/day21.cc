@@ -26,8 +26,7 @@ absl::StatusOr<Food> ParseFood(absl::string_view txt) {
   txt = txt.substr(0, txt.size() - 1);
 
   Food food;
-  const auto [ingredients, allergen_list] =
-      PairSplit(txt, " (contains ");
+  const auto [ingredients, allergen_list] = PairSplit(txt, " (contains ");
 
   food.ingredients = absl::StrSplit(ingredients, " ");
   food.allergens = absl::StrSplit(allergen_list, ", ");

@@ -18,7 +18,7 @@ namespace {
 
 absl::StatusOr<absl::flat_hash_set<Point>> Fold(
     absl::flat_hash_set<Point> points, absl::string_view axis, int64_t val) {
-      absl::flat_hash_set<Point> new_points;
+  absl::flat_hash_set<Point> new_points;
   for (Point p : points) {
     if (axis == "x") {
       if (p.x > val) {
@@ -31,7 +31,7 @@ absl::StatusOr<absl::flat_hash_set<Point>> Fold(
         if (p.y > 2 * val) return Error("Bad y: ", p.y);
         p.y = 2 * val - p.y;
       }
-    }        
+    }
     new_points.insert(p);
   }
   return new_points;
@@ -43,7 +43,7 @@ absl::StatusOr<std::string> Day_2021_13::Part1(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_set<Point> points;
   bool folds = false;
-  for (absl::string_view p_str: input) {
+  for (absl::string_view p_str : input) {
     if (p_str.empty()) {
       folds = true;
       continue;
@@ -55,7 +55,7 @@ absl::StatusOr<std::string> Day_2021_13::Part1(
         return Error("Bad fold");
       }
       absl::StatusOr<absl::flat_hash_set<Point>> folded =
-        Fold(std::move(points), axis, val);
+          Fold(std::move(points), axis, val);
       if (!folded.ok()) return folded.status();
       return IntReturn(folded->size());
     } else {
@@ -85,7 +85,7 @@ absl::StatusOr<std::string> Day_2021_13::Part2(
         return Error("Bad fold");
       }
       absl::StatusOr<absl::flat_hash_set<Point>> folded =
-        Fold(std::move(points), axis, val);
+          Fold(std::move(points), axis, val);
       if (!folded.ok()) return folded.status();
       points = std::move(*folded);
     } else {
@@ -97,7 +97,9 @@ absl::StatusOr<std::string> Day_2021_13::Part2(
     }
   }
   PointRectangle r;
-  for (Point p : points) { r.ExpandInclude(p); }
+  for (Point p : points) {
+    r.ExpandInclude(p);
+  }
   CharBoard b(r);
   for (Point p : points) {
     b[p] = '#';

@@ -21,7 +21,8 @@ struct State {
   bool has_visit2;
 };
 
-absl::StatusOr<int64_t> CountPaths(const Graph<int64_t>& map, bool allow_visit2) {
+absl::StatusOr<int64_t> CountPaths(const Graph<int64_t>& map,
+                                   bool allow_visit2) {
   constexpr absl::string_view kStartNode = "start";
   constexpr absl::string_view kEndNode = "end";
 
