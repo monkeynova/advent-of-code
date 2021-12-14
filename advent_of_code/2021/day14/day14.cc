@@ -19,6 +19,9 @@ struct Problem {
   absl::flat_hash_map<absl::string_view, absl::string_view> rules;
 };
 
+using CharPair = std::array<char, 2>;
+using CharPairCounts = absl::flat_hash_map<CharPair, int64_t>;
+
 absl::StatusOr<Problem> Parse(absl::Span<absl::string_view> input) {
   Problem ret;
   if (input.size() < 3) return Error("Bad input");
@@ -26,6 +29,8 @@ absl::StatusOr<Problem> Parse(absl::Span<absl::string_view> input) {
   if (input[1] != "") return Error("Bad input");
   for (int i = 2; i < input.size(); ++i) {
     auto [pair, insert] = PairSplit(input[i], " -> ");
+    if (pair.size() != 2) return Error("Bad from: ", input[i]);
+    if (insert.size() != 1) return Error("Bad insert: ", input[i]);
     ret.rules.emplace(pair, insert);
   }
   return ret;
@@ -43,14 +48,14 @@ absl::StatusOr<std::string> Expand(absl::string_view rec, const Problem& p) {
   return next;
 }
 
-absl::StatusOr<absl::flat_hash_map<std::string, int64_t>> Expand(
-    const absl::flat_hash_map<std::string, int64_t>& pair_counts, const Problem& p) {
-  absl::flat_hash_map<std::string, int64_t> new_pair_counts;
+absl::StatusOr<CharPairCounts> Expand(const CharPairCounts& pair_counts,
+                                      const Problem& p) {
+  CharPairCounts new_pair_counts;
   for (const auto& [str, count] : pair_counts) {
-    auto it = p.rules.find(str);
+    auto it = p.rules.find(absl::string_view(str.data(), 2));
     if (it == p.rules.end()) return Error("Bad");
-    std::string left = {str[0], it->second[0]};
-    std::string right = {it->second[0], str[1]};
+    CharPair left = {str[0], it->second[0]};
+    CharPair right = {it->second[0], str[1]};
     new_pair_counts[left] += count;
     new_pair_counts[right] += count;
   }
@@ -89,28 +94,26 @@ absl::StatusOr<std::string> Day_2021_14::Part2(
   absl::StatusOr<Problem> p = Parse(input);
   if (!p.ok()) return p.status();
   
-  absl::flat_hash_map<std::string, int64_t> pair_counts;
+  CharPairCounts pair_counts;
   for (int i = 0; i < p->start.size() - 1; ++i) {
-    ++pair_counts[std::string(p->start.substr(i, 2))];
+    ++pair_counts[{p->start[i], p->start[i + 1]}];
   }
   for (int i = 0; i < 40; ++i) {
-    absl::StatusOr<absl::flat_hash_map<std::string, int64_t>> new_pair_counts =
-        Expand(pair_counts, *p);
+    absl::StatusOr<CharPairCounts> new_pair_counts = Expand(pair_counts, *p);
     pair_counts = std::move(*new_pair_counts);
   }
-  absl::flat_hash_map<std::string, int64_t> single_char_counts = {
+  absl::flat_hash_map<char, int64_t> single_char_counts = {
     // End characters missed one count in pairs.
-    {std::string(p->start.substr(0, 1)), 1},
-    {std::string(p->start.substr(p->start.size() - 1, 1)), 1},
+    {p->start[0], 1}, {p->start.back(), 1},
   };
   for (const auto& [str, count] : pair_counts) {
-    single_char_counts[str.substr(0, 1)] += count;
-    single_char_counts[str.substr(1, 1)] += count;
+    single_char_counts[str[0]] += count;
+    single_char_counts[str[1]] += count;
   }
 
   int64_t max = 0;
   int64_t min = std::numeric_limits<int64_t>::max();
-  for (auto [str, count] : single_char_counts) {
+  for (auto [_, count] : single_char_counts) {
     // All characters counted twice (once in each pair).
     if (count % 2 != 0) return Error("MOD 2");
     count /= 2;
