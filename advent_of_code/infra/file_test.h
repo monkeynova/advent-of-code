@@ -7,17 +7,14 @@
 
 namespace advent_of_code {
 
-std::string TestCaseFileName();
-std::vector<int> TestCaseLines();
-
-bool TestSingleDay(AdventDay* solver);
+bool TestSingleDay(AdventDay* day);
 
 template <typename Day>
 class FileTest : public ::testing::Test {
  public:
   bool RunTest() {
-    Day solver;
-    return TestSingleDay(&solver);
+    Day day;
+    return TestSingleDay(&day);
   }
 };
 

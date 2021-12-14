@@ -24,21 +24,6 @@ ABSL_FLAG(int64_t, part_filter, 0, "If non-zero, only runs the specified part");
 
 namespace advent_of_code {
 
-std::string TestCaseFileName() { return absl::GetFlag(FLAGS_test_file); }
-
-static void CollectLines(
-    std::vector<int>* lines, absl::string_view test_case_with_options,
-    file_based_test_driver::RunTestCaseResult* test_result) {
-  lines->push_back(test_result->line());
-}
-
-std::vector<int> TestCaseLines() {
-  std::vector<int> lines;
-  (void)file_based_test_driver::RunTestCasesFromFiles(
-      TestCaseFileName(), absl::bind_front(&CollectLines, &lines));
-  return lines;
-}
-
 void RunTestCase(const AdventDay* advent_day,
                  absl::string_view test_case_with_options,
                  file_based_test_driver::RunTestCaseResult* test_result) {
@@ -117,11 +102,11 @@ void RunTestCase(const AdventDay* advent_day,
   test_result->AddTestOutput(*output);
 }
 
-bool TestSingleDay(AdventDay* solver) {
+bool TestSingleDay(AdventDay* day) {
   InitializeAbslFlagsFromGtest();
   google::InstallFailureSignalHandler();
   return file_based_test_driver::RunTestCasesFromFiles(
-      TestCaseFileName(), absl::bind_front(&RunTestCase, solver));
+      day->test_file(), absl::bind_front(&RunTestCase, day));
 }
 
 }  // namespace advent_of_code

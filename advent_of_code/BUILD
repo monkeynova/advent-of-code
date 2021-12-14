@@ -7,6 +7,7 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
+        "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/types:span",

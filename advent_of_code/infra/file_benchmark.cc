@@ -63,26 +63,33 @@ DirtyTestParse(absl::string_view contents) {
 }
 
 absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>>
-FileBenchmarkTests() {
+FileBenchmarkTests(absl::string_view test_file) {
   std::string file_contents;
   if (absl::Status st =
-          GetContents(absl::GetFlag(FLAGS_test_file), &file_contents);
+          GetContents(test_file, &file_contents);
       !st.ok()) {
     return st;
   }
   return DirtyTestParse(file_contents);
 }
 
+absl::StatusOr<int> FileBenchmarkTestCount(AdventDay* day) {
+  absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>> tests =
+      FileBenchmarkTests(day->test_file());
+  if (!tests.ok()) return tests.status();
+  return tests->size();
+}
+
 absl::StatusOr<int> FileBenchmarkTestCount() {
   absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>> tests =
-      FileBenchmarkTests();
+      FileBenchmarkTests(absl::GetFlag(FLAGS_test_file));
   if (!tests.ok()) return tests.status();
   return tests->size();
 }
 
 void BM_Day(benchmark::State& state, AdventDay* day) {
   absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>> tests =
-      FileBenchmarkTests();
+      FileBenchmarkTests(day->test_file());
   if (!tests.ok()) {
     return BM_Day_SetError(state, tests.status().message());
   }

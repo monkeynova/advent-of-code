@@ -9,6 +9,7 @@
 namespace advent_of_code {
 
 absl::StatusOr<int> FileBenchmarkTestCount();
+absl::StatusOr<int> FileBenchmarkTestCount(AdventDay* day);
 
 inline void BM_Day_SetError(benchmark::State& state,
                             absl::string_view message) {

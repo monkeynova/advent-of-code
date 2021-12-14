@@ -4,10 +4,13 @@
 #include <string>
 #include <vector>
 
+#include "absl/flags/flag.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
 #include "absl/types/span.h"
+
+extern absl::Flag<std::string> FLAGS_test_file;
 
 namespace advent_of_code {
 
@@ -51,6 +54,10 @@ class AdventDay {
   absl::StatusOr<std::string> IntReturn(absl::optional<int64_t> val) const {
     if (!val) return absl::NotFoundError("Not found");
     return absl::StrCat(*val);
+  }
+
+  virtual absl::string_view test_file() {
+    return absl::GetFlag(FLAGS_test_file);
   }
 
   virtual absl::StatusOr<std::string> Part1(
