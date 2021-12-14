@@ -93,7 +93,7 @@ absl::StatusOr<std::string> Day_2021_14::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<Problem> p = Parse(input);
   if (!p.ok()) return p.status();
-  
+
   CharPairCounts pair_counts;
   for (int i = 0; i < p->start.size() - 1; ++i) {
     ++pair_counts[{p->start[i], p->start[i + 1]}];
@@ -103,8 +103,9 @@ absl::StatusOr<std::string> Day_2021_14::Part2(
     pair_counts = std::move(*new_pair_counts);
   }
   absl::flat_hash_map<char, int64_t> single_char_counts = {
-    // End characters missed one count in pairs.
-    {p->start[0], 1}, {p->start.back(), 1},
+      // End characters missed one count in pairs.
+      {p->start[0], 1},
+      {p->start.back(), 1},
   };
   for (const auto& [str, count] : pair_counts) {
     single_char_counts[str[0]] += count;
