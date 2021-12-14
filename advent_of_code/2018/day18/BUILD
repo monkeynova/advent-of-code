@@ -15,16 +15,23 @@ cc_library(
     ],
 )
 
-cc_test(
-    name = "day18_test",
-    srcs = ["day18_test.cc"],
-    args = ["--test_file=advent_of_code/2018/day18/day18.test"],
+cc_library(
+    name = "day18_input",
+    testonly = 1,
     data = [
         "day18.test",
         "input.txt",
     ],
     deps = [
         ":day18",
+    ],
+)
+
+cc_test(
+    name = "day18_test",
+    srcs = ["day18_test.cc"],
+    deps = [
+        ":day18_input",
         "//advent_of_code/infra:file_test",
     ],
 )
@@ -32,14 +39,9 @@ cc_test(
 cc_test(
     name = "day18_benchmark",
     srcs = ["day18_benchmark.cc"],
-    args = ["--test_file=advent_of_code/2018/day18/day18.test"],
-    data = [
-        "day18.test",
-        "input.txt",
-    ],
     tags = ["benchmark"],
     deps = [
-        ":day18",
+        ":day18_input",
         "//advent_of_code/infra:file_benchmark",
         "@com_monkeynova_gunit_main//:test_main",
     ],

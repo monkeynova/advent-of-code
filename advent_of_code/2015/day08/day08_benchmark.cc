@@ -7,7 +7,8 @@ namespace advent_of_code {
 constexpr int kMaxTestCount = 4;
 
 TEST(DayBenchmarkTest, Consistency) {
-  absl::StatusOr<int> test_count = FileBenchmarkTestCount();
+  Day_2015_08 day;
+  absl::StatusOr<int> test_count = FileBenchmarkTestCount(&day);
   ASSERT_TRUE(test_count.ok()) << test_count.status().message();
   EXPECT_EQ(kMaxTestCount, *test_count);
 }

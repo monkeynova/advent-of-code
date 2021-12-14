@@ -7,6 +7,10 @@ namespace advent_of_code {
 
 class Day_2021_09 : public AdventDay {
  public:
+  virtual absl::string_view test_file() override {
+    return "advent_of_code/2021/day09/day09.test";
+  }
+
   absl::StatusOr<std::string> Part1(
       absl::Span<absl::string_view> input) const override;
   absl::StatusOr<std::string> Part2(
