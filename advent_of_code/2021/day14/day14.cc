@@ -98,7 +98,11 @@ absl::StatusOr<std::string> Day_2021_14::Part2(
         Expand(pair_counts, *p);
     pair_counts = std::move(*new_pair_counts);
   }
-  absl::flat_hash_map<std::string, int64_t> single_char_counts;
+  absl::flat_hash_map<std::string, int64_t> single_char_counts = {
+    // End characters missed one count in pairs.
+    {std::string(p->start.substr(0, 1)), 1},
+    {std::string(p->start.substr(p->start.size() - 1, 1)), 1},
+  };
   for (const auto& [str, count] : pair_counts) {
     single_char_counts[str.substr(0, 1)] += count;
     single_char_counts[str.substr(1, 1)] += count;
@@ -106,13 +110,9 @@ absl::StatusOr<std::string> Day_2021_14::Part2(
 
   int64_t max = 0;
   int64_t min = std::numeric_limits<int64_t>::max();
-  for (const auto& [str, c] : single_char_counts) {
-    int64_t count = c;
-    // End characters missed one count in pairs.
-    if (str == p->start.substr(0, 1)) ++count;
-    if (str == p->start.substr(p->start.size() - 1, 1)) ++count;
+  for (auto [str, count] : single_char_counts) {
+    // All characters counted twice (once in each pair).
     if (count % 2 != 0) return Error("MOD 2");
-    // All characters now counted twice (once in each pair).
     count /= 2;
     if (count > max) max = count;
     if (count < min) min = count;
