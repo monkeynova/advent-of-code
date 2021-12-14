@@ -39,7 +39,7 @@ for my $t (@targets) {
   print {$fh} JSON->new->utf8(1)->canonical(1)->pretty(1)->encode($merged_json);
   close $fh;
 }
-system("benchmark/merge_benchmarks.pl < ${tmp_file} " .
+system("tools/merge_benchmarks.pl < ${tmp_file} " .
        "> ${subpath}/benchmark/benchmark_${hostname}.txt")
   and die $!;
 
