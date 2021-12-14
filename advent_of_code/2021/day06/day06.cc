@@ -86,45 +86,39 @@ int64_t CountPopulationAfter(std::vector<int64_t> fish, int64_t steps) {
 absl::StatusOr<std::string> Day_2021_06::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  std::vector<int64_t> nums;
-  for (absl::string_view num_str : absl::StrSplit(input[0], ",")) {
-    int64_t num;
-    if (!absl::SimpleAtoi(num_str, &num)) return Error("Bad num: ", num_str);
-    nums.push_back(num);
-  }
+  absl::StatusOr<std::vector<int64_t>> nums =
+      ParseAsInts(absl::StrSplit(input[0], ","));
+  if (!nums.ok()) return nums.status();
 
   constexpr int64_t kDays = 80;
 
-  if (CountPopulationAfter(nums, kDays) !=
-      CountPopulationAfterBrute(nums, kDays)) {
+  if (CountPopulationAfter(*nums, kDays) !=
+      CountPopulationAfterBrute(*nums, kDays)) {
     return Error("Bad Brute");
   }
-  if (CountPopulationAfter(nums, kDays) !=
-      CountPopulationAfterUniquePop(nums, kDays)) {
+  if (CountPopulationAfter(*nums, kDays) !=
+      CountPopulationAfterUniquePop(*nums, kDays)) {
     return Error("Bad UniquePop");
   }
 
-  return IntReturn(CountPopulationAfter(nums, kDays));
+  return IntReturn(CountPopulationAfter(*nums, kDays));
 }
 
 absl::StatusOr<std::string> Day_2021_06::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  std::vector<int64_t> nums;
-  for (absl::string_view num_str : absl::StrSplit(input[0], ",")) {
-    int64_t num;
-    if (!absl::SimpleAtoi(num_str, &num)) return Error("Bad num: ", num_str);
-    nums.push_back(num);
-  }
+  absl::StatusOr<std::vector<int64_t>> nums =
+      ParseAsInts(absl::StrSplit(input[0], ","));
+  if (!nums.ok()) return nums.status();
 
   constexpr int64_t kDays = 256;
 
-  if (CountPopulationAfter(nums, kDays) !=
-      CountPopulationAfterUniquePop(nums, kDays)) {
+  if (CountPopulationAfter(*nums, kDays) !=
+      CountPopulationAfterUniquePop(*nums, kDays)) {
     return Error("Bad UniquePop");
   }
 
-  return IntReturn(CountPopulationAfter(nums, kDays));
+  return IntReturn(CountPopulationAfter(*nums, kDays));
 }
 
 }  // namespace advent_of_code
