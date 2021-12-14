@@ -30,7 +30,6 @@ cc_library(
 cc_test(
     name = "day15_test",
     srcs = ["day15_test.cc"],
-    args = ["--test_file=advent_of_code/2021/day15/day15.test"],
     deps = [
         ":day15_input",
         "//advent_of_code/infra:file_test",
@@ -40,7 +39,6 @@ cc_test(
 cc_test(
     name = "day15_benchmark",
     srcs = ["day15_benchmark.cc"],
-    args = ["--test_file=advent_of_code/2021/day15/day15.test"],
     tags = ["benchmark"],
     deps = [
         ":day15_input",
