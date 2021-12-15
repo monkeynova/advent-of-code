@@ -32,6 +32,9 @@ class Route : public BFSInterface<Route, Point> {
       if (!b_->OnBoard(n)) continue;
       Route next = *this;
       next.cur_ = n;
+      // Cost of moving to the new point is the value on the board.
+      // But we need to subtract the one that gets added for the move by
+      // BFSInterface itself
       next.add_steps((*b_)[n] - '0' - 1);
       state->AddNextStep(next);
     }
@@ -40,7 +43,6 @@ class Route : public BFSInterface<Route, Point> {
   bool IsFinal() override {
     return cur_ == end_;
   }
-  
 
  private:
   const CharBoard* b_;
@@ -65,10 +67,12 @@ absl::StatusOr<std::string> Day_2021_15::Part2(
 
   CharBoard big_board(b->width() * 5, b->height() * 5);
   for (Point p : b->range()) {
+    int base = (*b)[p] - '1';
     for (int i = 0; i < 5; i++) {
+      Point dx = i * Cardinal::kXHat * b->width();
       for (int j = 0; j < 5; j++) {
-        Point p2 = p + i * Cardinal::kXHat * b->width() + j * Cardinal::kYHat * b->height();
-        big_board[p2] = ((((*b)[p] + i + j) - '1') % 9) + '1';
+        Point dy = j * Cardinal::kYHat * b->height();
+        big_board[p + dx + dy] = ((base + i + j) % 9) + '1';
       }
     }
   }
