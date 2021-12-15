@@ -27,7 +27,6 @@ cc_test(
         "//advent_of_code/2015/day23:day23_benchmark_lib",
         "//advent_of_code/2015/day24:day24_benchmark_lib",
         "//advent_of_code/2015/day25:day25_benchmark_lib",
-        "//advent_of_code/infra:file_benchmark",
         "@com_monkeynova_gunit_main//:test_main",
     ],
 )

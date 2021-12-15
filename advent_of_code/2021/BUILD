@@ -17,7 +17,6 @@ cc_test(
         "//advent_of_code/2021/day13:day13_benchmark_lib",
         "//advent_of_code/2021/day14:day14_benchmark_lib",
         "//advent_of_code/2021/day15:day15_benchmark_lib",
-        "//advent_of_code/infra:file_benchmark",
         "@com_monkeynova_gunit_main//:test_main",
     ],
 )
