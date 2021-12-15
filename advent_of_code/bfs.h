@@ -153,6 +153,8 @@ template <typename BFSImpl, typename HistType>
 absl::optional<int> BFSInterface<BFSImpl, HistType>::FindMinStepsAStar() {
   static_assert(std::is_base_of<BFSInterface<BFSImpl, HistType>, BFSImpl>(),
                 "BFSInterface must be templated with a subclass");
+  static_assert(std::is_copy_assignable_v<BFSImpl>,
+                "BFSImpl must be copy-assignable for AStar");
   VLOG(3) << "New AStar: " << identifier();
   if (IsFinal()) return 0;
   QueueState<BFSImpl, HistType> state(*dynamic_cast<BFSImpl*>(this));
