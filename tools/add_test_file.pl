@@ -88,7 +88,6 @@ EOF
   }
 }
 
-
 sub read_fully {
   my ($fname) = @_;
   open my $fh, '<', $fname or die "cannot open ", $fname;

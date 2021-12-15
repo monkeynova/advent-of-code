@@ -68,14 +68,14 @@ struct Point {
   std::string DebugString() const { return absl::StrCat("{", x, ",", y, "}"); }
 };
 
-Point operator*(int s, Point p) { return {.x = s * p.x, .y = s * p.y}; }
+inline Point operator*(int s, Point p) { return {.x = s * p.x, .y = s * p.y}; }
 
 template <typename H>
 H AbslHashValue(H h, const Point& p) {
   return H::combine(std::move(h), p.x, p.y);
 }
 
-std::ostream& operator<<(std::ostream& out, const Point& p) {
+inline std::ostream& operator<<(std::ostream& out, const Point& p) {
   out << "{" << p.x << "," << p.y << "}";
   return out;
 }
@@ -125,7 +125,7 @@ struct PointRectangle {
   iterator end() const { return iterator{}; }
 };
 
-std::ostream& operator<<(std::ostream& out, const PointRectangle& r) {
+inline std::ostream& operator<<(std::ostream& out, const PointRectangle& r) {
   out << r.min << "-" << r.max;
   return out;
 }
@@ -211,7 +211,7 @@ H AbslHashValue(H h, const Point3& p) {
   return H::combine(std::move(h), p.x, p.y, p.z);
 }
 
-std::ostream& operator<<(std::ostream& out, const Point3& p) {
+inline std::ostream& operator<<(std::ostream& out, const Point3& p) {
   out << "{" << p.x << "," << p.y << "," << p.z << "}";
   return out;
 }
@@ -311,7 +311,7 @@ H AbslHashValue(H h, const Point4& p) {
   return H::combine(std::move(h), p.x, p.y, p.z, p.w);
 }
 
-std::ostream& operator<<(std::ostream& out, const Point4& p) {
+inline std::ostream& operator<<(std::ostream& out, const Point4& p) {
   out << "{" << p.x << "," << p.y << "," << p.z << "," << p.w << "}";
   return out;
 }
