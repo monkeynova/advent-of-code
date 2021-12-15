@@ -7,7 +7,7 @@ namespace advent_of_code {
 
 class Day_2020_02 : public AdventDay {
  public:
-  virtual absl::string_view test_file() override {
+  virtual absl::string_view test_file() const override {
     return "advent_of_code/2020/day02/day02.test";
   }
 
