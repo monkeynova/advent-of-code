@@ -8,9 +8,6 @@
 #include "glog/logging.h"
 #include "re2/re2.h"
 
-ABSL_FLAG(std::string, test_file, "",
-          "The file which contains the file based test driver tests");
-
 ABSL_FLAG(absl::Duration, run_long_tests, absl::Seconds(0),
           "Unless true, tests marked [long=$reason] will be ignored");
 
@@ -76,13 +73,6 @@ FileBenchmarkTests(absl::string_view test_file) {
 absl::StatusOr<int> FileBenchmarkTestCount(AdventDay* day) {
   absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>> tests =
       FileBenchmarkTests(day->test_file());
-  if (!tests.ok()) return tests.status();
-  return tests->size();
-}
-
-absl::StatusOr<int> FileBenchmarkTestCount() {
-  absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>> tests =
-      FileBenchmarkTests(absl::GetFlag(FLAGS_test_file));
   if (!tests.ok()) return tests.status();
   return tests->size();
 }

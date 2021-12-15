@@ -14,9 +14,6 @@
 #include "main_lib.h"
 #include "re2/re2.h"
 
-ABSL_FLAG(std::string, test_file, "",
-          "The file which contains the file based test driver tests");
-
 ABSL_FLAG(absl::Duration, run_long_tests, absl::Seconds(0),
           "Unless true, tests marked [long=$reason] will be ignored");
 

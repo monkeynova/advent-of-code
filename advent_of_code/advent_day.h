@@ -56,9 +56,7 @@ class AdventDay {
     return absl::StrCat(*val);
   }
 
-  virtual absl::string_view test_file() {
-    return absl::GetFlag(FLAGS_test_file);
-  }
+  virtual absl::string_view test_file() = 0;
 
   virtual absl::StatusOr<std::string> Part1(
       absl::Span<absl::string_view> input) const = 0;
