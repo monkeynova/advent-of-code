@@ -25,7 +25,7 @@ class PathWalk : public BFSInterface<PathWalk> {
         have_keys_(0),
         back_to_origin_(back_to_origin) {}
 
-  void AddNextSteps(State* state) final override {
+  void AddNextSteps(State* state) const final {
     for (Point dir : Cardinal::kFourDirs) {
       Point next_point = cur_ + dir;
       if (board_.OnBoard(next_point) && board_[next_point] != '#') {
@@ -39,7 +39,7 @@ class PathWalk : public BFSInterface<PathWalk> {
     }
   }
 
-  bool IsFinal() final override {
+  bool IsFinal() const final {
     if (need_keys_ != have_keys_) return false;
     if (back_to_origin_ && cur_ != start_) return false;
     return true;

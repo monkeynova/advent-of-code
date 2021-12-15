@@ -56,7 +56,7 @@ class Droid : public IntCode::IOModule {
 
       Point identifier() const override { return cur_; }
 
-      bool IsFinal() override {
+      bool IsFinal() const override {
         if (board_.contains(cur_)) return false;
         out_directions_->clear();
         out_directions_->insert(out_directions_->end(), directions_.begin(),
@@ -64,7 +64,7 @@ class Droid : public IntCode::IOModule {
         return true;
       }
 
-      void AddNextSteps(State* state) override {
+      void AddNextSteps(State* state) const override {
         for (InputDirection dir :
              {InputDirection::kNorthInput, InputDirection::kSouthInput,
               InputDirection::kWestInput, InputDirection::kEastInput}) {
@@ -107,9 +107,9 @@ class Droid : public IntCode::IOModule {
 
       Point identifier() const override { return cur_; }
 
-      bool IsFinal() override { return cur_ == end_; }
+      bool IsFinal() const override { return cur_ == end_; }
 
-      void AddNextSteps(State* state) override {
+      void AddNextSteps(State* state) const override {
         for (Point dir : Cardinal::kFourDirs) {
           Point next_cur = cur_ + dir;
           auto it = board_.find(next_cur);
@@ -138,12 +138,12 @@ class Droid : public IntCode::IOModule {
 
       Point identifier() const override { return cur_; }
 
-      bool IsFinal() override {
+      bool IsFinal() const override {
         *max_dist_ = std::max(*max_dist_, num_steps());
         return false;
       }
 
-      void AddNextSteps(State* state) override {
+      void AddNextSteps(State* state) const override {
         for (Point dir : Cardinal::kFourDirs) {
           Point next_cur = cur_ + dir;
           auto it = board_.find(next_cur);

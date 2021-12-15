@@ -50,9 +50,9 @@ class PathWalk : public BFSInterface<PathWalk, absl::string_view> {
     return groups;
   }
 
-  bool IsFinal() override { return false; }
+  bool IsFinal() const override { return false; }
 
-  void AddNextSteps(State* state) override {
+  void AddNextSteps(State* state) const override {
     if (reachable_ != nullptr) ++*reachable_;
     if (to_see_ != nullptr) to_see_->erase(cur_);
 

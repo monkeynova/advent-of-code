@@ -113,9 +113,9 @@ class Maze {
           : maze_(maze), cur_(start), end_(end) {}
 
       Point identifier() const override { return cur_; }
-      bool IsFinal() override { return cur_ == end_; }
+      bool IsFinal() const override { return cur_ == end_; }
 
-      void AddNextSteps(State* state) override {
+      void AddNextSteps(State* state) const override {
         for (Point dir : Cardinal::kFourDirs) {
           Point next_cur = cur_ + dir;
           if (maze_.CanStand(next_cur)) {
@@ -146,9 +146,9 @@ class Maze {
           : maze_(maze), cur_({start.x, start.y, 0}), end_({end.x, end.y, 0}) {}
 
       Point3 identifier() const override { return cur_; }
-      bool IsFinal() override { return cur_ == end_; }
+      bool IsFinal() const override { return cur_ == end_; }
 
-      void AddNextSteps(State* state) override {
+      void AddNextSteps(State* state) const override {
         for (Point dir : Cardinal::kFourDirs) {
           Point3 next_cur = cur_ + Point3{dir.x, dir.y, 0};
           if (maze_.CanStand({next_cur.x, next_cur.y})) {

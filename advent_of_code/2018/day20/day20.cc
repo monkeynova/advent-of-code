@@ -221,9 +221,9 @@ class RoomWalk : public BFSInterface<RoomWalk, Point> {
       : board_(b), max_dist_(max_dist), cur_(start) {}
 
   Point identifier() const override { return cur_; }
-  bool IsFinal() override { return false; }
+  bool IsFinal() const override { return false; }
 
-  void AddNextSteps(State* state) override {
+  void AddNextSteps(State* state) const override {
     *max_dist_ = std::max(num_steps(), *max_dist_);
 
     for (Point dir : Cardinal::kFourDirs) {
@@ -251,9 +251,9 @@ class RoomWalkPast : public BFSInterface<RoomWalkPast, Point> {
   }
 
   Point identifier() const override { return cur_; }
-  bool IsFinal() override { return false; }
+  bool IsFinal() const override { return false; }
 
-  void AddNextSteps(State* state) override {
+  void AddNextSteps(State* state) const override {
     if (num_steps() >= min_dist_) ++*count_;
 
     for (Point dir : Cardinal::kFourDirs) {

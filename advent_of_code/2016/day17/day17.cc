@@ -28,7 +28,7 @@ class PathWalk : public BFSInterface<PathWalk> {
         path_dest_(path_dest),
         stop_on_end_(stop_on_end) {}
 
-  bool IsFinal() override {
+  bool IsFinal() const override {
     if (cur_ == Point{3, 3}) {
       *path_dest_ = path_;
       if (stop_on_end_) return true;
@@ -36,7 +36,7 @@ class PathWalk : public BFSInterface<PathWalk> {
     return false;
   }
 
-  void AddNextSteps(State* state) override {
+  void AddNextSteps(State* state) const override {
     if (cur_ == Point{3, 3}) return;
 
     MD5 digest;

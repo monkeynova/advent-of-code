@@ -52,8 +52,8 @@ class BFSInterface {
   virtual ~BFSInterface() = default;
 
   virtual typename BFSInterfaceTraits<HistType>::RefType identifier() const = 0;
-  virtual void AddNextSteps(State* state) = 0;
-  virtual bool IsFinal() = 0;
+  virtual void AddNextSteps(State* state) const = 0;
+  virtual bool IsFinal() const = 0;
 
   virtual int min_steps_to_final() const { return 0; }
 
@@ -101,7 +101,7 @@ class DequeState : public BFSInterface<BFSImpl, HistType>::State {
  public:
   explicit DequeState(BFSImpl start)
       : BFSInterface<BFSImpl, HistType>::State(start) {
-    AddToFrontier(start);
+    AddToFrontier(std::move(start));
   }
 
   void AddToFrontier(BFSImpl next) final {
@@ -118,7 +118,7 @@ class QueueState : public BFSInterface<BFSImpl, HistType>::State {
  public:
   explicit QueueState(BFSImpl start)
       : BFSInterface<BFSImpl, HistType>::State(start) {
-    AddToFrontier(start);
+    AddToFrontier(std::move(start));
   }
 
   void AddToFrontier(BFSImpl next) final {
@@ -140,7 +140,7 @@ absl::optional<int> BFSInterface<BFSImpl, HistType>::FindMinSteps() {
   if (IsFinal()) return 0;
   DequeState<BFSImpl, HistType> state(*dynamic_cast<BFSImpl*>(this));
   while (!state.frontier_.empty()) {
-    BFSImpl& cur = state.frontier_.front();
+    const BFSImpl& cur = state.frontier_.front();
     VLOG(3) << "@" << cur.num_steps_ << "; " << cur.identifier();
     cur.AddNextSteps(&state);
     if (state.ret) return *state.ret;
@@ -157,6 +157,8 @@ absl::optional<int> BFSInterface<BFSImpl, HistType>::FindMinStepsAStar() {
   if (IsFinal()) return 0;
   QueueState<BFSImpl, HistType> state(*dynamic_cast<BFSImpl*>(this));
   while (!state.frontier_.empty()) {
+    // Copy (as opposed to a const reference) because mutations to the queue
+    // can invalidate the reference.
     BFSImpl cur = state.frontier_.top();
     if (cur.IsFinal()) return cur.num_steps();
     VLOG(3) << "  Next: " << cur.identifier() << " (" << cur.num_steps() << "+"

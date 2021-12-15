@@ -37,9 +37,9 @@ class PathWalk : public BFSInterface<PathWalk, Point> {
 
   Point identifier() const override { return cur_; }
 
-  bool IsFinal() override { return false; }
+  bool IsFinal() const override { return false; }
 
-  void AddNextSteps(State* state) override {
+  void AddNextSteps(State* state) const override {
     to_find_->erase(cur_);
     for (Point dir : Cardinal::kFourDirs) {
       Point next_cur = cur_ + dir;

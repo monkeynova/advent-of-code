@@ -42,7 +42,7 @@ class PathWalkToEnd : public BFSInterface<PathWalkToEnd, Point> {
   PathWalkToEnd(const SparseBoard& board, Point start, Point end)
       : board_(board), cur_(start), end_(end) {}
 
-  void AddNextSteps(State* state) override {
+  void AddNextSteps(State* state) const override {
     for (Point dir : Cardinal::kFourDirs) {
       Point next_point = dir + cur_;
       if (board_.OnBoard(next_point) && !board_.IsWall(next_point)) {
@@ -53,7 +53,7 @@ class PathWalkToEnd : public BFSInterface<PathWalkToEnd, Point> {
     }
   }
 
-  bool IsFinal() override { return cur_ == end_; }
+  bool IsFinal() const override { return cur_ == end_; }
 
   Point identifier() const override { return cur_; }
 
@@ -69,7 +69,7 @@ class PathWalkToDistance : public BFSInterface<PathWalkToDistance, Point> {
                      int* visited)
       : board_(board), cur_(start), distance_(distance), visited_(visited) {}
 
-  void AddNextSteps(State* state) override {
+  void AddNextSteps(State* state) const override {
     ++*visited_;
     if (num_steps() == distance_) {
       return;
@@ -86,7 +86,7 @@ class PathWalkToDistance : public BFSInterface<PathWalkToDistance, Point> {
 
   Point identifier() const override { return cur_; }
 
-  bool IsFinal() override { return false; }
+  bool IsFinal() const override { return false; }
 
  private:
   const SparseBoard& board_;

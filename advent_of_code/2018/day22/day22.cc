@@ -93,11 +93,11 @@ class MapWalk : public BFSInterface<MapWalk> {
     return (cur_ - map_->target()).dist() + (equipped_ != kTorch ? 7 : 0);
   }
 
-  bool IsFinal() override {
+  bool IsFinal() const override {
     return cur_ == map_->target() && equipped_ == kTorch;
   }
 
-  void AddNextSteps(State* state) override {
+  void AddNextSteps(State* state) const override {
     if (cur_ == map_->target() && equipped_ != kTorch) {
       MapWalk next = *this;
       // 7 to equip but one gets incremented with AddNextState.
@@ -126,7 +126,7 @@ class MapWalk : public BFSInterface<MapWalk> {
     }
   }
 
-  absl::flat_hash_set<Equipment> NeedEquip(Map::Terrain terrain) {
+  absl::flat_hash_set<Equipment> NeedEquip(Map::Terrain terrain) const {
     switch (terrain) {
       case Map::Terrain::kRocky:
         return {kGear, kTorch};

@@ -69,7 +69,7 @@ class ElevatorState : public BFSInterface<ElevatorState> {
     return min_steps_to_final_;
   }
 
-  void AddNextSteps(State* s) override;
+  void AddNextSteps(State* s) const override;
 
   bool IsValid() const {
     for (const Floor& f : floors) {
@@ -80,7 +80,7 @@ class ElevatorState : public BFSInterface<ElevatorState> {
     return true;
   }
 
-  bool IsFinal() override {
+  bool IsFinal() const override {
     for (int idx = 0; idx < floors.size() - 1; ++idx) {
       if (floors[idx].microchips_bv != 0) return false;
       if (floors[idx].generators_bv != 0) return false;
@@ -131,7 +131,7 @@ std::ostream& operator<<(std::ostream& out, const ElevatorState& s) {
   return out;
 }
 
-void ElevatorState::AddNextSteps(State* state) {
+void ElevatorState::AddNextSteps(State* state) const {
   int cur_floor_num = cur_floor;
   std::vector<int> next_floors;
   if (cur_floor_num - 1 >= 0) next_floors.push_back(cur_floor_num - 1);

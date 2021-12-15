@@ -34,9 +34,9 @@ class PathWalk : public BFSInterface<PathWalk, Point> {
 
   int min_steps_to_final() const override { return (end_ - cur_).dist(); }
 
-  bool IsFinal() override { return cur_ == end_; }
+  bool IsFinal() const override { return cur_ == end_; }
 
-  void AddNextSteps(State* state) override {
+  void AddNextSteps(State* state) const override {
     for (Point dir : kOrderedDirs) {
       Point next = cur_ + dir;
       if (!board_->OnBoard(next)) continue;
@@ -73,9 +73,9 @@ class FindEnemyAdjacent : public BFSInterface<FindEnemyAdjacent, Point> {
 
   Point identifier() const override { return cur_; }
 
-  bool IsFinal() override { return false; }
+  bool IsFinal() const override { return false; }
 
-  void AddNextSteps(State* state) override {
+  void AddNextSteps(State* state) const override {
     // Stop exploring if we've found a match.
     // if (num_steps() > ret_->d) return;
 

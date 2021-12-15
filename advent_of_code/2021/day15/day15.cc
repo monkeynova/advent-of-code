@@ -19,14 +19,13 @@ namespace {
 
 class Route : public BFSInterface<Route, Point> {
  public:
-  Route() = default;
-  Route(const CharBoard* b) : b_(b), cur_(b_->range().min), end_(b_->range().max) {}
+  Route(const CharBoard& b) : b_(&b), cur_(b_->range().min), end_(b_->range().max) {}
 
   Point identifier() const override { return cur_; }
 
   int min_steps_to_final() const override { return (end_ - cur_).dist(); }
 
-  void AddNextSteps(State* state) override {
+  void AddNextSteps(State* state) const override {
     for (Point d : Cardinal::kFourDirs) {
       Point n = cur_ + d;
       if (!b_->OnBoard(n)) continue;
@@ -36,11 +35,11 @@ class Route : public BFSInterface<Route, Point> {
       // But we need to subtract the one that gets added for the move by
       // BFSInterface itself
       next.add_steps((*b_)[n] - '0' - 1);
-      state->AddNextStep(next);
+      state->AddNextStep(std::move(next));
     }
   }
 
-  bool IsFinal() override {
+  bool IsFinal() const override {
     return cur_ == end_;
   }
 
@@ -57,7 +56,7 @@ absl::StatusOr<std::string> Day_2021_15::Part1(
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
 
-  return IntReturn(Route(&*b).FindMinStepsAStar());
+  return IntReturn(Route(*b).FindMinStepsAStar());
 }
 
 absl::StatusOr<std::string> Day_2021_15::Part2(
@@ -77,7 +76,7 @@ absl::StatusOr<std::string> Day_2021_15::Part2(
     }
   }
 
-  return IntReturn(Route(&big_board).FindMinStepsAStar());
+  return IntReturn(Route(big_board).FindMinStepsAStar());
 }
 
 }  // namespace advent_of_code
