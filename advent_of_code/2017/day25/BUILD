@@ -35,13 +35,27 @@ cc_test(
     ],
 )
 
-cc_test(
-    name = "day25_benchmark",
+cc_library(
+    name = "day25_benchmark_lib",
     srcs = ["day25_benchmark.cc"],
-    tags = ["benchmark"],
+    testonly = 1,
+    alwayslink = 1,
+    visibility = [
+        "//visibility:public",
+    ],
     deps = [
         ":day25_input",
         "//advent_of_code/infra:file_benchmark",
         "@com_monkeynova_gunit_main//:test_main",
     ],
 )
+
+cc_test(
+    name = "day25_benchmark",
+    tags = ["benchmark"],
+    deps = [
+        ":day25_benchmark_lib",
+        "@com_monkeynova_gunit_main//:test_main",
+    ],
+)
+
