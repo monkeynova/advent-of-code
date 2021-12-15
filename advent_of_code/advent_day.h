@@ -10,8 +10,6 @@
 #include "absl/strings/str_split.h"
 #include "absl/types/span.h"
 
-extern absl::Flag<std::string> FLAGS_test_file;
-
 namespace advent_of_code {
 
 template <class... Args>
