@@ -1,22 +1,40 @@
 [part=1]
-Example input
+1163751742
+1381373672
+2136511328
+3694931569
+7463417111
+1319128137
+1359912421
+3125421639
+1293138521
+2311944581
 --
-ERROR: UNIMPLEMENTED: Problem not known
+40
 ==
 
 [part=1]
 @include{advent_of_code/2021/day15/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+458
 ==
 
 [part=2]
-Example input
+1163751742
+1381373672
+2136511328
+3694931569
+7463417111
+1319128137
+1359912421
+3125421639
+1293138521
+2311944581
 --
-ERROR: UNIMPLEMENTED: Problem not known
+315
 ==
 
 [part=2]
 @include{advent_of_code/2021/day15/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+2800
