@@ -1,22 +1,94 @@
 [part=1]
-Example input
+D2FE28
 --
-ERROR: UNIMPLEMENTED: Problem not known
+6
+==
+
+[part=1]
+38006F45291200
+--
+9
+==
+
+[part=1]
+8A004A801A8002F478
+--
+16
+==
+
+[part=1]
+620080001611562C8802118E34
+--
+12
+==
+
+[part=1]
+C0015000016115A2E0802F182340
+--
+23
+==
+
+[part=1]
+A0016C880162017C3686B18A3D4780
+--
+31
 ==
 
 [part=1]
 @include{advent_of_code/2021/day16/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+847
 ==
 
 [part=2]
-Example input
+C200B40A82
 --
-ERROR: UNIMPLEMENTED: Problem not known
+3
+==
+
+[part=2]
+04005AC33890
+--
+54
+==
+
+[part=2]
+880086C3E88112
+--
+7
+==
+
+[part=2]
+CE00C43D881120
+--
+9
+==
+
+[part=2]
+D8005AC2A8F0
+--
+1
+==
+
+[part=2]
+F600BC2D8F
+--
+0
+==
+
+[part=2]
+9C005AC2F8F0
+--
+0
+==
+
+[part=2]
+9C0141080250320F1802104A08
+--
+1
 ==
 
 [part=2]
 @include{advent_of_code/2021/day16/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+333794664059
