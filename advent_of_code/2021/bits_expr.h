@@ -43,7 +43,7 @@ class BitsExpr {
     Parser(const std::vector<bool>& bits) : bits_(bits) {}
 
     absl::StatusOr<BitsExpr> ParseExpr();
-    absl::StatusOr<int64_t> ParseInt(int64_t count);
+    absl::StatusOr<int64_t> ReadInt(int64_t count);
 
    private:
     const std::vector<bool>& bits_;

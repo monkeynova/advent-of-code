@@ -25,32 +25,32 @@ absl::StatusOr<BitsExpr> BitsExpr::Parse(absl::string_view hex) {
 
 absl::StatusOr<BitsExpr> BitsExpr::Parser::ParseExpr() {
   BitsExpr ret;
-  absl::StatusOr<int64_t> ver = ParseInt(3);
+  absl::StatusOr<int64_t> ver = ReadInt(3);
   if (!ver.ok()) return ver.status();
   ret.version_ = *ver;
-  absl::StatusOr<int64_t> type = ParseInt(3);
+  absl::StatusOr<int64_t> type = ReadInt(3);
   if (!type.ok()) return type.status();
   ret.type_ = static_cast<EvaluateType>(*type);
   if (ret.type_ == EvaluateType::kLiteral) {
     ret.literal_ = 0;
-    while (true) {
-      absl::StatusOr<int64_t> more = ParseInt(1);
+    absl::StatusOr<int64_t> more;
+    do {
+      more = ReadInt(1);
       if (!more.ok()) return more.status();
-      absl::StatusOr<int64_t> n = ParseInt(4);
+      absl::StatusOr<int64_t> n = ReadInt(4);
       if (!n.ok()) return n.status();
       ret.literal_ <<= 4;
       ret.literal_ += *n;
-      if (!*more) break;
-    }
+    } while (*more);
     return ret;
   }
 
-  absl::StatusOr<int64_t> l_type = ParseInt(1);
+  absl::StatusOr<int64_t> l_type = ReadInt(1);
   if (!l_type.ok()) return l_type.status();
 
   if (*l_type == 0) {
     // 15-bit length;
-    absl::StatusOr<int64_t> length = ParseInt(15);
+    absl::StatusOr<int64_t> length = ReadInt(15);
     if (!length.ok()) return length.status();
 
     int64_t bit_end = offset_ + *length;
@@ -59,10 +59,14 @@ absl::StatusOr<BitsExpr> BitsExpr::Parser::ParseExpr() {
       if (!sub.ok()) return sub.status();
       ret.sub_.push_back(absl::make_unique<BitsExpr>(std::move(*sub)));
     }
+    if (offset_ != bit_end) {
+      return absl::InvalidArgumentError("Submessages not at length");
+    }
     return ret;
   }
+
   // 11-bit subpacket count;
-  absl::StatusOr<int64_t> sub_count = ParseInt(11);
+  absl::StatusOr<int64_t> sub_count = ReadInt(11);
   if (!sub_count.ok()) return sub_count.status();
   for (int i = 0; i < *sub_count; ++i) {
     absl::StatusOr<BitsExpr> sub = ParseExpr();
@@ -72,16 +76,14 @@ absl::StatusOr<BitsExpr> BitsExpr::Parser::ParseExpr() {
   return ret;
 }
 
-absl::StatusOr<int64_t> BitsExpr::Parser::ParseInt(int64_t count) {
+absl::StatusOr<int64_t> BitsExpr::Parser::ReadInt(int64_t count) {
   if (offset_ + count > bits_.size()) {
     return absl::InvalidArgumentError("Read past end of bits");
   }
-  CHECK(offset_ < bits_.size());
   int64_t v = 0;
   for (int i = 0; i < count; ++i) {
-    v = v * 2 + bits_[offset_ + i];
+    v = (v << 1) | bits_[offset_++];
   }
-  offset_ += count;
   return v;
 }
 
