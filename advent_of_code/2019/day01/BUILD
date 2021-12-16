@@ -33,9 +33,8 @@ cc_test(
 
 cc_library(
     name = "day01_benchmark_lib",
-    srcs = ["day01_benchmark.cc"],
     testonly = 1,
-    alwayslink = 1,
+    srcs = ["day01_benchmark.cc"],
     visibility = [
         "//visibility:public",
     ],
@@ -44,6 +43,7 @@ cc_library(
         "//advent_of_code/infra:file_benchmark",
         "@com_monkeynova_gunit_main//:test_main",
     ],
+    alwayslink = 1,
 )
 
 cc_test(
@@ -54,4 +54,3 @@ cc_test(
         "@com_monkeynova_gunit_main//:test_main",
     ],
 )
-

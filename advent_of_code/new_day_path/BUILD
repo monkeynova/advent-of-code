@@ -19,8 +19,8 @@ cc_library(
     name = "new_day_input",
     testonly = 1,
     data = [
-        "new_day.test",
         "input.txt",
+        "new_day.test",
     ],
     deps = [
         ":new_day",
@@ -38,9 +38,8 @@ cc_test(
 
 cc_library(
     name = "new_day_benchmark_lib",
-    srcs = ["new_day_benchmark.cc"],
     testonly = 1,
-    alwayslink = 1,
+    srcs = ["new_day_benchmark.cc"],
     visibility = [
         "//visibility:public",
     ],
@@ -49,6 +48,7 @@ cc_library(
         "//advent_of_code/infra:file_benchmark",
         "@com_monkeynova_gunit_main//:test_main",
     ],
+    alwayslink = 1,
 )
 
 cc_test(
@@ -59,4 +59,3 @@ cc_test(
         "@com_monkeynova_gunit_main//:test_main",
     ],
 )
-
