@@ -8,18 +8,19 @@ namespace advent_of_code {
 absl::StatusOr<BitsExpr> BitsExpr::Parse(absl::string_view hex) {
   std::vector<bool> bits;
   for (const char c : hex) {
-    int val = -1;
-    if (c >= '0' && c <= '9')
-      val = c - '0';
-    else if (c >= 'A' && c <= 'F')
-      val = c - 'A' + 10;
-    else
-      return absl::InvalidArgumentError("Bad hex");
+    int nibble = -1;
+    if (c >= '0' && c <= '9') {
+      nibble = c - '0';
+    } else if (c >= 'A' && c <= 'F') {
+      nibble = c - 'A' + 10;
+    } else {
+      return absl::InvalidArgumentError(
+          absl::StrCat("Bad hex: ", absl::string_view(&c, 1)));
+    }
     for (int bit = 3; bit >= 0; --bit) {
-      bits.push_back(val & (1 << bit));
+      bits.push_back(nibble & (1 << bit));
     }
   }
-  // VLOG(1) << absl::StrJoin(bits, ",");
   return Parser(bits).ParseExpr();
 }
 
@@ -31,16 +32,16 @@ absl::StatusOr<BitsExpr> BitsExpr::Parser::ParseExpr() {
   absl::StatusOr<int64_t> type = ReadInt(3);
   if (!type.ok()) return type.status();
   ret.type_ = static_cast<EvaluateType>(*type);
+
   if (ret.type_ == EvaluateType::kLiteral) {
     ret.literal_ = 0;
     absl::StatusOr<int64_t> more;
     do {
       more = ReadInt(1);
       if (!more.ok()) return more.status();
-      absl::StatusOr<int64_t> n = ReadInt(4);
-      if (!n.ok()) return n.status();
-      ret.literal_ <<= 4;
-      ret.literal_ += *n;
+      absl::StatusOr<int64_t> nibble = ReadInt(4);
+      if (!nibble.ok()) return nibble.status();
+      ret.literal_ = (ret.literal_ << 4) | *nibble;
     } while (*more);
     return ret;
   }
@@ -49,7 +50,7 @@ absl::StatusOr<BitsExpr> BitsExpr::Parser::ParseExpr() {
   if (!l_type.ok()) return l_type.status();
 
   if (*l_type == 0) {
-    // 15-bit length;
+    // 15-bit length in which sub-records exist.
     absl::StatusOr<int64_t> length = ReadInt(15);
     if (!length.ok()) return length.status();
 
@@ -60,12 +61,13 @@ absl::StatusOr<BitsExpr> BitsExpr::Parser::ParseExpr() {
       ret.sub_.push_back(absl::make_unique<BitsExpr>(std::move(*sub)));
     }
     if (offset_ != bit_end) {
-      return absl::InvalidArgumentError("Submessages not at length");
+      return absl::InvalidArgumentError(absl::StrCat(
+          "Submessages not at length: ", offset_, " != ", bit_end));
     }
     return ret;
   }
 
-  // 11-bit subpacket count;
+  // 11-bit sub-record count.
   absl::StatusOr<int64_t> sub_count = ReadInt(11);
   if (!sub_count.ok()) return sub_count.status();
   for (int i = 0; i < *sub_count; ++i) {
@@ -138,7 +140,8 @@ absl::StatusOr<int64_t> BitsExpr::Evaluate() const {
     }
     case EvaluateType::kGreater: {
       if (sub_.size() != 2) {
-        return absl::InvalidArgumentError("Bad >");
+        return absl::InvalidArgumentError(
+            absl::StrCat("Invalid argument count for Greater: ", sub_.size()));
       }
       absl::StatusOr<int64_t> left = sub_[0]->Evaluate();
       if (!left.ok()) return left.status();
@@ -148,7 +151,8 @@ absl::StatusOr<int64_t> BitsExpr::Evaluate() const {
     }
     case EvaluateType::kLess: {
       if (sub_.size() != 2) {
-        return absl::InvalidArgumentError("Bad <");
+        return absl::InvalidArgumentError(
+            absl::StrCat("Invalid argument count for Less: ", sub_.size()));
       }
       absl::StatusOr<int64_t> left = sub_[0]->Evaluate();
       if (!left.ok()) return left.status();
@@ -158,7 +162,8 @@ absl::StatusOr<int64_t> BitsExpr::Evaluate() const {
     }
     case EvaluateType::kEqual: {
       if (sub_.size() != 2) {
-        return absl::InvalidArgumentError("Bad ==");
+        return absl::InvalidArgumentError(
+            absl::StrCat("Invalid argument count for Equal: ", sub_.size()));
       }
       absl::StatusOr<int64_t> left = sub_[0]->Evaluate();
       if (!left.ok()) return left.status();

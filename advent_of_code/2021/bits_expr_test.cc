@@ -61,98 +61,89 @@ TEST(BitsExpr, Evaluate) {
 }
 
 TEST(BitsExpr, DebugString) {
-  EXPECT_THAT(
-      BitsExpr::Parse("D2FE28"),
-      IsOkAndHolds(DebugString(
-          "+-ver=6\n"
-          "+-type=Literal\n"
-          "  +-literal=2021\n")));
-  EXPECT_THAT(
-      BitsExpr::Parse("38006F45291200"),
-      IsOkAndHolds(DebugString(
-          "+-ver=1\n"
-          "+-type=Less\n"
-          "  +-ver=6\n"
-          "  +-type=Literal\n"
-          "    +-literal=10\n "
-          " +-ver=2\n"
-          "  +-type=Literal\n"
-          "    +-literal=20\n")));
-  EXPECT_THAT(
-      BitsExpr::Parse("8A004A801A8002F478"),
-      IsOkAndHolds(DebugString(
-          "+-ver=4\n"
-          "+-type=Min\n"
-          "  +-ver=1\n"
-          "  +-type=Min\n"
-          "    +-ver=5\n"
-          "    +-type=Min\n"
-          "      +-ver=6\n"
-          "      +-type=Literal\n"
-          "        +-literal=15\n")));
+  EXPECT_THAT(BitsExpr::Parse("D2FE28"),
+              IsOkAndHolds(DebugString("+-ver=6\n"
+                                       "+-type=Literal\n"
+                                       "  +-literal=2021\n")));
+  EXPECT_THAT(BitsExpr::Parse("38006F45291200"),
+              IsOkAndHolds(DebugString("+-ver=1\n"
+                                       "+-type=Less\n"
+                                       "  +-ver=6\n"
+                                       "  +-type=Literal\n"
+                                       "    +-literal=10\n "
+                                       " +-ver=2\n"
+                                       "  +-type=Literal\n"
+                                       "    +-literal=20\n")));
+  EXPECT_THAT(BitsExpr::Parse("8A004A801A8002F478"),
+              IsOkAndHolds(DebugString("+-ver=4\n"
+                                       "+-type=Min\n"
+                                       "  +-ver=1\n"
+                                       "  +-type=Min\n"
+                                       "    +-ver=5\n"
+                                       "    +-type=Min\n"
+                                       "      +-ver=6\n"
+                                       "      +-type=Literal\n"
+                                       "        +-literal=15\n")));
   EXPECT_THAT(BitsExpr::Parse("620080001611562C8802118E34"),
-              IsOkAndHolds(DebugString(
-                  "+-ver=3\n"
-                  "+-type=Sum\n"
-                  "  +-ver=0\n"
-                  "  +-type=Sum\n"
-                  "    +-ver=0\n"
-                  "    +-type=Literal\n"
-                  "      +-literal=10\n"
-                  "    +-ver=5\n"
-                  "    +-type=Literal\n"
-                  "      +-literal=11\n"
-                  "  +-ver=1\n"
-                  "  +-type=Sum\n"
-                  "    +-ver=0\n"
-                  "    +-type=Literal\n"
-                  "      +-literal=12\n"
-                  "    +-ver=3\n"
-                  "    +-type=Literal\n"
-                  "      +-literal=13\n")));
+              IsOkAndHolds(DebugString("+-ver=3\n"
+                                       "+-type=Sum\n"
+                                       "  +-ver=0\n"
+                                       "  +-type=Sum\n"
+                                       "    +-ver=0\n"
+                                       "    +-type=Literal\n"
+                                       "      +-literal=10\n"
+                                       "    +-ver=5\n"
+                                       "    +-type=Literal\n"
+                                       "      +-literal=11\n"
+                                       "  +-ver=1\n"
+                                       "  +-type=Sum\n"
+                                       "    +-ver=0\n"
+                                       "    +-type=Literal\n"
+                                       "      +-literal=12\n"
+                                       "    +-ver=3\n"
+                                       "    +-type=Literal\n"
+                                       "      +-literal=13\n")));
   EXPECT_THAT(BitsExpr::Parse("C0015000016115A2E0802F182340"),
-              IsOkAndHolds(DebugString(
-                  "+-ver=6\n"
-                  "+-type=Sum\n"
-                  "  +-ver=0\n"
-                  "  +-type=Sum\n"
-                  "    +-ver=0\n"
-                  "    +-type=Literal\n"
-                  "      +-literal=10\n"
-                  "    +-ver=6\n"
-                  "    +-type=Literal\n"
-                  "      +-literal=11\n"
-                  "  +-ver=4\n"
-                  "  +-type=Sum\n"
-                  "    +-ver=7\n"
-                  "    +-type=Literal\n"
-                  "      +-literal=12\n"
-                  "    +-ver=0\n"
-                  "    +-type=Literal\n"
-                  "      +-literal=13\n")));
+              IsOkAndHolds(DebugString("+-ver=6\n"
+                                       "+-type=Sum\n"
+                                       "  +-ver=0\n"
+                                       "  +-type=Sum\n"
+                                       "    +-ver=0\n"
+                                       "    +-type=Literal\n"
+                                       "      +-literal=10\n"
+                                       "    +-ver=6\n"
+                                       "    +-type=Literal\n"
+                                       "      +-literal=11\n"
+                                       "  +-ver=4\n"
+                                       "  +-type=Sum\n"
+                                       "    +-ver=7\n"
+                                       "    +-type=Literal\n"
+                                       "      +-literal=12\n"
+                                       "    +-ver=0\n"
+                                       "    +-type=Literal\n"
+                                       "      +-literal=13\n")));
   EXPECT_THAT(BitsExpr::Parse("A0016C880162017C3686B18A3D4780"),
-              IsOkAndHolds(DebugString(
-                  "+-ver=5\n"
-                  "+-type=Sum\n"
-                  "  +-ver=1\n"
-                  "  +-type=Sum\n"
-                  "    +-ver=3\n"
-                  "    +-type=Sum\n"
-                  "      +-ver=7\n"
-                  "      +-type=Literal\n"
-                  "        +-literal=6\n"
-                  "      +-ver=6\n"
-                  "      +-type=Literal\n"
-                  "        +-literal=6\n"
-                  "      +-ver=5\n"
-                  "      +-type=Literal\n"
-                  "        +-literal=12\n"
-                  "      +-ver=2\n"
-                  "      +-type=Literal\n"
-                  "        +-literal=15\n"
-                  "      +-ver=2\n"
-                  "      +-type=Literal\n"
-                  "        +-literal=15\n")));
+              IsOkAndHolds(DebugString("+-ver=5\n"
+                                       "+-type=Sum\n"
+                                       "  +-ver=1\n"
+                                       "  +-type=Sum\n"
+                                       "    +-ver=3\n"
+                                       "    +-type=Sum\n"
+                                       "      +-ver=7\n"
+                                       "      +-type=Literal\n"
+                                       "        +-literal=6\n"
+                                       "      +-ver=6\n"
+                                       "      +-type=Literal\n"
+                                       "        +-literal=6\n"
+                                       "      +-ver=5\n"
+                                       "      +-type=Literal\n"
+                                       "        +-literal=12\n"
+                                       "      +-ver=2\n"
+                                       "      +-type=Literal\n"
+                                       "        +-literal=15\n"
+                                       "      +-ver=2\n"
+                                       "      +-type=Literal\n"
+                                       "        +-literal=15\n")));
 }
 
 }  //  namespace advent_of_code
