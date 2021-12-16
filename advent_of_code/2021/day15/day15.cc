@@ -19,7 +19,8 @@ namespace {
 
 class Route : public BFSInterface<Route, Point> {
  public:
-  Route(const CharBoard& b) : b_(&b), cur_(b_->range().min), end_(b_->range().max) {}
+  Route(const CharBoard& b)
+      : b_(&b), cur_(b_->range().min), end_(b_->range().max) {}
 
   Point identifier() const override { return cur_; }
 
@@ -39,9 +40,7 @@ class Route : public BFSInterface<Route, Point> {
     }
   }
 
-  bool IsFinal() const override {
-    return cur_ == end_;
-  }
+  bool IsFinal() const override { return cur_ == end_; }
 
  private:
   const CharBoard* b_;

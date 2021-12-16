@@ -22,8 +22,10 @@ class BitsExpr {
   absl::StatusOr<int64_t> Evaluate() const;
 
  private:
-  static absl::StatusOr<BitsExpr> ParseExpr(const std::vector<bool>& bits, int64_t& offset);
-  static absl::StatusOr<int64_t> ParseInt(const std::vector<bool>& bits, int64_t& offset, int64_t count);
+  static absl::StatusOr<BitsExpr> ParseExpr(const std::vector<bool>& bits,
+                                            int64_t& offset);
+  static absl::StatusOr<int64_t> ParseInt(const std::vector<bool>& bits,
+                                          int64_t& offset, int64_t count);
 
   int version_;
   int type_;
@@ -37,19 +39,23 @@ absl::StatusOr<BitsExpr> BitsExpr::Parse(absl::string_view hex) {
   std::vector<bool> bits;
   for (const char c : hex) {
     int val = -1;
-    if (c >= '0' && c <= '9') val = c - '0';
-    else if (c >= 'A' && c <= 'F') val = c - 'A' + 10;
-    else return Error("Bad hex");
+    if (c >= '0' && c <= '9')
+      val = c - '0';
+    else if (c >= 'A' && c <= 'F')
+      val = c - 'A' + 10;
+    else
+      return Error("Bad hex");
     for (int bit = 3; bit >= 0; --bit) {
       bits.push_back(val & (1 << bit));
     }
   }
-  //VLOG(1) << absl::StrJoin(bits, ",");
+  // VLOG(1) << absl::StrJoin(bits, ",");
   int64_t offset = 0;
   return ParseExpr(bits, offset);
 }
 
-absl::StatusOr<BitsExpr> BitsExpr::ParseExpr(const std::vector<bool>& bits, int64_t& offset) {
+absl::StatusOr<BitsExpr> BitsExpr::ParseExpr(const std::vector<bool>& bits,
+                                             int64_t& offset) {
   BitsExpr ret;
   absl::StatusOr<int64_t> ver = ParseInt(bits, offset, 3);
   if (!ver.ok()) return ver.status();
@@ -98,7 +104,8 @@ absl::StatusOr<BitsExpr> BitsExpr::ParseExpr(const std::vector<bool>& bits, int6
   return ret;
 }
 
-absl::StatusOr<int64_t> BitsExpr::ParseInt(const std::vector<bool>& bits, int64_t& offset, int64_t count) {
+absl::StatusOr<int64_t> BitsExpr::ParseInt(const std::vector<bool>& bits,
+                                           int64_t& offset, int64_t count) {
   if (offset + count > bits.size()) return Error("Read past end of bits");
   CHECK(offset < bits.size());
   int64_t v = 0;
@@ -106,7 +113,7 @@ absl::StatusOr<int64_t> BitsExpr::ParseInt(const std::vector<bool>& bits, int64_
     v = v * 2 + bits[offset + i];
   }
   offset += count;
-  return v;  
+  return v;
 }
 
 int64_t BitsExpr::SumVersions() const {

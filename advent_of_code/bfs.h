@@ -59,9 +59,7 @@ class BFSInterface {
 
   virtual int min_steps_to_final() const { return 0; }
 
-  absl::optional<int> FindMinSteps() {
-    return FindMinStepsImpl<DequeState>();
-  }
+  absl::optional<int> FindMinSteps() { return FindMinStepsImpl<DequeState>(); }
   absl::optional<int> FindMinStepsAStar() {
     static_assert(std::is_copy_assignable_v<BFSImpl>,
                   "BFSImpl must be copy-assignable for AStar");
@@ -122,7 +120,8 @@ class BFSInterface<BFSImpl, HistType>::State {
 };
 
 template <typename BFSImpl, typename HistType>
-class BFSInterface<BFSImpl, HistType>::DequeState : public BFSInterface<BFSImpl, HistType>::State {
+class BFSInterface<BFSImpl, HistType>::DequeState
+    : public BFSInterface<BFSImpl, HistType>::State {
  public:
   explicit DequeState(BFSImpl start)
       : BFSInterface<BFSImpl, HistType>::State(start) {
@@ -143,7 +142,8 @@ class BFSInterface<BFSImpl, HistType>::DequeState : public BFSInterface<BFSImpl,
 };
 
 template <typename BFSImpl, typename HistType>
-class BFSInterface<BFSImpl, HistType>::QueueState : public BFSInterface<BFSImpl, HistType>::State {
+class BFSInterface<BFSImpl, HistType>::QueueState
+    : public BFSInterface<BFSImpl, HistType>::State {
  public:
   explicit QueueState(BFSImpl start)
       : BFSInterface<BFSImpl, HistType>::State(start) {
