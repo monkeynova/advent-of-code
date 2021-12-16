@@ -22,17 +22,22 @@ class BitsExpr {
   absl::StatusOr<int64_t> Evaluate() const;
 
  private:
-  static absl::StatusOr<BitsExpr> ParseExpr(const std::vector<bool>& bits,
-                                            int64_t& offset);
-  static absl::StatusOr<int64_t> ParseInt(const std::vector<bool>& bits,
-                                          int64_t& offset, int64_t count);
+  class Parser {
+   public:
+    Parser(const std::vector<bool>& bits) : bits_(bits) {}
+
+    absl::StatusOr<BitsExpr> ParseExpr();
+    absl::StatusOr<int64_t> ParseInt(int64_t count);
+
+   private:
+    const std::vector<bool>& bits_;
+    int64_t offset_ = 0;
+  };
 
   int version_;
   int type_;
   int64_t literal_;
   std::vector<std::unique_ptr<BitsExpr>> sub_;
-
-  friend class BitsExprParser;
 };
 
 absl::StatusOr<BitsExpr> BitsExpr::Parse(absl::string_view hex) {
@@ -50,25 +55,23 @@ absl::StatusOr<BitsExpr> BitsExpr::Parse(absl::string_view hex) {
     }
   }
   // VLOG(1) << absl::StrJoin(bits, ",");
-  int64_t offset = 0;
-  return ParseExpr(bits, offset);
+  return Parser(bits).ParseExpr();
 }
 
-absl::StatusOr<BitsExpr> BitsExpr::ParseExpr(const std::vector<bool>& bits,
-                                             int64_t& offset) {
+absl::StatusOr<BitsExpr> BitsExpr::Parser::ParseExpr() {
   BitsExpr ret;
-  absl::StatusOr<int64_t> ver = ParseInt(bits, offset, 3);
+  absl::StatusOr<int64_t> ver = ParseInt(3);
   if (!ver.ok()) return ver.status();
   ret.version_ = *ver;
-  absl::StatusOr<int64_t> type = ParseInt(bits, offset, 3);
+  absl::StatusOr<int64_t> type = ParseInt(3);
   if (!type.ok()) return type.status();
   ret.type_ = *type;
   if (ret.type_ == 4) {
     ret.literal_ = 0;
     while (true) {
-      absl::StatusOr<int64_t> more = ParseInt(bits, offset, 1);
+      absl::StatusOr<int64_t> more = ParseInt(1);
       if (!more.ok()) return more.status();
-      absl::StatusOr<int64_t> n = ParseInt(bits, offset, 4);
+      absl::StatusOr<int64_t> n = ParseInt(4);
       if (!n.ok()) return n.status();
       ret.literal_ <<= 4;
       ret.literal_ += *n;
@@ -77,42 +80,41 @@ absl::StatusOr<BitsExpr> BitsExpr::ParseExpr(const std::vector<bool>& bits,
     return ret;
   }
 
-  absl::StatusOr<int64_t> l_type = ParseInt(bits, offset, 1);
+  absl::StatusOr<int64_t> l_type = ParseInt(1);
   if (!l_type.ok()) return l_type.status();
 
   if (*l_type == 0) {
     // 15-bit length;
-    absl::StatusOr<int64_t> length = ParseInt(bits, offset, 15);
+    absl::StatusOr<int64_t> length = ParseInt(15);
     if (!length.ok()) return length.status();
 
-    int64_t bit_end = offset + *length;
-    while (offset < bit_end) {
-      absl::StatusOr<BitsExpr> sub = ParseExpr(bits, offset);
+    int64_t bit_end = offset_ + *length;
+    while (offset_ < bit_end) {
+      absl::StatusOr<BitsExpr> sub = ParseExpr();
       if (!sub.ok()) return sub.status();
       ret.sub_.push_back(absl::make_unique<BitsExpr>(std::move(*sub)));
     }
     return ret;
   }
   // 11-bit subpacket count;
-  absl::StatusOr<int64_t> sub_count = ParseInt(bits, offset, 11);
+  absl::StatusOr<int64_t> sub_count = ParseInt(11);
   if (!sub_count.ok()) return sub_count.status();
   for (int i = 0; i < *sub_count; ++i) {
-    absl::StatusOr<BitsExpr> sub = ParseExpr(bits, offset);
+    absl::StatusOr<BitsExpr> sub = ParseExpr();
     if (!sub.ok()) return sub.status();
     ret.sub_.push_back(absl::make_unique<BitsExpr>(std::move(*sub)));
   }
   return ret;
 }
 
-absl::StatusOr<int64_t> BitsExpr::ParseInt(const std::vector<bool>& bits,
-                                           int64_t& offset, int64_t count) {
-  if (offset + count > bits.size()) return Error("Read past end of bits");
-  CHECK(offset < bits.size());
+absl::StatusOr<int64_t> BitsExpr::Parser::ParseInt(int64_t count) {
+  if (offset_ + count > bits_.size()) return Error("Read past end of bits");
+  CHECK(offset_ < bits_.size());
   int64_t v = 0;
   for (int i = 0; i < count; ++i) {
-    v = v * 2 + bits[offset + i];
+    v = v * 2 + bits_[offset_ + i];
   }
-  offset += count;
+  offset_ += count;
   return v;
 }
 
