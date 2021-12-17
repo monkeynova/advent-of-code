@@ -47,7 +47,10 @@ absl::StatusOr<std::string> Day_2021_17::Part1(
   }
   PointRectangle target{{minx, miny}, {maxx, maxy}};
   int64_t max_max = 0;
-  PointRectangle v_bound{{0, 0}, {2000, 2000}};
+  if (miny > 0) return absl::UnimplementedError("target must have negative y");
+  // the y coordinate will always go back through 0, with oppositve velocity.
+  // This means that if v0.y > -miny it will skip the target.
+  PointRectangle v_bound{{1, miny}, {maxx, -miny}};
   for (Point v0 : v_bound) {
     absl::optional<int64_t> max_y = Fire(v0, target);
     if (!max_y) continue;
@@ -66,7 +69,8 @@ absl::StatusOr<std::string> Day_2021_17::Part2(
       return Error("Bad line");
   }
   PointRectangle target{{minx, miny}, {maxx, maxy}};
-  PointRectangle v_bound{{1, -4000}, {4000, 4000}};
+  if (miny > 0) return absl::UnimplementedError("target must have negative y");
+  PointRectangle v_bound{{1, miny}, {maxx, -miny}};
   int64_t count = 0;
   for (Point v0 : v_bound) {
     absl::optional<int64_t> max_y = Fire(v0, target);
