@@ -1,22 +1,22 @@
 [part=1]
-Example input
+target area: x=20..30, y=-10..-5
 --
-ERROR: UNIMPLEMENTED: Problem not known
+45
 ==
 
 [part=1]
 @include{advent_of_code/2021/day17/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+25200
 ==
 
 [part=2]
-Example input
+target area: x=20..30, y=-10..-5
 --
-ERROR: UNIMPLEMENTED: Problem not known
+112
 ==
 
 [part=2]
 @include{advent_of_code/2021/day17/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+3012
