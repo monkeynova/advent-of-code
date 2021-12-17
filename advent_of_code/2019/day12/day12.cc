@@ -19,16 +19,16 @@ struct Moon {
   }
   bool operator!=(const Moon& other) const { return !operator==(other); }
   int energy() const { return position.dist() * velocity.dist(); }
+
+  template <typename H>
+  friend H AbslHashValue(H h, const Moon& m) {
+    return H::combine(std::move(h), m.position, m.velocity);
+  }
+
+  friend std::ostream& operator<<(std::ostream& out, const Moon& m) {
+    return out << "{" << m.position << "," << m.velocity << "}";
+  }
 };
-
-template <typename H>
-H AbslHashValue(H h, const Moon& m) {
-  return H::combine(std::move(h), m.position, m.velocity);
-}
-
-std::ostream& operator<<(std::ostream& out, const Moon& m) {
-  return out << "{" << m.position << "," << m.velocity << "}";
-}
 
 void ApplyGravity(Moon* m1, Moon* m2) {
   Point3 gravity = m2->position - m1->position;

@@ -18,11 +18,11 @@ struct Particle {
   Point3 p;
   Point3 v;
   Point3 a;
-};
 
-std::ostream& operator<<(std::ostream& o, const Particle& p) {
-  return o << "p:" << p.p << ", v:" << p.v << ", a:" << p.a;
-}
+  friend std::ostream& operator<<(std::ostream& o, const Particle& p) {
+    return o << "p:" << p.p << ", v:" << p.v << ", a:" << p.a;
+  }
+};
 
 absl::StatusOr<std::vector<Particle>> Parse(
     absl::Span<absl::string_view> input) {

@@ -66,19 +66,19 @@ struct Point {
   int dist() const { return abs(x) + abs(y); }
 
   std::string DebugString() const { return absl::StrCat("{", x, ",", y, "}"); }
+
+  friend Point operator*(int s, Point p) { return {.x = s * p.x, .y = s * p.y}; }
+
+  template <typename H>
+  friend H AbslHashValue(H h, const Point& p) {
+    return H::combine(std::move(h), p.x, p.y);
+  }
+
+  friend std::ostream& operator<<(std::ostream& out, const Point& p) {
+    out << "{" << p.x << "," << p.y << "}";
+    return out;
+  }
 };
-
-inline Point operator*(int s, Point p) { return {.x = s * p.x, .y = s * p.y}; }
-
-template <typename H>
-H AbslHashValue(H h, const Point& p) {
-  return H::combine(std::move(h), p.x, p.y);
-}
-
-inline std::ostream& operator<<(std::ostream& out, const Point& p) {
-  out << "{" << p.x << "," << p.y << "}";
-  return out;
-}
 
 struct PointRectangle {
   static PointRectangle Null() {
@@ -131,12 +131,12 @@ struct PointRectangle {
 
   iterator begin() const { return iterator{.cur = min, .base = this}; }
   iterator end() const { return iterator{}; }
-};
 
-inline std::ostream& operator<<(std::ostream& out, const PointRectangle& r) {
-  out << r.min << "-" << r.max;
-  return out;
-}
+  friend std::ostream& operator<<(std::ostream& out, const PointRectangle& r) {
+    out << r.min << "-" << r.max;
+    return out;
+  }
+};
 
 struct Cardinal {
   static constexpr Point kOrigin{0, 0};
@@ -208,21 +208,21 @@ struct Point3 {
   std::string DebugString() const {
     return absl::StrCat("{", x, ",", y, ",", z, "}");
   }
+
+  friend constexpr Point3 operator*(int s, Point3 p) {
+    return {.x = s * p.x, .y = s * p.y, .z = s * p.z};
+  }
+
+  template <typename H>
+  friend H AbslHashValue(H h, const Point3& p) {
+    return H::combine(std::move(h), p.x, p.y, p.z);
+  }
+
+  friend std::ostream& operator<<(std::ostream& out, const Point3& p) {
+    out << "{" << p.x << "," << p.y << "," << p.z << "}";
+    return out;
+  }
 };
-
-constexpr Point3 operator*(int s, Point3 p) {
-  return {.x = s * p.x, .y = s * p.y, .z = s * p.z};
-}
-
-template <typename H>
-H AbslHashValue(H h, const Point3& p) {
-  return H::combine(std::move(h), p.x, p.y, p.z);
-}
-
-inline std::ostream& operator<<(std::ostream& out, const Point3& p) {
-  out << "{" << p.x << "," << p.y << "," << p.z << "}";
-  return out;
-}
 
 struct Cardinal3 {
   static constexpr Point3 kOrigin{0, 0, 0};
@@ -308,21 +308,21 @@ struct Point4 {
   std::string DebugString() const {
     return absl::StrCat("{", x, ",", y, ",", z, ",", w, "}");
   }
+
+  friend constexpr Point4 operator*(int s, Point4 p) {
+    return {.x = s * p.x, .y = s * p.y, .z = s * p.z, .w = s * p.w};
+  }
+
+  template <typename H>
+  friend H AbslHashValue(H h, const Point4& p) {
+    return H::combine(std::move(h), p.x, p.y, p.z, p.w);
+  }
+
+  friend std::ostream& operator<<(std::ostream& out, const Point4& p) {
+    out << "{" << p.x << "," << p.y << "," << p.z << "," << p.w << "}";
+    return out;
+  }
 };
-
-constexpr Point4 operator*(int s, Point4 p) {
-  return {.x = s * p.x, .y = s * p.y, .z = s * p.z, .w = s * p.w};
-}
-
-template <typename H>
-H AbslHashValue(H h, const Point4& p) {
-  return H::combine(std::move(h), p.x, p.y, p.z, p.w);
-}
-
-inline std::ostream& operator<<(std::ostream& out, const Point4& p) {
-  out << "{" << p.x << "," << p.y << "," << p.z << "," << p.w << "}";
-  return out;
-}
 
 struct Cardinal4 {
   static constexpr Point4 kOrigin{0, 0, 0, 0};
