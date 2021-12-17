@@ -37,7 +37,7 @@ absl::optional<int> Fire(Point v0, PointRectangle target) {
   Point v = v0;
   int max_y = cur.y;
   while (true) {
-    // VLOG(1) << "cur=" << cur << "; v=" << v;
+    VLOG(2) << "cur=" << cur << "; v=" << v;
     cur += v;
     max_y = std::max(max_y, cur.y);
     if (v.x > 0) --v.x;
@@ -68,7 +68,7 @@ absl::StatusOr<std::string> Day_2021_17::Part1(
   for (Point v0 : *vbound) {
     absl::optional<int64_t> max_y = Fire(v0, target);
     if (!max_y) continue;
-    // VLOG(1) << v0 << " => " << *max_y;
+    VLOG(2) << v0 << " => " << *max_y;
     max_max = std::max(*max_y, max_max);
   }
   return IntReturn(max_max);
@@ -89,7 +89,7 @@ absl::StatusOr<std::string> Day_2021_17::Part2(
   for (Point v0 : *vbound) {
     absl::optional<int64_t> max_y = Fire(v0, target);
     if (!max_y) continue;
-    // VLOG(1) << v0 << " => " << *max_y;
+    VLOG(2) << v0 << " => " << *max_y;
     ++count;
   }
   return IntReturn(count);
