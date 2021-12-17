@@ -114,6 +114,14 @@ struct PointRectangle {
   Point min;
   Point max;
 
+  bool Contains(Point p) {
+    if (p.x < min.x) return false;
+    if (p.x > max.x) return false;
+    if (p.y < min.y) return false;
+    if (p.y > max.y) return false;
+    return true;
+  }
+
   void ExpandInclude(Point p) {
     min.x = std::min(min.x, p.x);
     min.y = std::min(min.y, p.y);

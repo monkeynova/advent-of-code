@@ -26,10 +26,7 @@ absl::optional<int> Fire(Point v0, PointRectangle target) {
     if (v.x > 0) --v.x;
     if (v.x < 0) ++v.x;
     --v.y;
-    if (cur.x >= target.min.x && cur.x <= target.max.x &&
-        cur.y >= target.min.y && cur.y <= target.max.y) {
-      return max_y;
-    }
+    if (target.Contains(cur)) return max_y;
     if (cur.x > target.max.x) return {};
     if (cur.y < target.min.y) return {};
   }
@@ -50,14 +47,12 @@ absl::StatusOr<std::string> Day_2021_17::Part1(
   }
   PointRectangle target{{minx, miny}, {maxx, maxy}};
   int64_t max_max = 0;
-  for (int x = 1; x < 2000; x++) {
-    for (int y = 0; y < 2000; y++) {
-      Point v0{x, y};
-      absl::optional<int64_t> max_y = Fire(v0, target);
-      if (!max_y) continue;
-      // VLOG(1) << v0 << " => " << *max_y;
-      max_max = std::max(*max_y, max_max);
-    }
+  PointRectangle v_bound{{0, 0}, {2000, 2000}};
+  for (Point v0 : v_bound) {
+    absl::optional<int64_t> max_y = Fire(v0, target);
+    if (!max_y) continue;
+    // VLOG(1) << v0 << " => " << *max_y;
+    max_max = std::max(*max_y, max_max);
   }
   return IntReturn(max_max);
 }
@@ -71,15 +66,13 @@ absl::StatusOr<std::string> Day_2021_17::Part2(
       return Error("Bad line");
   }
   PointRectangle target{{minx, miny}, {maxx, maxy}};
+  PointRectangle v_bound{{1, -4000}, {4000, 4000}};
   int64_t count = 0;
-  for (int x = 1; x < 4000; x++) {
-    for (int y = -4000; y < 4000; y++) {
-      Point v0{x, y};
-      absl::optional<int64_t> max_y = Fire(v0, target);
-      if (!max_y) continue;
-      // VLOG(1) << v0 << " => " << *max_y;
-      ++count;
-    }
+  for (Point v0 : v_bound) {
+    absl::optional<int64_t> max_y = Fire(v0, target);
+    if (!max_y) continue;
+    // VLOG(1) << v0 << " => " << *max_y;
+    ++count;
   }
   return IntReturn(count);
 }
