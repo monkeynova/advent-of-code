@@ -15,12 +15,16 @@ namespace advent_of_code {
 
 namespace {
 
-PointRectangle VelocityBounds(PointRectangle target) {
+absl::StatusOr<PointRectangle> VelocityBounds(PointRectangle target) {
   // TODO(@monkeynova): We don't need to iterate over the full cartesian
   // product. x and y update independently, so we should be able to solve
   // each independently.
-  CHECK(target.min.y < 0);
-  CHECK(target.min.x > 0);
+  if (target.min.x <= 0) {
+    return absl::UnimplementedError("target must have positive x");
+  }
+  if (target.min.y > 0) {
+    return absl::UnimplementedError("target must have negative y");
+  }
   // the y coordinate will always go back through 0, with oppositve velocity.
   // This means that if v0.y > -miny it will skip the target.
   int min_vx = 1;
@@ -59,9 +63,9 @@ absl::StatusOr<std::string> Day_2021_17::Part1(
   }
   PointRectangle target{{minx, miny}, {maxx, maxy}};
   int64_t max_max = 0;
-  if (minx <= 0) return absl::UnimplementedError("target must have positive x");
-  if (miny > 0) return absl::UnimplementedError("target must have negative y");
-  for (Point v0 : VelocityBounds(target)) {
+  absl::StatusOr<PointRectangle> vbound = VelocityBounds(target);
+  if (!vbound.ok()) return vbound.status();
+  for (Point v0 : *vbound) {
     absl::optional<int64_t> max_y = Fire(v0, target);
     if (!max_y) continue;
     // VLOG(1) << v0 << " => " << *max_y;
@@ -79,10 +83,10 @@ absl::StatusOr<std::string> Day_2021_17::Part2(
       return Error("Bad line");
   }
   PointRectangle target{{minx, miny}, {maxx, maxy}};
-  if (minx <= 0) return absl::UnimplementedError("target must have positive x");
-  if (miny > 0) return absl::UnimplementedError("target must have negative y");
   int64_t count = 0;
-  for (Point v0 : VelocityBounds(target)) {
+  absl::StatusOr<PointRectangle> vbound = VelocityBounds(target);
+  if (!vbound.ok()) return vbound.status();
+  for (Point v0 : *vbound) {
     absl::optional<int64_t> max_y = Fire(v0, target);
     if (!max_y) continue;
     // VLOG(1) << v0 << " => " << *max_y;
