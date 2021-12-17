@@ -25,10 +25,12 @@ absl::StatusOr<PointRectangle> VelocityBounds(PointRectangle target) {
   if (target.min.y > 0) {
     return absl::UnimplementedError("target must have negative y");
   }
-  // the y coordinate will always go back through 0, with oppositve velocity.
-  // This means that if v0.y > -miny it will skip the target.
+  // In order to reach the bound, with a drag decay, we can start at the first
+  // step squad >= min_x.
   int min_vx = 1;
   while (min_vx * (min_vx + 1) / 2 < target.min.x) ++min_vx;
+  // the y coordinate will always go back through 0, with oppositve velocity.
+  // This means that if v0.y > -miny it will skip the target.
   return PointRectangle{{min_vx, target.min.y}, {target.max.x, -target.min.y}};
 }
 
