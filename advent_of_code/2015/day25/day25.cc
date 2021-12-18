@@ -39,21 +39,23 @@ int64_t ComputeCodePosition(int row, int col) {
 
 absl::StatusOr<std::string> Day_2015_25::Part1(
     absl::Span<absl::string_view> input) const {
-  struct TestVal {
-    int row;
-    int col;
-    int expected;
-  };
-  std::vector<TestVal> tests = {{1, 1, 20151125},
-                                {2, 1, 31916031},
-                                {1, 2, 18749137},
-                                {3, 4, 7981243},
-                                {5, 6, 31663883}};
-  for (TestVal t : tests) {
-    int64_t computed = ComputeCodeValue(ComputeCodePosition(t.row, t.col));
-    if (computed != t.expected) {
-      return Error("Test failed: ", t.row, "x", t.col, " should be ",
-                   t.expected, " but is ", computed);
+  if (run_audit()) {
+    struct TestVal {
+      int row;
+      int col;
+      int expected;
+    };
+    std::vector<TestVal> tests = {{1, 1, 20151125},
+                                  {2, 1, 31916031},
+                                  {1, 2, 18749137},
+                                  {3, 4, 7981243},
+                                  {5, 6, 31663883}};
+    for (TestVal t : tests) {
+      int64_t computed = ComputeCodeValue(ComputeCodePosition(t.row, t.col));
+      if (computed != t.expected) {
+        return Error("Test failed: ", t.row, "x", t.col, " should be ",
+                     t.expected, " but is ", computed);
+      }
     }
   }
 

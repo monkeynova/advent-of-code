@@ -42,9 +42,7 @@ class AdventDay {
  public:
   virtual ~AdventDay() = default;
 
-  bool run_audit() const {
-    return absl::GetFlag(FLAGS_advent_day_run_audit);
-  }
+  bool run_audit() const { return absl::GetFlag(FLAGS_advent_day_run_audit); }
 
   absl::StatusOr<std::string> IntReturn(int64_t val) const {
     return absl::StrCat(val);

@@ -92,13 +92,15 @@ absl::StatusOr<std::string> Day_2021_06::Part1(
 
   constexpr int64_t kDays = 80;
 
-  if (CountPopulationAfter(*nums, kDays) !=
-      CountPopulationAfterBrute(*nums, kDays)) {
-    return Error("Bad Brute");
-  }
-  if (CountPopulationAfter(*nums, kDays) !=
-      CountPopulationAfterUniquePop(*nums, kDays)) {
-    return Error("Bad UniquePop");
+  if (run_audit()) {
+    if (CountPopulationAfter(*nums, kDays) !=
+        CountPopulationAfterBrute(*nums, kDays)) {
+      return Error("Bad Brute");
+    }
+    if (CountPopulationAfter(*nums, kDays) !=
+        CountPopulationAfterUniquePop(*nums, kDays)) {
+      return Error("Bad UniquePop");
+    }
   }
 
   return IntReturn(CountPopulationAfter(*nums, kDays));
@@ -113,9 +115,11 @@ absl::StatusOr<std::string> Day_2021_06::Part2(
 
   constexpr int64_t kDays = 256;
 
-  if (CountPopulationAfter(*nums, kDays) !=
-      CountPopulationAfterUniquePop(*nums, kDays)) {
-    return Error("Bad UniquePop");
+  if (run_audit()) {
+    if (CountPopulationAfter(*nums, kDays) !=
+        CountPopulationAfterUniquePop(*nums, kDays)) {
+      return Error("Bad UniquePop");
+    }
   }
 
   return IntReturn(CountPopulationAfter(*nums, kDays));

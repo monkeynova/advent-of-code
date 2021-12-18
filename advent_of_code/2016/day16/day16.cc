@@ -80,7 +80,9 @@ std::string RunPart1(absl::string_view input, int size) {
 
 absl::StatusOr<std::string> Day_2016_16::Part1(
     absl::Span<absl::string_view> input) const {
-  if (RunPart1("10000", 20) != "01100") return Error("Bad code");
+  if (run_audit()) {
+    if (RunPart1("10000", 20) != "01100") return Error("Bad code");
+  }
   if (input.size() != 1) return Error("Bad input size");
   return RunPart1(input[0], 272);
 }

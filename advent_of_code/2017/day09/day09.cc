@@ -82,16 +82,18 @@ int GarbageCount(absl::string_view str) {
 
 absl::StatusOr<std::string> Day_2017_09::Part1(
     absl::Span<absl::string_view> input) const {
-  std::vector<std::pair<absl::string_view, int>> tests = {
-      {"{}", 1},
-      {"{{{}}}", 6},
-      {"{{}{}}", 5},
-      {"{{<a!>},{<a!>},{<a!>},{<ab>}}", 3},
-  };
-  for (const auto& [str, expect] : tests) {
-    int got = TotalGroupScore(str);
-    if (got != expect) {
-      return Error("Bad test: ", got, " != ", expect, ": ", str);
+  if (run_audit()) {
+    std::vector<std::pair<absl::string_view, int>> tests = {
+        {"{}", 1},
+        {"{{{}}}", 6},
+        {"{{}{}}", 5},
+        {"{{<a!>},{<a!>},{<a!>},{<ab>}}", 3},
+    };
+    for (const auto& [str, expect] : tests) {
+      int got = TotalGroupScore(str);
+      if (got != expect) {
+        return Error("Bad test: ", got, " != ", expect, ": ", str);
+      }
     }
   }
   if (input.size() != 1) return Error("Bad input");
@@ -100,16 +102,18 @@ absl::StatusOr<std::string> Day_2017_09::Part1(
 
 absl::StatusOr<std::string> Day_2017_09::Part2(
     absl::Span<absl::string_view> input) const {
-  std::vector<std::pair<absl::string_view, int>> tests = {
-      {"<>", 0},
-      {"<random characters>", 17},
-      {"<{o\"i!a,<{i<a>", 10},
-      {"<!!>", 0},
-  };
-  for (const auto& [str, expect] : tests) {
-    int got = GarbageCount(str);
-    if (got != expect) {
-      return Error("Bad test: ", got, " != ", expect, ": ", str);
+  if (run_audit()) {
+    std::vector<std::pair<absl::string_view, int>> tests = {
+        {"<>", 0},
+        {"<random characters>", 17},
+        {"<{o\"i!a,<{i<a>", 10},
+        {"<!!>", 0},
+    };
+    for (const auto& [str, expect] : tests) {
+      int got = GarbageCount(str);
+      if (got != expect) {
+        return Error("Bad test: ", got, " != ", expect, ": ", str);
+      }
     }
   }
   if (input.size() != 1) return Error("Bad input");

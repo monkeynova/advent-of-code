@@ -2,10 +2,8 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 
 cc_library(
     name = "advent_day",
-    hdrs = ["advent_day.h"],
     srcs = ["advent_day.cc"],
-    # Ensure the contained flag(s) get linked.
-    alwayslink = 1,
+    hdrs = ["advent_day.h"],
     visibility = [
         "//visibility:public",
     ],
@@ -15,6 +13,8 @@ cc_library(
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/types:span",
     ],
+    # Ensure the contained flag(s) get linked.
+    alwayslink = 1,
 )
 
 cc_library(

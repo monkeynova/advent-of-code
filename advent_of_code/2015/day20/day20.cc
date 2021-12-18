@@ -58,12 +58,14 @@ int PresentCountPart2(int house_num) {
 
 absl::StatusOr<std::string> Day_2015_20::Part1(
     absl::Span<absl::string_view> input) const {
-  std::vector<std::pair<int, int>> test_suite = {
-      {1, 10}, {2, 30}, {6, 120}, {8, 150}};
-  for (const auto& [house, presents] : test_suite) {
-    if (PresentCount(house) != presents) {
-      return Error("Bad PresentCount(", house, "): ", PresentCount(house),
-                   " != ", presents);
+  if (run_audit()) {
+    std::vector<std::pair<int, int>> test_suite = {
+        {1, 10}, {2, 30}, {6, 120}, {8, 150}};
+    for (const auto& [house, presents] : test_suite) {
+      if (PresentCount(house) != presents) {
+        return Error("Bad PresentCount(", house, "): ", PresentCount(house),
+                     " != ", presents);
+      }
     }
   }
 

@@ -29,9 +29,11 @@ int PowerLevel(int serial, Point p) {
 
 absl::StatusOr<std::string> Day_2018_11::Part1(
     absl::Span<absl::string_view> input) const {
-  if (PowerLevel(57, Point{122, 79}) != -5) return Error("Integrity check 1");
-  if (PowerLevel(39, Point{217, 196}) != 0) return Error("Integrity check 2");
-  if (PowerLevel(71, Point{101, 153}) != 4) return Error("Integrity check 3");
+  if (run_audit()) {
+    if (PowerLevel(57, Point{122, 79}) != -5) return Error("Integrity check 1");
+    if (PowerLevel(39, Point{217, 196}) != 0) return Error("Integrity check 2");
+    if (PowerLevel(71, Point{101, 153}) != 4) return Error("Integrity check 3");
+  }
   if (input.size() != 1) return Error("Bad size");
   int serial;
   if (!absl::SimpleAtoi(input[0], &serial)) return Error("Not an int");

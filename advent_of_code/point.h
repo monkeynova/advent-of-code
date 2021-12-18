@@ -67,7 +67,9 @@ struct Point {
 
   std::string DebugString() const { return absl::StrCat("{", x, ",", y, "}"); }
 
-  friend Point operator*(int s, Point p) { return {.x = s * p.x, .y = s * p.y}; }
+  friend Point operator*(int s, Point p) {
+    return {.x = s * p.x, .y = s * p.y};
+  }
 
   template <typename H>
   friend H AbslHashValue(H h, const Point& p) {

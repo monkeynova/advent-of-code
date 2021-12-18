@@ -99,11 +99,13 @@ class PathWalkToDistance : public BFSInterface<PathWalkToDistance, Point> {
 
 absl::StatusOr<std::string> Day_2016_13::Part1(
     absl::Span<absl::string_view> input) const {
-  SparseBoard test_board(10);
-  absl::optional<int> test_dist =
-      PathWalkToEnd(test_board, {1, 1}, {7, 4}).FindMinSteps();
-  if (!test_dist) return Error("Can't find test dist");
-  if (*test_dist != 11) return Error("Wrong test dist: ", *test_dist);
+  if (run_audit()) {
+    SparseBoard test_board(10);
+    absl::optional<int> test_dist =
+        PathWalkToEnd(test_board, {1, 1}, {7, 4}).FindMinSteps();
+    if (!test_dist) return Error("Can't find test dist");
+    if (*test_dist != 11) return Error("Wrong test dist: ", *test_dist);
+  }
 
   if (input.size() != 1) return Error("Bad input size");
   int v;

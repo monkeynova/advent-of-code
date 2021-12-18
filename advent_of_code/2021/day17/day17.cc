@@ -59,9 +59,10 @@ absl::StatusOr<std::string> Day_2021_17::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   int minx, maxx, miny, maxy;
-  if (!RE2::FullMatch(input[0], "target area: x=(-?\\d+)..(-?\\d+), y=(-\\d+)..(-?\\d+)",
+  if (!RE2::FullMatch(input[0],
+                      "target area: x=(-?\\d+)..(-?\\d+), y=(-\\d+)..(-?\\d+)",
                       &minx, &maxx, &miny, &maxy)) {
-      return Error("Bad line");
+    return Error("Bad line");
   }
   PointRectangle target{{minx, miny}, {maxx, maxy}};
   int64_t max_max = 0;
@@ -80,9 +81,10 @@ absl::StatusOr<std::string> Day_2021_17::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   int minx, maxx, miny, maxy;
-  if (!RE2::FullMatch(input[0], "target area: x=(-?\\d+)..(-?\\d+), y=(-\\d+)..(-?\\d+)",
+  if (!RE2::FullMatch(input[0],
+                      "target area: x=(-?\\d+)..(-?\\d+), y=(-\\d+)..(-?\\d+)",
                       &minx, &maxx, &miny, &maxy)) {
-      return Error("Bad line");
+    return Error("Bad line");
   }
   PointRectangle target{{minx, miny}, {maxx, maxy}};
   int64_t count = 0;

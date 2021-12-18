@@ -256,7 +256,9 @@ absl::Status RunReverseTest() {
 
 absl::StatusOr<std::string> Day_2016_21::Part1(
     absl::Span<absl::string_view> input) const {
-  if (absl::Status st = RunTest(); !st.ok()) return st;
+  if (run_audit()) {
+    if (absl::Status st = RunTest(); !st.ok()) return st;
+  }
 
   std::string pw = "abcdefgh";
   VLOG(2) << pw;
