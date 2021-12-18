@@ -4,6 +4,8 @@ cc_library(
     name = "advent_day",
     hdrs = ["advent_day.h"],
     srcs = ["advent_day.cc"],
+    # Ensure the contained flag(s) get linked.
+    alwayslink = 1,
     visibility = [
         "//visibility:public",
     ],

@@ -1,20 +1,20 @@
 Loading: 
 Loading: 0 packages loaded
-Analyzing: target //advent_of_code/2020:benchmark (1 packages loaded, 0 targets configured)
-INFO: Analyzed target //advent_of_code/2020:benchmark (26 packages loaded, 202 targets configured).
+Analyzing: target //advent_of_code/2020:benchmark (0 packages loaded, 0 targets configured)
+INFO: Analyzed target //advent_of_code/2020:benchmark (0 packages loaded, 76 targets configured).
 INFO: Found 1 target...
-[0 / 3] [Prepa] BazelWorkspaceStatusAction stable-status.txt
+[0 / 5] [Prepa] BazelWorkspaceStatusAction stable-status.txt
 Target //advent_of_code/2020:benchmark up-to-date:
   bazel-bin/advent_of_code/2020/benchmark
-INFO: Elapsed time: 0.401s, Critical Path: 0.04s
-INFO: 1 process: 1 internal.
-INFO: Build completed successfully, 1 total action
-INFO: Running command line: external/bazel_tools/tools/test/test-setup.sh advent_of_code/2020/benchmark --benchmark '--benchmark_out=/Users/keith/github/advent-of-code/advent_of_code/2020/benchmark/benchmark_keith-mbp.json' '--run_long_tests=1m'
-INFO: Build completed successfully, 1 total action
+INFO: Elapsed time: 0.538s, Critical Path: 0.33s
+INFO: 3 processes: 2 internal, 1 darwin-sandbox.
+INFO: Build completed successfully, 3 total actions
+INFO: Running command line: external/bazel_tools/tools/test/test-setup.sh advent_of_code/2020/benchmark '--benchmark_out=/Users/keith/github/advent-of-code/advent_of_code/2020/benchmark/benchmark_keith-mbp.json' --benchmark '--run_long_tests=1m' '--advent_day_run_audit=false'
+INFO: Build completed successfully, 3 total actions
 exec ${PAGER:-/usr/bin/less} "$0" || exit 1
 Executing tests from //advent_of_code/2020:benchmark
 -----------------------------------------------------------------------------
-2021-12-15T04:28:27+00:00
+2021-12-18T15:32:20+00:00
 Running /private/var/tmp/_bazel_keith/0ef773739f82bcf7ecc8ec8d4e65e080/execroot/com_monkeynova_advent_of_code/bazel-out/darwin-opt/bin/advent_of_code/2020/benchmark.runfiles/com_monkeynova_advent_of_code/advent_of_code/2020/benchmark
 Run on (8 X 2300 MHz CPU s)
 CPU Caches:
@@ -22,108 +22,108 @@ CPU Caches:
   L1 Instruction 32 KiB (x4)
   L2 Unified 256 KiB (x4)
   L3 Unified 6144 KiB (x1)
-Load Average: 2.42, 2.45, 2.25
+Load Average: 2.26, 2.21, 2.16
 ----------------------------------------------------------------
 Benchmark                      Time             CPU   Iterations
 ----------------------------------------------------------------
-BM_Day<Day_2020_01>/0       1061 ns         1060 ns       646544 Part: 1
-BM_Day<Day_2020_01>/1       9937 ns         9929 ns        71994 Part: 1
-BM_Day<Day_2020_01>/2     232553 ns       232363 ns         2863 Part: 2
-BM_Day<Day_2020_02>/0     404873 ns       404121 ns         1751 Part: 1
-BM_Day<Day_2020_02>/1     387546 ns       386780 ns         1851 Part: 2
-BM_Day<Day_2020_03>/0        126 ns          126 ns      5642204 Part: 1
-BM_Day<Day_2020_03>/1       3473 ns         3470 ns       200975 Part: 1
-BM_Day<Day_2020_03>/2        546 ns          545 ns      1188657 Part: 2
-BM_Day<Day_2020_03>/3      16731 ns        16715 ns        41516 Part: 2
-BM_Day<Day_2020_04>/0     390777 ns       390450 ns         1774 Part: 1
-BM_Day<Day_2020_04>/1     268116 ns       267958 ns         2440 Part: 2
-BM_Day<Day_2020_04>/2    7670745 ns      7668271 ns           85 Part: 2
-BM_Day<Day_2020_05>/0      30342 ns        30316 ns        23499 Part: 1
-BM_Day<Day_2020_05>/1      33930 ns        33869 ns        21391 Part: 2
-BM_Day<Day_2020_06>/0     155278 ns       155142 ns         4514 Part: 1
-BM_Day<Day_2020_06>/1        544 ns          543 ns      1224076 Part: 2
-BM_Day<Day_2020_06>/2     215689 ns       215492 ns         3303 Part: 2
-BM_Day<Day_2020_07>/0    3363154 ns      3360257 ns          214 Part: 1
-BM_Day<Day_2020_07>/1      32588 ns        32566 ns        20868 Part: 2
-BM_Day<Day_2020_07>/2      16956 ns        16944 ns        40774 Part: 2
-BM_Day<Day_2020_07>/3    3207358 ns      3204982 ns          217 Part: 2
-BM_Day<Day_2020_08>/0       3746 ns         3743 ns       194216 Part: 1
-BM_Day<Day_2020_08>/1     143909 ns       143808 ns         5084 Part: 1
-BM_Day<Day_2020_08>/2       6327 ns         6323 ns       104587 Part: 2
-BM_Day<Day_2020_08>/3    1554736 ns      1551618 ns          432 Part: 2
-BM_Day<Day_2020_09>/0      99578 ns        99495 ns         6756 Part: 1
-BM_Day<Day_2020_09>/1   37623791 ns     37597632 ns           19 Part: 2
-BM_Day<Day_2020_10>/0       1472 ns         1471 ns       487462 Part: 1
-BM_Day<Day_2020_10>/1       2072 ns         2071 ns       329640 Part: 1
-BM_Day<Day_2020_10>/2       4465 ns         4464 ns       156827 Part: 1
-BM_Day<Day_2020_10>/3       2328 ns         2325 ns       305003 Part: 2
-BM_Day<Day_2020_10>/4       4424 ns         4420 ns       157098 Part: 2
-BM_Day<Day_2020_10>/5       9958 ns         9954 ns        62803 Part: 2
-BM_Day<Day_2020_11>/0      23744 ns        23721 ns        30517 Part: 1
-BM_Day<Day_2020_11>/1   21323723 ns     21285030 ns           33 Part: 1
-BM_Day<Day_2020_11>/2      93809 ns        93739 ns         7038 Part: 2
-BM_Day<Day_2020_11>/3  127305379 ns    127044600 ns            5 Part: 2
-BM_Day<Day_2020_12>/0        105 ns          105 ns      6593634 Part: 1
-BM_Day<Day_2020_12>/1      13888 ns        13883 ns        47452 Part: 1
-BM_Day<Day_2020_12>/2        111 ns          110 ns      6150980 Part: 2
-BM_Day<Day_2020_12>/3      13465 ns        13454 ns        50343 Part: 2
-BM_Day<Day_2020_13>/0       1051 ns         1050 ns       680788 Part: 1
-BM_Day<Day_2020_13>/1       1328 ns         1327 ns       536748 Part: 2
-BM_Day<Day_2020_13>/2       1753 ns         1752 ns       382564 Part: 2
-BM_Day<Day_2020_13>/3       1713 ns         1711 ns       392381 Part: 2
-BM_Day<Day_2020_13>/4       2112 ns         2110 ns       305115 Part: 2
-BM_Day<Day_2020_13>/5       1880 ns         1876 ns       350126 Part: 2
-BM_Day<Day_2020_13>/6       5992 ns         5988 ns       118955 Part: 2
-BM_Day<Day_2020_13>/7      11083 ns        11059 ns        62374 Part: 2
-BM_Day<Day_2020_14>/0     132888 ns       132780 ns         5384 Part: 1
-BM_Day<Day_2020_14>/1   19669903 ns     19636892 ns           37 Part: 1
-BM_Day<Day_2020_14>/2     120780 ns       120560 ns         5652 Part: 2
-BM_Day<Day_2020_14>/3   23448634 ns     23419759 ns           29 Part: 2
-BM_Day<Day_2020_15>/0      31046 ns        31042 ns        21797 Part: 1
-BM_Day<Day_2020_15>/1      30818 ns        30815 ns        22496 Part: 1
-BM_Day<Day_2020_15>/2      32277 ns        32264 ns        21519 Part: 1
-BM_Day<Day_2020_15>/3      32048 ns        32025 ns        21102 Part: 1
-BM_Day<Day_2020_15>/4      32105 ns        32075 ns        20864 Part: 1
-BM_Day<Day_2020_15>/5 1829597044 ns   1827490000 ns            1 Part: 2
-BM_Day<Day_2020_15>/6 1768792906 ns   1767439000 ns            1 Part: 2
-BM_Day<Day_2020_16>/0     133803 ns       133739 ns         4996 Part: 1
-BM_Day<Day_2020_16>/1    1269945 ns      1269224 ns          509 Part: 1
-BM_Day<Day_2020_16>/2    1858855 ns      1857593 ns          381 Part: 2
-BM_Day<Day_2020_17>/0     188828 ns       188644 ns         3560 Part: 1
-BM_Day<Day_2020_17>/1     622658 ns       622431 ns         1041 Part: 1
-BM_Day<Day_2020_17>/2    3723904 ns      3720778 ns          185 Part: 2
-BM_Day<Day_2020_17>/3   13681392 ns     13657680 ns           50 Part: 2
-BM_Day<Day_2020_18>/0       1112 ns         1111 ns       600461 Part: 1
-BM_Day<Day_2020_18>/1       3752 ns         3749 ns       183352 Part: 1
-BM_Day<Day_2020_18>/2    1761689 ns      1760629 ns          375 Part: 1
-BM_Day<Day_2020_18>/3       1135 ns         1134 ns       601561 Part: 2
-BM_Day<Day_2020_18>/4       3691 ns         3689 ns       196883 Part: 2
-BM_Day<Day_2020_18>/5    1833984 ns      1832383 ns          366 Part: 2
-BM_Day<Day_2020_19>/0     121143 ns       121058 ns         5751 Part: 1
-BM_Day<Day_2020_19>/1     639881 ns       639540 ns          978 Part: 1
-BM_Day<Day_2020_19>/2    4383062 ns      4379813 ns          160 Part: 1
-BM_Day<Day_2020_19>/3   22894353 ns     22879700 ns           30 Part: 2
-BM_Day<Day_2020_19>/4 4330117853 ns   4325265000 ns            1 Part: 2
-BM_Day<Day_2020_20>/0    1750132 ns      1748828 ns          395 Part: 1
-BM_Day<Day_2020_20>/1   26887977 ns     26871481 ns           27 Part: 1
-BM_Day<Day_2020_20>/2    3973823 ns      3970497 ns          177 Part: 2
-BM_Day<Day_2020_20>/3   58927270 ns     58900545 ns           11 Part: 2
-BM_Day<Day_2020_21>/0      10396 ns        10389 ns        64644 Part: 1
-BM_Day<Day_2020_21>/1     733937 ns       733474 ns          906 Part: 1
-BM_Day<Day_2020_21>/2      11341 ns        11320 ns        63256 Part: 2
-BM_Day<Day_2020_21>/3     661671 ns       661434 ns         1017 Part: 2
-BM_Day<Day_2020_22>/0     199021 ns       198676 ns         3490 Part: 1
-BM_Day<Day_2020_22>/1     875655 ns       874810 ns          763 Part: 1
-BM_Day<Day_2020_22>/2     268091 ns       267930 ns         2645 Part: 2
-BM_Day<Day_2020_22>/3 3435463557 ns   3432935000 ns            1 Part: 2
-BM_Day<Day_2020_23>/0       3317 ns         3315 ns       214574 Part: 1
-BM_Day<Day_2020_23>/1       3240 ns         3238 ns       217620 Part: 1
-BM_Day<Day_2020_23>/2 1824418272 ns   1821260000 ns            1 Part: 2
-BM_Day<Day_2020_23>/3 1762487636 ns   1760327000 ns            1 Part: 2
-BM_Day<Day_2020_24>/0       4971 ns         4967 ns       124440 Part: 1
-BM_Day<Day_2020_24>/1      67009 ns        66462 ns         9844 Part: 1
-BM_Day<Day_2020_24>/2   19897240 ns     19882686 ns           35 Part: 2
-BM_Day<Day_2020_24>/3   37643696 ns     37607222 ns           18 Part: 2
-BM_Day<Day_2020_25>/0        403 ns          403 ns      1680196 Part: 1
-BM_Day<Day_2020_25>/1  807499574 ns    806862000 ns            1 Part: 1
-BM_Day<Day_2020_25>/2       5.78 ns         5.77 ns    112759548 Part: 2
+BM_Day<Day_2020_01>/0       1124 ns         1123 ns       643708 Part: 1
+BM_Day<Day_2020_01>/1       9493 ns         9488 ns        69902 Part: 1
+BM_Day<Day_2020_01>/2     235661 ns       235543 ns         2922 Part: 2
+BM_Day<Day_2020_02>/0     365112 ns       364861 ns         1910 Part: 1
+BM_Day<Day_2020_02>/1     360585 ns       360348 ns         1905 Part: 2
+BM_Day<Day_2020_03>/0        128 ns          128 ns      5598253 Part: 1
+BM_Day<Day_2020_03>/1       3509 ns         3507 ns       197365 Part: 1
+BM_Day<Day_2020_03>/2        534 ns          534 ns      1285300 Part: 2
+BM_Day<Day_2020_03>/3      16433 ns        16422 ns        40697 Part: 2
+BM_Day<Day_2020_04>/0     429168 ns       428887 ns         1626 Part: 1
+BM_Day<Day_2020_04>/1     273738 ns       273602 ns         2505 Part: 2
+BM_Day<Day_2020_04>/2    7839490 ns      7835299 ns           87 Part: 2
+BM_Day<Day_2020_05>/0      29596 ns        29577 ns        22996 Part: 1
+BM_Day<Day_2020_05>/1      32736 ns        32712 ns        21458 Part: 2
+BM_Day<Day_2020_06>/0     152302 ns       152223 ns         4168 Part: 1
+BM_Day<Day_2020_06>/1        530 ns          530 ns      1213740 Part: 2
+BM_Day<Day_2020_06>/2     213018 ns       212818 ns         3243 Part: 2
+BM_Day<Day_2020_07>/0    3346762 ns      3343933 ns          210 Part: 1
+BM_Day<Day_2020_07>/1      31714 ns        31686 ns        22153 Part: 2
+BM_Day<Day_2020_07>/2      16715 ns        16663 ns        41355 Part: 2
+BM_Day<Day_2020_07>/3    3298741 ns      3293228 ns          219 Part: 2
+BM_Day<Day_2020_08>/0       3673 ns         3670 ns       201979 Part: 1
+BM_Day<Day_2020_08>/1     139331 ns       139206 ns         4905 Part: 1
+BM_Day<Day_2020_08>/2       6208 ns         6204 ns       107860 Part: 2
+BM_Day<Day_2020_08>/3    1531127 ns      1530304 ns          438 Part: 2
+BM_Day<Day_2020_09>/0      97722 ns        97639 ns         6638 Part: 1
+BM_Day<Day_2020_09>/1   36926054 ns     36892000 ns           20 Part: 2
+BM_Day<Day_2020_10>/0       1460 ns         1460 ns       457708 Part: 1
+BM_Day<Day_2020_10>/1       2055 ns         2053 ns       316685 Part: 1
+BM_Day<Day_2020_10>/2       4305 ns         4301 ns       158513 Part: 1
+BM_Day<Day_2020_10>/3       2347 ns         2342 ns       299945 Part: 2
+BM_Day<Day_2020_10>/4       4633 ns         4623 ns       152840 Part: 2
+BM_Day<Day_2020_10>/5      10443 ns        10434 ns        62501 Part: 2
+BM_Day<Day_2020_11>/0      23412 ns        23394 ns        29298 Part: 1
+BM_Day<Day_2020_11>/1   20940211 ns     20927485 ns           33 Part: 1
+BM_Day<Day_2020_11>/2      96038 ns        95958 ns         7068 Part: 2
+BM_Day<Day_2020_11>/3  125370948 ns    125268600 ns            5 Part: 2
+BM_Day<Day_2020_12>/0        106 ns          106 ns      6582783 Part: 1
+BM_Day<Day_2020_12>/1      13893 ns        13882 ns        48540 Part: 1
+BM_Day<Day_2020_12>/2        109 ns          109 ns      6266730 Part: 2
+BM_Day<Day_2020_12>/3      13224 ns        13214 ns        49677 Part: 2
+BM_Day<Day_2020_13>/0        993 ns          993 ns       652182 Part: 1
+BM_Day<Day_2020_13>/1       1282 ns         1280 ns       557289 Part: 2
+BM_Day<Day_2020_13>/2       1799 ns         1795 ns       400089 Part: 2
+BM_Day<Day_2020_13>/3       1646 ns         1645 ns       422211 Part: 2
+BM_Day<Day_2020_13>/4       2188 ns         2186 ns       309213 Part: 2
+BM_Day<Day_2020_13>/5       1795 ns         1794 ns       355894 Part: 2
+BM_Day<Day_2020_13>/6       6021 ns         6015 ns       119452 Part: 2
+BM_Day<Day_2020_13>/7      11281 ns        11275 ns        57939 Part: 2
+BM_Day<Day_2020_14>/0     131057 ns       130981 ns         5276 Part: 1
+BM_Day<Day_2020_14>/1   18205288 ns     18194611 ns           36 Part: 1
+BM_Day<Day_2020_14>/2     110922 ns       110857 ns         6030 Part: 2
+BM_Day<Day_2020_14>/3   22161228 ns     22149400 ns           30 Part: 2
+BM_Day<Day_2020_15>/0      31617 ns        31557 ns        22069 Part: 1
+BM_Day<Day_2020_15>/1      32244 ns        32183 ns        21499 Part: 1
+BM_Day<Day_2020_15>/2      31640 ns        31621 ns        21627 Part: 1
+BM_Day<Day_2020_15>/3      31220 ns        31195 ns        22339 Part: 1
+BM_Day<Day_2020_15>/4      31154 ns        31132 ns        21798 Part: 1
+BM_Day<Day_2020_15>/5 1850919307 ns   1849118000 ns            1 Part: 2
+BM_Day<Day_2020_15>/6 1827820205 ns   1826802000 ns            1 Part: 2
+BM_Day<Day_2020_16>/0     135719 ns       135632 ns         5051 Part: 1
+BM_Day<Day_2020_16>/1    1295641 ns      1294734 ns          531 Part: 1
+BM_Day<Day_2020_16>/2    1806928 ns      1805373 ns          362 Part: 2
+BM_Day<Day_2020_17>/0     193475 ns       192949 ns         3591 Part: 1
+BM_Day<Day_2020_17>/1     655766 ns       655387 ns         1095 Part: 1
+BM_Day<Day_2020_17>/2    3581463 ns      3579221 ns          195 Part: 2
+BM_Day<Day_2020_17>/3   12802880 ns     12796480 ns           50 Part: 2
+BM_Day<Day_2020_18>/0       1177 ns         1160 ns       639345 Part: 1
+BM_Day<Day_2020_18>/1       3664 ns         3662 ns       189275 Part: 1
+BM_Day<Day_2020_18>/2    1797583 ns      1796789 ns          374 Part: 1
+BM_Day<Day_2020_18>/3       1115 ns         1115 ns       599911 Part: 2
+BM_Day<Day_2020_18>/4       3798 ns         3795 ns       200594 Part: 2
+BM_Day<Day_2020_18>/5    1843840 ns      1840530 ns          379 Part: 2
+BM_Day<Day_2020_19>/0     119928 ns       119809 ns         5404 Part: 1
+BM_Day<Day_2020_19>/1     659961 ns       659710 ns          992 Part: 1
+BM_Day<Day_2020_19>/2    4418573 ns      4408534 ns          161 Part: 1
+BM_Day<Day_2020_19>/3   23116549 ns     23103621 ns           29 Part: 2
+BM_Day<Day_2020_19>/4 4320060005 ns   4317380000 ns            1 Part: 2
+BM_Day<Day_2020_20>/0    1755529 ns      1754330 ns          397 Part: 1
+BM_Day<Day_2020_20>/1   27335237 ns     27290296 ns           27 Part: 1
+BM_Day<Day_2020_20>/2    3898449 ns      3894745 ns          184 Part: 2
+BM_Day<Day_2020_20>/3   57532076 ns     57481917 ns           12 Part: 2
+BM_Day<Day_2020_21>/0      12752 ns        12726 ns        52607 Part: 1
+BM_Day<Day_2020_21>/1     768899 ns       768301 ns          867 Part: 1
+BM_Day<Day_2020_21>/2      12995 ns        12983 ns        57597 Part: 2
+BM_Day<Day_2020_21>/3     715544 ns       715121 ns          916 Part: 2
+BM_Day<Day_2020_22>/0     199640 ns       199516 ns         3498 Part: 1
+BM_Day<Day_2020_22>/1     861621 ns       861137 ns          723 Part: 1
+BM_Day<Day_2020_22>/2     254017 ns       253743 ns         2715 Part: 2
+BM_Day<Day_2020_22>/3 3365938224 ns   3362810000 ns            1 Part: 2
+BM_Day<Day_2020_23>/0       3147 ns         3145 ns       214882 Part: 1
+BM_Day<Day_2020_23>/1       3274 ns         3267 ns       223936 Part: 1
+BM_Day<Day_2020_23>/2 1797985392 ns   1795143000 ns            1 Part: 2
+BM_Day<Day_2020_23>/3 1746000258 ns   1744932000 ns            1 Part: 2
+BM_Day<Day_2020_24>/0       4884 ns         4882 ns       132711 Part: 1
+BM_Day<Day_2020_24>/1      66829 ns        66797 ns         9848 Part: 1
+BM_Day<Day_2020_24>/2   18549843 ns     18531270 ns           37 Part: 2
+BM_Day<Day_2020_24>/3   36501908 ns     36424842 ns           19 Part: 2
+BM_Day<Day_2020_25>/0        440 ns          440 ns      1618594 Part: 1
+BM_Day<Day_2020_25>/1  779750387 ns    778952000 ns            1 Part: 1
+BM_Day<Day_2020_25>/2       10.5 ns         10.4 ns     63696586 Part: 2
