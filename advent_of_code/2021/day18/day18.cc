@@ -85,13 +85,11 @@ struct SnailFish {
     return ret;
   }
   int64_t Magnitude() const {
-    int depth = 0;
     std::vector<bool> on_left;
     std::vector<int> stack;
     VLOG(3) << "Magnitude: " << *this;
     for (const auto& r : values) {
-      while (depth < r.depth) {
-        ++depth;
+      while (on_left.size() < r.depth) {
         on_left.push_back(false);
       }
       int value = r.value;
@@ -105,7 +103,6 @@ struct SnailFish {
           VLOG(3) << "3 * " << stack.back() << " + 2 * " << value << " = " << new_val;
           stack.pop_back();
           value = new_val;
-          --depth;
           on_left.pop_back();
         }
         stack.push_back(value);
@@ -145,6 +142,7 @@ struct SnailFish {
         return true;
       }
     }
+    CHECK_LE(values.back().depth, 4);
     return false;
   }
   bool TrySplit() {
