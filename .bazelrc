@@ -6,3 +6,5 @@ run:compete -- --logtostderr --v=1
 run:compete --file_based_test_driver_generate_test_output=false
 run:compete --file_based_test_driver_log_ignored_test=false
 run:compete --file_based_test_driver_individual_tests=false
+
+run:benchmark -- --benchmark --run_long_tests=1m --advent_day_run_audit=false 

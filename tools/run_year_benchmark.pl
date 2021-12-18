@@ -9,10 +9,9 @@ if (!$year || $year < 2015 || $year > 2025) {
 }
 
 my $hostname = `hostname -s`;
+my $json_out = "advent_of_code/${year}/benchmark/benchmark_${hostname}.json";
+my $txt_out = "advent_of_code/${year}/benchmark/benchmark_${hostname}.txt";
 chomp($hostname);
-system("bazelisk run -c opt advent_of_code/${year}:benchmark -- " .
-       "--benchmark " .
-       "--benchmark_out=`pwd`/advent_of_code/${year}/benchmark/benchmark_${hostname}.json " .
-       "--run_long_tests=1m --advent_day_run_audit=false " .
-       "2>&1 | tee advent_of_code/${year}/benchmark/benchmark_${hostname}.txt")
+system("bazelisk run --config=benchmark advent_of_code/${year}:benchmark -- " .
+       "--benchmark_out=`pwd`/${json_out} 2>&1 | tee ${txt_out}")
   and die "benchmark failed: ", $!;
