@@ -14,14 +14,9 @@ namespace advent_of_code {
 
 namespace {
 
-struct SnailFish {
-  struct Rec {
-    int depth;
-    int value;
-  };
-  std::vector<Rec> values;
-  
-  friend std::ostream& operator<<(std::ostream& o, const SnailFish& s) {
+class SnailFishStack {
+ public:  
+  friend std::ostream& operator<<(std::ostream& o, const SnailFishStack& s) {
     int depth = 0;
     std::vector<bool> print_left;
     for (const auto& r : s.values) {
@@ -50,9 +45,9 @@ struct SnailFish {
     return o;
   }
 
-  static absl::StatusOr<SnailFish> Parse(absl::string_view& line) {
+  static absl::StatusOr<SnailFishStack> Parse(absl::string_view& line) {
     int depth = 0;
-    SnailFish ret;
+    SnailFishStack ret;
     for (int i = 0; i < line.size(); ++i) {
       if (line[i] == '[') { ++depth; continue; }
       else if (line[i] == ',') { continue; }
@@ -71,8 +66,8 @@ struct SnailFish {
     }
     return ret;
   }
-  SnailFish Add(const SnailFish& other) const {
-    SnailFish ret;
+  SnailFishStack Add(const SnailFishStack& other) const {
+    SnailFishStack ret;
     for (const auto &v : values) {
       ret.values.push_back({.depth = v.depth + 1, .value = v.value});
     }
@@ -161,37 +156,227 @@ struct SnailFish {
     }
     return false;
   }
+
+ private:
+  struct Rec {
+    int depth;
+    int value;
+  };
+  std::vector<Rec> values;
 };
+
+class SnailFishTree {
+ public:
+  friend std::ostream& operator<<(std::ostream& o, const SnailFishTree& s) {
+    if (s.value) return o << *s.value;
+    CHECK(s.left->parent == &s);
+    CHECK(s.right->parent == &s);
+    return o << "[" << *s.left << "," << *s.right << "]";
+  }
+
+  static absl::StatusOr<std::unique_ptr<SnailFishTree>> Parse(absl::string_view line) {
+    absl::StatusOr<std::unique_ptr<SnailFishTree>> rec = ParseImpl(line);
+    if (!rec.ok()) return rec.status();
+    if (!line.empty()) return absl::InvalidArgumentError("No full parse");
+    return rec;
+  }
+
+  static absl::StatusOr<std::unique_ptr<SnailFishTree>> ParseImpl(absl::string_view& line) {
+    std::unique_ptr<SnailFishTree> ret = absl::make_unique<SnailFishTree>();
+    if (line.empty()) return Error("Empty");
+    if (line[0] == '[') {
+      line = line.substr(1);
+
+      absl::StatusOr<std::unique_ptr<SnailFishTree>> left = ParseImpl(line);
+      if (!left.ok()) return left.status();
+      ret->left = std::move(*left);
+      ret->left->parent = ret.get();
+
+      if (line[0] != ',') return Error("Bad parse ','");
+      line = line.substr(1);
+      
+      absl::StatusOr<std::unique_ptr<SnailFishTree>> right = ParseImpl(line);
+      if (!right.ok()) return right.status();
+      ret->right = std::move(*right);
+      ret->right->parent = ret.get();
+
+      if (line[0] != ']') return Error("Bad parse ']'");
+      line = line.substr(1);
+      return ret;
+    }
+    if (line[0] < '0' || line[0] > '9') return Error("Bad parse: digit");
+    ret->value = 0;
+    while (!line.empty() && line[0] >= '0' && line[0] <= '9') {
+      ret->value = *ret->value * 10 + line[0] - '0';
+      line = line.substr(1);
+    }
+    return ret;
+  }
+  std::unique_ptr<SnailFishTree> Clone() const {
+    std::unique_ptr<SnailFishTree> ret = absl::make_unique<SnailFishTree>();
+    if (value) {
+      ret->value = value;
+      return ret;
+    }
+    ret->left = left->Clone();
+    ret->left->parent = ret.get();
+    ret->right = right->Clone();
+    ret->right->parent = ret.get();
+    return ret;
+  }
+  std::unique_ptr<SnailFishTree> Add(const std::unique_ptr<SnailFishTree>& other) const {
+    std::unique_ptr<SnailFishTree> ret = absl::make_unique<SnailFishTree>();
+    ret->left = Clone();
+    ret->left->parent = ret.get();
+    ret->right = other->Clone();
+    ret->right->parent = ret.get();
+    ret->Reduce();
+    return ret;
+  }
+  int64_t Magnitude() const {
+    if (value) return *value;
+    return 3 * left->Magnitude() + 2 * right->Magnitude();
+  }
+  void Reduce() {
+    bool work_done = true;
+    while (work_done) {
+      VLOG(2) << "Reduce";
+      VLOG(2) << *this;
+      work_done = false;
+      work_done = TryExplode(0);
+      if (work_done) continue;
+      work_done = TrySplit();
+    }
+  }
+  SnailFishTree* NearestLeft(SnailFishTree* from) {
+    if (from == right.get()) return left->RightMost();
+    CHECK(from == left.get());
+    if (parent == nullptr) return nullptr;
+    return parent->NearestLeft(this);
+  }
+  SnailFishTree* NearestRight(SnailFishTree* from) {
+    if (from == left.get()) return right->LeftMost();
+    CHECK(from == right.get());
+    if (parent == nullptr) return nullptr;
+    return parent->NearestRight(this);
+  }
+  SnailFishTree* LeftMost() {
+    if (value) return this;
+    return left->LeftMost();
+  }
+  SnailFishTree* RightMost() {
+    if (value) return this;
+    return right->RightMost();
+  }
+  bool TryExplode(int depth) {
+    if (value) return false;
+    if (depth == 4) {
+      SnailFishTree* nearest_left = parent->NearestLeft(this);
+      if (nearest_left) {
+        CHECK(left->value);
+        CHECK(nearest_left->value);
+        nearest_left->value = *nearest_left->value + *left->value;
+      }
+      SnailFishTree* nearest_right = parent->NearestRight(this);
+      if (nearest_right) {
+        CHECK(right->value);
+        CHECK(nearest_right->value);
+        nearest_right->value = *nearest_right->value + *right->value;
+      }
+      value = 0;
+      left.reset();
+      right.reset();
+      return true;
+    }
+    if (left->TryExplode(depth + 1)) return true;
+    return right->TryExplode(depth + 1);
+  }
+  bool TrySplit() {
+    if (value) {
+      if (*value >= 10) {
+        left = absl::make_unique<SnailFishTree>();
+        left->value = *value / 2;
+        left->parent = this;
+        right = absl::make_unique<SnailFishTree>();
+        right->value = *value - *left->value;
+        right->parent = this;
+        value = {};
+        return true;
+      }
+      return false;
+    }
+    if (left->TrySplit()) return true;
+    return right->TrySplit();
+  }
+
+ private:
+  absl::optional<int> value;
+  std::unique_ptr<SnailFishTree> left;
+  std::unique_ptr<SnailFishTree> right;
+  SnailFishTree* parent = nullptr;
+};
+
+absl::Status Audit(absl::Span<absl::string_view> input) {
+  absl::optional<SnailFishStack> total_stack;
+  std::unique_ptr<SnailFishTree> total_tree;
+
+  for (absl::string_view in_str : input) {
+    absl::StatusOr<SnailFishStack> in_stack = SnailFishStack::Parse(in_str);    
+    if (!in_stack.ok()) return in_stack.status();
+    if (!total_stack) {
+      total_stack = std::move(*in_stack);
+    } else {
+      total_stack = total_stack->Add(std::move(*in_stack));
+    }
+
+    absl::StatusOr<std::unique_ptr<SnailFishTree>> in_tree = SnailFishTree::Parse(in_str);    
+    if (!in_tree.ok()) return in_tree.status();
+    if (!total_tree) {
+      total_tree = std::move(*in_tree);
+    } else {
+      total_tree = total_tree->Add(std::move(*in_tree));
+    }
+  }
+
+  if (total_stack->Magnitude() != total_tree->Magnitude()) {
+    return Error("Stack and tree differ");
+  }
+  return absl::OkStatus();
+}
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_18::Part1(
     absl::Span<absl::string_view> input) const {
-  SnailFish total;
-  bool first = true;
+  if (run_audit()) {
+    if (auto st = Audit(input); !st.ok()) return st;
+    VLOG(1) << "Audit: OK";
+  }
+
+  absl::optional<SnailFishStack> total;
   for (absl::string_view in_str : input) {
-    absl::StatusOr<SnailFish> in = SnailFish::Parse(in_str);    
+    absl::StatusOr<SnailFishStack> in = SnailFishStack::Parse(in_str);    
     if (!in.ok()) return in.status();
     VLOG(2) << in_str;
     VLOG(2) << *in;
-    if (first) {
+    if (!total) {
       total = std::move(*in);
-      first = false;
     } else {
-      total = total.Add(std::move(*in));
+      total = total->Add(std::move(*in));
     }
-    VLOG(2) << "Total: " << total;
+    VLOG(2) << "Total: " << *total;
   }
-  return IntReturn(total.Magnitude());
+  if (!total) return absl::NotFoundError("No snailfish record");
+  return IntReturn(total->Magnitude());
 }
 
 absl::StatusOr<std::string> Day_2021_18::Part2(
     absl::Span<absl::string_view> input) const {
-  std::vector<SnailFish> values;
+  std::vector<SnailFishStack> values;
   for (absl::string_view in_str : input) {
-    absl::StatusOr<SnailFish> in = SnailFish::Parse(in_str);    
+    absl::StatusOr<SnailFishStack> in = SnailFishStack::Parse(in_str);    
     if (!in.ok()) return in.status();
-    values.push_back(*in);
+    values.push_back(std::move(*in));
   }
   int max = 0;
   for (const auto& sf1 : values) {
@@ -200,6 +385,7 @@ absl::StatusOr<std::string> Day_2021_18::Part2(
       max = std::max(max, test);
     }
   }
+  if (values.empty()) return absl::NotFoundError("No snailfish record");
   return IntReturn(max);
 }
 

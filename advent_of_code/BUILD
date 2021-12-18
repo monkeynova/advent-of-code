@@ -3,6 +3,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 cc_library(
     name = "advent_day",
     hdrs = ["advent_day.h"],
+    srcs = ["advent_day.cc"],
     visibility = [
         "//visibility:public",
     ],

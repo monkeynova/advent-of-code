@@ -10,6 +10,8 @@
 #include "absl/strings/str_split.h"
 #include "absl/types/span.h"
 
+extern absl::Flag<bool> FLAGS_advent_day_run_audit;
+
 namespace advent_of_code {
 
 template <class... Args>
@@ -39,6 +41,10 @@ inline std::pair<absl::string_view, absl::string_view> PairSplit(
 class AdventDay {
  public:
   virtual ~AdventDay() = default;
+
+  bool run_audit() const {
+    return absl::GetFlag(FLAGS_advent_day_run_audit);
+  }
 
   absl::StatusOr<std::string> IntReturn(int64_t val) const {
     return absl::StrCat(val);
