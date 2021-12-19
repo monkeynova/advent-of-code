@@ -68,18 +68,42 @@ struct Scanner {
   Point3 RelativeToAbsolute(Point3 in) const { return absolute + o.Apply(in); }
 };
 
+int max_dist(Point3 p) {
+  return std::max(abs(p.x), std::max(abs(p.y), abs(p.z)));
+}
+
 int CountOverlap(const Scanner& l, const Scanner& r) {
-  absl::flat_hash_set<Point3> absolute_becons;
+  absl::flat_hash_set<Point3> absolute_beacons;
   for (const auto& b : l.relative_beacons) {
-    absolute_becons.insert(l.RelativeToAbsolute(b));
+    absolute_beacons.insert(l.RelativeToAbsolute(b));
   }
-  int count = 0;
-  for (const auto& b : r.relative_beacons) {
-    if (absolute_becons.contains(r.RelativeToAbsolute(b))) {
-      ++count;
+  int visible_l_in_r = 0;
+  absl::flat_hash_set<Point3> found_both;
+  for (const auto& r_b : r.relative_beacons) {
+    Point3 a_b = r.RelativeToAbsolute(r_b);
+    if (absolute_beacons.contains(a_b)) {
+      found_both.insert(a_b);
+    } else {
+      if (max_dist(a_b - l.absolute) <= 1000) { 
+        ++visible_l_in_r;
+      }
     }
   }
-  return count;
+  if (found_both.size() >= 12) {
+    // Validate the problems assertion that if 12 overlap and we put these
+    // together that there aren't any beacons that should have been visble
+    // that we didn't align.
+    CHECK_EQ(visible_l_in_r, 0);
+    int visible_r_in_l = 0;
+    for (Point3 a_b : absolute_beacons) {
+      if (found_both.contains(a_b)) continue;
+      if (max_dist(a_b - r.absolute) <= 1000) { 
+        ++visible_r_in_l;
+      }
+    }
+    CHECK_EQ(visible_r_in_l, 0);
+  }
+  return found_both.size();
 }
 
 bool TryPosition(Scanner* dest, const Scanner& src) {
