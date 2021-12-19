@@ -135,23 +135,28 @@ absl::Status PositionScanners(std::vector<Scanner>& scanners) {
   scanners[0].absolute = Point3{0, 0, 0};
   scanners[0].o = Orientation::Aligned();
   absl::flat_hash_set<int> positioned = {0};
+  absl::flat_hash_map<int, absl::flat_hash_set<int>> attempted;
   while (positioned.size() < scanners.size()) {
-    absl::flat_hash_set<int> new_positioned = positioned;
+    absl::flat_hash_set<int> new_positioned;
     for (int i = 0; i < scanners.size(); ++i) {
       if (positioned.contains(i)) continue;
+      absl::flat_hash_set<int>& this_attempt = attempted[i];
       for (int p_idx : positioned) {
+        if (this_attempt.contains(p_idx)) continue;
+
         VLOG(2) << "Trying " << i << " with " << p_idx;
         if (TryPosition(&scanners[i], scanners[p_idx])) {
           VLOG(1) << "Collapsed " << i << " with " << p_idx;
           new_positioned.insert(i);
           break;
         }
+        this_attempt.insert(p_idx);
       }
     }
-    if (new_positioned.size() == positioned.size()) {
+    if (new_positioned.empty()) {
       return Error("Cannot add more positioning");
     }
-    positioned = std::move(new_positioned);
+    for (int p_idx : new_positioned) positioned.insert(p_idx);
   }
   return absl::OkStatus();
 }
