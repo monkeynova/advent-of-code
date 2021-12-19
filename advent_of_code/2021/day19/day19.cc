@@ -19,6 +19,10 @@ struct Orientation {
   Point3 x_hat;
   Point3 y_hat;
   Point3 z_hat;
+
+  Point3 Apply(Point3 in) const {
+    return in.x * x_hat + in.y * y_hat + in.z * z_hat;
+  }
 };
 
 const std::vector<Orientation>& AllOrientations() {
@@ -27,18 +31,11 @@ const std::vector<Orientation>& AllOrientations() {
 
   for (Point3 x_hat : Cardinal3::kNeighborDirs) {
     if (x_hat.dist() != 1) continue;
-    VLOG(2) << x_hat;
     for (Point3 y_hat : Cardinal3::kNeighborDirs) {
       if (y_hat.dist() != 1) continue;
-      if (y_hat == x_hat || y_hat == -x_hat) continue;
-      Point3 z_hat = {
-        x_hat.y * y_hat.z - x_hat.z * y_hat.y,
-        x_hat.z * y_hat.x - x_hat.x * y_hat.z,
-        x_hat.x * y_hat.y - x_hat.y * y_hat.x,
-      };
-      VLOG(2) << "  " << y_hat;
-      VLOG(2) << "  " << z_hat;
-      kMemo.push_back({x_hat, y_hat, z_hat});
+      if (y_hat == x_hat) continue;
+      if (y_hat == -x_hat) continue;
+      kMemo.push_back({x_hat, y_hat, x_hat.Cross(y_hat)});
     }
   }
   CHECK_EQ(kMemo.size(), 24);
@@ -51,7 +48,7 @@ struct Scanner {
   Orientation o;
 
   Point3 RelativeToAbsolute(Point3 in) const {
-    return absolute + in.x * o.x_hat + in.y * o.y_hat + in.z * o.z_hat;
+    return absolute + o.Apply(in);
   }
 };
 
@@ -79,11 +76,11 @@ bool TryPosition(Scanner* dest, const Scanner& src) {
       VLOG(2) << "Src: " << r_p1 << " -> " << a_p1;
       for (Point3 r_p2 : dest->relative_beacons) {
         // a_p1 == a_p2
-        // a_p2 = dest->absolute + r_p2.x * o.x_hat + r_p2.y * o.y_hat + r_p2.z * o.z_hat
-        // (a_p1 - r_p2.x * o.x_hat + r_p2.y * o.y_hat + r_p2.z * o.z_hat) = dest->absolute
-        Point3 a_p2 = a_p1 - r_p2.x * o.x_hat - r_p2.y * o.y_hat - r_p2.z * o.z_hat;
-        VLOG(2) << "Dst: " << r_p2 << " -> " << a_p2;
-        ++try_absolute_counts[a_p2];
+        // RelativeToAbsolute:
+        // a_p2 = dest->absolute + o.Apply(r_p2)
+        Point3 test_absolute = a_p1 - o.Apply(r_p2);
+        VLOG(2) << "Dst: " << r_p2 << " -> " << test_absolute;
+        ++try_absolute_counts[test_absolute];
       }
     }
     for (const auto& [p, c] : try_absolute_counts) {

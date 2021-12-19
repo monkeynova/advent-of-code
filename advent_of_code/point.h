@@ -179,6 +179,14 @@ struct Point3 {
     return {.x = s * x, .y = s * y, .z = s * z};
   }
 
+  constexpr Point3 Cross(const Point3& o) const {
+    return {
+      y * o.z - z * o.y,
+      z * o.x - x * o.z,
+      x * o.y - y * o.x,
+    };    
+  }
+
   constexpr bool operator==(const Point3& other) const {
     return x == other.x && y == other.y && z == other.z;
   }
