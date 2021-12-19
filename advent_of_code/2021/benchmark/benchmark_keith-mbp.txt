@@ -1,20 +1,22 @@
 Loading: 
 Loading: 0 packages loaded
 Analyzing: target //advent_of_code/2021:benchmark (0 packages loaded, 0 targets configured)
-INFO: Analyzed target //advent_of_code/2021:benchmark (0 packages loaded, 55 targets configured).
+INFO: Analyzed target //advent_of_code/2021:benchmark (0 packages loaded, 0 targets configured).
 INFO: Found 1 target...
-[0 / 3] [Prepa] BazelWorkspaceStatusAction stable-status.txt
+[0 / 58] [Prepa] BazelWorkspaceStatusAction stable-status.txt
+[43 / 61] Compiling advent_of_code/2021/day05/day05.cc; 1s darwin-sandbox ... (8 actions running)
+[57 / 61] Compiling advent_of_code/2021/day19/day19.cc; 5s darwin-sandbox
 Target //advent_of_code/2021:benchmark up-to-date:
   bazel-bin/advent_of_code/2021/benchmark
-INFO: Elapsed time: 0.499s, Critical Path: 0.31s
-INFO: 3 processes: 2 internal, 1 darwin-sandbox.
-INFO: Build completed successfully, 3 total actions
+INFO: Elapsed time: 6.939s, Critical Path: 6.62s
+INFO: 11 processes: 1 internal, 10 darwin-sandbox.
+INFO: Build completed successfully, 11 total actions
 INFO: Running command line: external/bazel_tools/tools/test/test-setup.sh advent_of_code/2021/benchmark '--benchmark_out=/Users/keith/github/advent-of-code/advent_of_code/2021/benchmark/benchmark_keith-mbp.json' --benchmark '--run_long_tests=1m' '--advent_day_run_audit=false'
-INFO: Build completed successfully, 3 total actions
+INFO: Build completed successfully, 11 total actions
 exec ${PAGER:-/usr/bin/less} "$0" || exit 1
 Executing tests from //advent_of_code/2021:benchmark
 -----------------------------------------------------------------------------
-2021-12-18T15:34:04+00:00
+2021-12-19T20:05:22+00:00
 Running /private/var/tmp/_bazel_keith/0ef773739f82bcf7ecc8ec8d4e65e080/execroot/com_monkeynova_advent_of_code/bazel-out/darwin-opt/bin/advent_of_code/2021/benchmark.runfiles/com_monkeynova_advent_of_code/advent_of_code/2021/benchmark
 Run on (8 X 2300 MHz CPU s)
 CPU Caches:
@@ -22,97 +24,105 @@ CPU Caches:
   L1 Instruction 32 KiB (x4)
   L2 Unified 256 KiB (x4)
   L3 Unified 6144 KiB (x1)
-Load Average: 1.85, 2.09, 2.12
+Load Average: 2.00, 2.57, 2.77
 -----------------------------------------------------------------
 Benchmark                       Time             CPU   Iterations
 -----------------------------------------------------------------
-BM_Day<Day_2021_01>/0        1028 ns         1027 ns       669370 Part: 1
-BM_Day<Day_2021_01>/1       29659 ns        29639 ns        23119 Part: 1
-BM_Day<Day_2021_01>/2        1000 ns          999 ns       722991 Part: 2
-BM_Day<Day_2021_01>/3       30352 ns        30330 ns        23813 Part: 2
-BM_Day<Day_2021_02>/0        1283 ns         1282 ns       539345 Part: 1
-BM_Day<Day_2021_02>/1      229381 ns       228854 ns         3217 Part: 1
-BM_Day<Day_2021_02>/2        1274 ns         1272 ns       542186 Part: 2
-BM_Day<Day_2021_02>/3      208855 ns       208738 ns         3164 Part: 2
-BM_Day<Day_2021_03>/0         103 ns          103 ns      6503823 Part: 1
-BM_Day<Day_2021_03>/1       57207 ns        57170 ns        11930 Part: 1
-BM_Day<Day_2021_03>/2        1312 ns         1309 ns       508399 Part: 2
-BM_Day<Day_2021_03>/3      137940 ns       137859 ns         4718 Part: 2
-BM_Day<Day_2021_04>/0       23118 ns        23086 ns        28561 Part: 1
-BM_Day<Day_2021_04>/1      732652 ns       732187 ns          872 Part: 1
-BM_Day<Day_2021_04>/2       24369 ns        24153 ns        29124 Part: 2
-BM_Day<Day_2021_04>/3     1002998 ns      1002336 ns          670 Part: 2
-BM_Day<Day_2021_05>/0       30223 ns        30205 ns        22252 Part: 1
-BM_Day<Day_2021_05>/1     4755591 ns      4743636 ns          132 Part: 1
-BM_Day<Day_2021_05>/2       31872 ns        31842 ns        21612 Part: 2
-BM_Day<Day_2021_05>/3     9508137 ns      9500770 ns           74 Part: 2
-BM_Day<Day_2021_06>/0      136758 ns       136660 ns         5234 Part: 1
-BM_Day<Day_2021_06>/1     4167398 ns      4159097 ns          175 Part: 1
-BM_Day<Day_2021_06>/2      240443 ns       240203 ns         2731 Part: 2
-BM_Day<Day_2021_06>/3      263794 ns       263628 ns         2510 Part: 2
-BM_Day<Day_2021_07>/0        1217 ns         1216 ns       586756 Part: 1
-BM_Day<Day_2021_07>/1       47241 ns        47217 ns        13156 Part: 1
-BM_Day<Day_2021_07>/2        1213 ns         1212 ns       538926 Part: 2
-BM_Day<Day_2021_07>/3      637444 ns       637064 ns         1081 Part: 2
-BM_Day<Day_2021_08>/0        3652 ns         3645 ns       202780 Part: 1
-BM_Day<Day_2021_08>/1       73417 ns        73368 ns         9405 Part: 1
-BM_Day<Day_2021_08>/2      113045 ns       112937 ns         6089 Part: 2
-BM_Day<Day_2021_08>/3     2392044 ns      2389910 ns          290 Part: 2
-BM_Day<Day_2021_09>/0        1913 ns         1910 ns       353694 Part: 1
-BM_Day<Day_2021_09>/1      159879 ns       159782 ns         4267 Part: 1
-BM_Day<Day_2021_09>/2        7564 ns         7559 ns        81456 Part: 2
-BM_Day<Day_2021_09>/3     1010631 ns      1010031 ns          641 Part: 2
-BM_Day<Day_2021_10>/0        5684 ns         5680 ns       120490 Part: 1
-BM_Day<Day_2021_10>/1       85819 ns        85782 ns         7728 Part: 1
-BM_Day<Day_2021_10>/2        6357 ns         6353 ns        98384 Part: 2
-BM_Day<Day_2021_10>/3       88164 ns        88099 ns         7649 Part: 2
-BM_Day<Day_2021_11>/0      533368 ns       532267 ns         1249 Part: 1
-BM_Day<Day_2021_11>/1      571698 ns       571376 ns         1128 Part: 1
-BM_Day<Day_2021_11>/2      920509 ns       919994 ns          721 Part: 2
-BM_Day<Day_2021_11>/3     1292160 ns      1290303 ns          535 Part: 2
-BM_Day<Day_2021_12>/0       17063 ns        17048 ns        38919 Part: 1
-BM_Day<Day_2021_12>/1       33956 ns        33937 ns        19800 Part: 1
-BM_Day<Day_2021_12>/2      958284 ns       957264 ns          678 Part: 1
-BM_Day<Day_2021_12>/3    14602525 ns     14592163 ns           49 Part: 1
-BM_Day<Day_2021_12>/4       40635 ns        40611 ns        17701 Part: 2
-BM_Day<Day_2021_12>/5      143967 ns       143696 ns         4658 Part: 2
-BM_Day<Day_2021_12>/6    15668457 ns     15659310 ns           42 Part: 2
-BM_Day<Day_2021_12>/7   463031884 ns    462308500 ns            2 Part: 2
-BM_Day<Day_2021_13>/0      321984 ns       321674 ns         2190 Part: 1
-BM_Day<Day_2021_13>/1    11178578 ns     11164607 ns           61 Part: 1
-BM_Day<Day_2021_13>/2      342365 ns       342106 ns         1970 Part: 2
-BM_Day<Day_2021_13>/3    11586397 ns     11577339 ns           59 Part: 2
-BM_Day<Day_2021_14>/0      171424 ns       171254 ns         3876 Part: 1
-BM_Day<Day_2021_14>/1     1075700 ns      1075062 ns          628 Part: 1
-BM_Day<Day_2021_14>/2       71696 ns        71637 ns         9005 Part: 2
-BM_Day<Day_2021_14>/3      254167 ns       253935 ns         2798 Part: 2
-BM_Day<Day_2021_15>/0       17320 ns        17228 ns        39026 Part: 1
-BM_Day<Day_2021_15>/1     3002571 ns      3000068 ns          235 Part: 1
-BM_Day<Day_2021_15>/2      626247 ns       625635 ns         1108 Part: 2
-BM_Day<Day_2021_15>/3    96569185 ns     96359857 ns            7 Part: 2
-BM_Day<Day_2021_16>/0         265 ns          265 ns      2646033 Part: 1
-BM_Day<Day_2021_16>/1        1104 ns         1103 ns       678900 Part: 1
-BM_Day<Day_2021_16>/2        1603 ns         1601 ns       442576 Part: 1
-BM_Day<Day_2021_16>/3        2669 ns         2667 ns       250237 Part: 1
-BM_Day<Day_2021_16>/4        2735 ns         2733 ns       263402 Part: 1
-BM_Day<Day_2021_16>/5        2961 ns         2960 ns       231776 Part: 1
-BM_Day<Day_2021_16>/6      127305 ns       127181 ns         5307 Part: 1
-BM_Day<Day_2021_16>/7        1078 ns         1077 ns       631074 Part: 2
-BM_Day<Day_2021_16>/8        1075 ns         1074 ns       637587 Part: 2
-BM_Day<Day_2021_16>/9        1469 ns         1468 ns       461118 Part: 2
-BM_Day<Day_2021_16>/10       1543 ns         1541 ns       428772 Part: 2
-BM_Day<Day_2021_16>/11       1080 ns         1079 ns       653503 Part: 2
-BM_Day<Day_2021_16>/12        999 ns          999 ns       647848 Part: 2
-BM_Day<Day_2021_16>/13       1052 ns         1051 ns       613572 Part: 2
-BM_Day<Day_2021_16>/14       2711 ns         2703 ns       250225 Part: 2
-BM_Day<Day_2021_16>/15     130796 ns       130675 ns         5238 Part: 2
-BM_Day<Day_2021_17>/0       62739 ns        62499 ns        10926 Part: 1
-BM_Day<Day_2021_17>/1      774022 ns       772695 ns          901 Part: 1
-BM_Day<Day_2021_17>/2       65454 ns        65315 ns        11050 Part: 2
-BM_Day<Day_2021_17>/3      772484 ns       771786 ns          866 Part: 2
-BM_Day<Day_2021_18>/0        2605 ns         2603 ns       275895 Part: 1
-BM_Day<Day_2021_18>/1       49761 ns        49639 ns        14198 Part: 1
-BM_Day<Day_2021_18>/2       86724 ns        86671 ns         7913 Part: 1
-BM_Day<Day_2021_18>/3      871183 ns       870646 ns          804 Part: 1
-BM_Day<Day_2021_18>/4      295726 ns       295475 ns         2257 Part: 2
-BM_Day<Day_2021_18>/5    27527309 ns     27507520 ns           25 Part: 2
+BM_Day<Day_2021_01>/0        1026 ns         1025 ns       658588 Part: 1
+BM_Day<Day_2021_01>/1       29691 ns        29674 ns        22774 Part: 1
+BM_Day<Day_2021_01>/2        1005 ns         1004 ns       676498 Part: 2
+BM_Day<Day_2021_01>/3       30912 ns        30896 ns        22975 Part: 2
+BM_Day<Day_2021_02>/0        1202 ns         1202 ns       556855 Part: 1
+BM_Day<Day_2021_02>/1      218381 ns       218202 ns         3259 Part: 1
+BM_Day<Day_2021_02>/2        1250 ns         1247 ns       551529 Part: 2
+BM_Day<Day_2021_02>/3      212643 ns       212475 ns         3316 Part: 2
+BM_Day<Day_2021_03>/0         132 ns          132 ns      5012890 Part: 1
+BM_Day<Day_2021_03>/1       61658 ns        61624 ns        11661 Part: 1
+BM_Day<Day_2021_03>/2        1421 ns         1420 ns       476872 Part: 2
+BM_Day<Day_2021_03>/3      138278 ns       138193 ns         4301 Part: 2
+BM_Day<Day_2021_04>/0       22543 ns        22530 ns        30997 Part: 1
+BM_Day<Day_2021_04>/1      729730 ns       729102 ns          950 Part: 1
+BM_Day<Day_2021_04>/2       22499 ns        22489 ns        29463 Part: 2
+BM_Day<Day_2021_04>/3      949118 ns       948822 ns          645 Part: 2
+BM_Day<Day_2021_05>/0       29617 ns        29600 ns        23287 Part: 1
+BM_Day<Day_2021_05>/1     4457774 ns      4455919 ns          136 Part: 1
+BM_Day<Day_2021_05>/2       32177 ns        32072 ns        21430 Part: 2
+BM_Day<Day_2021_05>/3     9348406 ns      9342478 ns           69 Part: 2
+BM_Day<Day_2021_06>/0        1281 ns         1280 ns       536637 Part: 1
+BM_Day<Day_2021_06>/1       11966 ns        11963 ns        53861 Part: 1
+BM_Day<Day_2021_06>/2        1206 ns         1204 ns       562746 Part: 2
+BM_Day<Day_2021_06>/3       12222 ns        12214 ns        54024 Part: 2
+BM_Day<Day_2021_07>/0        1204 ns         1204 ns       593492 Part: 1
+BM_Day<Day_2021_07>/1       46224 ns        46166 ns        15316 Part: 1
+BM_Day<Day_2021_07>/2        1263 ns         1262 ns       550141 Part: 2
+BM_Day<Day_2021_07>/3      645592 ns       645152 ns         1054 Part: 2
+BM_Day<Day_2021_08>/0        3575 ns         3573 ns       182549 Part: 1
+BM_Day<Day_2021_08>/1       75779 ns        75648 ns         9528 Part: 1
+BM_Day<Day_2021_08>/2      110784 ns       110663 ns         5965 Part: 2
+BM_Day<Day_2021_08>/3     2349143 ns      2347605 ns          306 Part: 2
+BM_Day<Day_2021_09>/0        1931 ns         1929 ns       351821 Part: 1
+BM_Day<Day_2021_09>/1      160906 ns       160826 ns         4080 Part: 1
+BM_Day<Day_2021_09>/2        7602 ns         7598 ns        88957 Part: 2
+BM_Day<Day_2021_09>/3     1037387 ns      1036425 ns          708 Part: 2
+BM_Day<Day_2021_10>/0        5542 ns         5539 ns       120986 Part: 1
+BM_Day<Day_2021_10>/1       85941 ns        85788 ns         7634 Part: 1
+BM_Day<Day_2021_10>/2        6407 ns         6404 ns       103558 Part: 2
+BM_Day<Day_2021_10>/3       88519 ns        88443 ns         8005 Part: 2
+BM_Day<Day_2021_11>/0      501724 ns       501523 ns         1399 Part: 1
+BM_Day<Day_2021_11>/1      552135 ns       551896 ns         1167 Part: 1
+BM_Day<Day_2021_11>/2      899369 ns       898927 ns          736 Part: 2
+BM_Day<Day_2021_11>/3     1245247 ns      1243242 ns          528 Part: 2
+BM_Day<Day_2021_12>/0       16342 ns        16332 ns        42027 Part: 1
+BM_Day<Day_2021_12>/1       34019 ns        33995 ns        20937 Part: 1
+BM_Day<Day_2021_12>/2      900596 ns       900233 ns          752 Part: 1
+BM_Day<Day_2021_12>/3    14580951 ns     14547250 ns           48 Part: 1
+BM_Day<Day_2021_12>/4       39313 ns        39228 ns        18173 Part: 2
+BM_Day<Day_2021_12>/5      140306 ns       140259 ns         4976 Part: 2
+BM_Day<Day_2021_12>/6    15221504 ns     15215762 ns           42 Part: 2
+BM_Day<Day_2021_12>/7   445558450 ns    445283500 ns            2 Part: 2
+BM_Day<Day_2021_13>/0      311394 ns       311236 ns         2280 Part: 1
+BM_Day<Day_2021_13>/1    10708000 ns     10704968 ns           62 Part: 1
+BM_Day<Day_2021_13>/2      341537 ns       341373 ns         2049 Part: 2
+BM_Day<Day_2021_13>/3    11510850 ns     11501893 ns           56 Part: 2
+BM_Day<Day_2021_14>/0      172982 ns       172893 ns         3999 Part: 1
+BM_Day<Day_2021_14>/1     1060226 ns      1059487 ns          661 Part: 1
+BM_Day<Day_2021_14>/2       73171 ns        73134 ns         9504 Part: 2
+BM_Day<Day_2021_14>/3      254558 ns       254065 ns         2696 Part: 2
+BM_Day<Day_2021_15>/0       16736 ns        16723 ns        41300 Part: 1
+BM_Day<Day_2021_15>/1     3044846 ns      3043176 ns          233 Part: 1
+BM_Day<Day_2021_15>/2      592968 ns       592737 ns         1124 Part: 2
+BM_Day<Day_2021_15>/3    91150188 ns     90724000 ns            7 Part: 2
+BM_Day<Day_2021_16>/0         266 ns          266 ns      2571941 Part: 1
+BM_Day<Day_2021_16>/1        1101 ns         1099 ns       631490 Part: 1
+BM_Day<Day_2021_16>/2        1544 ns         1543 ns       455744 Part: 1
+BM_Day<Day_2021_16>/3        2686 ns         2685 ns       268361 Part: 1
+BM_Day<Day_2021_16>/4        2640 ns         2639 ns       269316 Part: 1
+BM_Day<Day_2021_16>/5        2998 ns         2996 ns       232234 Part: 1
+BM_Day<Day_2021_16>/6      125812 ns       125604 ns         5424 Part: 1
+BM_Day<Day_2021_16>/7        1020 ns         1019 ns       619634 Part: 2
+BM_Day<Day_2021_16>/8        1047 ns         1047 ns       646538 Part: 2
+BM_Day<Day_2021_16>/9        1499 ns         1498 ns       427732 Part: 2
+BM_Day<Day_2021_16>/10       1473 ns         1472 ns       466533 Part: 2
+BM_Day<Day_2021_16>/11       1040 ns         1039 ns       619793 Part: 2
+BM_Day<Day_2021_16>/12       1043 ns         1041 ns       696386 Part: 2
+BM_Day<Day_2021_16>/13       1069 ns         1068 ns       611268 Part: 2
+BM_Day<Day_2021_16>/14       2643 ns         2642 ns       260588 Part: 2
+BM_Day<Day_2021_16>/15     125168 ns       125110 ns         5106 Part: 2
+BM_Day<Day_2021_17>/0       62710 ns        62668 ns        11544 Part: 1
+BM_Day<Day_2021_17>/1      754011 ns       753558 ns          872 Part: 1
+BM_Day<Day_2021_17>/2       60217 ns        60189 ns        10503 Part: 2
+BM_Day<Day_2021_17>/3      751397 ns       750956 ns          869 Part: 2
+BM_Day<Day_2021_18>/0        2468 ns         2467 ns       270968 Part: 1
+BM_Day<Day_2021_18>/1       47494 ns        47479 ns        13402 Part: 1
+BM_Day<Day_2021_18>/2       98425 ns        89782 ns         7824 Part: 1
+BM_Day<Day_2021_18>/3      901561 ns       900662 ns          749 Part: 1
+BM_Day<Day_2021_18>/4      298676 ns       298535 ns         2413 Part: 2
+BM_Day<Day_2021_18>/5    28674820 ns     28657917 ns           24 Part: 2
+BM_Day<Day_2021_19>/0     9646934 ns      9643813 ns           64 Part: 1
+BM_Day<Day_2021_19>/1   245060926 ns    244620000 ns            3 Part: 1
+BM_Day<Day_2021_19>/2    10210672 ns     10200580 ns           69 Part: 2
+BM_Day<Day_2021_19>/3   251315288 ns    251172667 ns            3 Part: 2
+BM_Day<Day_2021_20>/0  ERROR OCCURRED: 'Problem not known'
+BM_Day<Day_2021_20>/1  ERROR OCCURRED: 'Problem not known'
+BM_Day<Day_2021_20>/2  ERROR OCCURRED: 'Problem not known'
+BM_Day<Day_2021_20>/3  ERROR OCCURRED: 'Problem not known'
