@@ -92,10 +92,7 @@ bool TryPosition(Scanner* dest, const Scanner& src) {
   return false;
 }
 
-}  // namespace
-
-absl::StatusOr<std::string> Day_2021_19::Part1(
-    absl::Span<absl::string_view> input) const {
+absl::StatusOr<std::vector<Scanner>> Parse(absl::Span<absl::string_view> input) {
   std::vector<Scanner> scanners;
   Scanner cur;
   for (absl::string_view line : input) {
@@ -111,7 +108,10 @@ absl::StatusOr<std::string> Day_2021_19::Part1(
     }
   }
   scanners.push_back(cur);
+  return scanners;
+}
 
+absl::Status PositionScanners(std::vector<Scanner>& scanners) {
   scanners[0].absolute = Point3{0, 0, 0};
   scanners[0].o = {.x_hat = Cardinal3::kXHat, .y_hat = Cardinal3::kYHat, .z_hat = Cardinal3::kZHat};
   absl::flat_hash_set<int> positioned = {0};
@@ -133,9 +133,20 @@ absl::StatusOr<std::string> Day_2021_19::Part1(
     }
     positioned = std::move(new_positioned);
   }
+  return absl::OkStatus();
+}
+
+}  // namespace
+
+absl::StatusOr<std::string> Day_2021_19::Part1(
+    absl::Span<absl::string_view> input) const {
+  absl::StatusOr<std::vector<Scanner>> scanners = Parse(input);
+  if (!scanners.ok()) return scanners.status();
+
+  if (auto st = PositionScanners(*scanners); !st.ok()) return st;
 
   absl::flat_hash_set<Point3> absolute_becons;
-  for (const auto& s : scanners) {
+  for (const auto& s : *scanners) {
     for (const auto& b : s.relative_beacons) {
       absolute_becons.insert(s.RelativeToAbsolute(b));
     }
@@ -146,48 +157,15 @@ absl::StatusOr<std::string> Day_2021_19::Part1(
 
 absl::StatusOr<std::string> Day_2021_19::Part2(
     absl::Span<absl::string_view> input) const {
-  std::vector<Scanner> scanners;
-  Scanner cur;
-  for (absl::string_view line : input) {
-    if (line.empty()) continue;
-    Point3 beacon;
-    if (RE2::FullMatch(line, "--- scanner \\d+ ---")) {
-      if (!cur.relative_beacons.empty()) scanners.push_back(cur);
-      cur.relative_beacons.clear();
-    } else if (RE2::FullMatch(line, "(-?\\d+,-?\\d+,-?\\d+)", beacon.Capture())) {
-      cur.relative_beacons.push_back(beacon);
-    } else {
-      return Error("Bad line: ", line);
-    }
-  }
-  scanners.push_back(cur);
+  absl::StatusOr<std::vector<Scanner>> scanners = Parse(input);
+  if (!scanners.ok()) return scanners.status();
 
-  scanners[0].absolute = Point3{0, 0, 0};
-  scanners[0].o = {.x_hat = Cardinal3::kXHat, .y_hat = Cardinal3::kYHat, .z_hat = Cardinal3::kZHat};
-  absl::flat_hash_set<int> positioned = {0};
-  while (positioned.size() < scanners.size()) {
-    absl::flat_hash_set<int> new_positioned = positioned;
-    for (int i = 0; i < scanners.size(); ++i) {
-      if (positioned.contains(i)) continue;
-      for (int p_idx : positioned) {
-        VLOG(2) << "Trying " << i << " with " << p_idx;
-        if (TryPosition(&scanners[i], scanners[p_idx])) {
-          VLOG(1) << "Collapsed " << i << " with " << p_idx;
-          new_positioned.insert(i);
-          break;
-        }
-      }
-    }
-    if (new_positioned.size() == positioned.size()) {
-      return Error("Cannot add more positioning");
-    }
-    positioned = std::move(new_positioned);
-  }
+  if (auto st = PositionScanners(*scanners); !st.ok()) return st;
 
   int max_dist = 0;
-  for (int i = 0; i < scanners.size(); ++i) {
-    for (int j = i + 1; j < scanners.size(); ++j) {
-      int dist = (scanners[i].absolute - scanners[j].absolute).dist();
+  for (int i = 0; i < scanners->size(); ++i) {
+    for (int j = i + 1; j < scanners->size(); ++j) {
+      int dist = ((*scanners)[i].absolute - (*scanners)[j].absolute).dist();
       max_dist = std::max(max_dist, dist);
     }
   }
