@@ -17,18 +17,17 @@ namespace {
 
 class Orientation {
  public:
-  static Orientation Aligned() {
-    return Orientation();
-  }
+  static Orientation Aligned() { return Orientation(); }
 
   static const std::vector<Orientation>& All();
 
   Orientation()
-   : x_hat_(Cardinal3::kXHat), y_hat_(Cardinal3::kYHat), 
-     z_hat_(Cardinal3::kZHat) {}
+      : x_hat_(Cardinal3::kXHat),
+        y_hat_(Cardinal3::kYHat),
+        z_hat_(Cardinal3::kZHat) {}
 
   Orientation(Point3 x_hat, Point3 y_hat)
-   : x_hat_(x_hat), y_hat_(y_hat), z_hat_(x_hat.Cross(y_hat)) {}
+      : x_hat_(x_hat), y_hat_(y_hat), z_hat_(x_hat.Cross(y_hat)) {}
 
   Point3 Apply(Point3 in) const {
     return in.x * x_hat_ + in.y * y_hat_ + in.z * z_hat_;
@@ -66,9 +65,7 @@ struct Scanner {
   Point3 absolute;
   Orientation o;
 
-  Point3 RelativeToAbsolute(Point3 in) const {
-    return absolute + o.Apply(in);
-  }
+  Point3 RelativeToAbsolute(Point3 in) const { return absolute + o.Apply(in); }
 };
 
 int CountOverlap(const Scanner& l, const Scanner& r) {
@@ -112,7 +109,8 @@ bool TryPosition(Scanner* dest, const Scanner& src) {
   return false;
 }
 
-absl::StatusOr<std::vector<Scanner>> Parse(absl::Span<absl::string_view> input) {
+absl::StatusOr<std::vector<Scanner>> Parse(
+    absl::Span<absl::string_view> input) {
   std::vector<Scanner> scanners;
   Scanner cur;
   for (absl::string_view line : input) {
@@ -121,7 +119,8 @@ absl::StatusOr<std::vector<Scanner>> Parse(absl::Span<absl::string_view> input) 
     if (RE2::FullMatch(line, "--- scanner \\d+ ---")) {
       if (!cur.relative_beacons.empty()) scanners.push_back(cur);
       cur.relative_beacons.clear();
-    } else if (RE2::FullMatch(line, "(-?\\d+,-?\\d+,-?\\d+)", beacon.Capture())) {
+    } else if (RE2::FullMatch(line, "(-?\\d+,-?\\d+,-?\\d+)",
+                              beacon.Capture())) {
       cur.relative_beacons.push_back(beacon);
     } else {
       return Error("Bad line: ", line);

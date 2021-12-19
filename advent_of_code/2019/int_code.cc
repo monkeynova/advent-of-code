@@ -288,9 +288,9 @@ absl::Status IntCode::RunSingleOpcode(InputSource* input, OutputSink* output) {
       return absl::InvalidArgumentError(absl::StrCat(
           "Invalid instruction (@", code_pos_, "): ", codes_[code_pos_]));
     }
-    if (!jumped) {
-      code_pos_ += CodeTypes()[opcode].size;
-    }
+      if (!jumped) {
+        code_pos_ += CodeTypes()[opcode].size;
+      }
   }
 
   if (!jumped) {

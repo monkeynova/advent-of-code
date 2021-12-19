@@ -181,10 +181,10 @@ struct Point3 {
 
   constexpr Point3 Cross(const Point3& o) const {
     return {
-      y * o.z - z * o.y,
-      z * o.x - x * o.z,
-      x * o.y - y * o.x,
-    };    
+        y * o.z - z * o.y,
+        z * o.x - x * o.z,
+        x * o.y - y * o.x,
+    };
   }
 
   constexpr bool operator==(const Point3& other) const {
