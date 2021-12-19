@@ -30,7 +30,7 @@ void RunTestCase(absl::string_view test_case_with_options,
   std::string test_case = std::string(test_case_with_options);
   if (absl::Status st = options.ParseTestCaseOptions(&test_case); !st.ok()) {
     test_result->AddTestOutput(
-        absl::StrCat("ERROR: Could not parse options: ", st.message()));
+        absl::StrCat("ERROR: Could not parse options: ", st.ToString()));
     return;
   }
 
@@ -41,7 +41,7 @@ void RunTestCase(absl::string_view test_case_with_options,
   absl::StatusOr<IntCode> codes = IntCode::Parse(absl::MakeSpan(test_lines));
   if (!codes.ok()) {
     test_result->AddTestOutput(absl::StrCat("ERROR: Cannot parse Intcode: ",
-                                            codes.status().message()));
+                                            codes.status().ToString()));
     return;
   }
   std::vector<absl::string_view> input_str =
@@ -59,7 +59,7 @@ void RunTestCase(absl::string_view test_case_with_options,
   std::vector<int64_t> output;
   if (absl::Status st = codes->Run(input, &output); !st.ok()) {
     test_result->AddTestOutput(
-        absl::StrCat("ERROR: Could not run code: ", st.message()));
+        absl::StrCat("ERROR: Could not run code: ", st.ToString()));
     return;
   }
   for (int outvar : output) {

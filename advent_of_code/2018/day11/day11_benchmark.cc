@@ -11,7 +11,7 @@ constexpr int kMaxTestCount = 6;
 TEST(DayBenchmarkTest_2018_11, Consistency) {
   Day_2018_11 day;
   absl::StatusOr<int> test_count = FileBenchmarkTestCount(&day);
-  ASSERT_TRUE(test_count.ok()) << test_count.status().message();
+  ASSERT_TRUE(test_count.ok()) << test_count.status().ToString();
   EXPECT_EQ(kMaxTestCount, *test_count);
 }
 

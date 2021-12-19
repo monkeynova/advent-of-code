@@ -164,7 +164,7 @@ absl::StatusOr<std::string> Day_2021_08::Part2(
     absl::StatusOr<absl::flat_hash_map<char, char>> map =
         FindMap(absl::StrSplit(exemplars, " "));
     if (!map.ok()) {
-      return Error("Could not make map ", map.status().message(), " for ",
+      return Error("Could not make map ", map.status().ToString(), " for ",
                    exemplars);
     }
     int64_t decode_val = 0;

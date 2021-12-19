@@ -65,7 +65,7 @@ absl::Status HandleTestIncludes(std::string* test_case) {
     if (absl::Status st = GetContents(absl::StrCat(include_fname), &contents);
         !st.ok()) {
       return absl::InvalidArgumentError(absl::StrCat(
-          "Unable to include file \"", include_fname, "\": ", st.message()));
+          "Unable to include file \"", include_fname, "\": ", st.ToString()));
       return st;
     }
     *test_case = absl::StrReplaceAll(

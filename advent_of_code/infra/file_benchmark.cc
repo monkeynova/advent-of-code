@@ -79,7 +79,7 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
   absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>> tests =
       FileBenchmarkTests(day->test_file());
   if (!tests.ok()) {
-    return BM_Day_SetError(state, tests.status().message());
+    return BM_Day_SetError(state, tests.status().ToString());
   }
   if (state.range(0) >= tests->size()) {
     return BM_Day_SetError(state, "Bad test");
@@ -102,7 +102,7 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
     absl::StatusOr<absl::Duration> long_duration =
         ParseLongTestDuration(long_option);
     if (!long_duration.ok()) {
-      return BM_Day_SetError(state, long_duration.status().message());
+      return BM_Day_SetError(state, long_duration.status().ToString());
     }
     if (absl::GetFlag(FLAGS_run_long_tests) < *long_duration) {
       state.SetLabel(absl::StrCat(
@@ -119,7 +119,7 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
       for (auto _ : state) {
         absl::StatusOr<std::string> st = day->Part1(lines_span);
         if (!st.ok()) {
-          return BM_Day_SetError(state, st.status().message());
+          return BM_Day_SetError(state, st.status().ToString());
         }
       }
       break;
@@ -128,7 +128,7 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
       for (auto _ : state) {
         absl::StatusOr<std::string> st = day->Part2(lines_span);
         if (!st.ok()) {
-          return BM_Day_SetError(state, st.status().message());
+          return BM_Day_SetError(state, st.status().ToString());
         }
       }
       break;

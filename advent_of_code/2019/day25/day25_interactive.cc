@@ -48,16 +48,16 @@ int RunInteractive(int argc, char** argv) {
 
   std::string data;
   if (absl::Status st = GetContents(args[1], &data); !st.ok()) {
-    LOG(FATAL) << st.message();
+    LOG(FATAL) << st.ToString();
   }
 
   std::vector<absl::string_view> tmp = {absl::string_view(data)};
   absl::StatusOr<IntCode> codes = IntCode::Parse(absl::MakeSpan(tmp));
-  if (!codes.ok()) LOG(FATAL) << codes.status().message();
+  if (!codes.ok()) LOG(FATAL) << codes.status().ToString();
 
   Terminal t;
   if (absl::Status st = codes->Run(&t); !st.ok()) {
-    LOG(FATAL) << st.message();
+    LOG(FATAL) << st.ToString();
   }
   return 0;
 }
