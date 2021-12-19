@@ -15,17 +15,36 @@ namespace advent_of_code {
 
 namespace {
 
-struct Orientation {
-  Point3 x_hat;
-  Point3 y_hat;
-  Point3 z_hat;
+class Orientation {
+ public:
+  static Orientation Aligned() {
+    return Orientation();
+  }
+
+  static const std::vector<Orientation>& All();
+
+  Orientation()
+   : x_hat_(Cardinal3::kXHat), y_hat_(Cardinal3::kYHat), 
+     z_hat_(Cardinal3::kZHat) {}
+
+  Orientation(Point3 x_hat, Point3 y_hat)
+   : x_hat_(x_hat), y_hat_(y_hat), z_hat_(x_hat.Cross(y_hat)) {}
 
   Point3 Apply(Point3 in) const {
-    return in.x * x_hat + in.y * y_hat + in.z * z_hat;
+    return in.x * x_hat_ + in.y * y_hat_ + in.z * z_hat_;
   }
+
+  friend std::ostream& operator<<(std::ostream& out, const Orientation& o) {
+    return out << o.x_hat_ << "/" << o.y_hat_ << "/" << o.z_hat_;
+  }
+
+ private:
+  Point3 x_hat_;
+  Point3 y_hat_;
+  Point3 z_hat_;
 };
 
-const std::vector<Orientation>& AllOrientations() {
+const std::vector<Orientation>& Orientation::All() {
   static std::vector<Orientation> kMemo;
   if (!kMemo.empty()) return kMemo;
 
@@ -35,7 +54,7 @@ const std::vector<Orientation>& AllOrientations() {
       if (y_hat.dist() != 1) continue;
       if (y_hat == x_hat) continue;
       if (y_hat == -x_hat) continue;
-      kMemo.push_back({x_hat, y_hat, x_hat.Cross(y_hat)});
+      kMemo.push_back(Orientation(x_hat, y_hat));
     }
   }
   CHECK_EQ(kMemo.size(), 24);
@@ -67,15 +86,14 @@ int CountOverlap(const Scanner& l, const Scanner& r) {
 }
 
 bool TryPosition(Scanner* dest, const Scanner& src) {
-  for (const Orientation& o : AllOrientations()) {
+  for (const Orientation& o : Orientation::All()) {
     dest->o = o;
-    VLOG(2) << "Trying o=" << o.x_hat << "/" << o.y_hat << "/" << o.z_hat;
+    VLOG(2) << "Trying o=" << o;
     absl::flat_hash_map<Point3, int> try_absolute_counts;
     for (Point3 r_p1 : src.relative_beacons) {
       Point3 a_p1 = src.RelativeToAbsolute(r_p1);
       VLOG(2) << "Src: " << r_p1 << " -> " << a_p1;
       for (Point3 r_p2 : dest->relative_beacons) {
-        // a_p1 == a_p2
         // RelativeToAbsolute:
         // a_p2 = dest->absolute + o.Apply(r_p2)
         Point3 test_absolute = a_p1 - o.Apply(r_p2);
@@ -115,7 +133,7 @@ absl::StatusOr<std::vector<Scanner>> Parse(absl::Span<absl::string_view> input) 
 
 absl::Status PositionScanners(std::vector<Scanner>& scanners) {
   scanners[0].absolute = Point3{0, 0, 0};
-  scanners[0].o = {.x_hat = Cardinal3::kXHat, .y_hat = Cardinal3::kYHat, .z_hat = Cardinal3::kZHat};
+  scanners[0].o = Orientation::Aligned();
   absl::flat_hash_set<int> positioned = {0};
   while (positioned.size() < scanners.size()) {
     absl::flat_hash_set<int> new_positioned = positioned;
