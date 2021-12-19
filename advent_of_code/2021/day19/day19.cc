@@ -73,6 +73,7 @@ bool TryPosition(Scanner* dest, const Scanner& src) {
   for (const Orientation& o : AllOrientations()) {
     dest->o = o;
     VLOG(2) << "Trying o=" << o.x_hat << "/" << o.y_hat << "/" << o.z_hat;
+    absl::flat_hash_map<Point3, int> try_absolute_counts;
     for (Point3 r_p1 : src.relative_beacons) {
       Point3 a_p1 = src.RelativeToAbsolute(r_p1);
       VLOG(2) << "Src: " << r_p1 << " -> " << a_p1;
@@ -80,12 +81,16 @@ bool TryPosition(Scanner* dest, const Scanner& src) {
         // a_p1 == a_p2
         // a_p2 = dest->absolute + r_p2.x * o.x_hat + r_p2.y * o.y_hat + r_p2.z * o.z_hat
         // (a_p1 - r_p2.x * o.x_hat + r_p2.y * o.y_hat + r_p2.z * o.z_hat) = dest->absolute
-        dest->absolute = a_p1 - r_p2.x * o.x_hat - r_p2.y * o.y_hat - r_p2.z * o.z_hat;
-        Point3 a_p2 = src.RelativeToAbsolute(r_p2);
+        Point3 a_p2 = a_p1 - r_p2.x * o.x_hat - r_p2.y * o.y_hat - r_p2.z * o.z_hat;
         VLOG(2) << "Dst: " << r_p2 << " -> " << a_p2;
-        if (CountOverlap(*dest, src) >= 12) {
-          return true;
-        }
+        ++try_absolute_counts[a_p2];
+      }
+    }
+    for (const auto& [p, c] : try_absolute_counts) {
+      if (c < 12) continue;
+      dest->absolute = p;
+      if (CountOverlap(*dest, src) >= 12) {
+        return true;
       }
     }
   }
