@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "absl/status/status.h"
+#include "absl/status/statusor.h"
 #include "absl/strings/str_join.h"
 #include "advent_of_code/point.h"
 #include "glog/logging.h"

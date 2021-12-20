@@ -7,6 +7,7 @@
 
 #include "absl/hash/hash.h"
 #include "absl/strings/str_cat.h"
+#include "absl/strings/str_split.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {

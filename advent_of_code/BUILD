@@ -61,6 +61,23 @@ cc_library(
     deps = [
         ":point",
         "@com_google_absl//absl/status",
+        "@com_google_absl//absl/status:statusor",
+        "@com_google_absl//absl/strings",
+        "@com_google_glog//:glog",
+    ],
+)
+
+cc_library(
+    name = "conway",
+    hdrs = ["conway.h"],
+    srcs = ["conway.cc"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        ":char_board",
+        ":point",
+        "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
         "@com_google_glog//:glog",
     ],
