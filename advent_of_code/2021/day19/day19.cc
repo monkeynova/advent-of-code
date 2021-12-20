@@ -84,7 +84,7 @@ int CountOverlap(const Scanner& l, const Scanner& r) {
     if (absolute_beacons.contains(a_b)) {
       found_both.insert(a_b);
     } else {
-      if (max_dist(a_b - l.absolute) <= 1000) { 
+      if (max_dist(a_b - l.absolute) <= 1000) {
         ++visible_l_in_r;
       }
     }
@@ -97,7 +97,7 @@ int CountOverlap(const Scanner& l, const Scanner& r) {
     int visible_r_in_l = 0;
     for (Point3 a_b : absolute_beacons) {
       if (found_both.contains(a_b)) continue;
-      if (max_dist(a_b - r.absolute) <= 1000) { 
+      if (max_dist(a_b - r.absolute) <= 1000) {
         ++visible_r_in_l;
       }
     }

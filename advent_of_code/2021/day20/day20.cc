@@ -16,18 +16,23 @@ namespace advent_of_code {
 
 namespace {
 
-absl::StatusOr<CharBoard> Enhance(const CharBoard& b, absl::string_view lookup, char fill) {
+absl::StatusOr<CharBoard> Enhance(const CharBoard& b, absl::string_view lookup,
+                                  char fill) {
   CharBoard new_b(b.width() + 2, b.height() + 2);
   for (Point p : new_b.range()) {
     int bv = 0;
-    for (Point d : {Cardinal::kNorthWest, Cardinal::kNorth, Cardinal::kNorthEast,
-                    Cardinal::kWest, Cardinal::kOrigin, Cardinal::kEast,
-                    Cardinal::kSouthWest, Cardinal::kSouth, Cardinal::kSouthEast}) {      
+    for (Point d :
+         {Cardinal::kNorthWest, Cardinal::kNorth, Cardinal::kNorthEast,
+          Cardinal::kWest, Cardinal::kOrigin, Cardinal::kEast,
+          Cardinal::kSouthWest, Cardinal::kSouth, Cardinal::kSouthEast}) {
       Point src = p + Cardinal::kNorthWest + d;
       bv *= 2;
       char src_val = b.OnBoard(src) ? b[src] : fill;
-      if (src_val == '#') ++bv;
-      else if (src_val != '.') return Error("Bad board");
+      if (src_val == '#') {
+        ++bv;
+      } else if (src_val != '.') {
+        return Error("Bad board");
+      }
     }
     if (bv >= lookup.size()) return Error("Bad lookup size");
     new_b[p] = lookup[bv];
@@ -35,14 +40,16 @@ absl::StatusOr<CharBoard> Enhance(const CharBoard& b, absl::string_view lookup, 
   return new_b;
 }
 
-absl::StatusOr<CharBoard> EnhanceNTimes(const CharBoard& b, absl::string_view lookup, int count) {
+absl::StatusOr<CharBoard> EnhanceNTimes(const CharBoard& b,
+                                        absl::string_view lookup, int count) {
   absl::StatusOr<CharBoard> ret = b;
   char fill = '.';
   for (int i = 0; i < count; ++i) {
     ret = Enhance(*ret, lookup, fill);
     if (!ret.ok()) return ret.status();
-    if (fill == '.') fill = lookup[0];
-    else {
+    if (fill == '.') {
+      fill = lookup[0];
+    } else {
       if (fill != '#') return Error("Bad board");
       fill = lookup[511];
     }

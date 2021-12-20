@@ -37,7 +37,7 @@ class CharBoard {
       for (char c : r) {
         if (c == test) ++count;
       }
-    } 
+    }
     return count;
   }
 
