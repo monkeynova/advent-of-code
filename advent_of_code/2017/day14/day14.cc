@@ -89,11 +89,7 @@ absl::StatusOr<std::string> Day_2017_14::Part1(
   absl::StatusOr<CharBoard> board = BuildBoard(input[0]);
   if (!board.ok()) return board.status();
   VLOG(1) << "Board:\n" << *board;
-  int count = 0;
-  for (Point p : board->range()) {
-    if ((*board)[p] == '.') ++count;
-  }
-  return IntReturn(count);
+  return IntReturn(board->CountChar('.'));
 }
 
 absl::StatusOr<std::string> Day_2017_14::Part2(
