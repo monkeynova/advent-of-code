@@ -54,6 +54,9 @@ absl::StatusOr<CharBoard> EnhanceNTimes(const CharBoard& b,
       fill = lookup[511];
     }
   }
+  if (fill != '.') {
+    return absl::UnimplementedError("Can't return a board with non-'.' fill");
+  }
   return ret;
 }
 
