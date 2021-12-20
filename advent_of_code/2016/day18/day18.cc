@@ -40,11 +40,7 @@ absl::StatusOr<std::string> Day_2016_18::Part1(
     }
   }
   LOG(INFO) << "Board:\n" << b;
-  int safe_count = 0;
-  for (Point p : b.range()) {
-    if (b[p] == '.') ++safe_count;
-  }
-  return IntReturn(safe_count);
+  return IntReturn(b.CountChar('.'));
 }
 
 absl::StatusOr<std::string> Day_2016_18::Part2(
@@ -69,11 +65,7 @@ absl::StatusOr<std::string> Day_2016_18::Part2(
     }
   }
   VLOG(2) << "Board:\n" << b;
-  int safe_count = 0;
-  for (Point p : b.range()) {
-    if (b[p] == '.') ++safe_count;
-  }
-  return IntReturn(safe_count);
+  return IntReturn(b.CountChar('.'));
 }
 
 }  // namespace advent_of_code

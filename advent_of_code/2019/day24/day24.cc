@@ -253,9 +253,7 @@ std::string DebugBoards(absl::flat_hash_map<int, CharBoard> depth_to_board) {
 int64_t CountBugs(absl::flat_hash_map<int, CharBoard> depth_to_board) {
   int64_t bugs = 0;
   for (const auto& pair : depth_to_board) {
-    for (Point p : pair.second.range()) {
-      if (pair.second[p] == '#') ++bugs;
-    }
+    bugs += pair.second.CountOn();
   }
   return bugs;
 }
