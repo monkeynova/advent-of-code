@@ -42,7 +42,7 @@ class CharBoard {
   }
 
   int height() const { return rows_.size(); }
-  int width() const { return rows_[0].size(); }
+  int width() const { return rows_.empty() ? 0 : rows_[0].size(); }
 
   PointRectangle range() const {
     return PointRectangle{.min = {.x = 0, .y = 0},
