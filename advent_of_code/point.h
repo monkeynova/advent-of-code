@@ -187,6 +187,10 @@ struct Point3 {
     };
   }
 
+  constexpr int Dot(const Point3& o) const {
+    return x * o.x + y * o.y + z * o.z;
+  }
+
   constexpr bool operator==(const Point3& other) const {
     return x == other.x && y == other.y && z == other.z;
   }

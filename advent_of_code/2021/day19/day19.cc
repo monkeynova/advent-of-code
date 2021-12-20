@@ -15,25 +15,29 @@ namespace advent_of_code {
 
 namespace {
 
-class Orientation {
+class Orientation3 {
  public:
-  static Orientation Aligned() { return Orientation(); }
+  static Orientation3 Aligned() { return Orientation3(); }
 
-  static const std::vector<Orientation>& All();
+  static const std::vector<Orientation3>& All();
 
-  Orientation()
-      : x_hat_(Cardinal3::kXHat),
-        y_hat_(Cardinal3::kYHat),
-        z_hat_(Cardinal3::kZHat) {}
+  Orientation3() : Orientation3(Cardinal3::kXHat, Cardinal3::kYHat) {}
 
-  Orientation(Point3 x_hat, Point3 y_hat)
-      : x_hat_(x_hat), y_hat_(y_hat), z_hat_(x_hat.Cross(y_hat)) {}
+  Orientation3(Point3 x_hat, Point3 y_hat)
+      : x_hat_(x_hat), y_hat_(y_hat), z_hat_(x_hat.Cross(y_hat)) {
+    CHECK_EQ(x_hat_.dist(), 1);
+    CHECK_EQ(y_hat_.dist(), 1);
+    CHECK_EQ(z_hat_.dist(), 1);
+    CHECK_EQ(x_hat_.Dot(y_hat_), 0);
+    CHECK_EQ(x_hat_.Dot(z_hat_), 0);
+    CHECK_EQ(y_hat_.Dot(z_hat_), 0);
+  }
 
   Point3 Apply(Point3 in) const {
     return in.x * x_hat_ + in.y * y_hat_ + in.z * z_hat_;
   }
 
-  friend std::ostream& operator<<(std::ostream& out, const Orientation& o) {
+  friend std::ostream& operator<<(std::ostream& out, const Orientation3& o) {
     return out << o.x_hat_ << "/" << o.y_hat_ << "/" << o.z_hat_;
   }
 
@@ -43,8 +47,8 @@ class Orientation {
   Point3 z_hat_;
 };
 
-const std::vector<Orientation>& Orientation::All() {
-  static std::vector<Orientation> kMemo;
+const std::vector<Orientation3>& Orientation3::All() {
+  static std::vector<Orientation3> kMemo;
   if (!kMemo.empty()) return kMemo;
 
   for (Point3 x_hat : Cardinal3::kNeighborDirs) {
@@ -53,7 +57,7 @@ const std::vector<Orientation>& Orientation::All() {
       if (y_hat.dist() != 1) continue;
       if (y_hat == x_hat) continue;
       if (y_hat == -x_hat) continue;
-      kMemo.push_back(Orientation(x_hat, y_hat));
+      kMemo.push_back(Orientation3(x_hat, y_hat));
     }
   }
   CHECK_EQ(kMemo.size(), 24);
@@ -63,7 +67,7 @@ const std::vector<Orientation>& Orientation::All() {
 struct Scanner {
   std::vector<Point3> relative_beacons;
   Point3 absolute;
-  Orientation o;
+  Orientation3 o;
 
   Point3 RelativeToAbsolute(Point3 in) const { return absolute + o.Apply(in); }
 };
@@ -107,7 +111,7 @@ int CountOverlap(const Scanner& l, const Scanner& r) {
 }
 
 bool TryPosition(Scanner* dest, const Scanner& src) {
-  for (const Orientation& o : Orientation::All()) {
+  for (const Orientation3& o : Orientation3::All()) {
     dest->o = o;
     VLOG(2) << "Trying o=" << o;
     absl::flat_hash_map<Point3, int> try_absolute_counts;
@@ -156,7 +160,7 @@ absl::StatusOr<std::vector<Scanner>> Parse(
 
 absl::Status PositionScanners(std::vector<Scanner>& scanners) {
   scanners[0].absolute = Point3{0, 0, 0};
-  scanners[0].o = Orientation::Aligned();
+  scanners[0].o = Orientation3::Aligned();
   absl::flat_hash_set<int> positioned = {0};
   absl::flat_hash_map<int, absl::flat_hash_set<int>> attempted;
   while (positioned.size() < scanners.size()) {
