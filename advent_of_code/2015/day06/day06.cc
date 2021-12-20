@@ -12,19 +12,6 @@
 #include "re2/re2.h"
 
 namespace advent_of_code {
-namespace {
-
-int CountOn(const CharBoard& board) {
-  int lit = 0;
-  VLOG(1) << "CountOn: " << board.range();
-  for (const Point p : board.range()) {
-    VLOG(2) << "CountOn: " << p << ": " << board[p];
-    if (board[p] == '#') ++lit;
-  }
-  return lit;
-}
-
-}  // namespace
 
 absl::StatusOr<std::string> Day_2015_06::Part1(
     absl::Span<absl::string_view> input) const {
@@ -56,10 +43,10 @@ absl::StatusOr<std::string> Day_2015_06::Part1(
     } else {
       return absl::InvalidArgumentError(absl::StrCat("Bad instruction: ", str));
     }
-    VLOG(1) << "  on: " << CountOn(yard);
+    VLOG(1) << "  on: " << yard.CountOn();
   }
 
-  return IntReturn(CountOn(yard));
+  return IntReturn(yard.CountOn());
 }
 
 absl::StatusOr<std::string> Day_2015_06::Part2(

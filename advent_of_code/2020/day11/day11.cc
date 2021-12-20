@@ -32,14 +32,6 @@ CharBoard Update(CharBoard in) {
   return out;
 }
 
-int CountSeats(CharBoard b) {
-  int count = 0;
-  for (Point c : b.range()) {
-    if (b[c] == '#') ++count;
-  }
-  return count;
-}
-
 using VisMap = absl::flat_hash_map<std::pair<Point, Point>, Point>;
 
 VisMap ComputeVismap(CharBoard in) {
@@ -96,7 +88,7 @@ absl::StatusOr<std::string> Day_2020_11::Part1(
     if (next == cur) break;
     cur = next;
   }
-  return IntReturn(CountSeats(cur));
+  return IntReturn(cur.CountOn());
 }
 
 absl::StatusOr<std::string> Day_2020_11::Part2(
@@ -112,7 +104,7 @@ absl::StatusOr<std::string> Day_2020_11::Part2(
     if (next == cur) break;
     cur = next;
   }
-  return IntReturn(CountSeats(cur));
+  return IntReturn(cur.CountOn());
 }
 
 }  // namespace advent_of_code

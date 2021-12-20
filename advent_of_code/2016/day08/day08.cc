@@ -49,11 +49,7 @@ absl::StatusOr<std::string> Day_2016_08::Part1(
     VLOG(1) << "Board:\n" << display;
   }
   LOG(INFO) << "Board:\n" << display;
-  int count = 0;
-  for (Point p : display.range()) {
-    if (display[p] == '#') ++count;
-  }
-  return IntReturn(count);
+  return IntReturn(display.CountOn());
 }
 
 absl::StatusOr<std::string> Day_2016_08::Part2(

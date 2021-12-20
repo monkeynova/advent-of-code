@@ -62,12 +62,8 @@ absl::StatusOr<std::string> Day_2018_18::Part1(
     VLOG(1) << "Step [" << i << "]:\n" << step;
     step = Update(step);
   }
-  int trees = 0;
-  int lumber = 0;
-  for (Point p : step.range()) {
-    if (step[p] == '|') ++trees;
-    if (step[p] == '#') ++lumber;
-  }
+  int trees = step.CountChar('|');
+  int lumber = step.CountChar('#');
   return IntReturn(trees * lumber);
 }
 
@@ -99,12 +95,8 @@ absl::StatusOr<std::string> Day_2018_18::Part2(
     VLOG(1) << "Step [" << i << "]:\n" << step;
     step = Update(step);
   }
-  int trees = 0;
-  int lumber = 0;
-  for (Point p : step.range()) {
-    if (step[p] == '|') ++trees;
-    if (step[p] == '#') ++lumber;
-  }
+  int trees = step.CountChar('|');
+  int lumber = step.CountChar('#');
   return IntReturn(trees * lumber);
 }
 

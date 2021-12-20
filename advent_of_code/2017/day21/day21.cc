@@ -138,11 +138,7 @@ absl::StatusOr<std::string> Day_2017_21::Part1(
     VLOG(1) << "tmp=\n" << *tmp;
   }
 
-  int count = 0;
-  for (Point p : tmp->range())
-    if ((*tmp)[p] == '#') ++count;
-
-  return IntReturn(count);
+  return IntReturn(tmp->CountOn());
 }
 
 absl::StatusOr<std::string> Day_2017_21::Part2(
@@ -163,11 +159,7 @@ absl::StatusOr<std::string> Day_2017_21::Part2(
     VLOG(1) << "tmp=\n" << *tmp;
   }
 
-  int count = 0;
-  for (Point p : tmp->range())
-    if ((*tmp)[p] == '#') ++count;
-
-  return IntReturn(count);
+  return IntReturn(tmp->CountOn());
 }
 
 }  // namespace advent_of_code

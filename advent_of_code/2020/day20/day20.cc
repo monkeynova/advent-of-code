@@ -369,10 +369,7 @@ bool IsSeaMonster(const CharBoard& board, Point p) {
 
 absl::StatusOr<int> CountNonSeaMonster(const CharBoard& board) {
   const int kSeaMonsterOn = 15;
-  int on = 0;
-  for (Point p : board.range()) {
-    if (board[p] == '#') ++on;
-  }
+  int on = board.CountOn();
   absl::optional<int> sea_monster_count;
   for (std::function<Point(Point)> t : Transforms(board.range())) {
     CharBoard tmp = Transform(board, t);
