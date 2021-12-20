@@ -10,8 +10,8 @@
 35
 ==
 
-# 5456
-# 5565
+# 5456 (South->SouthWest in neighbors; also missing fill)
+# 5565 (Missing fill)
 [part=1]
 @include{advent_of_code/2021/day20/input.txt}
 --
