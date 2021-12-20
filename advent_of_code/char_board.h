@@ -64,12 +64,19 @@ class CharBoard {
     return true;
   }
 
-  CharBoard SubBoard(PointRectangle sub_range) const {
-    // TODO(@monkeynova): Just string-copy ranges in.
-    CharBoard out(sub_range.max.x - sub_range.min.x + 1,
-                  sub_range.max.y - sub_range.min.y + 1);
-    for (Point p : sub_range) {
-      out[p - sub_range.min] = at(p);
+  absl::StatusOr<CharBoard> SubBoard(PointRectangle sub_range) const {
+    if (!OnBoard(sub_range.min)) {
+      return absl::InvalidArgumentError("SubBoard: min not on board");
+    }
+    if (!OnBoard(sub_range.max)) {
+      return absl::InvalidArgumentError("SubBoard: max not on board");
+    }
+    CharBoard out(0, 0);
+    int sub_off = sub_range.min.x;
+    int sub_len = sub_range.max.x - sub_range.min.x + 1;
+    out.rows_.resize(sub_range.max.y - sub_range.min.y + 1);
+    for (int i = sub_range.min.y; i <= sub_range.max.y; ++i) {
+      out.rows_[i - sub_range.min.y] = rows_[i].substr(sub_off, sub_len);
     }
     return out;
   }

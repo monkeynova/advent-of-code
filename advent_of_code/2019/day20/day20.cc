@@ -33,7 +33,9 @@ class Maze {
     range.max -= Point{2, 2};
 
     Maze ret(with_portals->width() - 4, with_portals->height() - 4);
-    ret.board_ = with_portals->SubBoard(range);
+    absl::StatusOr<CharBoard> sub_board = with_portals->SubBoard(range);
+    if (!sub_board.ok()) return sub_board.status();
+    ret.board_ = std::move(*sub_board);
     for (Point p : range) {
       if (with_portals->at(p) == '.') {
         if (IsCapAlpha(with_portals->at(p + Point{0, -1}))) {

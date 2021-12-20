@@ -79,10 +79,11 @@ absl::StatusOr<CharBoard> RunIteration(
     for (int x = 0; x < in.width() / stride.x; ++x) {
       Point slice_at = {x * stride.x, y * stride.y};
       VLOG(2) << "Slice @" << slice_at;
-      CharBoard slice = in.SubBoard(
+      absl::StatusOr<CharBoard> slice = in.SubBoard(
           PointRectangle{slice_at, slice_at + stride - Point{1, 1}});
-      VLOG(2) << "Slice:\n" << slice;
-      absl::StatusOr<CharBoard> new_slice = FindPattern(slice, patterns);
+      if (!slice.ok()) return slice.status();
+      VLOG(2) << "Slice:\n" << *slice;
+      absl::StatusOr<CharBoard> new_slice = FindPattern(*slice, patterns);
       if (!new_slice.ok()) return new_slice.status();
       if (new_slice->width() != stride.x + 1) return Error("Bad pattern: x");
       if (new_slice->height() != stride.y + 1) return Error("Bad pattern: y");
