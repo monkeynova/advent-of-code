@@ -30,6 +30,17 @@ class CharBoard {
   CharBoard(const CharBoard&) = default;
   CharBoard& operator=(const CharBoard&) = default;
 
+  int CountOn() const { return CountChar('#'); }
+  int CountChar(char test) const {
+    int count = 0;
+    for (const auto& r : rows_) {
+      for (char c : r) {
+        if (c == test) ++count;
+      }
+    } 
+    return count;
+  }
+
   int height() const { return rows_.size(); }
   int width() const { return rows_[0].size(); }
 
