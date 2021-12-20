@@ -16,9 +16,30 @@ namespace advent_of_code {
 
 namespace {
 
-absl::StatusOr<CharBoard> Enhance(const CharBoard& b, absl::string_view lookup,
-                                  char fill) {
-  CharBoard new_b(b.width() + 2, b.height() + 2);
+class Conway {
+ public:
+  Conway(CharBoard b, std::string lookup, char fill = '.')
+   : b_(std::move(b)), lookup_(std::move(lookup)), fill_(fill) {}
+
+ const CharBoard& board() const { return b_; }
+ char fill() const { return fill_; }
+
+ absl::Status Advance();
+ absl::Status AdvanceN(int count) {
+   for (int i = 0; i < count; ++i) {
+     if (auto st = Advance(); !st.ok()) return st;
+   }
+   return absl::OkStatus();
+ }
+
+ private:
+  CharBoard b_;
+  std::string lookup_;
+  char fill_;
+};
+
+absl::Status Conway::Advance() {
+  CharBoard new_b(b_.width() + 2, b_.height() + 2);
   for (Point p : new_b.range()) {
     int bv = 0;
     for (Point d :
@@ -27,37 +48,24 @@ absl::StatusOr<CharBoard> Enhance(const CharBoard& b, absl::string_view lookup,
           Cardinal::kSouthWest, Cardinal::kSouth, Cardinal::kSouthEast}) {
       Point src = p + Cardinal::kNorthWest + d;
       bv *= 2;
-      char src_val = b.OnBoard(src) ? b[src] : fill;
+      char src_val = b_.OnBoard(src) ? b_[src] : fill_;
       if (src_val == '#') {
         ++bv;
       } else if (src_val != '.') {
         return Error("Bad board");
       }
     }
-    if (bv >= lookup.size()) return Error("Bad lookup size");
-    new_b[p] = lookup[bv];
+    if (bv >= lookup_.size()) return Error("Bad lookup size");
+    new_b[p] = lookup_[bv];
   }
-  return new_b;
-}
-
-absl::StatusOr<CharBoard> EnhanceNTimes(const CharBoard& b,
-                                        absl::string_view lookup, int count) {
-  absl::StatusOr<CharBoard> ret = b;
-  char fill = '.';
-  for (int i = 0; i < count; ++i) {
-    ret = Enhance(*ret, lookup, fill);
-    if (!ret.ok()) return ret.status();
-    if (fill == '.') {
-      fill = lookup[0];
-    } else {
-      if (fill != '#') return Error("Bad board");
-      fill = lookup[511];
-    }
+  b_ = std::move(new_b);
+  if (fill_ == '.') {
+    fill_ = lookup_[0];
+  } else {
+    if (fill_ != '#') return Error("Bad board");
+    fill_ = lookup_[511];
   }
-  if (fill != '.') {
-    return absl::UnimplementedError("Can't return a board with non-'.' fill");
-  }
-  return ret;
+  return absl::OkStatus();
 }
 
 }  // namespace
@@ -72,9 +80,13 @@ absl::StatusOr<std::string> Day_2021_20::Part1(
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input.subspan(2));
   if (!b.ok()) return b.status();
 
-  b = EnhanceNTimes(*b, lookup, 2);
+  Conway conway(*b, std::string(lookup));
+  if (auto st = conway.AdvanceN(2); !st.ok()) return st;
+  if (conway.fill() != '.') {
+    return absl::UnimplementedError("Can't return a board with non-'.' fill");
+  }
 
-  return IntReturn(b->CountOn());
+  return IntReturn(conway.board().CountOn());
 }
 
 absl::StatusOr<std::string> Day_2021_20::Part2(
@@ -87,9 +99,13 @@ absl::StatusOr<std::string> Day_2021_20::Part2(
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input.subspan(2));
   if (!b.ok()) return b.status();
 
-  b = EnhanceNTimes(*b, lookup, 50);
+  Conway conway(*b, std::string(lookup));
+  if (auto st = conway.AdvanceN(50); !st.ok()) return st;
+  if (conway.fill() != '.') {
+    return absl::UnimplementedError("Can't return a board with non-'.' fill");
+  }
 
-  return IntReturn(b->CountOn());
+  return IntReturn(conway.board().CountOn());
 }
 
 }  // namespace advent_of_code
