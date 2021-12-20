@@ -6,88 +6,41 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
-#include "advent_of_code/char_board.h"
-#include "advent_of_code/point.h"
+#include "advent_of_code/conway.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
-namespace {
-
-CharBoard RunStep(const CharBoard& in) {
-  CharBoard out = in;
-  for (Point p : in.range()) {
-    int neighbors = 0;
-    for (Point dir : Cardinal::kEightDirs) {
-      Point n = p + dir;
-      if (in.OnBoard(n) && in[n] == '#') {
-        ++neighbors;
-      }
-    }
-    if (in[p] == '#') {
-      out[p] = neighbors == 2 || neighbors == 3 ? '#' : '.';
-    } else {
-      out[p] = neighbors == 3 ? '#' : '.';
-    }
-  }
-  return out;
-}
-
-CharBoard RunStep2(const CharBoard& in) {
-  CharBoard out = in;
-  for (Point p : in.range()) {
-    int neighbors = 0;
-    for (Point dir : Cardinal::kEightDirs) {
-      Point n = p + dir;
-      if (in.OnBoard(n) && in[n] == '#') {
-        ++neighbors;
-      }
-    }
-    if (in[p] == '#') {
-      out[p] = neighbors == 2 || neighbors == 3 ? '#' : '.';
-    } else {
-      out[p] = neighbors == 3 ? '#' : '.';
-    }
-  }
-  out[Point{0, 0}] = '#';
-  out[Point{out.width() - 1, 0}] = '#';
-  out[Point{0, out.height() - 1}] = '#';
-  out[Point{out.width() - 1, out.height() - 1}] = '#';
-  return out;
-}
-
-int CountOn(const CharBoard& in) {
-  int on = 0;
-  for (Point p : in.range()) {
-    on += in[p] == '#';
-  }
-  return on;
-}
-
-}  // namespace
 
 absl::StatusOr<std::string> Day_2015_18::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
-  CharBoard cur = *board;
-  for (int i = 0; i < 100; ++i) {
-    VLOG(1) << cur;
-    cur = RunStep(cur);
-  }
-  return IntReturn(CountOn(cur));
+
+  Conway conway(*board);
+  if (auto st = conway.AdvanceN(100); !st.ok()) return st;
+
+  return IntReturn(conway.board().CountOn());
 }
 
 absl::StatusOr<std::string> Day_2015_18::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
-  CharBoard cur = *board;
+
+  Conway conway(*board);
+  const std::array<Point, 4> kCorners = {
+    board->range().min, board->range().max,
+    {board->range().min.x, board->range().max.y},
+    {board->range().max.x, board->range().min.y},
+  };
   for (int i = 0; i < 100; ++i) {
-    VLOG(1) << cur;
-    cur = RunStep2(cur);
+    if (auto st = conway.Advance(); !st.ok()) return st;
+    for (Point p : kCorners) {
+      conway.board()[p] = '#';
+    }
   }
-  return IntReturn(CountOn(cur));
+  return IntReturn(conway.board().CountOn());
 }
 
 }  // namespace advent_of_code

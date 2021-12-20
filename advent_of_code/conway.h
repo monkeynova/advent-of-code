@@ -9,9 +9,17 @@ namespace advent_of_code {
 
 class Conway {
  public:
-  Conway(CharBoard b, std::string lookup, char fill = '.')
-   : b_(std::move(b)), lookup_(std::move(lookup)), fill_(fill) {}
+  static std::string DefaultLookup();
 
+  Conway(CharBoard b, std::string lookup = DefaultLookup())
+   : b_(std::move(b)), lookup_(std::move(lookup)) {}
+
+  void set_infinite(char fill = '.') {
+    infinite_ = true;
+    fill_ = fill;
+  }
+
+  CharBoard& board() { return b_; }
   const CharBoard& board() const { return b_; }
   char fill() const { return fill_; }
 
@@ -21,7 +29,8 @@ class Conway {
  private:
   CharBoard b_;
   std::string lookup_;
-  char fill_;
+  bool infinite_ = false;
+  char fill_ = '.';
 };
 
 }  // namespace advent_of_code

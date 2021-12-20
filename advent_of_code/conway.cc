@@ -4,15 +4,35 @@
 
 namespace advent_of_code {
 
+// static
+std::string Conway::DefaultLookup() {
+  std::string ret(512, '.');
+  for (int i = 0; i < 512; ++i) {
+    bool alive = false;
+    int neighbors = 0;
+    for (int bit = 0; bit < 9; ++bit) {
+      if (i & (1 << bit)) {
+        if (bit == 4) alive = true;
+        else ++neighbors;
+      }
+    }
+    if (neighbors == 3) ret[i] = '#';
+    else if (alive && neighbors == 2) ret[i] = '#';
+  }
+  return ret;
+}
+
 absl::Status Conway::Advance() {
-  CharBoard new_b(b_.width() + 2, b_.height() + 2);
+  Point dst_to_src = infinite_ ? Cardinal::kNorthWest : Cardinal::kOrigin;
+  int buffer = infinite_ ? 2 : 0;
+  CharBoard new_b(b_.width() + buffer, b_.height() + buffer);
   for (Point p : new_b.range()) {
     int bv = 0;
     for (Point d :
          {Cardinal::kNorthWest, Cardinal::kNorth, Cardinal::kNorthEast,
           Cardinal::kWest, Cardinal::kOrigin, Cardinal::kEast,
           Cardinal::kSouthWest, Cardinal::kSouth, Cardinal::kSouthEast}) {
-      Point src = p + Cardinal::kNorthWest + d;
+      Point src = p + d + dst_to_src;
       bv *= 2;
       char src_val = b_.OnBoard(src) ? b_[src] : fill_;
       if (src_val == '#') {
