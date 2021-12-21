@@ -12,12 +12,18 @@ std::string Conway::DefaultLookup() {
     int neighbors = 0;
     for (int bit = 0; bit < 9; ++bit) {
       if (i & (1 << bit)) {
-        if (bit == 4) alive = true;
-        else ++neighbors;
+        if (bit == 4) {
+          alive = true;
+        } else {
+          ++neighbors;
+        }
       }
     }
-    if (neighbors == 3) ret[i] = '#';
-    else if (alive && neighbors == 2) ret[i] = '#';
+    if (neighbors == 3) {
+      ret[i] = '#';
+    } else if (alive && neighbors == 2) {
+      ret[i] = '#';
+    }
   }
   return ret;
 }
@@ -52,7 +58,7 @@ absl::Status Conway::Advance() {
       if (511 >= lookup_.size()) return absl::InternalError("Bad lookup size");
       fill_ = lookup_[511];
     } else {
-      return absl::InternalError("Bad board fill");      
+      return absl::InternalError("Bad board fill");
     }
   }
   return absl::OkStatus();

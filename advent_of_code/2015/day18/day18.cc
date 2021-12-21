@@ -30,9 +30,10 @@ absl::StatusOr<std::string> Day_2015_18::Part2(
 
   Conway conway(*board);
   const std::array<Point, 4> kCorners = {
-    board->range().min, board->range().max,
-    {board->range().min.x, board->range().max.y},
-    {board->range().max.x, board->range().min.y},
+      board->range().min,
+      board->range().max,
+      {board->range().min.x, board->range().max.y},
+      {board->range().max.x, board->range().min.y},
   };
   for (int i = 0; i < 100; ++i) {
     if (auto st = conway.Advance(); !st.ok()) return st;

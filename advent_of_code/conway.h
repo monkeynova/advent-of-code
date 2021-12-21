@@ -12,7 +12,7 @@ class Conway {
   static std::string DefaultLookup();
 
   Conway(CharBoard b, std::string lookup = DefaultLookup())
-   : b_(std::move(b)), lookup_(std::move(lookup)) {}
+      : b_(std::move(b)), lookup_(std::move(lookup)) {}
 
   void set_infinite(char fill = '.') {
     infinite_ = true;

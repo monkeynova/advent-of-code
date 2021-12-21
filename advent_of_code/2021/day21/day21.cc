@@ -22,12 +22,12 @@ struct State {
 
   void SetP1Roll(int roll) {
     p1 = (p1 + roll) % 10;
-    s1 += p1 + 1;    
+    s1 += p1 + 1;
   }
 
   void SetP2Roll(int roll) {
     p2 = (p2 + roll) % 10;
-    s2 += p2 + 1;    
+    s2 += p2 + 1;
   }
 
   bool operator==(const State& o) const {
@@ -60,7 +60,10 @@ absl::StatusOr<std::string> Day_2021_21::Part1(
   }
   State game = {p1 - 1, p2 - 1, 0, 0};
   int die = -1;
-  auto roll = [&die]() { die = (die + 1) % 100; return die + 1; };
+  auto roll = [&die]() {
+    die = (die + 1) % 100;
+    return die + 1;
+  };
   for (int turn = 1; true; turn += 2) {
     game.SetP1Roll(roll() + roll() + roll());
     VLOG(2) << game;
@@ -91,11 +94,11 @@ absl::StatusOr<std::string> Day_2021_21::Part2(
   int64_t p2_wins = 0;
 
   const absl::flat_hash_map<int, int> kRollToFrequency = {
-    {3, 1}, {4, 3}, {5, 6}, {6, 7}, {7, 6}, {8, 3}, {9, 1},
+      {3, 1}, {4, 3}, {5, 6}, {6, 7}, {7, 6}, {8, 3}, {9, 1},
   };
 
   absl::flat_hash_map<State, int64_t> state_map = {
-    {{p1 - 1, p2 - 1, 0, 0}, 1},
+      {{p1 - 1, p2 - 1, 0, 0}, 1},
   };
   while (!state_map.empty()) {
     absl::flat_hash_map<State, int64_t> new_state_map;

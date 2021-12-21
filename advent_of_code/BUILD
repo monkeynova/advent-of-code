@@ -69,8 +69,8 @@ cc_library(
 
 cc_library(
     name = "conway",
-    hdrs = ["conway.h"],
     srcs = ["conway.cc"],
+    hdrs = ["conway.h"],
     visibility = [
         "//visibility:public",
     ],
