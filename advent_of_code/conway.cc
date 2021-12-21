@@ -45,11 +45,15 @@ absl::Status Conway::Advance() {
     new_b[p] = lookup_[bv];
   }
   b_ = std::move(new_b);
-  if (fill_ == '.') {
-    fill_ = lookup_[0];
-  } else {
-    if (fill_ != '#') return absl::InternalError("Bad board");
-    fill_ = lookup_[511];
+  if (infinite_) {
+    if (fill_ == '.') {
+      fill_ = lookup_[0];
+    } else if (fill_ == '#') {
+      if (511 >= lookup_.size()) return absl::InternalError("Bad lookup size");
+      fill_ = lookup_[511];
+    } else {
+      return absl::InternalError("Bad board fill");      
+    }
   }
   return absl::OkStatus();
 }
