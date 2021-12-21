@@ -38,9 +38,42 @@ system("perl", "-spi", "-e",
         map { "advent_of_code/$year/day$day/$_" } values %renames)
   and die $!;
 
+my $year_build_fname = "advent_of_code/${year}/BUILD";
+my $build_contents = "";
+if (! -f $year_build_fname) {
+  $build_contents = <<EOF;
+cc_test(
+    name = "benchmark",
+    tags = ["benchmark"],
+    deps = [
+        "//advent_of_code/${year}/${day}:${day}_benchmark_lib",
+        "\@com_monkeynova_gunit_main//:test_main",
+    ],
+)
+EOF
+} else {
+  open my $fh, '<', $year_build_fname;
+  $build_contents = join '', <$fh>;
+  close $fh;
+  $build_contents =~ s{
+    (cc_test\([^\)]+
+     name\s*=\s*"benchmark"[^\)]+)
+    ("\@com_monkeynova_gunit_main//:test_main",[^\)]+\))
+  }{$1
+    "//advent_of_code/${year}/day${day}:day${day}_benchmark_lib",
+    $2
+  }x;
+}
+open my $fh, '>', $year_build_fname
+  or die "Can't write ${year_build_fname}: $!";
+print {$fh} $build_contents;
+close $fh;
+
+
 # Non-fatal if clang-format isn't present.
 system("find advent_of_code/$year/day$day -name '*.h' -o -name '*.cc' | " .
        "xargs clang-format --style=Google -i");
 
 # Non-fatal if buildifier isn't present.
 system("find advent_of_code/$year/day$day -name BUILD | xargs buildifier");
+system("buildifier advent_of_code/$year/BUILD");
