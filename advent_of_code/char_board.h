@@ -15,15 +15,36 @@ class CharBoard {
  public:
   template <typename Container>
   static absl::StatusOr<CharBoard> Parse(const Container& in) {
-    CharBoard ret(0, 0);
+    // We do a 2-pass read of 'in' to allow Container to not support
+    // empty()/operator[] calls. This is necessary to allow the value returned
+    // by absl::StrSplit to be passed directly in.
+    int width = -1;
+    int height = 0;
     for (absl::string_view line : in) {
-      ret.rows_.push_back(std::string(line));
+      ++height;
+      if (width == -1) {
+        width = line.size();
+      } else if (width != line.size()) {
+        return absl::InvalidArgumentError("Inconsistent width");
+      }
     }
-    if (absl::Status st = ret.Validate(); !st.ok()) return st;
+    if (height == 0) return CharBoard(0, 0);
+
+    CharBoard ret(width, height);
+    char* dst = ret.buf_.data();
+    for (absl::string_view line : in) {
+      memcpy(dst, line.data(), ret.width());
+      dst += ret.stride_;
+    }
     return ret;
   }
 
-  CharBoard(int width, int height) : rows_(height, std::string(width, '.')) {}
+  CharBoard(int width, int height)
+  : stride_(width + 1), buf_(stride_ * height, '.') {
+    for (int i = stride_ - 1; i < buf_.size(); i += stride_) {
+      buf_[i] = '\n';
+    }
+  }
 
   explicit CharBoard(PointRectangle r)
       : CharBoard(r.max.x - r.min.x + 1, r.max.y - r.min.y + 1) {}
@@ -34,39 +55,28 @@ class CharBoard {
   int CountOn() const { return CountChar('#'); }
   int CountChar(char test) const {
     int count = 0;
-    for (const auto& r : rows_) {
-      for (char c : r) {
-        if (c == test) ++count;
-      }
+    for (int i = 0; i < buf_.size(); ++i) {
+      if (i % stride_ == stride_ - 1) continue;
+      if (buf_[i] == test) ++count;
     }
     return count;
   }
 
-  int height() const { return rows_.size(); }
-  int width() const { return rows_.empty() ? 0 : rows_[0].size(); }
+  int height() const { return stride_ == 1 ? 0 : buf_.size() / stride_; }
+  int width() const { return stride_ - 1; }
 
   PointRectangle range() const {
     return PointRectangle{.min = {.x = 0, .y = 0},
                           .max = {.x = width() - 1, .y = height() - 1}};
   }
 
-  absl::Status Validate() const {
-    if (rows_.empty()) return absl::OkStatus();
-    for (absl::string_view r : rows_) {
-      if (r.size() != width()) {
-        return absl::InternalError(absl::StrCat("Bad row size: ", r));
-      }
-    }
-    return absl::OkStatus();
-  }
+  char at(Point p) const { return buf_[p.y * stride_ + p.x]; }
+  void set(Point p, char c) { buf_[p.y * stride_ + p.x] = c; }
 
-  char at(Point p) const { return rows_[p.y][p.x]; }
-  void set(Point p, char c) { rows_[p.y][p.x] = c; }
+  char operator[](Point p) const { return buf_[p.y * stride_ + p.x]; }
+  char& operator[](Point p) { return buf_[p.y * stride_ + p.x]; }
 
-  char operator[](Point p) const { return rows_[p.y][p.x]; }
-  char& operator[](Point p) { return rows_[p.y][p.x]; }
-
-  std::string AsString() const { return absl::StrJoin(rows_, "\n"); }
+  std::string AsString() const { return buf_; }
 
   bool OnBoard(Point p) const {
     if (p.y < 0) return false;
@@ -83,34 +93,36 @@ class CharBoard {
     if (!OnBoard(sub_range.max)) {
       return absl::InvalidArgumentError("SubBoard: max not on board");
     }
-    CharBoard out(0, 0);
-    int sub_off = sub_range.min.x;
-    int sub_len = sub_range.max.x - sub_range.min.x + 1;
-    out.rows_.resize(sub_range.max.y - sub_range.min.y + 1);
+    CharBoard out(sub_range.max.x - sub_range.min.x + 1,
+                  sub_range.max.y - sub_range.min.y + 1);
     for (int i = sub_range.min.y; i <= sub_range.max.y; ++i) {
-      out.rows_[i - sub_range.min.y] = rows_[i].substr(sub_off, sub_len);
+      memcpy(out.stride(i - sub_range.min.y), stride(i) + sub_range.min.x, out.width());
     }
     return out;
   }
 
   template <typename H>
   friend H AbslHashValue(H h, const CharBoard& b) {
-    return H::combine(std::move(h), b.rows_);
+    return H::combine(std::move(h), b.buf_);
   }
 
-  bool operator==(const CharBoard& o) const { return rows_ == o.rows_; }
+  bool operator==(const CharBoard& o) const { return buf_ == o.buf_; }
   bool operator!=(const CharBoard& o) const { return !operator==(o); }
 
   friend std::ostream& operator<<(std::ostream& out, const CharBoard& b) {
-    for (absl::string_view s : b.rows_) {
-      out << s << std::endl;
-    }
-    return out;
+    return out << b.buf_;
   }
 
  private:
-  // TODO(@monkeynova): Migrate to a single flat-buffer string.
-  std::vector<std::string> rows_;
+  char* stride(int y) {
+    return buf_.data() + stride_ * y;
+  }
+  const char* stride(int y) const {
+    return buf_.data() + stride_ * y;
+  }
+
+  int stride_;
+  std::string buf_;
 };
 
 }  // namespace advent_of_code
