@@ -1,22 +1,24 @@
 [part=1]
-Example input
+Player 1 starting position: 4
+Player 2 starting position: 8
 --
-ERROR: UNIMPLEMENTED: Problem not known
+739785
 ==
 
 [part=1]
 @include{advent_of_code/2021/day21/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+918081
 ==
 
 [part=2]
-Example input
+Player 1 starting position: 4
+Player 2 starting position: 8
 --
-ERROR: UNIMPLEMENTED: Problem not known
+444356092776315
 ==
 
 [part=2]
 @include{advent_of_code/2021/day21/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+158631174219251
