@@ -81,41 +81,31 @@ struct Cube {
     return true;
   }
 
-  std::vector<Cube> SetDifference(const Cube& o) const {
-    std::vector<Cube> ret = {*this};
-    // Split this cube along the planes defining the edges of `o`.
+  void SetDifference(const Cube& o, std::vector<Cube>* out) const {
+    if (!Overlaps(o)) {
+      out->push_back(*this);
+      return;
+    }
+  
+    Cube overlap = *this;
+    std::vector<Cube> ret;
+    // Cleave off sub-cubes that cannot overlap with o, until a fully contained
+    // sub-cube is all that remains, and then discard it.
     for (int Point3::*dim : {&Point3::x, &Point3::y, &Point3::z}) {
-      // Since cubes are inclusive, we uses split to mean '>=' and so use
-      // max + 1 as the inclusive upper boundary.
-      for (int split : {o.min.*dim, o.max.*dim + 1}) {
-        std::vector<Cube> new_ret;
-        for (const Cube& c : ret) {
-          if (split > c.min.*dim && split <= c.max.*dim) {
-            Point3 new_max = c.max;
-            new_max.*dim = split - 1;
-            new_ret.push_back({c.min, new_max});
-            Point3 new_min = c.min;
-            new_min.*dim = split;
-            new_ret.push_back({new_min, c.max});
-          } else {
-            new_ret.push_back(c);
-          }
-        }
-        ret = std::move(new_ret);
+      if (o.min.*dim > overlap.min.*dim && o.min.*dim <= overlap.max.*dim) {
+        Cube cleave = overlap;
+        cleave.max.*dim = o.min.*dim - 1;
+        out->push_back(cleave);
+        overlap.min.*dim = o.min.*dim;
+      }
+      if (o.max.*dim >= overlap.min.*dim && o.max.*dim < overlap.max.*dim) {
+        Cube cleave = overlap;
+        cleave.min.*dim = o.max.*dim + 1;
+        out->push_back(cleave);
+        overlap.max.*dim = o.max.*dim;
       }
     }
-    // Remove `o` from returned set now that each cube will either be fully
-    // inside or outside of it.
-    {
-      std::vector<Cube> new_ret;
-      for (const Cube& c : ret) {
-        if (o.FullyContains(c)) continue;
-        CHECK(!o.Overlaps(c));
-        new_ret.push_back(c);
-      }
-      ret = std::move(new_ret);
-    }
-    return ret;
+    CHECK(o.FullyContains(overlap));
   }
 };
 
@@ -131,12 +121,7 @@ struct CubeSet {
   void SetDifference(Cube in) {
     std::vector<Cube> new_set;
     for (const Cube& c : set_) {
-      if (c.Overlaps(in)) {
-        std::vector<Cube> split_c = c.SetDifference(in);
-        new_set.insert(new_set.end(), split_c.begin(), split_c.end());
-      } else {
-        new_set.push_back(c);
-      }
+      c.SetDifference(in, &new_set);
     }
     set_ = std::move(new_set);
   }
@@ -156,7 +141,8 @@ struct CubeSet {
 absl::Status Audit() {
   Cube c1({{10, 10, 10}, {12, 12, 12}});
   Cube c2({{11, 11, 11}, {13, 13, 13}});
-  std::vector<Cube> removed = c1.SetDifference(c2);
+  std::vector<Cube> removed;
+  c1.SetDifference(c2, &removed);
   for (Point3 p : c1) {
     bool should_in = c1.Contains(p) && !c2.Contains(p);
     int in_count = 0;
