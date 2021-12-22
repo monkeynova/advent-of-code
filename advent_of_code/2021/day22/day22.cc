@@ -19,16 +19,27 @@ struct Cube {
   Point3 min;
   Point3 max;
   int64_t Volume() const {
+    // 1ll forces the addition to return int64 before multiplying.
     return (max.x - min.x + 1ll) * (max.y - min.y + 1ll) *
            (max.z - min.z + 1ll);
   }
-  bool Within(Point3 p) const {
-    return p.x >= min.x && p.x <= max.x && p.y >= min.y && p.y <= max.y &&
-           p.z >= min.z && p.z <= max.z;
+  bool Contains(Point3 p) const {
+    if (p.x < min.x) return false;
+    if (p.x > max.x) return false; 
+    if (p.y < min.y) return false;
+    if (p.y > max.y) return false; 
+    if (p.z < min.z) return false;
+    if (p.z > max.z) return false; 
+    return true;
   }
-  bool ContainedWithin(const Cube& o) const {
-    return min.x >= o.min.x && max.x <= o.max.x && min.y >= o.min.y &&
-           max.y <= o.max.y && min.z >= o.min.z && max.z <= o.max.z;
+  bool Contains(const Cube& o) const {
+    if (o.min.x < min.x) return false;
+    if (o.max.x > max.x) return false;
+    if (o.min.y < min.y) return false;
+    if (o.max.y > max.y) return false;
+    if (o.min.z < min.z) return false;
+    if (o.max.z > max.z) return false;
+    return true;
   }
   bool Overlaps(const Cube& o) const {
     if (max.x < o.min.x) return false;
@@ -38,15 +49,12 @@ struct Cube {
     if (max.z < o.min.z) return false;
     if (min.z > o.max.z) return false;
     return true;
-    return min.x >= o.max.x && max.x <= o.min.x && min.y >= o.max.y &&
-           max.y <= o.min.y && min.z >= o.max.z && max.z <= o.min.z;
   }
 
   std::vector<Cube> Remove(const Cube& o) const {
-    VLOG(2) << "{" << min << "," << max << "} - {" << o.min << "," << o.max
-            << "}";
     std::vector<Cube> ret = {*this};
     {
+      // Split this cube along o.min.x if appropriate.
       std::vector<Cube> new_ret;
       for (const Cube& c : ret) {
         if (o.min.x > c.min.x && o.min.x <= c.max.x) {
@@ -61,6 +69,7 @@ struct Cube {
       ret = std::move(new_ret);
     }
     {
+      // Split this cube along o.max.x if appropriate.
       std::vector<Cube> new_ret;
       for (const Cube& c : ret) {
         if (o.max.x >= c.min.x && o.max.x < c.max.x) {
@@ -74,10 +83,8 @@ struct Cube {
       }
       ret = std::move(new_ret);
     }
-    for (const auto& c : ret) {
-      VLOG(2) << "  post-x: {" << c.min << "," << c.max << "}";
-    }
     {
+      // Split this cube along o.min.y if appropriate.
       std::vector<Cube> new_ret;
       for (const Cube& c : ret) {
         if (o.min.y > c.min.y && o.min.y <= c.max.y) {
@@ -92,6 +99,7 @@ struct Cube {
       ret = std::move(new_ret);
     }
     {
+      // Split this cube along o.max.y if appropriate.
       std::vector<Cube> new_ret;
       for (const Cube& c : ret) {
         if (o.max.y >= c.min.y && o.max.y < c.max.y) {
@@ -105,10 +113,8 @@ struct Cube {
       }
       ret = std::move(new_ret);
     }
-    for (const auto& c : ret) {
-      VLOG(2) << "  post-y: {" << c.min << "," << c.max << "}";
-    }
     {
+      // Split this cube along o.min.z if appropriate.
       std::vector<Cube> new_ret;
       for (const Cube& c : ret) {
         if (o.min.z > c.min.z && o.min.z <= c.max.z) {
@@ -123,6 +129,7 @@ struct Cube {
       ret = std::move(new_ret);
     }
     {
+      // Split this cube along o.max.z if appropriate.
       std::vector<Cube> new_ret;
       for (const Cube& c : ret) {
         if (o.max.z >= c.min.z && o.max.z < c.max.z) {
@@ -136,25 +143,22 @@ struct Cube {
       }
       ret = std::move(new_ret);
     }
-    for (const auto& c : ret) {
-      VLOG(2) << "  pre-crop: {" << c.min << "," << c.max << "}";
-    }
     {
       std::vector<Cube> new_ret;
       for (const Cube& c : ret) {
-        if (c.ContainedWithin(o)) continue;
+        if (o.Contains(c)) continue;
         new_ret.push_back(c);
       }
       ret = std::move(new_ret);
-    }
-    for (const auto& c : ret) {
-      VLOG(2) << "  post-crop: {" << c.min << "," << c.max << "}";
     }
     return ret;
   }
 };
 
 struct Space {
+ public:
+  Space() = default;
+
   void AddOn(Cube in) {
     std::vector<Cube> new_on;
     for (const Cube& c : on) {
@@ -186,7 +190,7 @@ struct Space {
     on = std::move(new_on);
   }
 
-  int64_t Volume() {
+  int64_t Volume() const {
     int64_t sum = 0;
     for (const Cube& c : on) {
       sum += c.Volume();
@@ -194,6 +198,7 @@ struct Space {
     return sum;
   }
 
+ private:
   std::vector<Cube> on;
 };
 
@@ -224,10 +229,13 @@ absl::StatusOr<std::string> Day_2021_22::Part1(
       for (int y = y0; y <= y1; ++y) {
         for (int z = z0; z <= z1; ++z) {
           Point3 p{x, y, z};
-          if (type == "on")
+          if (type == "on") {
             map.insert(p);
-          else
+          } else if (type == "off") {
             map.erase(p);
+          } else {
+            return Error("Neither on nor off?");
+          }
         }
       }
     }
@@ -245,10 +253,10 @@ absl::StatusOr<std::string> Day_2021_22::Part2(
       for (int y = 10; y <= 12; ++y) {
         for (int z = 10; z <= 12; ++z) {
           Point3 p{x, y, z};
-          bool should_in = c1.Within(p) && !c2.Within(p);
+          bool should_in = c1.Contains(p) && !c2.Contains(p);
           int in_count = 0;
           for (const Cube& r : removed) {
-            if (r.Within(p)) {
+            if (r.Contains(p)) {
               ++in_count;
             }
           }
@@ -262,10 +270,7 @@ absl::StatusOr<std::string> Day_2021_22::Part2(
     }
   }
   Space s;
-  int i = 0;
   for (absl::string_view line : input) {
-    VLOG(1) << i << "/" << input.size();
-    ++i;
     absl::string_view type;
     int x0, x1, y0, y1, z0, z1;
     if (!RE2::FullMatch(
@@ -277,8 +282,10 @@ absl::StatusOr<std::string> Day_2021_22::Part2(
     }
     if (type == "on") {
       s.AddOn(Cube{{x0, y0, z0}, {x1, y1, z1}});
-    } else {
+    } else if (type == "off") {
       s.AddOff(Cube{{x0, y0, z0}, {x1, y1, z1}});
+    } else {
+      return Error("Neither on nor off?");
     }
   }
   return IntReturn(s.Volume());
