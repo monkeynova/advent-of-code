@@ -83,84 +83,47 @@ struct Cube {
 
   std::vector<Cube> SetDifference(const Cube& o) const {
     std::vector<Cube> ret = {*this};
-    {
-      // Split this cube along o.min.x if appropriate.
+    // Split this cube along `x` planes if appropriate.
+    for (int x_split : {o.min.x, o.max.x + 1}) {
       std::vector<Cube> new_ret;
       for (const Cube& c : ret) {
-        if (o.min.x > c.min.x && o.min.x <= c.max.x) {
-          new_ret.push_back({c.min, {o.min.x - 1, c.max.y, c.max.z}});
-          new_ret.push_back({{o.min.x, c.min.y, c.min.z}, c.max});
+        if (x_split > c.min.x && x_split <= c.max.x) {
+          new_ret.push_back({c.min, {x_split - 1, c.max.y, c.max.z}});
+          new_ret.push_back({{x_split, c.min.y, c.min.z}, c.max});
         } else {
           new_ret.push_back(c);
         }
       }
       ret = std::move(new_ret);
     }
-    {
-      // Split this cube along o.max.x if appropriate.
+    // Split this cube along `y` planes if appropriate.
+    for (int y_split : {o.min.y, o.max.y + 1}) {
       std::vector<Cube> new_ret;
       for (const Cube& c : ret) {
-        if (o.max.x >= c.min.x && o.max.x < c.max.x) {
-          new_ret.push_back({c.min, {o.max.x, c.max.y, c.max.z}});
-          new_ret.push_back({{o.max.x + 1, c.min.y, c.min.z}, c.max});
+        if (y_split > c.min.y && y_split <= c.max.y) {
+          new_ret.push_back({c.min, {c.max.x, y_split - 1, c.max.z}});
+          new_ret.push_back({{c.min.x, y_split, c.min.z}, c.max});
         } else {
           new_ret.push_back(c);
         }
       }
       ret = std::move(new_ret);
     }
-    {
-      // Split this cube along o.min.y if appropriate.
+    // Split this cube along `z` planes if appropriate.
+    for (int z_split : {o.min.z, o.max.z + 1}) {
       std::vector<Cube> new_ret;
       for (const Cube& c : ret) {
-        if (o.min.y > c.min.y && o.min.y <= c.max.y) {
-          new_ret.push_back({c.min, {c.max.x, o.min.y - 1, c.max.z}});
-          new_ret.push_back({{c.min.x, o.min.y, c.min.z}, c.max});
+        if (z_split > c.min.z && z_split <= c.max.z) {
+          new_ret.push_back({c.min, {c.max.x, c.max.y, z_split - 1}});
+          new_ret.push_back({{c.min.x, c.min.y, z_split}, c.max});
         } else {
           new_ret.push_back(c);
         }
       }
       ret = std::move(new_ret);
     }
-    {
-      // Split this cube along o.max.y if appropriate.
-      std::vector<Cube> new_ret;
-      for (const Cube& c : ret) {
-        if (o.max.y >= c.min.y && o.max.y < c.max.y) {
-          new_ret.push_back({c.min, {c.max.x, o.max.y, c.max.z}});
-          new_ret.push_back({{c.min.x, o.max.y + 1, c.min.z}, c.max});
-        } else {
-          new_ret.push_back(c);
-        }
-      }
-      ret = std::move(new_ret);
-    }
-    {
-      // Split this cube along o.min.z if appropriate.
-      std::vector<Cube> new_ret;
-      for (const Cube& c : ret) {
-        if (o.min.z > c.min.z && o.min.z <= c.max.z) {
-          new_ret.push_back({c.min, {c.max.x, c.max.y, o.min.z - 1}});
-          new_ret.push_back({{c.min.x, c.min.y, o.min.z}, c.max});
-        } else {
-          new_ret.push_back(c);
-        }
-      }
-      ret = std::move(new_ret);
-    }
-    {
-      // Split this cube along o.max.z if appropriate.
-      std::vector<Cube> new_ret;
-      for (const Cube& c : ret) {
-        if (o.max.z >= c.min.z && o.max.z < c.max.z) {
-          new_ret.push_back({c.min, {c.max.x, c.max.y, o.max.z}});
-          new_ret.push_back({{c.min.x, c.min.y, o.max.z + 1}, c.max});
-        } else {
-          new_ret.push_back(c);
-        }
-      }
-      ret = std::move(new_ret);
-    }
+    // Remove `o` from returned set now that each cube will either be fully
+    // inside or outside of it.
     {
       std::vector<Cube> new_ret;
       for (const Cube& c : ret) {
