@@ -83,44 +83,26 @@ struct Cube {
 
   std::vector<Cube> SetDifference(const Cube& o) const {
     std::vector<Cube> ret = {*this};
-    // Split this cube along `x` planes if appropriate.
-    for (int x_split : {o.min.x, o.max.x + 1}) {
-      std::vector<Cube> new_ret;
-      for (const Cube& c : ret) {
-        if (x_split > c.min.x && x_split <= c.max.x) {
-          new_ret.push_back({c.min, {x_split - 1, c.max.y, c.max.z}});
-          new_ret.push_back({{x_split, c.min.y, c.min.z}, c.max});
-        } else {
-          new_ret.push_back(c);
+    // Split this cube along the planes defining the edges of `o`.
+    for (int Point3::*dim : {&Point3::x, &Point3::y, &Point3::z}) {
+      // Since cubes are inclusive, we uses split to mean '>=' and so use
+      // max + 1 as the inclusive upper boundary.
+      for (int split : {o.min.*dim, o.max.*dim + 1}) {
+        std::vector<Cube> new_ret;
+        for (const Cube& c : ret) {
+          if (split > c.min.*dim && split <= c.max.*dim) {
+            Point3 new_max = c.max;
+            new_max.*dim = split - 1;
+            new_ret.push_back({c.min, new_max});
+            Point3 new_min = c.min;
+            new_min.*dim = split;
+            new_ret.push_back({new_min, c.max});
+          } else {
+            new_ret.push_back(c);
+          }
         }
+        ret = std::move(new_ret);
       }
-      ret = std::move(new_ret);
-    }
-    // Split this cube along `y` planes if appropriate.
-    for (int y_split : {o.min.y, o.max.y + 1}) {
-      std::vector<Cube> new_ret;
-      for (const Cube& c : ret) {
-        if (y_split > c.min.y && y_split <= c.max.y) {
-          new_ret.push_back({c.min, {c.max.x, y_split - 1, c.max.z}});
-          new_ret.push_back({{c.min.x, y_split, c.min.z}, c.max});
-        } else {
-          new_ret.push_back(c);
-        }
-      }
-      ret = std::move(new_ret);
-    }
-    // Split this cube along `z` planes if appropriate.
-    for (int z_split : {o.min.z, o.max.z + 1}) {
-      std::vector<Cube> new_ret;
-      for (const Cube& c : ret) {
-        if (z_split > c.min.z && z_split <= c.max.z) {
-          new_ret.push_back({c.min, {c.max.x, c.max.y, z_split - 1}});
-          new_ret.push_back({{c.min.x, c.min.y, z_split}, c.max});
-        } else {
-          new_ret.push_back(c);
-        }
-      }
-      ret = std::move(new_ret);
     }
     // Remove `o` from returned set now that each cube will either be fully
     // inside or outside of it.
