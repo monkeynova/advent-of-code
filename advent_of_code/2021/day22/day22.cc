@@ -81,6 +81,14 @@ struct Cube {
     return true;
   }
 
+  absl::optional<Cube> Intersect(const Cube& o) const {
+    if (!Overlaps(o)) return {};
+    return Cube{
+      {std::max(min.x, o.min.x), std::max(min.y, o.min.y), std::max(min.z, o.min.z)},
+      {std::min(max.x, o.max.x), std::min(max.y, o.max.y), std::min(max.z, o.max.z)},
+    };
+  }
+
   void SetDifference(const Cube& o, std::vector<Cube>* out) const {
     if (!Overlaps(o)) {
       out->push_back(*this);
@@ -164,8 +172,12 @@ absl::Status Audit() {
 
 absl::StatusOr<std::string> Day_2021_22::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::flat_hash_set<Point3> map;
   Cube bound{{-50, -50, -50}, {50, 50, 50}};
+  CubeSet s;
+  absl::optional<absl::flat_hash_set<Point3>> map;
+  if (run_audit()) {
+    map = absl::flat_hash_set<Point3>{};
+  }
   for (absl::string_view line : input) {
     absl::string_view type;
     int x0, x1, y0, y1, z0, z1;
@@ -177,26 +189,24 @@ absl::StatusOr<std::string> Day_2021_22::Part1(
       return Error("Bad line: ", line);
     }
 
-    Cube c{{x0, y0, z0}, {x1, y1, z1}};
-    if (!c.Overlaps(bound)) continue;
-    c.min.x = std::max(c.min.x, bound.min.x);
-    c.min.y = std::max(c.min.y, bound.min.y);
-    c.min.z = std::max(c.min.z, bound.min.z);
-    c.max.x = std::min(c.max.x, bound.max.x);
-    c.max.y = std::min(c.max.y, bound.max.y);
-    c.max.z = std::min(c.max.z, bound.max.z);
-    VLOG(1) << c.min << "-" << c.max;
-    for (Point3 p : c) {
-      if (type == "on") {
-        map.insert(p);
-      } else if (type == "off") {
-        map.erase(p);
-      } else {
-        return Error("Neither on nor off?");
-      }
+    absl::optional<Cube> c = bound.Intersect(Cube{{x0, y0, z0}, {x1, y1, z1}});
+    if (!c) continue;  
+    if (type == "on") {
+      if (map) for (Point3 p : *c) map->insert(p);
+      s.Union(*c);
+    } else if (type == "off") {
+      if (map) for (Point3 p : *c) map->erase(p);
+      s.SetDifference(*c);
+    } else {
+      return Error("Neither on nor off?");
     }
   }
-  return IntReturn(map.size());
+  if (map) {
+    if (map->size() != s.Volume()) {
+      return Error("map->size() != s.Volumne(): ", map->size(), " != ", s.Volume());
+    }
+  }
+  return IntReturn(s.Volume());
 }
 
 absl::StatusOr<std::string> Day_2021_22::Part2(
