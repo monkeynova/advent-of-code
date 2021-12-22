@@ -40,7 +40,7 @@ class CharBoard {
   }
 
   CharBoard(int width, int height)
-  : stride_(width + 1), buf_(stride_ * height, '.') {
+      : stride_(width + 1), buf_(stride_ * height, '.') {
     for (int i = stride_ - 1; i < buf_.size(); i += stride_) {
       buf_[i] = '\n';
     }
@@ -96,7 +96,8 @@ class CharBoard {
     CharBoard out(sub_range.max.x - sub_range.min.x + 1,
                   sub_range.max.y - sub_range.min.y + 1);
     for (int i = sub_range.min.y; i <= sub_range.max.y; ++i) {
-      memcpy(out.stride(i - sub_range.min.y), stride(i) + sub_range.min.x, out.width());
+      memcpy(out.stride(i - sub_range.min.y), stride(i) + sub_range.min.x,
+             out.width());
     }
     return out;
   }
@@ -114,12 +115,8 @@ class CharBoard {
   }
 
  private:
-  char* stride(int y) {
-    return buf_.data() + stride_ * y;
-  }
-  const char* stride(int y) const {
-    return buf_.data() + stride_ * y;
-  }
+  char* stride(int y) { return buf_.data() + stride_ * y; }
+  const char* stride(int y) const { return buf_.data() + stride_ * y; }
 
   int stride_;
   std::string buf_;

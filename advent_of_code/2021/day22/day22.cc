@@ -19,17 +19,16 @@ struct Cube {
   Point3 min;
   Point3 max;
   int64_t Volume() const {
-    return (max.x - min.x + 1ll) * (max.y - min.y + 1ll) * (max.z - min.z + 1ll);
+    return (max.x - min.x + 1ll) * (max.y - min.y + 1ll) *
+           (max.z - min.z + 1ll);
   }
   bool Within(Point3 p) const {
-    return p.x >= min.x && p.x <= max.x &&
-       p.y >= min.y && p.y <= max.y &&
-       p.z >= min.z && p.z <= max.z;
+    return p.x >= min.x && p.x <= max.x && p.y >= min.y && p.y <= max.y &&
+           p.z >= min.z && p.z <= max.z;
   }
   bool ContainedWithin(const Cube& o) const {
-    return min.x >= o.min.x && max.x <= o.max.x &&
-       min.y >= o.min.y && max.y <= o.max.y &&
-       min.z >= o.min.z && max.z <= o.max.z;
+    return min.x >= o.min.x && max.x <= o.max.x && min.y >= o.min.y &&
+           max.y <= o.max.y && min.z >= o.min.z && max.z <= o.max.z;
   }
   bool Overlaps(const Cube& o) const {
     if (max.x < o.min.x) return false;
@@ -39,20 +38,22 @@ struct Cube {
     if (max.z < o.min.z) return false;
     if (min.z > o.max.z) return false;
     return true;
-    return min.x >= o.max.x && max.x <= o.min.x &&
-       min.y >= o.max.y && max.y <= o.min.y &&
-       min.z >= o.max.z && max.z <= o.min.z;
+    return min.x >= o.max.x && max.x <= o.min.x && min.y >= o.max.y &&
+           max.y <= o.min.y && min.z >= o.max.z && max.z <= o.min.z;
   }
 
   std::vector<Cube> Remove(const Cube& o) const {
-    VLOG(2) << "{" << min << "," << max << "} - {" << o.min << "," << o.max << "}";
+    VLOG(2) << "{" << min << "," << max << "} - {" << o.min << "," << o.max
+            << "}";
     std::vector<Cube> ret = {*this};
     {
       std::vector<Cube> new_ret;
       for (const Cube& c : ret) {
         if (o.min.x > c.min.x && o.min.x <= c.max.x) {
-          new_ret.push_back({{c.min.x, c.min.y, c.min.z}, {o.min.x - 1, c.max.y, c.max.z}});
-          new_ret.push_back({{o.min.x, c.min.y, c.min.z}, {c.max.x, c.max.y, c.max.z}});
+          new_ret.push_back(
+              {{c.min.x, c.min.y, c.min.z}, {o.min.x - 1, c.max.y, c.max.z}});
+          new_ret.push_back(
+              {{o.min.x, c.min.y, c.min.z}, {c.max.x, c.max.y, c.max.z}});
         } else {
           new_ret.push_back(c);
         }
@@ -63,8 +64,10 @@ struct Cube {
       std::vector<Cube> new_ret;
       for (const Cube& c : ret) {
         if (o.max.x >= c.min.x && o.max.x < c.max.x) {
-          new_ret.push_back({{c.min.x, c.min.y, c.min.z}, {o.max.x, c.max.y, c.max.z}});
-          new_ret.push_back({{o.max.x + 1, c.min.y, c.min.z}, {c.max.x, c.max.y, c.max.z}});
+          new_ret.push_back(
+              {{c.min.x, c.min.y, c.min.z}, {o.max.x, c.max.y, c.max.z}});
+          new_ret.push_back(
+              {{o.max.x + 1, c.min.y, c.min.z}, {c.max.x, c.max.y, c.max.z}});
         } else {
           new_ret.push_back(c);
         }
@@ -78,8 +81,10 @@ struct Cube {
       std::vector<Cube> new_ret;
       for (const Cube& c : ret) {
         if (o.min.y > c.min.y && o.min.y <= c.max.y) {
-          new_ret.push_back({{c.min.x, c.min.y, c.min.z}, {c.max.x, o.min.y - 1, c.max.z}});
-          new_ret.push_back({{c.min.x, o.min.y, c.min.z}, {c.max.x, c.max.y, c.max.z}});
+          new_ret.push_back(
+              {{c.min.x, c.min.y, c.min.z}, {c.max.x, o.min.y - 1, c.max.z}});
+          new_ret.push_back(
+              {{c.min.x, o.min.y, c.min.z}, {c.max.x, c.max.y, c.max.z}});
         } else {
           new_ret.push_back(c);
         }
@@ -90,8 +95,10 @@ struct Cube {
       std::vector<Cube> new_ret;
       for (const Cube& c : ret) {
         if (o.max.y >= c.min.y && o.max.y < c.max.y) {
-          new_ret.push_back({{c.min.x, c.min.y, c.min.z}, {c.max.x, o.max.y, c.max.z}});
-          new_ret.push_back({{c.min.x, o.max.y + 1, c.min.z}, {c.max.x, c.max.y, c.max.z}});
+          new_ret.push_back(
+              {{c.min.x, c.min.y, c.min.z}, {c.max.x, o.max.y, c.max.z}});
+          new_ret.push_back(
+              {{c.min.x, o.max.y + 1, c.min.z}, {c.max.x, c.max.y, c.max.z}});
         } else {
           new_ret.push_back(c);
         }
@@ -105,8 +112,10 @@ struct Cube {
       std::vector<Cube> new_ret;
       for (const Cube& c : ret) {
         if (o.min.z > c.min.z && o.min.z <= c.max.z) {
-          new_ret.push_back({{c.min.x, c.min.y, c.min.z}, {c.max.x, c.max.y, o.min.z - 1}});
-          new_ret.push_back({{c.min.x, c.min.y, o.min.z}, {c.max.x, c.max.y, c.max.z}});
+          new_ret.push_back(
+              {{c.min.x, c.min.y, c.min.z}, {c.max.x, c.max.y, o.min.z - 1}});
+          new_ret.push_back(
+              {{c.min.x, c.min.y, o.min.z}, {c.max.x, c.max.y, c.max.z}});
         } else {
           new_ret.push_back(c);
         }
@@ -117,8 +126,10 @@ struct Cube {
       std::vector<Cube> new_ret;
       for (const Cube& c : ret) {
         if (o.max.z >= c.min.z && o.max.z < c.max.z) {
-          new_ret.push_back({{c.min.x, c.min.y, c.min.z}, {c.max.x, c.max.y, o.max.z}});
-          new_ret.push_back({{c.min.x, c.min.y, o.max.z + 1}, {c.max.x, c.max.y, c.max.z}});
+          new_ret.push_back(
+              {{c.min.x, c.min.y, c.min.z}, {c.max.x, c.max.y, o.max.z}});
+          new_ret.push_back(
+              {{c.min.x, c.min.y, o.max.z + 1}, {c.max.x, c.max.y, c.max.z}});
         } else {
           new_ret.push_back(c);
         }
@@ -196,10 +207,13 @@ absl::StatusOr<std::string> Day_2021_22::Part1(
   for (absl::string_view line : input) {
     absl::string_view type;
     int x0, x1, y0, y1, z0, z1;
-    if (!RE2::FullMatch(line, "(on|off) x=(-?\\d+)..(-?\\d+),y=(-?\\d+)..(-?\\d+),z=(-?\\d+)..(-?\\d+)",
-     &type, &x0, &x1, &y0, &y1, &z0, &z1)) {
-       return Error("Bad line: ", line);
-     }
+    if (!RE2::FullMatch(
+            line,
+            "(on|off) "
+            "x=(-?\\d+)..(-?\\d+),y=(-?\\d+)..(-?\\d+),z=(-?\\d+)..(-?\\d+)",
+            &type, &x0, &x1, &y0, &y1, &z0, &z1)) {
+      return Error("Bad line: ", line);
+    }
     x0 = std::max(x0, -50);
     x1 = std::min(x1, 50);
     y0 = std::max(y0, -50);
@@ -210,8 +224,10 @@ absl::StatusOr<std::string> Day_2021_22::Part1(
       for (int y = y0; y <= y1; ++y) {
         for (int z = z0; z <= z1; ++z) {
           Point3 p{x, y, z};
-          if (type == "on") map.insert(p);
-          else map.erase(p); 
+          if (type == "on")
+            map.insert(p);
+          else
+            map.erase(p);
         }
       }
     }
@@ -222,8 +238,8 @@ absl::StatusOr<std::string> Day_2021_22::Part1(
 absl::StatusOr<std::string> Day_2021_22::Part2(
     absl::Span<absl::string_view> input) const {
   if (run_audit()) {
-    Cube c1({{10,10,10},{12,12,12}});
-    Cube c2({{11,11,11},{13,13,13}});
+    Cube c1({{10, 10, 10}, {12, 12, 12}});
+    Cube c2({{11, 11, 11}, {13, 13, 13}});
     std::vector<Cube> removed = c1.Remove(c2);
     for (int x = 10; x <= 12; ++x) {
       for (int y = 10; y <= 12; ++y) {
@@ -237,10 +253,11 @@ absl::StatusOr<std::string> Day_2021_22::Part2(
             }
           }
           if (in_count != should_in ? 1 : 0) {
-            VLOG(1) << "Bad point: " << p << "; should=" << (should_in ? "in" : "out");
+            VLOG(1) << "Bad point: " << p
+                    << "; should=" << (should_in ? "in" : "out");
             return Error("Bad point");
           }
-        } 
+        }
       }
     }
   }
@@ -251,10 +268,13 @@ absl::StatusOr<std::string> Day_2021_22::Part2(
     ++i;
     absl::string_view type;
     int x0, x1, y0, y1, z0, z1;
-    if (!RE2::FullMatch(line, "(on|off) x=(-?\\d+)..(-?\\d+),y=(-?\\d+)..(-?\\d+),z=(-?\\d+)..(-?\\d+)",
-     &type, &x0, &x1, &y0, &y1, &z0, &z1)) {
-       return Error("Bad line: ", line);
-     }
+    if (!RE2::FullMatch(
+            line,
+            "(on|off) "
+            "x=(-?\\d+)..(-?\\d+),y=(-?\\d+)..(-?\\d+),z=(-?\\d+)..(-?\\d+)",
+            &type, &x0, &x1, &y0, &y1, &z0, &z1)) {
+      return Error("Bad line: ", line);
+    }
     if (type == "on") {
       s.AddOn(Cube{{x0, y0, z0}, {x1, y1, z1}});
     } else {
