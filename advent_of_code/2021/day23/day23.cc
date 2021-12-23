@@ -178,7 +178,7 @@ struct State {
   }
 };
 
-int FindMinCost(
+absl::optional<int> FindMinCost(
     State initial_state,
     const std::vector<Point>& empty,
     const absl::flat_hash_map<char, std::vector<Point>>& destinations,
@@ -187,12 +187,12 @@ int FindMinCost(
   // We use a `node_hash_set` so that `history` can be the owning storage
   // for the queue and use pointers to not 2x storage and copies.
   absl::node_hash_set<State> history = {initial_state};
-  int64_t best = std::numeric_limits<int64_t>::max();
+  absl::optional<int> best;
   for (std::deque<const State*> queue = {&initial_state}; !queue.empty();
        history.erase(*queue.front()), queue.pop_front()) {
     const State& cur = *queue.front();
     if (cur.IsFinal()) {
-      if (best > cur.cost) {
+      if (!best || *best > cur.cost) {
         VLOG(1) << "Found better final cost: " << cur.cost;
         VLOG(2) << cur;
         best = cur.cost;
@@ -206,7 +206,7 @@ int FindMinCost(
       Point p = cur.actors[i].Destination(destinations, cur.board);
       absl::optional<int> cost = cur.actors[i].CanMove(p, cur.board, all_paths);
       if (cost) {
-        if (cur.cost + *cost >= best) continue;
+        if (best && cur.cost + *cost >= *best) continue;
         // We can reach the final destination. Go there and stop.
         const auto [it, inserted] = history.insert(cur.MoveActor(i, p, *cost, /*done=*/true));
         if (!inserted) continue;
@@ -222,7 +222,7 @@ int FindMinCost(
       for (Point p : empty) {
         absl::optional<int> cost = cur.actors[i].CanMove(p, cur.board, all_paths);
         if (cost) {
-          if (cur.cost + *cost >= best) continue;
+          if (best && cur.cost + *cost >= *best) continue;
           const auto [it, inserted] = history.insert(cur.MoveActor(i, p, *cost, /*done=*/false));
           if (!inserted) continue;
           VLOG(3) << cur << " => " << *it;
