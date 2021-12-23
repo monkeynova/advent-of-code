@@ -4,6 +4,7 @@
 #include "absl/functional/bind_front.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/infra/file_flags.h"
 #include "advent_of_code/infra/file_test_options.h"
 #include "advent_of_code/infra/file_util.h"
 #include "benchmark/benchmark.h"
@@ -13,12 +14,6 @@
 #include "file_based_test_driver/test_case_options.h"
 #include "main_lib.h"
 #include "re2/re2.h"
-
-ABSL_FLAG(absl::Duration, run_long_tests, absl::Seconds(10),
-          "Any tests marked [long=$duration] where $duration < "
-          "$run_long_tests will be skipped and ignored");
-
-ABSL_FLAG(int64_t, part_filter, 0, "If non-zero, only runs the specified part");
 
 namespace advent_of_code {
 

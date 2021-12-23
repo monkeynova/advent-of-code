@@ -17,6 +17,19 @@ cc_library(
 )
 
 cc_library(
+    name = "file_flags",
+    srcs = ["file_flags.cc"],
+    hdrs = ["file_flags.h"],
+    alwayslink = 1,
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "@com_google_absl//absl/flags:flag",
+    ],
+)
+
+cc_library(
     name = "file_test",
     testonly = 1,
     srcs = ["file_test.cc"],
@@ -25,6 +38,7 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
+        ":file_flags",
         ":file_test_options",
         ":file_util",
         "//advent_of_code:advent_day",
@@ -63,6 +77,7 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
+        ":file_flags",
         ":file_test_options",
         ":file_util",
         "//advent_of_code:advent_day",

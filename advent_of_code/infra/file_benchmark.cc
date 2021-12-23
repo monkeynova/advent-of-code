@@ -3,14 +3,11 @@
 #include "absl/flags/flag.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/infra/file_flags.h"
 #include "advent_of_code/infra/file_test_options.h"
 #include "file_based_test_driver/test_case_options.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
-
-ABSL_FLAG(absl::Duration, run_long_tests, absl::Seconds(10),
-          "Any tests marked [long=$duration] where $duration < "
-          "$run_long_tests will be skipped and ignored");
 
 namespace advent_of_code {
 
@@ -98,6 +95,12 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
   }
 
   int part = test->options.GetInt64(kPartOption);
+  absl::StatusOr<std::string> output;
+  std::string skip;
+  int64_t part_filter = absl::GetFlag(FLAGS_part_filter);
+  if (part_filter && part_filter != part) {
+    skip = absl::StrCat("(part=", part, ")");
+  }
   if (std::string long_option = test->options.GetString(kLongOption);
       !long_option.empty()) {
     absl::StatusOr<absl::Duration> long_duration =
@@ -106,12 +109,15 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
       return BM_Day_SetError(state, long_duration.status().ToString());
     }
     if (absl::GetFlag(FLAGS_run_long_tests) < *long_duration) {
-      state.SetLabel(absl::StrCat(
-          "Part: ", part, "; *** SKIPPED (long=", long_option, ") ****"));
-      for (auto _ : state) {
-      }
-      return;
+      skip = absl::StrCat("(long=", long_option, ")");
     }
+  }
+  if (!skip.empty()) {
+    state.SetLabel(absl::StrCat(
+        "Part: ", part, "; *** SKIPPED ", skip, " ****"));
+    for (auto _ : state) {
+    }
+    return;
   }
 
   state.SetLabel(absl::StrCat("Part: ", part));
