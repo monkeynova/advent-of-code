@@ -133,11 +133,24 @@ struct Actor {
 
 struct State {
   CharBoard board;
-  std::vector<Actor> actors;
-  int cost = 0;
+  // NonBoard exists for historical state deduplication. And using the full
+  // full state (including board which is redudnant) increases run time
+  // ~20-30%.
+  struct NonBoard {
+    std::vector<Actor> actors;
+    int cost = 0;
+
+    bool operator==(const NonBoard& o) const {
+      return actors == o.actors && cost == o.cost;
+    }
+    template <typename H>
+    friend H AbslHashValue(H h, const NonBoard& s) {
+      return H::combine(std::move(h), s.actors, s.cost);
+    }
+  } non_board;
 
   bool IsFinal() const {
-    for (const auto& a : actors) {
+    for (const auto& a : non_board.actors) {
       if (!a.done) return false;
     }
     return true;
@@ -145,32 +158,24 @@ struct State {
 
   State MoveActor(int actor_idx, Point to, int cost, bool done) const {
     State new_state = *this;
-    CHECK_LT(actor_idx, actors.size());
+    CHECK_LT(actor_idx, non_board.actors.size());
     CHECK_GE(actor_idx, 0);
-    new_state.board[new_state.actors[actor_idx].cur] = '.';
-    new_state.board[to] = new_state.actors[actor_idx].c;
-    new_state.actors[actor_idx].cur = to;
+    new_state.board[new_state.non_board.actors[actor_idx].cur] = '.';
+    new_state.board[to] = new_state.non_board.actors[actor_idx].c;
+    new_state.non_board.actors[actor_idx].cur = to;
     if (done) {
-      new_state.actors[actor_idx].done = true;
+      new_state.non_board.actors[actor_idx].done = true;
     } else {
-      CHECK(!new_state.actors[actor_idx].moved);
-      new_state.actors[actor_idx].moved = true;
+      CHECK(!new_state.non_board.actors[actor_idx].moved);
+      new_state.non_board.actors[actor_idx].moved = true;
     }
-    new_state.cost += cost;
+    new_state.non_board.cost += cost;
     return new_state;
   }
 
-  bool operator==(const State& o) const {
-    return board == o.board && actors == o.actors && cost == o.cost;
-  }
-  template <typename H>
-  friend H AbslHashValue(H h, const State& s) {
-    return H::combine(std::move(h), s.board, s.actors, s.cost);
-  }
-
   friend std::ostream& operator<<(std::ostream& o, const State& s) {
-    o << "Cost=" << s.cost << "; Board:\n" << s.board << "\n" << "Actors:\n";
-    for (const auto& a : s.actors) {
+    o << "Cost=" << s.non_board.cost << "; Board:\n" << s.board << "\n" << "Actors:\n";
+    for (const auto& a : s.non_board.actors) {
       o << a << "\n";
     }
     return o;
@@ -183,46 +188,46 @@ int FindMinCost(
     const absl::flat_hash_map<char, std::vector<Point>>& destinations,
     const AllPathsMap& all_paths) {
   VLOG(1) << "Start: " << s;
-  absl::flat_hash_set<State> history = {s};
+  absl::flat_hash_set<State::NonBoard> history = {s.non_board};
   int64_t best = std::numeric_limits<int64_t>::max();
   for (std::deque<State> queue = {s}; !queue.empty(); queue.pop_front()) {
     const State& cur = queue.front();
     if (cur.IsFinal()) {
-      if (best > cur.cost) {
-        VLOG(1) << "Found better final cost: " << cur.cost;
+      if (best > cur.non_board.cost) {
+        VLOG(1) << "Found better final cost: " << cur.non_board.cost;
         VLOG(2) << cur;
-        best = cur.cost;
+        best = cur.non_board.cost;
       }
       continue;
     }
     // Fork off test paths for the next best action of each actor. 
-    for (int i = 0; i < cur.actors.size(); ++i) {
-      if (cur.actors[i].done) continue;
+    for (int i = 0; i < cur.non_board.actors.size(); ++i) {
+      if (cur.non_board.actors[i].done) continue;
       // Can we go to the final location?
-      Point p = cur.actors[i].Destination(destinations, cur.board);
-      absl::optional<int> cost = cur.actors[i].CanMove(p, cur.board, all_paths);
+      Point p = cur.non_board.actors[i].Destination(destinations, cur.board);
+      absl::optional<int> cost = cur.non_board.actors[i].CanMove(p, cur.board, all_paths);
       if (cost) {
         // We can reach the final destination. Go there and stop.
         State new_state = cur.MoveActor(i, p, *cost, /*done=*/true);
-        if (new_state.cost >= best) continue;
-        if (history.contains(new_state)) continue;
-        history.insert(new_state);
+        if (new_state.non_board.cost >= best) continue;
+        if (history.contains(new_state.non_board)) continue;
+        history.insert(new_state.non_board);
         VLOG(3) << cur << " => " << new_state;
         queue.push_back(new_state);
         continue;
       }
       // If we have alread moved, we can't move again.
-      if (cur.actors[i].moved) continue;
+      if (cur.non_board.actors[i].moved) continue;
 
       // If we haven't moved, and we can't get to the final destionation,
       // fork off test paths for each candidate temporary location.
       for (Point p : empty) {
-        absl::optional<int> cost = cur.actors[i].CanMove(p, cur.board, all_paths);
+        absl::optional<int> cost = cur.non_board.actors[i].CanMove(p, cur.board, all_paths);
         if (cost) {
           State new_state = cur.MoveActor(i, p, *cost, /*done=*/false);
-          if (new_state.cost >= best) continue;
-          if (history.contains(new_state)) continue;
-          history.insert(new_state);
+          if (new_state.non_board.cost >= best) continue;
+          if (history.contains(new_state.non_board)) continue;
+          history.insert(new_state.non_board);
           VLOG(3) << cur << " => " << new_state;
           queue.push_back(new_state);
         }
@@ -247,7 +252,7 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
   std::vector<Point> srcs;
   for (Point p : b->range()) {
     if ((*b)[p] >= 'A' && (*b)[p] <= 'D') {
-      s.actors.push_back({.c = (*b)[p], .cur = p});
+      s.non_board.actors.push_back({.c = (*b)[p], .cur = p});
       srcs.push_back(p);
     }
     // p + south = '#' is the stupid test for not stopping at a hallway
@@ -287,7 +292,7 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
     for (Point test : v) {
       if ((*b)[test] != c) break;
       bool found = false;
-      for (auto& a : s.actors) {
+      for (auto& a : s.non_board.actors) {
         if (a.cur == test) {
           if (found) return Error("Double found");
           if (a.c != c) return Error("Bad A");
