@@ -115,6 +115,9 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
   if (!b.ok()) return b.status();
 
   State s{.board = *b};
+
+  // Find the initial locations of actors and the temporary places in which to
+  // store them. 
   absl::flat_hash_set<Point> empty;
   std::vector<Point> srcs;
   for (Point p : b->range()) {
@@ -122,19 +125,27 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
       s.actors.push_back({.c = (*b)[p], .cur = p, .moved = false, .done = false});
       srcs.push_back(p);
     }
+    // p + south = '#' is the stupid test for not stopping at a hallway
+    // entrance.
     if ((*b)[p] == '.' && (*b)[p + Cardinal::kSouth] == '#') {
       empty.insert(p);
     }
   };
-  if (srcs.size() != 8) return Error("Bad srcs");
+
+  // Identify the destination locations for each set of actors.
+  if (srcs.size() % 4 != 0) return Error("Bad srcs");
   absl::c_sort(srcs, [](Point a, Point b) { if (a.x != b.x) return a.x < b.x; return a.y > b.y; });
-  absl::flat_hash_map<char, std::vector<Point>> destinations = {
-    {'A', {srcs[0], srcs[1]}},
-    {'B', {srcs[2], srcs[3]}},
-    {'C', {srcs[4], srcs[5]}},
-    {'D', {srcs[6], srcs[7]}},
-  };
-#if 1
+  absl::flat_hash_map<char, std::vector<Point>> destinations;
+  auto it = srcs.begin();
+  for (char c : {'A', 'B', 'C', 'D'}) {
+    for (int i = 0; i < srcs.size() / 4; ++i) {
+      destinations[c].push_back(*it);
+      ++it;
+    }
+  }
+  if (it != srcs.end()) return Error("Bad destination creation");
+
+  // Identify which actors are already in their final destination.
   for (const auto& [c, v] : destinations) {
     for (Point test : v) {
       if ((*b)[test] != c) break;
@@ -149,34 +160,7 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
       }
     }
   }
-#else
-  for (const auto& [c, v] : destinations) {
-    if ((*b)[v[0]] == c) {
-      bool found = false;
-      for (auto& a : s.actors) {
-        if (a.cur == v[0]) {
-          if (found) return Error("Double found");
-          if (a.c != c) return Error("Bad A");
-          found = true;
-          a.done = true;
-        }
-      }
-      if (!found) return Error("Not found");
-      if ((*b)[v[1]] == c) {
-        bool found = false;
-        for (auto& a : s.actors) {
-          if (a.cur == v[1]) {
-            if (found) return Error("Double found");
-            if (a.c != c) return Error("Bad A");
-            found = true;
-            a.done = true;
-          }
-        }
-        if (!found) return Error("Not found");
-      }
-    }
-  }
-#endif
+
   VLOG(1) << "Start: " << s;
   absl::flat_hash_set<State> history = {s};
   int64_t best = std::numeric_limits<int64_t>::max();
@@ -189,12 +173,14 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
       }
       continue;
     }
+    // Fork off test paths for the next best action of each actor. 
     for (int i = 0; i < cur.actors.size(); ++i) {
       if (cur.actors[i].done) continue;
       // Can we go to the final location?
       Point p = cur.actors[i].Destination(destinations, cur.board);
       absl::optional<int> cost = cur.actors[i].CanMove(p, cur.board);
       if (cost) {
+        // We can reach the final destination. Go there and stop.
         State new_state = cur;
         new_state.board[new_state.actors[i].cur] = '.';
         new_state.actors[i].cur = p;
@@ -207,9 +193,11 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
         queue.push_back(new_state);
         continue;
       }
-      // If we have moved, we can't move again.
+      // If we have alread moved, we can't move again.
       if (cur.actors[i].moved) continue;
-      // Otherwise, consult empty points.
+
+      // If we haven't moved, and we can't get to the final destionation,
+      // fork off test paths for each candidate temporary location.
       for (Point p : empty) {
         absl::optional<int> cost = cur.actors[i].CanMove(p, cur.board);
         if (cost) {
@@ -238,95 +226,7 @@ absl::StatusOr<std::string> Day_2021_23::Part2(
   std::vector<absl::string_view> spliced = {
     input[0], input[1], input[2], insert1, insert2, input[3], input[4],
   };
-
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(spliced);
-  if (!b.ok()) return b.status();
-
-  State s{.board = *b};
-  absl::flat_hash_set<Point> empty;
-  std::vector<Point> srcs;
-  for (Point p : b->range()) {
-    if ((*b)[p] >= 'A' && (*b)[p] <= 'D') {
-      s.actors.push_back({.c = (*b)[p], .cur = p, .moved = false, .done = false});
-      srcs.push_back(p);
-    }
-    if ((*b)[p] == '.' && (*b)[p + Cardinal::kSouth] == '#') {
-      empty.insert(p);
-    }
-  };
-  if (srcs.size() != 16) return Error("Bad srcs");
-  absl::c_sort(srcs, [](Point a, Point b) { if (a.x != b.x) return a.x < b.x; return a.y > b.y; });
-  absl::flat_hash_map<char, std::vector<Point>> destinations = {
-    {'A', {srcs[0], srcs[1], srcs[2], srcs[3]}},
-    {'B', {srcs[4], srcs[5], srcs[6], srcs[7]}},
-    {'C', {srcs[8], srcs[9], srcs[10], srcs[11]}},
-    {'D', {srcs[12], srcs[13], srcs[14], srcs[15]}},
-  };
-  for (const auto& [c, v] : destinations) {
-    for (Point test : v) {
-      if ((*b)[test] != c) break;
-      bool found = false;
-      for (auto& a : s.actors) {
-        if (a.cur == test) {
-          if (found) return Error("Double found");
-          if (a.c != c) return Error("Bad A");
-          found = true;
-          a.done = true;
-        }
-      }
-    }
-  }
-  VLOG(1) << "Start: " << s;
-  absl::flat_hash_set<State> history = {s};
-  int64_t best = std::numeric_limits<int64_t>::max();
-  for (std::deque<State> queue = {s}; !queue.empty(); queue.pop_front()) {
-    const State& cur = queue.front();
-    if (cur.IsFinal()) {
-      if (best > cur.cost) {
-        VLOG(1) << "Found final: " << cur;
-        best = cur.cost;
-      }
-      continue;
-    }
-    for (int i = 0; i < cur.actors.size(); ++i) {
-      if (cur.actors[i].done) continue;
-      // Can we go to the final location?
-      Point p = cur.actors[i].Destination(destinations, cur.board);
-      absl::optional<int> cost = cur.actors[i].CanMove(p, cur.board);
-      if (cost) {
-        State new_state = cur;
-        new_state.board[new_state.actors[i].cur] = '.';
-        new_state.actors[i].cur = p;
-        new_state.actors[i].done = true;
-        new_state.board[p] = new_state.actors[i].c;
-        new_state.cost += *cost;
-        if (history.contains(new_state)) continue;
-        history.insert(new_state);
-        // VLOG(1) << cur << " => " << new_state;
-        queue.push_back(new_state);
-        continue;
-      }
-      // If we have moved, we can't move again.
-      if (cur.actors[i].moved) continue;
-      // Otherwise, consult empty points.
-      for (Point p : empty) {
-        absl::optional<int> cost = cur.actors[i].CanMove(p, cur.board);
-        if (cost) {
-          State new_state = cur;
-          new_state.board[new_state.actors[i].cur] = '.';
-          new_state.actors[i].cur = p;
-          new_state.actors[i].moved = true;
-          new_state.board[p] = new_state.actors[i].c;
-          new_state.cost += *cost;
-          if (history.contains(new_state)) continue;
-          history.insert(new_state);
-          // VLOG(1) << cur << " => " << new_state;
-          queue.push_back(new_state);
-        }
-      }
-    }
-  }
-  return IntReturn(best);
+  return Part1(absl::MakeSpan(spliced));
 }
 
 }  // namespace advent_of_code

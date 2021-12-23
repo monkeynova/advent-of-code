@@ -1,3 +1,5 @@
+# Long for no-opt is a guess. I didn't acutally let it go.
+[long=60m (9s opt) 2021.12.22]
 [part=1]
 \#############
 \#...........#
@@ -8,12 +10,16 @@
 12521
 ==
 
+# Long for no-opt is a guess. I didn't acutally let it go.
+[long=60m (9s opt) 2021.12.22]
 [part=1]
 @include{advent_of_code/2021/day23/input.txt}
 --
 18282
 ==
 
+# Long for no-opt is a guess. I didn't acutally let it go.
+[long=60m (25s opt) 2021.12.22]
 [part=2]
 \#############
 \#...........#
@@ -24,6 +30,8 @@
 44169
 ==
 
+# Long for no-opt is a guess. I didn't acutally let it go.
+[long=60m (25s opt) 2020.12.21]
 [part=2]
 @include{advent_of_code/2021/day23/input.txt}
 --
