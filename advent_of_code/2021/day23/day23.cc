@@ -109,13 +109,15 @@ struct Actor {
       VLOG(1) << dest;
       LOG(FATAL) << "Could not find path";
     }
-    for (Point p : it->second) {
-      if (p != cur && b[p] != '.') return {};
+    const std::vector<Point>& path = it->second;
+    for (Point p : path) {
+      if (p == cur) {
+        CHECK_EQ(b[p], c);
+      } else {
+        if (b[p] != '.') return {};
+      }
     }
-    return (it->second.size() - 1) * cost();
-    //absl::optional<int> dist = CanMoveBFS(&b, cur, dest).FindMinStepsAStar();
-    //if (!dist) return {};
-    //return *dist * cost();
+    return (path.size() - 1) * cost();
   }
 
   int cost() const {
@@ -255,6 +257,10 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
     }
   };
 
+  // Compute the paths from all points we might want to move an actor between.
+  // These paths are unique (TODO(@monkeynova): verify this) so future checks
+  // for motion between them only needs to check for blockages, rather than
+  // finding routes.
   std::vector<Point> all_points;
   all_points.insert(all_points.end(), empty.begin(), empty.end());
   all_points.insert(all_points.end(), srcs.begin(), srcs.end());
