@@ -1,22 +1,30 @@
 [part=1]
-Example input
+\#############
+\#...........#
+\###B#C#B#D###
+\  #A#D#C#A#  
+\  #########  
 --
-ERROR: UNIMPLEMENTED: Problem not known
+12521
 ==
 
 [part=1]
 @include{advent_of_code/2021/day23/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+18282
 ==
 
 [part=2]
-Example input
+\#############
+\#...........#
+\###B#C#B#D###
+\  #A#D#C#A#  
+\  #########  
 --
-ERROR: UNIMPLEMENTED: Problem not known
+44169
 ==
 
 [part=2]
 @include{advent_of_code/2021/day23/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+50132
