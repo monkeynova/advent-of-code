@@ -18,18 +18,32 @@ namespace {
 
 class CanMoveBFS : public BFSInterface<CanMoveBFS, Point> {
  public:
-  CanMoveBFS(const CharBoard* b, Point cur, Point end) : b_(b), cur_(cur), end_(end) {}
+  CanMoveBFS(const CharBoard* b, Point cur, Point end, std::vector<Point>* path_out) 
+    : b_(b), cur_(cur), end_(end), path_out_(path_out) {
+    path_.push_back(cur_);
+  }
 
   Point identifier() const override { return cur_; }
 
-  bool IsFinal() const override { return cur_ == end_; }
+  bool IsFinal() const override {
+    if (cur_ == end_) {
+      *path_out_ = path_;
+    }
+    return cur_ == end_;
+  }
+
+  int min_steps_to_final() const override {
+    return (cur_ - end_).dist();
+  }
 
   void AddNextSteps(State* state) const override {
+    const absl::flat_hash_set<char> kMovable = {'.', 'A', 'B', 'C', 'D'};
     for (Point d : Cardinal::kFourDirs) {
       if (!b_->OnBoard(cur_ + d)) continue;
-      if ((*b_)[cur_ + d] != '.') continue;
+      if (!kMovable.contains((*b_)[cur_ + d])) continue;
       CanMoveBFS next = *this;
       next.cur_ += d;
+      next.path_.push_back(next.cur_);
       state->AddNextStep(next);
     }
   }
@@ -38,7 +52,26 @@ class CanMoveBFS : public BFSInterface<CanMoveBFS, Point> {
   const CharBoard* b_;
   Point cur_;
   Point end_;
+  std::vector<Point>* path_out_;
+  std::vector<Point> path_;
 };
+
+using AllPathsMap = absl::flat_hash_map<std::pair<Point, Point>, std::vector<Point>>;
+
+AllPathsMap ComputeAllPaths(const CharBoard& b,
+                            const std::vector<Point>& point_list) {
+  AllPathsMap ret;
+  for (Point from : point_list) {
+    for (Point to : point_list) {
+      std::vector<Point>& path = ret[std::make_pair(from, to)];
+      CHECK(CanMoveBFS(&b, from, to, &path).FindMinSteps());
+      CHECK_EQ(path[0], from);
+      CHECK_EQ(path.back(), to);
+    }
+  }
+
+  return ret;
+}
 
 struct Actor {
   char c;
@@ -69,10 +102,20 @@ struct Actor {
     LOG(FATAL) << "No destination found: " << *this << "\n" << b;
   }
 
-  absl::optional<int> CanMove(Point dest, const CharBoard& b) const {
-    absl::optional<int> dist = CanMoveBFS(&b, cur, dest).FindMinSteps();
-    if (!dist) return {};
-    return *dist * cost();
+  absl::optional<int> CanMove(Point dest, const CharBoard& b, const AllPathsMap& all_paths) const {
+    auto it = all_paths.find(std::make_pair(cur, dest));
+    if (it == all_paths.end()) {
+      VLOG(1) << cur;
+      VLOG(1) << dest;
+      LOG(FATAL) << "Could not find path";
+    }
+    for (Point p : it->second) {
+      if (p != cur && b[p] != '.') return {};
+    }
+    return (it->second.size() - 1) * cost();
+    //absl::optional<int> dist = CanMoveBFS(&b, cur, dest).FindMinStepsAStar();
+    //if (!dist) return {};
+    //return *dist * cost();
   }
 
   int cost() const {
@@ -134,8 +177,9 @@ struct State {
 
 int FindMinCost(
     State s,
-    const absl::flat_hash_set<Point>& empty,
-    const absl::flat_hash_map<char, std::vector<Point>>& destinations) {
+    const std::vector<Point>& empty,
+    const absl::flat_hash_map<char, std::vector<Point>>& destinations,
+    const AllPathsMap& all_paths) {
   VLOG(1) << "Start: " << s;
   absl::flat_hash_set<State> history = {s};
   int64_t best = std::numeric_limits<int64_t>::max();
@@ -154,10 +198,11 @@ int FindMinCost(
       if (cur.actors[i].done) continue;
       // Can we go to the final location?
       Point p = cur.actors[i].Destination(destinations, cur.board);
-      absl::optional<int> cost = cur.actors[i].CanMove(p, cur.board);
+      absl::optional<int> cost = cur.actors[i].CanMove(p, cur.board, all_paths);
       if (cost) {
         // We can reach the final destination. Go there and stop.
         State new_state = cur.MoveActor(i, p, *cost, /*done=*/true);
+        if (new_state.cost >= best) continue;
         if (history.contains(new_state)) continue;
         history.insert(new_state);
         VLOG(3) << cur << " => " << new_state;
@@ -170,9 +215,10 @@ int FindMinCost(
       // If we haven't moved, and we can't get to the final destionation,
       // fork off test paths for each candidate temporary location.
       for (Point p : empty) {
-        absl::optional<int> cost = cur.actors[i].CanMove(p, cur.board);
+        absl::optional<int> cost = cur.actors[i].CanMove(p, cur.board, all_paths);
         if (cost) {
           State new_state = cur.MoveActor(i, p, *cost, /*done=*/false);
+          if (new_state.cost >= best) continue;
           if (history.contains(new_state)) continue;
           history.insert(new_state);
           VLOG(3) << cur << " => " << new_state;
@@ -195,7 +241,7 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
 
   // Find the initial locations of actors and the temporary places in which to
   // store them. 
-  absl::flat_hash_set<Point> empty;
+  std::vector<Point> empty;
   std::vector<Point> srcs;
   for (Point p : b->range()) {
     if ((*b)[p] >= 'A' && (*b)[p] <= 'D') {
@@ -205,18 +251,21 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
     // p + south = '#' is the stupid test for not stopping at a hallway
     // entrance.
     if ((*b)[p] == '.' && (*b)[p + Cardinal::kSouth] == '#') {
-      empty.insert(p);
+      empty.push_back(p);
     }
   };
 
-  auto point_x_then_y = [](Point a, Point b) {
-    if (a.x != b.x) return a.x < b.x;
-    return a.y > b.y;
-  };
+  std::vector<Point> all_points;
+  all_points.insert(all_points.end(), empty.begin(), empty.end());
+  all_points.insert(all_points.end(), srcs.begin(), srcs.end());
+  AllPathsMap all_paths = ComputeAllPaths(*b, all_points);
 
   // Identify the destination locations for each set of actors.
   if (srcs.size() % 4 != 0) return Error("Bad srcs");
-  absl::c_sort(srcs, point_x_then_y);
+  absl::c_sort(srcs, [](Point a, Point b) {
+    if (a.x != b.x) return a.x < b.x;
+    return a.y > b.y;
+  });
   absl::flat_hash_map<char, std::vector<Point>> destinations;
   auto it = srcs.begin();
   for (char c : {'A', 'B', 'C', 'D'}) {
@@ -243,7 +292,7 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
     }
   }
 
-  return IntReturn(FindMinCost(std::move(s), empty, destinations));
+  return IntReturn(FindMinCost(std::move(s), empty, destinations, all_paths));
 }
 
 absl::StatusOr<std::string> Day_2021_23::Part2(
