@@ -7,7 +7,6 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/directed_graph.h"
-#include "advent_of_code/graph_forest.h"
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
@@ -31,7 +30,7 @@ int CountConstellations(const std::vector<Point4>& points) {
     }
   }
 
-  return GraphForest(g).size();
+  return g.Forest().size();
 }
 
 }  // namespace

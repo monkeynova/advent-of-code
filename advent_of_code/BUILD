@@ -108,6 +108,7 @@ cc_library(
 cc_library(
     name = "directed_graph",
     hdrs = ["directed_graph.h"],
+    srcs = ["directed_graph.cc"],
     visibility = [
         "//visibility:public",
     ],
@@ -116,18 +117,6 @@ cc_library(
         "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
-        "@com_google_glog//:glog",
-    ],
-)
-
-cc_library(
-    name = "graph_forest",
-    hdrs = ["graph_forest.h"],
-    visibility = [
-        "//visibility:public",
-    ],
-    deps = [
-        ":directed_graph",
         "@com_google_glog//:glog",
     ],
 )

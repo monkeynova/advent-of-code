@@ -4,18 +4,17 @@
 #include <vector>
 
 #include "absl/container/flat_hash_map.h"
+#include "absl/container/flat_hash_set.h"
 #include "absl/strings/str_join.h"
 #include "glog/logging.h"
 
 namespace advent_of_code {
 
-template <typename Storage>
-class DirectedGraph {
+class DirectedGraphBase {
  public:
-  DirectedGraph() = default;
+  DirectedGraphBase() = default;
 
-  void AddNode(absl::string_view node_name, Storage s) {
-    storage_[node_name] = std::move(s);
+  void AddNode(absl::string_view node_name) {
     nodes_.insert(node_name);
   }
 
@@ -41,11 +40,7 @@ class DirectedGraph {
     return &it->second;
   }
 
-  const Storage* GetData(absl::string_view node) const {
-    auto it = storage_.find(node);
-    if (it == storage_.end()) return nullptr;
-    return &it->second;
-  }
+  std::vector<std::vector<absl::string_view>> Forest() const;
 
  private:
   absl::flat_hash_set<absl::string_view> nodes_;
@@ -53,6 +48,23 @@ class DirectedGraph {
       node_to_outgoing_;
   absl::flat_hash_map<absl::string_view, std::vector<absl::string_view>>
       node_to_incoming_;
+};
+
+template <typename Storage>
+class DirectedGraph : public DirectedGraphBase {
+ public:
+  void AddNode(absl::string_view node_name, Storage s) {
+    DirectedGraphBase::AddNode(node_name);
+    storage_[node_name] = std::move(s);
+  }
+
+  const Storage* GetData(absl::string_view node) const {
+    auto it = storage_.find(node);
+    if (it == storage_.end()) return nullptr;
+    return &it->second;
+  }
+
+ private:
   absl::flat_hash_map<absl::string_view, Storage> storage_;
 };
 
