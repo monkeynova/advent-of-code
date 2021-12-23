@@ -26,55 +26,6 @@ absl::StatusOr<DirectedGraph<bool>> Parse(absl::Span<absl::string_view> input) {
   return ret;
 }
 
-class PathWalk : public BFSInterface<PathWalk, absl::string_view> {
- public:
-  PathWalk(const DirectedGraph<bool>& graph, absl::string_view start)
-      : graph_(graph), cur_(start) {}
-
-  int FindReachable() {
-    int reachable = 0;
-    reachable_ = &reachable;
-    FindMinSteps();
-    return reachable;
-  }
-
-  int CountGroups() {
-    int groups = 0;
-    absl::flat_hash_set<absl::string_view> nodes = graph_.nodes();
-    to_see_ = &nodes;
-    while (!nodes.empty()) {
-      ++groups;
-      cur_ = *nodes.begin();
-      FindMinSteps();
-    }
-    return groups;
-  }
-
-  bool IsFinal() const override { return false; }
-
-  void AddNextSteps(State* state) const override {
-    if (reachable_ != nullptr) ++*reachable_;
-    if (to_see_ != nullptr) to_see_->erase(cur_);
-
-    const std::vector<absl::string_view>* outgoing = graph_.Outgoing(cur_);
-    if (outgoing != nullptr) {
-      for (absl::string_view next_cur : *outgoing) {
-        PathWalk next = *this;
-        next.cur_ = next_cur;
-        state->AddNextStep(next);
-      }
-    }
-  }
-
-  absl::string_view identifier() const override { return cur_; }
-
- private:
-  const DirectedGraph<bool>& graph_;
-  absl::string_view cur_;
-  int* reachable_ = nullptr;
-  absl::flat_hash_set<absl::string_view>* to_see_ = nullptr;
-};
-
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_12::Part1(
@@ -82,7 +33,7 @@ absl::StatusOr<std::string> Day_2017_12::Part1(
   absl::StatusOr<DirectedGraph<bool>> graph = Parse(input);
   if (!graph.ok()) return graph.status();
 
-  return IntReturn(PathWalk(*graph, "0").FindReachable());
+  return IntReturn(graph->Reachable("0").size());
 }
 
 absl::StatusOr<std::string> Day_2017_12::Part2(

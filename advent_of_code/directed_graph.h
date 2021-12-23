@@ -41,6 +41,7 @@ class DirectedGraphBase {
     return &it->second;
   }
 
+  absl::flat_hash_set<absl::string_view> Reachable(absl::string_view src) const;
   std::vector<std::vector<absl::string_view>> Forest() const;
   absl::StatusOr<std::vector<absl::string_view>> DAGSort() const;
   absl::StatusOr<std::vector<absl::string_view>> DAGSort(

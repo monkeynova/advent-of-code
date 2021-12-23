@@ -2,6 +2,23 @@
 
 namespace advent_of_code {
 
+absl::flat_hash_set<absl::string_view> DirectedGraphBase::Reachable(
+    absl::string_view src) const {
+  if (!nodes_.contains(src)) return {};
+  absl::flat_hash_set<absl::string_view> ret = {src};
+  for (std::deque<absl::string_view> queue = {src}; !queue.empty(); queue.pop_front()) {
+    absl::string_view cur = queue.front();
+    const std::vector<absl::string_view>* outgoing = Outgoing(cur);
+    if (!outgoing) continue;
+    for (absl::string_view next : *outgoing) {
+      if (ret.contains(next)) continue;
+      ret.insert(next);
+      queue.push_back(next);
+    }
+  }
+  return ret;
+}
+
 std::vector<std::vector<absl::string_view>> DirectedGraphBase::Forest() const {
   std::vector<std::vector<absl::string_view>> forest;
 
@@ -14,9 +31,9 @@ std::vector<std::vector<absl::string_view>> DirectedGraphBase::Forest() const {
       forest.back().push_back(name);
       frontier.pop_front();
       to_assign.erase(name);
-      const std::vector<absl::string_view>* incoming = Incoming(name);
-      if (incoming != nullptr) {
-        for (absl::string_view tmp : *incoming) {
+      const std::vector<absl::string_view>* outgoing = Outgoing(name);
+      if (outgoing != nullptr) {
+        for (absl::string_view tmp : *outgoing) {
           if (to_assign.contains(tmp)) frontier.push_back(tmp);
         }
       }
