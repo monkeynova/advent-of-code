@@ -47,6 +47,7 @@ cc_test(
         "//advent_of_code/2021/day21:day21_benchmark_lib",
         "//advent_of_code/2021/day22:day22_benchmark_lib",
         "//advent_of_code/2021/day23:day23_benchmark_lib",
+        "//advent_of_code/2021/day24:day24_benchmark_lib",
         "@com_monkeynova_gunit_main//:test_main",
     ],
 )
