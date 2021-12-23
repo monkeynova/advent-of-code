@@ -5,6 +5,7 @@
 
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
+#include "absl/status/statusor.h"
 #include "absl/strings/str_join.h"
 #include "glog/logging.h"
 
@@ -41,6 +42,9 @@ class DirectedGraphBase {
   }
 
   std::vector<std::vector<absl::string_view>> Forest() const;
+  absl::StatusOr<std::vector<absl::string_view>> DAGSort() const;
+  absl::StatusOr<std::vector<absl::string_view>> DAGSort(
+      absl::FunctionRef<bool(absl::string_view, absl::string_view)> cmp) const;
 
  private:
   absl::flat_hash_set<absl::string_view> nodes_;

@@ -6,7 +6,6 @@ cc_library(
     hdrs = ["day14.h"],
     deps = [
         "//advent_of_code:advent_day",
-        "//advent_of_code:dag_sort",
         "//advent_of_code:directed_graph",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",
