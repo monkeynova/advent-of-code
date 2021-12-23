@@ -8,6 +8,7 @@
 #include "absl/strings/str_split.h"
 #include "advent_of_code/bfs.h"
 #include "advent_of_code/directed_graph.h"
+#include "advent_of_code/graph_forest.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 
@@ -90,7 +91,7 @@ absl::StatusOr<std::string> Day_2017_12::Part2(
   absl::StatusOr<DirectedGraph<bool>> graph = Parse(input);
   if (!graph.ok()) return graph.status();
 
-  return IntReturn(PathWalk(*graph, "0").CountGroups());
+  return IntReturn(GraphForest(*graph).size());
 }
 
 }  // namespace advent_of_code

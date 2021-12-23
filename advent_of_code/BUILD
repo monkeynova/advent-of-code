@@ -121,6 +121,18 @@ cc_library(
 )
 
 cc_library(
+    name = "graph_forest",
+    hdrs = ["graph_forest.h"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        ":directed_graph",
+        "@com_google_glog//:glog",
+    ],
+)
+
+cc_library(
     name = "dag_sort",
     hdrs = ["dag_sort.h"],
     visibility = [
