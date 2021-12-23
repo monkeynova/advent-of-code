@@ -3,6 +3,7 @@
 #include "absl/algorithm/container.h"
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
+#include "absl/container/node_hash_set.h"
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
@@ -133,24 +134,19 @@ struct Actor {
 
 struct State {
   CharBoard board;
-  // NonBoard exists for historical state deduplication. And using the full
-  // full state (including board which is redudnant) increases run time
-  // ~20-30%.
-  struct NonBoard {
-    std::vector<Actor> actors;
-    int cost = 0;
+  std::vector<Actor> actors;
+  int cost = 0;
 
-    bool operator==(const NonBoard& o) const {
-      return actors == o.actors && cost == o.cost;
-    }
-    template <typename H>
-    friend H AbslHashValue(H h, const NonBoard& s) {
-      return H::combine(std::move(h), s.actors, s.cost);
-    }
-  } non_board;
+  bool operator==(const State& o) const {
+    return actors == o.actors && cost == o.cost;
+  }
+  template <typename H>
+  friend H AbslHashValue(H h, const State& s) {
+    return H::combine(std::move(h), s.actors, s.cost);
+  }
 
   bool IsFinal() const {
-    for (const auto& a : non_board.actors) {
+    for (const auto& a : actors) {
       if (!a.done) return false;
     }
     return true;
@@ -158,24 +154,24 @@ struct State {
 
   State MoveActor(int actor_idx, Point to, int cost, bool done) const {
     State new_state = *this;
-    CHECK_LT(actor_idx, non_board.actors.size());
+    CHECK_LT(actor_idx, actors.size());
     CHECK_GE(actor_idx, 0);
-    new_state.board[new_state.non_board.actors[actor_idx].cur] = '.';
-    new_state.board[to] = new_state.non_board.actors[actor_idx].c;
-    new_state.non_board.actors[actor_idx].cur = to;
+    new_state.board[new_state.actors[actor_idx].cur] = '.';
+    new_state.board[to] = new_state.actors[actor_idx].c;
+    new_state.actors[actor_idx].cur = to;
     if (done) {
-      new_state.non_board.actors[actor_idx].done = true;
+      new_state.actors[actor_idx].done = true;
     } else {
-      CHECK(!new_state.non_board.actors[actor_idx].moved);
-      new_state.non_board.actors[actor_idx].moved = true;
+      CHECK(!new_state.actors[actor_idx].moved);
+      new_state.actors[actor_idx].moved = true;
     }
-    new_state.non_board.cost += cost;
+    new_state.cost += cost;
     return new_state;
   }
 
   friend std::ostream& operator<<(std::ostream& o, const State& s) {
-    o << "Cost=" << s.non_board.cost << "; Board:\n" << s.board << "\n" << "Actors:\n";
-    for (const auto& a : s.non_board.actors) {
+    o << "Cost=" << s.cost << "; Board:\n" << s.board << "\n" << "Actors:\n";
+    for (const auto& a : s.actors) {
       o << a << "\n";
     }
     return o;
@@ -183,53 +179,54 @@ struct State {
 };
 
 int FindMinCost(
-    State s,
+    State initial_state,
     const std::vector<Point>& empty,
     const absl::flat_hash_map<char, std::vector<Point>>& destinations,
     const AllPathsMap& all_paths) {
-  VLOG(1) << "Start: " << s;
-  absl::flat_hash_set<State::NonBoard> history = {s.non_board};
+  VLOG(1) << "Start: " << initial_state;
+  // We use a `node_hash_set` so that `history` can be the owning storage
+  // for the queue and use pointers to not 2x storage and copies.
+  absl::node_hash_set<State> history = {initial_state};
   int64_t best = std::numeric_limits<int64_t>::max();
-  for (std::deque<State> queue = {s}; !queue.empty(); queue.pop_front()) {
-    const State& cur = queue.front();
+  for (std::deque<const State*> queue = {&initial_state}; !queue.empty();
+       history.erase(*queue.front()), queue.pop_front()) {
+    const State& cur = *queue.front();
     if (cur.IsFinal()) {
-      if (best > cur.non_board.cost) {
-        VLOG(1) << "Found better final cost: " << cur.non_board.cost;
+      if (best > cur.cost) {
+        VLOG(1) << "Found better final cost: " << cur.cost;
         VLOG(2) << cur;
-        best = cur.non_board.cost;
+        best = cur.cost;
       }
       continue;
     }
     // Fork off test paths for the next best action of each actor. 
-    for (int i = 0; i < cur.non_board.actors.size(); ++i) {
-      if (cur.non_board.actors[i].done) continue;
+    for (int i = 0; i < cur.actors.size(); ++i) {
+      if (cur.actors[i].done) continue;
       // Can we go to the final location?
-      Point p = cur.non_board.actors[i].Destination(destinations, cur.board);
-      absl::optional<int> cost = cur.non_board.actors[i].CanMove(p, cur.board, all_paths);
+      Point p = cur.actors[i].Destination(destinations, cur.board);
+      absl::optional<int> cost = cur.actors[i].CanMove(p, cur.board, all_paths);
       if (cost) {
+        if (cur.cost + *cost >= best) continue;
         // We can reach the final destination. Go there and stop.
-        State new_state = cur.MoveActor(i, p, *cost, /*done=*/true);
-        if (new_state.non_board.cost >= best) continue;
-        if (history.contains(new_state.non_board)) continue;
-        history.insert(new_state.non_board);
-        VLOG(3) << cur << " => " << new_state;
-        queue.push_back(new_state);
+        const auto [it, inserted] = history.insert(cur.MoveActor(i, p, *cost, /*done=*/true));
+        if (!inserted) continue;
+        VLOG(3) << cur << " => " << *it;
+        queue.push_back(&*it);
         continue;
       }
       // If we have alread moved, we can't move again.
-      if (cur.non_board.actors[i].moved) continue;
+      if (cur.actors[i].moved) continue;
 
       // If we haven't moved, and we can't get to the final destionation,
       // fork off test paths for each candidate temporary location.
       for (Point p : empty) {
-        absl::optional<int> cost = cur.non_board.actors[i].CanMove(p, cur.board, all_paths);
+        absl::optional<int> cost = cur.actors[i].CanMove(p, cur.board, all_paths);
         if (cost) {
-          State new_state = cur.MoveActor(i, p, *cost, /*done=*/false);
-          if (new_state.non_board.cost >= best) continue;
-          if (history.contains(new_state.non_board)) continue;
-          history.insert(new_state.non_board);
-          VLOG(3) << cur << " => " << new_state;
-          queue.push_back(new_state);
+          if (cur.cost + *cost >= best) continue;
+          const auto [it, inserted] = history.insert(cur.MoveActor(i, p, *cost, /*done=*/false));
+          if (!inserted) continue;
+          VLOG(3) << cur << " => " << *it;
+          queue.push_back(&*it);
         }
       }
     }
@@ -252,7 +249,7 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
   std::vector<Point> srcs;
   for (Point p : b->range()) {
     if ((*b)[p] >= 'A' && (*b)[p] <= 'D') {
-      s.non_board.actors.push_back({.c = (*b)[p], .cur = p});
+      s.actors.push_back({.c = (*b)[p], .cur = p});
       srcs.push_back(p);
     }
     // p + south = '#' is the stupid test for not stopping at a hallway
@@ -292,7 +289,7 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
     for (Point test : v) {
       if ((*b)[test] != c) break;
       bool found = false;
-      for (auto& a : s.non_board.actors) {
+      for (auto& a : s.actors) {
         if (a.cur == test) {
           if (found) return Error("Double found");
           if (a.c != c) return Error("Bad A");
