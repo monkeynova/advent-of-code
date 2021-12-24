@@ -3,6 +3,7 @@
 #include "absl/algorithm/container.h"
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
+#include "absl/functional/function_ref.h"
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
@@ -127,7 +128,7 @@ int64_t Decompiled(std::vector<int> input) {
   return z;
 }
 
-int64_t Partial(int input, int64_t off, int64_t z) {
+int64_t DecompiledPartial(int input, int64_t off, int64_t z) {
   std::vector<int64_t> x_array = {
     14, 14, 14, 12, 15, -12, -12, 12, -7, 18, -8, -5, -10, -7
   };
@@ -164,7 +165,7 @@ bool BetterInputMin(const std::vector<int>& a, const std::vector<int>& b) {
   return false;
 }
 
-std::string FindMaxInput(VM vm) {
+std::string FindBestInput(absl::FunctionRef<bool(const std::vector<int>&, const std::vector<int>&)> better_input_p) {
   absl::flat_hash_map<int64_t, std::vector<int>> z_to_partial = {
     {0, {}},
   };
@@ -174,11 +175,11 @@ std::string FindMaxInput(VM vm) {
     for (const auto& [z, this_input] : z_to_partial) {
       std::vector<int> next_input = this_input;
       for (int input = 1; input <= 9; ++input) {
-        int64_t next_z = Partial(input, offset, z);
+        int64_t next_z = DecompiledPartial(input, offset, z);
         next_input.push_back(input);
         auto [it, inserted] = next_z_to_partial.emplace(next_z, next_input);
         if (!inserted) {
-          if (BetterInputMax(next_input, it->second)) {
+          if (better_input_p(next_input, it->second)) {
             it->second = next_input;
           }
         }
@@ -189,57 +190,6 @@ std::string FindMaxInput(VM vm) {
   }
   VLOG(1) << "Final: " << z_to_partial.size();
   VLOG(1) << "Contains 0 " << z_to_partial.contains(0);
-  if (false) {
-  for (const auto& [z, input] : z_to_partial) {
-    vm.Reset();
-    auto st = vm.Execute(input);
-    CHECK(st.ok());
-    if (z != vm.registers["z"]) {
-      VLOG(1) << z << " != " << vm.registers["z"];
-    }
-  }
-  }
-  auto it = z_to_partial.find(0);
-  CHECK(it != z_to_partial.end());
-  VLOG(1) << absl::StrJoin(it->second, "");
-  return absl::StrJoin(it->second, "");
-}
-
-std::string FindMinInput(VM vm) {
-  absl::flat_hash_map<int64_t, std::vector<int>> z_to_partial = {
-    {0, {}},
-  };
-  for (int offset = 0; offset < 14; ++offset) {
-    VLOG(1) << offset << ": " << z_to_partial.size();
-    absl::flat_hash_map<int64_t, std::vector<int>> next_z_to_partial;
-    for (const auto& [z, this_input] : z_to_partial) {
-      std::vector<int> next_input = this_input;
-      for (int input = 1; input <= 9; ++input) {
-        int64_t next_z = Partial(input, offset, z);
-        next_input.push_back(input);
-        auto [it, inserted] = next_z_to_partial.emplace(next_z, next_input);
-        if (!inserted) {
-          if (BetterInputMin(next_input, it->second)) {
-            it->second = next_input;
-          }
-        }
-        next_input.pop_back();
-      }
-    }
-    z_to_partial = std::move(next_z_to_partial);
-  }
-  VLOG(1) << "Final: " << z_to_partial.size();
-  VLOG(1) << "Contains 0 " << z_to_partial.contains(0);
-  if (false) {
-  for (const auto& [z, input] : z_to_partial) {
-    vm.Reset();
-    auto st = vm.Execute(input);
-    CHECK(st.ok());
-    if (z != vm.registers["z"]) {
-      VLOG(1) << z << " != " << vm.registers["z"];
-    }
-  }
-  }
   auto it = z_to_partial.find(0);
   CHECK(it != z_to_partial.end());
   VLOG(1) << absl::StrJoin(it->second, "");
@@ -263,7 +213,7 @@ absl::StatusOr<std::string> Day_2021_24::Part1(
     if (auto st = vm.Execute(test); !st.ok()) return st;
     if (vm.registers["z"] != 0) return Error("Not 0 checksum");
   }
-  return FindMaxInput(vm);
+  return FindBestInput(BetterInputMax);
 
   std::vector<int> test(14, 9);
   int64_t best = std::numeric_limits<int64_t>::max();
@@ -302,7 +252,7 @@ absl::StatusOr<std::string> Day_2021_24::Part2(
     if (auto st = vm.Execute(test); !st.ok()) return st;
     if (vm.registers["z"] != 0) return Error("Not 0 checksum");
   }
-  return FindMinInput(vm);
+  return FindBestInput(BetterInputMin);
 }
 
 }  // namespace advent_of_code
