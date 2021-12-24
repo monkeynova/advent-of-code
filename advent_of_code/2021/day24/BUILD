@@ -22,6 +22,7 @@ cc_library(
     data = [
         "day24.test",
         "input.txt",
+        "input.cshabsin.txt",
     ],
     deps = [
         ":day24",
