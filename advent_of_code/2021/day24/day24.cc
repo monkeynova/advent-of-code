@@ -24,7 +24,7 @@ struct VM {
     return ret;
   }
 
-  absl::Status Execute(std::vector<int> input) {
+  absl::Status Execute(std::string input) {
     Reset();
     auto input_it = input.begin();
     for (const auto& op : ops_) {
@@ -36,7 +36,7 @@ struct VM {
       if (op[0] == "inp") {
         if (op.size() != 2) return Error("Bad inp");
         if (input_it == input.end()) return Error("Past input");
-        it_dest->second = *input_it;
+        it_dest->second = *input_it - '0';
         ++input_it;
       } else if (op[0] == "add") {
         if (op.size() != 3) return Error("Bad inp");
@@ -106,7 +106,7 @@ struct VM {
   };
 };
 
-int64_t Decompiled(std::vector<int> input) {
+int64_t Decompiled(std::string input) {
   CHECK_EQ(input.size(), 14);
   int64_t z = 0;
   std::vector<int64_t> x_array = {
@@ -121,15 +121,15 @@ int64_t Decompiled(std::vector<int> input) {
   for (int i = 0; i < 14; ++i) {
     int64_t save_z = z;
     z /= z_array[i];
-    if ((save_z % 26) + x_array[i] != input[i]) {
+    if ((save_z % 26) + x_array[i] != input[i] - '0') {
       z *= 26;
-      z += input[i] + y_array[i];
+      z += (input[i] - '0') + y_array[i];
     }
   }
   return z;
 }
 
-int64_t DecompiledPartial(int input, int64_t off, int64_t z) {
+int64_t DecompiledPartial(char input, int64_t off, int64_t z) {
   std::vector<int64_t> x_array = {
     14, 14, 14, 12, 15, -12, -12, 12, -7, 18, -8, -5, -10, -7
   };
@@ -141,50 +141,43 @@ int64_t DecompiledPartial(int input, int64_t off, int64_t z) {
   };
   int64_t save_z = z;
   z /= z_array[off];
-  if ((save_z % 26) + x_array[off] != input) {
+  if ((save_z % 26) + x_array[off] != (input - '0')) {
     z *= 26;
-    z += input + y_array[off];
+    z += (input - '0') + y_array[off];
   }
   return z;
 }
 
-bool BetterInputMax(const std::vector<int>& a, const std::vector<int>& b) {
+bool BetterInputMax(const std::string& a, const std::string& b) {
   CHECK_EQ(a.size(), b.size());
-  for (int i = 0; i < a.size(); ++i) {
-    if (a[i] > b[i]) return true;
-    if (a[i] < b[i]) return false;
-  }
-  return false;
+  return a > b;
 }
 
-bool BetterInputMin(const std::vector<int>& a, const std::vector<int>& b) {
+bool BetterInputMin(const std::string& a, const std::string& b) {
   CHECK_EQ(a.size(), b.size());
-  for (int i = 0; i < a.size(); ++i) {
-    if (a[i] < b[i]) return true;
-    if (a[i] > b[i]) return false;
-  }
-  return false;
+  return a < b;
 }
 
-std::string FindBestInput(absl::FunctionRef<bool(const std::vector<int>&, const std::vector<int>&)> better_input_p) {
-  absl::flat_hash_map<int64_t, std::vector<int>> z_to_partial = {
+std::string FindBestInput(absl::FunctionRef<bool(const std::string&, const std::string&)> better_input_p) {
+  absl::flat_hash_map<int64_t, std::string> z_to_partial = {
     {0, {}},
   };
   for (int offset = 0; offset < 14; ++offset) {
     VLOG(1) << offset << ": " << z_to_partial.size();
-    absl::flat_hash_map<int64_t, std::vector<int>> next_z_to_partial;
+    absl::flat_hash_map<int64_t, std::string> next_z_to_partial;
     for (const auto& [z, this_input] : z_to_partial) {
-      std::vector<int> next_input = this_input;
-      for (int input = 1; input <= 9; ++input) {
+      std::string next_input = this_input;
+      for (char input = '1'; input <= '9'; ++input) {
         int64_t next_z = DecompiledPartial(input, offset, z);
-        next_input.push_back(input);
+        next_input.append(1, input);
+        CHECK_EQ(next_input.size(), offset + 1);
         auto [it, inserted] = next_z_to_partial.emplace(next_z, next_input);
         if (!inserted) {
           if (better_input_p(next_input, it->second)) {
             it->second = next_input;
           }
         }
-        next_input.pop_back();
+        next_input.resize(this_input.size());
       }
     }
     z_to_partial = std::move(next_z_to_partial);
@@ -193,8 +186,9 @@ std::string FindBestInput(absl::FunctionRef<bool(const std::vector<int>&, const 
   VLOG(1) << "Contains 0 " << z_to_partial.contains(0);
   auto it = z_to_partial.find(0);
   CHECK(it != z_to_partial.end());
-  VLOG(1) << absl::StrJoin(it->second, "");
-  return absl::StrJoin(it->second, "");
+  std::string ret = it->second;
+  VLOG(1) << ret;
+  return ret;
 }
 
 }  // namespace
@@ -203,14 +197,14 @@ absl::StatusOr<std::string> Day_2021_24::Part1(
     absl::Span<absl::string_view> input) const {
   VM vm = VM::Parse(input);
   if (run_audit()) {
-    std::vector<int> test = {1, 3, 5, 7, 9, 2, 4, 6, 8, 9, 9, 9, 9, 9};
+    std::string test = "13579246899999";
     if (auto st = vm.Execute(test); !st.ok()) return st;
     if (vm.registers["z"] != Decompiled(test)) {
       return Error("Bad Decompiled: sample");
     }
   }
   if (run_audit()) {
-    std::vector<int> test = {2, 9, 9, 8, 9, 2, 9, 7, 9, 4, 9, 5, 1, 9};
+    std::string test = "29989297949519";
     if (auto st = vm.Execute(test); !st.ok()) return st;
     if (vm.registers["z"] != 0) return Error("Not 0 checksum");
     if (Decompiled(test) != 0) return Error("Not 0 checksum (Decompiled)");
@@ -222,7 +216,7 @@ absl::StatusOr<std::string> Day_2021_24::Part2(
     absl::Span<absl::string_view> input) const {
   VM vm = VM::Parse(input);
   if (run_audit()) {
-    std::vector<int> test = {1, 9, 5, 1, 8, 1, 2, 1, 3, 1, 6, 1, 1, 8};
+    std::string test = "19518121316118";
     vm.Reset();
     if (auto st = vm.Execute(test); !st.ok()) return st;
     if (vm.registers["z"] != 0) return Error("Not 0 checksum");
