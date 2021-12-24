@@ -1,11 +1,11 @@
-[long=60m (4m opt) 2021.12.23]
+[long=60m (8s opt) 2021.12.23]
 [part=1]
 @include{advent_of_code/2021/day24/input.txt}
 --
 29989297949519
 ==
 
-[long=60m (4m opt) 2021.12.23]
+[long=60m (8s opt) 2021.12.23]
 [part=2]
 @include{advent_of_code/2021/day24/input.txt}
 --
