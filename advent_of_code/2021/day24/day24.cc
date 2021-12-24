@@ -25,6 +25,7 @@ struct VM {
   }
 
   absl::Status Execute(std::vector<int> input) {
+    Reset();
     auto input_it = input.begin();
     for (const auto& op : ops_) {
       VLOG(2) << "Registers: w: " << registers["w"] << " x:" << registers["x"]
@@ -203,44 +204,18 @@ absl::StatusOr<std::string> Day_2021_24::Part1(
   VM vm = VM::Parse(input);
   if (run_audit()) {
     std::vector<int> test = {1, 3, 5, 7, 9, 2, 4, 6, 8, 9, 9, 9, 9, 9};
-    vm.Reset();
     if (auto st = vm.Execute(test); !st.ok()) return st;
-    VLOG(1) << "Sample is " << vm.registers["z"];
+    if (vm.registers["z"] != Decompiled(test)) {
+      return Error("Bad Decompiled: sample");
+    }
   }
   if (run_audit()) {
     std::vector<int> test = {2, 9, 9, 8, 9, 2, 9, 7, 9, 4, 9, 5, 1, 9};
-    vm.Reset();
     if (auto st = vm.Execute(test); !st.ok()) return st;
     if (vm.registers["z"] != 0) return Error("Not 0 checksum");
+    if (Decompiled(test) != 0) return Error("Not 0 checksum (Decompiled)");
   }
   return FindBestInput(BetterInputMax);
-
-  std::vector<int> test(14, 9);
-  int64_t best = std::numeric_limits<int64_t>::max();
-  while (test[0] > 0) {
-    vm.Reset();
-    if (auto st = vm.Execute(test); !st.ok()) return st;
-    int64_t z = vm.registers["z"];
-    int64_t dec_z = Decompiled(test);
-    if (dec_z != z) {
-      VLOG(1) << " *** ERROR *** ";
-      VLOG(1) << "Bad decompiled: " << dec_z << " != " << z << ": " << absl::StrJoin(test, "");
-    }
-    if (abs(best) > abs(z)) {
-      VLOG(1) << absl::StrJoin(test, "") << ": " << z;
-      best = z;
-    }
-    if (z == 0) {
-      return absl::StrJoin(test, "");
-    }
-    for (int i = test.size() - 1; i >= 0; --i) {
-      --test[i];
-      if (test[i] != 0) break;
-      if (i == 0) break;
-      test[i] = 9;
-    }
-  }
-  return Error("Left infinite loop");
 }
 
 absl::StatusOr<std::string> Day_2021_24::Part2(
@@ -251,6 +226,7 @@ absl::StatusOr<std::string> Day_2021_24::Part2(
     vm.Reset();
     if (auto st = vm.Execute(test); !st.ok()) return st;
     if (vm.registers["z"] != 0) return Error("Not 0 checksum");
+    if (Decompiled(test) != 0) return Error("Not 0 checksum (Decompiled)");
   }
   return FindBestInput(BetterInputMin);
 }
