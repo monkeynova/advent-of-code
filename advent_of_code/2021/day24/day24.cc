@@ -108,79 +108,94 @@ class VM {
   };
 };
 
-int64_t Decompiled(std::string input) {
+struct DecompiledConstants {
+  std::vector<int64_t> x_array;
+  std::vector<int64_t> y_array;
+  std::vector<int64_t> z_array;
+};
+
+absl::StatusOr<DecompiledConstants> ExtractConstants(
+    absl::Span<absl::string_view> input) {
+  std::vector<std::string> per_input = {
+    "inp w", "mul x 0", "add x z", "mod x 26", "div z (-?\\d+)",
+    "add x (-?\\d+)", "eql x w", "eql x 0", "mul y 0", "add y 25", "mul y x",
+    "add y 1", "mul z y", "mul y 0", "add y w", "add y (-?\\d+)", "mul y x",
+    "add z y",
+  };
+  if (input.size() != 14 * per_input.size()) return Error("Cannot match input");
+  DecompiledConstants ret;
+  for (int i = 0; i < 14; ++i) {
+    int input_off = i * per_input.size();
+    for (int j = 0; j < per_input.size(); ++j) {
+      if (!RE2::FullMatch(input[input_off + j], per_input[j])) {
+        return Error("Cannot match input: ", input[input_off + j], " !~ ", per_input[j]);
+      }
+    }
+    int z_val;
+    if (!RE2::FullMatch(input[input_off + 4], per_input[4], &z_val)) {
+      return Error("Integrity check");
+    }
+    ret.z_array.push_back(z_val);
+    int x_val;
+    if (!RE2::FullMatch(input[input_off + 5], per_input[5], &x_val)) {
+      return Error("Integrity check");
+    }
+    ret.x_array.push_back(x_val);
+    int y_val;
+    if (!RE2::FullMatch(input[input_off + 15], per_input[15], &y_val)) {
+      return Error("Integrity check");
+    }
+    ret.y_array.push_back(y_val);
+  }
+  return ret;
+}
+
+int64_t Decompiled(const DecompiledConstants& dc, std::string input) {
   CHECK_EQ(input.size(), 14);
   int64_t z = 0;
-  std::vector<int64_t> x_array = {
-    14, 14, 14, 12, 15, -12, -12, 12, -7, 18, -8, -5, -10, -7
-  };
-  std::vector<int64_t> y_array = {
-    14, 2, 1, 13, 5, 5, 5, 9, 3, 13, 2, 1, 11, 8 
-  };
-  std::vector<int64_t> z_array = {
-    1, 1, 1, 1, 1, 26, 26, 1, 26, 1, 26, 26, 26, 26,
-  };
   for (int i = 0; i < 14; ++i) {
-    if ((z % 26) + x_array[i] != input[i] - '0') {
-      z /= z_array[i];
+    if ((z % 26) + dc.x_array[i] != input[i] - '0') {
+      z /= dc.z_array[i];
       z *= 26;
-      z += (input[i] - '0') + y_array[i];
+      z += (input[i] - '0') + dc.y_array[i];
     } else {
-      z /= z_array[i];
+      z /= dc.z_array[i];
     }
   }
   return z;
 }
 
-int64_t DecompiledPartial(char input, int64_t off, int64_t z) {
-  std::vector<int64_t> x_array = {
-    14, 14, 14, 12, 15, -12, -12, 12, -7, 18, -8, -5, -10, -7
-  };
-  std::vector<int64_t> y_array = {
-    14, 2, 1, 13, 5, 5, 5, 9, 3, 13, 2, 1, 11, 8 
-  };
-  std::vector<int64_t> z_array = {
-    1, 1, 1, 1, 1, 26, 26, 1, 26, 1, 26, 26, 26, 26,
-  };
-  if ((z % 26) + x_array[off] != (input - '0')) {
-    z /= z_array[off];
+int64_t DecompiledPartial(const DecompiledConstants& dc, char input, int64_t off, int64_t z) {
+  if ((z % 26) + dc.x_array[off] != (input - '0')) {
+    z /=  dc.z_array[off];
     z *= 26;
-    z += (input - '0') + y_array[off];
+    z += (input - '0') +  dc.y_array[off];
   } else {
-    z /= z_array[off];
+    z /=  dc.z_array[off];
   }
   return z;
 }
 
-absl::flat_hash_set<std::pair<int64_t, char>> ReversePartial(int64_t off, const int64_t z) {
-  std::vector<int64_t> x_array = {
-    14, 14, 14, 12, 15, -12, -12, 12, -7, 18, -8, -5, -10, -7
-  };
-  std::vector<int64_t> y_array = {
-    14, 2, 1, 13, 5, 5, 5, 9, 3, 13, 2, 1, 11, 8 
-  };
-  std::vector<int64_t> z_array = {
-    1, 1, 1, 1, 1, 26, 26, 1, 26, 1, 26, 26, 26, 26,
-  };
-
+absl::flat_hash_set<std::pair<int64_t, char>> ReversePartial(
+    const DecompiledConstants& dc, int64_t off, const int64_t z) {
   absl::flat_hash_set<std::pair<int64_t, char>> ret;
   for (char input = '1'; input <= '9'; ++input) {
     absl::string_view input_view(&input, 1);
-    int64_t prev_mod_26 = (input - '0') - x_array[off];
+    int64_t prev_mod_26 = (input - '0') - dc.x_array[off];
     {
       // if is true
       int64_t this_z = z;
-      this_z -= (input - '0') + y_array[off];
+      this_z -= (input - '0') + dc.y_array[off];
       if (this_z % 26 == 0) {
         // Otherwise couldn't have gotten to this `z` with `input`.
         this_z /= 26;
-        if (z_array[off] == 1) {
+        if (dc.z_array[off] == 1) {
           if (this_z % 26 != prev_mod_26) {
             VLOG(3) << "Adding: " << this_z << ", " << input_view;
             ret.emplace(this_z, input);
           }
         } else {
-          CHECK_EQ(z_array[off], 26);
+          CHECK_EQ(dc.z_array[off], 26);
           for (int mod_26 = 0; mod_26 < 26; ++mod_26) {
             if (mod_26 == prev_mod_26) continue;
             VLOG(3) << "Adding: " << this_z * 26 + mod_26 << ", " << input_view;
@@ -192,13 +207,13 @@ absl::flat_hash_set<std::pair<int64_t, char>> ReversePartial(int64_t off, const 
     {
       // if is false
       int64_t this_z = z;
-      if (z_array[off] == 1) {
+      if (dc.z_array[off] == 1) {
         if (this_z % 26 == prev_mod_26) {
           VLOG(3) << "Adding: " << this_z << ", " << input_view;
           ret.emplace(this_z, input);
         }
       } else {
-        CHECK_EQ(z_array[off], 26);
+        CHECK_EQ(dc.z_array[off], 26);
         VLOG(3) << "Adding: " << 26 * this_z + prev_mod_26 << ", " << input_view;
         ret.emplace(26 * this_z + prev_mod_26, input);
       }
@@ -209,7 +224,7 @@ absl::flat_hash_set<std::pair<int64_t, char>> ReversePartial(int64_t off, const 
     // Check precision...
     for (const auto& [this_z, i] : ret) {
       VLOG(3) << this_z << "/" << absl::string_view(&i, 1);
-      int64_t next_z = DecompiledPartial(i, off, this_z);
+      int64_t next_z = DecompiledPartial(dc, i, off, this_z);
       VLOG(3) << next_z << "/" << z;
       CHECK_EQ(next_z, z)
           << "[" << this_z << ", " << absl::string_view(&i, 1) << "]";
@@ -219,7 +234,7 @@ absl::flat_hash_set<std::pair<int64_t, char>> ReversePartial(int64_t off, const 
     // Check recall...
     for (int this_z = z / 26; this_z < 27 * z; ++this_z) {
       for (char i = '1'; i <= '9'; ++i) {
-        int64_t next_z = DecompiledPartial(i, off, this_z);
+        int64_t next_z = DecompiledPartial(dc, i, off, this_z);
         if (next_z == z) {
           CHECK(ret.contains(std::make_pair(this_z, i)))
             << "[" << this_z << ", " << absl::string_view(&i, 1) << "]";
@@ -244,7 +259,8 @@ bool BetterInputMin(const std::string& a, const std::string& b) {
 using BetterInputP =
     absl::FunctionRef<bool(const std::string&, const std::string&)>;
 
-std::string FindBestInputMiddle(BetterInputP better_input_p) {
+std::string FindBestInputMiddle(
+    const DecompiledConstants& dc, BetterInputP better_input_p) {
   // Calculate back from the end to the middle.
   absl::flat_hash_map<int64_t, std::vector<std::string>> end_map = {{0, {""}}};
   for (int offset = 13; offset >= 7; --offset) {
@@ -252,7 +268,7 @@ std::string FindBestInputMiddle(BetterInputP better_input_p) {
     int total_inputs = 0;
     absl::flat_hash_map<int64_t, std::vector<std::string>> new_end_map;
     for (const auto& [z, input_list] : end_map) {
-      absl::flat_hash_set<std::pair<int64_t, char>> next = ReversePartial(offset, z);
+      absl::flat_hash_set<std::pair<int64_t, char>> next = ReversePartial(dc, offset, z);
       for (const auto& [z, c] : next) {
         for (const auto& input : input_list) {
           std::string next_input = std::string(1, c) + input;
@@ -272,7 +288,7 @@ std::string FindBestInputMiddle(BetterInputP better_input_p) {
     for (const auto& [z, this_input] : head_map) {
       std::string next_input = this_input;
       for (char input = '1'; input <= '9'; ++input) {
-        int64_t next_z = DecompiledPartial(input, offset, z);
+        int64_t next_z = DecompiledPartial(dc, input, offset, z);
         next_input.append(1, input);
         CHECK_EQ(next_input.size(), offset + 1);
         auto [it, inserted] = next_head_map.emplace(next_z, next_input);
@@ -306,33 +322,24 @@ std::string FindBestInputMiddle(BetterInputP better_input_p) {
 
 absl::StatusOr<std::string> Day_2021_24::Part1(
     absl::Span<absl::string_view> input) const {
+  absl::StatusOr<DecompiledConstants> dc = ExtractConstants(input);
+  if (!dc.ok()) return dc.status();
+  std::string ret = FindBestInputMiddle(*dc, BetterInputMax);
   VM vm = VM::Parse(input);
-  if (run_audit()) {
-    std::string test = "13579246899999";
-    if (auto st = vm.Execute(test); !st.ok()) return st;
-    if (vm.RegisterValue("z") != Decompiled(test)) {
-      return Error("Bad Decompiled: sample");
-    }
-  }
-  if (run_audit()) {
-    std::string test = "29989297949519";
-    if (auto st = vm.Execute(test); !st.ok()) return st;
-    if (vm.RegisterValue("z") != 0) return Error("Not 0 checksum");
-    if (Decompiled(test) != 0) return Error("Not 0 checksum (Decompiled)");
-  }
-  return FindBestInputMiddle(BetterInputMax);
+  if (auto st = vm.Execute(ret); !st.ok()) return st;
+  if (vm.RegisterValue("z") != 0) return Error("VM Check failure");
+  return ret;
 }
 
 absl::StatusOr<std::string> Day_2021_24::Part2(
     absl::Span<absl::string_view> input) const {
+  absl::StatusOr<DecompiledConstants> dc = ExtractConstants(input);
+  if (!dc.ok()) return dc.status();
+  std::string ret = FindBestInputMiddle(*dc, BetterInputMin);
   VM vm = VM::Parse(input);
-  if (run_audit()) {
-    std::string test = "19518121316118";
-    if (auto st = vm.Execute(test); !st.ok()) return st;
-    if (vm.RegisterValue("z") != 0) return Error("Not 0 checksum");
-    if (Decompiled(test) != 0) return Error("Not 0 checksum (Decompiled)");
-  }
-  return FindBestInputMiddle(BetterInputMin);
+  if (auto st = vm.Execute(ret); !st.ok()) return st;
+  if (vm.RegisterValue("z") != 0) return Error("VM Check failure");
+  return ret;
 }
 
 }  // namespace advent_of_code
