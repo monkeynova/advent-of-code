@@ -117,7 +117,7 @@ struct DecompiledConstants {
 absl::StatusOr<DecompiledConstants> ExtractConstants(
     absl::Span<absl::string_view> input) {
   std::vector<std::string> per_input = {
-    "inp w", "mul x 0", "add x z", "mod x 26", "div z (-?\\d+)",
+    "inp w", "mul x 0", "add x z", "mod x 26", "div z (1|26)",
     "add x (-?\\d+)", "eql x w", "eql x 0", "mul y 0", "add y 25", "mul y x",
     "add y 1", "mul z y", "mul y 0", "add y w", "add y (-?\\d+)", "mul y x",
     "add z y",
