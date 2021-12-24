@@ -244,53 +244,38 @@ bool BetterInputMin(const std::string& a, const std::string& b) {
 using BetterInputP =
     absl::FunctionRef<bool(const std::string&, const std::string&)>;
 
-std::string FindBestInputReverse(BetterInputP better_input_p) {
-  absl::flat_hash_map<int64_t, std::vector<std::string>> z_to_input = {{0, {""}}};
-  for (int offset = 13; offset >= 0; --offset) {
-    VLOG(1) << offset << ": " << z_to_input.size();
+std::string FindBestInputMiddle(BetterInputP better_input_p) {
+  // Calculate back from the end to the middle.
+  absl::flat_hash_map<int64_t, std::vector<std::string>> end_map = {{0, {""}}};
+  for (int offset = 13; offset >= 7; --offset) {
+    VLOG(1) << offset << ": " << end_map.size();
     int total_inputs = 0;
-    absl::flat_hash_map<int64_t, std::vector<std::string>> new_z_to_input;
-    for (const auto& [z, input_list] : z_to_input) {
+    absl::flat_hash_map<int64_t, std::vector<std::string>> new_end_map;
+    for (const auto& [z, input_list] : end_map) {
       absl::flat_hash_set<std::pair<int64_t, char>> next = ReversePartial(offset, z);
       for (const auto& [z, c] : next) {
         for (const auto& input : input_list) {
           std::string next_input = std::string(1, c) + input;
-          new_z_to_input[z].push_back(next_input);
+          new_end_map[z].push_back(next_input);
           ++total_inputs;
         }
       }
     }
     VLOG(1) << "  Generated " << total_inputs << " inputs";
-    z_to_input = std::move(new_z_to_input);
+    end_map = std::move(new_end_map);
   }
-  VLOG(1) << "Final: " << z_to_input.size();
-  VLOG(1) << "Contains 0 " << z_to_input.contains(0);
-  auto it = z_to_input.find(0);
-  CHECK(it != z_to_input.end());
-  CHECK(!it->second.empty());
-  std::string ret = *it->second.begin();
-  for (const auto& s : it->second) {
-    if (better_input_p(s, ret)) {
-      ret = s;
-    }
-  }
-  VLOG(1) << ret;
-  return ret;
 
-}
-
-std::string FindBestInput(BetterInputP better_input_p) {
-  absl::flat_hash_map<int64_t, std::string> z_to_partial = {{0, {}}};
-  for (int offset = 0; offset < 14; ++offset) {
-    VLOG(1) << offset << ": " << z_to_partial.size();
-    absl::flat_hash_map<int64_t, std::string> next_z_to_partial;
-    for (const auto& [z, this_input] : z_to_partial) {
+  absl::flat_hash_map<int64_t, std::string> head_map = {{0, {}}};
+  for (int offset = 0; offset < 7; ++offset) {
+    VLOG(1) << offset << ": " << head_map.size();
+    absl::flat_hash_map<int64_t, std::string> next_head_map;
+    for (const auto& [z, this_input] : head_map) {
       std::string next_input = this_input;
       for (char input = '1'; input <= '9'; ++input) {
         int64_t next_z = DecompiledPartial(input, offset, z);
         next_input.append(1, input);
         CHECK_EQ(next_input.size(), offset + 1);
-        auto [it, inserted] = next_z_to_partial.emplace(next_z, next_input);
+        auto [it, inserted] = next_head_map.emplace(next_z, next_input);
         if (!inserted) {
           if (better_input_p(next_input, it->second)) {
             it->second = next_input;
@@ -299,14 +284,21 @@ std::string FindBestInput(BetterInputP better_input_p) {
         next_input.resize(this_input.size());
       }
     }
-    z_to_partial = std::move(next_z_to_partial);
+    head_map = std::move(next_head_map);
   }
-  VLOG(1) << "Final: " << z_to_partial.size();
-  VLOG(1) << "Contains 0 " << z_to_partial.contains(0);
-  auto it = z_to_partial.find(0);
-  CHECK(it != z_to_partial.end());
-  std::string ret = it->second;
-  VLOG(1) << ret;
+
+  std::string ret;
+  for (const auto& [z, tail] : end_map) {
+    auto it = head_map.find(z);
+    if (it == head_map.end()) continue;
+    std::string head_input = it->second;
+    for (std::string tail_input : tail) {
+      std::string test = head_input + tail_input;
+      if (ret.empty() || better_input_p(test, ret)) {
+        ret = test;
+      }
+    }
+  }
   return ret;
 }
 
@@ -328,8 +320,7 @@ absl::StatusOr<std::string> Day_2021_24::Part1(
     if (vm.RegisterValue("z") != 0) return Error("Not 0 checksum");
     if (Decompiled(test) != 0) return Error("Not 0 checksum (Decompiled)");
   }
-  return FindBestInputReverse(BetterInputMax);
-  return FindBestInput(BetterInputMax);
+  return FindBestInputMiddle(BetterInputMax);
 }
 
 absl::StatusOr<std::string> Day_2021_24::Part2(
@@ -341,8 +332,7 @@ absl::StatusOr<std::string> Day_2021_24::Part2(
     if (vm.RegisterValue("z") != 0) return Error("Not 0 checksum");
     if (Decompiled(test) != 0) return Error("Not 0 checksum (Decompiled)");
   }
-  return FindBestInputReverse(BetterInputMin);
-  return FindBestInput(BetterInputMin);
+  return FindBestInputMiddle(BetterInputMin);
 }
 
 }  // namespace advent_of_code
