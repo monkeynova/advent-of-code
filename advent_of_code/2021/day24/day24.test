@@ -1,22 +1,12 @@
-[part=1]
-Example input
---
-ERROR: UNIMPLEMENTED: Problem not known
-==
-
+[long=60m (4m opt) 2021.12.23]
 [part=1]
 @include{advent_of_code/2021/day24/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+29989297949519
 ==
 
-[part=2]
-Example input
---
-ERROR: UNIMPLEMENTED: Problem not known
-==
-
+[long=60m (4m opt) 2021.12.23]
 [part=2]
 @include{advent_of_code/2021/day24/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+19518121316118
