@@ -1,16 +1,24 @@
 [part=1]
-Example input
+v...>>.vv>
+.vv>>.vv..
+>>.>v>...v
+>>v>>.>.v.
+v>v.vv.v..
+>.>>..v...
+.vv..>.>v.
+v.v..>>v.v
+....v..v.>
 --
-ERROR: UNIMPLEMENTED: Problem not known
+58
 ==
 
 [part=1]
 @include{advent_of_code/2021/day25/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+520
 ==
 
 [part=2]
 @include{advent_of_code/2021/day25/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+Merry Christmas!
