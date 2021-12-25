@@ -13,13 +13,13 @@ git_repository(
     name = "com_google_googletest",
     remote = "git://github.com/google/googletest.git",
     # branch = "main",
-    commit = "3e0e32ba300ce8afe695ad3ba7e81b21b7cf237a",
+    commit = "d81ae2f0bf2bb3fbb23691cae68e75a7563ae19d",
 )
 
 git_repository(
     name = "com_google_absl",
     remote = "git://github.com/abseil/abseil-cpp.git",
-    commit = "72c765111173a61de6e4184bb837f855b7869952",
+    commit = "d758735198573d04e3b01b8495a4bbdb1a0d5f90",
 )
 
 git_repository(
@@ -37,7 +37,7 @@ git_repository(
 git_repository(
     name = "com_google_glog",
     remote = "git://github.com/google/glog.git",
-    commit = "cd8fbd5fbf6d16d0529978024f56132f67949ba7",
+    commit = "43fc3bf91c7fb274aacc28861684abec4d392f34",
 )
 
 git_repository(
@@ -50,7 +50,7 @@ git_repository(
     name = "com_googlesource_code_re2",
     remote = "git://github.com/google/re2.git",
     # branch = "abseil"
-    commit = "4bb7b2e8b04c9c2483196a34217bab6fd355e35d",
+    commit = "600abff88997e2e6033e053564856e00094c6b9d",
 )
 
 git_repository(
