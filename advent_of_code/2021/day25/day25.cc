@@ -15,47 +15,26 @@ namespace advent_of_code {
 
 namespace {
 
-absl::StatusOr<CharBoard> UpdateEast(const CharBoard& b) {
-  CharBoard out(b.width(), b.height());
-  absl::flat_hash_set<Point> skip;
+int Update(CharBoard& b, char fish, Point dir) {
+  absl::flat_hash_map<Point, Point> move;
   for (Point p : b.range()) {
-    if (skip.contains(p)) continue;
-    if (b[p] == '>') {
-      Point n = p;
-      n.x = (n.x + 1) % b.width();
-      if (b[n] == '.') {
-        out[n] = '>';
-        out[p] = '.';
-        skip.insert(n);
-      } else {
-        out[p] = b[p];
-      }
-    } else {
-      out[p] = b[p];
+    if (b[p] == fish) {
+      Point n = b.TorusPoint(p + dir);
+      if (b[n] == '.') move[p] = n;
     }
   }
-  return out;
+  for (const auto& [p, n] : move) {
+    std::swap(b[p], b[n]);
+  }
+  return move.size();
 }
-absl::StatusOr<CharBoard> UpdateSouth(const CharBoard& b) {
-  CharBoard out(b.width(), b.height());
-  absl::flat_hash_set<Point> skip;
-  for (Point p : b.range()) {
-    if (skip.contains(p)) continue;
-    if (b[p] == 'v') {
-      Point n = p;
-      n.y = (n.y + 1) % b.height();
-      if (b[n] == '.') {
-        out[n] = 'v';
-        out[p] = '.';
-        skip.insert(n);
-      } else {
-        out[p] = b[p];
-      }
-    } else {
-      out[p] = b[p];
-    }
-  }
-  return out;
+
+int UpdateEast(CharBoard& b) {
+  return Update(b, '>', Cardinal::kEast);
+}
+
+int UpdateSouth(CharBoard& b) {
+  return Update(b, 'v', Cardinal::kSouth);
 }
 
 }  // namespace
@@ -66,14 +45,12 @@ absl::StatusOr<std::string> Day_2021_25::Part1(
   if (!b.ok()) return b.status();
 
   for (int i = 1; true; ++i) {
-    absl::StatusOr<CharBoard> new_b = UpdateEast(*b);
-    if (!new_b.ok()) return new_b.status();
-    new_b = UpdateSouth(*new_b);
-    if (!new_b.ok()) return new_b.status();
-    if (*new_b == *b) {
+    int moved = 0;
+    moved += UpdateEast(*b);
+    moved += UpdateSouth(*b);
+    if (moved == 0) {
       return IntReturn(i);
     }
-    b = std::move(*new_b);
   }
 
   return Error("Left infinite loop");

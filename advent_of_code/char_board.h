@@ -70,6 +70,13 @@ class CharBoard {
                           .max = {.x = width() - 1, .y = height() - 1}};
   }
 
+  Point TorusPoint(Point p) {
+    Point ret = {p.x % width(), p.y % height()};
+    if (ret.x < 0) ret.x += width();
+    if (ret.y < 0) ret.y += height();
+    return ret;
+  }
+
   char at(Point p) const { return buf_[p.y * stride_ + p.x]; }
   void set(Point p, char c) { buf_[p.y * stride_ + p.x] = c; }
 
