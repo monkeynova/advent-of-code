@@ -1,5 +1,5 @@
-#ifndef ADVENT_OF_CODE_2021_BITS_EXPR_H
-#define ADVENT_OF_CODE_2021_BITS_EXPR_H
+#ifndef ADVENT_OF_CODE_2021_DAY16_BITS_EXPR_H
+#define ADVENT_OF_CODE_2021_DAY16_BITS_EXPR_H
 
 #include <vector>
 
@@ -61,4 +61,4 @@ class BitsExpr {
 
 }  // namespace advent_of_code
 
-#endif  // ADVENT_OF_CODE_2021_BITS_EXPR_H
+#endif  // ADVENT_OF_CODE_2021_DAY16_BITS_EXPR_H

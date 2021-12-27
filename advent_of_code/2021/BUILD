@@ -1,25 +1,3 @@
-cc_library(
-    name = "bits_expr",
-    srcs = ["bits_expr.cc"],
-    hdrs = ["bits_expr.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "@com_google_absl//absl/status",
-        "@com_google_absl//absl/status:statusor",
-        "@com_google_absl//absl/strings",
-        "@com_google_glog//:glog",
-    ],
-)
-
-cc_test(
-    name = "bits_expr_test",
-    srcs = ["bits_expr_test.cc"],
-    deps = [
-        ":bits_expr",
-        "@com_monkeynova_gunit_main//:test_main",
-    ],
-)
-
 cc_test(
     name = "benchmark",
     tags = ["benchmark"],

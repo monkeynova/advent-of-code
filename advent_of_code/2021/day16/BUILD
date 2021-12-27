@@ -1,12 +1,33 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 
 cc_library(
+    name = "bits_expr",
+    srcs = ["bits_expr.cc"],
+    hdrs = ["bits_expr.h"],
+    deps = [
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/status:statusor",
+        "@com_google_absl//absl/strings",
+        "@com_google_glog//:glog",
+    ],
+)
+
+cc_test(
+    name = "bits_expr_test",
+    srcs = ["bits_expr_test.cc"],
+    deps = [
+        ":bits_expr",
+        "@com_monkeynova_gunit_main//:test_main",
+    ],
+)
+
+cc_library(
     name = "day16",
     srcs = ["day16.cc"],
     hdrs = ["day16.h"],
     deps = [
+        ":bits_expr",
         "//advent_of_code:advent_day",
-        "//advent_of_code/2021:bits_expr",
         "@com_google_absl//absl/algorithm:container",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",

@@ -1,4 +1,4 @@
-#include "advent_of_code/2021/bits_expr.h"
+#include "advent_of_code/2021/day16/bits_expr.h"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
