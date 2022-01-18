@@ -96,11 +96,15 @@ cc_library(
 
 cc_library(
     name = "mod",
+    srcs = ["mod.cc"],
     hdrs = ["mod.h"],
     visibility = [
         "//visibility:public",
     ],
     deps = [
+        "@com_google_absl//absl/functional:function_ref",
+        "@com_google_absl//absl/numeric:int128",
+        "@com_google_absl//absl/types:optional",
         "@com_google_glog//:glog",
     ],
 )

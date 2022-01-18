@@ -6,6 +6,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/mod.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
 
@@ -64,21 +65,11 @@ absl::StatusOr<std::string> Day_2020_13::Part2(
   }
   VLOG(1) << "full_cycle_time: " << full_cycle_time;
 
-  int64_t ts = 0;
-  int64_t product = 1;
+  std::vector<std::pair<int64_t, int64_t>> remainders;
   for (Route r : routes) {
-    while (true) {
-      int64_t mod = ts % r.id;
-      int64_t should_mod = (r.id - r.offset) % r.id;
-      if (should_mod < 0) should_mod += r.id;
-      if (mod == should_mod) break;
-      ts += product;
-      VLOG(2) << "ts: " << ts;
-    }
-    product = product * r.id / std::gcd(product, r.id);
-    VLOG(1) << "prodict: " << product;
+    remainders.emplace_back((r.id - r.offset) % r.id, r.id);
   }
-  return IntReturn(ts);
+  return IntReturn(ChineseRemainder(remainders));
 }
 
 }  // namespace advent_of_code
