@@ -107,11 +107,12 @@ class Board {
     absl::flat_hash_set<Point> visited;
     visited.insert(from);
     std::deque<KeyPath> frontier;
-    frontier.push_back({.from = from,
-                        .to = from,
-                        .steps = 0,
-                        .from_key = from_key,
-                        .to_key = '\0'});
+    frontier.push_back(KeyPath{
+      .from = from,
+      .to = from,
+      .steps = 0,
+      .from_key = from_key,
+      .to_key = '\0'});
     while (!frontier.empty()) {
       const KeyPath& cur = frontier.front();
       for (Point dir : Cardinal::kFourDirs) {
