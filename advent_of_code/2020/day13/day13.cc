@@ -19,7 +19,7 @@ absl::StatusOr<std::string> Day_2020_13::Part1(
   int start;
   if (!absl::SimpleAtoi(input[0], &start)) return Error("Bad input");
   int min_delta = std::numeric_limits<int>::max();
-  int min_id;
+  int min_id = 1;
   for (absl::string_view piece : absl::StrSplit(input[1], ",")) {
     if (piece == "x") continue;
     int id;
@@ -30,6 +30,7 @@ absl::StatusOr<std::string> Day_2020_13::Part1(
       min_id = id;
     }
   }
+  if (min_id == -1) return Error("Can't find minimum delta");
   return IntReturn(min_delta * min_id);
 }
 
@@ -41,7 +42,6 @@ absl::StatusOr<std::string> Day_2020_13::Part2(
 
   std::vector<absl::string_view> ids = absl::StrSplit(input[1], ",");
   int max_id = -1;
-  int max_offset = 0;
   struct Route {
     int64_t id;
     int64_t offset;
@@ -55,7 +55,6 @@ absl::StatusOr<std::string> Day_2020_13::Part2(
     routes.push_back({.id = id, .offset = i});
     if (id > max_id) {
       max_id = id;
-      max_offset = i;
     }
   }
 
