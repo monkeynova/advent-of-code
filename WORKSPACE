@@ -3,29 +3,38 @@ workspace(name="com_monkeynova_advent_of_code")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
+    name = "bazel_skylib",
+    remote = "https://github.com/bazelbuild/bazel-skylib.git",
+    # branch = "main",
+    commit = "312bccd83b1364fa736dde97ccba3d2b40cdfabc",
+)
+load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
+bazel_skylib_workspace()
+
+git_repository(
    name = "com_monkeynova_base_workspace",
    remote = "https://github.com/monkeynova/base-workspace.git",
    # branch = "main",
-   commit = "514579c611ebc6308585b6fb90912771a48e6413",
+   commit = "6e5d9f0dde4f3882b9a3bf48ca0f7adb169d9ba2",
 )
 
 git_repository(
     name = "com_google_googletest",
     remote = "https://github.com/google/googletest.git",
     # branch = "main",
-    commit = "d81ae2f0bf2bb3fbb23691cae68e75a7563ae19d",
+    commit = "9d21db9e0a60a1ea61ec19331c9bc0dd33e907b1",
 )
 
 git_repository(
     name = "com_google_absl",
     remote = "https://github.com/abseil/abseil-cpp.git",
-    commit = "d758735198573d04e3b01b8495a4bbdb1a0d5f90",
+    commit = "48f72c227b94b06387106f71d4450b31e88e283b",
 )
 
 git_repository(
     name = "com_github_gflags_gflags",
     remote = "https://github.com/gflags/gflags.git",
-    commit = "827c769e5fc98e0f2a34c47cef953cc6328abced",
+    commit = "986e8eed00ded8168ef4eaa6f925dc6be50b40fa",
 )
 
 git_repository(
@@ -37,7 +46,7 @@ git_repository(
 git_repository(
     name = "com_google_glog",
     remote = "https://github.com/google/glog.git",
-    commit = "43fc3bf91c7fb274aacc28861684abec4d392f34",
+    commit = "b33e3bad4c46c8a6345525fd822af355e5ef9446",
 )
 
 git_repository(
@@ -50,7 +59,7 @@ git_repository(
     name = "com_googlesource_code_re2",
     remote = "https://github.com/google/re2.git",
     # branch = "abseil"
-    commit = "600abff88997e2e6033e053564856e00094c6b9d",
+    commit = "6260193e468194afca94e6717ec76bced9b507a8",
 )
 
 git_repository(
