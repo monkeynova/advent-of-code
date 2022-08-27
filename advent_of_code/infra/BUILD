@@ -84,7 +84,7 @@ cc_library(
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
-        "@com_google_benchmark//:benchmark",
+        "@com_github_google_benchmark//:benchmark",
         "@com_googlesource_code_re2//:re2",
     ],
 )
