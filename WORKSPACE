@@ -15,7 +15,7 @@ git_repository(
    name = "com_monkeynova_base_workspace",
    remote = "https://github.com/monkeynova/base-workspace.git",
    # branch = "main",
-   commit = "8d8db5a27a7c8a92034e87e438de707a3251a01a",
+   commit = "21c3632e277633820f20a81b084e3c764c243a97",
 )
 
 git_repository(
