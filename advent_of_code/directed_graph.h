@@ -15,9 +15,7 @@ class DirectedGraphBase {
  public:
   DirectedGraphBase() = default;
 
-  void AddNode(absl::string_view node_name) {
-    nodes_.insert(node_name);
-  }
+  void AddNode(absl::string_view node_name) { nodes_.insert(node_name); }
 
   void AddEdge(absl::string_view src, absl::string_view dst) {
     VLOG(2) << "AddEdge: " << src << " => " << dst;

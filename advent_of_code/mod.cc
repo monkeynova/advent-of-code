@@ -25,8 +25,8 @@ absl::optional<int64_t> ExtendedEuclideanAlgorithm(
   return on_result(r_0, r_1, s_0, s_1, t_0, t_1);
 }
 
-absl::optional<int64_t> ExtendedEuclideanAlgorithmInvert(
-    int64_t n, int64_t mod) {
+absl::optional<int64_t> ExtendedEuclideanAlgorithmInvert(int64_t n,
+                                                         int64_t mod) {
   return ExtendedEuclideanAlgorithm(
       n, mod,
       [&](int64_t r_0, int64_t r_1, int64_t s_0, int64_t s_1, int64_t t_0,
@@ -36,8 +36,8 @@ absl::optional<int64_t> ExtendedEuclideanAlgorithmInvert(
       });
 }
 
-absl::optional<int64_t> ChineseRemainder(
-    int64_t mod_a, int64_t a, int64_t mod_b, int64_t b) {
+absl::optional<int64_t> ChineseRemainder(int64_t mod_a, int64_t a,
+                                         int64_t mod_b, int64_t b) {
   VLOG(2) << "  " << mod_a << " MOD " << a << " AND " << mod_b << " MOD " << b;
   if (b < a) {
     std::swap(a, b);
@@ -45,30 +45,32 @@ absl::optional<int64_t> ChineseRemainder(
   }
   if (a * b < 0x1'0000'0000) {
     return ExtendedEuclideanAlgorithm(
-      b, a, [&](int64_t r_0, int64_t r_1, int64_t s_0, int64_t s_1,
-                int64_t t_0, int64_t t_1) -> absl::optional<int64_t> {
-        if (r_0 != 1) return {};
-        DCHECK_EQ(s_0 * b + t_0 * a, r_0);
-        if (s_0 < 0) s_0 += a;
-        if (t_0 < 0) t_0 += b;
-        return (mod_a * s_0 * b + mod_b * t_0 * a) % (a * b);
-      });
+        b, a,
+        [&](int64_t r_0, int64_t r_1, int64_t s_0, int64_t s_1, int64_t t_0,
+            int64_t t_1) -> absl::optional<int64_t> {
+          if (r_0 != 1) return {};
+          DCHECK_EQ(s_0 * b + t_0 * a, r_0);
+          if (s_0 < 0) s_0 += a;
+          if (t_0 < 0) t_0 += b;
+          return (mod_a * s_0 * b + mod_b * t_0 * a) % (a * b);
+        });
   } else {
     return ExtendedEuclideanAlgorithm(
-      b, a, [&](int64_t r_0, int64_t r_1, int64_t s_0, int64_t s_1,
-                int64_t t_0, int64_t t_1) -> absl::optional<int64_t> {
-        if (r_0 != 1) return {};
-        DCHECK_EQ(s_0 * b + t_0 * a, r_0);
-        if (s_0 < 0) s_0 += a;
-        if (t_0 < 0) t_0 += b;
-        absl::int128 b_c = mod_a;
-        b_c *= s_0;
-        absl::int128 a_c = mod_b;
-        a_c *= t_0;
-        absl::int128 ret = (b_c * b + a_c * a) % (a * b);
-        CHECK_EQ(Uint128High64(ret), 0) << ret;
-        return Uint128Low64(ret);
-      });
+        b, a,
+        [&](int64_t r_0, int64_t r_1, int64_t s_0, int64_t s_1, int64_t t_0,
+            int64_t t_1) -> absl::optional<int64_t> {
+          if (r_0 != 1) return {};
+          DCHECK_EQ(s_0 * b + t_0 * a, r_0);
+          if (s_0 < 0) s_0 += a;
+          if (t_0 < 0) t_0 += b;
+          absl::int128 b_c = mod_a;
+          b_c *= s_0;
+          absl::int128 a_c = mod_b;
+          a_c *= t_0;
+          absl::int128 ret = (b_c * b + a_c * a) % (a * b);
+          CHECK_EQ(Uint128High64(ret), 0) << ret;
+          return Uint128Low64(ret);
+        });
   }
 }
 

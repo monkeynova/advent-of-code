@@ -19,8 +19,9 @@ namespace {
 
 class CanMoveBFS : public BFSInterface<CanMoveBFS, Point> {
  public:
-  CanMoveBFS(const CharBoard* b, Point cur, Point end, std::vector<Point>* path_out) 
-    : b_(b), cur_(cur), end_(end), path_out_(path_out) {
+  CanMoveBFS(const CharBoard* b, Point cur, Point end,
+             std::vector<Point>* path_out)
+      : b_(b), cur_(cur), end_(end), path_out_(path_out) {
     path_.push_back(cur_);
   }
 
@@ -33,9 +34,7 @@ class CanMoveBFS : public BFSInterface<CanMoveBFS, Point> {
     return cur_ == end_;
   }
 
-  int min_steps_to_final() const override {
-    return (cur_ - end_).dist();
-  }
+  int min_steps_to_final() const override { return (cur_ - end_).dist(); }
 
   void AddNextSteps(State* state) const override {
     const absl::flat_hash_set<char> kMovable = {'.', 'A', 'B', 'C', 'D'};
@@ -57,7 +56,8 @@ class CanMoveBFS : public BFSInterface<CanMoveBFS, Point> {
   std::vector<Point> path_;
 };
 
-using AllPathsMap = absl::flat_hash_map<std::pair<Point, Point>, std::vector<Point>>;
+using AllPathsMap =
+    absl::flat_hash_map<std::pair<Point, Point>, std::vector<Point>>;
 
 AllPathsMap ComputeAllPaths(const CharBoard& b,
                             const std::vector<Point>& point_list) {
@@ -103,7 +103,8 @@ struct Actor {
     LOG(FATAL) << "No destination found: " << *this << "\n" << b;
   }
 
-  absl::optional<int> CanMove(Point dest, const CharBoard& b, const AllPathsMap& all_paths) const {
+  absl::optional<int> CanMove(Point dest, const CharBoard& b,
+                              const AllPathsMap& all_paths) const {
     auto it = all_paths.find(std::make_pair(cur, dest));
     if (it == all_paths.end()) {
       VLOG(1) << cur;
@@ -123,10 +124,14 @@ struct Actor {
 
   int cost() const {
     switch (c) {
-      case 'A': return 1;
-      case 'B': return 10;
-      case 'C': return 100;
-      case 'D': return 1000;
+      case 'A':
+        return 1;
+      case 'B':
+        return 10;
+      case 'C':
+        return 100;
+      case 'D':
+        return 1000;
     }
     LOG(FATAL) << "Bad char";
   }
@@ -170,7 +175,9 @@ struct State {
   }
 
   friend std::ostream& operator<<(std::ostream& o, const State& s) {
-    o << "Cost=" << s.cost << "; Board:\n" << s.board << "\n" << "Actors:\n";
+    o << "Cost=" << s.cost << "; Board:\n"
+      << s.board << "\n"
+      << "Actors:\n";
     for (const auto& a : s.actors) {
       o << a << "\n";
     }
@@ -179,8 +186,7 @@ struct State {
 };
 
 absl::optional<int> FindMinCost(
-    State initial_state,
-    const std::vector<Point>& empty,
+    State initial_state, const std::vector<Point>& empty,
     const absl::flat_hash_map<char, std::vector<Point>>& destinations,
     const AllPathsMap& all_paths) {
   VLOG(1) << "Start: " << initial_state;
@@ -199,7 +205,7 @@ absl::optional<int> FindMinCost(
       }
       continue;
     }
-    // Fork off test paths for the next best action of each actor. 
+    // Fork off test paths for the next best action of each actor.
     for (int i = 0; i < cur.actors.size(); ++i) {
       if (cur.actors[i].done) continue;
       // Can we go to the final location?
@@ -208,7 +214,8 @@ absl::optional<int> FindMinCost(
       if (cost) {
         if (best && cur.cost + *cost >= *best) continue;
         // We can reach the final destination. Go there and stop.
-        const auto [it, inserted] = history.insert(cur.MoveActor(i, p, *cost, /*done=*/true));
+        const auto [it, inserted] =
+            history.insert(cur.MoveActor(i, p, *cost, /*done=*/true));
         if (!inserted) continue;
         VLOG(3) << cur << " => " << *it;
         queue.push_back(&*it);
@@ -220,10 +227,12 @@ absl::optional<int> FindMinCost(
       // If we haven't moved, and we can't get to the final destionation,
       // fork off test paths for each candidate temporary location.
       for (Point p : empty) {
-        absl::optional<int> cost = cur.actors[i].CanMove(p, cur.board, all_paths);
+        absl::optional<int> cost =
+            cur.actors[i].CanMove(p, cur.board, all_paths);
         if (cost) {
           if (best && cur.cost + *cost >= *best) continue;
-          const auto [it, inserted] = history.insert(cur.MoveActor(i, p, *cost, /*done=*/false));
+          const auto [it, inserted] =
+              history.insert(cur.MoveActor(i, p, *cost, /*done=*/false));
           if (!inserted) continue;
           VLOG(3) << cur << " => " << *it;
           queue.push_back(&*it);
@@ -244,7 +253,7 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
   State s{.board = *b};
 
   // Find the initial locations of actors and the temporary places in which to
-  // store them. 
+  // store them.
   std::vector<Point> empty;
   std::vector<Point> srcs;
   for (Point p : b->range()) {
@@ -309,7 +318,7 @@ absl::StatusOr<std::string> Day_2021_23::Part2(
   const std::string insert1 = "  #D#C#B#A#  ";
   const std::string insert2 = "  #D#B#A#C#  ";
   std::vector<absl::string_view> spliced = {
-    input[0], input[1], input[2], insert1, insert2, input[3], input[4],
+      input[0], input[1], input[2], insert1, insert2, input[3], input[4],
   };
   return Part1(absl::MakeSpan(spliced));
 }

@@ -20,13 +20,13 @@ cc_library(
     name = "file_flags",
     srcs = ["file_flags.cc"],
     hdrs = ["file_flags.h"],
-    alwayslink = 1,
     visibility = [
         "//visibility:public",
     ],
     deps = [
         "@com_google_absl//absl/flags:flag",
     ],
+    alwayslink = 1,
 )
 
 cc_library(
@@ -81,10 +81,10 @@ cc_library(
         ":file_test_options",
         ":file_util",
         "//advent_of_code:advent_day",
+        "@com_github_google_benchmark//:benchmark",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
-        "@com_github_google_benchmark//:benchmark",
         "@com_googlesource_code_re2//:re2",
     ],
 )

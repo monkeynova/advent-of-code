@@ -20,7 +20,8 @@ class VM {
   static VM Parse(absl::Span<absl::string_view> input) {
     VM ret;
     for (absl::string_view line : input) {
-      ret.ops_.push_back(std::vector<absl::string_view>(absl::StrSplit(line, " ")));
+      ret.ops_.push_back(
+          std::vector<absl::string_view>(absl::StrSplit(line, " ")));
     }
     return ret;
   }
@@ -104,7 +105,10 @@ class VM {
 
   std::vector<std::vector<absl::string_view>> ops_;
   absl::flat_hash_map<absl::string_view, int64_t> registers = {
-    {"w", 0}, {"x", 0}, {"y", 0}, {"z", 0},
+      {"w", 0},
+      {"x", 0},
+      {"y", 0},
+      {"z", 0},
   };
 };
 
@@ -117,10 +121,10 @@ struct DecompiledConstants {
 absl::StatusOr<DecompiledConstants> ExtractConstants(
     absl::Span<absl::string_view> input) {
   std::vector<std::string> per_input = {
-    "inp w", "mul x 0", "add x z", "mod x 26", "div z (1|26)",
-    "add x (-?\\d+)", "eql x w", "eql x 0", "mul y 0", "add y 25", "mul y x",
-    "add y 1", "mul z y", "mul y 0", "add y w", "add y (-?\\d+)", "mul y x",
-    "add z y",
+      "inp w",          "mul x 0", "add x z", "mod x 26", "div z (1|26)",
+      "add x (-?\\d+)", "eql x w", "eql x 0", "mul y 0",  "add y 25",
+      "mul y x",        "add y 1", "mul z y", "mul y 0",  "add y w",
+      "add y (-?\\d+)", "mul y x", "add z y",
   };
   if (input.size() != 14 * per_input.size()) return Error("Cannot match input");
   DecompiledConstants ret;
@@ -128,7 +132,8 @@ absl::StatusOr<DecompiledConstants> ExtractConstants(
     int input_off = i * per_input.size();
     for (int j = 0; j < per_input.size(); ++j) {
       if (!RE2::FullMatch(input[input_off + j], per_input[j])) {
-        return Error("Cannot match input: ", input[input_off + j], " !~ ", per_input[j]);
+        return Error("Cannot match input: ", input[input_off + j], " !~ ",
+                     per_input[j]);
       }
     }
     int z_val;
@@ -165,13 +170,14 @@ int64_t Decompiled(const DecompiledConstants& dc, std::string input) {
   return z;
 }
 
-int64_t DecompiledPartial(const DecompiledConstants& dc, char input, int64_t off, int64_t z) {
+int64_t DecompiledPartial(const DecompiledConstants& dc, char input,
+                          int64_t off, int64_t z) {
   if ((z % 26) + dc.x_array[off] != (input - '0')) {
-    z /=  dc.z_array[off];
+    z /= dc.z_array[off];
     z *= 26;
-    z += (input - '0') +  dc.y_array[off];
+    z += (input - '0') + dc.y_array[off];
   } else {
-    z /=  dc.z_array[off];
+    z /= dc.z_array[off];
   }
   return z;
 }
@@ -214,7 +220,8 @@ absl::flat_hash_set<std::pair<int64_t, char>> ReversePartial(
         }
       } else {
         CHECK_EQ(dc.z_array[off], 26);
-        VLOG(3) << "Adding: " << 26 * this_z + prev_mod_26 << ", " << input_view;
+        VLOG(3) << "Adding: " << 26 * this_z + prev_mod_26 << ", "
+                << input_view;
         ret.emplace(26 * this_z + prev_mod_26, input);
       }
     }
@@ -226,8 +233,8 @@ absl::flat_hash_set<std::pair<int64_t, char>> ReversePartial(
       VLOG(3) << this_z << "/" << absl::string_view(&i, 1);
       int64_t next_z = DecompiledPartial(dc, i, off, this_z);
       VLOG(3) << next_z << "/" << z;
-      CHECK_EQ(next_z, z)
-          << "[" << this_z << ", " << absl::string_view(&i, 1) << "]";
+      CHECK_EQ(next_z, z) << "[" << this_z << ", " << absl::string_view(&i, 1)
+                          << "]";
     }
   }
   if (false) {
@@ -237,7 +244,7 @@ absl::flat_hash_set<std::pair<int64_t, char>> ReversePartial(
         int64_t next_z = DecompiledPartial(dc, i, off, this_z);
         if (next_z == z) {
           CHECK(ret.contains(std::make_pair(this_z, i)))
-            << "[" << this_z << ", " << absl::string_view(&i, 1) << "]";
+              << "[" << this_z << ", " << absl::string_view(&i, 1) << "]";
         }
       }
     }
@@ -259,8 +266,8 @@ bool BetterInputMin(const std::string& a, const std::string& b) {
 using BetterInputP =
     absl::FunctionRef<bool(const std::string&, const std::string&)>;
 
-std::string FindBestInputMiddle(
-    const DecompiledConstants& dc, BetterInputP better_input_p) {
+std::string FindBestInputMiddle(const DecompiledConstants& dc,
+                                BetterInputP better_input_p) {
   // Calculate back from the end to the middle.
   absl::flat_hash_map<int64_t, std::vector<std::string>> end_map = {{0, {""}}};
   for (int offset = 13; offset >= 7; --offset) {
@@ -268,7 +275,8 @@ std::string FindBestInputMiddle(
     int total_inputs = 0;
     absl::flat_hash_map<int64_t, std::vector<std::string>> new_end_map;
     for (const auto& [z, input_list] : end_map) {
-      absl::flat_hash_set<std::pair<int64_t, char>> next = ReversePartial(dc, offset, z);
+      absl::flat_hash_set<std::pair<int64_t, char>> next =
+          ReversePartial(dc, offset, z);
       for (const auto& [z, c] : next) {
         for (const auto& input : input_list) {
           std::string next_input = std::string(1, c) + input;

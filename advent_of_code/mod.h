@@ -37,9 +37,12 @@ using OnExtendedEuclidean = absl::FunctionRef<absl::optional<int64_t>(
 absl::optional<int64_t> ExtendedEuclideanAlgorithm(
     int64_t a, int64_t b, OnExtendedEuclidean on_result);
 
-absl::optional<int64_t> ExtendedEuclideanAlgorithmInvert(int64_t n, int64_t mod);
-absl::optional<int64_t> ChineseRemainder(int64_t mod_a, int64_t a, int64_t mod_b, int64_t b);
-absl::optional<int64_t> ChineseRemainder(std::vector<std::pair<int64_t, int64_t>> list);
+absl::optional<int64_t> ExtendedEuclideanAlgorithmInvert(int64_t n,
+                                                         int64_t mod);
+absl::optional<int64_t> ChineseRemainder(int64_t mod_a, int64_t a,
+                                         int64_t mod_b, int64_t b);
+absl::optional<int64_t> ChineseRemainder(
+    std::vector<std::pair<int64_t, int64_t>> list);
 
 }  // namespace advent_of_code
 

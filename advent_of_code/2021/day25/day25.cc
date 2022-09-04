@@ -29,13 +29,9 @@ int Update(CharBoard& b, char fish, Point dir) {
   return move.size();
 }
 
-int UpdateEast(CharBoard& b) {
-  return Update(b, '>', Cardinal::kEast);
-}
+int UpdateEast(CharBoard& b) { return Update(b, '>', Cardinal::kEast); }
 
-int UpdateSouth(CharBoard& b) {
-  return Update(b, 'v', Cardinal::kSouth);
-}
+int UpdateSouth(CharBoard& b) { return Update(b, 'v', Cardinal::kSouth); }
 
 }  // namespace
 

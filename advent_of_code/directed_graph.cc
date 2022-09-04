@@ -6,7 +6,8 @@ absl::flat_hash_set<absl::string_view> DirectedGraphBase::Reachable(
     absl::string_view src) const {
   if (!nodes_.contains(src)) return {};
   absl::flat_hash_set<absl::string_view> ret = {src};
-  for (std::deque<absl::string_view> queue = {src}; !queue.empty(); queue.pop_front()) {
+  for (std::deque<absl::string_view> queue = {src}; !queue.empty();
+       queue.pop_front()) {
     absl::string_view cur = queue.front();
     const std::vector<absl::string_view>* outgoing = Outgoing(cur);
     if (!outgoing) continue;
@@ -43,8 +44,8 @@ std::vector<std::vector<absl::string_view>> DirectedGraphBase::Forest() const {
   return forest;
 }
 
-absl::StatusOr<std::vector<absl::string_view>>
-DirectedGraphBase::DAGSort() const {
+absl::StatusOr<std::vector<absl::string_view>> DirectedGraphBase::DAGSort()
+    const {
   absl::flat_hash_map<absl::string_view, int> name_to_dep_count;
   for (const auto& node : nodes()) {
     const std::vector<absl::string_view>* incoming = Incoming(node);

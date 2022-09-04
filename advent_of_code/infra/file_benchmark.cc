@@ -113,8 +113,8 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
     }
   }
   if (!skip.empty()) {
-    state.SetLabel(absl::StrCat(
-        "Part: ", part, "; *** SKIPPED ", skip, " ****"));
+    state.SetLabel(
+        absl::StrCat("Part: ", part, "; *** SKIPPED ", skip, " ****"));
     for (auto _ : state) {
     }
     return;

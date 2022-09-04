@@ -55,11 +55,11 @@ struct Cube {
   }
   bool Contains(Point3 p) const {
     if (p.x < min.x) return false;
-    if (p.x > max.x) return false; 
+    if (p.x > max.x) return false;
     if (p.y < min.y) return false;
-    if (p.y > max.y) return false; 
+    if (p.y > max.y) return false;
     if (p.z < min.z) return false;
-    if (p.z > max.z) return false; 
+    if (p.z > max.z) return false;
     return true;
   }
   bool FullyContains(const Cube& o) const {
@@ -84,8 +84,10 @@ struct Cube {
   absl::optional<Cube> Intersect(const Cube& o) const {
     if (!Overlaps(o)) return {};
     return Cube{
-      {std::max(min.x, o.min.x), std::max(min.y, o.min.y), std::max(min.z, o.min.z)},
-      {std::min(max.x, o.max.x), std::min(max.y, o.max.y), std::min(max.z, o.max.z)},
+        {std::max(min.x, o.min.x), std::max(min.y, o.min.y),
+         std::max(min.z, o.min.z)},
+        {std::min(max.x, o.max.x), std::min(max.y, o.max.y),
+         std::min(max.z, o.max.z)},
     };
   }
 
@@ -94,7 +96,7 @@ struct Cube {
       out->push_back(*this);
       return;
     }
-  
+
     Cube overlap = *this;
     std::vector<Cube> ret;
     // Cleave off sub-cubes that cannot overlap with o, until a fully contained
@@ -190,12 +192,14 @@ absl::StatusOr<std::string> Day_2021_22::Part1(
     }
 
     absl::optional<Cube> c = bound.Intersect(Cube{{x0, y0, z0}, {x1, y1, z1}});
-    if (!c) continue;  
+    if (!c) continue;
     if (type == "on") {
-      if (map) for (Point3 p : *c) map->insert(p);
+      if (map)
+        for (Point3 p : *c) map->insert(p);
       s.Union(*c);
     } else if (type == "off") {
-      if (map) for (Point3 p : *c) map->erase(p);
+      if (map)
+        for (Point3 p : *c) map->erase(p);
       s.SetDifference(*c);
     } else {
       return Error("Neither on nor off?");
@@ -203,7 +207,8 @@ absl::StatusOr<std::string> Day_2021_22::Part1(
   }
   if (map) {
     if (map->size() != s.Volume()) {
-      return Error("map->size() != s.Volumne(): ", map->size(), " != ", s.Volume());
+      return Error("map->size() != s.Volumne(): ", map->size(),
+                   " != ", s.Volume());
     }
   }
   return IntReturn(s.Volume());

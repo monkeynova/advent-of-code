@@ -111,8 +111,8 @@ cc_library(
 
 cc_library(
     name = "directed_graph",
-    hdrs = ["directed_graph.h"],
     srcs = ["directed_graph.cc"],
+    hdrs = ["directed_graph.h"],
     visibility = [
         "//visibility:public",
     ],

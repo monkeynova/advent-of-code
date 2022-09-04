@@ -128,8 +128,8 @@ absl::StatusOr<std::string> Day_2018_07::Part1(
     }
     graph.AddEdge(src, dst);
   }
-  absl::StatusOr<std::vector<absl::string_view>> ordered =
-      graph.DAGSort([](absl::string_view a, absl::string_view b) { return a < b; });
+  absl::StatusOr<std::vector<absl::string_view>> ordered = graph.DAGSort(
+      [](absl::string_view a, absl::string_view b) { return a < b; });
   if (!ordered.ok()) return ordered.status();
   return absl::StrJoin(*ordered, "");
 }
