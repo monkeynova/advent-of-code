@@ -6,7 +6,7 @@ git_repository(
     name = "bazel_skylib",
     remote = "https://github.com/bazelbuild/bazel-skylib.git",
     # branch = "main",
-    commit = "1bbb388780f6016b6981a2f075fb457e999bc3bd",
+    commit = "60abca8fa2f970d4899857a46cb0586338dbf7a1",
 )
 load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 bazel_skylib_workspace()
@@ -22,13 +22,13 @@ git_repository(
     name = "com_google_googletest",
     remote = "https://github.com/google/googletest.git",
     # branch = "main",
-    commit = "afd902e992b720d1b3e106bc5e425a5768872265",
+    commit = "912db742531bf82efb01194bc08140416e3b3467",
 )
 
 git_repository(
     name = "com_google_absl",
     remote = "https://github.com/abseil/abseil-cpp.git",
-    commit = "92fdbfb301f8b301b28ab5c99e7361e775c2fb8a",
+    commit = "1b976982d8cdbfd8320f34209b065bae7adefb09",
 )
 
 git_repository(
@@ -40,13 +40,14 @@ git_repository(
 git_repository(
     name = "com_github_google_benchmark",
     remote = "https://github.com/google/benchmark.git",
-    commit = "e991355c02b93fe17713efe04cbc2e278e00fdbd",
+    # branch = "main",
+    commit = "2257fa4d6afb8e5a2ccd510a70f38fe7fcdf1edf",
 )
 
 git_repository(
     name = "com_google_glog",
     remote = "https://github.com/google/glog.git",
-    commit = "b70ea80433c2a8f20b832be97b90f1f82b0d29e9",
+    commit = "05fbc65278db1aa545ca5cb743c31bc717a48d0f",
 )
 
 git_repository(
@@ -60,7 +61,7 @@ git_repository(
     name = "com_googlesource_code_re2",
     remote = "https://github.com/google/re2.git",
     # branch = "abseil"
-    commit = "8c0f7738d67b1808f9bb9a93a5cdc6d33d50ede9",
+    commit = "9d65debf47ccf68e51857009d14845f0354b852c",
 )
 
 git_repository(
