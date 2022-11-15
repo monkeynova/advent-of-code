@@ -73,7 +73,9 @@ absl::StatusOr<std::string> Day_2016_14::Part2(
 
   std::vector<std::string> window;
   int found = 0;
-  absl::flat_hash_map<char, std::set<int>> has_5ple;
+  absl::flat_hash_map<char, int> has_5ple;
+  for (int i = '0'; i <= '9'; ++i) has_5ple[i] = -1;
+  for (int i = 'a'; i <= 'f'; ++i) has_5ple[i] = -1;
   MD5 digest;
   for (int index = 0; true; ++index) {
     std::string str = absl::StrCat(input[0], index);
@@ -86,7 +88,7 @@ absl::StatusOr<std::string> Day_2016_14::Part2(
           str[i] == str[i + 3] && str[i] == str[i + 4]) {
         VLOG(2) << "Found 5-ple of " << str.substr(i, 1) << " in " << str
                 << " @" << index << "," << i;
-        has_5ple[str[i]].insert(index);
+        has_5ple[str[i]] = index;
       }
     }
 
@@ -108,15 +110,10 @@ absl::StatusOr<std::string> Day_2016_14::Part2(
         }
       }
     }
-    if (hunt != '\0') {
-      const std::set<int>& haystack = has_5ple[hunt];
-      auto it =
-          std::upper_bound(haystack.begin(), haystack.end(), test_index + 1);
-      if (it != haystack.end() && *it <= test_index + 1000) {
-        ++found;
-        VLOG(1) << "Found Key #" << found << " @" << test_index;
-        if (found == 64) return IntReturn(test_index);
-      }
+    if (has_5ple[hunt] > test_index) {
+      ++found;
+      VLOG(1) << "Found Key #" << found << " @" << test_index;
+      if (found == 64) return IntReturn(test_index);
     }
   }
 

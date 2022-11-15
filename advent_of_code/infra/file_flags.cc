@@ -1,6 +1,6 @@
 #include "advent_of_code/infra/file_flags.h"
 
-ABSL_FLAG(absl::Duration, run_long_tests, absl::Seconds(10),
+ABSL_FLAG(absl::Duration, run_long_tests, absl::Minutes(1),
           "Any tests marked [long=$duration] where $duration < "
           "$run_long_tests will be skipped and ignored");
 
