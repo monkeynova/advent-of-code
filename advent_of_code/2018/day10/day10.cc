@@ -55,7 +55,7 @@ absl::StatusOr<std::string> Day_2018_10::Part1(
   CharBoard b(r.max.x - r.min.x + 1, r.max.y - r.min.y + 1);
   for (Light l : lights) b[l.p - r.min] = '#';
 
-  return b.AsString();
+  return BoardReturn(b);
 }
 
 absl::StatusOr<std::string> Day_2018_10::Part2(

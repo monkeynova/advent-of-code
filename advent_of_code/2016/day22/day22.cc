@@ -214,7 +214,7 @@ absl::StatusOr<std::string> Day_2016_22::Part1(
       return Error("Bad line: ", str);
     }
     if (size != n.used + n.avail) return Error("Bad used: ", str);
-    if (grid.contains(p)) return Error("Dupe point: ", p.DebugString());
+    if (grid.contains(p)) return Error("Dupe point: ", p);
     grid[p] = n;
   }
   int viable = 0;
@@ -249,7 +249,7 @@ absl::StatusOr<std::string> Day_2016_22::Part2(
     if (size != n.used + n.avail) return Error("Bad used: ", str);
     if (n.used > 0 && 2 * n.used < size)
       return Error("Only work with over half full disks");
-    if (grid.contains(p)) return Error("Dupe point: ", p.DebugString());
+    if (grid.contains(p)) return Error("Dupe point: ", p);
     grid[p] = n;
   }
   if (grid.size() > 100) {

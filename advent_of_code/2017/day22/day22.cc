@@ -119,7 +119,7 @@ absl::StatusOr<std::string> Day_2017_22::Part1(
   int infected = 0;
   for (int i = 0; i < 10'000; ++i) {
     VLOG(1) << absl::StrJoin(*sparse_board, ",", [](std::string* out, Point p) {
-      absl::StrAppend(out, p.DebugString());
+      absl::StrAppend(out, p);
     });
     if (Move(n, *sparse_board)) ++infected;
   }

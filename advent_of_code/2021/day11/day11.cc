@@ -46,7 +46,7 @@ int64_t RunStep(CharBoard& b) {
 
 absl::StatusOr<std::string> Day_2021_11::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
+  absl::StatusOr<CharBoard> board = ParseAsBoard(input);
   if (!board.ok()) return board.status();
 
   int64_t flashes = 0;
@@ -59,7 +59,7 @@ absl::StatusOr<std::string> Day_2021_11::Part1(
 
 absl::StatusOr<std::string> Day_2021_11::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
+  absl::StatusOr<CharBoard> board = ParseAsBoard(input);
   if (!board.ok()) return board.status();
 
   int64_t all_flash = board->width() * board->height();

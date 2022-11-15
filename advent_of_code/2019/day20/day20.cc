@@ -89,8 +89,7 @@ class Maze {
             << absl::StrJoin(
                    ret.portals_, "\n",
                    [](std::string* out, const std::pair<Point, Point>& portal) {
-                     absl::StrAppend(out, portal.first.DebugString(), "<->",
-                                     portal.second.DebugString());
+                     absl::StrAppend(out, portal.first, "<->", portal.second);
                    });
     return ret;
   }

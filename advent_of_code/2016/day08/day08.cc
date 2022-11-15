@@ -81,7 +81,7 @@ absl::StatusOr<std::string> Day_2016_08::Part2(
     VLOG(1) << "Ins: " << ins;
     VLOG(1) << "Board:\n" << display;
   }
-  return display.AsString();
+  return BoardReturn(display);
 }
 
 }  // namespace advent_of_code

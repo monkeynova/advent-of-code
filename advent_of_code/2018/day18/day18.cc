@@ -55,7 +55,7 @@ CharBoard Update(const CharBoard& in) {
 
 absl::StatusOr<std::string> Day_2018_18::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> in = CharBoard::Parse(input);
+  absl::StatusOr<CharBoard> in = ParseAsBoard(input);
   if (!in.ok()) return in.status();
   CharBoard step = *in;
   for (int i = 0; i < 10; ++i) {
@@ -69,7 +69,7 @@ absl::StatusOr<std::string> Day_2018_18::Part1(
 
 absl::StatusOr<std::string> Day_2018_18::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> in = CharBoard::Parse(input);
+  absl::StatusOr<CharBoard> in = ParseAsBoard(input);
   if (!in.ok()) return in.status();
   CharBoard step = *in;
   constexpr int kNumSteps = 1'000'000'000;

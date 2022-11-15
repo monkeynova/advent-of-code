@@ -51,7 +51,7 @@ absl::StatusOr<std::string> Day_2016_02::Part1(
       }
     }
     auto it = codes.find(p);
-    if (it == codes.end()) return Error("Bad point: ", p.DebugString());
+    if (it == codes.end()) return Error("Bad point: ", p);
     code += it->second;
   }
   return code;
@@ -91,7 +91,7 @@ absl::StatusOr<std::string> Day_2016_02::Part2(
       }
     }
     auto it = codes.find(p);
-    if (it == codes.end()) return Error("Bad point: ", p.DebugString());
+    if (it == codes.end()) return Error("Bad point: ", p);
     code += it->second;
   }
   return code;

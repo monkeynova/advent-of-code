@@ -90,7 +90,7 @@ class Grid4 {
 
 absl::StatusOr<std::string> Day_2020_17::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> initial = CharBoard::Parse(input);
+  absl::StatusOr<CharBoard> initial = ParseAsBoard(input);
   if (!initial.ok()) return initial.status();
   Grid3 grid(*initial);
   for (int i = 0; i < 6; ++i) {
@@ -101,7 +101,7 @@ absl::StatusOr<std::string> Day_2020_17::Part1(
 
 absl::StatusOr<std::string> Day_2020_17::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> initial = CharBoard::Parse(input);
+  absl::StatusOr<CharBoard> initial = ParseAsBoard(input);
   if (!initial.ok()) return initial.status();
   Grid4 grid(*initial);
   for (int i = 0; i < 6; ++i) {

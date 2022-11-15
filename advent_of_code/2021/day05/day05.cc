@@ -55,7 +55,7 @@ absl::StatusOr<std::string> Day_2021_05::Part2(
     }
     Point dir = (p2 - p1).min_step();
     if (dir.dist() > 2) {
-      return Error("Found non-0/45/90 degree slope: ", dir.DebugString());
+      return Error("Found non-0/45/90 degree slope: ", dir);
     }
     for (Point p = p1; p != p2; p += dir) {
       ++counts[p];

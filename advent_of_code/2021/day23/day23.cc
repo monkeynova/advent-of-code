@@ -247,7 +247,7 @@ absl::optional<int> FindMinCost(
 
 absl::StatusOr<std::string> Day_2021_23::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
+  absl::StatusOr<CharBoard> b = ParseAsBoard(input);
   if (!b.ok()) return b.status();
 
   State s{.board = *b};

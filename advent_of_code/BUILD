@@ -8,6 +8,8 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
+        ":char_board",
+        ":point",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",

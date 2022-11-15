@@ -138,7 +138,7 @@ class GameBoard {
       find = 'G';
       attack = elf_attack_;
     } else
-      return Error("HP at bad location (attack): ", p.DebugString());
+      return Error("HP at bad location (attack): ", p);
     int fewest_hp = std::numeric_limits<int>::max();
     Point fewest_hp_location;
     for (Point dir : kOrderedDirs) {
@@ -177,7 +177,7 @@ class GameBoard {
     else if (board_[p] == 'E')
       find = 'G';
     else
-      return Error("HP at bad location (move): ", p.DebugString());
+      return Error("HP at bad location (move): ", p);
 
     FindEnemyAdjacent::PointAndDistance p_and_d;
     (void)FindEnemyAdjacent(board_, p, find, &p_and_d).FindMinSteps();
@@ -203,8 +203,7 @@ class GameBoard {
                    " != ", p_and_d.d - 1);
     }
     if (move_to == p) {
-      return Error("Can't find path from ", p.DebugString(), " to ",
-                   p_and_d.p.DebugString());
+      return Error("Can't find path from ", p, " to ", p_and_d.p);
     }
     VLOG(1) << "Moving " << board_[p] << " from " << p << " to " << move_to;
     board_[move_to] = board_[p];
@@ -256,7 +255,7 @@ class GameBoard {
         absl::StrJoin(hit_points_, "",
                       [](std::string* out, const std::pair<Point, int>& pair) {
                         absl::StrAppend(out, "  ", pair.second, " @",
-                                        pair.first.DebugString(), "\n");
+                                        pair.first, "\n");
                       }),
         board_.AsString());
   }
@@ -272,7 +271,7 @@ class GameBoard {
 
 absl::StatusOr<std::string> Day_2018_15::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
+  absl::StatusOr<CharBoard> b = ParseAsBoard(input);
   if (!b.ok()) return b.status();
 
   GameBoard game(std::move(*b));
@@ -292,7 +291,7 @@ absl::StatusOr<std::string> Day_2018_15::Part1(
 
 absl::StatusOr<std::string> Day_2018_15::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
+  absl::StatusOr<CharBoard> b = ParseAsBoard(input);
   if (!b.ok()) return b.status();
 
   for (int elf_attack = 3; true; ++elf_attack) {

@@ -204,8 +204,7 @@ absl::StatusOr<CharBoard> ConstructRoom(absl::string_view re,
       } else if (test_point.x % 2 == 0 && test_point.y % 2) {
         board[p] = '-';
       } else {
-        return Error("Sparse board contains corner: ",
-                     test_point.DebugString());
+        return Error("Sparse board contains corner: ", test_point);
       }
     } else {
       board[p] = '#';

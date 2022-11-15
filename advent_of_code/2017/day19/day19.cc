@@ -45,11 +45,11 @@ absl::StatusOr<WalkRet> WalkBoard(const CharBoard& b) {
       }
       if (!b.OnBoard(next) || b[next] == ' ') {
         if (b[p] == '+')
-          return Error("Erroneously marked end @", p.DebugString());
+          return Error("Erroneously marked end @", p);
         break;
       }
       if (b[p] != '+')
-        return Error("Turning at non-intersection @", p.DebugString());
+        return Error("Turning at non-intersection @", p);
     }
     if (b[next] == '+' || b[next] == '|' || b[next] == '-') {
       // Still on path. Keep going.
@@ -59,7 +59,7 @@ absl::StatusOr<WalkRet> WalkBoard(const CharBoard& b) {
       VLOG(1) << "Appending: " << b[next] << " to " << ret.sequence;
       ret.sequence.append(1, b[next]);
     } else {
-      return Error("Bad token @", next.DebugString());
+      return Error("Bad token @", next);
     }
     p = next;
   }
@@ -71,7 +71,7 @@ absl::StatusOr<WalkRet> WalkBoard(const CharBoard& b) {
 absl::StatusOr<std::string> Day_2017_19::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.empty()) return Error("Bad input");
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
+  absl::StatusOr<CharBoard> b = ParseAsBoard(input);
   if (!b.ok()) return b.status();
   absl::StatusOr<WalkRet> walk_ret = WalkBoard(*b);
   if (!walk_ret.ok()) return walk_ret.status();
@@ -81,7 +81,7 @@ absl::StatusOr<std::string> Day_2017_19::Part1(
 absl::StatusOr<std::string> Day_2017_19::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.empty()) return Error("Bad input");
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
+  absl::StatusOr<CharBoard> b = ParseAsBoard(input);
   if (!b.ok()) return b.status();
   absl::StatusOr<WalkRet> walk_ret = WalkBoard(*b);
   if (!walk_ret.ok()) return walk_ret.status();

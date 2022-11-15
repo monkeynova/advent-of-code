@@ -89,7 +89,7 @@ absl::StatusOr<std::string> Day_2019_11::Part2(
   painter.Set({.x = 0, .y = 0}, 1);
   if (absl::Status st = codes->Run(&painter); !st.ok()) return st;
 
-  return painter.Panels().AsString();
+  return BoardReturn(painter.Panels());
 }
 
 }  // namespace advent_of_code

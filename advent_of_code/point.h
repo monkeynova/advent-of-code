@@ -7,6 +7,7 @@
 
 #include "absl/hash/hash.h"
 #include "absl/strings/str_cat.h"
+#include "absl/strings/str_format.h"
 #include "absl/strings/str_split.h"
 #include "re2/re2.h"
 
@@ -66,7 +67,10 @@ struct Point {
 
   int dist() const { return abs(x) + abs(y); }
 
-  std::string DebugString() const { return absl::StrCat("{", x, ",", y, "}"); }
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const Point& p) {
+    absl::Format(&sink, "{%v,%v}", p.x, p.y);
+  }
 
   friend Point operator*(int s, Point p) {
     return {.x = s * p.x, .y = s * p.y};
@@ -220,8 +224,9 @@ struct Point3 {
 
   int dist() const { return abs(x) + abs(y) + abs(z); }
 
-  std::string DebugString() const {
-    return absl::StrCat("{", x, ",", y, ",", z, "}");
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const Point3& p) {
+    absl::Format(&sink, "{%v,%v,%v}", p.x, p.y, p.z);
   }
 
   friend constexpr Point3 operator*(int s, Point3 p) {
@@ -320,8 +325,9 @@ struct Point4 {
 
   int dist() const { return abs(x) + abs(y) + abs(z) + abs(w); }
 
-  std::string DebugString() const {
-    return absl::StrCat("{", x, ",", y, ",", z, ",", w, "}");
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const Point4& p) {
+    absl::Format(&sink, "{%v,%v,%v,%v}", p.x, p.y, p.z, p.w);
   }
 
   friend constexpr Point4 operator*(int s, Point4 p) {

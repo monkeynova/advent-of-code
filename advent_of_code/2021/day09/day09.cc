@@ -56,7 +56,7 @@ int64_t BasinSize(const CharBoard& board, Point p) {
 
 absl::StatusOr<std::string> Day_2021_09::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
+  absl::StatusOr<CharBoard> board = ParseAsBoard(input);
   if (!board.ok()) return board.status();
 
   std::vector<Point> basins = FindLow(*board);
@@ -70,7 +70,7 @@ absl::StatusOr<std::string> Day_2021_09::Part1(
 
 absl::StatusOr<std::string> Day_2021_09::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
+  absl::StatusOr<CharBoard> board = ParseAsBoard(input);
   if (!board.ok()) return board.status();
 
   std::vector<Point> basins = FindLow(*board);

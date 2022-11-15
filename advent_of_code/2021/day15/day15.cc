@@ -52,7 +52,7 @@ class Route : public BFSInterface<Route, Point> {
 
 absl::StatusOr<std::string> Day_2021_15::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
+  absl::StatusOr<CharBoard> b = ParseAsBoard(input);
   if (!b.ok()) return b.status();
 
   return IntReturn(Route(*b).FindMinStepsAStar());
@@ -60,7 +60,7 @@ absl::StatusOr<std::string> Day_2021_15::Part1(
 
 absl::StatusOr<std::string> Day_2021_15::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
+  absl::StatusOr<CharBoard> b = ParseAsBoard(input);
   if (!b.ok()) return b.status();
 
   CharBoard big_board(b->width() * 5, b->height() * 5);

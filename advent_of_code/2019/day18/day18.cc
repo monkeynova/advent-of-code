@@ -81,8 +81,7 @@ class Board {
       char from_key_str[] = {from_key, '\0'};
       char to_key_str[] = {to_key, '\0'};
       return absl::StrCat(
-          from_key_str, "->", to_key_str, "; ", from.DebugString(), "=>",
-          to.DebugString(), "; ", steps,
+          from_key_str, "->", to_key_str, "; ", from, "=>", to, "; ", steps,
           " steps; requires=", absl::StrJoin(required_keys, "", &CharJoin));
     }
   };
@@ -222,7 +221,7 @@ class Board {
 
 absl::StatusOr<std::string> Day_2019_18::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> char_board = CharBoard::Parse(input);
+  absl::StatusOr<CharBoard> char_board = ParseAsBoard(input);
   if (!char_board.ok()) return char_board.status();
   Board b(*char_board);
   if (absl::Status st = b.InitializeBoard(); !st.ok()) return st;
@@ -231,7 +230,7 @@ absl::StatusOr<std::string> Day_2019_18::Part1(
 
 absl::StatusOr<std::string> Day_2019_18::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> char_board = CharBoard::Parse(input);
+  absl::StatusOr<CharBoard> char_board = ParseAsBoard(input);
   if (!char_board.ok()) return char_board.status();
 
   bool found = false;

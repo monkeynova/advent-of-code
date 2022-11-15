@@ -20,7 +20,7 @@ absl::StatusOr<std::string> Day_2021_20::Part1(
   if (lookup.size() != 512) return Error("Bad input (lookup size)");
   if (!input[1].empty()) return Error("Bad input (missing empty line)");
 
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input.subspan(2));
+  absl::StatusOr<CharBoard> b = ParseAsBoard(input.subspan(2));
   if (!b.ok()) return b.status();
 
   Conway conway(*b, std::string(lookup));
@@ -40,7 +40,7 @@ absl::StatusOr<std::string> Day_2021_20::Part2(
   if (lookup.size() != 512) return Error("Bad input (lookup size)");
   if (!input[1].empty()) return Error("Bad input (missing empty line)");
 
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input.subspan(2));
+  absl::StatusOr<CharBoard> b = ParseAsBoard(input.subspan(2));
   if (!b.ok()) return b.status();
 
   Conway conway(*b, std::string(lookup));

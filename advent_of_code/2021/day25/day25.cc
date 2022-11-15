@@ -37,7 +37,7 @@ int UpdateSouth(CharBoard& b) { return Update(b, 'v', Cardinal::kSouth); }
 
 absl::StatusOr<std::string> Day_2021_25::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
+  absl::StatusOr<CharBoard> b = ParseAsBoard(input);
   if (!b.ok()) return b.status();
 
   for (int i = 1; true; ++i) {

@@ -9,6 +9,8 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
 #include "absl/types/span.h"
+#include "advent_of_code/char_board.h"
+#include "advent_of_code/point.h"
 
 extern absl::Flag<bool> FLAGS_advent_day_run_audit;
 
@@ -56,6 +58,43 @@ class AdventDay {
   absl::StatusOr<std::string> IntReturn(absl::optional<int64_t> val) const {
     if (!val) return absl::NotFoundError("Not found");
     return absl::StrCat(*val);
+  }
+
+  absl::StatusOr<std::string> PointReturn(Point val) const {
+    return absl::StrCat(val);
+  }
+
+  absl::StatusOr<std::string> PointReturn(absl::StatusOr<Point> val) const {
+    if (!val.ok()) return val.status();
+    return absl::StrCat(*val);
+  }
+
+  absl::StatusOr<std::string> PointReturn(absl::optional<Point> val) const {
+    if (!val) return absl::NotFoundError("Not found");
+    return absl::StrCat(*val);
+  }
+
+  absl::StatusOr<std::string> PointReturn(Point3 val) const {
+    return absl::StrCat(val);
+  }
+
+  absl::StatusOr<std::string> PointReturn(absl::StatusOr<Point3> val) const {
+    if (!val.ok()) return val.status();
+    return absl::StrCat(*val);
+  }
+
+  absl::StatusOr<std::string> PointReturn(absl::optional<Point3> val) const {
+    if (!val) return absl::NotFoundError("Not found");
+    return absl::StrCat(*val);
+  }
+
+  absl::StatusOr<CharBoard> ParseAsBoard(absl::Span<absl::string_view> input)
+      const {
+    return CharBoard::Parse(input);
+  }
+
+  absl::StatusOr<std::string> BoardReturn(const CharBoard& val) const {
+    return val.AsString();
   }
 
   virtual absl::string_view test_file() const = 0;

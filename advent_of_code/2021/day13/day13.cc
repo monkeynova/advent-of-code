@@ -113,7 +113,7 @@ absl::StatusOr<std::string> Day_2021_13::Part2(
   for (Point p : points) {
     b[p] = '#';
   }
-  return b.AsString();
+  return BoardReturn(b);
 }
 
 }  // namespace advent_of_code

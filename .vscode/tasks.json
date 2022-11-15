@@ -4,29 +4,12 @@
     "version": "2.0.0",
     "tasks": [
       {
-        "label": "Bazel test ...",
+        "label": "bazelisk test ...",
         "type": "shell",
         "command": "bazelisk",
         "args": [
           "test",
           "..."
-        ],
-        "problemMatcher": [],
-        "group": {
-          "kind": "build",
-          "isDefault": false
-        }
-      },
-      {
-        "label": "Bazel test (opt; long=5s) ...",
-        "type": "shell",
-        "command": "bazelisk",
-        "args": [
-          "test",
-          "-c",
-          "opt",
-          "...",
-          "--test_arg=--run_long_tests=5s"
         ],
         "problemMatcher": [],
         "group": {
