@@ -86,9 +86,9 @@
           "id": "year",
           "description": "Which year ?",
           "options": [
-            "2021",
+            "2022",
           ],
-          "default": "2021"
+          "default": "2022"
         },
         {
             "type": "pickString",

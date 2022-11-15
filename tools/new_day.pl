@@ -46,7 +46,7 @@ cc_test(
     name = "benchmark",
     tags = ["benchmark"],
     deps = [
-        "//advent_of_code/${year}/${day}:${day}_benchmark_lib",
+        "//advent_of_code/${year}/day${day}:day${day}_benchmark_lib",
         "\@com_monkeynova_gunit_main//:test_main",
     ],
 )
