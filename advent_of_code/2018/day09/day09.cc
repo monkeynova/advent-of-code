@@ -45,25 +45,29 @@ struct GameState {
     }
   }
 
-  std::string DebugString() {
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const GameState& s) {
     std::string out;
     int marble_idx = 0;
     for (int j = 0; j < 30; ++j) {
-      if (j > 0) absl::StrAppend(&out, ",");
-      if (marble_idx == cur_position) {
-        absl::StrAppend(&out, "(", marbles[marble_idx].score, ")");
+      if (j > 0) absl::Format(&out, ",");
+      if (marble_idx == s.cur_position) {
+        absl::Format(&sink, "(%d)", s.marbles[marble_idx].score);
       } else {
-        absl::StrAppend(&out, marbles[marble_idx].score);
+        absl::Format(&sink, "%d", s.marbles[marble_idx].score);
       }
-      if (marbles[marbles[marble_idx].next].prev != marble_idx) {
+      if (s.marbles[s.marbles[marble_idx].next].prev != marble_idx) {
         LOG(ERROR) << "Integrity check!";
       }
-      marble_idx = marbles[marble_idx].next;
+      marble_idx = s.marbles[marble_idx].next;
       // Looped before size.
       if (marble_idx == 0) break;
     }
-    if (marble_idx != 0) absl::StrAppend(&out, ",...");
-    return out;
+    if (marble_idx != 0) absl::Format(&sink, ",...");
+  }
+
+  friend std::ostream& operator<<(std::ostream& out, const GameState& s) {
+    return out << absl::StreamFormat("%v", s);
   }
 
   void IntegrityCheck() {
@@ -87,7 +91,7 @@ int64_t HighScore(int num_players, int num_marbles) {
   state.scores = std::vector<int64_t>(num_players, 0);
   state.marbles = {{0, 0, 0}};
   for (int64_t i = 1; i <= num_marbles; ++i) {
-    VLOG(2) << state.DebugString();
+    VLOG(2) << state;
     // state.IntegrityCheck();
     state.AddMarble(i);
   }
