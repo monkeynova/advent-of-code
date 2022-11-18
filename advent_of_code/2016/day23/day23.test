@@ -17,7 +17,7 @@ dec a
 ==
 
 # fastmode not actually run
-[long=10m (50s opt) 2020.12.23]
+[long=10m (25s opt) 2020.12.23]
 [part=2]
 @include{advent_of_code/2016/day23/input.txt}
 --

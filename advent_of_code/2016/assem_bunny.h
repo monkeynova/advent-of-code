@@ -21,15 +21,6 @@ class AssemBunny {
     int64_t b = 0;
     int64_t c = 0;
     int64_t d = 0;
-    int64_t* Val(absl::string_view name) {
-      static int64_t literal;
-      if (name == "a") return &a;
-      if (name == "b") return &b;
-      if (name == "c") return &c;
-      if (name == "d") return &d;
-      if (absl::SimpleAtoi(name, &literal)) return &literal;
-      return nullptr;
-    }
 
     bool operator==(const Registers& o) const {
       return a == o.a && b == o.b && c == o.c && d == o.d;
@@ -61,7 +52,7 @@ class AssemBunny {
   static absl::StatusOr<AssemBunny> Parse(absl::Span<absl::string_view> input) {
     AssemBunny ret;
     for (absl::string_view in : input) {
-      absl::StatusOr<Instruction> i = Instruction::Parse(in);
+      absl::StatusOr<Instruction> i = Instruction::Parse(in, ret.registers_.get());
       if (!i.ok()) return i.status();
       ret.instructions_.push_back(std::move(*i));
     }
@@ -71,8 +62,8 @@ class AssemBunny {
   absl::Status Execute(OutputInterface* output_interface = nullptr,
                        PauseInterface* pause_interface = nullptr);
 
-  Registers& registers() { return registers_; }
-  const Registers& registers() const { return registers_; }
+  Registers& registers() { return *registers_; }
+  const Registers& registers() const { return *registers_; }
 
  private:
   enum class OpCode {
@@ -86,15 +77,52 @@ class AssemBunny {
 
   struct Instruction {
     OpCode op_code;
-    absl::string_view arg1;
-    absl::string_view arg2;
-    static absl::StatusOr<Instruction> Parse(absl::string_view in);
+    int64_t Arg1() const {
+      if (std::holds_alternative<int64_t*>(arg1)) {
+        return *std::get<int64_t*>(arg1);
+      } else if (std::holds_alternative<int64_t>(arg1)) {
+        return std::get<int64_t>(arg1);
+      } else {
+        LOG(FATAL) << "Bad alternative: arg1";
+      }
+    }
+    int64_t* MutableArg1() const {
+      if (std::holds_alternative<int64_t*>(arg1)) {
+        return std::get<int64_t*>(arg1);
+      } else {
+        LOG(FATAL) << "Not mutable: arg1";
+      }
+    }
+    int64_t Arg2() const {
+      if (std::holds_alternative<int64_t*>(arg2)) {
+        return *std::get<int64_t*>(arg2);
+      } else if (std::holds_alternative<int64_t>(arg2)) {
+        return std::get<int64_t>(arg2);
+      } else {
+        LOG(FATAL) << "Bad alternative: arg2";
+      }
+    }
+    int64_t* MutableArg2() const {
+      if (std::holds_alternative<int64_t*>(arg2)) {
+        return std::get<int64_t*>(arg2);
+      } else {
+        LOG(FATAL) << "Not mutable: arg2";
+      }
+    }
+
+    static absl::StatusOr<Instruction> Parse(
+      absl::string_view in, Registers* registers);
+
+   private:
+    std::variant<int64_t*, int64_t> arg1;
+    std::variant<int64_t*, int64_t> arg2;
   };
 
-  AssemBunny() = default;
+  AssemBunny() : registers_(std::make_unique<Registers>()) {}
 
   std::vector<Instruction> instructions_;
-  Registers registers_;
+  // We need pointer stability in registers wehn the VM is move'd.
+  std::unique_ptr<Registers> registers_;
   int ip_ = 0;
 };
 
