@@ -58,6 +58,41 @@ absl::StatusOr<AssemBunny::Instruction> AssemBunny::Instruction::Parse(
   return i;
 }
 
+void AssemBunny::Instruction::RemapRegisters(Registers* from, Registers* to) {
+  int64_t delta = reinterpret_cast<char*>(to) - reinterpret_cast<char*>(from);
+  if (std::holds_alternative<int64_t*>(arg1)) {
+    arg1 = reinterpret_cast<int64_t*>(reinterpret_cast<char*>(
+      std::get<int64_t*>(arg1)) + delta);
+  }
+  if (std::holds_alternative<int64_t*>(arg2)) {
+    arg2 = reinterpret_cast<int64_t*>(reinterpret_cast<char*>(
+      std::get<int64_t*>(arg2)) + delta);
+  }
+}
+
+// static 
+absl::StatusOr<AssemBunny> AssemBunny ::Parse(
+    absl::Span<absl::string_view> input) {
+  AssemBunny ret;
+  for (absl::string_view in : input) {
+    absl::StatusOr<Instruction> i = Instruction::Parse(in, ret.registers_.get());
+    if (!i.ok()) return i.status();
+    ret.instructions_.push_back(std::move(*i));
+  }
+  return ret;
+}
+
+AssemBunny AssemBunny::Clone() const {
+  AssemBunny ret;
+  ret.registers_ = std::make_unique<Registers>(*registers_);
+  ret.ip_ = ip_;
+  ret.instructions_ = instructions_;
+  for (auto& i : ret.instructions_) {
+    i.RemapRegisters(registers_.get(), ret.registers_.get());
+  }
+  return ret;
+}
+
 absl::Status AssemBunny::Execute(OutputInterface* output_interface,
                                  PauseInterface* pause_interface) {
   while (ip_ < instructions_.size()) {

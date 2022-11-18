@@ -46,7 +46,7 @@ absl::StatusOr<std::string> Day_2016_25::Part1(
   absl::StatusOr<AssemBunny> vm = AssemBunny::Parse(input);
   if (!vm.ok()) return vm.status();
   for (int a = 0; true; ++a) {
-    AssemBunny copy = *vm;
+    AssemBunny copy = vm->Clone();
     VLOG(1) << "Trying: " << a;
     copy.registers().a = a;
     OutputWatch watch;

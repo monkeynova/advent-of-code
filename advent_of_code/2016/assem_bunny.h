@@ -49,15 +49,9 @@ class AssemBunny {
     virtual bool Pause() = 0;
   };
 
-  static absl::StatusOr<AssemBunny> Parse(absl::Span<absl::string_view> input) {
-    AssemBunny ret;
-    for (absl::string_view in : input) {
-      absl::StatusOr<Instruction> i = Instruction::Parse(in, ret.registers_.get());
-      if (!i.ok()) return i.status();
-      ret.instructions_.push_back(std::move(*i));
-    }
-    return ret;
-  }
+  static absl::StatusOr<AssemBunny> Parse(absl::Span<absl::string_view> input);
+
+  AssemBunny Clone() const;
 
   absl::Status Execute(OutputInterface* output_interface = nullptr,
                        PauseInterface* pause_interface = nullptr);
@@ -112,6 +106,8 @@ class AssemBunny {
 
     static absl::StatusOr<Instruction> Parse(
       absl::string_view in, Registers* registers);
+
+    void RemapRegisters(Registers* from, Registers* to);
 
    private:
     std::variant<int64_t*, int64_t> arg1;
