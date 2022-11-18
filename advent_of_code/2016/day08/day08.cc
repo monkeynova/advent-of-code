@@ -7,6 +7,7 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/char_board.h"
+#include "advent_of_code/ocr.h"
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
@@ -81,7 +82,7 @@ absl::StatusOr<std::string> Day_2016_08::Part2(
     VLOG(1) << "Ins: " << ins;
     VLOG(1) << "Board:\n" << display;
   }
-  return BoardReturn(display);
+  return OCRExtract(display);
 }
 
 }  // namespace advent_of_code

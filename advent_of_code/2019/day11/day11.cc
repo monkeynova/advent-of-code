@@ -6,6 +6,7 @@
 #include "absl/strings/str_split.h"
 #include "advent_of_code/2019/int_code.h"
 #include "advent_of_code/char_board.h"
+#include "advent_of_code/ocr.h"
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 
@@ -48,6 +49,7 @@ class Painter : public IntCode::IOModule {
 
     for (const auto& point_and_color : panel_to_painted_color_) {
       const Point& p = point_and_color.first;
+      if (point_and_color.second != 1) continue;
       r.ExpandInclude(p);
     }
     VLOG(1) << r;
@@ -55,7 +57,7 @@ class Painter : public IntCode::IOModule {
     for (Point p : r) {
       auto it = panel_to_painted_color_.find(p);
       bool is_white = (it != panel_to_painted_color_.end() && it->second == 1);
-      ret[p - r.min] = is_white ? 'X' : ' ';
+      ret[p - r.min] = is_white ? '#' : '.';
     }
     return ret;
   }
@@ -89,7 +91,7 @@ absl::StatusOr<std::string> Day_2019_11::Part2(
   painter.Set({.x = 0, .y = 0}, 1);
   if (absl::Status st = codes->Run(&painter); !st.ok()) return st;
 
-  return BoardReturn(painter.Panels());
+  return OCRExtract(painter.Panels());
 }
 
 }  // namespace advent_of_code

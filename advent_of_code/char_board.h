@@ -39,6 +39,8 @@ class CharBoard {
     return ret;
   }
 
+  CharBoard() : CharBoard(0, 0) {}
+
   CharBoard(int width, int height)
       : stride_(width + 1), buf_(stride_ * height, '.') {
     for (int i = stride_ - 1; i < buf_.size(); i += stride_) {

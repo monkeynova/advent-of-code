@@ -7,6 +7,7 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/char_board.h"
+#include "advent_of_code/ocr.h"
 #include "advent_of_code/point.h"
 #include "glog/logging.h"
 #include "re2/re2.h"
@@ -55,7 +56,7 @@ absl::StatusOr<std::string> Day_2018_10::Part1(
   CharBoard b(r.max.x - r.min.x + 1, r.max.y - r.min.y + 1);
   for (Light l : lights) b[l.p - r.min] = '#';
 
-  return BoardReturn(b);
+  return OCRExtract(b);
 }
 
 absl::StatusOr<std::string> Day_2018_10::Part2(

@@ -44,6 +44,19 @@ cc_library(
 )
 
 cc_library(
+    name = "ocr",
+    hdrs = ["ocr.h"],
+    srcs = ["ocr.cc"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        ":char_board",
+        "@com_google_absl//absl/algorithm:container",
+    ],
+)
+
+cc_library(
     name = "bfs",
     hdrs = ["bfs.h"],
     visibility = [

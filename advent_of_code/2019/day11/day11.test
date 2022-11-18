@@ -7,9 +7,11 @@
 [part=2]
 @include{advent_of_code/2019/day11/input.txt}
 --
- XXX  X  X X  X XXX   XX  X  X  XX  X  X   
- X  X X X  X  X X  X X  X X X  X  X X X    
- X  X XX   X  X X  X X    XX   X    XX     
- XXX  X X  X  X XXX  X XX X X  X XX X X    
- X X  X X  X  X X X  X  X X X  X  X X X    
- X  X X  X  XX  X  X  XXX X  X  XXX X  X   
+\###..#..#.#..#.###...##..#..#..##..#..#
+\#..#.#.#..#..#.#..#.#..#.#.#..#..#.#.#.
+\#..#.##...#..#.#..#.#....##...#....##..
+\###..#.#..#..#.###..#.##.#.#..#.##.#.#.
+\#.#..#.#..#..#.#.#..#..#.#.#..#..#.#.#.
+\#..#.#..#..##..#..#..###.#..#..###.#..#
+
+RKURGKGK
