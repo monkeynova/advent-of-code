@@ -220,16 +220,6 @@ absl::StatusOr<CharBoard> ExtractNextChar(
     PointRectangle{{start_col, 0}, {*end_col - 1, board.height() - 1}});  
 }
 
-bool HasSymmetery(const CharBoard& test,
-                  absl::FunctionRef<Point(Point, Point)> transform) {
-  PointRectangle range = test.range();
-  for (Point p : range) {
-    Point test_p = transform(p, range.max);
-    if (test[p] != test[test_p]) return false;
-  }
-  return true;
-}
-
 double Score(const CharBoard& test, const CharBoard& exemplar) {
   double overlap_score = 0;
   double dy = 0.01;
@@ -251,41 +241,38 @@ double Score(const CharBoard& test, const CharBoard& exemplar) {
 absl::StatusOr<char> OCRChar(
     const CharBoard& board,
     const std::vector<std::pair<char, CharBoard>>& exemplars) {
-  struct CharScore {
-    char c;
-    double score;
-    bool operator<(const CharScore& o) const {
-      return score > o.score;
-    }
-  };
-  LOG(INFO) << board.AsString();
-  std::vector<CharScore> scores;
+  VLOG(1) << board.AsString();
+  char best_c;
+  double best_score = -1;
   for (const auto& [e_char, e_board] : exemplars) {
-    scores.push_back({.c = e_char, .score = Score(board, e_board)});
-    LOG(INFO) << absl::string_view(&scores.back().c, 1) << " -> " << scores.back().score;
+    double score = Score(board, e_board);
+    VLOG(1) << absl::string_view(&e_char, 1) << " -> " << score;
+    if (score > best_score) {
+      best_score = score;
+      best_c = e_char;
+    }
   }
-  absl::c_sort(scores);
-  return scores[0].c;
+  return best_c;
 }
 
-}
+}  // namespace
 
-std::string OCRExtract(const CharBoard& board) {
+absl::StatusOr<std::string> OCRExtract(const CharBoard& board) {
   std::vector<std::pair<char, CharBoard>> exemplars = Exemplars();
 
   std::string ret;
-  int64_t char_start = 0;
-  while (char_start < board.width()) {
-    int char_end;
+  for (int char_start = 0, char_end;
+       char_start < board.width();
+       char_start = char_end + 1) {
     absl::StatusOr<CharBoard> single_char =
       ExtractNextChar(char_start, board, &char_end);
-    CHECK(single_char.ok()) << single_char.status();
+    if (!single_char.ok()) return single_char.status();
+
     absl::StatusOr<char> next_char = OCRChar(*single_char, exemplars);
-    CHECK(next_char.ok()) << next_char.status();
+    if(!next_char.ok()) return next_char.status();
+
     ret.append(1, *next_char);
-    char_start = char_end + 1;
   }
-  LOG(INFO) << ret;
   return absl::StrCat(board.AsString(), "\n", ret);
 }
 

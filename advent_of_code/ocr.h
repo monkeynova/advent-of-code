@@ -5,7 +5,7 @@
 
 namespace advent_of_code {
 
-std::string OCRExtract(const CharBoard& board);
+absl::StatusOr<std::string> OCRExtract(const CharBoard& board);
 
 }  // namespace advent_of_code
 
