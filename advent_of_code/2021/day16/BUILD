@@ -17,6 +17,9 @@ cc_test(
     srcs = ["bits_expr_test.cc"],
     deps = [
         ":bits_expr",
+        # Allow file flag options on all tests to avoid test failures in
+        # bazelisk test ... --test_arg=<file arg>.
+        "//advent_of_code/infra:file_flags",
         "@com_monkeynova_gunit_main//:test_main",
     ],
 )

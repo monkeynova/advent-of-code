@@ -22,6 +22,9 @@ cc_test(
     data = ["int_code.test"],
     deps = [
         ":int_code",
+        # Allow file flag options on all tests to avoid test failures in
+        # bazelisk test ... --test_arg=<file arg>.
+        "//advent_of_code/infra:file_flags",
         "@com_google_file_based_test_driver//file_based_test_driver",
         "@com_google_file_based_test_driver//file_based_test_driver:run_test_case_result",
         "@com_google_file_based_test_driver//file_based_test_driver:test_case_options",

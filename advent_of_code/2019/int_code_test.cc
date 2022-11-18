@@ -14,10 +14,6 @@
 ABSL_FLAG(std::string, test_file, "",
           "The file which contains the file based test driver tests");
 
-ABSL_FLAG(absl::Duration, run_long_tests, absl::Seconds(0),
-          "Flag does nothing but exists to allow success for bazel test ... "
-          "--test_arg=--run_long_tests=...");
-
 namespace advent_of_code {
 
 constexpr char kInputOption[] = "input";
