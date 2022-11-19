@@ -14,214 +14,230 @@ namespace advent_of_code {
 
 namespace {
 
-// TODO(@monkeunova): We could probably A* the search with a
-//                    SUM(dist_to_4th_floor) / 2 metric.
+class Floor {
+ public:
+  Floor() = default;
 
-struct Floor {
-  int generators_bv;
-  int microchips_bv;
-  bool operator==(const Floor& o) const {
-    return generators_bv == o.generators_bv && microchips_bv == o.microchips_bv;
+  std::vector<int> Generators() const {
+    std::vector<int> generators;
+    for (int bit_index = 0; (1 << bit_index) <= generators_bv_; ++bit_index) {
+      if (!(generators_bv_ & (1 << bit_index))) continue;
+      generators.push_back(bit_index);
+    }
+    return generators;
   }
+  std::vector<int>  Microchips() const {
+    std::vector<int> microchips;
+    for (int bit_index = 0; (1 << bit_index) <= microchips_bv_; ++bit_index) {
+      if (!(microchips_bv_ & (1 << bit_index))) continue;
+      microchips.push_back(bit_index);
+    }
+    return microchips;
+  }
+
+  bool IsValid() const {
+    if (generators_bv_ == 0) return true;
+    if (microchips_bv_ & ~generators_bv_) return false;
+    return true;
+  }
+
+  bool IsEmpty() const {
+    return generators_bv_ == 0 && microchips_bv_ == 0;
+  }
+
+  void AddMicrochip(int microchip) {
+    microchips_bv_ |= (1 << microchip);
+  }
+
+  void AddGenerator(int generator) {
+    generators_bv_ |= (1 << generator);
+  }
+
+  void RemoveMicrochip(int microchip) {
+    microchips_bv_ &= ~(1 << microchip);
+  }
+
+  void RemoveGenerator(int generator) {
+    generators_bv_ &= ~(1 << generator);
+  }
+
+  bool operator==(const Floor& o) const {
+    return generators_bv_ == o.generators_bv_ && 
+        microchips_bv_ == o.microchips_bv_;
+  }
+
+  template <typename H>
+  friend H AbslHashValue(H h, const Floor& f) {
+    return H::combine(std::move(h), f.generators_bv_, f.microchips_bv_);
+  }
+
+ private:
+  char generators_bv_ = 0;
+  char microchips_bv_ = 0;
 };
 
-template <typename H>
-H AbslHashValue(H h, const Floor& f) {
-  return H::combine(std::move(h), f.generators_bv, f.microchips_bv);
-}
 
 class ElevatorState : public BFSInterface<ElevatorState> {
  public:
   static absl::StatusOr<ElevatorState> Parse(
-      absl::Span<absl::string_view> input);
+      absl::Span<absl::string_view> input,
+      std::vector<absl::string_view>* elements);
 
   const ElevatorState& identifier() const override { return *this; }
 
   void AddElementAtFloor0(absl::string_view element_name) {
-    int e_index = elements.size();
-    elements.push_back(element_name);
-    floors[0].generators_bv |= (1 << e_index);
-    floors[0].microchips_bv |= (1 << e_index);
+    int e_index = elements->size();
+    elements->push_back(element_name);
+    floors[0].AddGenerator(e_index);
+    floors[0].AddMicrochip(e_index);
   }
 
-  int min_steps_to_final() const override {
-    // As of 2020.12.29, the AStar version which uses this method is actually
-    // a bit slower, so it appears that the path pruning isn't big enough to
-    // overcome the costs of the priority queue.
-    if (min_steps_to_final_ == -1) {
-      min_steps_to_final_ = 0;
-      int floor_items = 0;
-      for (int i = 0; i < floors.size() - 1; ++i) {
-        int or_bv = floors[i].generators_bv | floors[i].microchips_bv;
-        for (int bv = 1; (1 << bv) <= or_bv; ++bv) {
-          if (floors[i].generators_bv & (1 << bv)) {
-            ++floor_items;
-          }
-          if (floors[i].microchips_bv & (1 << bv)) {
-            ++floor_items;
-          }
-        }
-        // To move floor_items up one floor we have to move up two and down
-        // with one to come back.
-        min_steps_to_final_ += std::max(floor_items - 1, 0);
-      }
-    }
-    return min_steps_to_final_;
-  }
+  // As of 2020.12.29, the AStar version which uses this method is actually
+  // a bit slower, so it appears that the path pruning isn't big enough to
+  // overcome the costs of the priority queue.
+  // int min_steps_to_final() const override;
 
   void AddNextSteps(State* s) const override;
 
   bool IsValid() const {
     for (const Floor& f : floors) {
-      if (f.generators_bv != 0) {
-        if (f.microchips_bv & ~f.generators_bv) return false;
-      }
+      if (!f.IsValid()) return false;
     }
     return true;
   }
 
   bool IsFinal() const override {
     for (int idx = 0; idx < floors.size() - 1; ++idx) {
-      if (floors[idx].microchips_bv != 0) return false;
-      if (floors[idx].generators_bv != 0) return false;
+      if (!floors[idx].IsEmpty()) return false;
     }
     return true;
   }
 
   bool operator==(const ElevatorState& o) const {
-    return cur_floor == o.cur_floor && floors == o.floors;
+    return cur_floor_num == o.cur_floor_num && floors == o.floors;
   }
 
   template <typename H>
   friend H AbslHashValue(H h, const ElevatorState& s) {
-    return H::combine(std::move(h), s.cur_floor, s.floors);
+    return H::combine(std::move(h), s.cur_floor_num, s.floors);
   }
 
   friend std::ostream& operator<<(std::ostream& out, const ElevatorState& s);
 
  private:
-  int cur_floor = 0;
+  void MoveGenerator(int from_floor, int to_floor, int generator);
+  void MoveMicrochip(int from_floor, int to_floor, int microchip);
+
+  int cur_floor_num = 0;
   int steps = 0;
-  std::vector<Floor> floors;
-  std::vector<absl::string_view> elements;
-  // Memoized value for min_steps_to_final().
-  mutable int min_steps_to_final_ = -1;
+  std::array<Floor, 4> floors;
+  std::vector<absl::string_view>* elements;
 };
 
 std::ostream& operator<<(std::ostream& out, const ElevatorState& s) {
   for (int i = 0; i < s.floors.size(); ++i) {
-    out << "F" << i + 1 << (s.cur_floor == i ? " E" : "  ") << ":";
+    out << "F" << i + 1 << (s.cur_floor_num == i ? " E" : "  ") << ":";
     out << " G{";
-    for (int bit_index = 0; (1 << bit_index) <= s.floors[i].generators_bv;
-         ++bit_index) {
-      if (s.floors[i].generators_bv & (1 << bit_index)) {
-        out << s.elements[bit_index] << ",";
-      }
+    for (int g : s.floors[i].Generators()) {
+      out << (*s.elements)[g] << ",";
     }
     out << "}";
     out << " M{";
-    for (int bit_index = 0; (1 << bit_index) <= s.floors[i].microchips_bv;
-         ++bit_index) {
-      if (s.floors[i].microchips_bv & (1 << bit_index)) {
-        out << s.elements[bit_index] << ",";
-      }
+    for (int m : s.floors[i].Microchips()) {
+      out << (*s.elements)[m] << ",";
     }
     out << "}\n";
   }
   return out;
 }
 
+void ElevatorState::MoveGenerator(int from_floor, int to_floor, int generator) {
+  floors[to_floor].AddGenerator(generator);
+  floors[from_floor].RemoveGenerator(generator);
+}
+
+void ElevatorState::MoveMicrochip(int from_floor, int to_floor, int microchip) {
+  floors[to_floor].AddMicrochip(microchip);
+  floors[from_floor].RemoveMicrochip(microchip);  
+}
+
 void ElevatorState::AddNextSteps(State* state) const {
-  int cur_floor_num = cur_floor;
   std::vector<int> next_floors;
   if (cur_floor_num - 1 >= 0) next_floors.push_back(cur_floor_num - 1);
-  if (cur_floor_num + 1 < floors.size())
+  if (cur_floor_num + 1 < floors.size()) {
     next_floors.push_back(cur_floor_num + 1);
+  }
   const Floor& cur_floor = floors[cur_floor_num];
 
-  for (int bit_index = 0; (1 << bit_index) <= cur_floor.generators_bv;
-       ++bit_index) {
-    if (!(cur_floor.generators_bv & (1 << bit_index))) continue;
+  std::vector<int> generators = cur_floor.Generators();
+  std::vector<int> microchips = cur_floor.Microchips();
+
+  for (int g1 : cur_floor.Generators()) {
     for (int next_floor : next_floors) {
       ElevatorState next = *this;
+      next.MoveGenerator(cur_floor_num, next_floor, g1);
+      if (!next.floors[cur_floor_num].IsValid()) continue;
+      if (!next.floors[next_floor].IsValid()) continue;
       ++next.steps;
-      next.cur_floor = next_floor;
-      next.floors[next_floor].generators_bv |= (1 << bit_index);
-      next.floors[cur_floor_num].generators_bv &= ~(1 << bit_index);
-      if (next.IsValid()) state->AddNextStep(next);
+      next.cur_floor_num = next_floor;
+      state->AddNextStep(next);
     }
-  }
-  for (int bit_index1 = 0; (1 << bit_index1) <= cur_floor.generators_bv;
-       ++bit_index1) {
-    if (!(cur_floor.generators_bv & (1 << bit_index1))) continue;
-    for (int bit_index2 = 0; bit_index2 < bit_index1; ++bit_index2) {
-      if (!(cur_floor.generators_bv & (1 << bit_index2))) continue;
+    for (int g2 : generators) {
       for (int next_floor : next_floors) {
         ElevatorState next = *this;
+        next.MoveGenerator(cur_floor_num, next_floor, g1);
+        next.MoveGenerator(cur_floor_num, next_floor, g2);
+        if (!next.floors[cur_floor_num].IsValid()) continue;
+        if (!next.floors[next_floor].IsValid()) continue;
         ++next.steps;
-        next.cur_floor = next_floor;
-        next.floors[next_floor].generators_bv |= (1 << bit_index1);
-        next.floors[cur_floor_num].generators_bv &= ~(1 << bit_index1);
-        next.floors[next_floor].generators_bv |= (1 << bit_index2);
-        next.floors[cur_floor_num].generators_bv &= ~(1 << bit_index2);
-        if (next.IsValid()) state->AddNextStep(next);
+        next.cur_floor_num = next_floor;
+        state->AddNextStep(next);
       }
     }
   }
-  for (int bit_index = 0; (1 << bit_index) <= cur_floor.microchips_bv;
-       ++bit_index) {
-    if (!(cur_floor.microchips_bv & (1 << bit_index))) continue;
+  for (int m1 : microchips) {
     for (int next_floor : next_floors) {
       ElevatorState next = *this;
+      next.MoveMicrochip(cur_floor_num, next_floor, m1);
+      if (!next.floors[cur_floor_num].IsValid()) continue;
+      if (!next.floors[next_floor].IsValid()) continue;
       ++next.steps;
-      next.cur_floor = next_floor;
-      next.floors[next_floor].microchips_bv |= (1 << bit_index);
-      next.floors[cur_floor_num].microchips_bv &= ~(1 << bit_index);
-      if (next.IsValid()) state->AddNextStep(next);
+      next.cur_floor_num = next_floor;
+      state->AddNextStep(next);
     }
-  }
-  for (int bit_index1 = 0; (1 << bit_index1) <= cur_floor.microchips_bv;
-       ++bit_index1) {
-    if (!(cur_floor.microchips_bv & (1 << bit_index1))) continue;
-    for (int bit_index2 = 0; bit_index2 < bit_index1; ++bit_index2) {
-      if (!(cur_floor.microchips_bv & (1 << bit_index2))) continue;
+    for (int m2 : microchips) {
       for (int next_floor : next_floors) {
         ElevatorState next = *this;
+        next.MoveMicrochip(cur_floor_num, next_floor, m1);
+        next.MoveMicrochip(cur_floor_num, next_floor, m2);
+        if (!next.floors[cur_floor_num].IsValid()) continue;
+        if (!next.floors[next_floor].IsValid()) continue;
         ++next.steps;
-        next.cur_floor = next_floor;
-        next.floors[next_floor].microchips_bv |= (1 << bit_index1);
-        next.floors[cur_floor_num].microchips_bv &= ~(1 << bit_index1);
-        next.floors[next_floor].microchips_bv |= (1 << bit_index2);
-        next.floors[cur_floor_num].microchips_bv &= ~(1 << bit_index2);
-        if (next.IsValid()) state->AddNextStep(next);
+        next.cur_floor_num = next_floor;
+        state->AddNextStep(next);
       }
     }
-  }
-  for (int bit_index1 = 0; (1 << bit_index1) <= cur_floor.microchips_bv;
-       ++bit_index1) {
-    if (!(cur_floor.microchips_bv & (1 << bit_index1))) continue;
-    for (int bit_index2 = 0; (1 << bit_index2) <= cur_floor.generators_bv;
-         ++bit_index2) {
-      if (!(cur_floor.generators_bv & (1 << bit_index2))) continue;
+    for (int g : generators) {
       for (int next_floor : next_floors) {
         ElevatorState next = *this;
+        next.MoveMicrochip(cur_floor_num, next_floor, m1);
+        next.MoveGenerator(cur_floor_num, next_floor, g);
+        if (!next.floors[cur_floor_num].IsValid()) continue;
+        if (!next.floors[next_floor].IsValid()) continue;
         ++next.steps;
-        next.cur_floor = next_floor;
-        next.floors[next_floor].microchips_bv |= (1 << bit_index1);
-        next.floors[cur_floor_num].microchips_bv &= ~(1 << bit_index1);
-        next.floors[next_floor].generators_bv |= (1 << bit_index2);
-        next.floors[cur_floor_num].generators_bv &= ~(1 << bit_index2);
-        if (next.IsValid()) state->AddNextStep(next);
+        next.cur_floor_num = next_floor;
+        state->AddNextStep(next);
       }
     }
   }
 }
 
 absl::StatusOr<ElevatorState> ElevatorState::Parse(
-    absl::Span<absl::string_view> input) {
+    absl::Span<absl::string_view> input,
+    std::vector<absl::string_view>* elements) {
   if (input.size() != 4) return Error("Bad input size");
   ElevatorState s;
-  s.floors.resize(4);
+  s.elements = elements;
   int floor = 0;
   absl::string_view kFloorNames[] = {"first", "second", "third", "fourth"};
   absl::flat_hash_map<absl::string_view, int> element_to_id;
@@ -245,16 +261,16 @@ absl::StatusOr<ElevatorState> ElevatorState::Parse(
       absl::string_view e;
       if (RE2::FullMatch(comp, "a (.*) generator", &e)) {
         if (!element_to_id.contains(e)) {
-          element_to_id[e] = s.elements.size();
-          s.elements.push_back(e);
+          element_to_id[e] = s.elements->size();
+          s.elements->push_back(e);
         }
-        s.floors[floor].generators_bv |= (1 << element_to_id[e]);
+        s.floors[floor].AddGenerator(element_to_id[e]);
       } else if (RE2::FullMatch(comp, "a (.*)-compatible microchip", &e)) {
         if (!element_to_id.contains(e)) {
-          element_to_id[e] = s.elements.size();
-          s.elements.push_back(e);
+          element_to_id[e] = s.elements->size();
+          s.elements->push_back(e);
         }
-        s.floors[floor].microchips_bv |= (1 << element_to_id[e]);
+        s.floors[floor].AddMicrochip(element_to_id[e]);
       } else {
         return Error("Bad component: ", comp);
       }
@@ -264,20 +280,20 @@ absl::StatusOr<ElevatorState> ElevatorState::Parse(
   return s;
 }
 
-// Helper methods go here.
-
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_11::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<ElevatorState> s = ElevatorState::Parse(input);
+  std::vector<absl::string_view> element_names;
+  absl::StatusOr<ElevatorState> s = ElevatorState::Parse(input, &element_names);
   if (!s.ok()) return s.status();
   return IntReturn(s->FindMinSteps());
 }
 
 absl::StatusOr<std::string> Day_2016_11::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<ElevatorState> s = ElevatorState::Parse(input);
+  std::vector<absl::string_view> element_names;
+  absl::StatusOr<ElevatorState> s = ElevatorState::Parse(input, &element_names);
   s->AddElementAtFloor0("elerium");
   s->AddElementAtFloor0("dilithium");
 
