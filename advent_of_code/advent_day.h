@@ -88,8 +88,8 @@ class AdventDay {
     return absl::StrCat(*val);
   }
 
-  absl::StatusOr<CharBoard> ParseAsBoard(absl::Span<absl::string_view> input)
-      const {
+  absl::StatusOr<CharBoard> ParseAsBoard(
+      absl::Span<absl::string_view> input) const {
     return CharBoard::Parse(input);
   }
 

@@ -41,7 +41,7 @@ std::optional<int64_t> MatchesDecompiled(absl::Span<std::string_view> input) {
     "inc d",
     "jnz d \\-2",
     "inc c",
-    "jnz c \\-5"
+    "jnz c \\-5",
   };
 
   std::string full_re = absl::StrJoin(decompilable_res, "\n");
@@ -72,7 +72,6 @@ absl::StatusOr<std::string> Day_2016_23::Part1(
 
 absl::StatusOr<std::string> Day_2016_23::Part2(
     absl::Span<absl::string_view> input) const {
-
   if (std::optional<int64_t> ret = MatchesDecompiled(input)) {
     return IntReturn(ret);
   }

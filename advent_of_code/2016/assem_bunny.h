@@ -104,8 +104,8 @@ class AssemBunny {
       }
     }
 
-    static absl::StatusOr<Instruction> Parse(
-      absl::string_view in, Registers* registers);
+    static absl::StatusOr<Instruction> Parse(absl::string_view in,
+                                             Registers* registers);
 
     void RemapRegisters(Registers* from, Registers* to);
 

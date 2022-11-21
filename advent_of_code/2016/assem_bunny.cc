@@ -13,11 +13,15 @@ struct AssemBunnyArg {
     AssemBunnyArg* dest = static_cast<AssemBunnyArg*>(dest_untyped);
 
     bool ret = true;
-    if (str == "a") *dest->arg = &dest->registers->a;
-    else if (str == "b") *dest->arg = &dest->registers->b;
-    else if (str == "c") *dest->arg = &dest->registers->c;
-    else if (str == "d") *dest->arg = &dest->registers->d;
-    else if (int64_t literal; absl::SimpleAtoi(str, &literal)) {
+    if (str == "a") {
+      *dest->arg = &dest->registers->a;
+    } else if (str == "b") {
+      *dest->arg = &dest->registers->b;
+    } else if (str == "c"){
+      *dest->arg = &dest->registers->c;
+    } else if (str == "d"){
+      *dest->arg = &dest->registers->d;
+    } else if (int64_t literal; absl::SimpleAtoi(str, &literal)) {
       *dest->arg = literal;
     } else {
       ret = false;
@@ -25,21 +29,19 @@ struct AssemBunnyArg {
     return ret;
   }
 
-  RE2::Arg Capture() {
-    return RE2::Arg(this, AssemBunnyArg::Parse);
-  }
+  RE2::Arg Capture() { return RE2::Arg(this, AssemBunnyArg::Parse); }
 };
 
-}
+}  // namespace
 
 // static
 absl::StatusOr<AssemBunny::Instruction> AssemBunny::Instruction::Parse(
-    absl::string_view in,
-    AssemBunny::Registers* registers) {
+    absl::string_view in, AssemBunny::Registers* registers) {
   Instruction i;
   AssemBunnyArg arg1{.registers = registers, .arg = &i.arg1};
   AssemBunnyArg arg2{.registers = registers, .arg = &i.arg2};
-  if (RE2::FullMatch(in, "cpy ([-a-z0-9]+) ([a-z]+)", arg1.Capture(), arg2.Capture())) {
+  if (RE2::FullMatch(in, "cpy ([-a-z0-9]+) ([a-z]+)", arg1.Capture(),
+                     arg2.Capture())) {
     i.op_code = OpCode::kCpy;
   } else if (RE2::FullMatch(in, "inc ([a-z]+)", arg1.Capture())) {
     i.op_code = OpCode::kInc;
@@ -61,21 +63,22 @@ absl::StatusOr<AssemBunny::Instruction> AssemBunny::Instruction::Parse(
 void AssemBunny::Instruction::RemapRegisters(Registers* from, Registers* to) {
   int64_t delta = reinterpret_cast<char*>(to) - reinterpret_cast<char*>(from);
   if (std::holds_alternative<int64_t*>(arg1)) {
-    arg1 = reinterpret_cast<int64_t*>(reinterpret_cast<char*>(
-      std::get<int64_t*>(arg1)) + delta);
+    arg1 = reinterpret_cast<int64_t*>(
+        reinterpret_cast<char*>(std::get<int64_t*>(arg1)) + delta);
   }
   if (std::holds_alternative<int64_t*>(arg2)) {
-    arg2 = reinterpret_cast<int64_t*>(reinterpret_cast<char*>(
-      std::get<int64_t*>(arg2)) + delta);
+    arg2 = reinterpret_cast<int64_t*>(
+        reinterpret_cast<char*>(std::get<int64_t*>(arg2)) + delta);
   }
 }
 
-// static 
+// static
 absl::StatusOr<AssemBunny> AssemBunny ::Parse(
     absl::Span<absl::string_view> input) {
   AssemBunny ret;
   for (absl::string_view in : input) {
-    absl::StatusOr<Instruction> i = Instruction::Parse(in, ret.registers_.get());
+    absl::StatusOr<Instruction> i =
+        Instruction::Parse(in, ret.registers_.get());
     if (!i.ok()) return i.status();
     ret.instructions_.push_back(std::move(*i));
   }

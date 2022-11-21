@@ -28,7 +28,7 @@ class Floor {
     }
     return generators;
   }
-  std::vector<int>  Microchips() const {
+  std::vector<int> Microchips() const {
     std::vector<int> microchips;
     for (int bit_index = 0; (1 << bit_index) <= microchips_bv_; ++bit_index) {
       if (!(microchips_bv_ & (1 << bit_index))) continue;
@@ -43,29 +43,19 @@ class Floor {
     return true;
   }
 
-  bool IsEmpty() const {
-    return generators_bv_ == 0 && microchips_bv_ == 0;
-  }
+  bool IsEmpty() const { return generators_bv_ == 0 && microchips_bv_ == 0; }
 
-  void AddMicrochip(int microchip) {
-    microchips_bv_ |= (1 << microchip);
-  }
+  void AddMicrochip(int microchip) { microchips_bv_ |= (1 << microchip); }
 
-  void AddGenerator(int generator) {
-    generators_bv_ |= (1 << generator);
-  }
+  void AddGenerator(int generator) { generators_bv_ |= (1 << generator); }
 
-  void RemoveMicrochip(int microchip) {
-    microchips_bv_ &= ~(1 << microchip);
-  }
+  void RemoveMicrochip(int microchip) { microchips_bv_ &= ~(1 << microchip); }
 
-  void RemoveGenerator(int generator) {
-    generators_bv_ &= ~(1 << generator);
-  }
+  void RemoveGenerator(int generator) { generators_bv_ &= ~(1 << generator); }
 
   bool operator==(const Floor& o) const {
-    return generators_bv_ == o.generators_bv_ && 
-        microchips_bv_ == o.microchips_bv_;
+    return generators_bv_ == o.generators_bv_ &&
+           microchips_bv_ == o.microchips_bv_;
   }
 
   template <typename H>
@@ -77,7 +67,6 @@ class Floor {
   char generators_bv_ = 0;
   char microchips_bv_ = 0;
 };
-
 
 class ElevatorState : public BFSInterface<ElevatorState> {
  public:
@@ -160,7 +149,7 @@ void ElevatorState::MoveGenerator(int from_floor, int to_floor, int generator) {
 
 void ElevatorState::MoveMicrochip(int from_floor, int to_floor, int microchip) {
   floors[to_floor].AddMicrochip(microchip);
-  floors[from_floor].RemoveMicrochip(microchip);  
+  floors[from_floor].RemoveMicrochip(microchip);
 }
 
 void ElevatorState::AddNextSteps(State* state) const {

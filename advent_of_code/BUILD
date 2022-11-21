@@ -45,8 +45,8 @@ cc_library(
 
 cc_library(
     name = "ocr",
-    hdrs = ["ocr.h"],
     srcs = ["ocr.cc"],
+    hdrs = ["ocr.h"],
     visibility = [
         "//visibility:public",
     ],

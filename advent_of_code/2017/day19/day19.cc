@@ -46,12 +46,10 @@ absl::StatusOr<WalkRet> WalkBoard(const CharBoard& b) {
         next = p + dir;
       }
       if (!b.OnBoard(next) || b[next] == ' ') {
-        if (b[p] == '+')
-          return Error("Erroneously marked end @", p);
+        if (b[p] == '+') return Error("Erroneously marked end @", p);
         break;
       }
-      if (b[p] != '+')
-        return Error("Turning at non-intersection @", p);
+      if (b[p] != '+') return Error("Turning at non-intersection @", p);
     }
     if (b[next] == '+' || b[next] == '|' || b[next] == '-') {
       // Still on path. Keep going.

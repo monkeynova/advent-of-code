@@ -105,11 +105,9 @@ void RunTestCase(const AdventDay* advent_day,
   absl::Time end = absl::Now();
   if (absl::GetFlag(FLAGS_fail_if_long_skip) &&
       end - start > *test_allowed_duration) {
-    test_result->AddTestOutput(
-        absl::StrCat("ERROR: Test took took long: took=",
-                     (end - start) / absl::Seconds(1),
-                     "s; allowed=", *test_allowed_duration / absl::Seconds(1),
-                     "s"));
+    test_result->AddTestOutput(absl::StrCat(
+        "ERROR: Test took took long: took=", (end - start) / absl::Seconds(1),
+        "s; allowed=", *test_allowed_duration / absl::Seconds(1), "s"));
     return;
   }
   test_result->AddTestOutput(*output);
