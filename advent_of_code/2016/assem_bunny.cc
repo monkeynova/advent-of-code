@@ -17,9 +17,9 @@ struct AssemBunnyArg {
       *dest->arg = &dest->registers->a;
     } else if (str == "b") {
       *dest->arg = &dest->registers->b;
-    } else if (str == "c"){
+    } else if (str == "c") {
       *dest->arg = &dest->registers->c;
-    } else if (str == "d"){
+    } else if (str == "d") {
       *dest->arg = &dest->registers->d;
     } else if (int64_t literal; absl::SimpleAtoi(str, &literal)) {
       *dest->arg = literal;
