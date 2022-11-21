@@ -1,3 +1,6 @@
+# http://adventofcode.com/2018/day/19
+==
+
 [part=1]
 \#ip 0
 seti 5 0 1

@@ -1,3 +1,5 @@
+// http://adventofcode.com/2017/day/06
+
 #include "advent_of_code/2017/day06/day06.h"
 
 #include "absl/container/flat_hash_map.h"

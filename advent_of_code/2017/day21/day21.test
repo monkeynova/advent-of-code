@@ -1,3 +1,9 @@
+# http://adventofcode.com/2017/day/21
+==
+
+# http://adventofcode.com/2017/day/21
+==
+
 [part=1]
 @include{advent_of_code/2017/day21/input.txt}
 --

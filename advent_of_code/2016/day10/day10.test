@@ -1,3 +1,6 @@
+# http://adventofcode.com/2016/day/10
+==
+
 [part=1]
 value 5 goes to bot 2
 bot 2 gives low to bot 1 and high to bot 0

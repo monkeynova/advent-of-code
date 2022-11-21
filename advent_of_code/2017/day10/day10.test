@@ -1,3 +1,6 @@
+# http://adventofcode.com/2017/day/10
+==
+
 # 6972 (high)
 [part=1]
 @include{advent_of_code/2017/day10/input.txt}

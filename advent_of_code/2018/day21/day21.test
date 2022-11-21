@@ -1,3 +1,9 @@
+# http://adventofcode.com/2018/day/21
+==
+
+# http://adventofcode.com/2018/day/21
+==
+
 # 10626258 (low) <-- Had a bug where bori was running borr
 [part=1]
 @include{advent_of_code/2018/day21/input.txt}

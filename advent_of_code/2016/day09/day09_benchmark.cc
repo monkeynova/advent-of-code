@@ -6,7 +6,7 @@ namespace advent_of_code {
 
 namespace advent_of_code {
 
-constexpr int kMaxTestCount = 7;
+constexpr int kMaxTestCount = 8;
 
 TEST(DayBenchmarkTest_2016_09, Consistency) {
   Day_2016_09 day;

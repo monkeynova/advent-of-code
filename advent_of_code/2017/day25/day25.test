@@ -1,3 +1,6 @@
+# http://adventofcode.com/2017/day/25
+==
+
 [part=1]
 Begin in state A.
 Perform a diagnostic checksum after 6 steps.
