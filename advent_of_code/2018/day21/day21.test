@@ -1,9 +1,6 @@
 # http://adventofcode.com/2018/day/21
 ==
 
-# http://adventofcode.com/2018/day/21
-==
-
 # 10626258 (low) <-- Had a bug where bori was running borr
 [part=1]
 @include{advent_of_code/2018/day21/input.txt}
@@ -11,7 +8,7 @@
 10961197
 ==
 
-[long=60m (1m opt) 2020.01.02]
+[long=60m (45s opt) 2020.01.02]
 [part=2]
 @include{advent_of_code/2018/day21/input.txt}
 --

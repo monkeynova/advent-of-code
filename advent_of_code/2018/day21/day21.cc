@@ -1,7 +1,5 @@
 // http://adventofcode.com/2018/day/21
 
-// http://adventofcode.com/2018/day/21
-
 #include "advent_of_code/2018/day21/day21.h"
 
 #include "absl/container/flat_hash_map.h"
@@ -27,9 +25,9 @@ d = 678134
 do {
   e = a & 255
   d += e
-  d &= 16777215
+  d &= 0xFFFFFF
   d *= 65899
-  d &= 16777215
+  d &= 0xFFFFFF
   while (a > 256) a /= 256;
   if (a > 256) {
     for (e = 0; (e + 1) * 256 < a; ++e)

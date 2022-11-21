@@ -42,7 +42,74 @@ class VM {
 
     static absl::StatusOr<Op> Parse(absl::string_view str);
 
-    absl::Status Apply(std::vector<int32_t>& registers) const;
+    void Apply(std::vector<int32_t>& registers) const {
+      switch (op_code) {
+        case OpCode::kAddr: {
+          registers[arg3] = registers[arg1] + registers[arg2];
+          break;
+        }
+        case OpCode::kAddi: {
+          registers[arg3] = registers[arg1] + arg2;
+          break;
+        }
+        case OpCode::kMulr: {
+          registers[arg3] = registers[arg1] * registers[arg2];
+          break;
+        }
+        case OpCode::kMuli: {
+          registers[arg3] = registers[arg1] * arg2;
+          break;
+        }
+        case OpCode::kBanr: {
+          registers[arg3] = registers[arg1] & registers[arg2];
+          break;
+        }
+        case OpCode::kBani: {
+          registers[arg3] = registers[arg1] & arg2;
+          break;
+        }
+        case OpCode::kBorr: {
+          registers[arg3] = registers[arg1] | registers[arg2];
+          break;
+        }
+        case OpCode::kBori: {
+          registers[arg3] = registers[arg1] | arg2;
+          break;
+        }
+        case OpCode::kSetr: {
+          registers[arg3] = registers[arg1];
+          break;
+        }
+        case OpCode::kSeti: {
+          registers[arg3] = arg1;
+          break;
+        }
+        case OpCode::kGtir: {
+          registers[arg3] = arg1 > registers[arg2] ? 1 : 0;
+          break;
+        }
+        case OpCode::kGtri: {
+          registers[arg3] = registers[arg1] > arg2 ? 1 : 0;
+          break;
+        }
+        case OpCode::kGtrr: {
+          registers[arg3] = registers[arg1] > registers[arg2] ? 1 : 0;
+          break;
+        }
+        case OpCode::kEqir: {
+          registers[arg3] = arg1 == registers[arg2] ? 1 : 0;
+          break;
+        }
+        case OpCode::kEqri: {
+          registers[arg3] = registers[arg1] == arg2 ? 1 : 0;
+          break;
+        }
+        case OpCode::kEqrr: {
+          registers[arg3] = registers[arg1] == registers[arg2] ? 1 : 0;
+          break;
+        }
+      }
+    }
 
     friend std::ostream& operator<<(std::ostream& out, const Op& op) {
       return out << kCodeMap[op.op_code] << ": " << op.arg1 << ", " << op.arg2
@@ -62,9 +129,7 @@ class VM {
       if (watcher(*ip)) break;
       VLOG(4) << *ip << ": " << ops_[*ip] << "; "
               << absl::StrJoin(registers_, ",");
-      if (absl::Status st = ops_[*ip].Apply(registers_); !st.ok()) {
-        return st;
-      }
+      ops_[*ip].Apply(registers_);
       ++*ip;
     }
     return absl::OkStatus();
