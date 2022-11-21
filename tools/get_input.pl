@@ -26,11 +26,11 @@ $cookies->set_cookie(
     $ENV{AOC_SESSION},  # value
     '/',                # path
     'adventofcode.com', # domain
-    443,                 # port
+    443,                # port
     undef,              # path_spec
     1,                  # secure
     10,                 # max_age (seconds)
-    undef,              #discard
+    undef,              # discard
 );
 my $ua = LWP::UserAgent->new(cookie_jar => $cookies);
 my $response = $ua->get($input_url, ':content_file' => $out_file);
