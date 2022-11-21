@@ -1,4 +1,5 @@
 // http://adventofcode.com/2022/day/01
+
 #include "advent_of_code/2022/day01/day01.h"
 
 #include "absl/algorithm/container.h"
