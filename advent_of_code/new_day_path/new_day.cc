@@ -1,3 +1,4 @@
+// http://adventofcode.com/new_day_url
 #include "advent_of_code/new_day_path/new_day.h"
 
 #include "absl/algorithm/container.h"

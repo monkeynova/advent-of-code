@@ -32,6 +32,7 @@ while (my ($src, $dest) = each %renames) {
 system("perl", "-spi", "-e",
        join(" ", ("s{^// clang-format.*\n}{}g;",
                   "s{new_day_path}{$year/day$day}g;",
+                  "s{new_day_url}{$year/day/$day}g;",
                   "s{new_day}{day$day}g;",
                   "s{NEW_DAY}{${year}_DAY$day}g;",
                   "s{NewDay}{Day_${year}_${day}}g")),
