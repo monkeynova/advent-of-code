@@ -153,18 +153,20 @@ void ElevatorState::MoveMicrochip(int from_floor, int to_floor, int microchip) {
 }
 
 void ElevatorState::AddNextSteps(State* state) const {
-  std::vector<int> next_floors;
-  if (cur_floor_num - 1 >= 0) next_floors.push_back(cur_floor_num - 1);
-  if (cur_floor_num + 1 < floors.size()) {
-    next_floors.push_back(cur_floor_num + 1);
-  }
-  const Floor& cur_floor = floors[cur_floor_num];
+  std::vector<int> generators = floors[cur_floor_num].Generators();
+  std::vector<int> microchips = floors[cur_floor_num].Microchips();
 
-  std::vector<int> generators = cur_floor.Generators();
-  std::vector<int> microchips = cur_floor.Microchips();
+  // If we've cleared the lower N levels, never consider bringing anything back
+  // down to them.
+  int min_floor = 0;
+  while (floors[min_floor].IsEmpty()) ++min_floor;
 
-  for (int g1 : cur_floor.Generators()) {
-    for (int next_floor : next_floors) {
+  for (int floor_delta : {-1, +1}) {
+    int next_floor = cur_floor_num + floor_delta;
+    if (next_floor >= floors.size()) continue;
+    if (next_floor < min_floor) continue;
+
+    for (int g1 : generators) {
       ElevatorState next = *this;
       next.MoveGenerator(cur_floor_num, next_floor, g1);
       if (!next.floors[cur_floor_num].IsValid()) continue;
@@ -173,8 +175,8 @@ void ElevatorState::AddNextSteps(State* state) const {
       next.cur_floor_num = next_floor;
       state->AddNextStep(next);
     }
-    for (int g2 : generators) {
-      for (int next_floor : next_floors) {
+    for (int g1 : generators) {
+      for (int g2 : generators) {
         ElevatorState next = *this;
         next.MoveGenerator(cur_floor_num, next_floor, g1);
         next.MoveGenerator(cur_floor_num, next_floor, g2);
@@ -185,9 +187,7 @@ void ElevatorState::AddNextSteps(State* state) const {
         state->AddNextStep(next);
       }
     }
-  }
-  for (int m1 : microchips) {
-    for (int next_floor : next_floors) {
+    for (int m1 : microchips) {
       ElevatorState next = *this;
       next.MoveMicrochip(cur_floor_num, next_floor, m1);
       if (!next.floors[cur_floor_num].IsValid()) continue;
@@ -196,8 +196,8 @@ void ElevatorState::AddNextSteps(State* state) const {
       next.cur_floor_num = next_floor;
       state->AddNextStep(next);
     }
-    for (int m2 : microchips) {
-      for (int next_floor : next_floors) {
+    for (int m1 : microchips) {
+      for (int m2 : microchips) {
         ElevatorState next = *this;
         next.MoveMicrochip(cur_floor_num, next_floor, m1);
         next.MoveMicrochip(cur_floor_num, next_floor, m2);
@@ -208,10 +208,10 @@ void ElevatorState::AddNextSteps(State* state) const {
         state->AddNextStep(next);
       }
     }
-    for (int g : generators) {
-      for (int next_floor : next_floors) {
+    for (int m : microchips) {
+      for (int g : generators) {
         ElevatorState next = *this;
-        next.MoveMicrochip(cur_floor_num, next_floor, m1);
+        next.MoveMicrochip(cur_floor_num, next_floor, m);
         next.MoveGenerator(cur_floor_num, next_floor, g);
         if (!next.floors[cur_floor_num].IsValid()) continue;
         if (!next.floors[next_floor].IsValid()) continue;
