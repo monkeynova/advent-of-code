@@ -18,7 +18,7 @@ The fourth floor contains nothing relevant.
 ==
 
 # Long for no-opt is a guess. I didn't acutally let it go.
-[long=60m (20s opt) 2020.12.21]
+[long=60m (15s opt) 2020.12.21]
 [part=2]
 @include{advent_of_code/2016/day11/input.txt}
 --
