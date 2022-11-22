@@ -14,7 +14,6 @@
 
 namespace advent_of_code {
 
-namespace {}  // namespace
 
 absl::StatusOr<std::string> Day_2016_05::Part1(
     absl::Span<absl::string_view> input) const {

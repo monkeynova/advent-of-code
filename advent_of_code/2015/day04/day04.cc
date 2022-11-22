@@ -13,7 +13,6 @@
 #include "re2/re2.h"
 
 namespace advent_of_code {
-namespace {}  // namespace
 
 absl::StatusOr<std::string> Day_2015_04::Part1(
     absl::Span<absl::string_view> input) const {

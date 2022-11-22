@@ -9,7 +9,6 @@
 #include "glog/logging.h"
 
 namespace advent_of_code {
-namespace {}  // namespace
 
 absl::StatusOr<std::string> Day_2019_09::Part1(
     absl::Span<absl::string_view> input_text) const {
