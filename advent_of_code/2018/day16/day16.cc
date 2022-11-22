@@ -21,7 +21,7 @@ std::vector<int> ApplyOpcode(VM::OpCode op_code, std::vector<int> args,
   CHECK_EQ(args.size(), 4);
   CHECK_EQ(registers.size(), 4);
   VM::Op op = {op_code, args[1], args[2], args[3]};
-  CHECK(op.Apply(registers).ok());
+  op.Apply(registers);
   return registers;
 }
 
