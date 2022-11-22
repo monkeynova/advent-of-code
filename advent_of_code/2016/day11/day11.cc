@@ -241,13 +241,21 @@ absl::StatusOr<ElevatorState> ElevatorState::Parse(
     in = in.substr(prefix.size());
     if (in == "nothing relevant.") continue;
     std::vector<absl::string_view> components = absl::StrSplit(in, ", ");
-    if (components.back().substr(0, 4) == "and ") {
-      components.back() = components.back().substr(4);
+    // There have been two forms seen of a line with two elements.
+    // Originally we saw "... contains $foo, and $bar", but a re-download of
+    // the input shows a newer "... contains $foo and $bar" (no comma). We
+    // attempt to parse both forms.
+    if (components.back().find("and ") != std::string::npos) {
+      std::vector<absl::string_view> sub_components =
+        absl::StrSplit(components.back(), "and ");
+      components.pop_back();
+      for (absl::string_view sc : sub_components) {
+        if (sc.empty()) continue;
+        absl::ConsumeSuffix(&sc, " ");
+        components.push_back(sc);
+      }
     }
-    if (components.back().back() == '.') {
-      components.back() =
-          components.back().substr(0, components.back().size() - 1);
-    }
+    absl::ConsumeSuffix(&components.back(), ".");
     for (absl::string_view comp : components) {
       absl::string_view e;
       if (RE2::FullMatch(comp, "a (.*) generator", &e)) {
