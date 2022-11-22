@@ -4,8 +4,6 @@
 
 namespace advent_of_code {
 
-namespace advent_of_code {
-
 constexpr int kMaxTestCount = 4;
 
 TEST(DayBenchmarkTest_2017_22, Consistency) {
@@ -17,5 +15,4 @@ TEST(DayBenchmarkTest_2017_22, Consistency) {
 
 BENCHMARK_TEMPLATE(BM_Day, Day_2017_22)->DenseRange(0, kMaxTestCount - 1);
 
-}  // namespace advent_of_code
 }  // namespace advent_of_code
