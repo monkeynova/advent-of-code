@@ -32,7 +32,6 @@ DirtyTestParse(absl::string_view contents) {
   auto next = absl::make_unique<DirtyTestParseResult>();
   bool in_answer = false;
   bool in_test = false;
-  int64_t line_num = 0;
   for (absl::string_view line : absl::StrSplit(contents, "\n")) {
     if (line == "--") {
       in_answer = true;

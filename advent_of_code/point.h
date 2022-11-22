@@ -82,8 +82,7 @@ struct Point {
   }
 
   friend std::ostream& operator<<(std::ostream& out, const Point& p) {
-    out << "{" << p.x << "," << p.y << "}";
-    return out;
+    return out << absl::StreamFormat("%v", p);
   }
 };
 
@@ -139,10 +138,19 @@ struct PointRectangle {
   iterator begin() const { return iterator{.cur = min, .base = this}; }
   iterator end() const { return iterator{}; }
 
-  friend std::ostream& operator<<(std::ostream& out, const PointRectangle& r) {
-    out << r.min << "-" << r.max;
-    return out;
+  bool operator==(const PointRectangle& o) const {
+    return min == o.min && max == o.max;
   }
+
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const PointRectangle& r) {
+    absl::Format(&sink, "%v-%v", r.min, r.max);
+  }
+
+  friend std::ostream& operator<<(std::ostream& out, const PointRectangle& r) {
+    return out << absl::StreamFormat("%v", r);
+  }
+
 };
 
 struct Cardinal {
