@@ -16,83 +16,68 @@ namespace advent_of_code {
 
 namespace {
 
-/*
+bool RunDecompiled(
+    absl::Span<absl::string_view> input, absl::FunctionRef<bool(int)> on_test) {
+  std::vector<std::string> decompiled_re = {
+    "#ip 3",
+    "seti 123 0 4",
+    "bani 4 456 4",
+    "eqri 4 72 4",
+    "addr 4 3 3",
+    "seti 0 0 3",
+    "seti 0 6 4",
+    "bori 4 65536 1",
+    "seti (\\d+) 1 4",
+    "bani 1 255 5",
+    "addr 4 5 4",
+    "bani 4 16777215 4",
+    "muli 4 (\\d+) 4",
+    "bani 4 16777215 4",
+    "gtir 256 1 5",
+    "addr 5 3 3",
+    "addi 3 1 3",
+    "seti 27 8 3",
+    "seti 0 1 5",
+    "addi 5 1 2",
+    "muli 2 256 2",
+    "gtrr 2 1 2",
+    "addr 2 3 3",
+    "addi 3 1 3",
+    "seti 25 7 3",
+    "addi 5 1 5",
+    "seti 17 1 3",
+    "setr 5 3 1",
+    "seti 7 8 3",
+    "eqrr 4 0 5",
+    "addr 5 3 3",
+    "seti 5 4 3",
+  };
 
-#ip 3
-d = 0
-a = d | 65536
-d = 678134
-do {
-  e = a & 255
-  d += e
-  d &= 0xFFFFFF
-  d *= 65899
-  d &= 0xFFFFFF
-  while (a > 256) a /= 256;
-  if (a > 256) {
-    for (e = 0; (e + 1) * 256 < a; ++e)
-      ;// nop
-    a = e
-    e = 0
-    while (true) {
-      b = e + 1
-      b *= 256
-      if (b > a) break;
-      e++
-    }
-    ...
+  std::string full_re = absl::StrJoin(decompiled_re, "\n");
+  std::string full_input = absl::StrJoin(input, "\n");
+  int p1, p2;
+  if (!RE2::FullMatch(full_input, full_re, &p1, &p2)) {
+    return false;
   }
-} while (z != d)
-17: seti 0 1 5
-18: addi 5 1 2
-19: muli 2 256 2
-20: gtrr 2 1 2
-21: addr 2 3 3
-22: addi 3 1 3
-23: seti 25 7 3   // JMP 25
-24: addi 5 1 5
-25: seti 17 1 3   // JMP 17
-26: setr 5 3 1
-27: seti 7 8 3    // JMP 7
-28: eqrr 4 0 5
-29: addr 5 3 3
-30: seti 5 4 3   // JMP 5
 
-#ip 3
-00: seti 123 0 4
-01: bani 4 456 4
-02: eqri 4 72 4
-03: addr 4 3 3
-04: seti 0 0 3
-05: seti 0 6 4
-06: bori 4 65536 1
-07: seti 678134 1 4
-08: bani 1 255 5
-09: addr 4 5 4
-10: bani 4 16777215 4
-11: muli 4 65899 4
-12: bani 4 16777215 4
-13: gtir 256 1 5
-14: addr 5 3 3
-15: addi 3 1 3
-16: seti 27 8 3
-17: seti 0 1 5
-18: addi 5 1 2
-19: muli 2 256 2
-20: gtrr 2 1 2
-21: addr 2 3 3
-22: addi 3 1 3
-23: seti 25 7 3
-24: addi 5 1 5
-25: seti 17 1 3   // JMP 17
-26: setr 5 3 1
-27: seti 7 8 3    // JMP 7
-28: eqrr 4 0 5
-29: addr 5 3 3
-30: seti 5 4 3   // JMP 5
-*/
+  int a, d;
+  d = 0;
+  do {
+    a = d | 0x10000;
+    d = p1;
+    while (true) {
+      d += (a & 0xFF);
+      d &= 0xFFFFFF;
+      d *= p2;
+      d &= 0xFFFFFF;
+      if (256 > a) break;
+      a /= 256;
+    }
+    if (on_test(d)) return true;
+  } while (d != 0);
 
-// Helper methods go here.
+  LOG(FATAL) << "Left infinite loop";
+}
 
 }  // namespace
 
@@ -130,6 +115,20 @@ absl::StatusOr<std::string> Day_2018_21::Part2(
   absl::StatusOr<VM> vm = VM::Parse(input);
   if (!vm.ok()) return vm.status();
 
+  int last_new = -1;
+  absl::flat_hash_set<int> hist;
+
+  bool was_run = RunDecompiled(input, [&](int v) {
+    if (hist.contains(v)) return true;
+    VLOG(2) << "Value: " << v << " of " << hist.size();
+    hist.insert(v);
+    last_new = v;
+    return false;
+  });
+  if (was_run) return IntReturn(last_new);
+
+  LOG(ERROR) << "Falling back to interpreted mode...";
+  
   int watch_register = -1;
   int watch_ip = -1;
   for (int i = 0; i < vm->ops().size(); ++i) {
@@ -141,14 +140,11 @@ absl::StatusOr<std::string> Day_2018_21::Part2(
   }
   if (watch_ip == -1) return Error("Could not find equality test");
 
-  int last_new = -1;
-  absl::flat_hash_set<int> hist;
   absl::Status st = vm->Execute([&](int ip) {
     if (ip == watch_ip) {
       int watch_value = vm->register_value(watch_register);
       if (hist.contains(watch_value)) return true;
-      VLOG_IF(1, hist.size() % 777 == 0)
-          << "Value: " << watch_value << " of " << hist.size();
+      VLOG(2) << "Value: " << watch_value << " of " << hist.size();
       hist.insert(watch_value);
       last_new = watch_value;
     }
