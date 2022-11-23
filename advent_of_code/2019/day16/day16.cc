@@ -26,7 +26,7 @@ class SumRangeState {
  public:
   SumRangeState(absl::string_view input) : input_(input) {
     Build();
-    Audit();
+    DCHECK(Audit().ok());
   }
 
   // Returns CalcSumRange(input_, begin, end) in O(log(end - begin)) time.
@@ -36,24 +36,23 @@ class SumRangeState {
 
  private:
   void Build() {
-    for (int length = input_.size() / 2; length; length /= 2) {
-      std::vector<int> next_sums;
+    int length = input_.size() / 2;
+    std::vector<int> next_sums(length);
+    for (int i = 0; i < length; ++i) {
+      next_sums[i] = input_[2 * i] + input_[2 * i + 1] - '0' - '0';
+    }
+    sums_.push_back(std::move(next_sums));
+    for (length /= 2; length; length /= 2) {
+      next_sums.clear();
       next_sums.resize(length);
-      if (length == input_.size() / 2) {
-        for (int i = 0; i < length; ++i) {
-          next_sums[i] = input_[2 * i] + input_[2 * i + 1] - '0' - '0';
-        }
-      } else {
-        for (int i = 0; i < length; ++i) {
-          next_sums[i] = sums_.back()[2 * i] + sums_.back()[2 * i + 1];
-        }
+      for (int i = 0; i < length; ++i) {
+        next_sums[i] = sums_.back()[2 * i] + sums_.back()[2 * i + 1];
       }
       sums_.push_back(std::move(next_sums));
-      next_sums.clear();
     }
   }
 
-  void Audit() const {
+  absl::Status Audit() const {
     for (int shift = 0; (1 << shift) < input_.length(); ++shift) {
       int stride = (1 << shift);
       for (int begin = 0; begin < input_.length(); begin += stride) {
@@ -61,11 +60,11 @@ class SumRangeState {
         int a_sum = SumRangeAligned(begin, shift);
         int b_sum = CalcSumRange(input_, begin, begin + stride);
         if (a_sum != b_sum) {
-          LOG(WARNING) << begin << "+" << stride << "; " << a_sum
-                       << " != " << b_sum;
+          return Error(begin, "+", stride, "; ", a_sum, " != ", b_sum);
         }
       }
     }
+    return absl::OkStatus();
   }
 
   int SumRangeUnaligned(int begin, int end) const {
@@ -150,8 +149,6 @@ absl::StatusOr<std::string> Day_2019_16::Part1(
 
 absl::StatusOr<std::string> Day_2019_16::Part2(
     absl::Span<absl::string_view> input) const {
-  // TODO(@monkeynova): This model still takes way too long. There aught
-  // to sitll be opportunities to improve the runtime.
   int offset;
   if (!absl::SimpleAtoi(input[0].substr(0, 7), &offset)) {
     return absl::InvalidArgumentError("bad atoi");
