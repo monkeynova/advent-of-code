@@ -1,9 +1,6 @@
 # http://adventofcode.com/2016/day/23
 ==
 
-# https://adventofcode.com/2016/day/23
-==
-
 [part=1]
 cpy 2 a
 tgl a

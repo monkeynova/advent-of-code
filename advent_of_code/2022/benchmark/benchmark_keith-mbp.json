@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2022-11-22T14:37:22+00:00",
+    "date": "2022-11-25T23:21:14+00:00",
     "host_name": "keith-mbp.local",
     "executable": "/private/var/tmp/_bazel_keith/0ef773739f82bcf7ecc8ec8d4e65e080/execroot/com_monkeynova_advent_of_code/bazel-out/darwin-opt/bin/advent_of_code/2022/benchmark.runfiles/com_monkeynova_advent_of_code/advent_of_code/2022/benchmark",
     "num_cpus": 8,
@@ -32,7 +32,7 @@
         "num_sharing": 0
       }
     ],
-    "load_avg": [5.98828,4.18457,3.08301],
+    "load_avg": [2.59521,2.76758,2.80469],
     "library_build_type": "release"
   },
   "benchmarks": [
@@ -45,13 +45,11 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "error_occurred": true,
-      "error_message": "Bad part",
-      "iterations": 0,
-      "real_time": 0.0000000000000000e+00,
-      "cpu_time": 0.0000000000000000e+00,
+      "iterations": 1000000000,
+      "real_time": 4.7939829528331757e-06,
+      "cpu_time": 5.0000000000015310e-06,
       "time_unit": "ns",
-      "label": "Part: 0"
+      "label": "Part: 0; *** SKIPPED (empty test) ****"
     },
     {
       "name": "BM_Day<Day_2022_01>/1",
@@ -79,13 +77,11 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "error_occurred": true,
-      "error_message": "UNIMPLEMENTED: Problem not known",
-      "iterations": 1,
-      "real_time": 0.0000000000000000e+00,
-      "cpu_time": 0.0000000000000000e+00,
+      "iterations": 1000000000,
+      "real_time": 4.7869980335235596e-06,
+      "cpu_time": 4.9999999999980616e-06,
       "time_unit": "ns",
-      "label": "Part: 1"
+      "label": "Part: 1; *** SKIPPED (empty test) ****"
     },
     {
       "name": "BM_Day<Day_2022_01>/3",
@@ -113,13 +109,11 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "error_occurred": true,
-      "error_message": "UNIMPLEMENTED: Problem not known",
-      "iterations": 1,
-      "real_time": 0.0000000000000000e+00,
-      "cpu_time": 0.0000000000000000e+00,
+      "iterations": 1000000000,
+      "real_time": 6.4168125391006470e-06,
+      "cpu_time": 1.9999999999985307e-06,
       "time_unit": "ns",
-      "label": "Part: 2"
+      "label": "Part: 2; *** SKIPPED (empty test) ****"
     }
   ]
 }

@@ -1,112 +1,138 @@
 Loading: 
 Loading: 0 packages loaded
 Analyzing: target //advent_of_code/2019:benchmark (0 packages loaded, 0 targets configured)
-INFO: Analyzed target //advent_of_code/2019:benchmark (0 packages loaded, 78 targets configured).
+INFO: Analyzed target //advent_of_code/2019:benchmark (0 packages loaded, 0 targets configured).
 INFO: Found 1 target...
 [0 / 2] [Prepa] BazelWorkspaceStatusAction stable-status.txt
+[1 / 4] Compiling advent_of_code/2019/day21/day21_benchmark.cc; 1s darwin-sandbox
+[2 / 4] [Prepa] Linking advent_of_code/2019/day21/libday21_benchmark_lib.lo
 Target //advent_of_code/2019:benchmark up-to-date:
   bazel-bin/advent_of_code/2019/benchmark
-INFO: Elapsed time: 0.550s, Critical Path: 0.33s
-INFO: 3 processes: 2 internal, 1 darwin-sandbox.
-INFO: Build completed successfully, 3 total actions
+INFO: Elapsed time: 4.070s, Critical Path: 3.85s
+INFO: 4 processes: 1 internal, 3 darwin-sandbox.
+INFO: Build completed successfully, 4 total actions
 INFO: Running command line: external/bazel_tools/tools/test/test-setup.sh advent_of_code/2019/benchmark '--benchmark_out=/Users/keith/github/advent-of-code/advent_of_code/2019/benchmark/benchmark_keith-mbp.json' --benchmark '--run_long_tests=1m' '--advent_day_run_audit=false'
-INFO: Build completed successfully, 3 total actions
+INFO: Build completed successfully, 4 total actions
 exec ${PAGER:-/usr/bin/less} "$0" || exit 1
 Executing tests from //advent_of_code/2019:benchmark
 -----------------------------------------------------------------------------
-2021-12-18T15:30:52+00:00
+2022-11-25T23:15:57+00:00
 Running /private/var/tmp/_bazel_keith/0ef773739f82bcf7ecc8ec8d4e65e080/execroot/com_monkeynova_advent_of_code/bazel-out/darwin-opt/bin/advent_of_code/2019/benchmark.runfiles/com_monkeynova_advent_of_code/advent_of_code/2019/benchmark
 Run on (8 X 2300 MHz CPU s)
 CPU Caches:
-  L1 Data 32 KiB (x4)
-  L1 Instruction 32 KiB (x4)
+  L1 Data 32 KiB
+  L1 Instruction 32 KiB
   L2 Unified 256 KiB (x4)
-  L3 Unified 6144 KiB (x1)
-Load Average: 2.11, 2.16, 2.14
-----------------------------------------------------------------
-Benchmark                      Time             CPU   Iterations
-----------------------------------------------------------------
-BM_Day<Day_2019_01>/0       3122 ns         3120 ns       210667 Part: 1
-BM_Day<Day_2019_01>/1       4901 ns         4897 ns       127122 Part: 2
-BM_Day<Day_2019_02>/0       6910 ns         6904 ns        97752 Part: 1
-BM_Day<Day_2019_02>/1   14485556 ns     14476980 ns           49 Part: 2
-BM_Day<Day_2019_03>/0     385480 ns       385201 ns         1839 Part: 1
-BM_Day<Day_2019_03>/1     445910 ns       445057 ns         1680 Part: 2
-BM_Day<Day_2019_04>/0    5026149 ns      5021804 ns          138 Part: 1
-BM_Day<Day_2019_04>/1    5266964 ns      5263547 ns          117 Part: 2
-BM_Day<Day_2019_05>/0      26742 ns        26684 ns        26123 Part: 1
-BM_Day<Day_2019_05>/1      27453 ns        27437 ns        24909 Part: 2
-BM_Day<Day_2019_06>/0     488029 ns       487691 ns         1370 Part: 1
-BM_Day<Day_2019_06>/1     491963 ns       491721 ns         1249 Part: 2
-BM_Day<Day_2019_07>/0     518566 ns       516196 ns         1394 Part: 1
-BM_Day<Day_2019_07>/1    1957115 ns      1954538 ns          346 Part: 2
-BM_Day<Day_2019_08>/0       2735 ns         2715 ns       259181 Part: 1
-BM_Day<Day_2019_08>/1      26988 ns        26959 ns        24441 Part: 2
-BM_Day<Day_2019_09>/0      42237 ns        42145 ns        16511 Part: 1
-BM_Day<Day_2019_09>/1   17438107 ns     17426436 ns           39 Part: 2
-BM_Day<Day_2019_10>/0       3838 ns         3834 ns       182854 Part: 1
-BM_Day<Day_2019_10>/1      60426 ns        60300 ns        10603 Part: 1
-BM_Day<Day_2019_10>/2      62405 ns        62350 ns        11074 Part: 1
-BM_Day<Day_2019_10>/3     104301 ns       104218 ns         6514 Part: 1
-BM_Day<Day_2019_10>/4    5021085 ns      5016812 ns          138 Part: 1
-BM_Day<Day_2019_10>/5    9117007 ns      9104000 ns           74 Part: 1
-BM_Day<Day_2019_10>/6    8917162 ns      8912110 ns           73 Part: 2
-BM_Day<Day_2019_11>/0    4549733 ns      4547044 ns          136 Part: 1
-BM_Day<Day_2019_11>/1     438138 ns       437608 ns         1521 Part: 2
-BM_Day<Day_2019_12>/0      73437 ns        73366 ns         9462 Part: 1
-BM_Day<Day_2019_12>/1      34559 ns        34480 ns        20163 Part: 2
-BM_Day<Day_2019_12>/2   12694792 ns     12688722 ns           54 Part: 2
-BM_Day<Day_2019_13>/0     892075 ns       890969 ns          827 Part: 1
-BM_Day<Day_2019_13>/1   30542613 ns     30515000 ns           23 Part: 2
-BM_Day<Day_2019_14>/0      15818 ns        15810 ns        42144 Part: 1
-BM_Day<Day_2019_14>/1      19069 ns        19053 ns        35182 Part: 1
-BM_Day<Day_2019_14>/2      27896 ns        27880 ns        24766 Part: 1
-BM_Day<Day_2019_14>/3     119249 ns       119199 ns         5721 Part: 2
-BM_Day<Day_2019_14>/4      35554 ns        35527 ns        19139 Part: 1
-BM_Day<Day_2019_14>/5     134043 ns       133959 ns         4945 Part: 2
-BM_Day<Day_2019_14>/6      54768 ns        54725 ns        11677 Part: 1
-BM_Day<Day_2019_14>/7     172973 ns       172585 ns         3962 Part: 2
-BM_Day<Day_2019_14>/8     172689 ns       172537 ns         4040 Part: 1
-BM_Day<Day_2019_14>/9     559271 ns       558996 ns         1112 Part: 2
-BM_Day<Day_2019_15>/0   10093609 ns     10074897 ns           68 Part: 1
-BM_Day<Day_2019_15>/1   10017211 ns     10009826 ns           69 Part: 2
-BM_Day<Day_2019_16>/0     372407 ns       372182 ns         1882 Part: 1
-BM_Day<Day_2019_16>/1     364195 ns       363919 ns         1888 Part: 1
-BM_Day<Day_2019_16>/2     381659 ns       381413 ns         1843 Part: 1
-BM_Day<Day_2019_16>/3   16147004 ns     16139805 ns           41 Part: 1
-BM_Day<Day_2019_16>/4  276798250 ns    276657000 ns            2 Part: 2
-BM_Day<Day_2019_16>/5  456629509 ns    455984500 ns            2 Part: 2
-BM_Day<Day_2019_16>/6  191388582 ns    191290000 ns            3 Part: 2
-BM_Day<Day_2019_16>/7 11616087890 ns   11605468000 ns            1 Part: 2
-BM_Day<Day_2019_17>/0    1679306 ns      1678316 ns          396 Part: 1
-BM_Day<Day_2019_17>/1 1728629384 ns   1727139000 ns            1 Part: 2
-BM_Day<Day_2019_18>/0      15557 ns        15548 ns        40418 Part: 1
-BM_Day<Day_2019_18>/1     187387 ns       187252 ns         3527 Part: 1
-BM_Day<Day_2019_18>/2     219979 ns       219825 ns         3200 Part: 1
-BM_Day<Day_2019_18>/3     265116 ns       264982 ns         2632 Part: 1
-BM_Day<Day_2019_18>/4   17611218 ns     17594100 ns           40 Part: 1
-BM_Day<Day_2019_18>/5   88804257 ns     85924375 ns            8 Part: 1
-BM_Day<Day_2019_18>/6      23366 ns        23330 ns        29586 Part: 2
-BM_Day<Day_2019_18>/7      29129 ns        29074 ns        23169 Part: 2
-BM_Day<Day_2019_18>/8     302912 ns       302659 ns         2302 Part: 2
-BM_Day<Day_2019_18>/9  190327032 ns    190232250 ns            4 Part: 2
-BM_Day<Day_2019_19>/0   40361650 ns     40327588 ns           17 Part: 1
-BM_Day<Day_2019_19>/1   55474253 ns     55421615 ns           13 Part: 2
-BM_Day<Day_2019_20>/0      12863 ns        12853 ns        52285 Part: 1
-BM_Day<Day_2019_20>/1      82408 ns        82320 ns         8585 Part: 1
-BM_Day<Day_2019_20>/2     849594 ns       849005 ns          802 Part: 1
-BM_Day<Day_2019_20>/3      13656 ns        13646 ns        47367 Part: 2
-BM_Day<Day_2019_20>/4    1070988 ns      1070219 ns          661 Part: 2
-BM_Day<Day_2019_20>/5   79284905 ns     79244286 ns            7 Part: 2
-BM_Day<Day_2019_21>/0    1468861 ns      1464964 ns          475 Part: 1
-BM_Day<Day_2019_21>/1   33029518 ns     33001095 ns           21 Part: 2
-BM_Day<Day_2019_22>/0    4800362 ns      4796600 ns          150 Part: 1
-BM_Day<Day_2019_22>/1    5089306 ns      5088198 ns          131 Part: 2
-BM_Day<Day_2019_23>/0    4832903 ns      4829878 ns          131 Part: 1
-BM_Day<Day_2019_23>/1  241118049 ns    240979000 ns            3 Part: 2
-BM_Day<Day_2019_24>/0     102781 ns       102689 ns         6877 Part: 1
-BM_Day<Day_2019_24>/1     114163 ns       113268 ns         6297 Part: 1
-BM_Day<Day_2019_24>/2  201416244 ns    201298000 ns            3 Part: 2
-BM_Day<Day_2019_24>/3  201357715 ns    198355000 ns            3 Part: 2
-BM_Day<Day_2019_25>/0  330107170 ns    329699000 ns            2 Part: 1
-BM_Day<Day_2019_25>/1       10.2 ns         10.2 ns     66964499 Part: 2
+  L3 Unified 6144 KiB
+Load Average: 2.35, 2.68, 2.79
+-----------------------------------------------------------------
+Benchmark                       Time             CPU   Iterations
+-----------------------------------------------------------------
+BM_Day<Day_2019_01>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_01>/1        3130 ns         3125 ns       227812 Part: 1
+BM_Day<Day_2019_01>/2        4814 ns         4803 ns       145468 Part: 2
+BM_Day<Day_2019_02>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_02>/1        6593 ns         6583 ns       103240 Part: 1
+BM_Day<Day_2019_02>/2    13145325 ns     13117889 ns           54 Part: 2
+BM_Day<Day_2019_03>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_03>/1      386881 ns       386266 ns         1802 Part: 1
+BM_Day<Day_2019_03>/2      429716 ns       429053 ns         1634 Part: 2
+BM_Day<Day_2019_04>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_04>/1     5106942 ns      5084686 ns          140 Part: 1
+BM_Day<Day_2019_04>/2     5473930 ns      5453818 ns          132 Part: 2
+BM_Day<Day_2019_05>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_05>/1       28020 ns        27919 ns        25407 Part: 1
+BM_Day<Day_2019_05>/2       29240 ns        29121 ns        24141 Part: 2
+BM_Day<Day_2019_06>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_06>/1      527811 ns       525687 ns         1326 Part: 1
+BM_Day<Day_2019_06>/2      528808 ns       526397 ns         1344 Part: 2
+BM_Day<Day_2019_07>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_07>/1      513371 ns       510569 ns         1000 Part: 1
+BM_Day<Day_2019_07>/2     1945948 ns      1935780 ns          355 Part: 2
+BM_Day<Day_2019_08>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_08>/1        2724 ns         2714 ns       249647 Part: 1
+BM_Day<Day_2019_08>/2       28020 ns        27882 ns        24815 Part: 2
+BM_Day<Day_2019_09>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_09>/1       42987 ns        42832 ns        16555 Part: 1
+BM_Day<Day_2019_09>/2    17278718 ns     17230537 ns           41 Part: 2
+BM_Day<Day_2019_10>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_10>/1        3298 ns         3288 ns       209825 Part: 1
+BM_Day<Day_2019_10>/2       67390 ns        67185 ns        10305 Part: 1
+BM_Day<Day_2019_10>/3       63768 ns        63569 ns        10684 Part: 1
+BM_Day<Day_2019_10>/4      107061 ns       106705 ns         6438 Part: 1
+BM_Day<Day_2019_10>/5     5018853 ns      4997887 ns          142 Part: 1
+BM_Day<Day_2019_10>/6     9129548 ns      9094304 ns           79 Part: 1
+BM_Day<Day_2019_10>/7     9128136 ns      9099244 ns           78 Part: 2
+BM_Day<Day_2019_11>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_11>/1     4634834 ns      4616929 ns          154 Part: 1
+BM_Day<Day_2019_11>/2    46299983 ns     46147600 ns           15 Part: 2
+BM_Day<Day_2019_12>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_12>/1       76103 ns        75839 ns         9612 Part: 1
+BM_Day<Day_2019_12>/2       36555 ns        36423 ns        19430 Part: 2
+BM_Day<Day_2019_12>/3    13021829 ns     12976093 ns           54 Part: 2
+BM_Day<Day_2019_13>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_13>/1      884279 ns       881728 ns          769 Part: 1
+BM_Day<Day_2019_13>/2    29392879 ns     29289043 ns           23 Part: 2
+BM_Day<Day_2019_14>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_14>/1       16257 ns        16190 ns        42505 Part: 1
+BM_Day<Day_2019_14>/2       19955 ns        19888 ns        36594 Part: 1
+BM_Day<Day_2019_14>/3       27997 ns        27907 ns        24901 Part: 1
+BM_Day<Day_2019_14>/4      128432 ns       128016 ns         5522 Part: 2
+BM_Day<Day_2019_14>/5       37320 ns        37190 ns        18616 Part: 1
+BM_Day<Day_2019_14>/6      151309 ns       150787 ns         4776 Part: 2
+BM_Day<Day_2019_14>/7       58049 ns        57831 ns        12170 Part: 1
+BM_Day<Day_2019_14>/8      179287 ns       178661 ns         3479 Part: 2
+BM_Day<Day_2019_14>/9      178820 ns       178185 ns         3954 Part: 1
+BM_Day<Day_2019_14>/10     575415 ns       573566 ns         1273 Part: 2
+BM_Day<Day_2019_15>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_15>/1    10174045 ns     10140789 ns           71 Part: 1
+BM_Day<Day_2019_15>/2    10139151 ns     10050200 ns           70 Part: 2
+BM_Day<Day_2019_16>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_16>/1      346852 ns       345662 ns         2065 Part: 1
+BM_Day<Day_2019_16>/2      353834 ns       352855 ns         1993 Part: 1
+BM_Day<Day_2019_16>/3      350274 ns       349046 ns         2049 Part: 1
+BM_Day<Day_2019_16>/4    16608497 ns     16554227 ns           44 Part: 1
+BM_Day<Day_2019_16>/5   281941396 ns    281049000 ns            3 Part: 2
+BM_Day<Day_2019_16>/6   475508320 ns    474045500 ns            2 Part: 2
+BM_Day<Day_2019_16>/7   198543107 ns    197835000 ns            3 Part: 2
+BM_Day<Day_2019_16>/8  1.2255e+10 ns   1.2210e+10 ns            1 Part: 2
+BM_Day<Day_2019_17>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_17>/1     1390154 ns      1385231 ns          472 Part: 1
+BM_Day<Day_2019_17>/2  1776575488 ns   1770314000 ns            1 Part: 2
+BM_Day<Day_2019_18>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_18>/1       16125 ns        16068 ns        43948 Part: 1
+BM_Day<Day_2019_18>/2      196024 ns       195470 ns         3351 Part: 1
+BM_Day<Day_2019_18>/3      229815 ns       228972 ns         3017 Part: 1
+BM_Day<Day_2019_18>/4      274410 ns       273476 ns         2576 Part: 1
+BM_Day<Day_2019_18>/5    18020882 ns     17958513 ns           39 Part: 1
+BM_Day<Day_2019_18>/6    81777719 ns     81518875 ns            8 Part: 1
+BM_Day<Day_2019_18>/7       24660 ns        24572 ns        29364 Part: 2
+BM_Day<Day_2019_18>/8       33518 ns        33303 ns        21149 Part: 2
+BM_Day<Day_2019_18>/9      322457 ns       321434 ns         2247 Part: 2
+BM_Day<Day_2019_18>/10  205705250 ns    204956000 ns            3 Part: 2
+BM_Day<Day_2019_19>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_19>/1    39292923 ns     39150333 ns           18 Part: 1
+BM_Day<Day_2019_19>/2    52282950 ns     52109462 ns           13 Part: 2
+BM_Day<Day_2019_20>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_20>/1       12620 ns        12570 ns        55343 Part: 1
+BM_Day<Day_2019_20>/2       56889 ns        56719 ns        12226 Part: 1
+BM_Day<Day_2019_20>/3      813020 ns       810471 ns          805 Part: 1
+BM_Day<Day_2019_20>/4       13740 ns        13690 ns        52493 Part: 2
+BM_Day<Day_2019_20>/5     1333924 ns      1329289 ns          550 Part: 2
+BM_Day<Day_2019_20>/6    94292200 ns     93857714 ns            7 Part: 2
+BM_Day<Day_2019_21>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_21>/1     1458549 ns      1451848 ns          488 Part: 1
+BM_Day<Day_2019_21>/2    31785322 ns     31677739 ns           23 Part: 2
+BM_Day<Day_2019_22>/0     4883820 ns      4865956 ns          135 Part: 1
+BM_Day<Day_2019_22>/1     5471596 ns      5450144 ns          132 Part: 2
+BM_Day<Day_2019_23>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_23>/1     4771270 ns      4753235 ns          132 Part: 1
+BM_Day<Day_2019_23>/2   235854575 ns    235060667 ns            3 Part: 2
+BM_Day<Day_2019_24>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_24>/1      157604 ns       157063 ns         4454 Part: 1
+BM_Day<Day_2019_24>/2      170509 ns       169989 ns         4120 Part: 1
+BM_Day<Day_2019_24>/3   200709766 ns    200200333 ns            3 Part: 2
+BM_Day<Day_2019_24>/4   201933606 ns    201248000 ns            4 Part: 2
+BM_Day<Day_2019_25>/0       0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2019_25>/1   380796010 ns    379554000 ns            2 Part: 1
+BM_Day<Day_2019_25>/2        4.74 ns         4.73 ns    145758025 Part: 2

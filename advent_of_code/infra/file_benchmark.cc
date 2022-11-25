@@ -94,22 +94,29 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
     lines_span = lines_span.subspan(0, lines_span.size() - 1);
   }
 
-  int part = test->options.GetInt64(kPartOption);
   absl::StatusOr<std::string> output;
   std::string skip;
-  int64_t part_filter = absl::GetFlag(FLAGS_part_filter);
-  if (part_filter && part_filter != part) {
-    skip = absl::StrCat("(part=", part, ")");
+  if (lines_span.empty()) {
+    skip = "(empty test)";
   }
-  if (std::string long_option = test->options.GetString(kLongOption);
-      !long_option.empty()) {
-    absl::StatusOr<absl::Duration> long_duration =
-        ParseLongTestDuration(long_option);
-    if (!long_duration.ok()) {
-      return BM_Day_SetError(state, long_duration.status().ToString());
+  int part = test->options.IsExplicitlySet(kPartOption) ? test->options.GetInt64(kPartOption) : 0;
+  if (skip.empty()) {
+    int64_t part_filter = absl::GetFlag(FLAGS_part_filter);
+    if (part_filter && part_filter != part) {
+      skip = absl::StrCat("(part=", part, ")");
     }
-    if (absl::GetFlag(FLAGS_run_long_tests) < *long_duration) {
-      skip = absl::StrCat("(long=", long_option, ")");
+  }
+  if (skip.empty()) {
+    if (std::string long_option = test->options.GetString(kLongOption);
+        !long_option.empty()) {
+      absl::StatusOr<absl::Duration> long_duration =
+          ParseLongTestDuration(long_option);
+      if (!long_duration.ok()) {
+        return BM_Day_SetError(state, long_duration.status().ToString());
+      }
+      if (absl::GetFlag(FLAGS_run_long_tests) < *long_duration) {
+        skip = absl::StrCat("(long=", long_option, ")");
+      }
     }
   }
   if (!skip.empty()) {
