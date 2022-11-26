@@ -1,24 +1,12 @@
-Starting local Bazel server and connecting to it...
 Loading: 
 Loading: 0 packages loaded
-Loading: 0 packages loaded
-Loading: 0 packages loaded
-    currently loading: advent_of_code/2015
-Analyzing: target //advent_of_code/2015:benchmark (1 packages loaded, 0 targets configured)
-Analyzing: target //advent_of_code/2015:benchmark (5 packages loaded, 7 targets configured)
-Analyzing: target //advent_of_code/2015:benchmark (31 packages loaded, 22 targets configured)
-Analyzing: target //advent_of_code/2015:benchmark (60 packages loaded, 128 targets configured)
-Analyzing: target //advent_of_code/2015:benchmark (65 packages loaded, 281 targets configured)
-Analyzing: target //advent_of_code/2015:benchmark (75 packages loaded, 471 targets configured)
-Analyzing: target //advent_of_code/2015:benchmark (92 packages loaded, 943 targets configured)
-Analyzing: target //advent_of_code/2015:benchmark (104 packages loaded, 1420 targets configured)
-INFO: Analyzed target //advent_of_code/2015:benchmark (104 packages loaded, 1542 targets configured).
+Analyzing: target //advent_of_code/2015:benchmark (0 packages loaded, 0 targets configured)
+INFO: Analyzed target //advent_of_code/2015:benchmark (0 packages loaded, 0 targets configured).
 INFO: Found 1 target...
-
-[1 / 74] [Prepa] BazelWorkspaceStatusAction stable-status.txt
+[0 / 1] [Prepa] BazelWorkspaceStatusAction stable-status.txt
 Target //advent_of_code/2015:benchmark up-to-date:
   bazel-bin/advent_of_code/2015/benchmark
-INFO: Elapsed time: 22.906s, Critical Path: 0.25s
+INFO: Elapsed time: 0.841s, Critical Path: 0.02s
 INFO: 1 process: 1 internal.
 INFO: Build completed successfully, 1 total action
 INFO: Running command line: external/bazel_tools/tools/test/test-setup.sh advent_of_code/2015/benchmark '--benchmark_out=/home/keith/github/advent-of-code/advent_of_code/2015/benchmark/benchmark_hubris.json' --benchmark '--run_long_tests=1m' '--advent_day_run_audit=false'
@@ -26,82 +14,111 @@ INFO: Build completed successfully, 1 total action
 exec ${PAGER:-/usr/bin/less} "$0" || exit 1
 Executing tests from //advent_of_code/2015:benchmark
 -----------------------------------------------------------------------------
-2022-05-23T14:21:41+00:00
+2022-11-26T00:14:38+00:00
 Running /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/execroot/com_monkeynova_advent_of_code/bazel-out/aarch64-opt/bin/advent_of_code/2015/benchmark.runfiles/com_monkeynova_advent_of_code/advent_of_code/2015/benchmark
 Run on (4 X 1800 MHz CPU s)
-Load Average: 0.93, 0.35, 0.20
+CPU Caches:
+  L1 Data 32 KiB (x4)
+  L1 Instruction 48 KiB (x4)
+  L2 Unified 1024 KiB (x1)
+Load Average: 0.85, 2.96, 3.67
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 ----------------------------------------------------------------
 Benchmark                      Time             CPU   Iterations
 ----------------------------------------------------------------
-BM_Day<Day_2015_25>/0     102179 ns       102093 ns         6840 Part: 1
-BM_Day<Day_2015_25>/1       56.8 ns         56.8 ns     12322626 Part: 2
-BM_Day<Day_2015_24>/0 1056574821 ns   1052426071 ns            1 Part: 1
-BM_Day<Day_2015_24>/1    1718408 ns      1715655 ns          408 Part: 2
-BM_Day<Day_2015_23>/0    1772325 ns      1771080 ns          396 Part: 1
-BM_Day<Day_2015_23>/1    1776446 ns      1774829 ns          395 Part: 2
-BM_Day<Day_2015_22>/0  120896141 ns    120689311 ns            6 Part: 1
-BM_Day<Day_2015_22>/1  329618573 ns    328710720 ns            2 Part: 2
-BM_Day<Day_2015_21>/0     281087 ns       280806 ns         2493 Part: 1
-BM_Day<Day_2015_21>/1     270074 ns       269663 ns         2598 Part: 2
-BM_Day<Day_2015_20>/0 1646817207 ns   1644660620 ns            1 Part: 1
-BM_Day<Day_2015_20>/1 2013036251 ns   2011288693 ns            1 Part: 2
-BM_Day<Day_2015_19>/0      58653 ns        58589 ns        11940 Part: 1
-BM_Day<Day_2015_19>/1    1387375 ns      1386461 ns          507 Part: 1
-BM_Day<Day_2015_19>/2     167676 ns       167490 ns         4178 Part: 2
-BM_Day<Day_2015_19>/3    1020409 ns      1019321 ns          681 Part: 2
-BM_Day<Day_2015_18>/0     354301 ns       354046 ns         2029 Part: 1
-BM_Day<Day_2015_18>/1   85543364 ns     85493618 ns            8 Part: 1
-BM_Day<Day_2015_18>/2   85435063 ns     85322509 ns            8 Part: 2
-BM_Day<Day_2015_17>/0       1564 ns         1563 ns       446578 Part: 1
-BM_Day<Day_2015_17>/1  109567881 ns    109479370 ns            6 Part: 1
-BM_Day<Day_2015_17>/2       1578 ns         1576 ns       446059 Part: 2
-BM_Day<Day_2015_17>/3  116196314 ns    116152517 ns            6 Part: 2
-BM_Day<Day_2015_16>/0   28808445 ns     28795082 ns           24 Part: 1
-BM_Day<Day_2015_16>/1   28931042 ns     28916140 ns           24 Part: 2
-BM_Day<Day_2015_15>/0     143759 ns       143660 ns         4879 Part: 1
-BM_Day<Day_2015_15>/1    4889055 ns      4887127 ns          143 Part: 1
-BM_Day<Day_2015_15>/2     143089 ns       142989 ns         4891 Part: 2
-BM_Day<Day_2015_15>/3    4411996 ns      4407636 ns          159 Part: 2
-BM_Day<Day_2015_14>/0      62985 ns        62945 ns        11095 Part: 1
-BM_Day<Day_2015_14>/1     598129 ns       597421 ns         1170 Part: 2
-BM_Day<Day_2015_13>/0     793903 ns       792731 ns          880 Part: 1
-BM_Day<Day_2015_13>/1   70428753 ns     70365350 ns           10 Part: 1
-BM_Day<Day_2015_13>/2  630415916 ns    629796350 ns            1 Part: 2
-BM_Day<Day_2015_12>/0     105302 ns       105240 ns         6652 Part: 1
-BM_Day<Day_2015_12>/1      77983 ns        77941 ns         8965 Part: 1
-BM_Day<Day_2015_12>/2   50739901 ns     50704927 ns           14 Part: 1
-BM_Day<Day_2015_12>/3        294 ns          294 ns      2381110 Part: 2
-BM_Day<Day_2015_12>/4        354 ns          354 ns      1977748 Part: 2
-BM_Day<Day_2015_12>/5     249907 ns       249775 ns         2802 Part: 2
-BM_Day<Day_2015_11>/0    1745065 ns      1743904 ns          401 Part: 1
-BM_Day<Day_2015_11>/1   84924370 ns     84815067 ns            8 Part: 2
-BM_Day<Day_2015_10>/0   53033352 ns     52960752 ns           13 Part: 1
-BM_Day<Day_2015_10>/1  758398294 ns    756843309 ns            1 Part: 2
-BM_Day<Day_2015_09>/0     102873 ns       102747 ns         6816 Part: 1
-BM_Day<Day_2015_09>/1   38112521 ns     38037824 ns           18 Part: 1
-BM_Day<Day_2015_09>/2   38098190 ns     38045346 ns           18 Part: 2
-BM_Day<Day_2015_08>/0       93.5 ns         93.5 ns      7486087 Part: 1
-BM_Day<Day_2015_08>/1      18391 ns        18373 ns        37967 Part: 1
-BM_Day<Day_2015_08>/2        101 ns          101 ns      6948210 Part: 2
-BM_Day<Day_2015_08>/3      20633 ns        20618 ns        33808 Part: 2
-BM_Day<Day_2015_07>/0   33774103 ns     33753598 ns           21 Part: 1
-BM_Day<Day_2015_07>/1   33962602 ns     33886612 ns           21 Part: 2
-BM_Day<Day_2015_06>/0   84654242 ns     84382593 ns            8 Part: 1
-BM_Day<Day_2015_06>/1   97171783 ns     96857936 ns            7 Part: 2
-BM_Day<Day_2015_05>/0       4805 ns         4803 ns       151206 Part: 1
-BM_Day<Day_2015_05>/1    1032110 ns      1031645 ns          677 Part: 1
-BM_Day<Day_2015_05>/2       2388 ns         2386 ns       293072 Part: 2
-BM_Day<Day_2015_05>/3     520314 ns       519872 ns         1345 Part: 2
-BM_Day<Day_2015_04>/0  201426188 ns    201154721 ns            3 Part: 1
-BM_Day<Day_2015_04>/1   39056049 ns     38928568 ns           18 Part: 1
-BM_Day<Day_2015_04>/2 1313099384 ns   1312299325 ns            1 Part: 2
-BM_Day<Day_2015_03>/0     454428 ns       454014 ns         1540 Part: 1
-BM_Day<Day_2015_03>/1     486941 ns       486469 ns         1431 Part: 2
-BM_Day<Day_2015_02>/0      19014 ns        19002 ns        36867 Part: 1
-BM_Day<Day_2015_02>/1      19005 ns        18984 ns        36941 Part: 1
-BM_Day<Day_2015_02>/2   18694852 ns     18675034 ns           37 Part: 1
-BM_Day<Day_2015_02>/3      18963 ns        18950 ns        36945 Part: 2
-BM_Day<Day_2015_02>/4      18876 ns        18863 ns        36950 Part: 2
-BM_Day<Day_2015_02>/5   18659624 ns     18634068 ns           37 Part: 2
-BM_Day<Day_2015_01>/0      45367 ns        45333 ns        15397 Part: 1
-BM_Day<Day_2015_01>/1       7800 ns         7791 ns        85715 Part: 2
+BM_Day<Day_2015_25>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_25>/1     109323 ns       109115 ns         6870 Part: 1
+BM_Day<Day_2015_25>/2       56.3 ns         56.2 ns     12430911 Part: 2
+BM_Day<Day_2015_24>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_24>/1 1108052492 ns   1105181693 ns            1 Part: 1
+BM_Day<Day_2015_24>/2    2179306 ns      2173505 ns          322 Part: 2
+BM_Day<Day_2015_23>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_23>/1    1806008 ns      1805381 ns          389 Part: 1
+BM_Day<Day_2015_23>/2    1806335 ns      1805989 ns          386 Part: 2
+BM_Day<Day_2015_22>/0  125657177 ns    125438362 ns            5 Part: 1
+BM_Day<Day_2015_22>/1  340826869 ns    340735990 ns            2 Part: 2
+BM_Day<Day_2015_21>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_21>/1     282843 ns       282146 ns         2482 Part: 1
+BM_Day<Day_2015_21>/2     265319 ns       264313 ns         2647 Part: 2
+BM_Day<Day_2015_20>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_20>/1 1650236130 ns   1645471104 ns            1 Part: 1
+BM_Day<Day_2015_20>/2 2013358831 ns   2011220180 ns            1 Part: 2
+BM_Day<Day_2015_19>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_19>/1      58422 ns        58373 ns        11866 Part: 1
+BM_Day<Day_2015_19>/2    1412593 ns      1411606 ns          497 Part: 1
+BM_Day<Day_2015_19>/3     169110 ns       169036 ns         4141 Part: 2
+BM_Day<Day_2015_19>/4    1013444 ns      1011940 ns          692 Part: 2
+BM_Day<Day_2015_18>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_18>/1     356086 ns       355669 ns         1974 Part: 1
+BM_Day<Day_2015_18>/2   85399270 ns     85349606 ns            8 Part: 1
+BM_Day<Day_2015_18>/3   85359722 ns     85225264 ns            8 Part: 2
+BM_Day<Day_2015_17>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_17>/1       1584 ns         1581 ns       437510 Part: 1
+BM_Day<Day_2015_17>/2  109323462 ns    109261743 ns            6 Part: 1
+BM_Day<Day_2015_17>/3       1591 ns         1591 ns       434686 Part: 2
+BM_Day<Day_2015_17>/4  116612554 ns    116217345 ns            6 Part: 2
+BM_Day<Day_2015_16>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_16>/1   29419820 ns     29410048 ns           24 Part: 1
+BM_Day<Day_2015_16>/2   29311558 ns     29304771 ns           24 Part: 2
+BM_Day<Day_2015_15>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_15>/1     143062 ns       143044 ns         4869 Part: 1
+BM_Day<Day_2015_15>/2    4919452 ns      4900635 ns          143 Part: 1
+BM_Day<Day_2015_15>/3     142679 ns       142653 ns         4895 Part: 2
+BM_Day<Day_2015_15>/4    4436612 ns      4434616 ns          158 Part: 2
+BM_Day<Day_2015_14>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_14>/1      63317 ns        63285 ns        10859 Part: 1
+BM_Day<Day_2015_14>/2     617933 ns       617073 ns         1136 Part: 2
+BM_Day<Day_2015_13>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_13>/1     795255 ns       795095 ns          876 Part: 1
+BM_Day<Day_2015_13>/2   82173745 ns     82110306 ns            9 Part: 1
+BM_Day<Day_2015_13>/3  766521215 ns    766336017 ns            1 Part: 2
+BM_Day<Day_2015_12>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_12>/1     110346 ns       110300 ns         6331 Part: 1
+BM_Day<Day_2015_12>/2      83733 ns        82976 ns         8570 Part: 1
+BM_Day<Day_2015_12>/3   53144858 ns     53134909 ns           13 Part: 1
+BM_Day<Day_2015_12>/4        301 ns          300 ns      2329765 Part: 2
+BM_Day<Day_2015_12>/5        360 ns          360 ns      1944457 Part: 2
+BM_Day<Day_2015_12>/6     252865 ns       252820 ns         2771 Part: 2
+BM_Day<Day_2015_11>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_11>/1    2038335 ns      2037415 ns          344 Part: 1
+BM_Day<Day_2015_11>/2  100135258 ns    100121359 ns            7 Part: 2
+BM_Day<Day_2015_10>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_10>/1   57709217 ns     57691768 ns           12 Part: 1
+BM_Day<Day_2015_10>/2  821645498 ns    821356108 ns            1 Part: 2
+BM_Day<Day_2015_09>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_09>/1     103504 ns       103487 ns         6720 Part: 1
+BM_Day<Day_2015_09>/2   45467234 ns     45460534 ns           15 Part: 1
+BM_Day<Day_2015_09>/3   45424843 ns     45414441 ns           15 Part: 2
+BM_Day<Day_2015_08>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_08>/1       97.9 ns         97.9 ns      7144060 Part: 1
+BM_Day<Day_2015_08>/2      18401 ns        18399 ns        37872 Part: 1
+BM_Day<Day_2015_08>/3        105 ns          105 ns      6656702 Part: 2
+BM_Day<Day_2015_08>/4      20649 ns        20646 ns        34087 Part: 2
+BM_Day<Day_2015_07>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_07>/1   34003746 ns     33988906 ns           21 Part: 1
+BM_Day<Day_2015_07>/2   34204817 ns     34196514 ns           20 Part: 2
+BM_Day<Day_2015_06>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_06>/1   93536820 ns     93489671 ns            7 Part: 1
+BM_Day<Day_2015_06>/2  102197511 ns    102157208 ns            7 Part: 2
+BM_Day<Day_2015_05>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_05>/1       5095 ns         5094 ns       137204 Part: 1
+BM_Day<Day_2015_05>/2    1139848 ns      1139687 ns          614 Part: 1
+BM_Day<Day_2015_05>/3       2676 ns         2676 ns       261417 Part: 2
+BM_Day<Day_2015_05>/4     581735 ns       581665 ns         1203 Part: 2
+BM_Day<Day_2015_04>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_04>/1  201338371 ns    201302876 ns            3 Part: 1
+BM_Day<Day_2015_04>/2   38897408 ns     38890968 ns           18 Part: 1
+BM_Day<Day_2015_04>/3 1312775612 ns   1312561424 ns            1 Part: 2
+BM_Day<Day_2015_03>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_03>/1     522363 ns       522266 ns         1332 Part: 1
+BM_Day<Day_2015_03>/2     588898 ns       588734 ns         1185 Part: 2
+BM_Day<Day_2015_02>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_02>/1      18927 ns        18924 ns        36959 Part: 1
+BM_Day<Day_2015_02>/2      18980 ns        18972 ns        36632 Part: 1
+BM_Day<Day_2015_02>/3   18729403 ns     18724915 ns           37 Part: 1
+BM_Day<Day_2015_02>/4      18840 ns        18833 ns        36891 Part: 2
+BM_Day<Day_2015_02>/5      18995 ns        18990 ns        36654 Part: 2
+BM_Day<Day_2015_02>/6   18724216 ns     18718847 ns           38 Part: 2
+BM_Day<Day_2015_01>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2015_01>/1      44452 ns        44440 ns        15487 Part: 1
+BM_Day<Day_2015_01>/2       7789 ns         7788 ns        86586 Part: 2

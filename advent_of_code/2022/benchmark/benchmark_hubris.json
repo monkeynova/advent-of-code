@@ -1,0 +1,113 @@
+{
+  "context": {
+    "date": "2022-11-26T00:27:44+00:00",
+    "host_name": "hubris",
+    "executable": "/home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/execroot/com_monkeynova_advent_of_code/bazel-out/aarch64-opt/bin/advent_of_code/2022/benchmark.runfiles/com_monkeynova_advent_of_code/advent_of_code/2022/benchmark",
+    "num_cpus": 4,
+    "mhz_per_cpu": 1800,
+    "cpu_scaling_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 1
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 49152,
+        "num_sharing": 1
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1048576,
+        "num_sharing": 4
+      }
+    ],
+    "load_avg": [1.29,1.31,2.22],
+    "library_build_type": "release"
+  },
+  "benchmarks": [
+    {
+      "name": "BM_Day<Day_2022_01>/0",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "run_name": "BM_Day<Day_2022_01>/0",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1000000000,
+      "real_time": 1.5497207641601562e-05,
+      "cpu_time": 9.1300000000030246e-06,
+      "time_unit": "ns",
+      "label": "Part: 0; *** SKIPPED (empty test) ****"
+    },
+    {
+      "name": "BM_Day<Day_2022_01>/1",
+      "family_index": 0,
+      "per_family_instance_index": 1,
+      "run_name": "BM_Day<Day_2022_01>/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "error_occurred": true,
+      "error_message": "UNIMPLEMENTED: Problem not known",
+      "iterations": 1,
+      "real_time": 0.0000000000000000e+00,
+      "cpu_time": 0.0000000000000000e+00,
+      "time_unit": "ns",
+      "label": "Part: 1"
+    },
+    {
+      "name": "BM_Day<Day_2022_01>/2",
+      "family_index": 0,
+      "per_family_instance_index": 2,
+      "run_name": "BM_Day<Day_2022_01>/2",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1000000000,
+      "real_time": 1.8358230590820312e-05,
+      "cpu_time": 1.0815000000004293e-05,
+      "time_unit": "ns",
+      "label": "Part: 1; *** SKIPPED (empty test) ****"
+    },
+    {
+      "name": "BM_Day<Day_2022_01>/3",
+      "family_index": 0,
+      "per_family_instance_index": 3,
+      "run_name": "BM_Day<Day_2022_01>/3",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "error_occurred": true,
+      "error_message": "UNIMPLEMENTED: Problem not known",
+      "iterations": 1,
+      "real_time": 0.0000000000000000e+00,
+      "cpu_time": 0.0000000000000000e+00,
+      "time_unit": "ns",
+      "label": "Part: 2"
+    },
+    {
+      "name": "BM_Day<Day_2022_01>/4",
+      "family_index": 0,
+      "per_family_instance_index": 4,
+      "run_name": "BM_Day<Day_2022_01>/4",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1000000000,
+      "real_time": 1.1682510375976562e-05,
+      "cpu_time": 7.3889999999965372e-06,
+      "time_unit": "ns",
+      "label": "Part: 2; *** SKIPPED (empty test) ****"
+    }
+  ]
+}
