@@ -22,12 +22,42 @@ namespace {
 
 absl::StatusOr<std::string> Day_2022_01::Part1(
     absl::Span<absl::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  int best = 0;
+  int cur = 0;
+  for (const auto str : input) {
+    int next;
+    if (str.empty()) {
+      if (cur > best) {
+        best = cur;
+      }
+      cur = 0;
+    } else if (absl::SimpleAtoi(str, &next)) {
+      cur += next;
+    } else {  
+      return Error("Bad line");
+    }
+  }
+  return IntReturn(best);
 }
 
 absl::StatusOr<std::string> Day_2022_01::Part2(
     absl::Span<absl::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  std::vector<int> elves;
+  int cur = 0;
+  for (const auto str : input) {
+    int next;
+    if (str.empty()) {
+      elves.push_back(cur);
+      cur = 0;
+    } else if (absl::SimpleAtoi(str, &next)) {
+      cur += next;
+    } else {  
+      return Error("Bad line");
+    }
+  }
+  elves.push_back(cur);
+  absl::c_sort(elves, [](int a, int b) { return b < a; });
+  return IntReturn(elves[0] + elves[1] + elves[2]);
 }
 
 }  // namespace advent_of_code

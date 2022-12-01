@@ -2,24 +2,50 @@
 ==
 
 [part=1]
-Example input
+1000
+2000
+3000
+
+4000
+
+5000
+6000
+
+7000
+8000
+9000
+
+10000
 --
-ERROR: UNIMPLEMENTED: Problem not known
+24000
 ==
 
 [part=1]
 @include{advent_of_code/2022/day01/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+75622
 ==
 
 [part=2]
-Example input
+1000
+2000
+3000
+
+4000
+
+5000
+6000
+
+7000
+8000
+9000
+
+10000
 --
-ERROR: UNIMPLEMENTED: Problem not known
+45000
 ==
 
 [part=2]
 @include{advent_of_code/2022/day01/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+213159
