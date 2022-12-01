@@ -1,0 +1,33 @@
+Loading: 
+Loading: 0 packages loaded
+Analyzing: target //advent_of_code/2022:benchmark (0 packages loaded, 0 targets configured)
+INFO: Analyzed target //advent_of_code/2022:benchmark (0 packages loaded, 1 target configured).
+INFO: Found 1 target...
+[0 / 2] [Prepa] BazelWorkspaceStatusAction stable-status.txt
+Target //advent_of_code/2022:benchmark up-to-date:
+  bazel-bin/advent_of_code/2022/benchmark
+INFO: Elapsed time: 0.803s, Critical Path: 0.02s
+INFO: 1 process: 1 internal.
+INFO: Build completed successfully, 1 total action
+INFO: Running command line: external/bazel_tools/tools/test/test-setup.sh advent_of_code/2022/benchmark '--benchmark_out=/home/keith/github/advent-of-code/advent_of_code/2022/benchmark/benchmark_hubris.json' --benchmark '--run_long_tests=1m' '--advent_day_run_audit=false'
+INFO: Build completed successfully, 1 total action
+exec ${PAGER:-/usr/bin/less} "$0" || exit 1
+Executing tests from //advent_of_code/2022:benchmark
+-----------------------------------------------------------------------------
+2022-11-26T00:27:44+00:00
+Running /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/execroot/com_monkeynova_advent_of_code/bazel-out/aarch64-opt/bin/advent_of_code/2022/benchmark.runfiles/com_monkeynova_advent_of_code/advent_of_code/2022/benchmark
+Run on (4 X 1800 MHz CPU s)
+CPU Caches:
+  L1 Data 32 KiB (x4)
+  L1 Instruction 48 KiB (x4)
+  L2 Unified 1024 KiB (x1)
+Load Average: 1.29, 1.31, 2.22
+***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
+----------------------------------------------------------------
+Benchmark                      Time             CPU   Iterations
+----------------------------------------------------------------
+BM_Day<Day_2022_01>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_01>/1 ERROR OCCURRED: 'UNIMPLEMENTED: Problem not known'
+BM_Day<Day_2022_01>/2      0.000 ns        0.000 ns   1000000000 Part: 1; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_01>/3 ERROR OCCURRED: 'UNIMPLEMENTED: Problem not known'
+BM_Day<Day_2022_01>/4      0.000 ns        0.000 ns   1000000000 Part: 2; *** SKIPPED (empty test) ****

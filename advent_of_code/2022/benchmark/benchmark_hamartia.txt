@@ -1,0 +1,78 @@
+Loading: 
+Loading: 0 packages loaded
+DEBUG: Rule 'bazel_skylib' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1667816738 +0100"
+DEBUG: Repository bazel_skylib instantiated at:
+  /home/keith/github/advent-of-code/WORKSPACE:5:15: in <toplevel>
+Repository rule git_repository defined at:
+  /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/external/bazel_tools/tools/build_defs/repo/git.bzl:199:33: in <toplevel>
+Analyzing: target //advent_of_code/2022:benchmark (0 packages loaded, 0 targets configured)
+DEBUG: Rule 'com_monkeynova_gunit_main' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1661523395 -0700"
+DEBUG: Repository com_monkeynova_gunit_main instantiated at:
+  /home/keith/github/advent-of-code/WORKSPACE:53:15: in <toplevel>
+Repository rule git_repository defined at:
+  /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/external/bazel_tools/tools/build_defs/repo/git.bzl:199:33: in <toplevel>
+DEBUG: Rule 'com_google_glog' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1663772402 +0200"
+DEBUG: Repository com_google_glog instantiated at:
+  /home/keith/github/advent-of-code/WORKSPACE:47:15: in <toplevel>
+Repository rule git_repository defined at:
+  /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/external/bazel_tools/tools/build_defs/repo/git.bzl:199:33: in <toplevel>
+DEBUG: Rule 'com_google_absl' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1668201198 -0800"
+DEBUG: Repository com_google_absl instantiated at:
+  /home/keith/github/advent-of-code/WORKSPACE:28:15: in <toplevel>
+Repository rule git_repository defined at:
+  /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/external/bazel_tools/tools/build_defs/repo/git.bzl:199:33: in <toplevel>
+DEBUG: Rule 'com_googlesource_code_re2' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1667962101 +0000"
+DEBUG: Repository com_googlesource_code_re2 instantiated at:
+  /home/keith/github/advent-of-code/WORKSPACE:60:15: in <toplevel>
+Repository rule git_repository defined at:
+  /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/external/bazel_tools/tools/build_defs/repo/git.bzl:199:33: in <toplevel>
+DEBUG: Rule 'com_github_gflags_gflags' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1658955969 +0100"
+DEBUG: Repository com_github_gflags_gflags instantiated at:
+  /home/keith/github/advent-of-code/WORKSPACE:34:15: in <toplevel>
+Repository rule git_repository defined at:
+  /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/external/bazel_tools/tools/build_defs/repo/git.bzl:199:33: in <toplevel>
+DEBUG: Rule 'com_github_google_benchmark' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1668214216 +0300"
+DEBUG: Repository com_github_google_benchmark instantiated at:
+  /home/keith/github/advent-of-code/WORKSPACE:40:15: in <toplevel>
+Repository rule git_repository defined at:
+  /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/external/bazel_tools/tools/build_defs/repo/git.bzl:199:33: in <toplevel>
+DEBUG: Rule 'com_google_file_based_test_driver' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1622670187 -0700"
+DEBUG: Repository com_google_file_based_test_driver instantiated at:
+  /home/keith/github/advent-of-code/WORKSPACE:67:15: in <toplevel>
+Repository rule git_repository defined at:
+  /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/external/bazel_tools/tools/build_defs/repo/git.bzl:199:33: in <toplevel>
+DEBUG: Rule 'com_google_googletest' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1668200350 -0800"
+DEBUG: Repository com_google_googletest instantiated at:
+  /home/keith/github/advent-of-code/WORKSPACE:21:15: in <toplevel>
+Repository rule git_repository defined at:
+  /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/external/bazel_tools/tools/build_defs/repo/git.bzl:199:33: in <toplevel>
+INFO: Analyzed target //advent_of_code/2022:benchmark (0 packages loaded, 0 targets configured).
+INFO: Found 1 target...
+[0 / 1] [Prepa] BazelWorkspaceStatusAction stable-status.txt
+Target //advent_of_code/2022:benchmark up-to-date:
+  bazel-bin/advent_of_code/2022/benchmark
+INFO: Elapsed time: 0.375s, Critical Path: 0.00s
+INFO: 1 process: 1 internal.
+INFO: Build completed successfully, 1 total action
+INFO: Running command line: external/bazel_tools/tools/test/test-setup.sh advent_of_code/2022/benchmark '--benchmark_out=/home/keith/github/advent-of-code/advent_of_code/2022/benchmark/benchmark_hamartia.json' --benchmark '--run_long_tests=1m' '--advent_day_run_audit=false'
+INFO: Build completed successfully, 1 total action
+exec ${PAGER:-/usr/bin/less} "$0" || exit 1
+Executing tests from //advent_of_code/2022:benchmark
+-----------------------------------------------------------------------------
+2022-11-26T02:34:04+00:00
+Running /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/execroot/com_monkeynova_advent_of_code/bazel-out/k8-opt/bin/advent_of_code/2022/benchmark.runfiles/com_monkeynova_advent_of_code/advent_of_code/2022/benchmark
+Run on (4 X 3000 MHz CPU s)
+CPU Caches:
+  L1 Data 32 KiB (x4)
+  L1 Instruction 32 KiB (x4)
+  L2 Unified 256 KiB (x4)
+  L3 Unified 6144 KiB (x1)
+Load Average: 1.00, 0.93, 0.58
+----------------------------------------------------------------
+Benchmark                      Time             CPU   Iterations
+----------------------------------------------------------------
+BM_Day<Day_2022_01>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_01>/1 ERROR OCCURRED: 'UNIMPLEMENTED: Problem not known'
+BM_Day<Day_2022_01>/2      0.000 ns        0.000 ns   1000000000 Part: 1; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_01>/3 ERROR OCCURRED: 'UNIMPLEMENTED: Problem not known'
+BM_Day<Day_2022_01>/4      0.000 ns        0.000 ns   1000000000 Part: 2; *** SKIPPED (empty test) ****
