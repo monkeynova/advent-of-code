@@ -31,6 +31,9 @@ absl::StatusOr<std::string> Day_2022_01::Part1(
       return Error("Bad line: ", line);
     }
   }
+  if (cur > best) {
+    best = cur;
+  }
   return IntReturn(best);
 }
 
