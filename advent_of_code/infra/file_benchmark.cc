@@ -99,7 +99,9 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
   if (lines_span.empty()) {
     skip = "(empty test)";
   }
-  int part = test->options.IsExplicitlySet(kPartOption) ? test->options.GetInt64(kPartOption) : 0;
+  int part = test->options.IsExplicitlySet(kPartOption)
+                 ? test->options.GetInt64(kPartOption)
+                 : 0;
   if (skip.empty()) {
     int64_t part_filter = absl::GetFlag(FLAGS_part_filter);
     if (part_filter && part_filter != part) {

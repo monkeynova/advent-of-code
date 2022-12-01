@@ -21,9 +21,7 @@ struct Particle {
   Point3 v;
   Point3 a;
 
-  Point3 AtTime(int t) const {
-    return p + v * t + a * (t * (t + 1) / 2);
-  } 
+  Point3 AtTime(int t) const { return p + v * t + a * (t * (t + 1) / 2); }
 
   bool operator==(const Particle& o) const {
     return p == o.p && v == o.v && a == o.a;

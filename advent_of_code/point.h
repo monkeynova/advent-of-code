@@ -150,7 +150,6 @@ struct PointRectangle {
   friend std::ostream& operator<<(std::ostream& out, const PointRectangle& r) {
     return out << absl::StreamFormat("%v", r);
   }
-
 };
 
 struct Cardinal {

@@ -16,8 +16,8 @@ namespace advent_of_code {
 
 namespace {
 
-bool RunDecompiled(
-    absl::Span<absl::string_view> input, absl::FunctionRef<bool(int)> on_test) {
+bool RunDecompiled(absl::Span<absl::string_view> input,
+                   absl::FunctionRef<bool(int)> on_test) {
   std::vector<std::string> decompiled_re = {
     "#ip 3",
     "seti 123 0 4",
@@ -128,7 +128,7 @@ absl::StatusOr<std::string> Day_2018_21::Part2(
   if (was_run) return IntReturn(last_new);
 
   LOG(ERROR) << "Falling back to interpreted mode...";
-  
+
   int watch_register = -1;
   int watch_ip = -1;
   for (int i = 0; i < vm->ops().size(); ++i) {

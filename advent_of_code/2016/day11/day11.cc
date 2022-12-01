@@ -247,7 +247,7 @@ absl::StatusOr<ElevatorState> ElevatorState::Parse(
     // attempt to parse both forms.
     if (components.back().find("and ") != std::string::npos) {
       std::vector<absl::string_view> sub_components =
-        absl::StrSplit(components.back(), "and ");
+          absl::StrSplit(components.back(), "and ");
       components.pop_back();
       for (absl::string_view sc : sub_components) {
         if (sc.empty()) continue;

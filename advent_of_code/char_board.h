@@ -97,12 +97,12 @@ class CharBoard {
 
   absl::StatusOr<CharBoard> SubBoard(PointRectangle sub_range) const {
     if (!OnBoard(sub_range.min)) {
-      return absl::InvalidArgumentError(absl::StrCat(
-        "SubBoard: min not on board: ", sub_range));
+      return absl::InvalidArgumentError(
+          absl::StrCat("SubBoard: min not on board: ", sub_range));
     }
     if (!OnBoard(sub_range.max)) {
-      return absl::InvalidArgumentError(absl::StrCat(
-        "SubBoard: max not on board: ", sub_range));
+      return absl::InvalidArgumentError(
+          absl::StrCat("SubBoard: max not on board: ", sub_range));
     }
     CharBoard out(sub_range.max.x - sub_range.min.x + 1,
                   sub_range.max.y - sub_range.min.y + 1);

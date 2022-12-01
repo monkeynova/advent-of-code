@@ -27,7 +27,7 @@ absl::StatusOr<std::string> Day_2022_01::Part1(
       cur = 0;
     } else if (absl::SimpleAtoi(line, &next)) {
       cur += next;
-    } else {  
+    } else {
       return Error("Bad line: ", line);
     }
   }
@@ -48,7 +48,7 @@ absl::StatusOr<std::string> Day_2022_01::Part2(
       cur = 0;
     } else if (absl::SimpleAtoi(line, &next)) {
       cur += next;
-    } else {  
+    } else {
       return Error("Bad line: ", line);
     }
   }

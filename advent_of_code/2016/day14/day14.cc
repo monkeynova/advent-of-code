@@ -14,7 +14,6 @@
 
 namespace advent_of_code {
 
-
 absl::StatusOr<std::string> Day_2016_14::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
