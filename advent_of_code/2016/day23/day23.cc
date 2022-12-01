@@ -15,6 +15,8 @@
 namespace advent_of_code {
 
 std::optional<int64_t> MatchesDecompiled(absl::Span<std::string_view> input) {
+  // Keep the regex strings as a vertical list.
+  // clang-format off
   std::vector<absl::string_view> decompilable_res = {
     "cpy a b",
     "dec b",
@@ -43,6 +45,7 @@ std::optional<int64_t> MatchesDecompiled(absl::Span<std::string_view> input) {
     "inc c",
     "jnz c \\-5",
   };
+  // clang-format off
 
   std::string full_re = absl::StrJoin(decompilable_res, "\n");
 

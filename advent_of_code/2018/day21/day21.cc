@@ -18,6 +18,8 @@ namespace {
 
 bool RunDecompiled(absl::Span<absl::string_view> input,
                    absl::FunctionRef<bool(int)> on_test) {
+  // Keep the regex strings as a vertical list.
+  // clang-format off
   std::vector<std::string> decompiled_re = {
     "#ip 3",
     "seti 123 0 4",
@@ -52,6 +54,7 @@ bool RunDecompiled(absl::Span<absl::string_view> input,
     "addr 5 3 3",
     "seti 5 4 3",
   };
+  // clang-format on
 
   std::string full_re = absl::StrJoin(decompiled_re, "\n");
   std::string full_input = absl::StrJoin(input, "\n");
