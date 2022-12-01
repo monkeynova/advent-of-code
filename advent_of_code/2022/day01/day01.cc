@@ -14,27 +14,21 @@
 
 namespace advent_of_code {
 
-namespace {
-
-// Helper methods go here.
-
-}  // namespace
-
 absl::StatusOr<std::string> Day_2022_01::Part1(
     absl::Span<absl::string_view> input) const {
   int best = 0;
   int cur = 0;
-  for (const auto str : input) {
+  for (absl::string_view line : input) {
     int next;
-    if (str.empty()) {
+    if (line.empty()) {
       if (cur > best) {
         best = cur;
       }
       cur = 0;
-    } else if (absl::SimpleAtoi(str, &next)) {
+    } else if (absl::SimpleAtoi(line, &next)) {
       cur += next;
     } else {  
-      return Error("Bad line");
+      return Error("Bad line: ", line);
     }
   }
   return IntReturn(best);
@@ -44,19 +38,23 @@ absl::StatusOr<std::string> Day_2022_01::Part2(
     absl::Span<absl::string_view> input) const {
   std::vector<int> elves;
   int cur = 0;
-  for (const auto str : input) {
+  for (absl::string_view line : input) {
     int next;
-    if (str.empty()) {
+    if (line.empty()) {
       elves.push_back(cur);
       cur = 0;
-    } else if (absl::SimpleAtoi(str, &next)) {
+    } else if (absl::SimpleAtoi(line, &next)) {
       cur += next;
     } else {  
-      return Error("Bad line");
+      return Error("Bad line: ", line);
     }
   }
   elves.push_back(cur);
-  absl::c_sort(elves, [](int a, int b) { return b < a; });
+  if (elves.size() < 3) {
+    return Error("Too few elves (need 3, have ", elves.size(), ")");
+  }
+  absl::c_sort(elves);
+  absl::c_reverse(elves);
   return IntReturn(elves[0] + elves[1] + elves[2]);
 }
 
