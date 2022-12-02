@@ -14,22 +14,22 @@
 
 namespace advent_of_code {
 
-namespace {
-
-// Helper methods go here.
-
-}  // namespace
-
 absl::StatusOr<std::string> Day_2022_02::Part1(
     absl::Span<absl::string_view> input) const {
   int score = 0;
   for (absl::string_view round : input) {
-    if (round.size() != 3) return Error("Bad round");
-    int a = round[0] - 'A';
-    int b = round[2] - 'X';
-    score += b + 1;
-    if (b == (a + 1) % 3) score += 6;
-    if (b == a) score += 3;
+    if (round.size() != 3) return Error("Bad round: ", round);
+    if (!RE2::FullMatch(round, "[A-C] [X-Z]")) {
+      return Error("Bad round: ", round);
+    }
+    int p1 = round[0] - 'A';
+    int p2 = round[2] - 'X';
+    // Score my choice.
+    score += p2 + 1;
+    // Win is exactly one more, modulo 3.
+    if (p2 == (p1 + 1) % 3) score += 6;
+    // Tie.
+    if (p2 == p1) score += 3;
   }
   return IntReturn(score);
 }
@@ -38,13 +38,20 @@ absl::StatusOr<std::string> Day_2022_02::Part2(
     absl::Span<absl::string_view> input) const {
   int score = 0;
   for (absl::string_view round : input) {
-    if (round.size() != 3) return Error("Bad round");
-    int a = round[0] - 'A';
-    int b = round[2] - 'X';
-    int c = (b + 2 + a) % 3;
-    score += c + 1;
-    if (c == (a + 1) % 3) score += 6;
-    if (c == a) score += 3;
+    if (round.size() != 3) return Error("Bad round: ", round);
+    if (!RE2::FullMatch(round, "[A-C] [X-Z]")) {
+      return Error("Bad round: ", round);
+    }
+    int p1 = round[0] - 'A';
+    int outcome = round[2] - 'X';
+    // {0, 1, 2} -> {Lose, Draw Win} -> p2 - p1 = outcome - 1 MOD 3.
+    int p2 = (outcome + 2 + p1) % 3;
+    // Score my choice.
+    score += p2 + 1;
+    // Win is exactly one more, modulo 3.
+    if (p2 == (p1 + 1) % 3) score += 6;
+    // Tie.
+    if (p2 == p1) score += 3;
   }
   return IntReturn(score);
 }
