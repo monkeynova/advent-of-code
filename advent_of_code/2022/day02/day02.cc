@@ -22,12 +22,31 @@ namespace {
 
 absl::StatusOr<std::string> Day_2022_02::Part1(
     absl::Span<absl::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  int score = 0;
+  for (absl::string_view round : input) {
+    if (round.size() != 3) return Error("Bad round");
+    int a = round[0] - 'A';
+    int b = round[2] - 'X';
+    score += b + 1;
+    if (b == (a + 1) % 3) score += 6;
+    if (b == a) score += 3;
+  }
+  return IntReturn(score);
 }
 
 absl::StatusOr<std::string> Day_2022_02::Part2(
     absl::Span<absl::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  int score = 0;
+  for (absl::string_view round : input) {
+    if (round.size() != 3) return Error("Bad round");
+    int a = round[0] - 'A';
+    int b = round[2] - 'X';
+    int c = (b + 2 + a) % 3;
+    score += c + 1;
+    if (c == (a + 1) % 3) score += 6;
+    if (c == a) score += 3;
+  }
+  return IntReturn(score);
 }
 
 }  // namespace advent_of_code

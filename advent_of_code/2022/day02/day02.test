@@ -2,24 +2,28 @@
 ==
 
 [part=1]
-Example input
+A Y
+B X
+C Z
 --
-ERROR: UNIMPLEMENTED: Problem not known
+15
 ==
 
 [part=1]
 @include{advent_of_code/2022/day02/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+8890
 ==
 
 [part=2]
-Example input
+A Y
+B X
+C Z
 --
-ERROR: UNIMPLEMENTED: Problem not known
+12
 ==
 
 [part=2]
 @include{advent_of_code/2022/day02/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+10238
