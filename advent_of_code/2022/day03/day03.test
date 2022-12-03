@@ -2,24 +2,34 @@
 ==
 
 [part=1]
-Example input
+vJrwpWtwJgWrhcsFMMfFFhFp
+jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+PmmdzqPrVvPwwTWBwg
+wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+ttgJtRGJQctTZtZT
+CrZsJsPPZsGzwwsLwLmpwMDw
 --
-ERROR: UNIMPLEMENTED: Problem not known
+157
 ==
 
 [part=1]
 @include{advent_of_code/2022/day03/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+8018
 ==
 
 [part=2]
-Example input
+vJrwpWtwJgWrhcsFMMfFFhFp
+jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+PmmdzqPrVvPwwTWBwg
+wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+ttgJtRGJQctTZtZT
+CrZsJsPPZsGzwwsLwLmpwMDw
 --
-ERROR: UNIMPLEMENTED: Problem not known
+70
 ==
 
 [part=2]
 @include{advent_of_code/2022/day03/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+2518
