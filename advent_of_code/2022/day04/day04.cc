@@ -38,15 +38,14 @@ absl::StatusOr<std::string> Day_2022_04::Part1(
 
 absl::StatusOr<std::string> Day_2022_04::Part2(
     absl::Span<absl::string_view> input) const {
-  int count = input.size();
+  int count = 0;
   for (absl::string_view line : input) {
     int p1s, p1e, p2s, p2e;
     if (!RE2::FullMatch(line, "(\\d+)-(\\d+),(\\d+)-(\\d+)", 
                         &p1s, &p1e, &p2s, &p2e)) {
       return Error("Bad line: ", line);
     }
-    if (p1e < p2s) --count;
-    else if (p2e < p1s) --count;
+    if (p1e >= p2s && p2e >= p1s) ++count;
   }
 
   return IntReturn(count);
