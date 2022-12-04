@@ -2,6 +2,7 @@
 #define ADVENT_OF_CODE_MOD_H
 
 #include <numeric>
+#include <vector>
 
 #include "absl/functional/function_ref.h"
 #include "absl/log/check.h"

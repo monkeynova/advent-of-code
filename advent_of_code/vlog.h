@@ -1,10 +1,16 @@
 #ifndef ADVENT_OF_CODE_VLOG_H
 #define ADVENT_OF_CODE_VLOG_H
 
-#include "absl/flags/flag.h"
-#include "advent_of_code/infra/file_flags.h"
+namespace internal {
 
-#define VLOG_IS_ON(s) (s <= absl::GetFlag(FLAGS_v))
+// We use a simple boolean cache of the flag value to avoid any costs
+// associated with acquiring the value (like mutex acquisition). The
+// value must _never_ be set after flag parsing.
+extern int verbosity_level;
+
+}  // namespace internal
+
+#define VLOG_IS_ON(s) (s <= internal::verbosity_level)
 
 // TODO(@monkeynova): Remove when part of absl/log public API.
 #define VLOG(s) LOG_IF(INFO, VLOG_IS_ON(s))

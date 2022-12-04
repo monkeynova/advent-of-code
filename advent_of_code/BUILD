@@ -123,8 +123,9 @@ cc_library(
 cc_library(
     name = "vlog",
     hdrs = ["vlog.h"],
+    srcs = ["vlog.cc"],
+    alwayslink = 1,
     deps = [
-        "//advent_of_code/infra:file_flags",
         "@com_google_absl//absl/flags:flag",
     ],
 )

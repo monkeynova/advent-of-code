@@ -10,5 +10,3 @@ ABSL_FLAG(bool, fail_if_long_skip, false,
           "for finding tests that take longer than $TIME to run.");
 
 ABSL_FLAG(int64_t, part_filter, 0, "If non-zero, only runs the specified part");
-
-ABSL_FLAG(int, v, 0, "The verbosity level for VLOG.");
