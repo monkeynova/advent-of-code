@@ -14,12 +14,6 @@
 
 namespace advent_of_code {
 
-namespace {
-
-// Helper methods go here.
-
-}  // namespace
-
 absl::StatusOr<std::string> Day_2022_04::Part1(
     absl::Span<absl::string_view> input) const {
   int count = 0;
@@ -29,6 +23,8 @@ absl::StatusOr<std::string> Day_2022_04::Part1(
                         &p1s, &p1e, &p2s, &p2e)) {
       return Error("Bad line: ", line);
     }
+    if (p1s > p1e) return Error("Bad range (1): ", line);
+    if (p2s > p2e) return Error("Bad range (2): ", line);
     if (p1s >= p2s && p1e <= p2e) ++count;
     else if (p2s >= p1s && p2e <= p1e) ++count;
   }
@@ -45,6 +41,8 @@ absl::StatusOr<std::string> Day_2022_04::Part2(
                         &p1s, &p1e, &p2s, &p2e)) {
       return Error("Bad line: ", line);
     }
+    if (p1s > p1e) return Error("Bad range (1): ", line);
+    if (p2s > p2e) return Error("Bad range (2): ", line);
     if (p1e >= p2s && p2e >= p1s) ++count;
   }
 
