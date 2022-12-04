@@ -11,7 +11,7 @@
 #include "advent_of_code/char_board.h"
 #include "advent_of_code/opt_cmp.h"
 #include "advent_of_code/point.h"
-#include "glog/logging.h"
+#include "absl/log/log.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
@@ -169,7 +169,7 @@ int CountNeighborsRecursive(const CharBoard& in_board, Point p,
             if ((*board_plus_one)[{sub_x, 4}] == '#') ++neighbors;
           }
         } else {
-          LOG(DFATAL) << "Can't get here";
+          DLOG(FATAL) << "Can't get here";
         }
       }
     } else if (in_board[n] == '#') {

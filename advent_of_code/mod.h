@@ -4,8 +4,9 @@
 #include <numeric>
 
 #include "absl/functional/function_ref.h"
+#include "absl/log/check.h"
 #include "absl/types/optional.h"
-#include "glog/logging.h"
+#include "absl/log/log.h"
 
 namespace advent_of_code {
 

@@ -8,9 +8,10 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
+        "//advent_of_code:vlog",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/types:span",
-        "@com_google_glog//:glog",
+        "@com_google_absl//absl/log",
     ],
 )
 
@@ -23,7 +24,7 @@ cc_test(
         # bazelisk test ... --test_arg=<file arg>.
         "//advent_of_code/infra:file_flags",
         "@com_google_googletest//:gtest",
-        "@com_monkeynova_gunit_main//:test_main",
+        "//advent_of_code/infra:gunit_main",
     ],
 )
 
@@ -56,6 +57,6 @@ cc_test(
         "//advent_of_code/2017/day23:day23_benchmark_lib",
         "//advent_of_code/2017/day24:day24_benchmark_lib",
         "//advent_of_code/2017/day25:day25_benchmark_lib",
-        "@com_monkeynova_gunit_main//:test_main",
+        "//advent_of_code/infra:gunit_main",
     ],
 )

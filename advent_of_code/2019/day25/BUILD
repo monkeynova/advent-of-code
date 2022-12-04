@@ -10,7 +10,7 @@ cc_library(
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/strings",
-        "@com_google_glog//:glog",
+        "@com_google_absl//absl/log",
         "@com_googlesource_code_re2//:re2",
     ],
 )
@@ -24,8 +24,15 @@ cc_binary(
     deps = [
         "//advent_of_code/2019:int_code",
         "//advent_of_code/infra:file_util",
-        "@com_google_glog//:glog",
-        "@com_monkeynova_gunit_main//:main_lib",
+        "@com_google_absl//absl/debugging:failure_signal_handler",
+        "@com_google_absl//absl/debugging:symbolize",
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/flags:parse",
+        "@com_google_absl//absl/log:check",
+        "@com_google_absl//absl/log:flags",
+        "@com_google_absl//absl/log:initialize",
+        "@com_google_absl//absl/log",
+        "@com_google_absl//absl/strings",
     ],
 )
 
@@ -60,7 +67,7 @@ cc_library(
     deps = [
         ":day25_input",
         "//advent_of_code/infra:file_benchmark",
-        "@com_monkeynova_gunit_main//:test_main",
+        "//advent_of_code/infra:gunit_main",
     ],
     alwayslink = 1,
 )
@@ -70,6 +77,6 @@ cc_test(
     tags = ["benchmark"],
     deps = [
         ":day25_benchmark_lib",
-        "@com_monkeynova_gunit_main//:test_main",
+        "//advent_of_code/infra:gunit_main",
     ],
 )

@@ -1,6 +1,7 @@
 #include "advent_of_code/mod.h"
 
 #include "absl/numeric/int128.h"
+#include "advent_of_code/vlog.h"
 
 namespace advent_of_code {
 

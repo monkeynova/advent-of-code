@@ -1,16 +1,17 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
+package(default_visibility = ["//visibility:public"])
+
 cc_library(
     name = "advent_day",
     srcs = ["advent_day.cc"],
     hdrs = ["advent_day.h"],
-    visibility = [
-        "//visibility:public",
-    ],
     deps = [
         ":char_board",
         ":point",
+        ":vlog",
         "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/log:check",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/types:span",
@@ -22,9 +23,6 @@ cc_library(
 cc_library(
     name = "point",
     hdrs = ["point.h"],
-    visibility = [
-        "//visibility:public",
-    ],
     deps = [
         "@com_google_absl//absl/hash",
         "@com_google_absl//absl/strings",
@@ -35,9 +33,6 @@ cc_library(
 cc_library(
     name = "opt_cmp",
     hdrs = ["opt_cmp.h"],
-    visibility = [
-        "//visibility:public",
-    ],
     deps = [
         "@com_google_absl//absl/types:optional",
     ],
@@ -47,11 +42,9 @@ cc_library(
     name = "ocr",
     srcs = ["ocr.cc"],
     hdrs = ["ocr.h"],
-    visibility = [
-        "//visibility:public",
-    ],
     deps = [
         ":char_board",
+        ":vlog",
         "@com_google_absl//absl/algorithm:container",
     ],
 )
@@ -59,26 +52,20 @@ cc_library(
 cc_library(
     name = "bfs",
     hdrs = ["bfs.h"],
-    visibility = [
-        "//visibility:public",
-    ],
     deps = [
-        "@com_google_glog//:glog",
+        "@com_google_absl//absl/log",
     ],
 )
 
 cc_library(
     name = "char_board",
     hdrs = ["char_board.h"],
-    visibility = [
-        "//visibility:public",
-    ],
     deps = [
         ":point",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
-        "@com_google_glog//:glog",
+        "@com_google_absl//absl/log",
     ],
 )
 
@@ -86,24 +73,18 @@ cc_library(
     name = "conway",
     srcs = ["conway.cc"],
     hdrs = ["conway.h"],
-    visibility = [
-        "//visibility:public",
-    ],
     deps = [
         ":char_board",
         ":point",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
-        "@com_google_glog//:glog",
+        "@com_google_absl//absl/log",
     ],
 )
 
 cc_library(
     name = "md5",
     hdrs = ["md5.h"],
-    visibility = [
-        "//visibility:public",
-    ],
     deps = [
         "//third_party/md5",
     ],
@@ -113,14 +94,13 @@ cc_library(
     name = "mod",
     srcs = ["mod.cc"],
     hdrs = ["mod.h"],
-    visibility = [
-        "//visibility:public",
-    ],
     deps = [
+        ":vlog",
         "@com_google_absl//absl/functional:function_ref",
+        "@com_google_absl//absl/log",
+        "@com_google_absl//absl/log:check",
         "@com_google_absl//absl/numeric:int128",
         "@com_google_absl//absl/types:optional",
-        "@com_google_glog//:glog",
     ],
 )
 
@@ -128,16 +108,23 @@ cc_library(
     name = "directed_graph",
     srcs = ["directed_graph.cc"],
     hdrs = ["directed_graph.h"],
-    visibility = [
-        "//visibility:public",
-    ],
     deps = [
+        ":vlog",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/functional:function_ref",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
-        "@com_google_glog//:glog",
+        "@com_google_absl//absl/log",
+    ],
+)
+
+cc_library(
+    name = "vlog",
+    hdrs = ["vlog.h"],
+    deps = [
+        "//advent_of_code/infra:file_flags",
+        "@com_google_absl//absl/flags:flag",
     ],
 )

@@ -2,7 +2,8 @@
 
 #include "absl/strings/str_join.h"
 #include "absl/types/span.h"
-#include "glog/logging.h"
+#include "absl/log/log.h"
+#include "advent_of_code/vlog.h"
 
 namespace advent_of_code {
 

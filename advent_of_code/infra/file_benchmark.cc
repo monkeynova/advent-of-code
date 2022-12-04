@@ -6,7 +6,7 @@
 #include "advent_of_code/infra/file_flags.h"
 #include "advent_of_code/infra/file_test_options.h"
 #include "file_based_test_driver/test_case_options.h"
-#include "glog/logging.h"
+#include "absl/log/log.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {

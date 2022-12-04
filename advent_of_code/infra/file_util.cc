@@ -8,7 +8,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_replace.h"
 #include "absl/strings/str_split.h"
-#include "glog/logging.h"
+#include "absl/log/log.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {

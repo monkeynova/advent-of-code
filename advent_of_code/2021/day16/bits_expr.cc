@@ -1,7 +1,7 @@
 #include "advent_of_code/2021/day16/bits_expr.h"
 
 #include "absl/strings/str_cat.h"
-#include "glog/logging.h"
+#include "absl/log/log.h"
 
 namespace advent_of_code {
 

@@ -8,10 +8,11 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
+        "//advent_of_code:vlog",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
-        "@com_google_glog//:glog",
+        "@com_google_absl//absl/log",
     ],
 )
 
@@ -25,10 +26,11 @@ cc_test(
         # Allow file flag options on all tests to avoid test failures in
         # bazelisk test ... --test_arg=<file arg>.
         "//advent_of_code/infra:file_flags",
+        "@com_google_absl//absl/debugging:failure_signal_handler",
         "@com_google_file_based_test_driver//file_based_test_driver",
         "@com_google_file_based_test_driver//file_based_test_driver:run_test_case_result",
         "@com_google_file_based_test_driver//file_based_test_driver:test_case_options",
-        "@com_monkeynova_gunit_main//:test_main",
+        "//advent_of_code/infra:gunit_main",
     ],
 )
 
@@ -61,6 +63,6 @@ cc_test(
         "//advent_of_code/2019/day23:day23_benchmark_lib",
         "//advent_of_code/2019/day24:day24_benchmark_lib",
         "//advent_of_code/2019/day25:day25_benchmark_lib",
-        "@com_monkeynova_gunit_main//:test_main",
+        "//advent_of_code/infra:gunit_main",
     ],
 )

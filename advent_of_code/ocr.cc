@@ -1,6 +1,7 @@
 #include "advent_of_code/ocr.h"
 
 #include "absl/algorithm/container.h"
+#include "advent_of_code/vlog.h"
 
 namespace advent_of_code {
 

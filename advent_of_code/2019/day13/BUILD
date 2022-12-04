@@ -10,7 +10,7 @@ cc_library(
         "//advent_of_code/2019:int_code",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/strings",
-        "@com_google_glog//:glog",
+        "@com_google_absl//absl/log",
     ],
 )
 
@@ -45,7 +45,7 @@ cc_library(
     deps = [
         ":day13_input",
         "//advent_of_code/infra:file_benchmark",
-        "@com_monkeynova_gunit_main//:test_main",
+        "//advent_of_code/infra:gunit_main",
     ],
     alwayslink = 1,
 )
@@ -55,6 +55,6 @@ cc_test(
     tags = ["benchmark"],
     deps = [
         ":day13_benchmark_lib",
-        "@com_monkeynova_gunit_main//:test_main",
+        "//advent_of_code/infra:gunit_main",
     ],
 )

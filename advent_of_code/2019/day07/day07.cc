@@ -10,7 +10,7 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/2019/int_code.h"
-#include "glog/logging.h"
+#include "absl/log/log.h"
 
 namespace advent_of_code {
 namespace {

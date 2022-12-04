@@ -1,6 +1,6 @@
 #include "advent_of_code/conway.h"
 
-#include "glog/logging.h"
+#include "absl/log/log.h"
 
 namespace advent_of_code {
 

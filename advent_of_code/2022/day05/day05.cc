@@ -9,7 +9,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
-#include "glog/logging.h"
+#include "absl/log/log.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
@@ -22,11 +22,17 @@ namespace {
 
 absl::StatusOr<std::string> Day_2022_05::Part1(
     absl::Span<absl::string_view> input) const {
+  for (absl::string_view line : input) {
+    VLOG(1) << line;
+  }
   return absl::UnimplementedError("Problem not known");
 }
 
 absl::StatusOr<std::string> Day_2022_05::Part2(
     absl::Span<absl::string_view> input) const {
+  for (absl::string_view line : input) {
+    VLOG(1) << line;
+  }
   return absl::UnimplementedError("Problem not known");
 }
 

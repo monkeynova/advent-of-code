@@ -9,7 +9,7 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/2018/vm.h"
-#include "glog/logging.h"
+#include "absl/log/log.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {

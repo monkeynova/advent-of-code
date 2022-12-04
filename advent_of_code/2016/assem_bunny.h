@@ -9,7 +9,7 @@
 #include "absl/status/statusor.h"
 #include "absl/strings/numbers.h"
 #include "advent_of_code/advent_day.h"
-#include "glog/logging.h"
+#include "absl/log/log.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {

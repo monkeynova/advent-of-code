@@ -10,7 +10,7 @@
 #include "advent_of_code/2019/int_code.h"
 #include "advent_of_code/char_board.h"
 #include "advent_of_code/point.h"
-#include "glog/logging.h"
+#include "absl/log/log.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {

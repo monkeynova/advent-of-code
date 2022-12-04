@@ -7,6 +7,6 @@ cc_test(
         "//advent_of_code/2022/day03:day03_benchmark_lib",
         "//advent_of_code/2022/day04:day04_benchmark_lib",
         "//advent_of_code/2022/day05:day05_benchmark_lib",
-        "@com_monkeynova_gunit_main//:test_main",
+        "//advent_of_code/infra:gunit_main",
     ],
 )

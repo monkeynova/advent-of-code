@@ -32,29 +32,10 @@ git_repository(
 )
 
 git_repository(
-    name = "com_github_gflags_gflags",
-    remote = "https://github.com/gflags/gflags.git",
-    commit = "a738fdf9338412f83ab3f26f31ac11ed3f3ec4bd",
-)
-
-git_repository(
     name = "com_github_google_benchmark",
     remote = "https://github.com/google/benchmark.git",
     # branch = "main",
     commit = "2257fa4d6afb8e5a2ccd510a70f38fe7fcdf1edf",
-)
-
-git_repository(
-    name = "com_google_glog",
-    remote = "https://github.com/google/glog.git",
-    commit = "05fbc65278db1aa545ca5cb743c31bc717a48d0f",
-)
-
-git_repository(
-    name = "com_monkeynova_gunit_main",
-    remote = "https://github.com/monkeynova/gunit-main.git",
-    # branch = "main"
-    commit = "537db9c23114a3d2c300ffd4681f194c1f1b547c",
 )
 
 git_repository(

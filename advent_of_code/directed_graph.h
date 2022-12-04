@@ -7,7 +7,8 @@
 #include "absl/container/flat_hash_set.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/str_join.h"
-#include "glog/logging.h"
+#include "absl/log/log.h"
+#include "advent_of_code/vlog.h"
 
 namespace advent_of_code {
 

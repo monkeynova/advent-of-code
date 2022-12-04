@@ -5,5 +5,6 @@
 extern absl::Flag<absl::Duration> FLAGS_run_long_tests;
 extern absl::Flag<bool> FLAGS_fail_if_long_skip;
 extern absl::Flag<int64_t> FLAGS_part_filter;
+extern absl::Flag<int> FLAGS_v;
 
 #endif

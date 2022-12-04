@@ -1,14 +1,14 @@
 #include "advent_of_code/2019/int_code.h"
 
+#include "absl/debugging/failure_signal_handler.h"
 #include "absl/flags/flag.h"
 #include "absl/strings/str_split.h"
 #include "file_based_test_driver/base/file_util.h"
 #include "file_based_test_driver/file_based_test_driver.h"
 #include "file_based_test_driver/run_test_case_result.h"
 #include "file_based_test_driver/test_case_options.h"
-#include "glog/logging.h"
+#include "absl/log/log.h"
 #include "gmock/gmock.h"
-#include "main_lib.h"
 #include "re2/re2.h"
 
 ABSL_FLAG(std::string, test_file, "",
@@ -64,8 +64,7 @@ void RunTestCase(absl::string_view test_case_with_options,
 }
 
 TEST(IntCodeTest, FileBasedTest) {
-  InitializeAbslFlagsFromGtest();
-  google::InstallFailureSignalHandler();
+  absl::InstallFailureSignalHandler({});
   EXPECT_TRUE(file_based_test_driver::RunTestCasesFromFiles(
       absl::GetFlag(FLAGS_test_file), &RunTestCase));
 }

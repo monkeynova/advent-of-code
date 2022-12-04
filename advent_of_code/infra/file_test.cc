@@ -1,5 +1,6 @@
 #include "advent_of_code/infra/file_test.h"
 
+#include "absl/debugging/failure_signal_handler.h"
 #include "absl/flags/flag.h"
 #include "absl/functional/bind_front.h"
 #include "absl/strings/str_join.h"
@@ -12,7 +13,6 @@
 #include "file_based_test_driver/file_based_test_driver.h"
 #include "file_based_test_driver/run_test_case_result.h"
 #include "file_based_test_driver/test_case_options.h"
-#include "main_lib.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
@@ -114,8 +114,7 @@ void RunTestCase(const AdventDay* advent_day,
 }
 
 bool TestSingleDay(AdventDay* day) {
-  InitializeAbslFlagsFromGtest();
-  google::InstallFailureSignalHandler();
+  absl::InstallFailureSignalHandler({});
   return file_based_test_driver::RunTestCasesFromFiles(
       day->test_file(), absl::bind_front(&RunTestCase, day));
 }

@@ -1,7 +1,13 @@
+#include "absl/debugging/failure_signal_handler.h"
+#include "absl/debugging/symbolize.h"
+#include "absl/flags/flag.h"
+#include "absl/flags/parse.h"
+#include "absl/log/check.h"
+#include "absl/log/flags.h"
+#include "absl/log/initialize.h"
+#include "absl/log/log.h"
 #include "advent_of_code/2019/int_code.h"
 #include "advent_of_code/infra/file_util.h"
-#include "glog/logging.h"
-#include "main_lib.h"
 
 namespace advent_of_code {
 namespace {
@@ -41,7 +47,13 @@ class Terminal : public IntCode::IOModule {
 };
 
 int RunInteractive(int argc, char** argv) {
-  std::vector<char*> args = InitMain(argc, argv);
+  absl::InitializeSymbolizer(argv[0]);
+  absl::InstallFailureSignalHandler(/*options=*/{});
+  absl::InitializeLog();
+
+  std::vector<char*> args = absl::ParseCommandLine(argc, argv);
+  CHECK_EQ(args.size(), 1) << absl::StrJoin(args, ",");
+
   if (args.size() != 2) {
     LOG(FATAL) << "Usage:\n" << args[0] << " <file>";
   }

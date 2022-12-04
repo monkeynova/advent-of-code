@@ -2,7 +2,7 @@
 #define ADVENT_OF_CODE_INFRA_FILE_TEST_H
 
 #include "advent_of_code/advent_day.h"
-#include "glog/logging.h"
+#include "absl/log/log.h"
 #include "gtest/gtest.h"
 
 namespace advent_of_code {

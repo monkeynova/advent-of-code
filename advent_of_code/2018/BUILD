@@ -8,12 +8,13 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
+        "//advent_of_code:vlog",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
-        "@com_google_glog//:glog",
+        "@com_google_absl//absl/log",
         "@com_googlesource_code_re2//:re2",
     ],
 )
@@ -47,6 +48,6 @@ cc_test(
         "//advent_of_code/2018/day23:day23_benchmark_lib",
         "//advent_of_code/2018/day24:day24_benchmark_lib",
         "//advent_of_code/2018/day25:day25_benchmark_lib",
-        "@com_monkeynova_gunit_main//:test_main",
+        "//advent_of_code/infra:gunit_main",
     ],
 )
