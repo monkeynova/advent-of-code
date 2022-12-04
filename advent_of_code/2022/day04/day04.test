@@ -2,24 +2,35 @@
 ==
 
 [part=1]
-Example input
+2-4,6-8
+2-3,4-5
+5-7,7-9
+2-8,3-7
+6-6,4-6
+2-6,4-8
 --
-ERROR: UNIMPLEMENTED: Problem not known
+2
 ==
 
+# 482 (didn't atoi)
 [part=1]
 @include{advent_of_code/2022/day04/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+431
 ==
 
 [part=2]
-Example input
+2-4,6-8
+2-3,4-5
+5-7,7-9
+2-8,3-7
+6-6,4-6
+2-6,4-8
 --
-ERROR: UNIMPLEMENTED: Problem not known
+4
 ==
 
 [part=2]
 @include{advent_of_code/2022/day04/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+823
