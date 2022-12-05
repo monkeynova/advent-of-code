@@ -2,24 +2,44 @@
 ==
 
 [part=1]
-Example input
+HACK:
+    [D]    
+[N] [C]    
+[Z] [M] [P]
+ 1   2   3 
+
+move 1 from 2 to 1
+move 3 from 1 to 3
+move 2 from 2 to 1
+move 1 from 1 to 2
 --
-ERROR: UNIMPLEMENTED: Problem not known
+CMZ
 ==
 
 [part=1]
+HACK:
 @include{advent_of_code/2022/day05/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+TGWSMRBPN
 ==
 
 [part=2]
-Example input
+HACK:
+    [D]    
+[N] [C]    
+[Z] [M] [P]
+ 1   2   3 
+
+move 1 from 2 to 1
+move 3 from 1 to 3
+move 2 from 2 to 1
+move 1 from 1 to 2
 --
-ERROR: UNIMPLEMENTED: Problem not known
+MCD
 ==
 
 [part=2]
+HACK:
 @include{advent_of_code/2022/day05/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+TZLTLWRNF
