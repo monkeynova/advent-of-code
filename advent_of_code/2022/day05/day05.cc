@@ -16,9 +16,11 @@ namespace advent_of_code {
 
 namespace {
 
-absl::StatusOr<std::vector<std::vector<char>>> ParseStacks(
+using CargoStack = std::vector<char>;
+
+absl::StatusOr<std::vector<CargoStack>> ParseStacks(
     absl::Span<absl::string_view> lines) {
-  std::vector<std::vector<char>> stacks;
+  std::vector<CargoStack> stacks;
   for (absl::string_view line : lines) {
     if (line.size() % 4 != 3) return Error("Bad line");
     for (int i = 0; 4 * i < line.size(); ++i) {
@@ -36,10 +38,42 @@ absl::StatusOr<std::vector<std::vector<char>>> ParseStacks(
     }
   }
 
-  for (std::vector<char>& s : stacks) {
+  for (CargoStack& s : stacks) {
     absl::c_reverse(s);
   }
   return stacks;
+}
+
+struct Move {
+  int count;
+  CargoStack& from;
+  CargoStack& to;
+};
+
+absl::StatusOr<std::vector<Move>> ParseMoves(
+    absl::Span<absl::string_view> moves,
+    std::vector<CargoStack>& stacks) {
+  std::vector<Move> ret;
+  for (absl::string_view line : moves) {
+    int count, from_idx, to_idx;
+    if (!RE2::FullMatch(line, "move (\\d+) from (\\d+) to (\\d+)",
+                        &count, &from_idx, &to_idx)) {
+      return Error("Bad move (RE)");
+    }
+    if (stacks.size() < from_idx) return Error("Bad move (from) ", from_idx);
+    if (stacks.size() < to_idx) return Error("Bad move (to) ", to_idx);
+    ret.push_back(Move{.count = count, .from = stacks[from_idx - 1],
+                       .to = stacks[to_idx - 1]});
+  }
+  return ret;
+}
+
+std::string StackTops(const std::vector<CargoStack>& stacks) {
+  std::string ret;
+  for (const CargoStack& s : stacks) {
+    ret.append(1, s.back());
+  }
+  return ret;
 }
 
 }  // namespace
@@ -55,31 +89,22 @@ absl::StatusOr<std::string> Day_2022_05::Part1(
   }
   if (!split_at) return Error("No empty line in input");
 
-  absl::StatusOr<std::vector<std::vector<char>>> stacks =
+  absl::StatusOr<std::vector<CargoStack>> stacks =
       ParseStacks(input.subspan(0, *split_at));
   if (!stacks.ok()) return stacks.status();
 
-  for (absl::string_view line : input.subspan(*split_at + 1)) {
-    int count, from_idx, to_idx;
-    if (!RE2::FullMatch(line, "move (\\d+) from (\\d+) to (\\d+)",
-                        &count, &from_idx, &to_idx)) {
-      return Error("Bad move (RE)");
+  absl::StatusOr<std::vector<Move>> moves =
+      ParseMoves(input.subspan(*split_at + 1), *stacks);
+
+  for (const Move& m : *moves) {
+    if (m.from.size() < m.count) return Error("Bad move: empty");
+    for (int i = 0; i < m.count; ++i) {
+      m.to.push_back(m.from[m.from.size() - i - 1]);
     }
-    if (stacks->size() < from_idx) return Error("Bad move (from) ", from_idx);
-    std::vector<char>& from = (*stacks)[from_idx - 1];
-    if (stacks->size() < to_idx) return Error("Bad move (to) ", to_idx);
-    std::vector<char>& to = (*stacks)[to_idx - 1];
-    if (from.size() < count) return Error("Bad move: empty");
-    for (int i = 0; i < count; ++i) {
-      to.push_back(from[from.size() - i - 1]);
-    }
-    from.resize(from.size() - count);
+    m.from.resize(m.from.size() - m.count);
   }
-  std::string ret;
-  for (std::vector<char>& s : *stacks) {
-    ret.append(1, s.back());
-  }
-  return ret;
+
+  return StackTops(*stacks);
 }
 
 absl::StatusOr<std::string> Day_2022_05::Part2(
@@ -93,31 +118,22 @@ absl::StatusOr<std::string> Day_2022_05::Part2(
   }
   if (!split_at) return Error("No empty line in input");
 
-  absl::StatusOr<std::vector<std::vector<char>>> stacks =
+  absl::StatusOr<std::vector<CargoStack>> stacks =
       ParseStacks(input.subspan(0, *split_at));
   if (!stacks.ok()) return stacks.status();
 
-  for (absl::string_view line : input.subspan(*split_at + 1)) {
-    int count, from_idx, to_idx;
-    if (!RE2::FullMatch(line, "move (\\d+) from (\\d+) to (\\d+)",
-                        &count, &from_idx, &to_idx)) {
-      return Error("Bad move (RE)");
+  absl::StatusOr<std::vector<Move>> moves =
+      ParseMoves(input.subspan(*split_at + 1), *stacks);
+
+  for (const Move& m : *moves) {
+    if (m.from.size() < m.count) return Error("Bad move: empty");
+    for (int i = 0; i < m.count; ++i) {
+      m.to.push_back(m.from[m.from.size() - m.count + i]);
     }
-    if (stacks->size() < from_idx) return Error("Bad move (from) ", from_idx);
-    std::vector<char>& from = (*stacks)[from_idx - 1];
-    if (stacks->size() < to_idx) return Error("Bad move (to) ", to_idx);
-    std::vector<char>& to = (*stacks)[to_idx - 1];
-    if (from.size() < count) return Error("Bad move: empty");
-    for (int i = 0; i < count; ++i) {
-      to.push_back(from[from.size() - count + i]);
-    }
-    from.resize(from.size() - count);
+    m.from.resize(m.from.size() - m.count);
   }
-  std::string ret;
-  for (std::vector<char>& s : *stacks) {
-    ret.append(1, s.back());
-  }
-  return ret;
+
+  return StackTops(*stacks);
 }
 
 }  // namespace advent_of_code
