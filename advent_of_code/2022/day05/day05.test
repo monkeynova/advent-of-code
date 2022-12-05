@@ -2,7 +2,7 @@
 ==
 
 [part=1]
-HACK:
+HACK: Crates Look Like Options
     [D]    
 [N] [C]    
 [Z] [M] [P]
@@ -17,14 +17,14 @@ CMZ
 ==
 
 [part=1]
-HACK:
+HACK: Crates Look Like Options
 @include{advent_of_code/2022/day05/input.txt}
 --
 TGWSMRBPN
 ==
 
 [part=2]
-HACK:
+HACK: Crates Look Like Options
     [D]    
 [N] [C]    
 [Z] [M] [P]
@@ -39,7 +39,7 @@ MCD
 ==
 
 [part=2]
-HACK:
+HACK: Crates Look Like Options
 @include{advent_of_code/2022/day05/input.txt}
 --
 TZLTLWRNF
