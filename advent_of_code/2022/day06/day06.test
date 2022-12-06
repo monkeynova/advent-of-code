@@ -2,24 +2,24 @@
 ==
 
 [part=1]
-Example input
+mjqjpqmgbljsphdztnvjfqwrcgsmlb
 --
-ERROR: UNIMPLEMENTED: Problem not known
+7
 ==
 
 [part=1]
 @include{advent_of_code/2022/day06/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+1238
 ==
 
 [part=2]
-Example input
+mjqjpqmgbljsphdztnvjfqwrcgsmlb
 --
-ERROR: UNIMPLEMENTED: Problem not known
+19
 ==
 
 [part=2]
 @include{advent_of_code/2022/day06/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+3037
