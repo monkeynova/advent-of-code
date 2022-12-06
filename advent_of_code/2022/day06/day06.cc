@@ -16,42 +16,34 @@ namespace advent_of_code {
 
 namespace {
 
-// Helper methods go here.
+absl::StatusOr<int> FindMarker(absl::string_view line, int len) {
+  for (int i = 0; i < line.size() - len; ++i) {
+    bool found = true;
+    absl::flat_hash_set<char> set;
+    for (int j = 0; j < len; ++j) {
+      if (set.contains(line[i + j])) {
+        found = false;
+        break;
+      }
+      set.insert(line[i + j]);
+    }
+    if (found) return i + len;
+  }
+  return Error("No marker found");
+}
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_06::Part1(
     absl::Span<absl::string_view> input) const {
-  for (int i = 0; i < input[0].size(); ++i) {
-    bool found = true;
-    absl::flat_hash_set<char> set;
-    for (int j = 0; j < 4; ++j) {
-      if (set.contains(input[0][i + j])) {
-        found = false;
-        break;
-      }
-      set.insert(input[0][i + j]);
-    }
-    if (found) return IntReturn(i + 4);
-  }
-  return absl::UnimplementedError("Problem not known");
+  if (input.size() != 1) return Error("Bad input");
+  return IntReturn(FindMarker(input[0], 4));
 }
 
 absl::StatusOr<std::string> Day_2022_06::Part2(
     absl::Span<absl::string_view> input) const {
-  for (int i = 0; i < input[0].size(); ++i) {
-    bool found = true;
-    absl::flat_hash_set<char> set;
-    for (int j = 0; j < 14; ++j) {
-      if (set.contains(input[0][i + j])) {
-        found = false;
-        break;
-      }
-      set.insert(input[0][i + j]);
-    }
-    if (found) return IntReturn(i + 14);
-  }
-  return absl::UnimplementedError("Problem not known");
+  if (input.size() != 1) return Error("Bad input");
+  return IntReturn(FindMarker(input[0], 14));
 }
 
 }  // namespace advent_of_code
