@@ -18,16 +18,9 @@ namespace {
 
 absl::StatusOr<int> FindMarker(absl::string_view line, int len) {
   for (int i = 0; i < line.size() - len; ++i) {
-    bool found = true;
-    absl::flat_hash_set<char> set;
-    for (int j = 0; j < len; ++j) {
-      if (set.contains(line[i + j])) {
-        found = false;
-        break;
-      }
-      set.insert(line[i + j]);
-    }
-    if (found) return i + len;
+    absl::string_view sub = line.substr(i, len);
+    absl::flat_hash_set<char> set(sub.begin(), sub.end());
+    if (sub.size() == set.size()) return i + len;
   }
   return Error("No marker found");
 }
