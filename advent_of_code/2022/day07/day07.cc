@@ -18,7 +18,7 @@ namespace {
 
 absl::StatusOr<absl::flat_hash_map<std::string, int>> ParseFileSizes(
     absl::Span<absl::string_view> input) {
-  std::string cur_dir = "/";
+  std::string cur_dir = "";
   absl::flat_hash_map<std::string, int> file2size;
   bool listing = false;
   for (absl::string_view line : input) {
@@ -35,7 +35,7 @@ absl::StatusOr<absl::flat_hash_map<std::string, int>> ParseFileSizes(
         if (idx == std::string::npos) return Error("Can't cd ..");
         cur_dir = cur_dir.substr(0, idx);
       } else if (dname == "/") {
-        cur_dir = "/";
+        cur_dir = "";
       } else {
         if (dname.find(".") != std::string::npos) {
           return Error("Unhandled subdir", dname);
@@ -47,13 +47,16 @@ absl::StatusOr<absl::flat_hash_map<std::string, int>> ParseFileSizes(
         cur_dir.append(dname);
       }
     } else if (absl::StartsWith(line, "dir ")) {
-      // ignore
+      if (!listing) return Error("Not listing");
+      // Ignore directory listings.
     } else if (RE2::FullMatch(line, "(\\d+) (.*)", &size, &fname)) {
       if (!listing) return Error("Not listing");
       std::string file = cur_dir;
       file.append("/");
       file.append(fname);
-      file2size[file] = size;
+      if (!file2size.emplace(file, size).second) {
+        return Error("Duplicate file: ", file);
+      }
     } else {
       return Error("Bad line: ", line);
     }
@@ -66,7 +69,8 @@ absl::flat_hash_map<std::string, int> FileSizes2DirSizes(
   absl::flat_hash_map<std::string, int> dir2size;
   for (const auto& [fname, size] : file2size) {
     std::string_view dir = fname;
-    for (size_t idx = dir.rfind("/"); idx != std::string::npos; idx = dir.rfind("/")) {
+    for (size_t idx = dir.rfind("/"); idx != std::string::npos;
+         idx = dir.rfind("/")) {
       dir = dir.substr(0, idx);
       dir2size[dir] += size;
     }
@@ -86,28 +90,35 @@ absl::StatusOr<absl::flat_hash_map<std::string, int>> ParseDirSizes(
 
 absl::StatusOr<std::string> Day_2022_07::Part1(
     absl::Span<absl::string_view> input) const {
+  const int kSmallSizeThreshold = 100'000;
+
   absl::StatusOr<absl::flat_hash_map<std::string, int>> dir2size =
       ParseDirSizes(input);
   if (!dir2size.ok()) return dir2size.status();
   
   int small_size = 0;
   for (const auto& [dname, size] : *dir2size) {
-    if (size < 100000) small_size += size; 
+    if (size > kSmallSizeThreshold) continue;
+    small_size += size; 
   }
   return IntReturn(small_size);
 }
 
 absl::StatusOr<std::string> Day_2022_07::Part2(
     absl::Span<absl::string_view> input) const {
+  const int kDiskSize = 70'000'000;
+  const int kFreeSize = 30'000'000;
+
   absl::StatusOr<absl::flat_hash_map<std::string, int>> dir2size =
       ParseDirSizes(input);
   if (!dir2size.ok()) return dir2size.status();
 
-  int total = (*dir2size)["/"];
-  int min_free = total - 40000000;
+  int total = (*dir2size)[""];
+  int min_free = total - (kDiskSize - kFreeSize);
   int best = std::numeric_limits<int>::max();
   for (const auto& [dname, size] : *dir2size) {
-    if (size > min_free && size < best) best = size;
+    if (size < min_free) continue;
+    best = std::min(size, best);
   }
   return IntReturn(best);
 }
