@@ -61,7 +61,7 @@ my $part2_txt =
         ->new()
         ->format(HTML::TreeBuilder->new->parse($part2_html));
 $part2_txt =~ s/\s+$//;
-$part2_txt =~ s{(^|\n) *}{$1// }g;
+$part2_txt =~ s{(^|\n)( )? *}{$1//$2}g;
 
 my $header_comment = "// $input_url\n//\n$part1_txt\n//\n$part2_txt\n\n";
 
