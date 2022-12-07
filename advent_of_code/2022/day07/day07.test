@@ -63,7 +63,7 @@ $ ls
 24933642
 ==
 
-# 15542173
+# 15542173 (Totally screwed up free space calculation)
 [part=2]
 @include{advent_of_code/2022/day07/input.txt}
 --

@@ -16,12 +16,8 @@ namespace advent_of_code {
 
 namespace {
 
-// Helper methods go here.
-
-}  // namespace
-
-absl::StatusOr<std::string> Day_2022_07::Part1(
-    absl::Span<absl::string_view> input) const {
+absl::StatusOr<absl::flat_hash_map<std::string, int>> ParseFileSizes(
+    absl::Span<absl::string_view> input) {
   std::string cur_dir = "/";
   absl::flat_hash_map<std::string, int> file2size;
   bool listing = false;
@@ -31,7 +27,8 @@ absl::StatusOr<std::string> Day_2022_07::Part1(
     int size;
     if (line == "$ ls") {
       listing = true;
-    } else if (RE2::FullMatch(line, "\\$ cd (.*)", &dname)) {
+    } else if (absl::StartsWith(line, "$ cd ")) {
+      dname = line.substr(5);
       listing = false;
       if (dname == "..") {
         size_t idx = cur_dir.rfind("/");
@@ -40,10 +37,16 @@ absl::StatusOr<std::string> Day_2022_07::Part1(
       } else if (dname == "/") {
         cur_dir = "/";
       } else {
+        if (dname.find(".") != std::string::npos) {
+          return Error("Unhandled subdir", dname);
+        }
+        if (dname.find("/") != std::string::npos) {
+          return Error("Unhandled subdir: ", dname);
+        }
         cur_dir.append("/");
         cur_dir.append(dname);
       }
-    } else if (RE2::FullMatch(line, "dir (.*)", &dname)) {
+    } else if (absl::StartsWith(line, "dir ")) {
       // ignore
     } else if (RE2::FullMatch(line, "(\\d+) (.*)", &size, &fname)) {
       if (!listing) return Error("Not listing");
@@ -55,6 +58,11 @@ absl::StatusOr<std::string> Day_2022_07::Part1(
       return Error("Bad line: ", line);
     }
   }
+  return file2size;
+}
+
+absl::flat_hash_map<std::string, int> FileSizes2DirSizes(
+    const absl::flat_hash_map<std::string, int>& file2size) {
   absl::flat_hash_map<std::string, int> dir2size;
   for (const auto& [fname, size] : file2size) {
     std::string_view dir = fname;
@@ -63,8 +71,27 @@ absl::StatusOr<std::string> Day_2022_07::Part1(
       dir2size[dir] += size;
     }
   }
+  return dir2size;
+}
+
+absl::StatusOr<absl::flat_hash_map<std::string, int>> ParseDirSizes(
+    absl::Span<absl::string_view> input) {
+  absl::StatusOr<absl::flat_hash_map<std::string, int>> file2size =
+      ParseFileSizes(input);
+  if (!file2size.ok()) return file2size.status();
+  return FileSizes2DirSizes(*file2size);
+}
+
+}  // namespace
+
+absl::StatusOr<std::string> Day_2022_07::Part1(
+    absl::Span<absl::string_view> input) const {
+  absl::StatusOr<absl::flat_hash_map<std::string, int>> dir2size =
+      ParseDirSizes(input);
+  if (!dir2size.ok()) return dir2size.status();
+  
   int small_size = 0;
-  for (const auto& [dname, size] : dir2size) {
+  for (const auto& [dname, size] : *dir2size) {
     if (size < 100000) small_size += size; 
   }
   return IntReturn(small_size);
@@ -72,51 +99,14 @@ absl::StatusOr<std::string> Day_2022_07::Part1(
 
 absl::StatusOr<std::string> Day_2022_07::Part2(
     absl::Span<absl::string_view> input) const {
-  std::string cur_dir = "/";
-  absl::flat_hash_map<std::string, int> file2size;
-  bool listing = false;
-  for (absl::string_view line : input) {
-    absl::string_view dname;
-    absl::string_view fname;
-    int size;
-    if (line == "$ ls") {
-      listing = true;
-    } else if (RE2::FullMatch(line, "\\$ cd (.*)", &dname)) {
-      listing = false;
-      if (dname == "..") {
-        size_t idx = cur_dir.rfind("/");
-        if (idx == std::string::npos) return Error("Can't cd ..");
-        cur_dir = cur_dir.substr(0, idx);
-      } else if (dname == "/") {
-        cur_dir = "/";
-      } else {
-        cur_dir.append("/");
-        cur_dir.append(dname);
-      }
-    } else if (RE2::FullMatch(line, "dir (.*)", &dname)) {
-      // ignore
-    } else if (RE2::FullMatch(line, "(\\d+) (.*)", &size, &fname)) {
-      if (!listing) return Error("Not listing");
-      std::string file = cur_dir;
-      file.append("/");
-      file.append(fname);
-      file2size[file] = size;
-    } else {
-      return Error("Bad line: ", line);
-    }
-  }
-  absl::flat_hash_map<std::string, int> dir2size;
-  for (const auto& [fname, size] : file2size) {
-    std::string_view dir = fname;
-    for (size_t idx = dir.rfind("/"); idx != std::string::npos; idx = dir.rfind("/")) {
-      dir = dir.substr(0, idx);
-      dir2size[dir] += size;
-    }
-  }
-  int total = dir2size["/"];
-  int min_free = 30000000 - (70000000 - total);
+  absl::StatusOr<absl::flat_hash_map<std::string, int>> dir2size =
+      ParseDirSizes(input);
+  if (!dir2size.ok()) return dir2size.status();
+
+  int total = (*dir2size)["/"];
+  int min_free = total - 40000000;
   int best = std::numeric_limits<int>::max();
-  for (const auto& [dname, size] : dir2size) {
+  for (const auto& [dname, size] : *dir2size) {
     if (size > min_free && size < best) best = size;
   }
   return IntReturn(best);
