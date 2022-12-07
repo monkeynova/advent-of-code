@@ -2,12 +2,12 @@
 
 #include "absl/debugging/failure_signal_handler.h"
 #include "absl/flags/flag.h"
+#include "absl/log/log.h"
 #include "absl/strings/str_split.h"
 #include "file_based_test_driver/base/file_util.h"
 #include "file_based_test_driver/file_based_test_driver.h"
 #include "file_based_test_driver/run_test_case_result.h"
 #include "file_based_test_driver/test_case_options.h"
-#include "absl/log/log.h"
 #include "gmock/gmock.h"
 #include "re2/re2.h"
 

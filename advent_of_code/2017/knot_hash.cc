@@ -1,8 +1,8 @@
 #include "advent_of_code/2017/knot_hash.h"
 
+#include "absl/log/log.h"
 #include "absl/strings/str_join.h"
 #include "absl/types/span.h"
-#include "absl/log/log.h"
 #include "advent_of_code/vlog.h"
 
 namespace advent_of_code {

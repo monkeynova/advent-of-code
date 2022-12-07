@@ -3,11 +3,11 @@
 
 #include <vector>
 
+#include "absl/log/log.h"
 #include "absl/status/status.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/str_join.h"
 #include "advent_of_code/point.h"
-#include "absl/log/log.h"
 
 namespace advent_of_code {
 

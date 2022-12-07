@@ -12,9 +12,9 @@ cc_library(
         "//advent_of_code/2019:int_code",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",
+        "@com_google_absl//absl/log",
         "@com_google_absl//absl/random",
         "@com_google_absl//absl/strings",
-        "@com_google_absl//absl/log",
     ],
 )
 

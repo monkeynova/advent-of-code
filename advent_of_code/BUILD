@@ -62,10 +62,10 @@ cc_library(
     hdrs = ["char_board.h"],
     deps = [
         ":point",
+        "@com_google_absl//absl/log",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
-        "@com_google_absl//absl/log",
     ],
 )
 
@@ -76,9 +76,9 @@ cc_library(
     deps = [
         ":char_board",
         ":point",
+        "@com_google_absl//absl/log",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
-        "@com_google_absl//absl/log",
     ],
 )
 
@@ -113,19 +113,19 @@ cc_library(
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/functional:function_ref",
+        "@com_google_absl//absl/log",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
-        "@com_google_absl//absl/log",
     ],
 )
 
 cc_library(
     name = "vlog",
-    hdrs = ["vlog.h"],
     srcs = ["vlog.cc"],
-    alwayslink = 1,
+    hdrs = ["vlog.h"],
     deps = [
         "@com_google_absl//absl/flags:flag",
     ],
+    alwayslink = 1,
 )

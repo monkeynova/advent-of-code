@@ -25,8 +25,8 @@ int main(int argc, char** argv) {
     for (int i = 0; argv[i] != nullptr; ++i) {
       consumable_argv.push_back(argv[i]);
     }
-    benchmark::Initialize(
-      &consumable_argc, const_cast<char**>(consumable_argv.data()));
+    benchmark::Initialize(&consumable_argc,
+                          const_cast<char**>(consumable_argv.data()));
   }
   std::vector<char*> args = absl::ParseCommandLine(argc, argv);
   CHECK_EQ(args.size(), 1) << absl::StrJoin(args, ",");

@@ -6,10 +6,10 @@
 #include <vector>
 
 #include "absl/container/flat_hash_set.h"
+#include "absl/log/log.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/numbers.h"
 #include "advent_of_code/advent_day.h"
-#include "absl/log/log.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {

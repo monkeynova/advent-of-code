@@ -9,9 +9,9 @@ cc_library(
     ],
     deps = [
         "//advent_of_code:vlog",
+        "@com_google_absl//absl/log",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/types:span",
-        "@com_google_absl//absl/log",
     ],
 )
 

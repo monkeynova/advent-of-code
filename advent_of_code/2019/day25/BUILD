@@ -9,8 +9,8 @@ cc_library(
         "//advent_of_code/2019:int_code",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",
-        "@com_google_absl//absl/strings",
         "@com_google_absl//absl/log",
+        "@com_google_absl//absl/strings",
         "@com_googlesource_code_re2//:re2",
     ],
 )
@@ -28,10 +28,10 @@ cc_binary(
         "@com_google_absl//absl/debugging:symbolize",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/flags:parse",
+        "@com_google_absl//absl/log",
         "@com_google_absl//absl/log:check",
         "@com_google_absl//absl/log:flags",
         "@com_google_absl//absl/log:initialize",
-        "@com_google_absl//absl/log",
         "@com_google_absl//absl/strings",
     ],
 )

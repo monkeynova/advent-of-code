@@ -3,9 +3,9 @@
 
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
+#include "absl/log/log.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/str_join.h"
-#include "absl/log/log.h"
 #include "advent_of_code/vlog.h"
 #include "re2/re2.h"
 

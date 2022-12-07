@@ -6,8 +6,8 @@
 
 #include "absl/functional/function_ref.h"
 #include "absl/log/check.h"
-#include "absl/types/optional.h"
 #include "absl/log/log.h"
+#include "absl/types/optional.h"
 
 namespace advent_of_code {
 

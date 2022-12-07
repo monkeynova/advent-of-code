@@ -1,9 +1,9 @@
 #include "advent_of_code/2019/int_code.h"
 
+#include "absl/log/log.h"
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
-#include "absl/log/log.h"
 #include "advent_of_code/vlog.h"
 
 namespace advent_of_code {
