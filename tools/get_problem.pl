@@ -54,10 +54,13 @@ my $part1_md =
     HTML::FormatMarkdown
         ->new()
         ->format(HTML::TreeBuilder->new->parse($part1_html));
+$part1_md =~ s/`\*(\d+)\*`/*`$1`*/g;
+
 my $part2_md =
     HTML::FormatMarkdown
         ->new()
         ->format(HTML::TreeBuilder->new->parse($part2_html));
+$part2_md =~ s/`\*(\d+)\*`/*`$1`*/g;
 
 open my $ofh, '>', $out_file or die "Can't write to $out_file: $!";
 print {$ofh} $part1_md;
