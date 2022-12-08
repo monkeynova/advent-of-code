@@ -55,13 +55,15 @@ my $part1_txt =
         ->format(HTML::TreeBuilder->new->parse($part1_html));
 $part1_txt =~ s/\s+$//;
 $part1_txt =~ s{(^|\n) *}{$1// }g;
+$part1_txt =~ s{\s+($|\n)}{$1}g;
 
 my $part2_txt =
     HTML::FormatText
         ->new()
         ->format(HTML::TreeBuilder->new->parse($part2_html));
 $part2_txt =~ s/\s+$//;
-$part2_txt =~ s{(^|\n)( )? *}{$1//$2}g;
+$part2_txt =~ s{(^|\n) *}{$1// }g;
+$part2_txt =~ s{\s+($|\n)}{$1}g;
 
 my $header_comment = "// $input_url\n//\n$part1_txt\n//\n$part2_txt\n\n";
 
@@ -71,6 +73,7 @@ print {$ofh} $header_comment;
 my $in_header = 1;
 while (<$ifh>) {
     next if $in_header && m{^//};
+    next if $in_header && m{^\s*$};
     $in_header = 0;
     print {$ofh} $_;
 }
