@@ -78,7 +78,7 @@ house anyway.
 In the example above, consider the middle `5` in the second row:
 
     30373
-    25*    5*    12
+    25**5**12
     65332
     33549
     35390
@@ -105,20 +105,20 @@ middle of the fourth row:
     30373
     25512
     65332
-    33*    5*    49
+    33**5**49
     35390
 
-  * Looking up, its view is blocked at `*2*` trees (by another tree
+  * Looking up, its view is blocked at `**2**` trees (by another tree
     with a height of `5`).
 
-  * Looking left, its view is not blocked; it can see `*2*` trees.
+  * Looking left, its view is not blocked; it can see `**2**` trees.
 
-  * Looking down, its view is also not blocked; it can see `*1*` tree.
+  * Looking down, its view is also not blocked; it can see `**1**` tree.
 
-  * Looking right, its view is blocked at `*2*` trees (by a massive
+  * Looking right, its view is blocked at `**2**` trees (by a massive
     tree of height `9`).
 
-This tree's scenic score is `*8*` (`2 * 2 * 1 * 2`); this is the ideal
+This tree's scenic score is `**8**` (`2 * 2 * 1 * 2`); this is the ideal
 spot for the tree house.
 
 Consider each tree on your map. *What is the highest scenic score
