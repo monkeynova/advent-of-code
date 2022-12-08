@@ -1,5 +1,3 @@
-// http://adventofcode.com/2022/day/09
-
 #include "advent_of_code/2022/day09/day09.h"
 
 #include "absl/algorithm/container.h"
