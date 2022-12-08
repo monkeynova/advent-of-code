@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use HTML::FormatText;
+use HTML::FormatMarkdown;
 use HTML::TreeBuilder;
 use HTTP::Cookies;
 use LWP::UserAgent;
@@ -18,7 +19,7 @@ die "Bad year: $year" unless $year =~ /^\d+$/ && $year >= 2015;
 die "Bad day: $day" unless $day =~ /^\d+$/ && $day > 0 && $day <= 25;
 
 my $input_url = sprintf("https://adventofcode.com/%4d/day/%d", $year, $day);
-my $out_file = sprintf("advent_of_code/%4d/day%02d/day%02d.cc", $year, $day, $day);
+my $out_file = sprintf("advent_of_code/%4d/day%02d/README.md", $year, $day, $day);
 
 print "Fetching $input_url into $out_file ...\n";
 my $cookies = HTTP::Cookies->new();
@@ -49,34 +50,17 @@ my ($part1_html, $part2_html) =
 $part1_html or die "Can't find Part1";
 $part2_html or die "Can't find Part2";
 
-my $part1_txt =
-    HTML::FormatText
+my $part1_md =
+    HTML::FormatMarkdown
         ->new()
         ->format(HTML::TreeBuilder->new->parse($part1_html));
-$part1_txt =~ s/\s+$//;
-$part1_txt =~ s{(^|\n) *}{$1// }g;
-$part1_txt =~ s{\s+($|\n)}{$1}g;
-
-my $part2_txt =
-    HTML::FormatText
+my $part2_md =
+    HTML::FormatMarkdown
         ->new()
         ->format(HTML::TreeBuilder->new->parse($part2_html));
-$part2_txt =~ s/\s+$//;
-$part2_txt =~ s{(^|\n) *}{$1// }g;
-$part2_txt =~ s{\s+($|\n)}{$1}g;
 
-my $header_comment = "// $input_url\n//\n$part1_txt\n//\n$part2_txt\n\n";
-
-open my $ifh, '<', $out_file or die "Can't read $out_file: $!";
-open my $ofh, '>', "$out_file.new.$$" or die "Can't write $out_file (tmp): $!";
-print {$ofh} $header_comment;
-my $in_header = 1;
-while (<$ifh>) {
-    next if $in_header && m{^//};
-    next if $in_header && m{^\s*$};
-    $in_header = 0;
-    print {$ofh} $_;
-}
-close $ofh or die "Can't close $out_file (tmp): $!";
-close $ifh or die "Can't close $out_file: $!";
-rename "$out_file.new.$$", $out_file or die "Can't rename $out_file: $!";
+open my $ofh, '>', $out_file or die "Can't write to $out_file: $!";
+print {$ofh} $part1_md;
+print {$ofh} "\n";
+print {$ofh} $part2_md;
+close $ofh or die "Error writing to $out_file: $!";
