@@ -54,7 +54,7 @@ example, that only leaves the *interior nine trees* to consider:
     are not.
 
 With 16 trees visible on the edge and another 5 visible in the
-interior, a total of `*21*` trees are visible in this arrangement.
+interior, a total of *`21`* trees are visible in this arrangement.
 
 Consider your map; *how many trees are visible from outside the grid?*
 
@@ -77,48 +77,52 @@ house anyway.
 
 In the example above, consider the middle `5` in the second row:
 
+<pre>
     30373
-    25*    5*    12
+    25<b>5</b>12
     65332
     33549
     35390
+</pre>
 
-  * Looking up, its view is not blocked; it can see `*1*` tree (of
+  * Looking up, its view is not blocked; it can see *`1`* tree (of
     height `3`).
 
-  * Looking left, its view is blocked immediately; it can see only `*1*`
+  * Looking left, its view is blocked immediately; it can see only *`1`*
     tree (of height `5`, right next to it).
 
-  * Looking right, its view is not blocked; it can see `*2*` trees.
+  * Looking right, its view is not blocked; it can see *`2`* trees.
 
-  * Looking down, its view is blocked eventually; it can see `*2*`
+  * Looking down, its view is blocked eventually; it can see *`2`*
     trees (one of height `3`, then the tree of height `5` that blocks
     its view).
 
 A tree's *scenic score* is found by *multiplying together* its viewing
-distance in each of the four directions. For this tree, this is `*4*`
+distance in each of the four directions. For this tree, this is *`4`*
 (found by multiplying `1 * 1 * 2 * 2`).
 
 However, you can do even better: consider the tree of height `5` in the
 middle of the fourth row:
 
+<pre>
     30373
     25512
     65332
-    33*    5*    49
+    33<b>5</b>49
     35390
+</pre>
 
-  * Looking up, its view is blocked at `*2*` trees (by another tree
+  * Looking up, its view is blocked at *`2`* trees (by another tree
     with a height of `5`).
 
-  * Looking left, its view is not blocked; it can see `*2*` trees.
+  * Looking left, its view is not blocked; it can see *`2`* trees.
 
-  * Looking down, its view is also not blocked; it can see `*1*` tree.
+  * Looking down, its view is also not blocked; it can see *`1`* tree.
 
-  * Looking right, its view is blocked at `*2*` trees (by a massive
+  * Looking right, its view is blocked at *`2`* trees (by a massive
     tree of height `9`).
 
-This tree's scenic score is `*8*` (`2 * 2 * 1 * 2`); this is the ideal
+This tree's scenic score is *`8`* (`2 * 2 * 1 * 2`); this is the ideal
 spot for the tree house.
 
 Consider each tree on your map. *What is the highest scenic score
