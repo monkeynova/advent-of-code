@@ -1,3 +1,5 @@
+#include "advent_of_code/2015/day01/day01.h"
+
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
 #include "absl/log/log.h"
