@@ -14,15 +14,9 @@
 
 namespace advent_of_code {
 
-namespace {
-
-// Helper methods go here.
-
-}  // namespace
-
 absl::StatusOr<std::string> Day_2022_08::Part1(
     absl::Span<absl::string_view> input) const {
-  auto board = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> board = ParseAsBoard(input);
   if (!board.ok()) return board.status();
 
   int count = 0;
@@ -48,7 +42,7 @@ absl::StatusOr<std::string> Day_2022_08::Part1(
 
 absl::StatusOr<std::string> Day_2022_08::Part2(
     absl::Span<absl::string_view> input) const {
-  auto board = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> board = ParseAsBoard(input);
   if (!board.ok()) return board.status();
 
   int best_score = 0;
