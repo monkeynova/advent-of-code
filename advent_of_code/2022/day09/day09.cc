@@ -16,19 +16,20 @@ namespace {
 
 Point DragPoint(Point head, Point tail) {
   static absl::flat_hash_map<Point, Point> dragdir = {
-    {Point{2, 0}, Point{1, 0}},
-    {Point{-2, 0}, Point{-1, 0}},
-    {Point{0, 2}, Point{0, 1}},
-    {Point{0, -2}, Point{0, -1}},
-
-    {Point{2, 1}, Point{1, 1}},
-    {Point{1, 2}, Point{1, 1}},
-    {Point{2, -1}, Point{1, -1}},
-    {Point{1, -2}, Point{1, -1}},
-    {Point{-2, 1}, Point{-1, 1}},
-    {Point{-1, 2}, Point{-1, 1}},
-    {Point{-2, -1}, Point{-1, -1}},
-    {Point{-1, -2}, Point{-1, -1}},
+      // Distance 2.
+      {Point{2, 0}, Point{1, 0}},
+      {Point{-2, 0}, Point{-1, 0}},
+      {Point{0, 2}, Point{0, 1}},
+      {Point{0, -2}, Point{0, -1}},
+      // Distance sqrt(5).
+      {Point{2, 1}, Point{1, 1}},
+      {Point{1, 2}, Point{1, 1}},
+      {Point{2, -1}, Point{1, -1}},
+      {Point{1, -2}, Point{1, -1}},
+      {Point{-2, 1}, Point{-1, 1}},
+      {Point{-1, 2}, Point{-1, 1}},
+      {Point{-2, -1}, Point{-1, -1}},
+      {Point{-1, -2}, Point{-1, -1}},
   };
   auto it = dragdir.find(head - tail);
   if (it == dragdir.end()) {
@@ -38,13 +39,17 @@ Point DragPoint(Point head, Point tail) {
   return tail + it->second;
 }
 
-absl::StatusOr<int> DragRope(
-    absl::Span<absl::string_view> input, int ropesize) {
+absl::StatusOr<int> DragRope(absl::Span<absl::string_view> input,
+                             int ropesize) {
   std::vector<Point> rope(ropesize, Point{0, 0});
   absl::flat_hash_set<Point> tail_seen = {rope.back()};
   static absl::flat_hash_map<char, Point> char2dir = {
-    {'U', Cardinal::kNorth}, {'D', Cardinal::kSouth}, {'L', Cardinal::kWest},
-    {'R', Cardinal::kEast},
+      // Up or down.
+      {'U', Cardinal::kNorth},
+      {'D', Cardinal::kSouth},
+      // Left or right.
+      {'L', Cardinal::kWest},
+      {'R', Cardinal::kEast},
   };
   for (absl::string_view line : input) {
     char dir_char;
