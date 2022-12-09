@@ -14,35 +14,19 @@ namespace advent_of_code {
 
 namespace {
 
+int Norm2(Point p) { return p.x * p.x + p.y * p.y; }
+
+int Sign(int x) { return x > 0 ? 1 : x < 0 ? -1 : 0; }
+Point Sign(Point p) { return {Sign(p.x), Sign(p.y)}; }
+
 Point DragPoint(Point head, Point tail) {
-  static absl::flat_hash_map<Point, Point> dragdir = {
-      // Distance 2.
-      {Point{2, 0}, Point{1, 0}},
-      {Point{-2, 0}, Point{-1, 0}},
-      {Point{0, 2}, Point{0, 1}},
-      {Point{0, -2}, Point{0, -1}},
-      // Distance sqrt(5).
-      {Point{2, 1}, Point{1, 1}},
-      {Point{1, 2}, Point{1, 1}},
-      {Point{2, -1}, Point{1, -1}},
-      {Point{1, -2}, Point{1, -1}},
-      {Point{-2, 1}, Point{-1, 1}},
-      {Point{-1, 2}, Point{-1, 1}},
-      {Point{-2, -1}, Point{-1, -1}},
-      {Point{-1, -2}, Point{-1, -1}},
-  };
-  auto it = dragdir.find(head - tail);
-  if (it == dragdir.end()) {
-    CHECK(d.dist() < 2);
-    return tail;
-  }
-  return tail + it->second;
+  Point delta = head - tail;
+  if (Norm2(delta) < 4) return tail;
+  return tail + Sign(delta);
 }
 
 absl::StatusOr<int> DragRope(absl::Span<absl::string_view> input,
-                             int ropesize) {
-  std::vector<Point> rope(ropesize, Point{0, 0});
-  absl::flat_hash_set<Point> tail_seen = {rope.back()};
+                             int rope_len) {
   static absl::flat_hash_map<char, Point> char2dir = {
       // Up or down.
       {'U', Cardinal::kNorth},
@@ -51,10 +35,14 @@ absl::StatusOr<int> DragRope(absl::Span<absl::string_view> input,
       {'L', Cardinal::kWest},
       {'R', Cardinal::kEast},
   };
+
+  std::vector<Point> rope(rope_len, Point{0, 0});
+  absl::flat_hash_set<Point> tail_seen = {rope.back()};
   for (absl::string_view line : input) {
     char dir_char;
     int dist;
-    if (!RE2::FullMatch(line, "([RULD]) (\\d+)", &dir_char, &dist)) {
+    static LazyRE2 parse_re = {"([RULD]) (\\d+)"};
+    if (!RE2::FullMatch(line, *parse_re, &dir_char, &dist)) {
       return Error("Bad line: ", line);
     }
     CHECK(char2dir.contains(dir_char));
@@ -75,12 +63,12 @@ absl::StatusOr<int> DragRope(absl::Span<absl::string_view> input,
 
 absl::StatusOr<std::string> Day_2022_09::Part1(
     absl::Span<absl::string_view> input) const {
-  return IntReturn(DragRope(input, 2));
+  return IntReturn(DragRope(input, /*rope_len=*/2));
 }
 
 absl::StatusOr<std::string> Day_2022_09::Part2(
     absl::Span<absl::string_view> input) const {
-  return IntReturn(DragRope(input, 10));
+  return IntReturn(DragRope(input, /*rope_len=*/10));
 }
 
 }  // namespace advent_of_code
