@@ -14,6 +14,8 @@
 17940
 ==
 
+# We include the arbitrary output of OCR here ('R') in spite of it not being
+# meaningful.
 [part=2]
 @include{advent_of_code/2022/day10/example.txt}
 --
