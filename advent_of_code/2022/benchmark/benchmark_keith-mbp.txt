@@ -1,20 +1,20 @@
 Loading: 
 Loading: 0 packages loaded
-Analyzing: target //advent_of_code/2022:benchmark (0 packages loaded, 0 targets configured)
-INFO: Analyzed target //advent_of_code/2022:benchmark (0 packages loaded, 0 targets configured).
+Analyzing: target //advent_of_code/2022:benchmark (1 packages loaded, 0 targets configured)
+INFO: Analyzed target //advent_of_code/2022:benchmark (1 packages loaded, 7 targets configured).
 INFO: Found 1 target...
-[0 / 1] [Prepa] BazelWorkspaceStatusAction stable-status.txt
+[0 / 3] [Prepa] BazelWorkspaceStatusAction stable-status.txt
 Target //advent_of_code/2022:benchmark up-to-date:
   bazel-bin/advent_of_code/2022/benchmark
-INFO: Elapsed time: 0.208s, Critical Path: 0.00s
-INFO: 1 process: 1 internal.
-INFO: Build completed successfully, 1 total action
-INFO: Running command line: external/bazel_tools/tools/test/test-setup.sh advent_of_code/2022/benchmark '--benchmark_out=/Users/keith/github/advent-of-code/advent_of_code/2022/benchmark/benchmark_keith-mbp.json' --benchmark '--run_long_tests=1m' '--advent_day_run_audit=false'
-INFO: Build completed successfully, 1 total action
+INFO: Elapsed time: 0.694s, Critical Path: 0.36s
+INFO: 5 processes: 4 internal, 1 darwin-sandbox.
+INFO: Build completed successfully, 5 total actions
+INFO: Running command line: external/bazel_tools/tools/test/test-setup.sh advent_of_code/2022/benchmark '--benchmark_flags=--benchmark_out=/Users/keith/github/advent-of-code/advent_of_code/2022/benchmark/benchmark_keith-mbp.json' --benchmark '--run_long_tests=1m' '--advent_day_run_audit=false'
+INFO: Build completed successfully, 5 total actions
 exec ${PAGER:-/usr/bin/less} "$0" || exit 1
 Executing tests from //advent_of_code/2022:benchmark
 -----------------------------------------------------------------------------
-2022-11-25T23:21:14+00:00
+2022-12-10T20:48:53+00:00
 Running /private/var/tmp/_bazel_keith/0ef773739f82bcf7ecc8ec8d4e65e080/execroot/com_monkeynova_advent_of_code/bazel-out/darwin-opt/bin/advent_of_code/2022/benchmark.runfiles/com_monkeynova_advent_of_code/advent_of_code/2022/benchmark
 Run on (8 X 2300 MHz CPU s)
 CPU Caches:
@@ -22,12 +22,62 @@ CPU Caches:
   L1 Instruction 32 KiB
   L2 Unified 256 KiB (x4)
   L3 Unified 6144 KiB
-Load Average: 2.60, 2.77, 2.80
+Load Average: 2.28, 2.19, 2.30
 ----------------------------------------------------------------
 Benchmark                      Time             CPU   Iterations
 ----------------------------------------------------------------
 BM_Day<Day_2022_01>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
-BM_Day<Day_2022_01>/1 ERROR OCCURRED: 'UNIMPLEMENTED: Problem not known'
-BM_Day<Day_2022_01>/2      0.000 ns        0.000 ns   1000000000 Part: 1; *** SKIPPED (empty test) ****
-BM_Day<Day_2022_01>/3 ERROR OCCURRED: 'UNIMPLEMENTED: Problem not known'
-BM_Day<Day_2022_01>/4      0.000 ns        0.000 ns   1000000000 Part: 2; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_01>/1        160 ns          159 ns      4391000 Part: 1
+BM_Day<Day_2022_01>/2      30228 ns        30105 ns        23825 Part: 1
+BM_Day<Day_2022_01>/3        749 ns          748 ns       948278 Part: 2
+BM_Day<Day_2022_01>/4      31822 ns        31808 ns        21181 Part: 2
+BM_Day<Day_2022_02>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_02>/1       1754 ns         1751 ns       412366 Part: 1
+BM_Day<Day_2022_02>/2      51101 ns        50971 ns        13874 Part: 1
+BM_Day<Day_2022_02>/3       1748 ns         1739 ns       394782 Part: 2
+BM_Day<Day_2022_02>/4      51684 ns        51505 ns        13772 Part: 2
+BM_Day<Day_2022_03>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_03>/1       3225 ns         3215 ns       222468 Part: 1
+BM_Day<Day_2022_03>/2     214827 ns       213915 ns         3417 Part: 1
+BM_Day<Day_2022_03>/3       2190 ns         2179 ns       327314 Part: 2
+BM_Day<Day_2022_03>/4     164422 ns       163753 ns         4245 Part: 2
+BM_Day<Day_2022_04>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_04>/1     162134 ns       152746 ns         5113 Part: 1
+BM_Day<Day_2022_04>/2   23377386 ns     23266034 ns           29 Part: 1
+BM_Day<Day_2022_04>/3     136989 ns       136328 ns         5002 Part: 2
+BM_Day<Day_2022_04>/4   21154429 ns     21149344 ns           32 Part: 2
+BM_Day<Day_2022_05>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_05>/1      96427 ns        96391 ns         7080 Part: 1
+BM_Day<Day_2022_05>/2   13296034 ns     12868803 ns           61 Part: 1
+BM_Day<Day_2022_05>/3      96579 ns        96541 ns         6851 Part: 2
+BM_Day<Day_2022_05>/4   11939191 ns     11923339 ns           59 Part: 2
+BM_Day<Day_2022_06>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_06>/1        696 ns          692 ns       989245 Part: 1
+BM_Day<Day_2022_06>/2     205672 ns       204658 ns         3399 Part: 1
+BM_Day<Day_2022_06>/3       1680 ns         1675 ns       392661 Part: 2
+BM_Day<Day_2022_06>/4     952818 ns       945021 ns          747 Part: 2
+BM_Day<Day_2022_07>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_07>/1     225648 ns       223965 ns         3301 Part: 1
+BM_Day<Day_2022_07>/2    6776526 ns      6728173 ns          104 Part: 1
+BM_Day<Day_2022_07>/3     228787 ns       227873 ns         3150 Part: 2
+BM_Day<Day_2022_07>/4    6225710 ns      6220231 ns          117 Part: 2
+BM_Day<Day_2022_08>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_08>/1       1239 ns         1230 ns       554122 Part: 1
+BM_Day<Day_2022_08>/2    1243275 ns      1233368 ns          585 Part: 1
+BM_Day<Day_2022_08>/3       2142 ns         2130 ns       321331 Part: 2
+BM_Day<Day_2022_08>/4    1547296 ns      1534335 ns          463 Part: 2
+BM_Day<Day_2022_09>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_09>/1       3079 ns         3041 ns       218494 Part: 1
+BM_Day<Day_2022_09>/2    1388898 ns       971473 ns          694 Part: 1
+BM_Day<Day_2022_09>/3      10123 ns         9935 ns        76222 Part: 2
+BM_Day<Day_2022_09>/4    1407169 ns      1315335 ns          547 Part: 2
+BM_Day<Day_2022_10>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_10>/1      21577 ns        17214 ns        36264 Part: 1
+BM_Day<Day_2022_10>/2      25101 ns        18842 ns        38701 Part: 1
+BM_Day<Day_2022_10>/3    5920697 ns      5837333 ns          111 Part: 2
+BM_Day<Day_2022_10>/4   48207160 ns     47518813 ns           16 Part: 2
+BM_Day<Day_2022_11>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_11>/1 ERROR OCCURRED: 'UNIMPLEMENTED: Problem not known'
+BM_Day<Day_2022_11>/2      0.000 ns        0.000 ns   1000000000 Part: 1; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_11>/3 ERROR OCCURRED: 'UNIMPLEMENTED: Problem not known'
+BM_Day<Day_2022_11>/4      0.000 ns        0.000 ns   1000000000 Part: 2; *** SKIPPED (empty test) ****
