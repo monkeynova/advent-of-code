@@ -21,6 +21,7 @@ cc_library(
     testonly = 1,
     data = [
         "day10.test",
+        "example.txt",
         "input.txt",
     ],
     deps = [
