@@ -242,12 +242,12 @@ double Score(const CharBoard& test, const CharBoard& exemplar) {
 absl::StatusOr<char> OCRChar(
     const CharBoard& board,
     const std::vector<std::pair<char, CharBoard>>& exemplars) {
-  VLOG(1) << board.AsString();
+  VLOG(3) << board.AsString();
   char best_c;
   double best_score = -1;
   for (const auto& [e_char, e_board] : exemplars) {
     double score = Score(board, e_board);
-    VLOG(1) << absl::string_view(&e_char, 1) << " -> " << score;
+    VLOG(3) << absl::string_view(&e_char, 1) << " -> " << score;
     if (score > best_score) {
       best_score = score;
       best_c = e_char;
