@@ -1,7 +1,44 @@
 #include "advent_of_code/ocr.h"
 
 #include "absl/algorithm/container.h"
+#include "absl/flags/flag.h"
+#include "absl/log/check.h"
+#include "absl/log/log.h"
+#include "absl/strings/str_cat.h"
 #include "advent_of_code/vlog.h"
+
+enum OCRMode {
+  kInput = 1,
+  kOutput = 2,
+  kBoth = 3,
+};
+
+bool AbslParseFlag(absl::string_view str, OCRMode* ocr_mode, std::string* error) {
+  if (str == "input") *ocr_mode = kInput;
+  else if (str == "output") *ocr_mode = kOutput;
+  else if (str == "both") *ocr_mode = kBoth;
+  else {
+    *error = absl::StrCat("Bad OCRMode: ", str);
+    return false;
+  }
+  return true;
+}
+
+std::string AbslUnparseFlag(OCRMode ocr_mode) {
+  switch (ocr_mode) {
+    case kInput: return "input";
+    case kOutput: return "output";
+    case kBoth: return "both";
+  }
+  DLOG(FATAL) << "Bad ocr_mode: " << static_cast<int>(ocr_mode);
+  return "";
+}
+
+ABSL_FLAG(OCRMode, ocr_mode, kBoth,
+          "What mode to use when outputting the results of OCR actions. Valid "
+          "values are `input` (return the raw char_board), `output` (return "
+          "just the result of OCR) and `both` (return both separated by an "
+          "empty line.");
 
 namespace advent_of_code {
 
@@ -259,7 +296,10 @@ absl::StatusOr<char> OCRChar(
 }  // namespace
 
 absl::StatusOr<std::string> OCRExtract(const CharBoard& board) {
-  std::vector<std::pair<char, CharBoard>> exemplars = Exemplars();
+  static std::vector<std::pair<char, CharBoard>> exemplars = Exemplars();
+  if (absl::GetFlag(FLAGS_ocr_mode) == kInput) {
+    return board.AsString();
+  }
 
   std::string ret;
   for (int char_start = 0, char_end; char_start < board.width();
@@ -273,6 +313,10 @@ absl::StatusOr<std::string> OCRExtract(const CharBoard& board) {
 
     ret.append(1, *next_char);
   }
+  if (absl::GetFlag(FLAGS_ocr_mode) == kOutput) {
+    return ret;
+  }
+  CHECK_EQ(absl::GetFlag(FLAGS_ocr_mode), kBoth);
   return absl::StrCat(board.AsString(), "\n", ret);
 }
 

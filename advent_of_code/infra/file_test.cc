@@ -1,7 +1,9 @@
 #include "advent_of_code/infra/file_test.h"
 
 #include "absl/debugging/failure_signal_handler.h"
+#include "absl/flags/commandlineflag.h"
 #include "absl/flags/flag.h"
+#include "absl/flags/reflection.h"
 #include "absl/functional/bind_front.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
@@ -22,6 +24,8 @@ constexpr absl::Duration kMinAllowedTestTime = absl::Seconds(15);
 void RunTestCase(const AdventDay* advent_day,
                  absl::string_view test_case_with_options,
                  file_based_test_driver::RunTestCaseResult* test_result) {
+  std::unique_ptr<absl::FlagSaver> flag_saver;
+
   file_based_test_driver::TestCaseOptions options;
   SetupTestCaseOptions(&options);
 
@@ -40,6 +44,29 @@ void RunTestCase(const AdventDay* advent_day,
   if (options.GetBool(kIgnoreOption)) {
     test_result->set_ignore_test_output(true);
     return;
+  }
+
+  if (std::string flag_opt = options.GetString(kFlagOption);
+      !flag_opt.empty()) {
+    flag_saver = absl::make_unique<absl::FlagSaver>();
+    for (absl::string_view key_value : absl::StrSplit(flag_opt, ",")) {
+      const auto& [key, value] =
+          std::pair<absl::string_view, absl::string_view>(
+              absl::StrSplit(key_value, absl::MaxSplits("=", 2)));
+      absl::CommandLineFlag* flag = absl::FindCommandLineFlag(key);
+      if (!flag) {
+        test_result->AddTestOutput(absl::StrCat(
+          "ERROR: Could not find flag '", key, "'"));
+        return;
+      }
+      std::string error;
+      if (!flag->ParseFrom(value, &error)) {
+        test_result->AddTestOutput(absl::StrCat(
+          "ERROR: Could not set flag '", key, "' to value: '", value, "': ",
+          error));
+        return;
+      }
+    }
   }
 
   absl::StatusOr<absl::Duration> test_allowed_duration = kMinAllowedTestTime;
