@@ -115,6 +115,7 @@ struct PointRectangle {
     bool operator!=(const iterator& o) const { return !operator==(o); }
 
     Point operator*() const { return cur; }
+    const Point* operator->() const { return &cur; }
   };
 
   Point min;

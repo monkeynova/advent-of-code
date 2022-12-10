@@ -51,13 +51,15 @@ absl::StatusOr<std::string> Day_2022_10::Part1(
 absl::StatusOr<std::string> Day_2022_10::Part2(
     absl::Span<absl::string_view> input) const {
   CharBoard board(40, 6);
+  PointRectangle board_rect = board.range();
+  auto pos_it = board_rect.begin();
   int sprite = 1;
-  int step = -1;
   auto on_step = [&]() {
-    ++step;
-    Point p{step % 40, step / 40};
-    if (abs(sprite - p.x) <= 1) board[p] = '#';
+    if (pos_it == board_rect.end()) return;
+    if (abs(sprite - pos_it->x) <= 1) board[*pos_it] = '#';
+    ++pos_it;
   };
+
   on_step();
   for (absl::string_view line : input) {
     if (line == "noop") {
@@ -68,6 +70,7 @@ absl::StatusOr<std::string> Day_2022_10::Part2(
       on_step();
     }
   }
+
   return OCRExtract(board);
 }
 
