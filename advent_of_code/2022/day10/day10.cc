@@ -17,7 +17,7 @@ namespace advent_of_code {
 
 namespace {
 
-// Helper methods go here.
+static LazyRE2 addx_re = {"addx (-?\\d+)"};
 
 }  // namespace
 
@@ -28,56 +28,44 @@ absl::StatusOr<std::string> Day_2022_10::Part1(
   std::vector<int>::iterator it = at.begin();
   int signal_strength = 0;
   int step = 0;
-  for (absl::string_view line : input) {
-    int start_x = x;
-    int add;
-    if (line == "noop") {
-      ++step;
-    } else if (RE2::FullMatch(line, "addx (-?\\d+)", &add)) {
-      x += add;
-      step += 2;
+  auto on_step = [&]() -> bool {
+    ++step;
+    if (step == *it) {
+      signal_strength += x * step;
+      if (++it == at.end()) return true;
     }
-    if (step >= *it) {
-      int delta;
-      if (true || step > *it) {
-        delta = *it * start_x;
-      } else {
-        delta = *it * x;
-      }
-      VLOG(1) << x;
-      VLOG(1) << start_x;
-      VLOG(1) << *it << ": " << delta;
-      signal_strength += delta;
-      ++it;
-      if (it == at.end()) return IntReturn(signal_strength);
+    return false;
+  };
+  for (absl::string_view line : input) {
+    if (line == "noop") {
+      if (on_step()) return IntReturn(signal_strength);
+    } else if (int add; RE2::FullMatch(line, *addx_re, &add)) {
+      if (on_step()) return IntReturn(signal_strength);
+      if (on_step()) return IntReturn(signal_strength);
+      x += add;
     }
   }
-  return absl::InternalError("Infinte loop");
+  return absl::InternalError("Left infinte loop");
 }
 
 absl::StatusOr<std::string> Day_2022_10::Part2(
     absl::Span<absl::string_view> input) const {
   CharBoard board(40, 6);
   int sprite = 1;
-  int signal_strength = 0;
-  int step = 0;
-  board[{0,0}] = '#';
+  int step = -1;
+  auto on_step = [&]() {
+    ++step;
+    Point p{step % 40, step / 40};
+    if (abs(sprite - p.x) <= 1) board[p] = '#';
+  };
+  on_step();
   for (absl::string_view line : input) {
-    int start_sprite = sprite;
-
-    int add;
     if (line == "noop") {
-      ++step;
-      Point p{step % 40, step / 40};
-      if (abs(sprite - p.x) <= 1) board[p] = '#';
-    } else if (RE2::FullMatch(line, "addx (-?\\d+)", &add)) {
-      ++step;
-      Point p{step % 40, step / 40};
-      if (abs(sprite - p.x) <= 1) board[p] = '#';
-      ++step;
-      p = {step % 40, step / 40};
+      on_step();
+    } else if (int add; RE2::FullMatch(line, *addx_re, &add)) {
+      on_step();
       sprite += add;
-      if (abs(sprite - p.x) <= 1) board[p] = '#';
+      on_step();
     }
   }
   return OCRExtract(board);
