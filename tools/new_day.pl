@@ -48,7 +48,7 @@ cc_test(
     tags = ["benchmark"],
     deps = [
         "//advent_of_code/${year}/day${day}:day${day}_benchmark_lib",
-        "\@com_monkeynova_gunit_main//:test_main",
+        "//advent_of_code/infra:gunit_main",
     ],
 )
 EOF
@@ -59,11 +59,11 @@ EOF
   $build_contents =~ s{
     (cc_test\([^\)]+
      name\s*=\s*"benchmark"[^\)]+)
-    ("\@com_monkeynova_gunit_main//:test_main",[^\)]+\))
+    ("//advent_of_code/infra:gunit_main",[^\)]+\))
   }{$1
     "//advent_of_code/${year}/day${day}:day${day}_benchmark_lib",
     $2
-  }x;
+  }x or die "Could not add benchmark to the year target";
 }
 open my $fh, '>', $year_build_fname
   or die "Can't write ${year_build_fname}: $!";
