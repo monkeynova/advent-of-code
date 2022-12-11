@@ -39,8 +39,7 @@ struct Monkey {
   }
 
   int NextMonkey(const Item& i) const {
-    if (i.worry % div_test == 0) return true_monkey;
-    return false_monkey;
+    return i.worry % div_test == 0 ? true_monkey : false_monkey;
   }
 
   void UpdateWorry(Item& i) const {
@@ -49,7 +48,6 @@ struct Monkey {
     else if (op == Monkey::kTimesOld) i.worry *= i.worry;
     else LOG(FATAL) << "Bad op";
   }
-
 };
 
 absl::StatusOr<std::vector<Monkey>> ParseMonkeys(
@@ -70,6 +68,7 @@ absl::StatusOr<std::vector<Monkey>> ParseMonkeys(
       if (monkeys.size() != i) return Error("Bad monkey order");
       monkeys.push_back({});
       cur_monkey = &monkeys[i];
+
     } else if (RE2::FullMatch(line, "  Starting items: ([\\d, ]+)", &str)) {
       if (cur_monkey == nullptr) return Error("No monkey");
       for (absl::string_view item : absl::StrSplit(str, ",")) {
@@ -79,26 +78,33 @@ absl::StatusOr<std::vector<Monkey>> ParseMonkeys(
         }
         cur_monkey->items.push_back({.worry = i});
       }
+
     } else if (RE2::FullMatch(line, "  Operation: new = old \\+ (\\d+)", &i)) {
       if (cur_monkey == nullptr) return Error("No monkey");
       cur_monkey->op = Monkey::kPlus;
       cur_monkey->op_val = i;
+
     } else if (RE2::FullMatch(line, "  Operation: new = old \\* old")) {
       if (cur_monkey == nullptr) return Error("No monkey");
       cur_monkey->op = Monkey::kTimesOld;
+
     } else if (RE2::FullMatch(line, "  Operation: new = old \\* (\\d+)", &i)) {
       if (cur_monkey == nullptr) return Error("No monkey");
       cur_monkey->op = Monkey::kTimes;
       cur_monkey->op_val = i;
+
     } else if (RE2::FullMatch(line, "  Test: divisible by (\\d+)", &i)) {
       if (cur_monkey == nullptr) return Error("No monkey");
       cur_monkey->div_test = i;
+
     } else if (RE2::FullMatch(line, "    If true: throw to monkey (\\d+)", &i)) {
       if (cur_monkey == nullptr) return Error("No monkey");
       cur_monkey->true_monkey = i;
+
     } else if (RE2::FullMatch(line, "    If false: throw to monkey (\\d+)", &i)) {
       if (cur_monkey == nullptr) return Error("No monkey");
       cur_monkey->false_monkey = i;
+
     } else {
       return Error("Bad line: ", line);
     }
@@ -107,12 +113,19 @@ absl::StatusOr<std::vector<Monkey>> ParseMonkeys(
 }
 
 int64_t ScoreMonkeys(const std::vector<Monkey>& monkeys) {
-  std::vector<int64_t> inspections;
-  inspections.reserve(monkeys.size());
-  for (const Monkey& m : monkeys) inspections.push_back(m.inspections);
-  absl::c_sort(inspections);
-  absl::c_reverse(inspections);
-  return inspections[0] * inspections[1];
+  // We only need the top two. Don't bother with a full sort, or a priority
+  // heap when a very simple, unrolled insertion sort will do just fine.
+  // H/T to @cshabsin for this trick.
+  int64_t top2[2] = {0, 0};
+  for (const Monkey& m : monkeys) {
+    if (m.inspections > top2[0]) {
+      top2[1] = top2[0];
+      top2[0] = m.inspections; 
+    } else if (m.inspections > top2[1]) {
+      top2[1] = m.inspections; 
+    }
+  }
+  return top2[0] * top2[1];
 }
 
 }  // namespace
@@ -145,7 +158,7 @@ absl::StatusOr<std::string> Day_2022_11::Part2(
   for (const Monkey& m : *monkeys) full_mod *= m.div_test;
   VLOG(1) << "full_mod = " << full_mod;
 
-  for (int64_t round = 0; round < 10000; ++round) {
+  for (int64_t round = 0; round < 10'000; ++round) {
     for (Monkey& m : *monkeys) {
       for (Monkey::Item& i : m.items) {
         m.UpdateWorry(i);
