@@ -13,11 +13,15 @@ enum OCRMode {
   kBoth = 3,
 };
 
-bool AbslParseFlag(absl::string_view str, OCRMode* ocr_mode, std::string* error) {
-  if (str == "input") *ocr_mode = kInput;
-  else if (str == "output") *ocr_mode = kOutput;
-  else if (str == "both") *ocr_mode = kBoth;
-  else {
+bool AbslParseFlag(absl::string_view str, OCRMode* ocr_mode,
+                   std::string* error) {
+  if (str == "input") {
+    *ocr_mode = kInput;
+  } else if (str == "output") {
+    *ocr_mode = kOutput;
+  } else if (str == "both") {
+    *ocr_mode = kBoth;
+  } else {
     *error = absl::StrCat("Bad OCRMode: ", str);
     return false;
   }
@@ -26,9 +30,12 @@ bool AbslParseFlag(absl::string_view str, OCRMode* ocr_mode, std::string* error)
 
 std::string AbslUnparseFlag(OCRMode ocr_mode) {
   switch (ocr_mode) {
-    case kInput: return "input";
-    case kOutput: return "output";
-    case kBoth: return "both";
+    case kInput:
+      return "input";
+    case kOutput:
+      return "output";
+    case kBoth:
+      return "both";
   }
   DLOG(FATAL) << "Bad ocr_mode: " << static_cast<int>(ocr_mode);
   return "";

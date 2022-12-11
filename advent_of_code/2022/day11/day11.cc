@@ -43,10 +43,15 @@ struct Monkey {
   }
 
   void UpdateWorry(Item& i) const {
-    if (op == Monkey::kPlus) i.worry += op_val;
-    else if (op == Monkey::kTimes) i.worry *= op_val;
-    else if (op == Monkey::kTimesOld) i.worry *= i.worry;
-    else LOG(FATAL) << "Bad op";
+    if (op == Monkey::kPlus) {
+      i.worry += op_val;
+    } else if (op == Monkey::kTimes) {
+      i.worry *= op_val;
+    } else if (op == Monkey::kTimesOld) {
+      i.worry *= i.worry;
+    } else {
+      LOG(FATAL) << "Bad op";
+    }
   }
 };
 
@@ -97,11 +102,13 @@ absl::StatusOr<std::vector<Monkey>> ParseMonkeys(
       if (cur_monkey == nullptr) return Error("No monkey");
       cur_monkey->div_test = i;
 
-    } else if (RE2::FullMatch(line, "    If true: throw to monkey (\\d+)", &i)) {
+    } else if (RE2::FullMatch(line, "    If true: throw to monkey (\\d+)",
+                              &i)) {
       if (cur_monkey == nullptr) return Error("No monkey");
       cur_monkey->true_monkey = i;
 
-    } else if (RE2::FullMatch(line, "    If false: throw to monkey (\\d+)", &i)) {
+    } else if (RE2::FullMatch(line, "    If false: throw to monkey (\\d+)",
+                              &i)) {
       if (cur_monkey == nullptr) return Error("No monkey");
       cur_monkey->false_monkey = i;
 
@@ -120,9 +127,9 @@ int64_t ScoreMonkeys(const std::vector<Monkey>& monkeys) {
   for (const Monkey& m : monkeys) {
     if (m.inspections > top2[0]) {
       top2[1] = top2[0];
-      top2[0] = m.inspections; 
+      top2[0] = m.inspections;
     } else if (m.inspections > top2[1]) {
-      top2[1] = m.inspections; 
+      top2[1] = m.inspections;
     }
   }
   return top2[0] * top2[1];

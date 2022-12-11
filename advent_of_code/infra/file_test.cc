@@ -55,15 +55,15 @@ void RunTestCase(const AdventDay* advent_day,
               absl::StrSplit(key_value, absl::MaxSplits("=", 2)));
       absl::CommandLineFlag* flag = absl::FindCommandLineFlag(key);
       if (!flag) {
-        test_result->AddTestOutput(absl::StrCat(
-          "ERROR: Could not find flag '", key, "'"));
+        test_result->AddTestOutput(
+            absl::StrCat("ERROR: Could not find flag '", key, "'"));
         return;
       }
       std::string error;
       if (!flag->ParseFrom(value, &error)) {
-        test_result->AddTestOutput(absl::StrCat(
-          "ERROR: Could not set flag '", key, "' to value: '", value, "': ",
-          error));
+        test_result->AddTestOutput(absl::StrCat("ERROR: Could not set flag '",
+                                                key, "' to value: '", value,
+                                                "': ", error));
         return;
       }
     }
