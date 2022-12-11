@@ -157,8 +157,9 @@ So, the above example now becomes:
     #############
     #...........#
     ###B#C#B#D###
-      *    #D#C#B#A#
-      #D#B#A#C#*      #A#D#C#A#
+      #D#C#B#A#
+      #D#B#A#C#
+      #A#D#C#A#
       #########
 
 The amphipods still want to be organized into rooms similar to before:
