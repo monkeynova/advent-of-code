@@ -17,146 +17,146 @@ namespace advent_of_code {
 namespace {
 
 struct Monkey {
-  int64_t div_test;
-  int64_t true_monkey;
-  int64_t false_monkey;
-  enum { kPlus = 1, kTimes = 2, kTimesOld = 3 } op;
-  int64_t op_val;
+  int div_test = -1;
+  int true_monkey = -1;
+  int false_monkey = -1;
+  enum { kUnset = 0, kPlus = 1, kTimes = 2, kTimesOld = 3 } op = kUnset;
+  int op_val = -1;
   struct Item {
     int64_t worry;
   };
   std::vector<Item> items;
 
-  int64_t inspections = 0;
+  int inspections = 0;
+
+  bool IsValid() const {
+    if (div_test == -1) return false;
+    if (true_monkey == -1) return false;
+    if (false_monkey == -1) return false;
+    if (op == kUnset) return false;
+    if (op_val == -1 && op != kTimesOld) return false;
+    return true;
+  }
+
+  int NextMonkey(const Item& i) const {
+    if (i.worry % div_test == 0) return true_monkey;
+    return false_monkey;
+  }
+
+  void UpdateWorry(Item& i) const {
+    if (op == Monkey::kPlus) i.worry += op_val;
+    else if (op == Monkey::kTimes) i.worry *= op_val;
+    else if (op == Monkey::kTimesOld) i.worry *= i.worry;
+    else LOG(FATAL) << "Bad op";
+  }
+
 };
+
+absl::StatusOr<std::vector<Monkey>> ParseMonkeys(
+    absl::Span<absl::string_view> input) {
+  std::vector<Monkey> monkeys;
+  Monkey* cur_monkey = nullptr;
+  for (absl::string_view line : input) {
+    if (line.empty()) {
+      if (cur_monkey != nullptr && !cur_monkey->IsValid()) {
+        return Error("Invalid monkey");
+      }
+      cur_monkey = nullptr;
+      continue;
+    }
+    int i;
+    absl::string_view str;
+    if (RE2::FullMatch(line, "Monkey (\\d+):", &i)) {
+      if (monkeys.size() != i) return Error("Bad monkey order");
+      monkeys.push_back({});
+      cur_monkey = &monkeys[i];
+    } else if (RE2::FullMatch(line, "  Starting items: ([\\d, ]+)", &str)) {
+      if (cur_monkey == nullptr) return Error("No monkey");
+      for (absl::string_view item : absl::StrSplit(str, ",")) {
+        item = absl::StripAsciiWhitespace(item);
+        if (!absl::SimpleAtoi(item, &i)) {
+          return Error("Bad item: ", item);
+        }
+        cur_monkey->items.push_back({.worry = i});
+      }
+    } else if (RE2::FullMatch(line, "  Operation: new = old \\+ (\\d+)", &i)) {
+      if (cur_monkey == nullptr) return Error("No monkey");
+      cur_monkey->op = Monkey::kPlus;
+      cur_monkey->op_val = i;
+    } else if (RE2::FullMatch(line, "  Operation: new = old \\* old")) {
+      if (cur_monkey == nullptr) return Error("No monkey");
+      cur_monkey->op = Monkey::kTimesOld;
+    } else if (RE2::FullMatch(line, "  Operation: new = old \\* (\\d+)", &i)) {
+      if (cur_monkey == nullptr) return Error("No monkey");
+      cur_monkey->op = Monkey::kTimes;
+      cur_monkey->op_val = i;
+    } else if (RE2::FullMatch(line, "  Test: divisible by (\\d+)", &i)) {
+      if (cur_monkey == nullptr) return Error("No monkey");
+      cur_monkey->div_test = i;
+    } else if (RE2::FullMatch(line, "    If true: throw to monkey (\\d+)", &i)) {
+      if (cur_monkey == nullptr) return Error("No monkey");
+      cur_monkey->true_monkey = i;
+    } else if (RE2::FullMatch(line, "    If false: throw to monkey (\\d+)", &i)) {
+      if (cur_monkey == nullptr) return Error("No monkey");
+      cur_monkey->false_monkey = i;
+    } else {
+      return Error("Bad line: ", line);
+    }
+  }
+  return monkeys;
+}
+
+int64_t ScoreMonkeys(const std::vector<Monkey>& monkeys) {
+  std::vector<int64_t> inspections;
+  inspections.reserve(monkeys.size());
+  for (const Monkey& m : monkeys) inspections.push_back(m.inspections);
+  absl::c_sort(inspections);
+  absl::c_reverse(inspections);
+  return inspections[0] * inspections[1];
+}
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_11::Part1(
     absl::Span<absl::string_view> input) const {
-  std::vector<Monkey> monkeys;
-  Monkey* cur_monkey = nullptr;
-  for (absl::string_view line : input) {
-    if (line.empty()) continue;
-    int64_t i;
-    absl::string_view str;
-    if (RE2::FullMatch(line, "Monkey (\\d+):", &i)) {
-      while (monkeys.size() <= i) {
-        monkeys.push_back({});
-      }
-      cur_monkey = &monkeys[i];
-    } else if (RE2::FullMatch(line, "  Starting items: ([\\d, ]+)", &str)) {
-      for (absl::string_view item : absl::StrSplit(str, ",")) {
-        item = absl::StripAsciiWhitespace(item);
-        if (!absl::SimpleAtoi(item, &i)) {
-          return Error("Bad item: ", item);
-        }
-        cur_monkey->items.push_back({.worry = i});
-      }
-    } else if (RE2::FullMatch(line, "  Operation: new = old \\+ (\\d+)", &i)) {
-      cur_monkey->op = Monkey::kPlus;
-      cur_monkey->op_val = i;
-    } else if (RE2::FullMatch(line, "  Operation: new = old \\* old")) {
-      cur_monkey->op = Monkey::kTimesOld;
-    } else if (RE2::FullMatch(line, "  Operation: new = old \\* (\\d+)", &i)) {
-      cur_monkey->op = Monkey::kTimes;
-      cur_monkey->op_val = i;
-    } else if (RE2::FullMatch(line, "  Test: divisible by (\\d+)", &i)) {
-      cur_monkey->div_test = i;
-    } else if (RE2::FullMatch(line, "    If true: throw to monkey (\\d+)", &i)) {
-      cur_monkey->true_monkey = i;
-    } else if (RE2::FullMatch(line, "    If false: throw to monkey (\\d+)", &i)) {
-      cur_monkey->false_monkey = i;
-    } else {
-      return Error("Bad line: ", line);
-    }
-  }
+  absl::StatusOr<std::vector<Monkey>> monkeys = ParseMonkeys(input);
+  if (!monkeys.ok()) return monkeys.status();
+
   for (int64_t round = 0; round < 20; ++round) {
-    for (Monkey& m : monkeys) {
+    for (Monkey& m : *monkeys) {
       for (Monkey::Item& i : m.items) {
-        if (m.op == Monkey::kPlus) i.worry += m.op_val;
-        else if (m.op == Monkey::kTimes) i.worry *= m.op_val;
-        else if (m.op == Monkey::kTimesOld) i.worry *= i.worry;
-        else return Error("Bad op");
+        m.UpdateWorry(i);
         i.worry /= 3;
-        if (i.worry % m.div_test == 0) {
-          monkeys[m.true_monkey].items.push_back(i);
-        } else {
-          monkeys[m.false_monkey].items.push_back(i);
-        }
+        (*monkeys)[m.NextMonkey(i)].items.push_back(i);
       }
       m.inspections += m.items.size();
       m.items.clear();
     }
   }
-  absl::c_sort(monkeys, [](const Monkey& a, const Monkey& b) { return a.inspections > b.inspections; });
-  return IntReturn(monkeys[0].inspections * monkeys[1].inspections);
+  return IntReturn(ScoreMonkeys(*monkeys));
 }
 
 absl::StatusOr<std::string> Day_2022_11::Part2(
     absl::Span<absl::string_view> input) const {
-  std::vector<Monkey> monkeys;
-  Monkey* cur_monkey = nullptr;
-  for (absl::string_view line : input) {
-    if (line.empty()) continue;
-    int64_t i;
-    absl::string_view str;
-    if (RE2::FullMatch(line, "Monkey (\\d+):", &i)) {
-      while (monkeys.size() <= i) {
-        monkeys.push_back({});
-      }
-      cur_monkey = &monkeys[i];
-    } else if (RE2::FullMatch(line, "  Starting items: ([\\d, ]+)", &str)) {
-      for (absl::string_view item : absl::StrSplit(str, ",")) {
-        item = absl::StripAsciiWhitespace(item);
-        if (!absl::SimpleAtoi(item, &i)) {
-          return Error("Bad item: ", item);
-        }
-        cur_monkey->items.push_back({.worry = i});
-      }
-    } else if (RE2::FullMatch(line, "  Operation: new = old \\+ (\\d+)", &i)) {
-      cur_monkey->op = Monkey::kPlus;
-      cur_monkey->op_val = i;
-    } else if (RE2::FullMatch(line, "  Operation: new = old \\* old")) {
-      cur_monkey->op = Monkey::kTimesOld;
-    } else if (RE2::FullMatch(line, "  Operation: new = old \\* (\\d+)", &i)) {
-      cur_monkey->op = Monkey::kTimes;
-      cur_monkey->op_val = i;
-    } else if (RE2::FullMatch(line, "  Test: divisible by (\\d+)", &i)) {
-      cur_monkey->div_test = i;
-    } else if (RE2::FullMatch(line, "    If true: throw to monkey (\\d+)", &i)) {
-      cur_monkey->true_monkey = i;
-    } else if (RE2::FullMatch(line, "    If false: throw to monkey (\\d+)", &i)) {
-      cur_monkey->false_monkey = i;
-    } else {
-      return Error("Bad line: ", line);
-    }
-  }
+  absl::StatusOr<std::vector<Monkey>> monkeys = ParseMonkeys(input);
+  if (!monkeys.ok()) return monkeys.status();
+
   int full_mod = 1;
-  for (Monkey& m : monkeys) {
-    full_mod *= m.div_test;
-  }
+  for (const Monkey& m : *monkeys) full_mod *= m.div_test;
+  VLOG(1) << "full_mod = " << full_mod;
 
   for (int64_t round = 0; round < 10000; ++round) {
-    for (Monkey& m : monkeys) {
+    for (Monkey& m : *monkeys) {
       for (Monkey::Item& i : m.items) {
-        if (m.op == Monkey::kPlus) i.worry += m.op_val;
-        else if (m.op == Monkey::kTimes) i.worry *= m.op_val;
-        else if (m.op == Monkey::kTimesOld) i.worry *= i.worry;
-        else return Error("Bad op");
+        m.UpdateWorry(i);
         i.worry %= full_mod;
-        if (i.worry % m.div_test == 0) {
-          monkeys[m.true_monkey].items.push_back(i);
-        } else {
-          monkeys[m.false_monkey].items.push_back(i);
-        }
+        (*monkeys)[m.NextMonkey(i)].items.push_back(i);
       }
       m.inspections += m.items.size();
       m.items.clear();
     }
   }
-  absl::c_sort(monkeys, [](const Monkey& a, const Monkey& b) { return a.inspections > b.inspections; });
-  return IntReturn(monkeys[0].inspections * monkeys[1].inspections);
+  return IntReturn(ScoreMonkeys(*monkeys));
 }
 
 }  // namespace advent_of_code
