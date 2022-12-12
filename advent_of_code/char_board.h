@@ -12,6 +12,11 @@ namespace advent_of_code {
 
 class CharBoard {
  public:
+  // Constructs a CharBoard by iterating over `in` and adding one row to the
+  // board for each iteration (line). Returns an error if board construction
+  // fails (for example if not all lines have the same size).
+  // `in` must allow multiple iterations and the iteration value must be
+  // implicitly castable to absl::string_view.
   template <typename Container>
   static absl::StatusOr<CharBoard> Parse(const Container& in);
 
@@ -88,6 +93,9 @@ absl::StatusOr<CharBoard> CharBoard::Parse(const Container& in) {
   // We do a 2-pass read of 'in' to allow Container to not support
   // empty()/operator[] calls. This is necessary to allow the value returned
   // by absl::StrSplit to be passed directly in.
+  static_assert(std::is_same_v<absl::string_view,
+                               decltype(absl::string_view(*in.begin()))>,
+                "Container must iterate over absl::string_view");
   int width = -1;
   int height = 0;
   for (absl::string_view line : in) {
