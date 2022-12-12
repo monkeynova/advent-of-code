@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "absl/log/log.h"
+#include "absl/container/flat_hash_set.h"
 #include "absl/status/status.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/str_join.h"
@@ -70,6 +71,12 @@ class CharBoard {
   PointRectangle range() const {
     return PointRectangle{.min = {.x = 0, .y = 0},
                           .max = {.x = width() - 1, .y = height() - 1}};
+  }
+
+  absl::flat_hash_set<Point> Find(char c) {
+    absl::flat_hash_set<Point> ret;
+    for (Point p : range()) if (at(p) == c) ret.insert(p);
+    return ret;
   }
 
   Point TorusPoint(Point p) {

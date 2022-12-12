@@ -66,6 +66,7 @@ cc_library(
     hdrs = ["char_board.h"],
     deps = [
         ":point",
+        "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/log",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
