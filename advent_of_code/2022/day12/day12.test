@@ -2,24 +2,32 @@
 ==
 
 [part=1]
-Example input
+Sabqponm
+abcryxxl
+accszExk
+acctuvwj
+abdefghi
 --
-ERROR: UNIMPLEMENTED: Problem not known
+31
 ==
 
 [part=1]
 @include{advent_of_code/2022/day12/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+484
 ==
 
 [part=2]
-Example input
+Sabqponm
+abcryxxl
+accszExk
+acctuvwj
+abdefghi
 --
-ERROR: UNIMPLEMENTED: Problem not known
+29
 ==
 
 [part=2]
 @include{advent_of_code/2022/day12/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+478
