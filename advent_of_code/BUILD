@@ -63,11 +63,11 @@ cc_library(
 
 cc_library(
     name = "char_board",
+    srcs = ["char_board.cc"],
     hdrs = ["char_board.h"],
     deps = [
         ":point",
         "@com_google_absl//absl/container:flat_hash_set",
-        "@com_google_absl//absl/log",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",

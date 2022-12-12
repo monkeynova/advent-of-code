@@ -3,11 +3,9 @@
 
 #include <vector>
 
-#include "absl/log/log.h"
 #include "absl/container/flat_hash_set.h"
 #include "absl/status/status.h"
 #include "absl/status/statusor.h"
-#include "absl/strings/str_join.h"
 #include "advent_of_code/point.h"
 
 namespace advent_of_code {
@@ -15,30 +13,7 @@ namespace advent_of_code {
 class CharBoard {
  public:
   template <typename Container>
-  static absl::StatusOr<CharBoard> Parse(const Container& in) {
-    // We do a 2-pass read of 'in' to allow Container to not support
-    // empty()/operator[] calls. This is necessary to allow the value returned
-    // by absl::StrSplit to be passed directly in.
-    int width = -1;
-    int height = 0;
-    for (absl::string_view line : in) {
-      ++height;
-      if (width == -1) {
-        width = line.size();
-      } else if (width != line.size()) {
-        return absl::InvalidArgumentError("Inconsistent width");
-      }
-    }
-    if (height == 0) return CharBoard(0, 0);
-
-    CharBoard ret(width, height);
-    char* dst = ret.buf_.data();
-    for (absl::string_view line : in) {
-      memcpy(dst, line.data(), ret.width());
-      dst += ret.stride_;
-    }
-    return ret;
-  }
+  static absl::StatusOr<CharBoard> Parse(const Container& in);
 
   CharBoard() : CharBoard(0, 0) {}
 
@@ -56,14 +31,7 @@ class CharBoard {
   CharBoard& operator=(const CharBoard&) = default;
 
   int CountOn() const { return CountChar('#'); }
-  int CountChar(char test) const {
-    int count = 0;
-    for (int i = 0; i < buf_.size(); ++i) {
-      if (i % stride_ == stride_ - 1) continue;
-      if (buf_[i] == test) ++count;
-    }
-    return count;
-  }
+  int CountChar(char test) const;
 
   int height() const { return stride_ == 1 ? 0 : buf_.size() / stride_; }
   int width() const { return stride_ - 1; }
@@ -73,18 +41,9 @@ class CharBoard {
                           .max = {.x = width() - 1, .y = height() - 1}};
   }
 
-  absl::flat_hash_set<Point> Find(char c) {
-    absl::flat_hash_set<Point> ret;
-    for (Point p : range()) if (at(p) == c) ret.insert(p);
-    return ret;
-  }
+  absl::flat_hash_set<Point> Find(char c) const;
 
-  Point TorusPoint(Point p) {
-    Point ret = {p.x % width(), p.y % height()};
-    if (ret.x < 0) ret.x += width();
-    if (ret.y < 0) ret.y += height();
-    return ret;
-  }
+  Point TorusPoint(Point p) const;
 
   char at(Point p) const { return buf_[p.y * stride_ + p.x]; }
   void set(Point p, char c) { buf_[p.y * stride_ + p.x] = c; }
@@ -102,23 +61,7 @@ class CharBoard {
     return true;
   }
 
-  absl::StatusOr<CharBoard> SubBoard(PointRectangle sub_range) const {
-    if (!OnBoard(sub_range.min)) {
-      return absl::InvalidArgumentError(
-          absl::StrCat("SubBoard: min not on board: ", sub_range));
-    }
-    if (!OnBoard(sub_range.max)) {
-      return absl::InvalidArgumentError(
-          absl::StrCat("SubBoard: max not on board: ", sub_range));
-    }
-    CharBoard out(sub_range.max.x - sub_range.min.x + 1,
-                  sub_range.max.y - sub_range.min.y + 1);
-    for (int i = sub_range.min.y; i <= sub_range.max.y; ++i) {
-      memcpy(out.stride(i - sub_range.min.y), stride(i) + sub_range.min.x,
-             out.width());
-    }
-    return out;
-  }
+  absl::StatusOr<CharBoard> SubBoard(PointRectangle sub_range) const;
 
   template <typename H>
   friend H AbslHashValue(H h, const CharBoard& b) {
@@ -139,6 +82,32 @@ class CharBoard {
   int stride_;
   std::string buf_;
 };
+
+template <typename Container>
+absl::StatusOr<CharBoard> CharBoard::Parse(const Container& in) {
+  // We do a 2-pass read of 'in' to allow Container to not support
+  // empty()/operator[] calls. This is necessary to allow the value returned
+  // by absl::StrSplit to be passed directly in.
+  int width = -1;
+  int height = 0;
+  for (absl::string_view line : in) {
+    ++height;
+    if (width == -1) {
+      width = line.size();
+    } else if (width != line.size()) {
+      return absl::InvalidArgumentError("Inconsistent width");
+    }
+  }
+  if (height == 0) return CharBoard(0, 0);
+
+  CharBoard ret(width, height);
+  char* dst = ret.buf_.data();
+  for (absl::string_view line : in) {
+    memcpy(dst, line.data(), ret.width());
+    dst += ret.stride_;
+  }
+  return ret;
+}
 
 }  // namespace advent_of_code
 
