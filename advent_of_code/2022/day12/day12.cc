@@ -22,17 +22,8 @@ class HeightBfs : public BFSInterface<HeightBfs, Point> {
   HeightBfs(const CharBoard& b, Point c, bool reverse)
    : b_(b), cur_(c), reverse_(reverse) {}
 
-  bool CanStep(Point from, Point to) const {
-    if (reverse_) {
-      std::swap(from, to);
-    }
-    if (b_[from] == 'S') return true;
-    if (b_[to] == 'E') return b_[from] >= 'y';
-    return b_[to] <= b_[from] + 1;
-  }
-
-  Point identifier() const { return cur_; }
-  void AddNextSteps(State* state) const {
+  Point identifier() const override { return cur_; }
+  void AddNextSteps(State* state) const override {
     for (Point d : Cardinal::kFourDirs) {
       Point n = cur_ + d;
       if (b_.OnBoard(n) && CanStep(cur_, n)) {
@@ -42,8 +33,17 @@ class HeightBfs : public BFSInterface<HeightBfs, Point> {
       }
     }
   }
-  bool IsFinal() const {
+  bool IsFinal() const override {
     return b_[cur_] == (reverse_ ? 'a' : 'E');
+  }
+
+  bool CanStep(Point from, Point to) const {
+    if (reverse_) {
+      std::swap(from, to);
+    }
+    if (b_[from] == 'S') return true;
+    if (b_[to] == 'E') return b_[from] >= 'y';
+    return b_[to] <= b_[from] + 1;
   }
 
  private:
