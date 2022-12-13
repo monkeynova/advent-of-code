@@ -129,6 +129,8 @@ absl::StatusOr<std::string> Day_2022_13::Part2(
     if (*list[i] == *f1) idx1 = i + 1;
     if (*list[i] == *f2) idx2 = i + 1;
   }
+  if (idx1 == -1) return Error("marker1 not found");
+  if (idx2 == -1) return Error("marker1 not found");
   return IntReturn(idx1 * idx2);
 }
 
