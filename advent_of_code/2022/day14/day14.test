@@ -2,24 +2,26 @@
 ==
 
 [part=1]
-Example input
+498,4 -> 498,6 -> 496,6
+503,4 -> 502,4 -> 502,9 -> 494,9
 --
-ERROR: UNIMPLEMENTED: Problem not known
+24
 ==
 
 [part=1]
 @include{advent_of_code/2022/day14/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+1068
 ==
 
 [part=2]
-Example input
+498,4 -> 498,6 -> 496,6
+503,4 -> 502,4 -> 502,9 -> 494,9
 --
-ERROR: UNIMPLEMENTED: Problem not known
+93
 ==
 
 [part=2]
 @include{advent_of_code/2022/day14/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+27936
