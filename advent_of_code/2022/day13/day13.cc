@@ -16,25 +16,25 @@ namespace advent_of_code {
 
 namespace {
 
-struct Cmp {
+struct Packet {
   bool IsInt() const { return absl::holds_alternative<int>(val); }
   int AsInt() const { return absl::get<int>(val); }
-  const std::vector<Cmp>& AsList() const {
-    return absl::get<std::vector<Cmp>>(val);
+  const std::vector<Packet>& AsList() const {
+    return absl::get<std::vector<Packet>>(val);
   }
 
-  Cmp& SetInt(int new_val) {
+  Packet& SetInt(int new_val) {
     val = new_val;
     return *this;
   }
-  Cmp& SetList(std::vector<Cmp> new_list) {
+  Packet& SetList(std::vector<Packet> new_list) {
     val = std::move(new_list);
     return *this;
   }
 
-  absl::variant<int, std::vector<Cmp>> val;
+  absl::variant<int, std::vector<Packet>> val;
 
-  friend std::ostream& operator<<(std::ostream& o, const Cmp& cmp) {
+  friend std::ostream& operator<<(std::ostream& o, const Packet& cmp) {
     if (cmp.IsInt()) return o << cmp.AsInt();
     o << "[";
     for (int i = 0; i < cmp.AsList().size(); ++i) {
@@ -44,26 +44,26 @@ struct Cmp {
     return o << "]";
   }
 
-  bool operator==(const Cmp& o) const {
+  bool operator==(const Packet& o) const {
     return cmp(o) == 0;
   }
 
-  bool operator<(const Cmp& o) const {
+  bool operator<(const Packet& o) const {
     return cmp(o) < 0;
   }
 
-  int cmp(const Cmp& o) const {
+  int cmp(const Packet& o) const {
     if (IsInt() && o.IsInt()) {
       return AsInt() < o.AsInt() ? -1 : AsInt() > o.AsInt() ? 1 : 0;
     }
     if (IsInt()) {
-      Cmp list_val;
-      list_val.SetList({Cmp().SetInt(AsInt())});
+      Packet list_val;
+      list_val.SetList({Packet().SetInt(AsInt())});
       return list_val.cmp(o);
     }
     if (o.IsInt()) {
-      Cmp list_val;
-      list_val.SetList({Cmp().SetInt(o.AsInt())});
+      Packet list_val;
+      list_val.SetList({Packet().SetInt(o.AsInt())});
       return cmp(list_val);
     }
     for (int i = 0; i < AsList().size(); ++i) {
@@ -76,11 +76,11 @@ struct Cmp {
   }
 };
 
-Cmp Parse(absl::string_view& line) {
-  Cmp ret;
+Packet Parse(absl::string_view& line) {
+  Packet ret;
   if (line[0] == '[') {
     line = line.substr(1);
-    std::vector<Cmp> list;
+    std::vector<Packet> list;
     while (true) {
       if (line[0] == ']') {
         line = line.substr(1);
@@ -101,14 +101,14 @@ Cmp Parse(absl::string_view& line) {
   return ret;
 }
 
-bool ByPointerLt(const std::unique_ptr<Cmp>& a,
-                 const std::unique_ptr<Cmp>& b) {
+bool ByPointerLt(const std::unique_ptr<Packet>& a,
+                 const std::unique_ptr<Packet>& b) {
   return *a < *b;
 }
 
-absl::StatusOr<Cmp> ParseFull( absl::string_view line) {
+absl::StatusOr<Packet> ParseFull( absl::string_view line) {
   absl::string_view tmp = line;
-  Cmp ret = Parse(tmp);
+  Packet ret = Parse(tmp);
   if (!tmp.empty()) return Error("Bad line: ", line);
   return ret;
 }
@@ -120,9 +120,9 @@ absl::StatusOr<std::string> Day_2022_13::Part1(
   int ret = 0;
   for (int i = 0; i < input.size(); i += 3) {
     if (!input[i+2].empty()) return Error("Bad input: empty");
-    absl::StatusOr<Cmp> left = ParseFull(input[i]);
+    absl::StatusOr<Packet> left = ParseFull(input[i]);
     if (!left.ok()) return left.status();
-    absl::StatusOr<Cmp> right = ParseFull(input[i+1]);
+    absl::StatusOr<Packet> right = ParseFull(input[i+1]);
     if (!right.ok()) return right.status();
     if (!(*right < *left)) ret += (i/3) + 1;
   }
@@ -131,14 +131,14 @@ absl::StatusOr<std::string> Day_2022_13::Part1(
 
 absl::StatusOr<std::string> Day_2022_13::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<Cmp> m1 = ParseFull("[[2]]");
-  absl::StatusOr<Cmp> m2 = ParseFull("[[6]]");
+  absl::StatusOr<Packet> m1 = ParseFull("[[2]]");
+  absl::StatusOr<Packet> m2 = ParseFull("[[6]]");
 
   int idx1 = 1;
   int idx2 = 2;
   for (int i = 0; i < input.size(); ++i) {
     if (input[i].empty()) continue;
-    absl::StatusOr<Cmp> test = ParseFull(input[i]);
+    absl::StatusOr<Packet> test = ParseFull(input[i]);
     if (!test.ok()) return test.status();
     if (*test < *m1) { ++idx1; ++idx2; }
     else if (*test < *m2) { ++idx2; }
