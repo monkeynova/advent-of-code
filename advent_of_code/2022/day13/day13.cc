@@ -91,6 +91,14 @@ bool ByPointerLt(const std::unique_ptr<Cmp>& a,
   return *a < *b;
 }
 
+absl::StatusOr<std::unique_ptr<Cmp>> ParseFull(
+    absl::string_view line) {
+  absl::string_view tmp = line;
+  std::unique_ptr<Cmp> ret = Parse(tmp);
+  if (!tmp.empty()) return Error("Bad line: ", line);
+  return ret;
+}
+
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_13::Part1(
@@ -98,39 +106,28 @@ absl::StatusOr<std::string> Day_2022_13::Part1(
   int ret = 0;
   for (int i = 0; i < input.size(); i += 3) {
     if (!input[i+2].empty()) return Error("Bad input: empty");
-    absl::string_view consume;
-    auto left = Parse(consume = input[i]);
-    if (!consume.empty()) return Error("Bad line: ", input[i]);
-    auto right = Parse(consume = input[i+1]);
-    if (!consume.empty()) return Error("Bad line: ", input[i + 1]);
-    if (!(*right < *left)) ret += (i/3) + 1;
+    absl::StatusOr<std::unique_ptr<Cmp>> left = ParseFull(input[i]);
+    if (!left.ok()) return left.status();
+    absl::StatusOr<std::unique_ptr<Cmp>> right = ParseFull(input[i+1]);
+    if (!right.ok()) return right.status();
+    if (!(**right < **left)) ret += (i/3) + 1;
   }
   return IntReturn(ret);
 }
 
 absl::StatusOr<std::string> Day_2022_13::Part2(
     absl::Span<absl::string_view> input) const {
-  std::vector<std::unique_ptr<Cmp>> list;
-  absl::string_view consume;
-  list.push_back(Parse(consume = "[[2]]"));
-  list.push_back(Parse(consume = "[[6]]"));
+  absl::StatusOr<std::unique_ptr<Cmp>> m1 = ParseFull("[[2]]");
+  absl::StatusOr<std::unique_ptr<Cmp>> m2 = ParseFull("[[6]]");
 
-  for (absl::string_view line : input) {
-    if (line.empty()) continue;
-    list.push_back(Parse(line));
+  int idx1 = 1;
+  int idx2 = 2;
+  for (int i = 0; i < input.size(); ++i) {
+    if (input[i].empty()) continue;
+    absl::StatusOr<std::unique_ptr<Cmp>> test = ParseFull(input[i]);
+    if (**test < **m1) { ++idx1; ++idx2; }
+    else if (**test < **m2) { ++idx2; }
   }
-  absl::c_sort(list, ByPointerLt);
-
-  std::unique_ptr<Cmp> f1 = Parse(consume = "[[2]]");
-  std::unique_ptr<Cmp> f2 = Parse(consume = "[[6]]");
-
-  int idx1 = -1, idx2 = -1;
-  for (int i = 0; i < list.size(); ++i) {
-    if (*list[i] == *f1) idx1 = i + 1;
-    if (*list[i] == *f2) idx2 = i + 1;
-  }
-  if (idx1 == -1) return Error("marker1 not found");
-  if (idx2 == -1) return Error("marker1 not found");
   return IntReturn(idx1 * idx2);
 }
 
