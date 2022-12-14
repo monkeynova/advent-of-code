@@ -17,15 +17,29 @@ namespace advent_of_code {
 namespace {
 
 struct Cmp {
-  int val = -1;
-  std::vector<Cmp> list;
+  bool IsInt() const { return absl::holds_alternative<int>(val); }
+  int AsInt() const { return absl::get<int>(val); }
+  const std::vector<Cmp>& AsList() const {
+    return absl::get<std::vector<Cmp>>(val);
+  }
+
+  Cmp& SetInt(int new_val) {
+    val = new_val;
+    return *this;
+  }
+  Cmp& SetList(std::vector<Cmp> new_list) {
+    val = std::move(new_list);
+    return *this;
+  }
+
+  absl::variant<int, std::vector<Cmp>> val;
 
   friend std::ostream& operator<<(std::ostream& o, const Cmp& cmp) {
-    if (cmp.val != -1) return o << cmp.val;
+    if (cmp.IsInt()) return o << cmp.AsInt();
     o << "[";
-    for (int i = 0; i < cmp.list.size(); ++i) {
+    for (int i = 0; i < cmp.AsList().size(); ++i) {
       if (i > 0) o << ",";
-      o << cmp.list[i];
+      o << cmp.AsList()[i];
     }
     return o << "]";
   }
@@ -39,27 +53,25 @@ struct Cmp {
   }
 
   int cmp(const Cmp& o) const {
-    if (val != -1 && o.val != -1) {
-      return val < o.val ? -1 : val > o.val ? 1 : 0;
+    if (IsInt() && o.IsInt()) {
+      return AsInt() < o.AsInt() ? -1 : AsInt() > o.AsInt() ? 1 : 0;
     }
-    if (val != -1) {
+    if (IsInt()) {
       Cmp list_val;
-      list_val.list.push_back(Cmp{});
-      list_val.list.back().val = val;
+      list_val.SetList({Cmp().SetInt(AsInt())});
       return list_val.cmp(o);
     }
-    if (o.val != -1) {
+    if (o.IsInt()) {
       Cmp list_val;
-      list_val.list.push_back(Cmp{});
-      list_val.list.back().val = o.val;
+      list_val.SetList({Cmp().SetInt(o.AsInt())});
       return cmp(list_val);
     }
-    for (int i = 0; i < list.size(); ++i) {
-      if (i >= o.list.size()) return 1;
-      int sub_cmp = list[i].cmp(o.list[i]);
+    for (int i = 0; i < AsList().size(); ++i) {
+      if (i >= o.AsList().size()) return 1;
+      int sub_cmp = AsList()[i].cmp(o.AsList()[i]);
       if (sub_cmp != 0) return sub_cmp;
     }
-    if (o.list.size() > list.size()) return -1;
+    if (o.AsList().size() > AsList().size()) return -1;
     return 0;
   }
 };
@@ -68,20 +80,23 @@ Cmp Parse(absl::string_view& line) {
   Cmp ret;
   if (line[0] == '[') {
     line = line.substr(1);
+    std::vector<Cmp> list;
     while (true) {
       if (line[0] == ']') {
         line = line.substr(1);
         break;
       }
-      ret.list.push_back(Parse(line));
+      list.push_back(Parse(line));
       if (line[0] == ',') line = line.substr(1);
     }
+    ret.SetList(list);
   } else if (line[0] >= '0' && line[0] <= '9') {
-    ret.val = 0;
+    int val = 0;
     while (line[0] >= '0' && line[0] <= '9') {
-      ret.val = ret.val * 10 + line[0] - '0';
+      val = val * 10 + line[0] - '0';
       line = line.substr(1);
     }
+    ret.SetInt(val);
   }
   return ret;
 }
