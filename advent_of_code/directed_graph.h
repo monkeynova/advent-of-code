@@ -68,6 +68,12 @@ class DirectedGraph : public DirectedGraphBase {
     return &it->second;
   }
 
+  Storage* GetData(absl::string_view node) {
+    auto it = storage_.find(node);
+    if (it == storage_.end()) return nullptr;
+    return &it->second;
+  }
+
  private:
   absl::flat_hash_map<absl::string_view, Storage> storage_;
 };
