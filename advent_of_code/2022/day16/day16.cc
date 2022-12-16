@@ -20,214 +20,175 @@ namespace {
 struct Valve {
   absl::string_view name;
   int flow;
-  bool open;
 };
+
+absl::StatusOr<DirectedGraph<Valve>> ParseGraph(
+    absl::Span<absl::string_view> input) {
+  DirectedGraph<Valve> graph;
+  int full_flow = 0;
+  for (absl::string_view line : input) {
+    Valve v;
+    absl::string_view out;
+    if (!RE2::FullMatch(line, "Valve ([A-Z]+) has flow rate=(\\d+); tunnels? leads? to valves? ([A-Z ,]+)",
+                        &v.name, &v.flow, &out)) {
+      return Error("Bad line: ", line);
+    }
+    full_flow += v.flow;
+    graph.AddNode(v.name, v);
+    for (absl::string_view out_name : absl::StrSplit(out, ", ")) {
+      graph.AddEdge(v.name, out_name);
+    }
+  }
+  return graph;
+}
 
 struct State {
-  int64_t open;
-  absl::string_view cur;
-  int flow = 0;
-
-  bool operator==(const State& o) const {
-    return open == o.open && cur == o.cur;
-  }
-
-  template <typename H>
-  friend H AbslHashValue(H h, const State& s) {
-    return H::combine(std::move(h), s.open, s.cur);
-  }
-};
-
-struct State2 {
-  int64_t open;
+  int open_set;
   absl::string_view me;
   absl::string_view el;
   int flow = 0;
 
-  bool operator==(const State2& o) const {
-    return open == o.open && me == o.me && el == o.el;
+  bool TryOpenMe(const DirectedGraph<Valve>& graph, 
+                 const absl::flat_hash_map<absl::string_view, int>& pack) {
+    auto bit_it = pack.find(me);
+    if (bit_it == pack.end()) return false;
+    int64_t bit = 1ll << bit_it->second;
+    if (open_set & bit) return false;
+    flow += graph.GetData(me)->flow;
+    open_set |= bit;
+    return true;
+  }
+
+  void MoveMe(absl::string_view dest) {
+    me = dest;
+  }
+
+  bool TryOpenEl(const DirectedGraph<Valve>& graph, 
+                 const absl::flat_hash_map<absl::string_view, int>& pack) {
+    auto bit_it = pack.find(el);
+    if (bit_it == pack.end()) return false;
+    int64_t bit = 1ll << bit_it->second;
+    if (open_set & bit) return false;
+    flow += graph.GetData(el)->flow;
+    open_set |= bit;
+    return true;
+  }
+
+  void MoveEl(absl::string_view dest) {
+    el = dest;
+  }
+
+  bool operator==(const State& o) const {
+    return open_set == o.open_set && me == o.me && el == o.el;
   }
 
   template <typename H>
-  friend H AbslHashValue(H h, const State2& s) {
-    return H::combine(std::move(h), s.open, s.me, s.el);
+  friend H AbslHashValue(H h, const State& s) {
+    return H::combine(std::move(h), s.open_set, s.me, s.el);
   }
 };
+
+absl::StatusOr<int> BestPath(
+    const DirectedGraph<Valve>& graph, int minutes, bool use_elephant) {
+  absl::flat_hash_map<absl::string_view, int> pack;
+  int64_t all_on = 0;
+  int full_flow = 0;
+  for (absl::string_view n : graph.nodes()) {
+    if (graph.GetData(n)->flow == 0) continue;
+    all_on |= 1ll << pack.size();
+    full_flow += graph.GetData(n)->flow;
+    pack[n] = pack.size();
+  }
+  if (pack.size() > 30) return Error("Can't fit");
+  VLOG(1) << "Max cardinality: "
+          << graph.nodes().size() * (1 << pack.size()) *
+             (use_elephant ? graph.nodes().size() : 1);
+
+  int best_known = 0;
+  if (use_elephant) { 
+    absl::StatusOr<int> just_me =
+        BestPath(graph, minutes, /*use_elephant=*/false);
+    if (!just_me.ok()) return just_me.status();
+    best_known = *just_me;
+  }
+
+  absl::flat_hash_map<State, int> state_to_flow =
+      {{State{.me = "AA", .el = "AA", .open_set = 0, .flow = 0}, 0}};
+  for (int r = 0; r < minutes; ++r) {
+    VLOG(1) << r << ": " << state_to_flow.size();
+    absl::flat_hash_map<State, int> new_state_to_flow;
+    int best_flow = best_known;
+    for (const auto& [s, f] : state_to_flow) {
+      best_flow = std::max(best_flow, f + s.flow * (minutes - r));
+    }
+    for (const auto& [s, f] : state_to_flow) {
+      if (f + full_flow * (minutes - r) < best_flow) continue;
+      int new_flow = f + s.flow;
+      if (s.open_set == all_on) {
+        new_state_to_flow[s] = std::max(new_state_to_flow[s], new_flow);
+        continue;
+      }
+      {
+        State news = s;
+        if (news.TryOpenMe(graph, pack)) {
+          if (use_elephant) {
+            State newes = news;
+            if (newes.TryOpenEl(graph, pack)) {
+              new_state_to_flow[newes] = std::max(new_state_to_flow[newes], new_flow);
+            }
+            for (absl::string_view out : *graph.Outgoing(s.el)) {
+              State newes = news;
+              newes.MoveEl(out);
+              new_state_to_flow[newes] = std::max(new_state_to_flow[newes], new_flow);
+            }
+          } else {
+            new_state_to_flow[news] = std::max(new_state_to_flow[news], new_flow);
+          }
+        }
+      }
+      for (absl::string_view out : *graph.Outgoing(s.me)) {
+        State news = s;
+        news.MoveMe(out);
+        if (use_elephant) {
+          State newes = news;
+          if (newes.TryOpenEl(graph, pack)) {
+            new_state_to_flow[newes] = std::max(new_state_to_flow[newes], new_flow);
+          }
+          for (absl::string_view out : *graph.Outgoing(s.el)) {
+            State newes = news;
+            newes.MoveEl(out);
+            new_state_to_flow[newes] = std::max(new_state_to_flow[newes], new_flow);
+          }
+        } else {
+          new_state_to_flow[news] = std::max(new_state_to_flow[news], new_flow);
+        }
+      }
+    }
+    state_to_flow = new_state_to_flow;
+  }
+  int max = 0;
+  for (const auto& [s, f] : state_to_flow) {
+    max = std::max(f, max);
+  }
+  return max;
+}
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_16::Part1(
     absl::Span<absl::string_view> input) const {
-  DirectedGraph<Valve> graph;
-  int closed_count = 0;
-  int full_flow = 0;
-  for (absl::string_view line : input) {
-    Valve v;
-    absl::string_view out;
-    if (!RE2::FullMatch(line, "Valve ([A-Z]+) has flow rate=(\\d+); tunnels? leads? to valves? ([A-Z ,]+)",
-                        &v.name, &v.flow, &out)) {
-      return Error("Bad line: ", line);
-    }
-    v.open = false;
-    if (v.flow == 0) {
-      v.open = true;
-      ++closed_count;
-    }
-    full_flow += v.flow;
-    graph.AddNode(v.name, v);
-    for (absl::string_view out_name : absl::StrSplit(out, ", ")) {
-      graph.AddEdge(v.name, out_name);
-    }
-  }
-  absl::flat_hash_map<absl::string_view, int> pack;
-  int64_t all_on = 0;
-  int64_t start_on = 0;
-  for (absl::string_view n : graph.nodes()) {
-    all_on |= 1ll << pack.size();
-    if (graph.GetData(n)->open) start_on |= 1ll << pack.size();
-    pack[n] = pack.size();
-  }
-  if (pack.size() > 62) return Error("Can't fit");
-  absl::flat_hash_map<State, int> state_to_flow = {{State{.cur = "AA", .open = start_on, .flow = 0}, 0}};
-  for (int r = 0; r < 30; ++r) {
-    VLOG(1) << r << ": " << state_to_flow.size();
-    absl::flat_hash_map<State, int> new_state_to_flow;
-    int best_flow = 0;
-    for (const auto& [s, f] : state_to_flow) {
-      best_flow = std::max(best_flow, f + s.flow * (30 - r));
-    }
-    for (const auto& [s, f] : state_to_flow) {
-      if (f + full_flow * (30 - r) < best_flow) continue;
-      int new_flow = f + s.flow;
-      if (s.open == all_on) {
-        new_state_to_flow[s] = std::max(new_state_to_flow[s], new_flow);
-        continue;
-      }
-      auto bit_it = pack.find(s.cur);
-      if (bit_it == pack.end()) return Error("Bad bit");
-      int bit = bit_it->second;
-      if ((s.open & (1ll << bit)) == 0) {
-        State news = s;
-        news.flow += graph.GetData(s.cur)->flow;
-        news.open |= (1ll << bit);
-        new_state_to_flow[news] = std::max(new_state_to_flow[news], new_flow);
-      }
-      for (absl::string_view out : *graph.Outgoing(s.cur)) {
-        State news = s;
-        news.cur = out;
-        new_state_to_flow[news] = std::max(new_state_to_flow[news], new_flow);
-      }
-    }
-    state_to_flow = new_state_to_flow;
-  }
-  int max = 0;
-  for (const auto& [s, f] : state_to_flow) {
-    max = std::max(f, max);
-  }
-  return IntReturn(max);
+  absl::StatusOr<DirectedGraph<Valve>> graph = ParseGraph(input);
+  if (!graph.ok()) return graph.status();
+
+  return IntReturn(BestPath(*graph, 30, /*use_elephant=*/false));
 }
 
 absl::StatusOr<std::string> Day_2022_16::Part2(
     absl::Span<absl::string_view> input) const {
-  DirectedGraph<Valve> graph;
-  int closed_count = 0;
-  int full_flow = 0;
-  for (absl::string_view line : input) {
-    Valve v;
-    absl::string_view out;
-    if (!RE2::FullMatch(line, "Valve ([A-Z]+) has flow rate=(\\d+); tunnels? leads? to valves? ([A-Z ,]+)",
-                        &v.name, &v.flow, &out)) {
-      return Error("Bad line: ", line);
-    }
-    v.open = false;
-    if (v.flow == 0) {
-      v.open = true;
-      ++closed_count;
-    }
-    full_flow += v.flow;
-    graph.AddNode(v.name, v);
-    for (absl::string_view out_name : absl::StrSplit(out, ", ")) {
-      graph.AddEdge(v.name, out_name);
-    }
-  }
-  absl::flat_hash_map<absl::string_view, int> pack;
-  int64_t all_on = 0;
-  int64_t start_on = 0;
-  for (absl::string_view n : graph.nodes()) {
-    all_on |= 1ll << pack.size();
-    if (graph.GetData(n)->open) start_on |= 1ll << pack.size();
-    pack[n] = pack.size();
-  }
-  if (pack.size() > 62) return Error("Can't fit");
-  absl::flat_hash_map<State2, int> state_to_flow =
-      {{State2{.me = "AA", .el = "AA", .open = start_on, .flow = 0}, 0}};
-  for (int r = 0; r < 26; ++r) {
-    VLOG(1) << r << ": " << state_to_flow.size();
-    absl::flat_hash_map<State2, int> new_state_to_flow;
-    int best_flow = 0;
-    for (const auto& [s, f] : state_to_flow) {
-      best_flow = std::max(best_flow, f + s.flow * (26 - r));
-    }
-    for (const auto& [s, f] : state_to_flow) {
-      if (f + full_flow * (26 - r) < best_flow) continue;
-      int new_flow = f + s.flow;
-      if (s.open == all_on) {
-        new_state_to_flow[s] = std::max(new_state_to_flow[s], new_flow);
-        continue;
-      }
-      auto me_bit_it = pack.find(s.me);
-      if (me_bit_it == pack.end()) return Error("Bad bit");
-      int me_bit = me_bit_it->second;
-      auto el_bit_it = pack.find(s.el);
-      if (el_bit_it == pack.end()) return Error("Bad bit");
-      int el_bit = el_bit_it->second;
-      if (me_bit != el_bit && (s.open & (1ll << me_bit)) == 0 &&
-          (s.open & (1ll << el_bit)) == 0) {
-        // We both turn on.
-        State2 news = s;
-        news.flow += graph.GetData(s.me)->flow;
-        news.open |= (1ll << me_bit);
-        news.flow += graph.GetData(s.el)->flow;
-        news.open |= (1ll << el_bit);
-        new_state_to_flow[news] = std::max(new_state_to_flow[news], new_flow);
-      }
-      if ((s.open & (1ll << me_bit)) == 0) {
-        // I turn on, elephant moves.
-        for (absl::string_view out : *graph.Outgoing(s.el)) {
-          State2 news = s;
-          news.el = out;
-          news.flow += graph.GetData(s.me)->flow;
-          news.open |= (1ll << me_bit);
-          new_state_to_flow[news] = std::max(new_state_to_flow[news], new_flow);
-        }
-      }
-      if ((s.open & (1ll << el_bit)) == 0) {
-        // Elevent turns on, I move.
-        for (absl::string_view out : *graph.Outgoing(s.me)) {
-          State2 news = s;
-          news.me = out;
-          news.flow += graph.GetData(s.el)->flow;
-          news.open |= (1ll << el_bit);
-          new_state_to_flow[news] = std::max(new_state_to_flow[news], new_flow);
-        }
-      }
-      // We both move.
-      for (absl::string_view me_out : *graph.Outgoing(s.me)) {
-        for (absl::string_view el_out : *graph.Outgoing(s.el)) {
-          State2 news = s;
-          news.me = me_out;
-          news.el = el_out;
-          new_state_to_flow[news] = std::max(new_state_to_flow[news], new_flow);
-        }
-      }
-    }
-    state_to_flow = new_state_to_flow;
-  }
-  int max = 0;
-  for (const auto& [s, f] : state_to_flow) {
-    max = std::max(f, max);
-  }
-  return IntReturn(max);
+  absl::StatusOr<DirectedGraph<Valve>> graph = ParseGraph(input);
+  if (!graph.ok()) return graph.status();
+
+  return IntReturn(BestPath(*graph, 26, /*use_elephant=*/true));
 }
 
 }  // namespace advent_of_code
