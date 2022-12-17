@@ -56,8 +56,7 @@ struct State {
       on_next(*this);
       return;
     }
-    State s = *this;
-    if (s.TryOpenMe(graph, pack)) on_next(s);
+    TryOpenMe(graph, pack, on_next);
     for (absl::string_view out : *graph.Outgoing(me)) {
       State s = *this;
       s.MoveMe(out);
@@ -73,8 +72,7 @@ struct State {
       on_next(*this);
       return;
     }
-    State s = *this;
-    if (s.TryOpenEl(graph, pack)) on_next(s);
+    TryOpenEl(graph, pack, on_next);
     for (absl::string_view out : *graph.Outgoing(el)) {
       State s = *this;
       s.MoveEl(out);
@@ -82,30 +80,36 @@ struct State {
     }
   }
 
-  bool TryOpenMe(const DirectedGraph<Valve>& graph, 
-                 const absl::flat_hash_map<absl::string_view, int>& pack) {
+  void TryOpenMe(const DirectedGraph<Valve>& graph, 
+                 const absl::flat_hash_map<absl::string_view, int>& pack,
+                 absl::FunctionRef<void(State)> on_next) const {
     auto bit_it = pack.find(me);
-    if (bit_it == pack.end()) return false;
+    if (bit_it == pack.end()) return;
     int64_t bit = 1ll << bit_it->second;
-    if (open_set & bit) return false;
-    flow += graph.GetData(me)->flow;
-    open_set |= bit;
-    return true;
+    if (open_set & bit) return;
+
+    State new_state = *this;
+    new_state.flow += graph.GetData(me)->flow;
+    new_state.open_set |= bit;
+    on_next(new_state);;
   }
 
   void MoveMe(absl::string_view dest) {
     me = dest;
   }
 
-  bool TryOpenEl(const DirectedGraph<Valve>& graph, 
-                 const absl::flat_hash_map<absl::string_view, int>& pack) {
+  void TryOpenEl(const DirectedGraph<Valve>& graph, 
+                 const absl::flat_hash_map<absl::string_view, int>& pack,
+                 absl::FunctionRef<void(State)> on_next) const {
     auto bit_it = pack.find(el);
-    if (bit_it == pack.end()) return false;
+    if (bit_it == pack.end()) return;
     int64_t bit = 1ll << bit_it->second;
-    if (open_set & bit) return false;
-    flow += graph.GetData(el)->flow;
-    open_set |= bit;
-    return true;
+    if (open_set & bit) return;
+
+    State new_state = *this;
+    new_state.flow += graph.GetData(el)->flow;
+    new_state.open_set |= bit;
+    on_next(new_state);;
   }
 
   void MoveEl(absl::string_view dest) {
@@ -154,8 +158,8 @@ absl::StatusOr<int> BestPath(
     best_known = *just_me;
   }
 
-  absl::flat_hash_map<State, int> state_to_flow =
-      {{State{.me = "AA", .el = "AA", .open_set = 0, .flow = 0}, 0}};
+  State start = {.me = "AA", .el = "AA", .open_set = 0, .flow = 0};
+  absl::flat_hash_map<State, int> state_to_flow = {{start, 0}};
   for (int r = 0; r < minutes; ++r) {
     VLOG(1) << r << ": " << state_to_flow.size();
     absl::flat_hash_map<State, int> new_state_to_flow;
