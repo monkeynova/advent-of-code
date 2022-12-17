@@ -1,6 +1,8 @@
 #ifndef ADVENT_OF_CODE_VLOG_H
 #define ADVENT_OF_CODE_VLOG_H
 
+#include "absl/log/log.h"
+
 // TODO(@monkeynova): Remove when part of absl/log public API.
 
 namespace internal {

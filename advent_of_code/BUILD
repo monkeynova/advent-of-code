@@ -22,9 +22,11 @@ cc_library(
 
 cc_library(
     name = "point",
+    srcs = ["point.cc"],
     hdrs = ["point.h"],
     deps = [
         "@com_google_absl//absl/hash",
+        "@com_google_absl//absl/log:check",
         "@com_google_absl//absl/strings",
         "@com_googlesource_code_re2//:re2",
     ],
@@ -126,11 +128,25 @@ cc_library(
 )
 
 cc_library(
+    name = "interval",
+    srcs = ["interval.cc"],
+    hdrs = ["interval.h"],
+    deps = [
+        ":point",
+        ":vlog",
+        "@com_google_absl//absl/functional:function_ref",
+        "@com_google_absl//absl/log",
+        "@com_google_absl//absl/strings",
+    ],
+)
+
+cc_library(
     name = "vlog",
     srcs = ["vlog.cc"],
     hdrs = ["vlog.h"],
     deps = [
         "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/log",
     ],
     alwayslink = 1,
 )

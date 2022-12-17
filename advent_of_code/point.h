@@ -121,11 +121,29 @@ struct PointRectangle {
   Point min;
   Point max;
 
+  int64_t Area() const {
+    // 1ll forces the addition to return int64 before multiplying.
+    return (max.x - min.x + 1ll) * (max.y - min.y + 1ll);
+  }
   bool Contains(Point p) const {
     if (p.x < min.x) return false;
     if (p.x > max.x) return false;
     if (p.y < min.y) return false;
     if (p.y > max.y) return false;
+    return true;
+  }
+  bool FullyContains(const PointRectangle& o) const {
+    if (o.min.x < min.x) return false;
+    if (o.max.x > max.x) return false;
+    if (o.min.y < min.y) return false;
+    if (o.max.y > max.y) return false;
+    return true;
+  }
+  bool Overlaps(const PointRectangle& o) const {
+    if (max.x < o.min.x) return false;
+    if (min.x > o.max.x) return false;
+    if (max.y < o.min.y) return false;
+    if (min.y > o.max.y) return false;
     return true;
   }
 
@@ -151,6 +169,8 @@ struct PointRectangle {
   friend std::ostream& operator<<(std::ostream& out, const PointRectangle& r) {
     return out << absl::StreamFormat("%v", r);
   }
+
+  void SetDifference(const PointRectangle& o, std::vector<PointRectangle>* out) const;
 };
 
 struct Cardinal {
@@ -275,6 +295,85 @@ struct Cardinal3 {
     return ret;
   }
   ();
+};
+
+struct Cube {
+  Point3 min;
+  Point3 max;
+
+  struct iterator {
+    Point3 cur = Point3{0, 0, 0};
+    const Cube* base = nullptr;
+
+    iterator operator++() {
+      if (++cur.x > base->max.x) {
+        cur.x = base->min.x;
+        if (++cur.y > base->max.y) {
+          cur.y = base->min.y;
+          if (++cur.z > base->max.z) {
+            base = nullptr;
+            cur = Point3{0, 0, 0};
+          }
+        }
+      }
+      return *this;
+    }
+
+    bool operator==(const iterator& o) const {
+      return base == o.base && cur == o.cur;
+    }
+    bool operator!=(const iterator& o) const { return !operator==(o); }
+
+    Point3 operator*() const { return cur; }
+  };
+
+  iterator begin() const { return iterator{.cur = min, .base = this}; }
+  iterator end() const { return iterator{}; }
+
+  int64_t Volume() const {
+    // 1ll forces the addition to return int64 before multiplying.
+    return (max.x - min.x + 1ll) * (max.y - min.y + 1ll) *
+           (max.z - min.z + 1ll);
+  }
+  bool Contains(Point3 p) const {
+    if (p.x < min.x) return false;
+    if (p.x > max.x) return false;
+    if (p.y < min.y) return false;
+    if (p.y > max.y) return false;
+    if (p.z < min.z) return false;
+    if (p.z > max.z) return false;
+    return true;
+  }
+  bool FullyContains(const Cube& o) const {
+    if (o.min.x < min.x) return false;
+    if (o.max.x > max.x) return false;
+    if (o.min.y < min.y) return false;
+    if (o.max.y > max.y) return false;
+    if (o.min.z < min.z) return false;
+    if (o.max.z > max.z) return false;
+    return true;
+  }
+  bool Overlaps(const Cube& o) const {
+    if (max.x < o.min.x) return false;
+    if (min.x > o.max.x) return false;
+    if (max.y < o.min.y) return false;
+    if (min.y > o.max.y) return false;
+    if (max.z < o.min.z) return false;
+    if (min.z > o.max.z) return false;
+    return true;
+  }
+
+  absl::optional<Cube> Intersect(const Cube& o) const {
+    if (!Overlaps(o)) return {};
+    return Cube{
+        {std::max(min.x, o.min.x), std::max(min.y, o.min.y),
+         std::max(min.z, o.min.z)},
+        {std::min(max.x, o.max.x), std::min(max.y, o.max.y),
+         std::min(max.z, o.max.z)},
+    };
+  }
+
+  void SetDifference(const Cube& o, std::vector<Cube>* out) const;
 };
 
 struct Point4 {
