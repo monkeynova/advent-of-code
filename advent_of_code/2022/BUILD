@@ -18,6 +18,7 @@ cc_test(
         "//advent_of_code/2022/day14:day14_benchmark_lib",
         "//advent_of_code/2022/day15:day15_benchmark_lib",
         "//advent_of_code/2022/day16:day16_benchmark_lib",
+        "//advent_of_code/2022/day17:day17_benchmark_lib",
         "//advent_of_code/infra:gunit_main",
     ],
 )
