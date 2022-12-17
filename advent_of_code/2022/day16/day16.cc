@@ -44,9 +44,43 @@ absl::StatusOr<DirectedGraph<Valve>> ParseGraph(
 
 struct State {
   int open_set;
+  int flow = 0;
   absl::string_view me;
   absl::string_view el;
-  int flow = 0;
+
+  void NextForMe(
+      const DirectedGraph<Valve>& graph,
+      const absl::flat_hash_map<absl::string_view, int>& pack,
+      absl::FunctionRef<void(State)> on_next) const {
+    if (open_set == (1 << pack.size()) - 1) {
+      on_next(*this);
+      return;
+    }
+    State s = *this;
+    if (s.TryOpenMe(graph, pack)) on_next(s);
+    for (absl::string_view out : *graph.Outgoing(me)) {
+      State s = *this;
+      s.MoveMe(out);
+      on_next(s);
+    }
+  }
+
+  void NextForEl(
+      const DirectedGraph<Valve>& graph,
+      const absl::flat_hash_map<absl::string_view, int>& pack,
+      absl::FunctionRef<void(State)> on_next) const {
+    if (open_set == (1 << pack.size()) - 1) {
+      on_next(*this);
+      return;
+    }
+    State s = *this;
+    if (s.TryOpenEl(graph, pack)) on_next(s);
+    for (absl::string_view out : *graph.Outgoing(el)) {
+      State s = *this;
+      s.MoveEl(out);
+      on_next(s);
+    }
+  }
 
   bool TryOpenMe(const DirectedGraph<Valve>& graph, 
                  const absl::flat_hash_map<absl::string_view, int>& pack) {
@@ -88,6 +122,12 @@ struct State {
   }
 };
 
+void InsertOrUpdateMax(
+    absl::flat_hash_map<State, int>& map, State s, int new_val) {
+  auto [it, inserted] = map.emplace(s, new_val);
+  if (!inserted) it->second = std::max(it->second, new_val);
+}
+
 absl::StatusOr<int> BestPath(
     const DirectedGraph<Valve>& graph, int minutes, bool use_elephant) {
   absl::flat_hash_map<absl::string_view, int> pack;
@@ -100,7 +140,9 @@ absl::StatusOr<int> BestPath(
     pack[n] = pack.size();
   }
   if (pack.size() > 30) return Error("Can't fit");
-  VLOG(1) << "Max cardinality: "
+  VLOG(1) << "Max cardinality: " << graph.nodes().size() << "*"
+          << (1 << pack.size()) << "*"
+          << (use_elephant ? graph.nodes().size() : 1) << " = " 
           << graph.nodes().size() * (1 << pack.size()) *
              (use_elephant ? graph.nodes().size() : 1);
 
@@ -124,47 +166,21 @@ absl::StatusOr<int> BestPath(
     for (const auto& [s, f] : state_to_flow) {
       if (f + full_flow * (minutes - r) < best_flow) continue;
       int new_flow = f + s.flow;
-      if (s.open_set == all_on) {
-        new_state_to_flow[s] = std::max(new_state_to_flow[s], new_flow);
-        continue;
-      }
-      {
-        State news = s;
-        if (news.TryOpenMe(graph, pack)) {
+      s.NextForMe(
+        graph, pack,
+        [&](State s1) {
           if (use_elephant) {
-            State newes = news;
-            if (newes.TryOpenEl(graph, pack)) {
-              new_state_to_flow[newes] = std::max(new_state_to_flow[newes], new_flow);
-            }
-            for (absl::string_view out : *graph.Outgoing(s.el)) {
-              State newes = news;
-              newes.MoveEl(out);
-              new_state_to_flow[newes] = std::max(new_state_to_flow[newes], new_flow);
-            }
+            s1.NextForEl(
+              graph, pack,
+              [&](State s2) {
+                InsertOrUpdateMax(new_state_to_flow, s2, new_flow);
+              });
           } else {
-            new_state_to_flow[news] = std::max(new_state_to_flow[news], new_flow);
+            InsertOrUpdateMax(new_state_to_flow, s1, new_flow);
           }
-        }
-      }
-      for (absl::string_view out : *graph.Outgoing(s.me)) {
-        State news = s;
-        news.MoveMe(out);
-        if (use_elephant) {
-          State newes = news;
-          if (newes.TryOpenEl(graph, pack)) {
-            new_state_to_flow[newes] = std::max(new_state_to_flow[newes], new_flow);
-          }
-          for (absl::string_view out : *graph.Outgoing(s.el)) {
-            State newes = news;
-            newes.MoveEl(out);
-            new_state_to_flow[newes] = std::max(new_state_to_flow[newes], new_flow);
-          }
-        } else {
-          new_state_to_flow[news] = std::max(new_state_to_flow[news], new_flow);
-        }
-      }
+        });
     }
-    state_to_flow = new_state_to_flow;
+    state_to_flow = std::move(new_state_to_flow);
   }
   int max = 0;
   for (const auto& [s, f] : state_to_flow) {
