@@ -42,6 +42,109 @@ absl::StatusOr<std::vector<SAndB>> ParseList(
   return list;
 }
 
+struct Interval1D {
+  std::vector<int> x;
+
+  Interval1D() = default;
+  Interval1D(int start, int end) : x({start, end}) {}
+
+  int Size() const;
+
+  Interval1D Union(const Interval1D& o) const;
+  Interval1D Minus(const Interval1D& o) const;
+
+  Interval1D Merge(const Interval1D& o,
+                   absl::FunctionRef<bool(bool, bool)> merge_fn) const;
+
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const Interval1D& iv) {
+    if (iv.x.empty()) {
+      absl::Format(&sink, "∅");
+    }
+    for (int i = 0; i + 1 < iv.x.size(); i += 2) {
+      absl::Format(&sink, "[%d,%d)", iv.x[i], iv.x[i + 1]);
+    }
+    if (iv.x.size() % 2 != 0) {
+      absl::Format(&sink, "[%d,∞)", iv.x.back());
+    }
+  }
+
+  friend std::ostream& operator<<(std::ostream& out, const Interval1D& i) {
+    return out << absl::StreamFormat("%v", i);
+  }
+};
+
+int Interval1D::Size() const {
+  int size = 0;
+  for (int i = 0; i < x.size(); i += 2) {
+    size += x[i + 1] - x[i];
+  }
+  return size;
+}
+
+Interval1D Interval1D::Union(const Interval1D& o) const {
+  return Merge(o, [](bool left, bool right) { return left || right; });
+}
+
+Interval1D Interval1D::Minus(const Interval1D& o) const {
+  return Merge(o, [](bool left, bool right) { return left && !right; });
+}
+
+Interval1D Interval1D::Merge(const Interval1D& o,
+                             absl::FunctionRef<bool(bool, bool)> merge_fn) const {
+  auto left_it = x.begin();
+  bool left_on = false;
+  auto right_it = o.x.begin();
+  bool right_on = false;
+  bool ret_on = false;
+  Interval1D ret;
+  while (left_it != x.end() && right_it != o.x.end()) {
+    int lval = *left_it;
+    int rval = *right_it;
+    int t;
+    if (lval <= rval) {
+      t = lval;
+      left_on = !left_on;
+      ++left_it;
+    }
+    if (lval >= rval) {
+      t = rval;
+      right_on = !right_on;
+      ++right_it;
+    }
+    if (ret_on != merge_fn(left_on, right_on)) {
+      ret.x.push_back(t);
+      ret_on = !ret_on;
+    }
+  }
+  while (left_it != x.end()) {
+    int t = *left_it;
+    left_on = !left_on;
+    ++left_it;
+    if (ret_on != merge_fn(left_on, right_on)) {
+      ret.x.push_back(t);
+      ret_on = !ret_on;
+    }
+  }
+  while (right_it != o.x.end()) {
+    int t = *right_it;
+    right_on = !right_on;
+    ++right_it;
+    if (ret_on != merge_fn(left_on, right_on)) {
+      ret.x.push_back(t);
+      ret_on = !ret_on;
+    }
+  }
+  VLOG(3) << *this << " + " << o << " = " << ret;
+  return ret;
+}
+
+Interval1D NoCloser(const SAndB& sandb, int y) {
+  int dx = sandb.d - abs(sandb.sensor.y - y);
+  if (dx < 0) return Interval1D();
+  return Interval1D(sandb.sensor.x - dx, sandb.sensor.x + dx + 1);
+}
+
 bool HasCloser(const std::vector<SAndB>& list, Point t) {
   bool is_closer = false;
   for (const auto& sandb : list) {
@@ -59,23 +162,17 @@ absl::StatusOr<std::string> Day_2022_15::Part1(
   absl::StatusOr<std::vector<SAndB>> list = ParseList(input);
   if (!list.ok()) return list.status();
 
-  PointRectangle r;
-  absl::flat_hash_set<Point> beacons;
-  for (const auto& sandb : *list) {
-    r.ExpandInclude(sandb.sensor);
-    r.ExpandInclude(sandb.beacon);
-    beacons.insert(sandb.beacon);
-  }
   int y = absl::GetFlag(FLAGS_advent_day_2022_15_param);
-  int count = 0;
-  int width = r.max.x - r.min.x + 1;
-  for (int x = r.min.x - width; x <= r.max.x + width; ++x) {
-    Point t = {x, y};
-    if (HasCloser(*list, t) && !beacons.contains(t)) {
-      ++count;
+  Interval1D no_closer;
+  Interval1D beacons;
+  for (const auto& sandb : *list) {
+    if (sandb.beacon.y == y) {
+      beacons = beacons.Union(Interval1D(sandb.beacon.x, sandb.beacon.x + 1));
     }
+    no_closer = no_closer.Union(NoCloser(sandb, y));
   }
-  return IntReturn(count);
+  VLOG(1) << "Final: " << no_closer.Minus(beacons);
+  return IntReturn(no_closer.Minus(beacons).Size());
 }
 
 absl::StatusOr<std::string> Day_2022_15::Part2(
