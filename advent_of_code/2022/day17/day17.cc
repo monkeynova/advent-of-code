@@ -16,22 +16,67 @@ namespace advent_of_code {
 
 namespace {
 
-struct Rock {
-  Point off;
-  std::vector<Point> delta;
+class DropState {
+ public:
+  struct Rock {
+    Point off;
+    std::vector<Point> delta;
+  };
 
-  bool TryMove(PointRectangle bounds, const absl::flat_hash_set<Point>& stopped, Point d) {
-    for (Point p : delta) {
-      Point t = p + off + d;
-      if (!bounds.Contains(t)) return false;
-      if (stopped.contains(t)) return false;
+  struct SummaryState {
+    int w_idx;
+    int r_idx;
+    std::vector<Point> bounds;
+
+    CharBoard Draw() const;
+
+    bool operator==(const SummaryState& o) const {
+      return w_idx == o.w_idx && r_idx == o.r_idx && bounds == o.bounds;
     }
-    off += d;
+
+    template <typename H>
+    friend H AbslHashValue(H h, const SummaryState& s) {
+      return H::combine(std::move(h), s.w_idx, s.r_idx, s.bounds);
+    }
+  };
+
+  DropState() = default;
+
+  int height() const { return height_; }
+
+  absl::Status ParseWind(absl::string_view wind);
+  absl::Status DropNextRock(int i);
+  SummaryState Summarize() const;
+
+ private:
+  CharBoard Draw(int height) const;
+  CharBoard AddPiece(CharBoard b, Rock r) const;
+
+  absl::Status InsertRock(const Rock& r);
+  bool TryMove(Rock& r, Point d) {
+    for (Point p : r.delta) {
+      Point t = p + r.off + d;
+      if (!kBounds.Contains(t)) return false;
+      if (stopped_.contains(t)) return false;
+    }
+    r.off += d;
     return true;
   }
+
+  static const std::vector<Rock> kRockTypes;
+  static const PointRectangle kBounds;
+
+  std::vector<Point> wind_;
+  int w_idx_ = -1;
+  int r_idx_ = -1;
+  int height_ = 0;
+  absl::flat_hash_set<Point> stopped_;
 };
 
-const std::vector<Rock> kRockTypes = {
+const PointRectangle DropState::kBounds =
+  {{0, 0}, {6, std::numeric_limits<int>::max()}};
+
+const std::vector<DropState::Rock> DropState::kRockTypes = {
   Rock{.off = {0, 0}, .delta = {{0, 0}, {1, 0}, {2, 0}, {3, 0}}},
   Rock{.off = {0, 0}, .delta = {{2, 1}, {1, 0}, {1, 1}, {1, 2}, {0, 1}}},
   Rock{.off = {0, 0}, .delta = {{2, 2}, {2, 1}, {0, 0}, {1, 0}, {2, 0}}},
@@ -39,77 +84,84 @@ const std::vector<Rock> kRockTypes = {
   Rock{.off = {0, 0}, .delta = {{1, 0}, {1, 1}, {0, 0}, {0, 1}}},
 };
 
-absl::StatusOr<int> InsertRock(
-    absl::flat_hash_set<Point>& stopped, const Rock& r, int height) {
-  for (Point p : r.delta) {
-    Point t = p + r.off;
-    if (!stopped.insert(t).second) return Error("Double insert!");
-    height = std::max(height, t.y + 1);
+absl::Status DropState::ParseWind(absl::string_view wind_str) {
+  for (char c : wind_str) {
+    if (c == '<') wind_.push_back(Cardinal::kWest);
+    else if (c == '>') wind_.push_back(Cardinal::kEast);
+    else return Error("Bad wind");
   }
-  return height;
+  return absl::OkStatus();
 }
 
-CharBoard Draw(const absl::flat_hash_set<Point>& stopped, int height) {
-  CharBoard b(7, height);
-  for (Point p : stopped) {
-    b[p] = '#';
+absl::Status DropState::InsertRock(const Rock& r) {
+  for (Point p : r.delta) {
+    Point t = p + r.off;
+    if (!stopped_.insert(t).second) return Error("Double insert!");
+    height_ = std::max(height_, t.y + 1);
   }
+  return absl::OkStatus();
+}
+
+absl::Status DropState::DropNextRock(int i) {
+  r_idx_ = (r_idx_ + 1) % kRockTypes.size();
+  Rock drop = kRockTypes[r_idx_];
+  drop.off = {2, height_ + 3};
+  if (!kBounds.Contains(drop.off + Point{4, 4})) return Error("Bad bounds");
+  while (true) {
+    w_idx_ = (w_idx_ + 1) % wind_.size();
+    Point d = wind_[w_idx_];
+    VLOG(2) << "Drop: " << drop.off << "; Wind: " << d;
+    if (i == 13) {
+      VLOG(2) << "Board (" << i << "):\n"
+              << AddPiece(Draw(height_ + 10), drop);
+    }
+    TryMove(drop, d);
+    if (!TryMove(drop, Cardinal::kNorth)) {
+      break;
+    }
+  }
+  if (absl::Status st = InsertRock(drop); !st.ok()) return st;
+  VLOG(2) << "Board (" << i << "):\n" << Draw(height_);
+  return absl::OkStatus();
+}
+
+CharBoard DropState::Draw(int height) const {
+  CharBoard b(7, height);
+  for (Point p : stopped_) b[p] = '#';
   return b;
 }
 
-CharBoard AddPiece(CharBoard b, Rock r) {
+CharBoard DropState::AddPiece(CharBoard b, DropState::Rock r) const {
   for (Point p : r.delta) {
     b[p + r.off] = '@';
   }
   return b;
 }
 
-struct PointLt {
-  const bool operator()(Point a, Point b) const {
-    if (a.x != b.x) return a.x < b.x;
-    return a.y < b.y;
-  }
-};
-
-CharBoard Draw(const std::set<Point, PointLt>& stopped) {
-  PointRectangle r = {*stopped.begin(), *stopped.begin()};
-  for (Point p : stopped) r.ExpandInclude(p);
+CharBoard DropState::SummaryState::Draw() const {
+  PointRectangle r = {*bounds.begin(), *bounds.begin()};
+  for (Point p : bounds) r.ExpandInclude(p);
   CharBoard b(r);
-  for (Point p : stopped) {
+  for (Point p : bounds) {
     b[p - r.min] = '#';
   }
   return b;
 }
 
-struct SummaryState {
-  int w_idx;
-  int r_idx;
-  std::set<Point, PointLt> bounds;
+DropState::SummaryState DropState::Summarize() const {
+  SummaryState ret = {.w_idx = w_idx_, .r_idx = r_idx_, .bounds = {}};
 
-  bool operator==(const SummaryState& o) const {
-    return w_idx == o.w_idx && r_idx == o.r_idx && bounds == o.bounds;
-  }
+  PointRectangle bounds = {{0, 0}, {6, height_}};
 
-  template <typename H>
-  friend H AbslHashValue(H h, const SummaryState& s) {
-    return H::combine(std::move(h), s.w_idx, s.r_idx, s.bounds);
-  }
-};
-
-SummaryState Summarize(
-    const absl::flat_hash_set<Point>& stopped, int w_idx, int r_idx, int height) {
-  SummaryState ret = {.w_idx = w_idx, .r_idx = r_idx, .bounds = {}};
-
-  PointRectangle bounds = {{0, 0}, {6, height}};
-
-  Point start = {0, height};
+  Point start = {0, height_};
   absl::flat_hash_set<Point> visited = {start};
+  absl::flat_hash_set<Point> edge;
   for (std::deque queue = {{start}}; !queue.empty(); queue.pop_front()) {
     for (Point d : Cardinal::kFourDirs) {
       Point t = d + queue.front();
       if (!bounds.Contains(t)) continue;
-      if (stopped.contains(t)) {
-        ret.bounds.insert(t - start);
+      if (stopped_.contains(t)) {
+        edge.insert(t - start);
         continue;
       }
       if (visited.insert(t).second) {
@@ -117,6 +169,10 @@ SummaryState Summarize(
       }
     }
   }
+  ret.bounds = std::vector<Point>(edge.begin(), edge.end());
+  auto point_x_then_y =
+      [](Point a, Point b) { return a.x != b.x ? a.x < b.x : a.y < b.y; };
+  absl::c_sort(ret.bounds, point_x_then_y);
   return ret;
 }
 
@@ -125,91 +181,41 @@ SummaryState Summarize(
 absl::StatusOr<std::string> Day_2022_17::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  std::vector<Point> wind;
-  for (char c : input[0]) {
-    if (c == '<') wind.push_back(Cardinal::kWest);
-    else if (c == '>') wind.push_back(Cardinal::kEast);
-    else return Error("Bad wind");
-  }
-  // Drop rocks.
-  absl::flat_hash_set<Point> stopped;
-  int w_idx = -1;
-  int r_idx = -1;
-  int height = 0;
-  PointRectangle bounds = {{0, 0}, {6, 2022 * 10}};
+
+  DropState ds;
+  if (absl::Status st = ds.ParseWind(input[0]); !st.ok()) return st;
+  
   for (int i = 0; i < 2022; ++i) {
-    r_idx = (r_idx + 1) % kRockTypes.size();
-    Rock drop = kRockTypes[r_idx];
-    drop.off = {2, height + 3};
-    if (!bounds.Contains(drop.off + Point{4, 4})) return Error("Bad bounds");
-    while (true) {
-      w_idx = (w_idx + 1) % wind.size();
-      Point d = wind[w_idx];
-      VLOG(2) << "Drop: " << drop.off << "; Wind: " << d;
-      if (i == 13) {
-        VLOG(2) << "Board (" << i << "):\n" << AddPiece(Draw(stopped, height + 10), drop);
-      }
-      drop.TryMove(bounds, stopped, d);
-      if (!drop.TryMove(bounds, stopped, Cardinal::kNorth)) {
-        break;
-      }
-    }
-    absl::StatusOr<int> new_height = InsertRock(stopped, drop, height);
-    if (!new_height.ok()) return new_height.status();
-    height = *new_height;
-    VLOG(2) << "Board (" << i << "):\n" << Draw(stopped, height);
+    if (absl::Status st = ds.DropNextRock(i); !st.ok()) return st;
   }
-  return IntReturn(height);
+  return IntReturn(ds.height());
 }
 
 absl::StatusOr<std::string> Day_2022_17::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  std::vector<Point> wind;
-  for (char c : input[0]) {
-    if (c == '<') wind.push_back(Cardinal::kWest);
-    else if (c == '>') wind.push_back(Cardinal::kEast);
-    else return Error("Bad wind");
-  }
-  // Drop rocks.
-  absl::flat_hash_set<Point> stopped;
-  int w_idx = -1;
-  int r_idx = -1;
-  int height = 0;
-  PointRectangle bounds = {{0, 0}, {6, std::numeric_limits<int>::max()}};
-  absl::flat_hash_map<SummaryState, int> state_to_idx;
+
+  DropState ds;
+  if (absl::Status st = ds.ParseWind(input[0]); !st.ok()) return st;
+  
+  absl::flat_hash_map<DropState::SummaryState, int> state_to_idx;
   std::vector<int> heights;
   for (int i = 0; true; ++i) {
-    r_idx = (r_idx + 1) % kRockTypes.size();
-    Rock drop = kRockTypes[r_idx];
-    drop.off = {2, height + 3};
-    if (!bounds.Contains(drop.off + Point{4, 4})) return Error("Bad bounds");
-    while (true) {
-      w_idx = (w_idx + 1) % wind.size();
-      Point d = wind[w_idx];
-      VLOG(2) << "Drop: " << drop.off << "; Wind: " << d;
-      drop.TryMove(bounds, stopped, d);
-      if (!drop.TryMove(bounds, stopped, Cardinal::kNorth)) {
-        break;
-      }
-    }
-    absl::StatusOr<int> new_height = InsertRock(stopped, drop, height);
-    if (!new_height.ok()) return new_height.status();
-    height = *new_height;
+    if (absl::Status st = ds.DropNextRock(i); !st.ok()) return st;
 
-    heights.push_back(height);
-    auto [it, inserted] = state_to_idx.emplace(Summarize(stopped, w_idx, r_idx, height), i);
-    VLOG(2) << "Summary:\n" << Draw(it->first.bounds);
+    heights.push_back(ds.height());
+    auto [it, inserted] = state_to_idx.emplace(ds.Summarize(), i);
+    VLOG(2) << "Summary:\n" << it->first.Draw();
     if (!inserted) {
       VLOG(1) << "Repeat @" << i << " == " << it->second;
-      int64_t find = 1000000000000 - 1;
+      int64_t find = 1000000000000 - 1; // Problem is 1-indexed.
       int prev_i = it->second;
 
-      int64_t ret_height = heights[prev_i];
-      find -= prev_i;
-      ret_height += (heights[i] - heights[prev_i]) * (find / (i - prev_i));
-      find %= (i - prev_i);
-      ret_height += heights[find + prev_i] - heights[prev_i];
+      int64_t cycles = (find - prev_i) / (i - prev_i);
+      int64_t offset = (find - prev_i) % (i - prev_i);
+
+      int64_t ret_height = 
+          (heights[i] - heights[prev_i]) * cycles + heights[offset + prev_i];
 
       VLOG(1) << "Return " << ret_height;
 

@@ -121,7 +121,7 @@ struct PointRectangle {
   Point min;
   Point max;
 
-  bool Contains(Point p) {
+  bool Contains(Point p) const {
     if (p.x < min.x) return false;
     if (p.x > max.x) return false;
     if (p.y < min.y) return false;
