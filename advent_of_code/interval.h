@@ -14,7 +14,10 @@ class Interval1D {
   Interval1D() = default;
   Interval1D(int start, int end) : x_({start, end}) {}
 
+  bool empty() const { return x_.empty(); }
   int Size() const;
+
+  absl::Span<const int> x() const { return x_; }
 
   Interval1D Union(const Interval1D& o) const;
   Interval1D Intersect(const Interval1D& o) const;
@@ -59,6 +62,12 @@ class RectangleSet {
       r.SetDifference(in, &new_set);
     }
     set_ = std::move(new_set);
+  }
+
+  void SetDifference(const RectangleSet& o) {
+    for (const PointRectangle& r : o.set_) {
+      SetDifference(r);
+    }
   }
 
   int64_t Area() const {

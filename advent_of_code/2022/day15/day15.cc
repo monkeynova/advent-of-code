@@ -85,11 +85,36 @@ absl::StatusOr<std::string> Day_2022_15::Part2(
   if (!list.ok()) return list.status();
 
   int max = absl::GetFlag(FLAGS_advent_day_2022_15_param);
-
-  std::optional<Point> found;
   PointRectangle test_area;
   test_area.min = {0, 0};
   test_area.max = Point{max, max};
+  std::optional<Point> found;
+
+  // Check with every 1D interval. Proves unique, but slow.
+  for (int y = 0; y <= max; ++y) {
+    Interval1D no_closer(0, max);
+    Interval1D beacons;
+    for (const auto& sandb : *list) {
+      no_closer = no_closer.Minus(NoCloser(sandb, y));
+      if (no_closer.empty()) break;
+    }
+    int size = no_closer.Size();
+    if (size == 1) {
+      if (found) return Error("Multiple points (different y)");
+      found = {no_closer.x()[0], y};
+      VLOG(1) << "Found @" << *found << " -> "
+              << found->x * 4000000ll + found->y;
+    } else if (size == 0) {
+      if (!no_closer.empty()) return Error("Bad empty");
+      continue;
+    } else {
+      return Error("Multiple points (same y)");
+    }
+  }
+  if (!found) return Error("Not found");
+  return IntReturn(found->x * 4000000ll + found->y);
+
+  // Check for 1 past a boundary. Can't prove unique, but reasonably fast.
   for (const auto& sandb : *list) {
     int d = (sandb.beacon - sandb.sensor).dist();
     for (int i = 0; i <= d + 1; ++i) {
