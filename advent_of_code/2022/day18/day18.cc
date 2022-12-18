@@ -24,8 +24,7 @@ class CanReach : public BFSInterface<CanReach, Point3> {
   Point3 identifier() const override { return cur_; }
   bool IsFinal() const override { return cur_ == end_; }
   void AddNextSteps(State* state) const override {
-    for (Point3 dir : Cardinal3::kNeighborDirs) {
-      if (dir.dist() != 1) continue;
+    for (Point3 dir : Cardinal3::kSixDirs) {
       if (g_.contains(cur_ + dir)) continue;
       CanReach next = *this;
       next.cur_ += dir;
@@ -51,8 +50,7 @@ absl::StatusOr<std::string> Day_2022_18::Part1(
   }
   int sides = 0;
   for (Point3 p : points) {
-    for (Point3 dir : Cardinal3::kNeighborDirs) {
-      if (dir.dist() != 1) continue;
+    for (Point3 dir : Cardinal3::kSixDirs) {
       if (points.contains(p + dir)) continue;
       ++sides;
     }
@@ -68,29 +66,37 @@ absl::StatusOr<std::string> Day_2022_18::Part2(
     if (!RE2::FullMatch(line, "([\\d,]+)", p.Capture())) return Error("Bad line");
     points.insert(p);
   }
-  Cube cube = {*points.begin(), *points.begin()};
-  for (Point3 p : points) {
-    cube.min.x = std::min(cube.min.x, p.x);
-    cube.min.y = std::min(cube.min.y, p.y);
-    cube.min.z = std::min(cube.min.z, p.z);
-    cube.max.x = std::max(cube.max.x, p.x);
-    cube.max.y = std::max(cube.max.y, p.y);
-    cube.max.z = std::max(cube.max.z, p.z);
-  }
+  Cube cube = {{1, 1, 1}, {1, 1, 1}};
+  for (Point3 p : points) cube.ExpandInclude(p);
 
-  Point3 out = cube.min - Cardinal3::kXHat;
-
-  VLOG(1) << "Dist to " << out;
-
-  for (Point3 p : cube) {
-    absl::optional<int> dist = CanReach(points, p, out).FindMinSteps();
-    if (!dist) points.insert(p);
+  std::vector<Point3> test(points.begin(), points.end());
+  for (Point3 start : test) {
+    for (Point3 start_dir : Cardinal3::kSixDirs) {
+      Point3 p = start + start_dir;
+      if (points.contains(p)) continue;
+      absl::flat_hash_set<Point3> hist = {p};
+      bool found = false;
+      for (std::deque<Point3> queue = {p}; !queue.empty() && !found; queue.pop_front()) {
+        Point3 cur = queue.front();
+        for (Point3 dir : Cardinal3::kSixDirs) {
+          Point3 test = cur + dir;
+          if (test == Cardinal3::kOrigin) {
+            found = true;
+            break;
+          }
+          if (points.contains(test)) continue;
+          if (hist.insert(test).second) queue.push_back(test);
+        }
+      }
+      if (!found) {
+        for (Point3 p2 : hist) points.insert(p2);
+      }
+    }
   }
 
   int sides = 0;
   for (Point3 p : points) {
-    for (Point3 dir : Cardinal3::kNeighborDirs) {
-      if (dir.dist() != 1) continue;
+    for (Point3 dir : Cardinal3::kSixDirs) {
       if (points.contains(p + dir)) continue;
       ++sides;
     }

@@ -277,6 +277,9 @@ struct Cardinal3 {
   static constexpr Point3 kXHat{1, 0, 0};
   static constexpr Point3 kYHat{0, 1, 0};
   static constexpr Point3 kZHat{0, 0, 1};
+  static constexpr std::array<Point3, 6> kSixDirs = {
+    kXHat, -kXHat, kYHat, -kYHat, kZHat, -kZHat
+  };
   static constexpr std::array<Point3, 3 * 3 * 3 - 1> kNeighborDirs =
       []() constexpr {
     std::array<Point3, 3 * 3 * 3 - 1> ret{};
@@ -334,6 +337,15 @@ struct Cube {
     // 1ll forces the addition to return int64 before multiplying.
     return (max.x - min.x + 1ll) * (max.y - min.y + 1ll) *
            (max.z - min.z + 1ll);
+  }
+
+  void ExpandInclude(Point3 p) {
+    min.x = std::min(min.x, p.x);
+    min.y = std::min(min.y, p.y);
+    min.z = std::min(min.z, p.z);
+    max.x = std::max(max.x, p.x);
+    max.y = std::max(max.y, p.y);
+    max.z = std::max(max.z, p.z);
   }
   bool Contains(Point3 p) const {
     if (p.x < min.x) return false;
