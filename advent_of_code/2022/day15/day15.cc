@@ -90,6 +90,29 @@ absl::StatusOr<std::string> Day_2022_15::Part2(
   test_area.max = Point{max, max};
   std::optional<Point> found;
 
+  // Check for 1 past a boundary. Can't prove unique, but reasonably fast.
+  for (const auto& sandb : *list) {
+    int d = (sandb.beacon - sandb.sensor).dist();
+    for (int i = 0; i <= d + 1; ++i) {
+      std::array<Point, 4> to_test = {
+        Point{i, (d + 1) - i}, Point{-i, -(d + 1) + i},
+        Point{i, (d + 1) - i}, Point{-i, -(d + 1) + i},
+      };
+      for (Point delta : to_test) {
+        Point t = sandb.sensor + delta;
+        if (!test_area.Contains(t)) continue;
+        if (!HasCloser(*list, t)) {
+          if (found && *found != t) return Error("Duplicate!");
+          found = t;
+          VLOG(1) << "Found @" << *found << " -> "
+                  << found->x * 4000000ll + found->y;
+        }
+      }
+    }
+  }
+  if (!found) return Error("Not found");
+  return IntReturn(found->x * 4000000ll + found->y);
+
   // Check with every 1D interval. Proves unique, but slow.
   for (int y = 0; y <= max; ++y) {
     Interval1D no_closer(0, max);
@@ -109,29 +132,6 @@ absl::StatusOr<std::string> Day_2022_15::Part2(
       continue;
     } else {
       return Error("Multiple points (same y)");
-    }
-  }
-  if (!found) return Error("Not found");
-  return IntReturn(found->x * 4000000ll + found->y);
-
-  // Check for 1 past a boundary. Can't prove unique, but reasonably fast.
-  for (const auto& sandb : *list) {
-    int d = (sandb.beacon - sandb.sensor).dist();
-    for (int i = 0; i <= d + 1; ++i) {
-      std::array<Point, 4> to_test = {
-        Point{i, (d + 1) - i}, Point{-i, -(d + 1) + i},
-        Point{i, (d + 1) - i}, Point{-i, -(d + 1) + i},
-      };
-      for (Point delta : to_test) {
-        Point t = sandb.sensor + delta;
-        if (!test_area.Contains(t)) continue;
-        if (!HasCloser(*list, t)) {
-          if (found && *found != t) return Error("Duplicate!");
-          found = t;
-          VLOG(1) << "Found @" << *found << " -> "
-                  << found->x * 4000000ll + found->y;
-        }
-      }
     }
   }
   if (!found) return Error("Not found");
