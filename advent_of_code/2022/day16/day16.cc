@@ -43,10 +43,10 @@ absl::StatusOr<DirectedGraph<Valve>> ParseGraph(
 }
 
 struct State {
-  int open_set;
-  int flow = 0;
   absl::string_view me;
   absl::string_view el;
+  int open_set;
+  int flow = 0;
 
   void NextForMe(
       const DirectedGraph<Valve>& graph,
