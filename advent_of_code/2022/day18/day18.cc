@@ -75,20 +75,20 @@ absl::StatusOr<std::string> Day_2022_18::Part2(
       Point3 p = start + start_dir;
       if (points.contains(p)) continue;
       absl::flat_hash_set<Point3> hist = {p};
-      bool found = false;
-      for (std::deque<Point3> queue = {p}; !queue.empty() && !found; queue.pop_front()) {
+      bool escaped = false;
+      for (std::deque<Point3> queue = {p}; !queue.empty() && !escaped; queue.pop_front()) {
         Point3 cur = queue.front();
         for (Point3 dir : Cardinal3::kSixDirs) {
           Point3 test = cur + dir;
-          if (test == Cardinal3::kOrigin) {
-            found = true;
+          if (!cube.Contains(test)) {
+            escaped = true;
             break;
           }
           if (points.contains(test)) continue;
           if (hist.insert(test).second) queue.push_back(test);
         }
       }
-      if (!found) {
+      if (!escaped) {
         for (Point3 p2 : hist) points.insert(p2);
       }
     }
