@@ -59,7 +59,8 @@ struct State {
       return;
     }
     TryOpenMe(pack, on_next);
-    std::string me_str = {static_cast<char>(me >> 8), static_cast<char>(me & 0xFF)};
+    std::string me_str = 
+        {static_cast<char>(me >> 8), static_cast<char>(me & 0xFF)};
     CHECK(graph.Outgoing(me_str) != nullptr) << me_str;
     for (absl::string_view out : *graph.Outgoing(me_str)) {
       State s = *this;
@@ -77,7 +78,8 @@ struct State {
       return;
     }
     TryOpenEl(pack, on_next);
-    std::string el_str = {static_cast<char>(el >> 8), static_cast<char>(el & 0xFF)};
+    std::string el_str =
+        {static_cast<char>(el >> 8), static_cast<char>(el & 0xFF)};
     CHECK(graph.Outgoing(el_str) != nullptr) << el_str;
     for (absl::string_view out : *graph.Outgoing(el_str)) {
       State s = *this;
@@ -88,7 +90,8 @@ struct State {
 
   void TryOpenMe(const absl::flat_hash_map<absl::string_view, int>& pack,
                  absl::FunctionRef<void(State)> on_next) const {
-    std::string me_str = {static_cast<char>(me >> 8), static_cast<char>(me & 0xFF)};
+    std::string me_str =
+        {static_cast<char>(me >> 8), static_cast<char>(me & 0xFF)};
     auto bit_it = pack.find(me_str);
     if (bit_it == pack.end()) return;
     int64_t bit = 1ll << bit_it->second;
@@ -105,7 +108,8 @@ struct State {
 
   void TryOpenEl(const absl::flat_hash_map<absl::string_view, int>& pack,
                  absl::FunctionRef<void(State)> on_next) const {
-    std::string el_str = {static_cast<char>(el >> 8), static_cast<char>(el & 0xFF)};
+    std::string el_str =
+        {static_cast<char>(el >> 8), static_cast<char>(el & 0xFF)};
     auto bit_it = pack.find(el_str);
     if (bit_it == pack.end()) return;
     int64_t bit = 1ll << bit_it->second;
@@ -145,7 +149,9 @@ absl::StatusOr<int> BestPath(
   for (absl::string_view n : graph.nodes()) {
     ordered_valves.push_back(graph.GetData(n));
   }
-  absl::c_sort(ordered_valves, [](const Valve* a, const Valve* b) { return a->flow > b->flow; });
+  auto by_flow = 
+      [](const Valve* a, const Valve* b) { return a->flow > b->flow; };
+  absl::c_sort(ordered_valves, by_flow);
   for (const Valve* v : ordered_valves) {
     if (v->flow == 0) break;
     all_on |= 1ll << pack.size();
@@ -188,7 +194,8 @@ absl::StatusOr<int> BestPath(
     absl::flat_hash_map<State, int> new_state_to_pressure;
     int best_pressure = best_known;
     for (const auto& [s, p] : state_to_pressure) {
-      best_pressure = std::max(best_pressure, p + flows[s.open_set] * (minutes - r));
+      best_pressure =
+          std::max(best_pressure, p + flows[s.open_set] * (minutes - r));
     }
     for (const auto& [s, p] : state_to_pressure) {
       if (p + full_flow * (minutes - r) < best_pressure) continue;
