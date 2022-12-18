@@ -10,6 +10,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/bfs.h"
 #include "advent_of_code/directed_graph.h"
 #include "re2/re2.h"
 
@@ -223,12 +224,117 @@ absl::StatusOr<int> BestPath(
   return max;
 }
 
+using MinPathMap =
+    absl::flat_hash_map<absl::string_view,
+                        absl::flat_hash_map<absl::string_view, int>>;
+
+class CalcMinPath : public BFSInterface<CalcMinPath, absl::string_view> {
+ public:
+  CalcMinPath(const DirectedGraph<Valve>& graph, absl::string_view src,
+              absl::string_view dest)
+    : graph_(graph), cur_(src), dest_(dest) {}
+
+  absl::string_view identifier() const override { return cur_; }
+  bool IsFinal() const override { return cur_ == dest_; }
+  void AddNextSteps(State* state) const override {
+    for (absl::string_view next_cur : *graph_.Outgoing(cur_)) {
+      CalcMinPath next = *this;
+      next.cur_ = next_cur;
+      state->AddNextStep(next);
+    }
+  }
+
+ private:
+  const DirectedGraph<Valve>& graph_;
+  absl::string_view cur_;
+  absl::string_view dest_;
+};
+
+MinPathMap MinValvePaths(const DirectedGraph<Valve>& graph) {
+  std::vector<absl::string_view> valves;
+  for (absl::string_view loc : graph.nodes()) {
+    if (graph.GetData(loc)->flow != 0) {
+      valves.push_back(loc);
+    }
+  }
+  MinPathMap ret;
+  for (absl::string_view dest : valves) {
+    absl::string_view src = "AA";
+    std::optional<int> dist = CalcMinPath(graph, src, dest).FindMinSteps();
+    CHECK(dist);
+    ret[src][dest] = *dist;
+  }
+  for (absl::string_view src : valves) {
+    for (absl::string_view dest : valves) {
+      std::optional<int> dist = CalcMinPath(graph, src, dest).FindMinSteps();
+      CHECK(dist);
+      ret[src][dest] = *dist;
+    }
+  }
+  return ret;
+}
+
+int FindBestOrderRecursive(
+    int depth,
+    const absl::flat_hash_map<absl::string_view, int>& valves,
+    const MinPathMap& min_path_map,
+    int minutes,
+    int pressure,
+    int flow,
+    absl::string_view cur,
+    absl::flat_hash_set<absl::string_view>& open) {
+
+  std::string prefix(depth * 2, ' ');
+  VLOG(2) << prefix << "FindBestOrderRecursive(" << minutes << "," << pressure << "," << flow << "," << cur << ")";
+
+  auto next_map_it = min_path_map.find(cur);
+  CHECK(next_map_it != min_path_map.end()) << cur;
+
+  int best = pressure + minutes * flow;
+  for (const auto& [dest, dist] : next_map_it->second) {
+    int time_to_open = dist + 1;
+    if (open.contains(dest)) continue;
+    if (time_to_open > minutes) continue;
+    auto valves_it = valves.find(dest);
+    CHECK(valves_it != valves.end()) << dest;
+    open.insert(dest);
+    int sub = FindBestOrderRecursive(
+      depth + 1, valves, min_path_map, minutes - time_to_open,
+      pressure + time_to_open * flow,
+      flow + valves_it->second,
+      dest, open);
+    open.erase(dest);
+    best = std::max(best, sub);
+  }
+  return best;
+}
+
+int FindBestOrder(
+    const absl::flat_hash_map<absl::string_view, int>& valves,
+    const MinPathMap& min_path_map,
+    int minutes) {
+  absl::flat_hash_set<absl::string_view> open;
+  return FindBestOrderRecursive(
+    /*depth=*/0, valves, min_path_map, minutes, /*pressure=*/0, /*flow=*/0,
+    /*cur=*/"AA", open);
+}
+
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_16::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<DirectedGraph<Valve>> graph = ParseGraph(input);
   if (!graph.ok()) return graph.status();
+
+  absl::flat_hash_map<absl::string_view, int> valves;
+  for (absl::string_view loc : graph->nodes()) {
+    if (graph->GetData(loc)->flow != 0) {
+      valves.insert({loc, graph->GetData(loc)->flow});
+    }
+  }
+
+  MinPathMap min_paths = MinValvePaths(*graph);
+  return IntReturn(FindBestOrder(valves, min_paths, 30));
 
   return IntReturn(BestPath(*graph, 30, /*use_elephant=*/false));
 }
