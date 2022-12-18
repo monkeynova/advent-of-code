@@ -90,7 +90,8 @@ absl::StatusOr<std::string> Day_2022_15::Part2(
   test_area.max = Point{max, max};
   std::optional<Point> found;
 
-  // Check for 1 past a boundary. Can't prove unique, but reasonably fast.
+  // Check for 1 past a boundary. Can't fully prove unique, but reasonably
+  // fast.
   for (const auto& sandb : *list) {
     int d = (sandb.beacon - sandb.sensor).dist();
     for (int i = 0; i <= d + 1; ++i) {
@@ -111,6 +112,9 @@ absl::StatusOr<std::string> Day_2022_15::Part2(
     }
   }
   if (!found) return Error("Not found");
+  for (Point d : Cardinal::kFourDirs) {
+    if (!HasCloser(*list, *found + d)) return Error("Not unique");
+  }
   return IntReturn(found->x * 4000000ll + found->y);
 
   // Check with every 1D interval. Proves unique, but slow.
