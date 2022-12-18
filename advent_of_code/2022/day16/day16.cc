@@ -29,13 +29,16 @@ absl::StatusOr<DirectedGraph<Valve>> ParseGraph(
   for (absl::string_view line : input) {
     Valve v;
     absl::string_view out;
-    if (!RE2::FullMatch(line, "Valve ([A-Z]+) has flow rate=(\\d+); tunnels? leads? to valves? ([A-Z ,]+)",
+    if (!RE2::FullMatch(line, "Valve ([A-Z]+) has flow rate=(\\d+); "
+                        "tunnels? leads? to valves? ([A-Z ,]+)",
                         &v.name, &v.flow, &out)) {
       return Error("Bad line: ", line);
     }
+    if (v.name.size() != 2) return Error("Bad valve: ", v.name);
     full_flow += v.flow;
     graph.AddNode(v.name, v);
     for (absl::string_view out_name : absl::StrSplit(out, ", ")) {
+      if (out_name.size() != 2) return Error("Bad valve: ", out_name);
       graph.AddEdge(v.name, out_name);
     }
   }
@@ -43,10 +46,9 @@ absl::StatusOr<DirectedGraph<Valve>> ParseGraph(
 }
 
 struct State {
-  absl::string_view me;
-  absl::string_view el;
+  int16_t me;
+  int16_t el;
   int open_set;
-  int flow = 0;
 
   void NextForMe(
       const DirectedGraph<Valve>& graph,
@@ -56,8 +58,10 @@ struct State {
       on_next(*this);
       return;
     }
-    TryOpenMe(graph, pack, on_next);
-    for (absl::string_view out : *graph.Outgoing(me)) {
+    TryOpenMe(pack, on_next);
+    std::string me_str = {static_cast<char>(me >> 8), static_cast<char>(me & 0xFF)};
+    CHECK(graph.Outgoing(me_str) != nullptr) << me_str;
+    for (absl::string_view out : *graph.Outgoing(me_str)) {
       State s = *this;
       s.MoveMe(out);
       on_next(s);
@@ -72,48 +76,48 @@ struct State {
       on_next(*this);
       return;
     }
-    TryOpenEl(graph, pack, on_next);
-    for (absl::string_view out : *graph.Outgoing(el)) {
+    TryOpenEl(pack, on_next);
+    std::string el_str = {static_cast<char>(el >> 8), static_cast<char>(el & 0xFF)};
+    CHECK(graph.Outgoing(el_str) != nullptr) << el_str;
+    for (absl::string_view out : *graph.Outgoing(el_str)) {
       State s = *this;
       s.MoveEl(out);
       on_next(s);
     }
   }
 
-  void TryOpenMe(const DirectedGraph<Valve>& graph, 
-                 const absl::flat_hash_map<absl::string_view, int>& pack,
+  void TryOpenMe(const absl::flat_hash_map<absl::string_view, int>& pack,
                  absl::FunctionRef<void(State)> on_next) const {
-    auto bit_it = pack.find(me);
+    std::string me_str = {static_cast<char>(me >> 8), static_cast<char>(me & 0xFF)};
+    auto bit_it = pack.find(me_str);
     if (bit_it == pack.end()) return;
     int64_t bit = 1ll << bit_it->second;
     if (open_set & bit) return;
 
     State new_state = *this;
-    new_state.flow += graph.GetData(me)->flow;
     new_state.open_set |= bit;
     on_next(new_state);;
   }
 
   void MoveMe(absl::string_view dest) {
-    me = dest;
+    me = (dest[0] << 8) | dest[1];
   }
 
-  void TryOpenEl(const DirectedGraph<Valve>& graph, 
-                 const absl::flat_hash_map<absl::string_view, int>& pack,
+  void TryOpenEl(const absl::flat_hash_map<absl::string_view, int>& pack,
                  absl::FunctionRef<void(State)> on_next) const {
-    auto bit_it = pack.find(el);
+    std::string el_str = {static_cast<char>(el >> 8), static_cast<char>(el & 0xFF)};
+    auto bit_it = pack.find(el_str);
     if (bit_it == pack.end()) return;
     int64_t bit = 1ll << bit_it->second;
     if (open_set & bit) return;
 
     State new_state = *this;
-    new_state.flow += graph.GetData(el)->flow;
     new_state.open_set |= bit;
     on_next(new_state);;
   }
 
   void MoveEl(absl::string_view dest) {
-    el = dest;
+    el = (dest[0] << 8) | dest[1];
   }
 
   bool operator==(const State& o) const {
@@ -150,6 +154,15 @@ absl::StatusOr<int> BestPath(
   }
   if (pack.size() > 30) return Error("Can't fit");
 
+  std::vector<int> flows(all_on + 1);
+  for (int bv = 1; bv <= all_on; ++bv) {
+    for (int bit = 0; (1 << bit) <= bv; ++bit) {
+      if (bv & (1 << bit)) {
+        flows[bv] += ordered_valves[bit]->flow;
+      }
+    }
+  }
+
   int best_known = 0;
   if (use_elephant) { 
     absl::StatusOr<int> just_me =
@@ -165,19 +178,21 @@ absl::StatusOr<int> BestPath(
              (use_elephant ? graph.nodes().size() : 1);
 
 
-  State start = {.me = "AA", .el = "AA", .open_set = 0, .flow = 0};
+  State start;
+  start.open_set = 0;
+  start.MoveMe("AA");
+  start.MoveEl("AA");
   absl::flat_hash_map<State, int> state_to_pressure = {{start, 0}};
   for (int r = 0; r < minutes; ++r) {
     VLOG(1) << r << ": " << state_to_pressure.size();
     absl::flat_hash_map<State, int> new_state_to_pressure;
     int best_pressure = best_known;
     for (const auto& [s, p] : state_to_pressure) {
-      best_pressure = std::max(best_pressure, p + s.flow * (minutes - r));
+      best_pressure = std::max(best_pressure, p + flows[s.open_set] * (minutes - r));
     }
-    int rejects = 0;
     for (const auto& [s, p] : state_to_pressure) {
       if (p + full_flow * (minutes - r) < best_pressure) continue;
-      int new_pressure = p + s.flow;
+      int new_pressure = p + flows[s.open_set];
       s.NextForMe(
         graph, pack,
         [&](State s1) {
