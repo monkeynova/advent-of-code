@@ -137,18 +137,18 @@ absl::StatusOr<int> BestPath(
   absl::flat_hash_map<absl::string_view, int> pack;
   int64_t all_on = 0;
   int full_flow = 0;
+  std::vector<const Valve*> ordered_valves;
   for (absl::string_view n : graph.nodes()) {
-    if (graph.GetData(n)->flow == 0) continue;
+    ordered_valves.push_back(graph.GetData(n));
+  }
+  absl::c_sort(ordered_valves, [](const Valve* a, const Valve* b) { return a->flow > b->flow; });
+  for (const Valve* v : ordered_valves) {
+    if (v->flow == 0) break;
     all_on |= 1ll << pack.size();
-    full_flow += graph.GetData(n)->flow;
-    pack[n] = pack.size();
+    full_flow += v->flow;
+    pack[v->name] = pack.size();
   }
   if (pack.size() > 30) return Error("Can't fit");
-  VLOG(1) << "Max cardinality: " << graph.nodes().size() << "*"
-          << (1 << pack.size()) << "*"
-          << (use_elephant ? graph.nodes().size() : 1) << " = " 
-          << graph.nodes().size() * (1 << pack.size()) *
-             (use_elephant ? graph.nodes().size() : 1);
 
   int best_known = 0;
   if (use_elephant) { 
@@ -158,18 +158,26 @@ absl::StatusOr<int> BestPath(
     best_known = *just_me;
   }
 
+  VLOG(1) << "Max cardinality: " << graph.nodes().size() << "*"
+          << (1 << pack.size()) << "*"
+          << (use_elephant ? graph.nodes().size() : 1) << " = " 
+          << graph.nodes().size() * (1 << pack.size()) *
+             (use_elephant ? graph.nodes().size() : 1);
+
+
   State start = {.me = "AA", .el = "AA", .open_set = 0, .flow = 0};
-  absl::flat_hash_map<State, int> state_to_flow = {{start, 0}};
+  absl::flat_hash_map<State, int> state_to_pressure = {{start, 0}};
   for (int r = 0; r < minutes; ++r) {
-    VLOG(1) << r << ": " << state_to_flow.size();
-    absl::flat_hash_map<State, int> new_state_to_flow;
-    int best_flow = best_known;
-    for (const auto& [s, f] : state_to_flow) {
-      best_flow = std::max(best_flow, f + s.flow * (minutes - r));
+    VLOG(1) << r << ": " << state_to_pressure.size();
+    absl::flat_hash_map<State, int> new_state_to_pressure;
+    int best_pressure = best_known;
+    for (const auto& [s, p] : state_to_pressure) {
+      best_pressure = std::max(best_pressure, p + s.flow * (minutes - r));
     }
-    for (const auto& [s, f] : state_to_flow) {
-      if (f + full_flow * (minutes - r) < best_flow) continue;
-      int new_flow = f + s.flow;
+    int rejects = 0;
+    for (const auto& [s, p] : state_to_pressure) {
+      if (p + full_flow * (minutes - r) < best_pressure) continue;
+      int new_pressure = p + s.flow;
       s.NextForMe(
         graph, pack,
         [&](State s1) {
@@ -177,18 +185,18 @@ absl::StatusOr<int> BestPath(
             s1.NextForEl(
               graph, pack,
               [&](State s2) {
-                InsertOrUpdateMax(new_state_to_flow, s2, new_flow);
+                InsertOrUpdateMax(new_state_to_pressure, s2, new_pressure);
               });
           } else {
-            InsertOrUpdateMax(new_state_to_flow, s1, new_flow);
+            InsertOrUpdateMax(new_state_to_pressure, s1, new_pressure);
           }
         });
     }
-    state_to_flow = std::move(new_state_to_flow);
+    state_to_pressure = std::move(new_state_to_pressure);
   }
   int max = 0;
-  for (const auto& [s, f] : state_to_flow) {
-    max = std::max(f, max);
+  for (const auto& [s, p] : state_to_pressure) {
+    max = std::max(p, max);
   }
   return max;
 }
