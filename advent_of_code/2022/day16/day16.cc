@@ -201,8 +201,10 @@ absl::StatusOr<int> BestPath(const DirectedGraph<Valve>& graph, int minutes,
           std::max(best_pressure, p + flows[s.open_set] * (minutes - r));
     }
     for (const auto& [s, p] : state_to_pressure) {
-      if (p + full_flow * (minutes - r) < best_pressure) continue;
       int new_pressure = p + flows[s.open_set];
+      if (new_pressure + full_flow * (minutes - r - 1) < best_pressure) {
+        continue;
+      }
       s.NextForMe(graph, pack, [&](State s1) {
         if (use_elephant) {
           s1.NextForEl(graph, pack, [&](State s2) {
