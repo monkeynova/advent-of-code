@@ -27,7 +27,7 @@ absl::StatusOr<absl::flat_hash_set<Point>> AllPoints(
       Point p;
       if (!Point::RE2Parse(p_str.data(), p_str.size(), &p)) {
         return Error("Bad point");
-      } 
+      }
       if (last) {
         Point d = (p - *last).min_step();
         if (d.dist() != 1) return Error("Bad d");
@@ -56,7 +56,8 @@ bool AddSand(CharBoard& b, Point at) {
   if (b[at] != '.') return false;
   while (b.OnBoard(at + Cardinal::kSouth)) {
     bool fell = false;
-    for (Point d : {Cardinal::kSouth, Cardinal::kSouthWest, Cardinal::kSouthEast}) {
+    for (Point d :
+         {Cardinal::kSouth, Cardinal::kSouthWest, Cardinal::kSouthEast}) {
       Point t = at + d;
       CHECK(b.OnBoard(t));
       if (b[t] == '.') {

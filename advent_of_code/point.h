@@ -170,7 +170,8 @@ struct PointRectangle {
     return out << absl::StreamFormat("%v", r);
   }
 
-  void SetDifference(const PointRectangle& o, std::vector<PointRectangle>* out) const;
+  void SetDifference(const PointRectangle& o,
+                     std::vector<PointRectangle>* out) const;
 };
 
 struct Cardinal {
@@ -277,9 +278,8 @@ struct Cardinal3 {
   static constexpr Point3 kXHat{1, 0, 0};
   static constexpr Point3 kYHat{0, 1, 0};
   static constexpr Point3 kZHat{0, 0, 1};
-  static constexpr std::array<Point3, 6> kSixDirs = {
-    kXHat, -kXHat, kYHat, -kYHat, kZHat, -kZHat
-  };
+  static constexpr std::array<Point3, 6> kSixDirs = {kXHat,  -kXHat, kYHat,
+                                                     -kYHat, kZHat,  -kZHat};
   static constexpr std::array<Point3, 3 * 3 * 3 - 1> kNeighborDirs =
       []() constexpr {
     std::array<Point3, 3 * 3 * 3 - 1> ret{};

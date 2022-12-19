@@ -24,8 +24,8 @@ Interval1D Interval1D::Minus(const Interval1D& o) const {
   return Merge(o, [](bool left, bool right) { return left && !right; });
 }
 
-Interval1D Interval1D::Merge(const Interval1D& o,
-                             absl::FunctionRef<bool(bool, bool)> merge_fn) const {
+Interval1D Interval1D::Merge(
+    const Interval1D& o, absl::FunctionRef<bool(bool, bool)> merge_fn) const {
   auto left_it = x_.begin();
   bool left_on = false;
   auto right_it = o.x_.begin();

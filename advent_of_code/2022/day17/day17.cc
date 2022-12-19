@@ -73,22 +73,25 @@ class DropState {
   absl::flat_hash_set<Point> stopped_;
 };
 
-const PointRectangle DropState::kBounds =
-  {{0, 0}, {6, std::numeric_limits<int>::max()}};
+const PointRectangle DropState::kBounds = {
+    {0, 0}, {6, std::numeric_limits<int>::max()}};
 
 const std::vector<DropState::Rock> DropState::kRockTypes = {
-  Rock{.off = {0, 0}, .delta = {{0, 0}, {1, 0}, {2, 0}, {3, 0}}},
-  Rock{.off = {0, 0}, .delta = {{2, 1}, {1, 0}, {1, 1}, {1, 2}, {0, 1}}},
-  Rock{.off = {0, 0}, .delta = {{2, 2}, {2, 1}, {0, 0}, {1, 0}, {2, 0}}},
-  Rock{.off = {0, 0}, .delta = {{0, 3}, {0, 2}, {0, 1}, {0, 0}}},
-  Rock{.off = {0, 0}, .delta = {{1, 0}, {1, 1}, {0, 0}, {0, 1}}},
+    Rock{.off = {0, 0}, .delta = {{0, 0}, {1, 0}, {2, 0}, {3, 0}}},
+    Rock{.off = {0, 0}, .delta = {{2, 1}, {1, 0}, {1, 1}, {1, 2}, {0, 1}}},
+    Rock{.off = {0, 0}, .delta = {{2, 2}, {2, 1}, {0, 0}, {1, 0}, {2, 0}}},
+    Rock{.off = {0, 0}, .delta = {{0, 3}, {0, 2}, {0, 1}, {0, 0}}},
+    Rock{.off = {0, 0}, .delta = {{1, 0}, {1, 1}, {0, 0}, {0, 1}}},
 };
 
 absl::Status DropState::ParseWind(absl::string_view wind_str) {
   for (char c : wind_str) {
-    if (c == '<') wind_.push_back(Cardinal::kWest);
-    else if (c == '>') wind_.push_back(Cardinal::kEast);
-    else return Error("Bad wind");
+    if (c == '<')
+      wind_.push_back(Cardinal::kWest);
+    else if (c == '>')
+      wind_.push_back(Cardinal::kEast);
+    else
+      return Error("Bad wind");
   }
   return absl::OkStatus();
 }
@@ -112,8 +115,7 @@ absl::Status DropState::DropNextRock(int i) {
     Point d = wind_[w_idx_];
     VLOG(2) << "Drop: " << drop.off << "; Wind: " << d;
     if (i == 13) {
-      VLOG(2) << "Board (" << i << "):\n"
-              << AddPiece(Draw(height_ + 10), drop);
+      VLOG(2) << "Board (" << i << "):\n" << AddPiece(Draw(height_ + 10), drop);
     }
     TryMove(drop, d);
     if (!TryMove(drop, Cardinal::kNorth)) {
@@ -170,8 +172,9 @@ DropState::SummaryState DropState::Summarize() const {
     }
   }
   ret.bounds = std::vector<Point>(edge.begin(), edge.end());
-  auto point_x_then_y =
-      [](Point a, Point b) { return a.x != b.x ? a.x < b.x : a.y < b.y; };
+  auto point_x_then_y = [](Point a, Point b) {
+    return a.x != b.x ? a.x < b.x : a.y < b.y;
+  };
   absl::c_sort(ret.bounds, point_x_then_y);
   return ret;
 }
@@ -184,7 +187,7 @@ absl::StatusOr<std::string> Day_2022_17::Part1(
 
   DropState ds;
   if (absl::Status st = ds.ParseWind(input[0]); !st.ok()) return st;
-  
+
   for (int i = 0; i < 2022; ++i) {
     if (absl::Status st = ds.DropNextRock(i); !st.ok()) return st;
   }
@@ -197,7 +200,7 @@ absl::StatusOr<std::string> Day_2022_17::Part2(
 
   DropState ds;
   if (absl::Status st = ds.ParseWind(input[0]); !st.ok()) return st;
-  
+
   absl::flat_hash_map<DropState::SummaryState, int> state_to_idx;
   std::vector<int> heights;
   for (int i = 0; true; ++i) {
@@ -208,13 +211,13 @@ absl::StatusOr<std::string> Day_2022_17::Part2(
     VLOG(2) << "Summary:\n" << it->first.Draw();
     if (!inserted) {
       VLOG(1) << "Repeat @" << i << " == " << it->second;
-      int64_t find = 1000000000000 - 1; // Problem is 1-indexed.
+      int64_t find = 1000000000000 - 1;  // Problem is 1-indexed.
       int prev_i = it->second;
 
       int64_t cycles = (find - prev_i) / (i - prev_i);
       int64_t offset = (find - prev_i) % (i - prev_i);
 
-      int64_t ret_height = 
+      int64_t ret_height =
           (heights[i] - heights[prev_i]) * cycles + heights[offset + prev_i];
 
       VLOG(1) << "Return " << ret_height;

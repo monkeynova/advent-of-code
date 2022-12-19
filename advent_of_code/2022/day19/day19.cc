@@ -28,15 +28,15 @@ struct Blueprint {
 
 absl::StatusOr<Blueprint> Parse(absl::string_view line) {
   Blueprint bp;
-  if (!RE2::FullMatch(
-    line,
-    "Blueprint (\\d+): Each ore robot costs (\\d+) ore. "
-    "Each clay robot costs (\\d+) ore. "
-    "Each obsidian robot costs (\\d+) ore and (\\d+) clay. "
-    "Each geode robot costs (\\d+) ore and (\\d+) obsidian.",
-    &bp.id, &bp.ore_robot_ore_cost, &bp.clay_robot_ore_cost,
-    &bp.obsidian_robot_ore_cost, &bp.obsidian_robot_clay_cost,
-    &bp.geode_robot_ore_cost, &bp.geode_robot_obsidian_cost)) {
+  if (!RE2::FullMatch(line,
+                      "Blueprint (\\d+): Each ore robot costs (\\d+) ore. "
+                      "Each clay robot costs (\\d+) ore. "
+                      "Each obsidian robot costs (\\d+) ore and (\\d+) clay. "
+                      "Each geode robot costs (\\d+) ore and (\\d+) obsidian.",
+                      &bp.id, &bp.ore_robot_ore_cost, &bp.clay_robot_ore_cost,
+                      &bp.obsidian_robot_ore_cost, &bp.obsidian_robot_clay_cost,
+                      &bp.geode_robot_ore_cost,
+                      &bp.geode_robot_obsidian_cost)) {
     return Error("Bad line: ", line);
   }
   return bp;
@@ -54,9 +54,9 @@ struct State {
 
   friend std::ostream& operator<<(std::ostream& o, const State& s) {
     return o << "O:+" << (int)s.ore << "*" << (int)s.ore_robot << ";"
-    << "O:+" << (int)s.clay << "*" << (int)s.clay_robot << ";"
-    << "O:+" << (int)s.obsidian << "*" << (int)s.obsidian_robot << ";"
-    << "O:+" << (int)s.geode << "*" << (int)s.geode_robot << ";";
+             << "O:+" << (int)s.clay << "*" << (int)s.clay_robot << ";"
+             << "O:+" << (int)s.obsidian << "*" << (int)s.obsidian_robot << ";"
+             << "O:+" << (int)s.geode << "*" << (int)s.geode_robot << ";";
   }
 
   template <typename H>
@@ -66,10 +66,10 @@ struct State {
   }
 
   bool operator==(const State& o) const {
-    return ore == o.ore && ore_robot == o.ore_robot && clay == o.clay && 
-      clay_robot == o.clay_robot && obsidian == o.obsidian &&
-      obsidian_robot == o.obsidian_robot && geode == o.geode &&
-      geode_robot == o.geode_robot;
+    return ore == o.ore && ore_robot == o.ore_robot && clay == o.clay &&
+           clay_robot == o.clay_robot && obsidian == o.obsidian &&
+           obsidian_robot == o.obsidian_robot && geode == o.geode &&
+           geode_robot == o.geode_robot;
   }
 };
 
@@ -88,7 +88,8 @@ int BestGeode(Blueprint bp, int minutes) {
     absl::flat_hash_set<State> new_states;
     for (const State& s : states) {
       if (true) {
-        int best_geode_add = s.geode_robot * (minutes - i) + (minutes - i) * (minutes - i + 1) / 2;
+        int best_geode_add = s.geode_robot * (minutes - i) +
+                             (minutes - i) * (minutes - i + 1) / 2;
         if (s.geode + best_geode_add < max_geode) {
           continue;
         }
@@ -106,21 +107,19 @@ int BestGeode(Blueprint bp, int minutes) {
       }
       if (i == minutes - 1) continue;
 
-      if (s.ore >= bp.ore_robot_ore_cost && 
-          s.ore_robot < max_ore_robots) {
+      if (s.ore >= bp.ore_robot_ore_cost && s.ore_robot < max_ore_robots) {
         State build = next_state;
         build.ore -= bp.ore_robot_ore_cost;
         build.ore_robot++;
         new_states.insert(build);
       }
-      if (s.ore >= bp.clay_robot_ore_cost &&
-          s.clay_robot < max_clay_robots) {
+      if (s.ore >= bp.clay_robot_ore_cost && s.clay_robot < max_clay_robots) {
         State build = next_state;
         build.ore -= bp.clay_robot_ore_cost;
         build.clay_robot++;
         new_states.insert(build);
       }
-      if (s.ore >= bp.obsidian_robot_ore_cost && 
+      if (s.ore >= bp.obsidian_robot_ore_cost &&
           s.clay >= bp.obsidian_robot_clay_cost &&
           s.obsidian_robot < max_obsidian_robots) {
         State build = next_state;
@@ -129,7 +128,7 @@ int BestGeode(Blueprint bp, int minutes) {
         build.obsidian_robot++;
         new_states.insert(build);
       }
-      if (s.ore >= bp.geode_robot_ore_cost && 
+      if (s.ore >= bp.geode_robot_ore_cost &&
           s.obsidian >= bp.geode_robot_obsidian_cost) {
         State build = next_state;
         build.ore -= bp.geode_robot_ore_cost;

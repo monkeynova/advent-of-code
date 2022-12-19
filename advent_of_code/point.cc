@@ -4,8 +4,8 @@
 
 namespace advent_of_code {
 
-void PointRectangle::SetDifference(
-    const PointRectangle& o, std::vector<PointRectangle>* out) const {
+void PointRectangle::SetDifference(const PointRectangle& o,
+                                   std::vector<PointRectangle>* out) const {
   if (!Overlaps(o)) {
     out->push_back(*this);
     return;

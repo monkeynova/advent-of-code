@@ -44,13 +44,9 @@ struct Packet {
     return o << "]";
   }
 
-  bool operator==(const Packet& o) const {
-    return cmp(o) == 0;
-  }
+  bool operator==(const Packet& o) const { return cmp(o) == 0; }
 
-  bool operator<(const Packet& o) const {
-    return cmp(o) < 0;
-  }
+  bool operator<(const Packet& o) const { return cmp(o) < 0; }
 
   int cmp(const Packet& o) const {
     if (IsInt() && o.IsInt()) {
@@ -106,7 +102,7 @@ bool ByPointerLt(const std::unique_ptr<Packet>& a,
   return *a < *b;
 }
 
-absl::StatusOr<Packet> ParseFull( absl::string_view line) {
+absl::StatusOr<Packet> ParseFull(absl::string_view line) {
   absl::string_view tmp = line;
   Packet ret = Parse(tmp);
   if (!tmp.empty()) return Error("Bad line: ", line);
@@ -119,12 +115,12 @@ absl::StatusOr<std::string> Day_2022_13::Part1(
     absl::Span<absl::string_view> input) const {
   int ret = 0;
   for (int i = 0; i < input.size(); i += 3) {
-    if (!input[i+2].empty()) return Error("Bad input: empty");
+    if (!input[i + 2].empty()) return Error("Bad input: empty");
     absl::StatusOr<Packet> left = ParseFull(input[i]);
     if (!left.ok()) return left.status();
-    absl::StatusOr<Packet> right = ParseFull(input[i+1]);
+    absl::StatusOr<Packet> right = ParseFull(input[i + 1]);
     if (!right.ok()) return right.status();
-    if (!(*right < *left)) ret += (i/3) + 1;
+    if (!(*right < *left)) ret += (i / 3) + 1;
   }
   return IntReturn(ret);
 }
@@ -140,8 +136,12 @@ absl::StatusOr<std::string> Day_2022_13::Part2(
     if (input[i].empty()) continue;
     absl::StatusOr<Packet> test = ParseFull(input[i]);
     if (!test.ok()) return test.status();
-    if (*test < *m1) { ++idx1; ++idx2; }
-    else if (*test < *m2) { ++idx2; }
+    if (*test < *m1) {
+      ++idx1;
+      ++idx2;
+    } else if (*test < *m2) {
+      ++idx2;
+    }
   }
   return IntReturn(idx1 * idx2);
 }

@@ -30,7 +30,8 @@ absl::StatusOr<DirectedGraph<Valve>> ParseGraph(
   for (absl::string_view line : input) {
     Valve v;
     absl::string_view out;
-    if (!RE2::FullMatch(line, "Valve ([A-Z]+) has flow rate=(\\d+); "
+    if (!RE2::FullMatch(line,
+                        "Valve ([A-Z]+) has flow rate=(\\d+); "
                         "tunnels? leads? to valves? ([A-Z ,]+)",
                         &v.name, &v.flow, &out)) {
       return Error("Bad line: ", line);
@@ -51,17 +52,16 @@ struct State {
   int16_t el;
   int open_set;
 
-  void NextForMe(
-      const DirectedGraph<Valve>& graph,
-      const absl::flat_hash_map<absl::string_view, int>& pack,
-      absl::FunctionRef<void(State)> on_next) const {
+  void NextForMe(const DirectedGraph<Valve>& graph,
+                 const absl::flat_hash_map<absl::string_view, int>& pack,
+                 absl::FunctionRef<void(State)> on_next) const {
     if (open_set == (1 << pack.size()) - 1) {
       on_next(*this);
       return;
     }
     TryOpenMe(pack, on_next);
-    std::string me_str = 
-        {static_cast<char>(me >> 8), static_cast<char>(me & 0xFF)};
+    std::string me_str = {static_cast<char>(me >> 8),
+                          static_cast<char>(me & 0xFF)};
     CHECK(graph.Outgoing(me_str) != nullptr) << me_str;
     for (absl::string_view out : *graph.Outgoing(me_str)) {
       State s = *this;
@@ -70,17 +70,16 @@ struct State {
     }
   }
 
-  void NextForEl(
-      const DirectedGraph<Valve>& graph,
-      const absl::flat_hash_map<absl::string_view, int>& pack,
-      absl::FunctionRef<void(State)> on_next) const {
+  void NextForEl(const DirectedGraph<Valve>& graph,
+                 const absl::flat_hash_map<absl::string_view, int>& pack,
+                 absl::FunctionRef<void(State)> on_next) const {
     if (open_set == (1 << pack.size()) - 1) {
       on_next(*this);
       return;
     }
     TryOpenEl(pack, on_next);
-    std::string el_str =
-        {static_cast<char>(el >> 8), static_cast<char>(el & 0xFF)};
+    std::string el_str = {static_cast<char>(el >> 8),
+                          static_cast<char>(el & 0xFF)};
     CHECK(graph.Outgoing(el_str) != nullptr) << el_str;
     for (absl::string_view out : *graph.Outgoing(el_str)) {
       State s = *this;
@@ -91,8 +90,8 @@ struct State {
 
   void TryOpenMe(const absl::flat_hash_map<absl::string_view, int>& pack,
                  absl::FunctionRef<void(State)> on_next) const {
-    std::string me_str =
-        {static_cast<char>(me >> 8), static_cast<char>(me & 0xFF)};
+    std::string me_str = {static_cast<char>(me >> 8),
+                          static_cast<char>(me & 0xFF)};
     auto bit_it = pack.find(me_str);
     if (bit_it == pack.end()) return;
     int64_t bit = 1ll << bit_it->second;
@@ -100,17 +99,16 @@ struct State {
 
     State new_state = *this;
     new_state.open_set |= bit;
-    on_next(new_state);;
+    on_next(new_state);
+    ;
   }
 
-  void MoveMe(absl::string_view dest) {
-    me = (dest[0] << 8) | dest[1];
-  }
+  void MoveMe(absl::string_view dest) { me = (dest[0] << 8) | dest[1]; }
 
   void TryOpenEl(const absl::flat_hash_map<absl::string_view, int>& pack,
                  absl::FunctionRef<void(State)> on_next) const {
-    std::string el_str =
-        {static_cast<char>(el >> 8), static_cast<char>(el & 0xFF)};
+    std::string el_str = {static_cast<char>(el >> 8),
+                          static_cast<char>(el & 0xFF)};
     auto bit_it = pack.find(el_str);
     if (bit_it == pack.end()) return;
     int64_t bit = 1ll << bit_it->second;
@@ -118,12 +116,11 @@ struct State {
 
     State new_state = *this;
     new_state.open_set |= bit;
-    on_next(new_state);;
+    on_next(new_state);
+    ;
   }
 
-  void MoveEl(absl::string_view dest) {
-    el = (dest[0] << 8) | dest[1];
-  }
+  void MoveEl(absl::string_view dest) { el = (dest[0] << 8) | dest[1]; }
 
   bool operator==(const State& o) const {
     return open_set == o.open_set && me == o.me && el == o.el;
@@ -135,14 +132,14 @@ struct State {
   }
 };
 
-void InsertOrUpdateMax(
-    absl::flat_hash_map<State, int>& map, State s, int new_val) {
+void InsertOrUpdateMax(absl::flat_hash_map<State, int>& map, State s,
+                       int new_val) {
   auto [it, inserted] = map.emplace(s, new_val);
   if (!inserted) it->second = std::max(it->second, new_val);
 }
 
-absl::StatusOr<int> BestPath(
-    const DirectedGraph<Valve>& graph, int minutes, bool use_elephant) {
+absl::StatusOr<int> BestPath(const DirectedGraph<Valve>& graph, int minutes,
+                             bool use_elephant) {
   absl::flat_hash_map<absl::string_view, int> pack;
   int64_t all_on = 0;
   int full_flow = 0;
@@ -150,8 +147,9 @@ absl::StatusOr<int> BestPath(
   for (absl::string_view n : graph.nodes()) {
     ordered_valves.push_back(graph.GetData(n));
   }
-  auto by_flow = 
-      [](const Valve* a, const Valve* b) { return a->flow > b->flow; };
+  auto by_flow = [](const Valve* a, const Valve* b) {
+    return a->flow > b->flow;
+  };
   absl::c_sort(ordered_valves, by_flow);
   for (const Valve* v : ordered_valves) {
     if (v->flow == 0) break;
@@ -171,7 +169,7 @@ absl::StatusOr<int> BestPath(
   }
 
   int best_known = 0;
-  if (use_elephant) { 
+  if (use_elephant) {
     absl::StatusOr<int> just_me =
         BestPath(graph, minutes, /*use_elephant=*/false);
     if (!just_me.ok()) return just_me.status();
@@ -180,10 +178,9 @@ absl::StatusOr<int> BestPath(
 
   VLOG(1) << "Max cardinality: " << graph.nodes().size() << "*"
           << (1 << pack.size()) << "*"
-          << (use_elephant ? graph.nodes().size() : 1) << " = " 
+          << (use_elephant ? graph.nodes().size() : 1) << " = "
           << graph.nodes().size() * (1 << pack.size()) *
-             (use_elephant ? graph.nodes().size() : 1);
-
+                 (use_elephant ? graph.nodes().size() : 1);
 
   State start;
   start.open_set = 0;
@@ -201,19 +198,15 @@ absl::StatusOr<int> BestPath(
     for (const auto& [s, p] : state_to_pressure) {
       if (p + full_flow * (minutes - r) < best_pressure) continue;
       int new_pressure = p + flows[s.open_set];
-      s.NextForMe(
-        graph, pack,
-        [&](State s1) {
-          if (use_elephant) {
-            s1.NextForEl(
-              graph, pack,
-              [&](State s2) {
-                InsertOrUpdateMax(new_state_to_pressure, s2, new_pressure);
-              });
-          } else {
-            InsertOrUpdateMax(new_state_to_pressure, s1, new_pressure);
-          }
-        });
+      s.NextForMe(graph, pack, [&](State s1) {
+        if (use_elephant) {
+          s1.NextForEl(graph, pack, [&](State s2) {
+            InsertOrUpdateMax(new_state_to_pressure, s2, new_pressure);
+          });
+        } else {
+          InsertOrUpdateMax(new_state_to_pressure, s1, new_pressure);
+        }
+      });
     }
     state_to_pressure = std::move(new_state_to_pressure);
   }
@@ -232,7 +225,7 @@ class CalcMinPath : public BFSInterface<CalcMinPath, absl::string_view> {
  public:
   CalcMinPath(const DirectedGraph<Valve>& graph, absl::string_view src,
               absl::string_view dest)
-    : graph_(graph), cur_(src), dest_(dest) {}
+      : graph_(graph), cur_(src), dest_(dest) {}
 
   absl::string_view identifier() const override { return cur_; }
   bool IsFinal() const override { return cur_ == dest_; }
@@ -275,17 +268,12 @@ MinPathMap MinValvePaths(const DirectedGraph<Valve>& graph) {
 }
 
 int FindBestOrderRecursive(
-    int depth,
-    const absl::flat_hash_map<absl::string_view, int>& valves,
-    const MinPathMap& min_path_map,
-    int minutes,
-    int pressure,
-    int flow,
-    absl::string_view cur,
-    absl::flat_hash_set<absl::string_view>& open) {
-
+    int depth, const absl::flat_hash_map<absl::string_view, int>& valves,
+    const MinPathMap& min_path_map, int minutes, int pressure, int flow,
+    absl::string_view cur, absl::flat_hash_set<absl::string_view>& open) {
   std::string prefix(depth * 2, ' ');
-  VLOG(2) << prefix << "FindBestOrderRecursive(" << minutes << "," << pressure << "," << flow << "," << cur << ")";
+  VLOG(2) << prefix << "FindBestOrderRecursive(" << minutes << "," << pressure
+          << "," << flow << "," << cur << ")";
 
   auto next_map_it = min_path_map.find(cur);
   CHECK(next_map_it != min_path_map.end()) << cur;
@@ -299,24 +287,20 @@ int FindBestOrderRecursive(
     CHECK(valves_it != valves.end()) << dest;
     open.insert(dest);
     int sub = FindBestOrderRecursive(
-      depth + 1, valves, min_path_map, minutes - time_to_open,
-      pressure + time_to_open * flow,
-      flow + valves_it->second,
-      dest, open);
+        depth + 1, valves, min_path_map, minutes - time_to_open,
+        pressure + time_to_open * flow, flow + valves_it->second, dest, open);
     open.erase(dest);
     best = std::max(best, sub);
   }
   return best;
 }
 
-int FindBestOrder(
-    const absl::flat_hash_map<absl::string_view, int>& valves,
-    const MinPathMap& min_path_map,
-    int minutes) {
+int FindBestOrder(const absl::flat_hash_map<absl::string_view, int>& valves,
+                  const MinPathMap& min_path_map, int minutes) {
   absl::flat_hash_set<absl::string_view> open;
   return FindBestOrderRecursive(
-    /*depth=*/0, valves, min_path_map, minutes, /*pressure=*/0, /*flow=*/0,
-    /*cur=*/"AA", open);
+      /*depth=*/0, valves, min_path_map, minutes, /*pressure=*/0, /*flow=*/0,
+      /*cur=*/"AA", open);
 }
 
 struct TravelState {
@@ -325,16 +309,13 @@ struct TravelState {
 };
 
 int FindBestOrderElephantRecursive(
-    int depth,
-    const absl::flat_hash_map<absl::string_view, int>& valves,
-    const MinPathMap& min_path_map,
-    int minutes, int pressure, int flow,
+    int depth, const absl::flat_hash_map<absl::string_view, int>& valves,
+    const MinPathMap& min_path_map, int minutes, int pressure, int flow,
     TravelState me, TravelState el,
     absl::flat_hash_set<absl::string_view>& open) {
-
   std::string prefix(depth * 2, ' ');
-  VLOG(2) << prefix << "FindBestOrderRecursive(" 
-          << minutes << "," << pressure << "," << flow << "," 
+  VLOG(2) << prefix << "FindBestOrderRecursive(" << minutes << "," << pressure
+          << "," << flow << ","
           << "{" << me.dest << "@" << me.time << "},"
           << "{" << el.dest << "@" << el.time << "}"
           << ")";
@@ -346,7 +327,7 @@ int FindBestOrderElephantRecursive(
     el.time -= time_to_next;
     minutes -= time_to_next;
     pressure += time_to_next * flow;
-    
+
     if (me.time == 0) {
       auto valves_it = valves.find(me.dest);
       CHECK(valves_it != valves.end()) << me.dest;
@@ -358,14 +339,14 @@ int FindBestOrderElephantRecursive(
     if (el.time == 0) {
       auto valves_it = valves.find(el.dest);
       CHECK(valves_it != valves.end()) << el.dest;
-      flow += valves_it->second;        
+      flow += valves_it->second;
       CHECK(!open.contains(el.dest)) << el.dest;
       open.insert(el.dest);
       to_close.push_back(el.dest);
     }
     std::string prefix(depth * 2, ' ');
-    VLOG(2) << prefix << "FindBestOrderRecursive(" 
-            << minutes << "," << pressure << "," << flow << "," 
+    VLOG(2) << prefix << "FindBestOrderRecursive(" << minutes << "," << pressure
+            << "," << flow << ","
             << "{" << me.dest << "@" << me.time << "},"
             << "{" << el.dest << "@" << el.time << "}"
             << ")";
@@ -384,9 +365,9 @@ int FindBestOrderElephantRecursive(
 
       TravelState new_me = {.dest = me_dest, .time = time_to_open};
 
-      int sub = FindBestOrderElephantRecursive(
-        depth + 1, valves, min_path_map, minutes, pressure, flow, new_me, el,
-        open);
+      int sub = FindBestOrderElephantRecursive(depth + 1, valves, min_path_map,
+                                               minutes, pressure, flow, new_me,
+                                               el, open);
 
       best = std::max(best, sub);
       if (depth < 2) {
@@ -404,9 +385,9 @@ int FindBestOrderElephantRecursive(
 
       TravelState new_el = {.dest = el_dest, .time = time_to_open};
 
-      int sub = FindBestOrderElephantRecursive(
-        depth + 1, valves, min_path_map, minutes, pressure, flow, me, new_el,
-        open);
+      int sub = FindBestOrderElephantRecursive(depth + 1, valves, min_path_map,
+                                               minutes, pressure, flow, me,
+                                               new_el, open);
 
       best = std::max(best, sub);
       if (depth < 2) {
@@ -425,13 +406,11 @@ int FindBestOrderElephantRecursive(
 
 int FindBestOrderElephant(
     const absl::flat_hash_map<absl::string_view, int>& valves,
-    const MinPathMap& min_path_map,
-    int minutes) {
+    const MinPathMap& min_path_map, int minutes) {
   absl::flat_hash_set<absl::string_view> open;
   return FindBestOrderElephantRecursive(
-    /*depth=*/0, valves, min_path_map, minutes, /*pressure=*/0, /*flow=*/0,
-    /*me=*/{.dest = "AA", .time = 0},  /*el=*/{.dest = "AA", .time = 0},
-    open);
+      /*depth=*/0, valves, min_path_map, minutes, /*pressure=*/0, /*flow=*/0,
+      /*me=*/{.dest = "AA", .time = 0}, /*el=*/{.dest = "AA", .time = 0}, open);
 }
 
 }  // namespace

@@ -33,9 +33,9 @@ Interval1D NoCloser(const SAndB& sandb, int y) {
 
 absl::StatusOr<std::vector<SAndB>> ParseList(
     absl::Span<absl::string_view> input) {
-  static LazyRE2 parse_re =
-      {"Sensor at x=(-?\\d+), y=(-?\\d+): closest beacon is at "
-       "x=(-?\\d+), y=(-?\\d+)"};
+  static LazyRE2 parse_re = {
+      "Sensor at x=(-?\\d+), y=(-?\\d+): closest beacon is at "
+      "x=(-?\\d+), y=(-?\\d+)"};
   std::vector<SAndB> list;
   for (absl::string_view line : input) {
     SAndB add;
@@ -96,8 +96,10 @@ absl::StatusOr<std::string> Day_2022_15::Part2(
     int d = (sandb.beacon - sandb.sensor).dist();
     for (int i = 0; i <= d + 1; ++i) {
       std::array<Point, 4> to_test = {
-        Point{i, (d + 1) - i}, Point{-i, -(d + 1) + i},
-        Point{i, (d + 1) - i}, Point{-i, -(d + 1) + i},
+          Point{i, (d + 1) - i},
+          Point{-i, -(d + 1) + i},
+          Point{i, (d + 1) - i},
+          Point{-i, -(d + 1) + i},
       };
       for (Point delta : to_test) {
         Point t = sandb.sensor + delta;

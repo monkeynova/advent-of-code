@@ -31,7 +31,8 @@ Point CharBoard::TorusPoint(Point p) const {
 
 absl::flat_hash_set<Point> CharBoard::Find(char c) const {
   absl::flat_hash_set<Point> ret;
-  for (Point p : range()) if (at(p) == c) ret.insert(p);
+  for (Point p : range())
+    if (at(p) == c) ret.insert(p);
   return ret;
 }
 

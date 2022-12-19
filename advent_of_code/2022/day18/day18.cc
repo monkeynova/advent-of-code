@@ -19,7 +19,8 @@ namespace {
 
 class CanReach : public BFSInterface<CanReach, Point3> {
  public:
-  CanReach(const absl::flat_hash_set<Point3>& g, Point3 start, Point3 end) : g_(g), cur_(start), end_(end) {}
+  CanReach(const absl::flat_hash_set<Point3>& g, Point3 start, Point3 end)
+      : g_(g), cur_(start), end_(end) {}
 
   Point3 identifier() const override { return cur_; }
   bool IsFinal() const override { return cur_ == end_; }
@@ -45,7 +46,8 @@ absl::StatusOr<std::string> Day_2022_18::Part1(
   absl::flat_hash_set<Point3> points;
   for (absl::string_view line : input) {
     Point3 p;
-    if (!RE2::FullMatch(line, "([\\d,]+)", p.Capture())) return Error("Bad line");
+    if (!RE2::FullMatch(line, "([\\d,]+)", p.Capture()))
+      return Error("Bad line");
     points.insert(p);
   }
   int sides = 0;
@@ -63,7 +65,8 @@ absl::StatusOr<std::string> Day_2022_18::Part2(
   absl::flat_hash_set<Point3> points;
   for (absl::string_view line : input) {
     Point3 p;
-    if (!RE2::FullMatch(line, "([\\d,]+)", p.Capture())) return Error("Bad line");
+    if (!RE2::FullMatch(line, "([\\d,]+)", p.Capture()))
+      return Error("Bad line");
     points.insert(p);
   }
   Cube cube = {{1, 1, 1}, {1, 1, 1}};
@@ -76,7 +79,8 @@ absl::StatusOr<std::string> Day_2022_18::Part2(
       if (points.contains(p)) continue;
       absl::flat_hash_set<Point3> hist = {p};
       bool escaped = false;
-      for (std::deque<Point3> queue = {p}; !queue.empty() && !escaped; queue.pop_front()) {
+      for (std::deque<Point3> queue = {p}; !queue.empty() && !escaped;
+           queue.pop_front()) {
         Point3 cur = queue.front();
         for (Point3 dir : Cardinal3::kSixDirs) {
           Point3 test = cur + dir;

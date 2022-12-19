@@ -78,9 +78,7 @@ class RectangleSet {
     return sum;
   }
 
-  absl::Span<const PointRectangle> rects() const {
-    return set_;
-  }
+  absl::Span<const PointRectangle> rects() const { return set_; }
 
   template <typename Sink>
   friend void AbslStringify(Sink& sink, const RectangleSet& s) {

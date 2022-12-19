@@ -20,7 +20,7 @@ namespace {
 class HeightBfs : public BFSInterface<HeightBfs, Point> {
  public:
   HeightBfs(const CharBoard& b, Point c, bool reverse)
-   : b_(b), cur_(c), reverse_(reverse) {}
+      : b_(b), cur_(c), reverse_(reverse) {}
 
   Point identifier() const override { return cur_; }
   void AddNextSteps(State* state) const override {
@@ -33,9 +33,7 @@ class HeightBfs : public BFSInterface<HeightBfs, Point> {
       }
     }
   }
-  bool IsFinal() const override {
-    return b_[cur_] == (reverse_ ? 'a' : 'E');
-  }
+  bool IsFinal() const override { return b_[cur_] == (reverse_ ? 'a' : 'E'); }
 
   bool CanStep(Point from, Point to) const {
     if (reverse_) {
@@ -56,7 +54,7 @@ class HeightBfs : public BFSInterface<HeightBfs, Point> {
 
 absl::StatusOr<std::string> Day_2022_12::Part1(
     absl::Span<absl::string_view> input) const {
-  auto board = ParseAsBoard(input); 
+  auto board = ParseAsBoard(input);
   if (!board.ok()) return board.status();
   absl::flat_hash_set<Point> starts = board->Find('S');
   if (starts.size() != 1) return Error("Bad start");
@@ -67,7 +65,7 @@ absl::StatusOr<std::string> Day_2022_12::Part1(
 
 absl::StatusOr<std::string> Day_2022_12::Part2(
     absl::Span<absl::string_view> input) const {
-  auto board = ParseAsBoard(input); 
+  auto board = ParseAsBoard(input);
   if (!board.ok()) return board.status();
   absl::flat_hash_set<Point> starts = board->Find('E');
   if (starts.size() != 1) return Error("Bad start");
