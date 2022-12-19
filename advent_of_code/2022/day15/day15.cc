@@ -90,26 +90,36 @@ absl::StatusOr<std::string> Day_2022_15::Part2(
   test_area.max = Point{max, max};
   std::optional<Point> found;
 
-  // Check for 1 past a boundary. Can't fully prove unique, but reasonably
-  // fast.
+  // Check for 1 past a boundary by looking for intersections and overlaps in
+  // the rotates space {x+y, x-y}. Any point that is in "free space", (and not
+  // at the edge) must be one past a boundary, and we check that the point is
+  // unique and not next to another in order to prove the answer is unique.
+  absl::flat_hash_map<int, int> x_plus_y_to_count;
+  absl::flat_hash_map<int, int> x_minus_y_to_count;
   for (const auto& sandb : *list) {
-    int d = (sandb.beacon - sandb.sensor).dist();
-    for (int i = 0; i <= d + 1; ++i) {
-      std::array<Point, 4> to_test = {
-          Point{i, (d + 1) - i},
-          Point{-i, -(d + 1) + i},
-          Point{i, (d + 1) - i},
-          Point{-i, -(d + 1) + i},
-      };
-      for (Point delta : to_test) {
-        Point t = sandb.sensor + delta;
-        if (!test_area.Contains(t)) continue;
-        if (!HasCloser(*list, t)) {
-          if (found && *found != t) return Error("Duplicate!");
-          found = t;
-          VLOG(1) << "Found @" << *found << " -> "
-                  << found->x * 4000000ll + found->y;
-        }
+    int x_plus_y = sandb.sensor.x + sandb.sensor.y;
+    int x_minus_y = sandb.sensor.x - sandb.sensor.y;
+    ++x_plus_y_to_count[x_plus_y + sandb.d + 1];
+    ++x_plus_y_to_count[x_plus_y - sandb.d - 1];
+    ++x_minus_y_to_count[x_minus_y + sandb.d + 1];
+    ++x_minus_y_to_count[x_minus_y - sandb.d - 1];
+  }
+  for (const auto& [x_plus_y, c1] : x_plus_y_to_count) {
+    if (c1 < 2) continue;
+    for (const auto& [x_minus_y, c2] : x_minus_y_to_count) {
+      if (c2 < 2) continue;
+      Point t;
+      t.x = x_plus_y + x_minus_y;
+      if (t.x % 2 != 0) continue;
+      t.x /= 2;
+      t.y = x_plus_y - x_minus_y;
+      if (t.y % 2 != 0) continue;
+      t.y /= 2;
+      if (test_area.Contains(t) && !HasCloser(*list, t)) {
+        if (found && *found != t) return Error("Duplicate!");
+        found = t;
+        VLOG(1) << "Found @" << *found << " -> "
+                << found->x * 4000000ll + found->y;
       }
     }
   }
@@ -117,30 +127,6 @@ absl::StatusOr<std::string> Day_2022_15::Part2(
   for (Point d : Cardinal::kFourDirs) {
     if (!HasCloser(*list, *found + d)) return Error("Not unique");
   }
-  return IntReturn(found->x * 4000000ll + found->y);
-
-  // Check with every 1D interval. Proves unique, but slow.
-  for (int y = 0; y <= max; ++y) {
-    Interval1D no_closer(0, max);
-    Interval1D beacons;
-    for (const auto& sandb : *list) {
-      no_closer = no_closer.Minus(NoCloser(sandb, y));
-      if (no_closer.empty()) break;
-    }
-    int size = no_closer.Size();
-    if (size == 1) {
-      if (found) return Error("Multiple points (different y)");
-      found = {no_closer.x()[0], y};
-      VLOG(1) << "Found @" << *found << " -> "
-              << found->x * 4000000ll + found->y;
-    } else if (size == 0) {
-      if (!no_closer.empty()) return Error("Bad empty");
-      continue;
-    } else {
-      return Error("Multiple points (same y)");
-    }
-  }
-  if (!found) return Error("Not found");
   return IntReturn(found->x * 4000000ll + found->y);
 }
 
