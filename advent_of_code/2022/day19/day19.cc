@@ -75,9 +75,16 @@ struct State {
 
 int BestGeode(Blueprint bp, int minutes) {
   absl::flat_hash_set<State> states = {State{}};
+
+  int max_ore_robots =
+      std::max(std::max(bp.clay_robot_ore_cost, bp.obsidian_robot_ore_cost),
+               bp.geode_robot_ore_cost);
+  int max_clay_robots = bp.obsidian_robot_clay_cost;
+  int max_obsidian_robots = bp.geode_robot_obsidian_cost;
+
   int max_geode = 0;
   for (int i = 0; i < minutes; ++i) {
-    VLOG(1) << i << ": " << states.size();
+    VLOG(2) << i << ": " << states.size();
     absl::flat_hash_set<State> new_states;
     for (const State& s : states) {
       if (true) {
@@ -99,20 +106,23 @@ int BestGeode(Blueprint bp, int minutes) {
       }
       if (i == minutes - 1) continue;
 
-      if (s.ore >= bp.ore_robot_ore_cost) {
+      if (s.ore >= bp.ore_robot_ore_cost && 
+          s.ore_robot < max_ore_robots) {
         State build = next_state;
         build.ore -= bp.ore_robot_ore_cost;
         build.ore_robot++;
         new_states.insert(build);
       }
-      if (s.ore >= bp.clay_robot_ore_cost) {
+      if (s.ore >= bp.clay_robot_ore_cost &&
+          s.clay_robot < max_clay_robots) {
         State build = next_state;
         build.ore -= bp.clay_robot_ore_cost;
         build.clay_robot++;
         new_states.insert(build);
       }
       if (s.ore >= bp.obsidian_robot_ore_cost && 
-          s.clay >= bp.obsidian_robot_clay_cost) {
+          s.clay >= bp.obsidian_robot_clay_cost &&
+          s.obsidian_robot < max_obsidian_robots) {
         State build = next_state;
         build.ore -= bp.obsidian_robot_ore_cost;
         build.clay -= bp.obsidian_robot_clay_cost;
