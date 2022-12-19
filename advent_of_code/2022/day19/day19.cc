@@ -26,6 +26,22 @@ struct Blueprint {
   int geode_robot_obsidian_cost;
 };
 
+absl::StatusOr<Blueprint> Parse(absl::string_view line) {
+  Blueprint bp;
+  if (!RE2::FullMatch(
+    line,
+    "Blueprint (\\d+): Each ore robot costs (\\d+) ore. "
+    "Each clay robot costs (\\d+) ore. "
+    "Each obsidian robot costs (\\d+) ore and (\\d+) clay. "
+    "Each geode robot costs (\\d+) ore and (\\d+) obsidian.",
+    &bp.id, &bp.ore_robot_ore_cost, &bp.clay_robot_ore_cost,
+    &bp.obsidian_robot_ore_cost, &bp.obsidian_robot_clay_cost,
+    &bp.geode_robot_ore_cost, &bp.geode_robot_obsidian_cost)) {
+    return Error("Bad line: ", line);
+  }
+  return bp;
+}
+
 struct State {
   char ore = 0;
   char ore_robot = 1;
@@ -45,16 +61,19 @@ struct State {
 
   template <typename H>
   friend H AbslHashValue(H h, const State& s) {
-    return H::combine(std::move(h), s.ore, s.ore_robot, s.clay, s.clay_robot, s.obsidian, s.obsidian_robot, s.geode, s.geode_robot);
+    return H::combine(std::move(h), s.ore, s.ore_robot, s.clay, s.clay_robot,
+                      s.obsidian, s.obsidian_robot, s.geode, s.geode_robot);
   }
 
   bool operator==(const State& o) const {
-    return ore == o.ore && ore_robot == o.ore_robot && clay == o.clay && clay_robot == o.clay_robot &&
-      obsidian == o.obsidian && obsidian_robot == o.obsidian_robot && geode == o.geode && geode_robot == o.geode_robot;
+    return ore == o.ore && ore_robot == o.ore_robot && clay == o.clay && 
+      clay_robot == o.clay_robot && obsidian == o.obsidian &&
+      obsidian_robot == o.obsidian_robot && geode == o.geode &&
+      geode_robot == o.geode_robot;
   }
 };
 
-int Cost(Blueprint pb, int minutes, bool use_id) {
+int BestGeode(Blueprint bp, int minutes) {
   absl::flat_hash_set<State> states = {State{}};
   int max_geode = 0;
   for (int i = 0; i < minutes; ++i) {
@@ -80,31 +99,31 @@ int Cost(Blueprint pb, int minutes, bool use_id) {
       }
       if (i == minutes - 1) continue;
 
-      if (s.ore >= pb.ore_robot_ore_cost) {
+      if (s.ore >= bp.ore_robot_ore_cost) {
         State build = next_state;
-        build.ore -= pb.ore_robot_ore_cost;
+        build.ore -= bp.ore_robot_ore_cost;
         build.ore_robot++;
         new_states.insert(build);
       }
-      if (s.ore >= pb.clay_robot_ore_cost) {
+      if (s.ore >= bp.clay_robot_ore_cost) {
         State build = next_state;
-        build.ore -= pb.clay_robot_ore_cost;
+        build.ore -= bp.clay_robot_ore_cost;
         build.clay_robot++;
         new_states.insert(build);
       }
-      if (s.ore >= pb.obsidian_robot_ore_cost && 
-          s.clay >= pb.obsidian_robot_clay_cost) {
+      if (s.ore >= bp.obsidian_robot_ore_cost && 
+          s.clay >= bp.obsidian_robot_clay_cost) {
         State build = next_state;
-        build.ore -= pb.obsidian_robot_ore_cost;
-        build.clay -= pb.obsidian_robot_clay_cost;
+        build.ore -= bp.obsidian_robot_ore_cost;
+        build.clay -= bp.obsidian_robot_clay_cost;
         build.obsidian_robot++;
         new_states.insert(build);
       }
-      if (s.ore >= pb.geode_robot_ore_cost && 
-          s.obsidian >= pb.geode_robot_obsidian_cost) {
+      if (s.ore >= bp.geode_robot_ore_cost && 
+          s.obsidian >= bp.geode_robot_obsidian_cost) {
         State build = next_state;
-        build.ore -= pb.geode_robot_ore_cost;
-        build.obsidian -= pb.geode_robot_obsidian_cost;
+        build.ore -= bp.geode_robot_ore_cost;
+        build.obsidian -= bp.geode_robot_obsidian_cost;
         build.geode_robot++;
         new_states.insert(build);
       }
@@ -112,9 +131,6 @@ int Cost(Blueprint pb, int minutes, bool use_id) {
     states = std::move(new_states);
   }
 
-  VLOG(1) << "id: " << pb.id << " best is " << max_geode;
-  
-  if (use_id) return pb.id * max_geode;
   return max_geode;
 }
 
@@ -124,15 +140,11 @@ absl::StatusOr<std::string> Day_2022_19::Part1(
     absl::Span<absl::string_view> input) const {
   int cost = 0;
   for (absl::string_view line : input) {
-    Blueprint pb;
-    if (!RE2::FullMatch(
-      line,
-      "Blueprint (\\d+): Each ore robot costs (\\d+) ore. Each clay robot costs (\\d+) ore. Each obsidian robot costs (\\d+) ore and (\\d+) clay. Each geode robot costs (\\d+) ore and (\\d+) obsidian.",
-      &pb.id, &pb.ore_robot_ore_cost, &pb.clay_robot_ore_cost, &pb.obsidian_robot_ore_cost, &pb.obsidian_robot_clay_cost,
-      &pb.geode_robot_ore_cost, &pb.geode_robot_obsidian_cost)) {
-      return Error("Bad line: ", line);
-    }
-    cost += Cost(pb, 24, /*use_id=*/true);
+    absl::StatusOr<Blueprint> bp = Parse(line);
+    if (!bp.ok()) return bp.status();
+    int best_geode = BestGeode(*bp, 24);
+    VLOG(1) << "id: " << bp->id << " best is " << best_geode;
+    cost += bp->id * best_geode;
   }
   return IntReturn(cost);
 }
@@ -142,15 +154,11 @@ absl::StatusOr<std::string> Day_2022_19::Part2(
   int64_t cost = 1;
   input = input.subspan(0, 3);
   for (absl::string_view line : input) {
-    Blueprint pb;
-    if (!RE2::FullMatch(
-      line,
-      "Blueprint (\\d+): Each ore robot costs (\\d+) ore. Each clay robot costs (\\d+) ore. Each obsidian robot costs (\\d+) ore and (\\d+) clay. Each geode robot costs (\\d+) ore and (\\d+) obsidian.",
-      &pb.id, &pb.ore_robot_ore_cost, &pb.clay_robot_ore_cost, &pb.obsidian_robot_ore_cost, &pb.obsidian_robot_clay_cost,
-      &pb.geode_robot_ore_cost, &pb.geode_robot_obsidian_cost)) {
-      return Error("Bad line: ", line);
-    }
-    cost *= Cost(pb, 32, /*use_id=*/false);
+    absl::StatusOr<Blueprint> bp = Parse(line);
+    if (!bp.ok()) return bp.status();
+    int best_geode = BestGeode(*bp, 32);
+    VLOG(1) << "id: " << bp->id << " best is " << best_geode;
+    cost *= best_geode;
   }
   return IntReturn(cost);
 }
