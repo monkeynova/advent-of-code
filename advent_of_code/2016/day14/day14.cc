@@ -76,9 +76,9 @@ absl::StatusOr<std::string> Day_2016_14::Part2(
   for (int i = 'a'; i <= 'f'; ++i) has_5ple[i] = -1;
   MD5 digest;
   for (int index = 0; true; ++index) {
-    std::string str = absl::StrCat(input[0], index);
-    for (int i = 0; i < 2017; ++i) {
-      str = std::string(digest.DigestHex(str));
+    std::string str(digest.DigestHex(absl::StrCat(input[0], index)));
+    for (int i = 0; i < 2016; ++i) {
+      memcpy(str.data(), digest.DigestHex(str).data(), 32);
     }
 
     for (int i = 0; i + 4 < str.size(); ++i) {
