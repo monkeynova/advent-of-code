@@ -14,6 +14,8 @@
 #include "advent_of_code/directed_graph.h"
 #include "re2/re2.h"
 
+ABSL_FLAG(bool, advent_2022_16_deep, false, "...");
+
 namespace advent_of_code {
 
 namespace {
@@ -117,18 +119,21 @@ struct State {
     State new_state = *this;
     new_state.open_set |= bit;
     on_next(new_state);
-    ;
   }
 
   void MoveEl(absl::string_view dest) { el = (dest[0] << 8) | dest[1]; }
 
   bool operator==(const State& o) const {
-    return open_set == o.open_set && me == o.me && el == o.el;
+    return open_set == o.open_set && 
+        ((me == o.me && el == o.el) || (me == o.el && el == o.me));
   }
 
   template <typename H>
   friend H AbslHashValue(H h, const State& s) {
-    return H::combine(std::move(h), s.open_set, s.me, s.el);
+    if (s.me < s.el) {
+      return H::combine(std::move(h), s.open_set, s.me, s.el);
+    }
+    return H::combine(std::move(h), s.open_set, s.el, s.me);
   }
 };
 
@@ -420,7 +425,7 @@ absl::StatusOr<std::string> Day_2022_16::Part1(
   absl::StatusOr<DirectedGraph<Valve>> graph = ParseGraph(input);
   if (!graph.ok()) return graph.status();
 
-  if (false) {
+  if (absl::GetFlag(FLAGS_advent_2022_16_deep)) {
     absl::flat_hash_map<absl::string_view, int> valves;
     for (absl::string_view loc : graph->nodes()) {
       if (graph->GetData(loc)->flow != 0) {
@@ -440,7 +445,7 @@ absl::StatusOr<std::string> Day_2022_16::Part2(
   absl::StatusOr<DirectedGraph<Valve>> graph = ParseGraph(input);
   if (!graph.ok()) return graph.status();
 
-  if (false) {
+  if (absl::GetFlag(FLAGS_advent_2022_16_deep)) {
     absl::flat_hash_map<absl::string_view, int> valves;
     valves.insert({"AA", 0});
     for (absl::string_view loc : graph->nodes()) {
