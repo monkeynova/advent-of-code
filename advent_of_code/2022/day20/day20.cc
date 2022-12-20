@@ -16,68 +16,61 @@ namespace advent_of_code {
 
 namespace {
 
-struct NumAndOrder {
-  int64_t value;
-  int64_t order;
-  template <typename Sink>
-  friend void AbslStringify(Sink& sink, const NumAndOrder& no) {
-    absl::Format(&sink, "%d@%d", no.value, no.order);
-  }
-  friend std::ostream& operator<<(std::ostream& o, const NumAndOrder& no) {
-    return o << no.value << "@" << no.order;
-  }
+struct DLL {
+  explicit DLL(int64_t v) : value(v) {}
+  const int64_t value;
+  struct DLL* prev;
+  struct DLL* next;
 };
 
-absl::Status Mix(std::list<NumAndOrder>& moved) {
-  for (int64_t order = 0; order < moved.size(); ++order) {
-    VLOG(2) << "moving: #" << order;
-    VLOG(2) << absl::StrJoin(moved, ",");
-    bool found = false;
-    for (auto it = moved.begin(); it != moved.end(); ++it) {
-      if (it->order != order) continue;
-      found = true;
-      int64_t v = it->value;
-      if (v == 0) break;
-      it = moved.erase(it);
-      if (it == moved.end()) it = moved.begin();
-      if (v > 0) {
-        int64_t incs = v % moved.size();
-        for (int64_t i = 0; i < incs; ++i) {
-          ++it;
-          if (it == moved.end()) it = moved.begin();
-        }
-      } else {
-        int64_t decs = (-v) % moved.size();
-        for (int64_t i = 0; i < decs; ++i) {
-          if (it == moved.begin()) it = moved.end();
-          --it;
-        }
-      }
-      moved.insert(it, {v, order});
-      break;
-    }
-    if (!found) return Error("Could not move #", order);
+std::string DebugString(DLL* root) {
+  std::string ret = absl::StrCat(root->value);
+  for (DLL* add = root->next; add != root; add = add->next) {
+    absl::StrAppend(&ret, ",", add->value);
   }
-  return absl::OkStatus();
+  return ret;
 }
 
-absl::StatusOr<int64_t> Coordinates(std::list<NumAndOrder>& moved) {
-  auto zero_it = moved.end();
-  for (auto it = moved.begin(); it != moved.end(); ++it) {
-    if (it->value == 0) {
-      if (zero_it != moved.end()) return Error("Not unqiue");
-      zero_it = it;
+void Mix(std::vector<std::unique_ptr<DLL>>& list) {
+  DLL* root = list[0].get();
+  for (const std::unique_ptr<DLL>& ent : list) {
+    if (ent->value == 0) {
+      // Do nothing.
+    } else if (ent->value > 0) {
+      int64_t incs = ent->value % (list.size() - 1);
+      DLL* cur = ent.get();
+      for (int i = 0; i < incs; ++i) {
+        DLL* next = cur->next;
+        cur->next = next->next;
+        cur->next->prev = cur;
+        next->prev = cur->prev;
+        next->prev->next = next;
+        cur->prev = next;
+        next->next = cur;
+      }
+    } else {
+      int64_t decs = (-ent->value) % (list.size() - 1);
+      DLL* cur = ent.get();
+      for (int i = 0; i < decs; ++i) {
+        DLL* prev = cur->prev;
+        cur->prev = prev->prev;
+        cur->prev->next = cur;
+        prev->next = cur->next;
+        prev->next->prev = prev;
+        cur->next = prev;
+        prev->prev = cur;
+      }
     }
   }
-  if (zero_it == moved.end()) return Error("No 0 found");
+}
+
+int64_t Coordinates(DLL* from_val) {
   int64_t sum = 0;
-  auto sum_it = zero_it;
-  for (int64_t i = 0; i < 3; ++i) {
-    for (int64_t j = 0; j < 1000; ++j) {
-      ++sum_it;
-      if (sum_it == moved.end()) sum_it = moved.begin();
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 1000; ++j) {
+      from_val = from_val->next;
     }
-    sum += sum_it->value;
+    sum += from_val->value;
   }
   return sum;
 }
@@ -89,15 +82,24 @@ absl::StatusOr<std::string> Day_2022_20::Part1(
   absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
   if (!list.ok()) return list.status();
 
-  std::list<NumAndOrder> moved;
-  for (int64_t i = 0; i < list->size(); ++i) {
-    moved.push_back(NumAndOrder{.value = (*list)[i], .order = i});
+  DLL* zero_dll = nullptr;
+  std::vector<std::unique_ptr<DLL>> cycle;
+  for (int64_t v : *list) {
+    cycle.push_back(absl::make_unique<DLL>(v));
+    if (v == 0) {
+      if (zero_dll != nullptr) return Error("Duplicate 0");
+      zero_dll = cycle.back().get();
+    }
+  }
+  if (zero_dll == nullptr) return Error("No zero found");
+
+  for (int i = 0; i < cycle.size(); ++i) {
+    cycle[i]->prev = cycle[(cycle.size() + i - 1) % cycle.size()].get();
+    cycle[i]->next = cycle[(i + 1) % cycle.size()].get();
   }
 
-  absl::Status st = Mix(moved);
-  if (!st.ok()) return st;
-
-  return IntReturn(Coordinates(moved));
+  Mix(cycle);
+  return IntReturn(Coordinates(zero_dll));
 }
 
 absl::StatusOr<std::string> Day_2022_20::Part2(
@@ -105,19 +107,26 @@ absl::StatusOr<std::string> Day_2022_20::Part2(
   absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
   if (!list.ok()) return list.status();
 
-  std::list<NumAndOrder> moved;
-  for (int64_t i = 0; i < list->size(); ++i) {
-    moved.push_back(NumAndOrder{.value = (*list)[i] * 811589153, .order = i});
+  DLL* zero_dll = nullptr;
+  std::vector<std::unique_ptr<DLL>> cycle;
+  for (int64_t v : *list) {
+    cycle.push_back(absl::make_unique<DLL>(811589153 * v));
+    if (v == 0) {
+      if (zero_dll != nullptr) return Error("Duplicate 0");
+      zero_dll = cycle.back().get();
+    }
+  }
+  if (zero_dll == nullptr) return Error("No zero found");
+
+  for (int i = 0; i < cycle.size(); ++i) {
+    cycle[i]->prev = cycle[(cycle.size() + i - 1) % cycle.size()].get();
+    cycle[i]->next = cycle[(i + 1) % cycle.size()].get();
   }
 
   for (int64_t mix = 0; mix < 10; ++mix) {
-    VLOG(2) << "mix: #" << mix;
-    VLOG(2) << absl::StrJoin(moved, ",");
-    absl::Status st = Mix(moved);
-    if (!st.ok()) return st;
+    Mix(cycle);
   }
-
-  return IntReturn(Coordinates(moved));
+  return IntReturn(Coordinates(zero_dll));
 }
 
 }  // namespace advent_of_code
