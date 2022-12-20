@@ -19,6 +19,9 @@
 # -540
 # -6975
 # -3537
+# ... Random iterations on "replacement or not" while missing the bigger
+#     problem that the list had duplicate values, so I needed to store
+#     the order in an auxilliary structure.
 [part=1]
 @include{advent_of_code/2022/day20/input.txt}
 --
