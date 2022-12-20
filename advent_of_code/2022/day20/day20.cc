@@ -16,18 +16,147 @@ namespace advent_of_code {
 
 namespace {
 
-// Helper methods go here.
+  struct NumAndOrder {
+    int64_t value;
+    int64_t order;
+    template <typename Sink>
+    friend void AbslStringify(Sink& sink, const NumAndOrder& no) {
+      absl::Format(&sink, "%d@%d", no.value, no.order);
+    }
+    friend std::ostream& operator<<(std::ostream& o, const NumAndOrder& no) {
+      return o << no.value << "@" << no.order;
+    }
+  };
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_20::Part1(
     absl::Span<absl::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
+  if (!list.ok()) return list.status();
+  VLOG(1) << list->size();
+
+
+  std::list<NumAndOrder> moved;
+  for (int64_t i = 0; i < list->size(); ++i) {
+    moved.push_back(NumAndOrder{.value = (*list)[i], .order = i});
+  }
+
+  for (int64_t order = 0; order < moved.size(); ++order) {
+    VLOG(2) << "moving: #" << order;
+    VLOG(2) << absl::StrJoin(moved, ",");
+    bool found = false;
+    for (auto it = moved.begin(); it != moved.end(); ++it) {
+      if (it->order != order) continue;
+      found = true;
+      int64_t v = it->value;
+      if (v == 0) break;
+      it = moved.erase(it);
+      if (it == moved.end()) it = moved.begin();
+      if (v > 0) {
+        int64_t incs = v % moved.size();
+        for (int64_t i = 0; i < incs; ++i) {
+          ++it;
+          if (it == moved.end()) it = moved.begin();
+        }
+      } else {
+        int64_t decs = (-v) % moved.size();
+        for (int64_t i = 0; i < decs; ++i) {
+          if (it == moved.begin()) it = moved.end();
+          --it;
+        }
+      }
+      moved.insert(it, {v, order});
+      break;
+    }
+    if (!found) return Error("Could not move #", order);
+  }
+
+  auto zero_it = moved.end();
+  for (auto it = moved.begin(); it != moved.end(); ++it) {
+    if (it->value == 0) {
+      if (zero_it != moved.end()) return Error("Not unqiue");
+      zero_it = it;
+    }
+  }
+  if (zero_it == moved.end()) return Error("No 0 found");
+  int64_t sum = 0;
+  auto sum_it = zero_it;
+  for (int64_t i = 0; i < 3; ++i) {
+    for (int64_t j = 0; j < 1000; ++j) {
+      ++sum_it;
+      if (sum_it == moved.end()) sum_it = moved.begin();
+    }
+    sum += sum_it->value;
+  }
+  return IntReturn(sum);
 }
 
 absl::StatusOr<std::string> Day_2022_20::Part2(
     absl::Span<absl::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
+  if (!list.ok()) return list.status();
+  VLOG(1) << list->size();
+
+
+  std::list<NumAndOrder> moved;
+  for (int64_t i = 0; i < list->size(); ++i) {
+    moved.push_back(NumAndOrder{.value = (*list)[i] * 811589153, .order = i});
+  }
+
+  for (int64_t mix = 0; mix < 10; ++mix) {
+    VLOG(2) << "mix: #" << mix;
+    VLOG(2) << absl::StrJoin(moved, ",");
+    for (int64_t order = 0; order < moved.size(); ++order) {
+      bool found = false;
+      for (auto it = moved.begin(); it != moved.end(); ++it) {
+        if (it->order != order) continue;
+        VLOG(2) << "  " << absl::StrJoin(moved, ",");
+        found = true;
+        int64_t v = it->value;
+        if (v == 0) break;
+        it = moved.erase(it);
+        if (it == moved.end()) it = moved.begin();
+        if (v > 0) {
+          int64_t incs = v % moved.size();
+          VLOG(2) << v << " -> +" << incs;
+          for (int64_t i = 0; i < incs; ++i) {
+            ++it;
+            if (it == moved.end()) it = moved.begin();
+          }
+        } else {
+          int64_t decs = (-v) % moved.size();
+          VLOG(2) << v << " -> -" << decs;
+          for (int64_t i = 0; i < decs; ++i) {
+            if (it == moved.begin()) it = moved.end();
+            --it;
+          }
+        }
+        moved.insert(it, {v, order});
+        break;
+      }
+      if (!found) return Error("Could not move #", order);
+    }
+  }
+
+  auto zero_it = moved.end();
+  for (auto it = moved.begin(); it != moved.end(); ++it) {
+    if (it->value == 0) {
+      if (zero_it != moved.end()) return Error("Not unqiue");
+      zero_it = it;
+    }
+  }
+  if (zero_it == moved.end()) return Error("No 0 found");
+  int64_t sum = 0;
+  auto sum_it = zero_it;
+  for (int64_t i = 0; i < 3; ++i) {
+    for (int64_t j = 0; j < 1000; ++j) {
+      ++sum_it;
+      if (sum_it == moved.end()) sum_it = moved.begin();
+    }
+    sum += sum_it->value;
+  }
+  return IntReturn(sum);
 }
 
 }  // namespace advent_of_code

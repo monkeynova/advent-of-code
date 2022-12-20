@@ -2,24 +2,42 @@
 ==
 
 [part=1]
-Example input
+1
+2
+-3
+3
+-2
+0
+4
 --
-ERROR: UNIMPLEMENTED: Problem not known
+3
 ==
 
+# 11071 
+# -7128
+# -17393
+# -540
+# -6975
+# -3537
 [part=1]
 @include{advent_of_code/2022/day20/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+5904
 ==
 
 [part=2]
-Example input
+1
+2
+-3
+3
+-2
+0
+4
 --
-ERROR: UNIMPLEMENTED: Problem not known
+1623178306
 ==
 
 [part=2]
 @include{advent_of_code/2022/day20/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+8332585833851
