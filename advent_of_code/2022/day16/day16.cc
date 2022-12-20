@@ -202,9 +202,30 @@ absl::StatusOr<int> BestPath(const DirectedGraph<Valve>& graph, int minutes,
     }
     for (const auto& [s, p] : state_to_pressure) {
       int new_pressure = p + flows[s.open_set];
-      if (new_pressure + full_flow * (minutes - r - 1) < best_pressure) {
-        continue;
+      {
+        // The total pressure we can produce from here is bounded by a series
+        // of move-1, open, move-1, open steps with open sorted by decreasing
+        // pressure. Calculate what that is, and if there's some state that
+        // produces more than that we can cut this branch short.
+        int best_possible_pressure = new_pressure;
+        int flow = flows[s.open_set];
+        auto it = ordered_valves.begin();
+        for (int j = r + 1; j < minutes; ++j) {
+          // Only consider opening valves every other turn to allow for moving.
+          if ((j - r) % 2 == 1) { 
+            for (/*nop*/; it != ordered_valves.end(); ++it) {
+              if (s.open_set & (1 << (it - ordered_valves.begin()))) continue;
+              flow += (*it)->flow;
+              break;
+            }
+          }
+          best_possible_pressure += flow;
+        }
+        if (best_possible_pressure < best_pressure) {
+          continue;
+        }
       }
+
       s.NextForMe(graph, pack, [&](State s1) {
         if (use_elephant) {
           s1.NextForEl(graph, pack, [&](State s2) {
