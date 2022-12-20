@@ -39,6 +39,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II
 ==
 
 [part=2]
+[long=60m (20s opt) 2022.12.19]
 @include{advent_of_code/2022/day16/input.txt}
 --
 2261
