@@ -42,7 +42,7 @@ absl::StatusOr<int64_t> ConstantFold(
   if (!me.value) {
     absl::StatusOr<int64_t> left = ConstantFold(monkeys, me.left);
     absl::StatusOr<int64_t> right = ConstantFold(monkeys, me.right);
-    // Evaluate both sides before checking for errors, so that we evaluate 
+    // Evaluate both sides before checking for errors, so that we evaluate
     // all that we can before we return a NotFound error for either branch.
     if (!left.ok()) return left.status();
     if (!right.ok()) return right.status();
@@ -72,8 +72,8 @@ absl::StatusOr<int64_t> Evaluate(
 }
 
 absl::StatusOr<int64_t> SolveForVal(
-    absl::flat_hash_map<absl::string_view, Monkey>& monkeys,
-    int64_t val, absl::string_view node) {
+    absl::flat_hash_map<absl::string_view, Monkey>& monkeys, int64_t val,
+    absl::string_view node) {
   if (!monkeys.contains(node)) return Error("Bad monkey: ", node);
   const Monkey& me = monkeys[node];
   if (me.unknown) return val;
@@ -99,7 +99,7 @@ absl::StatusOr<int64_t> SolveForVal(
       return SolveForVal(monkeys, *left.value - val, me.right);
     } else {
       return SolveForVal(monkeys, val + *right.value, me.left);
-    }    
+    }
   } else if (me.op == "*") {
     if (left.value) {
       if (val % *left.value != 0) return Error("Non-integral division");
@@ -107,16 +107,16 @@ absl::StatusOr<int64_t> SolveForVal(
     } else {
       if (val % *right.value != 0) return Error("Non-integral division");
       return SolveForVal(monkeys, val / *right.value, me.left);
-    }    
+    }
   } else if (me.op == "/") {
     if (left.value) {
       if (*left.value % val != 0) return Error("Non-integral division");
       return SolveForVal(monkeys, *left.value / val, me.right);
     } else {
       return SolveForVal(monkeys, val * *right.value, me.left);
-    }        
-  } 
-  
+    }
+  }
+
   return Error("Bad op: ", me.op);
 }
 
@@ -147,7 +147,7 @@ absl::StatusOr<absl::flat_hash_map<absl::string_view, Monkey>> ParseMonkeys(
     absl::string_view name;
     int64_t value;
     if (RE2::FullMatch(line, "([a-z]+): ([a-z]+) ([\\+\\-\\*\\/]) ([a-z]+)",
-         &name, &m.left, &m.op, &m.right)) {
+                       &name, &m.left, &m.op, &m.right)) {
       monkeys.insert({name, m});
     } else if (RE2::FullMatch(line, "([a-z]+): ([-\\d]+)", &name, &value)) {
       m.value = value;

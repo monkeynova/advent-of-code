@@ -124,8 +124,8 @@ struct State {
   void MoveEl(absl::string_view dest) { el = (dest[0] << 8) | dest[1]; }
 
   bool operator==(const State& o) const {
-    return open_set == o.open_set && 
-        ((me == o.me && el == o.el) || (me == o.el && el == o.me));
+    return open_set == o.open_set &&
+           ((me == o.me && el == o.el) || (me == o.el && el == o.me));
   }
 
   template <typename H>
@@ -212,7 +212,7 @@ absl::StatusOr<int> BestPath(const DirectedGraph<Valve>& graph, int minutes,
         auto it = ordered_valves.begin();
         for (int j = r + 1; j < minutes; ++j) {
           // Only consider opening valves every other turn to allow for moving.
-          if ((j - r) % 2 == 1) { 
+          if ((j - r) % 2 == 1) {
             for (/*nop*/; it != ordered_valves.end(); ++it) {
               if (s.open_set & (1 << (it - ordered_valves.begin()))) continue;
               flow += (*it)->flow;
