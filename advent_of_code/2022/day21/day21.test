@@ -2,24 +2,52 @@
 ==
 
 [part=1]
-Example input
+root: pppw + sjmn
+dbpl: 5
+cczh: sllz + lgvd
+zczc: 2
+ptdq: humn - dvpt
+dvpt: 3
+lfqf: 4
+humn: 5
+ljgn: 2
+sjmn: drzm * dbpl
+sllz: 4
+pppw: cczh / lfqf
+lgvd: ljgn * ptdq
+drzm: hmdt - zczc
+hmdt: 32
 --
-ERROR: UNIMPLEMENTED: Problem not known
+152
 ==
 
 [part=1]
 @include{advent_of_code/2022/day21/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+158731561459602
 ==
 
 [part=2]
-Example input
+root: pppw + sjmn
+dbpl: 5
+cczh: sllz + lgvd
+zczc: 2
+ptdq: humn - dvpt
+dvpt: 3
+lfqf: 4
+humn: 5
+ljgn: 2
+sjmn: drzm * dbpl
+sllz: 4
+pppw: cczh / lfqf
+lgvd: ljgn * ptdq
+drzm: hmdt - zczc
+hmdt: 32
 --
-ERROR: UNIMPLEMENTED: Problem not known
+301
 ==
 
 [part=2]
 @include{advent_of_code/2022/day21/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+3769668716709
