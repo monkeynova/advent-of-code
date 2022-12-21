@@ -18,6 +18,7 @@ cc_library(
 
 cc_test(
     name = "int_code_test",
+    size = "small",
     srcs = ["int_code_test.cc"],
     args = ["--test_file=advent_of_code/2019/int_code.test"],
     data = ["int_code.test"],
@@ -36,6 +37,7 @@ cc_test(
 
 cc_test(
     name = "benchmark",
+    size = "small",
     tags = ["benchmark"],
     deps = [
         "//advent_of_code/2019/day01:day01_benchmark_lib",

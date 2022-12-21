@@ -1,5 +1,6 @@
 cc_test(
     name = "benchmark",
+    size = "small",
     tags = ["benchmark"],
     deps = [
         "//advent_of_code/2021/day01:day01_benchmark_lib",

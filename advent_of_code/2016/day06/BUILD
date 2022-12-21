@@ -28,6 +28,7 @@ cc_library(
 
 cc_test(
     name = "day06_test",
+    size = "small",
     srcs = ["day06_test.cc"],
     deps = [
         ":day06_input",
@@ -52,6 +53,7 @@ cc_library(
 
 cc_test(
     name = "day06_benchmark",
+    size = "small",
     tags = ["benchmark"],
     deps = [
         ":day06_benchmark_lib",

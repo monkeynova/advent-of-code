@@ -29,6 +29,7 @@ cc_library(
 
 cc_test(
     name = "day11_test",
+    size = "small",
     srcs = ["day11_test.cc"],
     deps = [
         ":day11_input",
@@ -53,6 +54,7 @@ cc_library(
 
 cc_test(
     name = "day11_benchmark",
+    size = "small",
     tags = ["benchmark"],
     deps = [
         ":day11_benchmark_lib",

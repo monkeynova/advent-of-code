@@ -17,6 +17,7 @@ cc_library(
 
 cc_test(
     name = "knot_hash_test",
+    size = "small",
     srcs = ["knot_hash_test.cc"],
     deps = [
         ":knot_hash",
@@ -30,6 +31,7 @@ cc_test(
 
 cc_test(
     name = "benchmark",
+    size = "small",
     tags = ["benchmark"],
     deps = [
         "//advent_of_code/2017/day01:day01_benchmark_lib",
