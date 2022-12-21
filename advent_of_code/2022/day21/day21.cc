@@ -21,70 +21,91 @@ struct Monkey {
   absl::string_view left;
   absl::string_view right;
   absl::string_view op;
+
+  friend std::ostream& operator<<(std::ostream& out, const Monkey& m) {
+    if (m.value) return out << *m.value;
+    return out << m.left << " " << m.op << " " << m.right;
+  }
 };
 
-int64_t Evaluate(absl::flat_hash_map<absl::string_view, Monkey>& monkeys, absl::string_view name) {
-  auto it = monkeys.find(name);
-  CHECK(it != monkeys.end());
-  if (!it->second.value) {
-    int64_t left = Evaluate(monkeys, it->second.left);
-    int64_t right = Evaluate(monkeys, it->second.right);
-    VLOG(2) << left << " ? " << right;
-    if (it->second.op == "+") {
-      it->second.value = left + right;
-    } else if (it->second.op == "-") {
-      it->second.value = left - right;
-    } else if (it->second.op == "*") {
-      it->second.value = left * right;
-    } else if (it->second.op == "/") {
-      it->second.value = left / right;
+absl::StatusOr<int64_t> Evaluate(
+    absl::flat_hash_map<absl::string_view, Monkey>& monkeys,
+    absl::string_view name) {
+  if (!monkeys.contains(name)) return Error("Bad monkey: ", name);
+  Monkey& me = monkeys[name];
+  if (!me.value) {
+    absl::StatusOr<int64_t> left = Evaluate(monkeys, me.left);
+    if (!left.ok()) return left.status();
+    absl::StatusOr<int64_t> right = Evaluate(monkeys, me.right);
+    if (!right.ok()) return right.status();
+    VLOG(2) << *left << " ? " << *right;
+    if (me.op == "+") {
+      me.value = *left + *right;
+    } else if (me.op == "-") {
+      me.value = *left - *right;
+    } else if (me.op == "*") {
+      me.value = *left * *right;
+    } else if (me.op == "/") {
+      me.value = *left / *right;
     } else {
-      LOG(FATAL) << "Bad op: " << it->second.op;
+      return Error("Bad op: ", me.op, " (in monkey ", name, ")");
     }
-    VLOG(2) << *it->second.value;
-    VLOG(2) << "  " << it->second.left << " " << it->second.op << " " << it->second.right;
+    VLOG(2) << *me.value;
+    VLOG(2) << "  " << me;
   }
-  VLOG(2) << name << " -> " << *it->second.value;
+  VLOG(2) << name << " -> " << *me.value;
 
-  return *it->second.value;
+  return *me.value;
 }
 
-std::optional<int64_t> ConstantFold(absl::flat_hash_map<absl::string_view, Monkey>& monkeys, absl::string_view name) {
+absl::StatusOr<std::optional<int64_t>> ConstantFold(
+    absl::flat_hash_map<absl::string_view, Monkey>& monkeys,
+    absl::string_view name) {
   if (name == "humn") return std::nullopt;
 
   VLOG(2) << "ConstantFold(" << name << ")";
 
-  auto it = monkeys.find(name);
-  CHECK(it != monkeys.end());
-  if (!it->second.value) {
-    std::optional<int64_t> left = ConstantFold(monkeys, it->second.left);
-    std::optional<int64_t> right = ConstantFold(monkeys, it->second.right);
-    if (!left || !right) return std::nullopt;
-    if (it->second.op == "+") {
-      it->second.value = *left + *right;
-    } else if (it->second.op == "-") {
-      it->second.value = *left - *right;
-    } else if (it->second.op == "*") {
-      it->second.value = *left * *right;
-    } else if (it->second.op == "/") {
-      it->second.value = *left / *right;
+  if (!monkeys.contains(name)) return Error("Bad monkey: ", name);
+  Monkey& me = monkeys[name];
+  if (!me.value) {
+    absl::StatusOr<std::optional<int64_t>> left = ConstantFold(monkeys, me.left);
+    if (!left.ok()) return left.status();
+    absl::StatusOr<std::optional<int64_t>> right = ConstantFold(monkeys, me.right);
+    if (!right.ok()) return right.status();
+    if (!*left || !*right) return std::nullopt;
+    if (me.op == "+") {
+      me.value = **left + **right;
+    } else if (me.op == "-") {
+      me.value = **left - **right;
+    } else if (me.op == "*") {
+      me.value = **left * **right;
+    } else if (me.op == "/") {
+      me.value = **left / **right;
     } else {
-      LOG(FATAL) << "Bad op: " << it->second.op;
+      LOG(FATAL) << "Bad op: " << me.op;
     }
   }
-  VLOG(2) << name << " -> " << *it->second.value;
+  VLOG(2) << name << " -> " << *me.value;
 
-  return *it->second.value;
+  return *me.value;
 }
 
-int64_t ProbeVal(absl::flat_hash_map<absl::string_view, Monkey>& monkeys, int64_t val, absl::string_view node) {
+absl::StatusOr<int64_t> ProbeVal(
+    absl::flat_hash_map<absl::string_view, Monkey>& monkeys,
+    int64_t val, absl::string_view node) {
   if (node == "humn") return val;
-  Monkey me = monkeys[node];
-  VLOG(2) << "ProbeVal: " << node << ": " << val << " = " << me.left << " " << me.op << " " << me.right;
-  CHECK(!me.value);
-  Monkey left = monkeys[me.left];
-  Monkey right = monkeys[me.right];
-  CHECK(left.value || right.value && !(left.value && right.value));
+  if (!monkeys.contains(node)) return Error("Bad monkey: ", node);
+  const Monkey& me = monkeys[node];
+  VLOG(2) << "ProbeVal: " << node << ": " << val << " = " << me;
+  if (me.value) return Error("Probing known value for ", node);
+  const Monkey& left = monkeys[me.left];
+  const Monkey& right = monkeys[me.right];
+  if (left.value && right.value) {
+    return Error("Both left and right known for ", node);
+  }
+  if (!left.value && !right.value) {
+    return Error("Neither left nor right known for ", node);
+  }
   if (me.op == "+") {
     if (left.value) {
       return ProbeVal(monkeys, val - *left.value, me.right);
@@ -109,33 +130,24 @@ int64_t ProbeVal(absl::flat_hash_map<absl::string_view, Monkey>& monkeys, int64_
     } else {
       return ProbeVal(monkeys, val * *right.value, me.left);
     }        
-  } else {
-    LOG(FATAL) << "Bad op";
-  }
+  } 
+  
+  return Error("Bad op: ", me.op);
 }
 
-std::string Tree(absl::flat_hash_map<absl::string_view, Monkey>& monkeys, absl::string_view node) {
-  if (node == "humn") return "HUMN";
-  CHECK(monkeys.contains(node)) << node;
-  Monkey m = monkeys[node];
-  if (m.value) return absl::StrCat(*m.value);
-  return absl::StrCat("(", Tree(monkeys, m.left), m.op, Tree(monkeys, m.right), ")");
-}
-
-int64_t FindRoot(absl::flat_hash_map<absl::string_view, Monkey>& monkeys) {
+absl::StatusOr<int64_t> FindRoot(
+    absl::flat_hash_map<absl::string_view, Monkey>& monkeys) {
   Monkey root = monkeys["root"];
-  std::optional<int64_t> left = ConstantFold(monkeys, root.left);
-  VLOG(1) << "left: " << Tree(monkeys, root.left);
-  std::optional<int64_t> right = ConstantFold(monkeys, root.right);
-  VLOG(1) << "right: " << Tree(monkeys, root.right);
-  CHECK(left || right && !(left && right));
-  if (left) {
-    VLOG(1) << "left defined going to : " <<  root.right;
-    return ProbeVal(monkeys, *left, root.right);
-  }
-  CHECK(right);
-    VLOG(1) << "right defined going to : " <<  root.left;
-  return ProbeVal(monkeys, *right, root.left);
+  absl::StatusOr<std::optional<int64_t>> left =
+      ConstantFold(monkeys, root.left);
+  if (!left.ok()) return left.status();
+  absl::StatusOr<std::optional<int64_t>> right =
+      ConstantFold(monkeys, root.right);
+  if (!right.ok()) return right.status();
+  if (*left && *right) return Error("Both sides are constant");
+  if (!*left && !*right) return Error("Neigher side is constant");
+  if (*left) return ProbeVal(monkeys, **left, root.right);
+  return ProbeVal(monkeys, **right, root.left);
 }
 
 }  // namespace
@@ -179,16 +191,6 @@ absl::StatusOr<std::string> Day_2022_21::Part2(
   }
 
   return IntReturn(FindRoot(monkeys));
-
-  absl::string_view left = monkeys["root"].left;
-  absl::string_view right = monkeys["root"].right;
-  for (int i = 0; true; ++i) {
-    absl::flat_hash_map<absl::string_view, Monkey> clean = monkeys;
-    clean["humn"].value = i;
-    if (Evaluate(clean, left) == Evaluate(clean, right)) return IntReturn(i);
-  }
-
-  return Error("left inifinite loop");
 }
 
 }  // namespace advent_of_code
