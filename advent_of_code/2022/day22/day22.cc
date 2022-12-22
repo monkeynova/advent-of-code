@@ -16,7 +16,38 @@ namespace advent_of_code {
 
 namespace {
 
-using StitchMap = absl::flat_hash_map<std::pair<Point, Point>, std::pair<Point, Point>>;
+struct PointAndDir {
+  Point p;
+  Point d;
+
+  PointAndDir Advance() const {
+    return {.p = p + d, .d = d};
+  }
+
+  PointAndDir rotate_right() const {
+    return {.p = p, .d = d.rotate_right()};
+  }
+
+  PointAndDir rotate_left() const {
+    return {.p = p, .d = d.rotate_left()};
+  }
+
+  template <typename H>
+  friend H AbslHashValue(H h, const PointAndDir& pd) {
+    return H::combine(std::move(h), pd.p, pd.d);
+  }
+
+  bool operator==(const PointAndDir& o) const {
+    return p == o.p && d == o.d;
+  }
+
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const PointAndDir& pd) {
+    absl::Format(&sink, "%v (@%v)", pd.p, pd.d);
+  }
+};
+
+using StitchMap = absl::flat_hash_map<PointAndDir, PointAndDir>;
 
 void Stitch(StitchMap& ret, Point s1, Point s2, Point d1, Point e1, Point e2, Point d2) {
   CHECK_EQ((s2 - s1).dist(), (e2 - e1).dist()) << s1 << "-" << s2 << "; " << e1 << "-" << e2;
@@ -26,8 +57,8 @@ void Stitch(StitchMap& ret, Point s1, Point s2, Point d1, Point e1, Point e2, Po
   VLOG(1) << "Stitch: " << s1 << "-" << s2 << " (@" << d1 << ")" << " to " << e1 << "-" << e2 << " (@" << d2 << ")";
 
   for (Point s = s1, e = e1; true; s += ds, e += de) {
-    ret[{s, d1}] = {e, d2};
-    ret[{e, -d2}] = {s, -d1};
+    ret[{.p = s, .d = d1}] = {.p = e, .d = d2};
+    ret[{.p = e, .d = -d2}] = {.p = s, .d = -d1};
     VLOG(2) << s << "," << d1 << " => " << e << "," << d2;
     VLOG(2) << e << "," << -d2 << " => " << s << "," << -d1;
     if (s == s2) break;
@@ -47,16 +78,6 @@ struct Transform {
 struct StitchFace {
   Point board_coord;
   Transform to_cube;
-};
-
-struct PointAndDir {
-  Point p;
-  Point d;
-
-  template <typename Sink>
-  friend void AbslStringify(Sink& sink, const PointAndDir& pd) {
-    absl::Format(&sink, "%v (@%v)", pd.p, pd.d);
-  }
 };
 
 StitchMap BuildStitchMap(const CharBoard& board) {
@@ -205,6 +226,18 @@ StitchMap BuildStitchMap(const CharBoard& board) {
   return ret;
 }
 
+absl::StatusOr<int> Score(PointAndDir pd) {
+  int score = 0;
+  score += 1000 * (pd.p.y + 1) + 4 * (pd.p.x + 1);
+  if (pd.d == Cardinal::kEast) score += 0;
+  else if (pd.d == Cardinal::kSouth) score += 1;
+  else if (pd.d == Cardinal::kWest) score += 2;
+  else if (pd.d == Cardinal::kNorth) score += 3;
+  else return Error("Bad dir");
+
+  return score;
+}
+
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_22::Part1(
@@ -235,20 +268,20 @@ absl::StatusOr<std::string> Day_2022_22::Part1(
   }
   if (!start) return Error("No start");
 
+  PointAndDir cur = {.p = *start, .d = Cardinal::kEast};
 
-  Point cur = *start;
-  Point dir = Cardinal::kEast;
   int dist = 0;
 
   auto move = [&]() {
-    VLOG(2) << cur << " d=" << dir;
-    VLOG(2) << "move: " << dist;
+    VLOG(2) << cur << "; move=" << dist;
       for (int i = 0; i < dist; ++i) {
-        Point next = board.TorusPoint(cur + dir);
-        while (board[next] == ' ') {
-          next = board.TorusPoint(next + dir);
+        PointAndDir next = cur.Advance();
+        next.p = board.TorusPoint(next.p);
+        while (board[next.p] == ' ') {
+          next = next.Advance();
+          next.p = board.TorusPoint(next.p);
         }
-        if (board[next] == '#') break;
+        if (board[next.p] == '#') break;
         cur = next;
       }
     dist = 0;
@@ -259,25 +292,17 @@ absl::StatusOr<std::string> Day_2022_22::Part1(
     if (c >= '0' && c <= '9') dist = dist * 10 + c - '0';
     else if (c == 'R') {
       move();
-      dir = dir.rotate_right();
+      cur = cur.rotate_right();
     } else if (c == 'L') {
       move();
-      dir = dir.rotate_left();
+      cur = cur.rotate_left();
     } else {
       return Error("Bad path");
     }
   }
   move();
 
-  int score = 0;
-  score += 1000 * (cur.y + 1) + 4 * (cur.x + 1);
-  if (dir == Cardinal::kEast) score += 0;
-  else if (dir == Cardinal::kSouth) score += 1;
-  else if (dir == Cardinal::kWest) score += 2;
-  else if (dir == Cardinal::kNorth) score += 3;
-  else return Error("Bad dir");
-
-  return IntReturn(score);
+  return IntReturn(Score(cur));
 }
 
 absl::StatusOr<std::string> Day_2022_22::Part2(
@@ -308,37 +333,30 @@ absl::StatusOr<std::string> Day_2022_22::Part2(
   }
   if (!start) return Error("No start");
 
-  Point cur = *start;
-  Point dir = Cardinal::kEast;
+  PointAndDir cur = {.p = *start, .d = Cardinal::kEast};
   int dist = 0;
 
   StitchMap stitched = BuildStitchMap(board);
 
-  Point next;
-  Point next_dir;
+  PointAndDir next;
 
   auto cube_move = [&]() {
-    if (stitched.contains({cur, dir})) {
-      auto pair = stitched[{cur, dir}];
-      next = pair.first;
-      next_dir = pair.second;
+    if (stitched.contains(cur)) {
+      next = stitched[{cur.p, cur.d}];
       VLOG(2) << "Stitch: " << cur << "->" << next;
     } else {
-      next = cur + dir;
-      next_dir = dir;
+      next = cur.Advance();
     }
-    CHECK(board.OnBoard(next)) << next;
-    CHECK(board[next] != ' ') << next;
+    CHECK(board.OnBoard(next.p)) << next;
+    CHECK(board[next.p] != ' ') << next;
   };
 
   auto move = [&]() {
-    VLOG(2) << cur << " d=" << dir;
-    VLOG(2) << "move: " << dist;
+    VLOG(2) << cur << " move: " << dist;
       for (int i = 0; i < dist; ++i) {
         cube_move();
-        if (board[next] == '#') break;
+        if (board[next.p] == '#') break;
         cur = next;
-        dir = next_dir;
       }
     dist = 0;
   };
@@ -347,25 +365,17 @@ absl::StatusOr<std::string> Day_2022_22::Part2(
     if (c >= '0' && c <= '9') dist = dist * 10 + c - '0';
     else if (c == 'R') {
       move();
-      dir = dir.rotate_right();
+      cur = cur.rotate_right();
     } else if (c == 'L') {
       move();
-      dir = dir.rotate_left();
+      cur = cur.rotate_left();
     } else {
       return Error("Bad path");
     }
   }
   move();
 
-  int score = 0;
-  score += 1000 * (cur.y + 1) + 4 * (cur.x + 1);
-  if (dir == Cardinal::kEast) score += 0;
-  else if (dir == Cardinal::kSouth) score += 1;
-  else if (dir == Cardinal::kWest) score += 2;
-  else if (dir == Cardinal::kNorth) score += 3;
-  else return Error("Bad dir");
-
-  return IntReturn(score);
+  return IntReturn(Score(cur));
 }
 
 }  // namespace advent_of_code
