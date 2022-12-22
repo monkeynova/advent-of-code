@@ -2,24 +2,55 @@
 ==
 
 [part=1]
-Example input
+HACK:
+        ...#
+        .#..
+        #...
+        ....
+...#.......#
+........#...
+..#....#....
+..........#.
+        ...#....
+        .....#..
+        .#......
+        ......#.
+
+10R5L5R10L4R5L5
 --
-ERROR: UNIMPLEMENTED: Problem not known
+6032
 ==
 
+# 117166
 [part=1]
+HACK:
 @include{advent_of_code/2022/day22/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+126350
 ==
 
 [part=2]
-Example input
+HACK:
+        ...#
+        .#..
+        #...
+        ....
+...#.......#
+........#...
+..#....#....
+..........#.
+        ...#....
+        .....#..
+        .#......
+        ......#.
+
+10R5L5R10L4R5L5
 --
-ERROR: UNIMPLEMENTED: Problem not known
+5031
 ==
 
 [part=2]
+HACK:
 @include{advent_of_code/2022/day22/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+129339
