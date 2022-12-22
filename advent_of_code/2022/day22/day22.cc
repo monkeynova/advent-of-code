@@ -76,6 +76,38 @@ struct Transform {
   Point3 Apply(Point3 p) const {
     return x_dest * p.x + y_dest * p.y + z_dest * p.z;
   }
+
+  Transform Rotate(Point dir) {
+    if (dir == Cardinal::kXHat) {
+      return {
+        .x_dest = -z_dest,
+        .y_dest = y_dest,
+        .z_dest = x_dest,
+      };
+    }
+    if (dir == -Cardinal::kXHat) {
+      return {
+        .x_dest = z_dest,
+        .y_dest = y_dest,
+        .z_dest = -x_dest,
+      };
+    }
+    if (dir == Cardinal::kYHat) {
+      return {
+        .x_dest = x_dest,
+        .y_dest = -z_dest,
+        .z_dest = y_dest,
+      };
+    }
+    if (dir == -Cardinal::kXHat) {
+      return {
+        .x_dest = x_dest,
+        .y_dest = z_dest,
+        .z_dest = -y_dest,
+      };
+    }
+    LOG(FATAL) << "Bad dir: " << dir;
+  }
 };
 
 struct StitchFace {
@@ -95,6 +127,9 @@ StitchMap BuildStitchMap(const CharBoard& board) {
     }
   }
 
+  // Map a 3d cube corner to the set of square corners on the board along with
+  // an 'outward' facing direction. This means each corner is added twice (once
+  // for each 'outward' direction).
   absl::flat_hash_map<Point3, std::vector<PointAndDir>> corner_maps;
 
   absl::flat_hash_set<Point> hist = {*face_start};
@@ -135,40 +170,15 @@ StitchMap BuildStitchMap(const CharBoard& board) {
       VLOG(1) << "Paint " << face_corners[i] << " on " << to_paint;
     }
 
-    if (std::optional<Point> next_face = try_dir(on_board, Cardinal::kXHat)) {
-      Transform new_t {
-        .x_dest = -to_cube.z_dest,
-        .y_dest = to_cube.y_dest,
-        .z_dest = to_cube.x_dest,
-      };
-      queue.push_back({*next_face, new_t});
-    }
-    if (std::optional<Point> next_face = try_dir(on_board, -Cardinal::kXHat)) {
-      Transform new_t {
-        .x_dest = to_cube.z_dest,
-        .y_dest = to_cube.y_dest,
-        .z_dest = -to_cube.x_dest,
-      };
-      queue.push_back({*next_face, new_t});
-    }
-    if (std::optional<Point> next_face = try_dir(on_board, Cardinal::kYHat)) {
-      Transform new_t {
-        .x_dest = to_cube.x_dest,
-        .y_dest = -to_cube.z_dest,
-        .z_dest = to_cube.y_dest,
-      };
-      queue.push_back({*next_face, new_t});
-    }
-    if (std::optional<Point> next_face = try_dir(on_board, -Cardinal::kXHat)) {
-      Transform new_t {
-        .x_dest = to_cube.x_dest,
-        .y_dest = to_cube.z_dest,
-        .z_dest = -to_cube.y_dest,
-      };
-      queue.push_back({*next_face, new_t});
+    for (Point dir : Cardinal::kFourDirs) {
+      if (std::optional<Point> next_face = try_dir(on_board, dir)) {
+        queue.push_back({*next_face, to_cube.Rotate(dir)});
+      }
     }
   }
 
+  // Every corner should have 3 faces attached, each face attached in two
+  // directions.
   for (auto [p3, p2v] : corner_maps) {
     CHECK_EQ(p2v.size(), 6);
   }
@@ -193,8 +203,8 @@ StitchMap BuildStitchMap(const CharBoard& board) {
     {{1, 1, -1}, {1, 1, 1}},
   };
 
-  StitchMap ret;
-  auto same_face = [&](std::vector<PointAndDir>& set, PointAndDir f) {
+  // Find the entry in `set` on the same face with the same direction as `f`.
+  auto same_edge = [&](std::vector<PointAndDir>& set, PointAndDir f) {
     std::optional<PointAndDir> ret;
     for (PointAndDir pd : set) {
       if (f.d != pd.d) continue;
@@ -207,6 +217,7 @@ StitchMap BuildStitchMap(const CharBoard& board) {
     return ret;
   };
 
+  StitchMap ret;
   for (auto [s, e] : cube_edges) {
     CHECK(corner_maps.contains(s));
     CHECK(corner_maps.contains(e));
@@ -215,11 +226,11 @@ StitchMap BuildStitchMap(const CharBoard& board) {
     int stitch_count = 0;
     for (int i = 0; i < 6; ++i) {
       PointAndDir s1 = s_set[i];
-      std::optional<PointAndDir> e1 = same_face(e_set, s1);
+      std::optional<PointAndDir> e1 = same_edge(e_set, s1);
       if (!e1) continue;
       for (int j = i + 1; j < 6; ++j) {
         PointAndDir s2 = s_set[j];
-        std::optional<PointAndDir> e2 = same_face(e_set, s2);
+        std::optional<PointAndDir> e2 = same_edge(e_set, s2);
         if (!e2) continue;
         ++stitch_count;
         Stitch(ret, s1.p, e1->p, s1.d, s2.p, e2->p, -s2.d);
