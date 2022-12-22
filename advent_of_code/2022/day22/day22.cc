@@ -23,6 +23,8 @@ void Stitch(StitchMap& ret, Point s1, Point s2, Point d1, Point e1, Point e2, Po
   Point ds = (s2 - s1).min_step();
   Point de = (e2 - e1).min_step();
 
+  VLOG(1) << "Stitch: " << s1 << "-" << s2 << " (@" << d1 << ")" << " to " << e1 << "-" << e2 << " (@" << d2 << ")";
+
   for (Point s = s1, e = e1; true; s += ds, e += de) {
     ret[{s, d1}] = {e, d2};
     ret[{e, -d2}] = {s, -d1};
@@ -32,82 +34,174 @@ void Stitch(StitchMap& ret, Point s1, Point s2, Point d1, Point e1, Point e2, Po
   }
 }
 
+struct Transform {
+  Point3 x_dest = Cardinal3::kXHat;
+  Point3 y_dest = Cardinal3::kYHat;
+  Point3 z_dest = Cardinal3::kZHat;
+
+  Point3 Apply(Point3 p) const {
+    return x_dest * p.x + y_dest * p.y + z_dest * p.z;
+  }
+};
+
+struct StitchFace {
+  Point board_coord;
+  Transform to_cube;
+};
+
+struct PointAndDir {
+  Point p;
+  Point d;
+
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const PointAndDir& pd) {
+    absl::Format(&sink, "%v (@%v)", pd.p, pd.d);
+  }
+};
+
 StitchMap BuildStitchMap(const CharBoard& board) {
   int tile_width = std::gcd(board.width(), board.height());
 
-  StitchMap ret;
-  if (tile_width == 4) {
-    // ..1.
-    // 234.
-    // ..56
-    // 1-3
-    Stitch(ret, {8, 0}, {8, 3}, Cardinal::kWest, {4, 4}, {7, 4}, Cardinal::kSouth);
-    // 1-2
-    Stitch(ret, {8, 0}, {11, 0}, Cardinal::kNorth, {3, 3}, {0, 3}, Cardinal::kSouth);
-    // 1-6
-    Stitch(ret, {11, 0}, {11, 3}, Cardinal::kWest, {15, 11}, {12, 11}, Cardinal::kEast);
-    // 4-6
-    Stitch(ret, {11, 4}, {11, 7}, Cardinal::kEast, {15, 8}, {12, 8}, Cardinal::kSouth);
-    // 3-5
-    Stitch(ret, {4, 7}, {7, 7}, Cardinal::kSouth, {8, 11}, {8, 8}, Cardinal::kEast);
-    // 2-5
-    Stitch(ret, {0, 7}, {3, 7}, Cardinal::kSouth, {11, 11}, {8, 11}, Cardinal::kNorth);
-    // 2-6
-    Stitch(ret, {15, 11}, {12, 11}, Cardinal::kSouth, {0, 4}, {0, 7}, Cardinal::kEast);
-  }
-
-  if (tile_width == 50) {
-    // .12
-    // .3.
-    // 45.
-    // 6..
-  
-    // 3-4
-    Stitch(ret, {0, 100}, {49, 100}, Cardinal::kNorth, {50, 50}, {50, 99}, Cardinal::kEast);
-    // 5-6
-    Stitch(ret, {50, 149}, {99, 149}, Cardinal::kSouth, {49, 150}, {49, 199}, Cardinal::kWest);
-    // 2-3
-    Stitch(ret, {100, 49}, {149, 49}, Cardinal::kSouth, {99, 50}, {99, 99}, Cardinal::kWest);
-    // 5-2
-    Stitch(ret, {99, 100}, {99, 149}, Cardinal::kEast, {149, 49}, {149, 0}, Cardinal::kWest);
-    // 1-4
-    Stitch(ret, {50, 0}, {50, 49}, Cardinal::kWest, {0, 149}, {0, 100}, Cardinal::kEast);
-    // 1-6
-    Stitch(ret, {0, 150}, {0, 199}, Cardinal::kWest, {50, 0}, {99, 0}, Cardinal::kSouth);
-    // 2-6
-    Stitch(ret, {0, 199}, {49, 199}, Cardinal::kSouth, {100, 0}, {149, 0}, Cardinal::kSouth);
-  }
-
-  return ret;
-
-  for (Point p : board.range()) {
-    if (board[p] != ' ') continue;
-    for (Point c1 : {Cardinal::kSouth, Cardinal::kNorth}) {
-      if (!board.OnBoard(p + c1)) continue;
-      if (board[p + c1] == ' ') continue;
-      for (Point c2 : {Cardinal::kWest, Cardinal::kEast}) {
-        if (!board.OnBoard(p + c2)) continue;
-        if (board[p + c2] == ' ') continue;
-
-        for (int i = 0; i < tile_width; ++i) {
-          std::pair<Point, Point> from;
-          from.first = p + c1 - i * c2;
-          from.second = -c1;
-          std::pair<Point, Point> to;
-          to.first = p + c2 - i * c1;
-          to.second = c2;
-          ret[from] = to;
-          VLOG(1) << from.first << "/" << from.second << " -> " << to.first << "/" << to.second;
-          std::swap(from, to);
-          from.second = -from.second;
-          to.second = -to.second;
-          ret[from] = to;
-          VLOG(1) << from.first << "/" << from.second << " -> " << to.first << "/" << to.second;
-        }
-      }
+  std::optional<Point> face_start;
+  for (int y = 0; y < board.width(); y += tile_width) {
+    for (int x = 0; x < board.width(); x += tile_width) {
+      if (face_start) break;
+      if (board[{x, y}] == ' ') continue;
+      face_start = Point{x, y};
     }
   }
-  // TODO: Handle non-corners...
+
+  absl::flat_hash_map<Point3, std::vector<PointAndDir>> corner_maps;
+
+  absl::flat_hash_set<Point> hist = {*face_start};
+  auto try_dir = [&](Point p, Point d) -> std::optional<Point> {
+    Point next_face = p + tile_width * d;
+    if (!board.OnBoard(next_face)) return std::nullopt;
+    if (board[next_face] == ' ') return std::nullopt;
+    if (hist.contains(next_face)) return std::nullopt;
+    hist.insert(next_face);
+    return next_face;
+  };
+
+  std::vector<Point3> paint_corners = {
+    {-1, -1, 1}, {1, -1, 1}, {-1, 1, 1}, {1, 1, 1}
+  };
+  for (std::deque<StitchFace> queue = {{*face_start, Transform()}};
+       !queue.empty(); queue.pop_front()) {
+    Point on_board = queue.front().board_coord;
+    Transform to_cube = queue.front().to_cube;
+    std::vector<Point> face_corners = {
+      on_board,
+      on_board + (tile_width - 1) * Cardinal::kXHat,
+      on_board + (tile_width - 1) * Cardinal::kYHat,
+      on_board + (tile_width - 1) * (Cardinal::kXHat + Cardinal::kYHat),
+    };
+    std::vector<Point> face_dirs = {
+      Cardinal::kNorth, Cardinal::kWest,
+      Cardinal::kNorth, Cardinal::kEast,
+      Cardinal::kWest, Cardinal::kSouth,
+      Cardinal::kEast, Cardinal::kSouth,
+    };
+    for (int i = 0; i < face_corners.size(); ++i) {
+      Point3 to_paint = to_cube.Apply(paint_corners[i]);
+      corner_maps[to_paint].push_back({.p = face_corners[i], .d = face_dirs[2 * i]});
+      corner_maps[to_paint].push_back({.p = face_corners[i], .d = face_dirs[2 * i + 1]});
+      VLOG(1) << "Paint " << face_corners[i] << " on " << to_paint;
+    }
+
+    if (std::optional<Point> next_face = try_dir(on_board, Cardinal::kXHat)) {
+      Transform new_t {
+        .x_dest = -to_cube.z_dest,
+        .y_dest = to_cube.y_dest,
+        .z_dest = to_cube.x_dest,
+      };
+      queue.push_back({*next_face, new_t});
+    }
+    if (std::optional<Point> next_face = try_dir(on_board, -Cardinal::kXHat)) {
+      Transform new_t {
+        .x_dest = to_cube.z_dest,
+        .y_dest = to_cube.y_dest,
+        .z_dest = -to_cube.x_dest,
+      };
+      queue.push_back({*next_face, new_t});
+    }
+    if (std::optional<Point> next_face = try_dir(on_board, Cardinal::kYHat)) {
+      Transform new_t {
+        .x_dest = to_cube.x_dest,
+        .y_dest = -to_cube.z_dest,
+        .z_dest = to_cube.y_dest,
+      };
+      queue.push_back({*next_face, new_t});
+    }
+    if (std::optional<Point> next_face = try_dir(on_board, -Cardinal::kXHat)) {
+      Transform new_t {
+        .x_dest = to_cube.x_dest,
+        .y_dest = to_cube.z_dest,
+        .z_dest = -to_cube.y_dest,
+      };
+      queue.push_back({*next_face, new_t});
+    }
+  }
+
+  for (auto [p3, p2v] : corner_maps) {
+    CHECK_EQ(p2v.size(), 6);
+  }
+
+  std::vector<std::pair<Point3, Point3>> cube_edges = {
+    // Top.
+    {{-1, -1, 1}, {1, -1, 1}},
+    {{1, -1, 1}, {1, 1, 1}},
+    {{1, 1, 1}, {-1, 1, 1}},
+    {{-1, 1, 1}, {-1, -1, 1}},
+
+    // Bottom.
+    {{1, -1, -1}, {-1, -1, -1}},
+    {{1, 1, -1}, {1, -1, -1}},
+    {{-1, 1, -1}, {1, 1, -1}},
+    {{-1, -1, -1}, {-1, 1, -1}},
+
+    // Struts.
+    {{-1, -1, -1}, {-1, -1, 1}},
+    {{-1, 1, -1}, {-1, 1, 1}},
+    {{1, -1, -1}, {1, -1, 1}},
+    {{1, 1, -1}, {1, 1, 1}},
+  };
+
+  StitchMap ret;
+  auto same_face = [&](std::vector<PointAndDir>& set, PointAndDir f) {
+    std::optional<PointAndDir> ret;
+    for (PointAndDir pd : set) {
+      if (f.d != pd.d) continue;
+      if (f.p.x / tile_width == pd.p.x / tile_width &&
+          f.p.y / tile_width == pd.p.y / tile_width) {
+        CHECK(!ret);
+        ret = pd;
+      }
+    }
+    return ret;
+  };
+
+  for (auto [s, e] : cube_edges) {
+    CHECK(corner_maps.contains(s));
+    CHECK(corner_maps.contains(e));
+    std::vector<PointAndDir> s_set = corner_maps[s];
+    std::vector<PointAndDir> e_set = corner_maps[e];
+    int stitch_count = 0;
+    for (int i = 0; i < 6; ++i) {
+      PointAndDir s1 = s_set[i];
+      std::optional<PointAndDir> e1 = same_face(e_set, s1);
+      if (!e1) continue;
+      for (int j = i + 1; j < 6; ++j) {
+        PointAndDir s2 = s_set[j];
+        std::optional<PointAndDir> e2 = same_face(e_set, s2);
+        if (!e2) continue;
+        ++stitch_count;
+        Stitch(ret, s1.p, e1->p, s1.d, s2.p, e2->p, -s2.d);
+      }
+    }
+    CHECK_EQ(stitch_count, 1)
+        << "s_set: " << absl::StrJoin(s_set, ",") << "; e_set: " << absl::StrJoin(e_set, ",");
+  }
   return ret;
 }
 
@@ -247,7 +341,6 @@ absl::StatusOr<std::string> Day_2022_22::Part2(
         dir = next_dir;
       }
     dist = 0;
-    VLOG(2) << cur;
   };
 
   for (char c : path) {
