@@ -49,12 +49,15 @@ struct PointAndDir {
 
 using StitchMap = absl::flat_hash_map<PointAndDir, PointAndDir>;
 
-void Stitch(StitchMap& ret, Point s1, Point s2, Point d1, Point e1, Point e2, Point d2) {
-  CHECK_EQ((s2 - s1).dist(), (e2 - e1).dist()) << s1 << "-" << s2 << "; " << e1 << "-" << e2;
+void Stitch(StitchMap& ret, Point s1, Point s2, Point d1,
+            Point e1, Point e2, Point d2) {
+  CHECK_EQ((s2 - s1).dist(), (e2 - e1).dist())
+      << s1 << "-" << s2 << "; " << e1 << "-" << e2;
   Point ds = (s2 - s1).min_step();
   Point de = (e2 - e1).min_step();
 
-  VLOG(1) << "Stitch: " << s1 << "-" << s2 << " (@" << d1 << ")" << " to " << e1 << "-" << e2 << " (@" << d2 << ")";
+  VLOG(1) << "Stitch: " << s1 << "-" << s2 << " (@" << d1 << ")" << " to "
+          << e1 << "-" << e2 << " (@" << d2 << ")";
 
   for (Point s = s1, e = e1; true; s += ds, e += de) {
     ret[{.p = s, .d = d1}] = {.p = e, .d = d2};
@@ -125,8 +128,10 @@ StitchMap BuildStitchMap(const CharBoard& board) {
     };
     for (int i = 0; i < face_corners.size(); ++i) {
       Point3 to_paint = to_cube.Apply(paint_corners[i]);
-      corner_maps[to_paint].push_back({.p = face_corners[i], .d = face_dirs[2 * i]});
-      corner_maps[to_paint].push_back({.p = face_corners[i], .d = face_dirs[2 * i + 1]});
+      corner_maps[to_paint].push_back(
+        {.p = face_corners[i], .d = face_dirs[2 * i]});
+      corner_maps[to_paint].push_back(
+        {.p = face_corners[i], .d = face_dirs[2 * i + 1]});
       VLOG(1) << "Paint " << face_corners[i] << " on " << to_paint;
     }
 
@@ -221,9 +226,57 @@ StitchMap BuildStitchMap(const CharBoard& board) {
       }
     }
     CHECK_EQ(stitch_count, 1)
-        << "s_set: " << absl::StrJoin(s_set, ",") << "; e_set: " << absl::StrJoin(e_set, ",");
+        << "s_set: " << absl::StrJoin(s_set, ",") << "; "
+        << "e_set: " << absl::StrJoin(e_set, ",");
   }
   return ret;
+}
+
+absl::StatusOr<CharBoard> PadAndParseBoard(
+    absl::Span<absl::string_view> input, std::vector<std::string>& storage) {
+  int max = 0;
+  for (absl::string_view line : input) {
+    max = std::max<int>(max, line.size());
+  }
+  for (absl::string_view line : input) {
+    storage.push_back(std::string(line));
+    storage.back().resize(max, ' ');
+  }
+
+  return CharBoard::Parse(storage);
+}
+
+absl::StatusOr<PointAndDir> FindStart(const CharBoard& board) {
+  std::optional<Point> start;
+  for (Point p : board.range()) {
+    if (board[p] == '.') {
+      start = p;
+      break;
+    }
+  }
+  if (!start) return Error("No start");
+  return PointAndDir{.p = *start, .d = Cardinal::kEast};
+}
+
+absl::StatusOr<PointAndDir> MovePath(
+  absl::string_view path, PointAndDir cur,
+  absl::FunctionRef<PointAndDir(PointAndDir, int)> move) {
+  int dist = 0;
+  for (char c : path) {
+    if (c >= '0' && c <= '9') dist = dist * 10 + c - '0';
+    else if (c == 'R') {
+      cur = move(cur, dist);
+      dist = 0;
+      cur = cur.rotate_right();
+    } else if (c == 'L') {
+      cur = move(cur, dist);
+      dist = 0;
+      cur = cur.rotate_left();
+    } else {
+      return Error("Bad path");
+    }
+  }
+  return move(cur, dist);
 }
 
 absl::StatusOr<int> Score(PointAndDir pd) {
@@ -242,140 +295,73 @@ absl::StatusOr<int> Score(PointAndDir pd) {
 
 absl::StatusOr<std::string> Day_2022_22::Part1(
     absl::Span<absl::string_view> input) const {
+  if (input.size() < 2) return Error("Bad input");
+  if (!input[input.size() - 2].empty()) return Error("Bad input");
   absl::string_view path = input.back();
   input = input.subspan(0, input.size() - 2);
   
-  int max = 0;
-  for (absl::string_view line : input) {
-    max = std::max<int>(max, line.size());
-  }
-  std::vector<std::string> copy;
-  for (absl::string_view line : input) {
-    copy.push_back(std::string(line));
-    copy.back().resize(max, ' ');
-  }
+  std::vector<std::string> storage;
+  absl::StatusOr<CharBoard> board = PadAndParseBoard(input, storage);
 
-  absl::StatusOr<CharBoard> board_or = CharBoard::Parse(copy);
-  if (!board_or.ok()) return board_or.status();
-  CharBoard board = std::move(*board_or);
-
-  std::optional<Point> start;
-  for (Point p : board.range()) {
-    if (board[p] == '.') {
-      start = p;
-      break;
-    }
-  }
-  if (!start) return Error("No start");
-
-  PointAndDir cur = {.p = *start, .d = Cardinal::kEast};
-
-  int dist = 0;
-
-  auto move = [&]() {
+  auto move = [&board](PointAndDir cur, int dist) {
     VLOG(2) << cur << "; move=" << dist;
-      for (int i = 0; i < dist; ++i) {
-        PointAndDir next = cur.Advance();
-        next.p = board.TorusPoint(next.p);
-        while (board[next.p] == ' ') {
-          next = next.Advance();
-          next.p = board.TorusPoint(next.p);
-        }
-        if (board[next.p] == '#') break;
-        cur = next;
+    for (int i = 0; i < dist; ++i) {
+      PointAndDir next = cur.Advance();
+      next.p = board->TorusPoint(next.p);
+      while ((*board)[next.p] == ' ') {
+        next = next.Advance();
+        next.p = board->TorusPoint(next.p);
       }
-    dist = 0;
+      if ((*board)[next.p] == '#') break;
+      cur = next;
+    }
     VLOG(2) << cur;
+    return cur;
   };
 
-  for (char c : path) {
-    if (c >= '0' && c <= '9') dist = dist * 10 + c - '0';
-    else if (c == 'R') {
-      move();
-      cur = cur.rotate_right();
-    } else if (c == 'L') {
-      move();
-      cur = cur.rotate_left();
-    } else {
-      return Error("Bad path");
-    }
-  }
-  move();
-
-  return IntReturn(Score(cur));
+  absl::StatusOr<PointAndDir> start = FindStart(*board);
+  if (!start.ok()) return start.status();
+  absl::StatusOr<PointAndDir> end = MovePath(path, *start, move);
+  if (!end.ok()) return end.status();
+  return IntReturn(Score(*end));
 }
 
 absl::StatusOr<std::string> Day_2022_22::Part2(
     absl::Span<absl::string_view> input) const {
+  if (input.size() < 2) return Error("Bad input");
+  if (!input[input.size() - 2].empty()) return Error("Bad input");
   absl::string_view path = input.back();
   input = input.subspan(0, input.size() - 2);
   
-  int max = 0;
-  for (absl::string_view line : input) {
-    max = std::max<int>(max, line.size());
-  }
-  std::vector<std::string> copy;
-  for (absl::string_view line : input) {
-    copy.push_back(std::string(line));
-    copy.back().resize(max, ' ');
-  }
+  std::vector<std::string> storage;
+  absl::StatusOr<CharBoard> board = PadAndParseBoard(input, storage);
+  if (!board.ok()) return board.status();
 
-  absl::StatusOr<CharBoard> board_or = CharBoard::Parse(copy);
-  if (!board_or.ok()) return board_or.status();
-  CharBoard board = std::move(*board_or);
+  StitchMap stitched = BuildStitchMap(*board);
 
-  std::optional<Point> start;
-  for (Point p : board.range()) {
-    if (board[p] == '.') {
-      start = p;
-      break;
-    }
-  }
-  if (!start) return Error("No start");
-
-  PointAndDir cur = {.p = *start, .d = Cardinal::kEast};
-  int dist = 0;
-
-  StitchMap stitched = BuildStitchMap(board);
-
-  PointAndDir next;
-
-  auto cube_move = [&]() {
-    if (stitched.contains(cur)) {
-      next = stitched[{cur.p, cur.d}];
-      VLOG(2) << "Stitch: " << cur << "->" << next;
-    } else {
-      next = cur.Advance();
-    }
-    CHECK(board.OnBoard(next.p)) << next;
-    CHECK(board[next.p] != ' ') << next;
-  };
-
-  auto move = [&]() {
+  auto move = [&board, &stitched](PointAndDir cur, int dist) {
     VLOG(2) << cur << " move: " << dist;
-      for (int i = 0; i < dist; ++i) {
-        cube_move();
-        if (board[next.p] == '#') break;
-        cur = next;
+    for (int i = 0; i < dist; ++i) {
+      PointAndDir next;
+      if (auto it = stitched.find(cur); it != stitched.end()) {
+        next = it->second;
+        VLOG(2) << "Stitch: " << cur << "->" << next;
+      } else {
+        next = cur.Advance();
       }
-    dist = 0;
+      CHECK(board->OnBoard(next.p)) << next;
+      CHECK((*board)[next.p] != ' ') << next;
+      if ((*board)[next.p] == '#') break;
+      cur = next;
+    }
+    return cur;
   };
 
-  for (char c : path) {
-    if (c >= '0' && c <= '9') dist = dist * 10 + c - '0';
-    else if (c == 'R') {
-      move();
-      cur = cur.rotate_right();
-    } else if (c == 'L') {
-      move();
-      cur = cur.rotate_left();
-    } else {
-      return Error("Bad path");
-    }
-  }
-  move();
-
-  return IntReturn(Score(cur));
+  absl::StatusOr<PointAndDir> start = FindStart(*board);
+  if (!start.ok()) return start.status();
+  absl::StatusOr<PointAndDir> end = MovePath(path, *start, move);
+  if (!end.ok()) return end.status();
+  return IntReturn(Score(*end));
 }
 
 }  // namespace advent_of_code
