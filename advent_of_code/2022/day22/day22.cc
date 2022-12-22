@@ -47,10 +47,24 @@ struct PointAndDir {
   }
 };
 
-using StitchMap = absl::flat_hash_map<PointAndDir, PointAndDir>;
+class StitchMap {
+ public:
+  StitchMap() = default;
 
-void Stitch(StitchMap& ret, Point s1, Point s2, Point d1,
-            Point e1, Point e2, Point d2) {
+  void Add(Point s1, Point s2, Point d1, Point e1, Point e2, Point d2);
+  std::optional<PointAndDir> Find(PointAndDir src) const {
+    if (auto it = map_.find(src); it != map_.end()) {
+      return it->second;
+    }
+    return std::nullopt;
+  }
+
+ private:
+  absl::flat_hash_map<PointAndDir, PointAndDir> map_;
+};
+
+void StitchMap::Add(Point s1, Point s2, Point d1,
+                    Point e1, Point e2, Point d2) {
   CHECK_EQ((s2 - s1).dist(), (e2 - e1).dist())
       << s1 << "-" << s2 << "; " << e1 << "-" << e2;
   Point ds = (s2 - s1).min_step();
@@ -60,59 +74,17 @@ void Stitch(StitchMap& ret, Point s1, Point s2, Point d1,
           << e1 << "-" << e2 << " (@" << d2 << ")";
 
   for (Point s = s1, e = e1; true; s += ds, e += de) {
-    ret[{.p = s, .d = d1}] = {.p = e, .d = d2};
-    ret[{.p = e, .d = -d2}] = {.p = s, .d = -d1};
+    map_[{.p = s, .d = d1}] = {.p = e, .d = d2};
+    map_[{.p = e, .d = -d2}] = {.p = s, .d = -d1};
     VLOG(2) << s << "," << d1 << " => " << e << "," << d2;
     VLOG(2) << e << "," << -d2 << " => " << s << "," << -d1;
     if (s == s2) break;
   }
 }
 
-struct Transform {
-  Point3 x_dest = Cardinal3::kXHat;
-  Point3 y_dest = Cardinal3::kYHat;
-  Point3 z_dest = Cardinal3::kZHat;
-
-  Point3 Apply(Point3 p) const {
-    return x_dest * p.x + y_dest * p.y + z_dest * p.z;
-  }
-
-  Transform Rotate(Point dir) const {
-    if (dir == Cardinal::kXHat) {
-      return {
-        .x_dest = -z_dest,
-        .y_dest = y_dest,
-        .z_dest = x_dest,
-      };
-    }
-    if (dir == -Cardinal::kXHat) {
-      return {
-        .x_dest = z_dest,
-        .y_dest = y_dest,
-        .z_dest = -x_dest,
-      };
-    }
-    if (dir == Cardinal::kYHat) {
-      return {
-        .x_dest = x_dest,
-        .y_dest = -z_dest,
-        .z_dest = y_dest,
-      };
-    }
-    if (dir == -Cardinal::kXHat) {
-      return {
-        .x_dest = x_dest,
-        .y_dest = z_dest,
-        .z_dest = -y_dest,
-      };
-    }
-    LOG(FATAL) << "Bad dir: " << dir;
-  }
-};
-
 struct StitchFace {
   Point board_coord;
-  Transform to_cube;
+  Orientation3 to_cube;
 };
 
 struct PaintCorner {
@@ -149,7 +121,7 @@ StitchMap BuildStitchMap(const CharBoard& board) {
   // for each 'outward' direction).
   absl::flat_hash_map<Point3, std::vector<PointAndDir>> corner_maps;
 
-  const std::array<PaintCorner, 4> paint_corners = {
+  const std::array<PaintCorner, 4> kPaintCorners = {
     PaintCorner{.cube = {-1, -1, 1}, .board = Cardinal::kOrigin,
                 .board_out1 = Cardinal::kNorth, .board_out2 = Cardinal::kWest},
     PaintCorner{.cube = {1, -1, 1}, .board = Cardinal::kEast,
@@ -160,11 +132,18 @@ StitchMap BuildStitchMap(const CharBoard& board) {
                 .board_out1 = Cardinal::kEast, .board_out2 = Cardinal::kSouth},
   };
 
+  const absl::flat_hash_map<Point, Orientation3> kRotations = {
+    {Cardinal::kXHat, Orientation3(-Cardinal3::kZHat, Cardinal3::kYHat)},
+    {-Cardinal::kXHat, Orientation3(Cardinal3::kZHat, Cardinal3::kYHat)},
+    {Cardinal::kYHat, Orientation3(Cardinal3::kXHat, -Cardinal3::kZHat)},
+    {-Cardinal::kYHat, Orientation3(Cardinal3::kXHat, Cardinal3::kZHat)},
+  };
+
   absl::flat_hash_set<Point> hist = {*face_start};
-  for (std::deque<StitchFace> queue = {{*face_start, Transform()}};
+  for (std::deque<StitchFace> queue = {{*face_start, Orientation3()}};
        !queue.empty(); queue.pop_front()) {
     const StitchFace& stitch_face = queue.front();
-    for (const PaintCorner& corner : paint_corners) {
+    for (const PaintCorner& corner : kPaintCorners) {
       corner.Paint(corner_maps, stitch_face, tile_width);
     }
 
@@ -174,7 +153,9 @@ StitchMap BuildStitchMap(const CharBoard& board) {
       if (board[next_face] == ' ') continue;
       if (hist.contains(next_face)) continue;
       hist.insert(next_face);
-      queue.push_back({next_face, stitch_face.to_cube.Rotate(dir)});
+      auto it = kRotations.find(dir);
+      CHECK(it != kRotations.end());
+      queue.push_back({next_face, stitch_face.to_cube.Apply(it->second)});
     }
   }
 
@@ -218,7 +199,7 @@ StitchMap BuildStitchMap(const CharBoard& board) {
     return ret;
   };
 
-  StitchMap ret;
+  StitchMap stitch_map;
   for (auto [s, e] : cube_edges) {
     CHECK(corner_maps.contains(s));
     CHECK(corner_maps.contains(e));
@@ -234,14 +215,14 @@ StitchMap BuildStitchMap(const CharBoard& board) {
         std::optional<PointAndDir> e2 = same_edge(e_set, s2);
         if (!e2) continue;
         ++stitch_count;
-        Stitch(ret, s1.p, e1->p, s1.d, s2.p, e2->p, -s2.d);
+        stitch_map.Add(s1.p, e1->p, s1.d, s2.p, e2->p, -s2.d);
       }
     }
     CHECK_EQ(stitch_count, 1)
         << "s_set: " << absl::StrJoin(s_set, ",") << "; "
         << "e_set: " << absl::StrJoin(e_set, ",");
   }
-  return ret;
+  return stitch_map;
 }
 
 absl::StatusOr<CharBoard> PadAndParseBoard(
@@ -349,22 +330,19 @@ absl::StatusOr<std::string> Day_2022_22::Part2(
   absl::StatusOr<CharBoard> board = PadAndParseBoard(input, storage);
   if (!board.ok()) return board.status();
 
-  StitchMap stitched = BuildStitchMap(*board);
+  StitchMap stitch_map = BuildStitchMap(*board);
 
-  auto move = [&board, &stitched](PointAndDir cur, int dist) {
+  auto move = [&board, &stitch_map](PointAndDir cur, int dist) {
     VLOG(2) << cur << " move: " << dist;
     for (int i = 0; i < dist; ++i) {
-      PointAndDir next;
-      if (auto it = stitched.find(cur); it != stitched.end()) {
-        next = it->second;
-        VLOG(2) << "Stitch: " << cur << "->" << next;
-      } else {
+      std::optional<PointAndDir> next = stitch_map.Find(cur);
+      if (!next) {
         next = cur.Advance();
       }
-      CHECK(board->OnBoard(next.p)) << next;
-      CHECK((*board)[next.p] != ' ') << next;
-      if ((*board)[next.p] == '#') break;
-      cur = next;
+      CHECK(board->OnBoard(next->p)) << *next;
+      CHECK((*board)[next->p] != ' ') << *next;
+      if ((*board)[next->p] == '#') break;
+      cur = *next;
     }
     return cur;
   };

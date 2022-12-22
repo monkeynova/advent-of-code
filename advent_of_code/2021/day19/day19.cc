@@ -15,55 +15,6 @@ namespace advent_of_code {
 
 namespace {
 
-class Orientation3 {
- public:
-  static Orientation3 Aligned() { return Orientation3(); }
-
-  static const std::vector<Orientation3>& All();
-
-  Orientation3() : Orientation3(Cardinal3::kXHat, Cardinal3::kYHat) {}
-
-  Orientation3(Point3 x_hat, Point3 y_hat)
-      : x_hat_(x_hat), y_hat_(y_hat), z_hat_(x_hat.Cross(y_hat)) {
-    CHECK_EQ(x_hat_.dist(), 1);
-    CHECK_EQ(y_hat_.dist(), 1);
-    CHECK_EQ(z_hat_.dist(), 1);
-    CHECK_EQ(x_hat_.Dot(y_hat_), 0);
-    CHECK_EQ(x_hat_.Dot(z_hat_), 0);
-    CHECK_EQ(y_hat_.Dot(z_hat_), 0);
-  }
-
-  Point3 Apply(Point3 in) const {
-    return in.x * x_hat_ + in.y * y_hat_ + in.z * z_hat_;
-  }
-
-  friend std::ostream& operator<<(std::ostream& out, const Orientation3& o) {
-    return out << o.x_hat_ << "/" << o.y_hat_ << "/" << o.z_hat_;
-  }
-
- private:
-  Point3 x_hat_;
-  Point3 y_hat_;
-  Point3 z_hat_;
-};
-
-const std::vector<Orientation3>& Orientation3::All() {
-  static std::vector<Orientation3> kMemo;
-  if (!kMemo.empty()) return kMemo;
-
-  for (Point3 x_hat : Cardinal3::kNeighborDirs) {
-    if (x_hat.dist() != 1) continue;
-    for (Point3 y_hat : Cardinal3::kNeighborDirs) {
-      if (y_hat.dist() != 1) continue;
-      if (y_hat == x_hat) continue;
-      if (y_hat == -x_hat) continue;
-      kMemo.push_back(Orientation3(x_hat, y_hat));
-    }
-  }
-  CHECK_EQ(kMemo.size(), 24);
-  return kMemo;
-}
-
 struct Scanner {
   std::vector<Point3> relative_beacons;
   Point3 absolute;

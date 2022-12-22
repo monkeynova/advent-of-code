@@ -6,6 +6,7 @@
 #include <numeric>
 
 #include "absl/hash/hash.h"
+#include "absl/log/check.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_format.h"
 #include "absl/strings/str_split.h"
@@ -462,6 +463,46 @@ struct Point4 {
     out << "{" << p.x << "," << p.y << "," << p.z << "," << p.w << "}";
     return out;
   }
+};
+
+class Orientation3 {
+ public:
+  static Orientation3 Aligned() { return Orientation3(); }
+
+  static const std::vector<Orientation3>& All();
+
+  Orientation3() : Orientation3(Cardinal3::kXHat, Cardinal3::kYHat) {}
+
+  Orientation3(Point3 x_hat, Point3 y_hat)
+      : x_hat_(x_hat), y_hat_(y_hat), z_hat_(x_hat.Cross(y_hat)) {
+    CHECK_EQ(x_hat_.dist(), 1);
+    CHECK_EQ(y_hat_.dist(), 1);
+    CHECK_EQ(z_hat_.dist(), 1);
+    CHECK_EQ(x_hat_.Dot(y_hat_), 0);
+    CHECK_EQ(x_hat_.Dot(z_hat_), 0);
+    CHECK_EQ(y_hat_.Dot(z_hat_), 0);
+  }
+
+  Point3 Apply(Point3 in) const {
+    return in.x * x_hat_ + in.y * y_hat_ + in.z * z_hat_;
+  }
+
+  Orientation3 Apply(Orientation3 in) const {
+    Orientation3 ret;
+    ret.x_hat_ = Apply(in.x_hat_);
+    ret.y_hat_ = Apply(in.y_hat_);
+    ret.z_hat_ = Apply(in.z_hat_);
+    return ret;
+  }
+
+  friend std::ostream& operator<<(std::ostream& out, const Orientation3& o) {
+    return out << o.x_hat_ << "/" << o.y_hat_ << "/" << o.z_hat_;
+  }
+
+ private:
+  Point3 x_hat_;
+  Point3 y_hat_;
+  Point3 z_hat_;
 };
 
 struct Cardinal4 {

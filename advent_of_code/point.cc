@@ -59,4 +59,21 @@ void Cube::SetDifference(const Cube& o, std::vector<Cube>* out) const {
   DCHECK(o.FullyContains(overlap));
 }
 
+const std::vector<Orientation3>& Orientation3::All() {
+  static std::vector<Orientation3> kMemo;
+  if (!kMemo.empty()) return kMemo;
+
+  for (Point3 x_hat : Cardinal3::kNeighborDirs) {
+    if (x_hat.dist() != 1) continue;
+    for (Point3 y_hat : Cardinal3::kNeighborDirs) {
+      if (y_hat.dist() != 1) continue;
+      if (y_hat == x_hat) continue;
+      if (y_hat == -x_hat) continue;
+      kMemo.push_back(Orientation3(x_hat, y_hat));
+    }
+  }
+  CHECK_EQ(kMemo.size(), 24);
+  return kMemo;
+}
+
 }  // namespace advent_of_code
