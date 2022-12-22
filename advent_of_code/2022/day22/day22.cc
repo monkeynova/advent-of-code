@@ -77,7 +77,7 @@ struct Transform {
     return x_dest * p.x + y_dest * p.y + z_dest * p.z;
   }
 
-  Transform Rotate(Point dir) {
+  Transform Rotate(Point dir) const {
     if (dir == Cardinal::kXHat) {
       return {
         .x_dest = -z_dest,
@@ -115,6 +115,23 @@ struct StitchFace {
   Transform to_cube;
 };
 
+struct PaintCorner {
+  Point3 cube;
+  Point board;
+  Point board_out1;
+  Point board_out2;
+
+  void Paint(
+      absl::flat_hash_map<Point3, std::vector<PointAndDir>>& corner_maps,
+      const StitchFace& stitch_face, int tile_width) const {
+    Point test = stitch_face.board_coord + board * (tile_width - 1);
+    Point3 to_paint = stitch_face.to_cube.Apply(cube);
+    corner_maps[to_paint].push_back({.p = test, .d = board_out1});
+    corner_maps[to_paint].push_back({.p = test, .d = board_out2});
+    VLOG(1) << "Paint " << test << " on " << to_paint;
+  }
+};
+
 StitchMap BuildStitchMap(const CharBoard& board) {
   int tile_width = std::gcd(board.width(), board.height());
 
@@ -132,48 +149,32 @@ StitchMap BuildStitchMap(const CharBoard& board) {
   // for each 'outward' direction).
   absl::flat_hash_map<Point3, std::vector<PointAndDir>> corner_maps;
 
-  absl::flat_hash_set<Point> hist = {*face_start};
-  auto try_dir = [&](Point p, Point d) -> std::optional<Point> {
-    Point next_face = p + tile_width * d;
-    if (!board.OnBoard(next_face)) return std::nullopt;
-    if (board[next_face] == ' ') return std::nullopt;
-    if (hist.contains(next_face)) return std::nullopt;
-    hist.insert(next_face);
-    return next_face;
+  const std::array<PaintCorner, 4> paint_corners = {
+    PaintCorner{.cube = {-1, -1, 1}, .board = Cardinal::kOrigin,
+                .board_out1 = Cardinal::kNorth, .board_out2 = Cardinal::kWest},
+    PaintCorner{.cube = {1, -1, 1}, .board = Cardinal::kEast,
+                .board_out1 = Cardinal::kNorth, .board_out2 = Cardinal::kEast},
+    PaintCorner{.cube = {-1, 1, 1}, .board = Cardinal::kSouth,
+                .board_out1 = Cardinal::kWest, .board_out2 = Cardinal::kSouth},
+    PaintCorner{.cube = {1, 1, 1}, .board = Cardinal::kSouthEast,
+                .board_out1 = Cardinal::kEast, .board_out2 = Cardinal::kSouth},
   };
 
-  std::vector<Point3> paint_corners = {
-    {-1, -1, 1}, {1, -1, 1}, {-1, 1, 1}, {1, 1, 1}
-  };
+  absl::flat_hash_set<Point> hist = {*face_start};
   for (std::deque<StitchFace> queue = {{*face_start, Transform()}};
        !queue.empty(); queue.pop_front()) {
-    Point on_board = queue.front().board_coord;
-    Transform to_cube = queue.front().to_cube;
-    std::vector<Point> face_corners = {
-      on_board,
-      on_board + (tile_width - 1) * Cardinal::kXHat,
-      on_board + (tile_width - 1) * Cardinal::kYHat,
-      on_board + (tile_width - 1) * (Cardinal::kXHat + Cardinal::kYHat),
-    };
-    std::vector<Point> face_dirs = {
-      Cardinal::kNorth, Cardinal::kWest,
-      Cardinal::kNorth, Cardinal::kEast,
-      Cardinal::kWest, Cardinal::kSouth,
-      Cardinal::kEast, Cardinal::kSouth,
-    };
-    for (int i = 0; i < face_corners.size(); ++i) {
-      Point3 to_paint = to_cube.Apply(paint_corners[i]);
-      corner_maps[to_paint].push_back(
-        {.p = face_corners[i], .d = face_dirs[2 * i]});
-      corner_maps[to_paint].push_back(
-        {.p = face_corners[i], .d = face_dirs[2 * i + 1]});
-      VLOG(1) << "Paint " << face_corners[i] << " on " << to_paint;
+    const StitchFace& stitch_face = queue.front();
+    for (const PaintCorner& corner : paint_corners) {
+      corner.Paint(corner_maps, stitch_face, tile_width);
     }
 
     for (Point dir : Cardinal::kFourDirs) {
-      if (std::optional<Point> next_face = try_dir(on_board, dir)) {
-        queue.push_back({*next_face, to_cube.Rotate(dir)});
-      }
+      Point next_face = stitch_face.board_coord + tile_width * dir;
+      if (!board.OnBoard(next_face)) continue;
+      if (board[next_face] == ' ') continue;
+      if (hist.contains(next_face)) continue;
+      hist.insert(next_face);
+      queue.push_back({next_face, stitch_face.to_cube.Rotate(dir)});
     }
   }
 
