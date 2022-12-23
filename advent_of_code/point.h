@@ -96,7 +96,8 @@ struct PointRectangle {
                     .y = std::numeric_limits<int>::min()}};
   }
 
-  static PointRectangle Bounding(const absl::flat_hash_set<Point>& set) {
+  template <typename Container>
+  static PointRectangle Bounding(const Container& set) {
     PointRectangle ret{*set.begin(), *set.begin()};
     for (Point p : set) ret.ExpandInclude(p);
     return ret;
