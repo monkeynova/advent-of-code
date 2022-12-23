@@ -21,7 +21,7 @@ namespace advent_of_code {
 
 constexpr absl::Duration kMinAllowedTestTime = absl::Seconds(15);
 
-void RunTestCase(const AdventDay* advent_day,
+void RunTestCase(AdventDay* advent_day,
                  absl::string_view test_case_with_options,
                  file_based_test_driver::RunTestCaseResult* test_result) {
   std::unique_ptr<absl::FlagSaver> flag_saver;
@@ -108,6 +108,7 @@ void RunTestCase(const AdventDay* advent_day,
     test_result->set_ignore_test_output(true);
     return;
   }
+  advent_day->set_param(options.GetString(kParamOption));
   absl::Time start = absl::Now();
   switch (options.GetInt64(kPartOption)) {
     case 1: {

@@ -47,6 +47,9 @@ class AdventDay {
   virtual ~AdventDay() = default;
 
   bool run_audit() const { return absl::GetFlag(FLAGS_advent_day_run_audit); }
+  absl::string_view param() const { return param_; }
+
+  void set_param(std::string param) { param_ = param; }
 
   absl::StatusOr<std::string> IntReturn(int64_t val) const {
     return absl::StrCat(val);
@@ -105,6 +108,9 @@ class AdventDay {
       absl::Span<absl::string_view> input) const = 0;
   virtual absl::StatusOr<std::string> Part2(
       absl::Span<absl::string_view> input) const = 0;
+
+ private:
+  std::string param_;
 };
 
 }  // namespace advent_of_code

@@ -13,8 +13,6 @@
 #include "advent_of_code/interval.h"
 #include "re2/re2.h"
 
-ABSL_FLAG(int, advent_day_2022_15_param, -1, "...");
-
 namespace advent_of_code {
 
 namespace {
@@ -66,7 +64,8 @@ absl::StatusOr<std::string> Day_2022_15::Part1(
   absl::StatusOr<std::vector<SAndB>> list = ParseList(input);
   if (!list.ok()) return list.status();
 
-  int y = absl::GetFlag(FLAGS_advent_day_2022_15_param);
+  int y;
+  if (!absl::SimpleAtoi(param(), &y)) return Error(param(), " isn't an int");
   Interval1D no_closer;
   Interval1D beacons;
   for (const auto& sandb : *list) {
@@ -84,7 +83,8 @@ absl::StatusOr<std::string> Day_2022_15::Part2(
   absl::StatusOr<std::vector<SAndB>> list = ParseList(input);
   if (!list.ok()) return list.status();
 
-  int max = absl::GetFlag(FLAGS_advent_day_2022_15_param);
+  int max;
+  if (!absl::SimpleAtoi(param(), &max)) return Error(param(), " isn't an int");
   PointRectangle test_area;
   test_area.min = {0, 0};
   test_area.max = Point{max, max};

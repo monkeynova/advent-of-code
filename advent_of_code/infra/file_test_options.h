@@ -10,6 +10,7 @@ constexpr char kPartOption[] = "part";
 constexpr char kIgnoreOption[] = "ignore";
 constexpr char kLongOption[] = "long";
 constexpr char kFlagOption[] = "flag";
+constexpr char kParamOption[] = "param";
 
 void SetupTestCaseOptions(file_based_test_driver::TestCaseOptions* options);
 
