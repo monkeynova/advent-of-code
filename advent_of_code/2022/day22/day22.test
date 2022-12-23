@@ -21,7 +21,7 @@ HACK:
 6032
 ==
 
-# 117166
+# 117166 (Didn't include "HACK:" and fbtd ate semantic whitespace)
 [part=1]
 HACK:
 @include{advent_of_code/2022/day22/input.txt}
