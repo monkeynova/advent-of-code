@@ -17,35 +17,34 @@ namespace advent_of_code {
 namespace {
 
 bool Move(absl::flat_hash_set<Point>& elves, int turn) {
-  std::array<Point, 4> checks = {
+  constexpr std::array<Point, 4> kDirProposeOrder = {
     Cardinal::kNorth, Cardinal::kSouth, Cardinal::kWest, Cardinal::kEast};
+  constexpr std::array<std::array<Point, 3>, 4> kDirTestOrder = {
+    std::array<Point, 3>{Cardinal::kNorth, Cardinal::kNorthWest,
+                         Cardinal::kNorthEast},
+    std::array<Point, 3>{Cardinal::kSouth, Cardinal::kSouthWest,
+                         Cardinal::kSouthEast},
+    std::array<Point, 3>{Cardinal::kWest, Cardinal::kNorthWest,
+                         Cardinal::kSouthWest},
+    std::array<Point, 3>{Cardinal::kEast, Cardinal::kNorthEast,
+                         Cardinal::kSouthEast},
+  };
 
   absl::flat_hash_map<Point, std::vector<Point>> proposals;
   for (Point p : elves) {
-    bool any_elf = false;
-    for (Point d : Cardinal::kEightDirs) {
-      if (elves.contains(p + d)) {
-        any_elf = true;
-        break;
-      }
-    }
-    if (!any_elf) continue;
+    auto has_elf = [&elves, p](Point d) { return elves.contains(p + d); };
+
+    if (absl::c_none_of(Cardinal::kEightDirs, has_elf)) continue;
+
     bool proposal_added = false;
     for (int i = 0; i < 4; ++i) {
-      Point move = checks[(i + turn) % 4];
-      bool any_elf = false;
-      for (Point test : {move, move + move.rotate_left(), move + move.rotate_right()}) {
-        if (elves.contains(p + test)) {
-          any_elf = true;
-          break;
-        }
-      }
-      if (any_elf) continue;
+      int proposal = (i + turn) % 4;
+      Point move = kDirProposeOrder[proposal];
+      if (absl::c_any_of(kDirTestOrder[proposal], has_elf)) continue;
       proposals[p + move].push_back(p);
       proposal_added = true;
       break;
     }
-    //CHECK(proposal_added);
   } 
   bool moved = false;
   for (const auto& [to, from_set] : proposals) {
@@ -81,14 +80,14 @@ absl::StatusOr<std::string> Day_2022_23::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<CharBoard> board = ParseAsBoard(input);
   if (!board.ok()) return board.status();
-  absl::flat_hash_set<Point> elves;
-  for (Point p : board->range()) {
-    if ((*board)[p] == '#') elves.insert(p);
-  }
+
+  absl::flat_hash_set<Point> elves = board->Find('#');
+
   for (int i = 0; i < 10; ++i) {
     VLOG(2) << "Board:\n" <<Draw(elves);
     Move(elves, i);
   }
+
   return IntReturn(Score(elves));
 }
 
@@ -96,17 +95,17 @@ absl::StatusOr<std::string> Day_2022_23::Part2(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<CharBoard> board = ParseAsBoard(input);
   if (!board.ok()) return board.status();
-  absl::flat_hash_set<Point> elves;
-  for (Point p : board->range()) {
-    if ((*board)[p] == '#') elves.insert(p);
-  }
+
+  absl::flat_hash_set<Point> elves = board->Find('#');
+
   for (int i = 0; true; ++i) {
     VLOG(2) << "Board:\n" <<Draw(elves);
     if (!Move(elves, i)) {
       return IntReturn(i + 1);
     }
   }
-  return IntReturn(Score(elves));
+
+  LOG(FATAL) << "Left infinite loop";
 }
 
 }  // namespace advent_of_code
