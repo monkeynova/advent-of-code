@@ -141,13 +141,7 @@ CharBoard DropState::AddPiece(CharBoard b, DropState::Rock r) const {
 }
 
 CharBoard DropState::SummaryState::Draw() const {
-  PointRectangle r = {*bounds.begin(), *bounds.begin()};
-  for (Point p : bounds) r.ExpandInclude(p);
-  CharBoard b(r);
-  for (Point p : bounds) {
-    b[p - r.min] = '#';
-  }
-  return b;
+  return CharBoard::Draw(bounds);
 }
 
 DropState::SummaryState DropState::Summarize() const {

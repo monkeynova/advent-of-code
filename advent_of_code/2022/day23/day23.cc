@@ -56,22 +56,8 @@ bool Move(absl::flat_hash_set<Point>& elves, int turn) {
   return moved;
 }
 
-CharBoard Draw(absl::flat_hash_set<Point> elves) {
-  PointRectangle pr{*elves.begin(), *elves.begin()};
-  for (Point p : elves) {
-    pr.ExpandInclude(p);
-  }
-  CharBoard draw(pr);
-  for (Point p : elves) draw[p - pr.min] = '#';
-  return draw;
-}
-
 int64_t Score(absl::flat_hash_set<Point> elves) {
-  PointRectangle pr{*elves.begin(), *elves.begin()};
-  for (Point p : elves) {
-    pr.ExpandInclude(p);
-  }
-  return pr.Area() - elves.size();
+  return PointRectangle::Bounding(elves).Area() - elves.size();
 }
 
 }  // namespace
@@ -84,7 +70,7 @@ absl::StatusOr<std::string> Day_2022_23::Part1(
   absl::flat_hash_set<Point> elves = board->Find('#');
 
   for (int i = 0; i < 10; ++i) {
-    VLOG(2) << "Board:\n" <<Draw(elves);
+    VLOG(2) << "Board:\n" << CharBoard::Draw(elves);
     Move(elves, i);
   }
 
@@ -99,7 +85,7 @@ absl::StatusOr<std::string> Day_2022_23::Part2(
   absl::flat_hash_set<Point> elves = board->Find('#');
 
   for (int i = 0; true; ++i) {
-    VLOG(2) << "Board:\n" <<Draw(elves);
+    VLOG(2) << "Board:\n" << CharBoard::Draw(elves);
     if (!Move(elves, i)) {
       return IntReturn(i + 1);
     }

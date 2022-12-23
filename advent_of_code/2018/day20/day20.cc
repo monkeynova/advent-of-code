@@ -185,11 +185,7 @@ absl::StatusOr<CharBoard> ConstructRoom(absl::string_view re,
       WalkAllPaths(*parsed_re, start, &sparse_board);
   if (!final_points.ok()) return final_points.status();
 
-  PointRectangle grid = {start, start};
-  for (Point p : sparse_board) {
-    VLOG(2) << "Point @" << p;
-    grid.ExpandInclude(p);
-  }
+  PointRectangle grid = PointRectangle::Bounding(sparse_board);
 
   CharBoard board(grid.max.x - grid.min.x + 1 + 2,
                   grid.max.y - grid.min.y + 1 + 2);

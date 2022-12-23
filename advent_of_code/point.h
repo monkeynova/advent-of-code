@@ -5,6 +5,7 @@
 #include <iostream>
 #include <numeric>
 
+#include "absl/container/flat_hash_set.h"
 #include "absl/hash/hash.h"
 #include "absl/log/check.h"
 #include "absl/strings/str_cat.h"
@@ -93,6 +94,12 @@ struct PointRectangle {
                     .y = std::numeric_limits<int>::max()},
             .max = {.x = std::numeric_limits<int>::min(),
                     .y = std::numeric_limits<int>::min()}};
+  }
+
+  static PointRectangle Bounding(const absl::flat_hash_set<Point>& set) {
+    PointRectangle ret{*set.begin(), *set.begin()};
+    for (Point p : set) ret.ExpandInclude(p);
+    return ret;
   }
 
   struct iterator {

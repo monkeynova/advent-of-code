@@ -20,6 +20,13 @@ class CharBoard {
   template <typename Container>
   static absl::StatusOr<CharBoard> Parse(const Container& in);
 
+  static CharBoard Draw(const absl::flat_hash_set<Point>& points) {
+    PointRectangle bounds = PointRectangle::Bounding(points);
+    CharBoard ret(bounds);
+    for (Point p : points) ret[p - bounds.min] = '#';
+    return ret;
+  }
+
   CharBoard() : CharBoard(0, 0) {}
 
   CharBoard(int width, int height)
