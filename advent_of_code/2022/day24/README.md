@@ -116,7 +116,7 @@ steps. Drawing the position of the expedition as `E`, one way to
 achieve this is:
 
     Initial state:
-    #*    E*    ######
+    #E######
     #>>.<^<#
     #.<..<<#
     #>v.><>#
@@ -125,7 +125,7 @@ achieve this is:
     
     Minute 1, move down:
     #.######
-    #*    E*    >3.<.#
+    #E>3.<.#
     #<..<<.#
     #>2.22.#
     #>v..^<#
@@ -134,7 +134,7 @@ achieve this is:
     Minute 2, move down:
     #.######
     #.2>2..#
-    #*    E*    ^22^<#
+    #E^22^<#
     #.>2.^>#
     #.>..<.#
     ######.#
@@ -142,14 +142,14 @@ achieve this is:
     Minute 3, wait:
     #.######
     #<^<22.#
-    #*    E*    2<.2.#
+    #E2<.2.#
     #><2>..#
     #..><..#
     ######.#
     
     Minute 4, move up:
     #.######
-    #*    E*    <..22#
+    #E<..22#
     #<<.<..#
     #<2.>>.#
     #.^22^.#
@@ -157,7 +157,7 @@ achieve this is:
     
     Minute 5, move right:
     #.######
-    #2*    E*    v.<>#
+    #2Ev.<>#
     #<.<..<#
     #.^>^22#
     #.2..2.#
@@ -165,7 +165,7 @@ achieve this is:
     
     Minute 6, move right:
     #.######
-    #>2*    E*    <.<#
+    #>2E<.<#
     #.2v^2<#
     #>..>2>#
     #<....>#
@@ -174,7 +174,7 @@ achieve this is:
     Minute 7, move down:
     #.######
     #.22^2.#
-    #<v*    E*    <2.#
+    #<vE<2.#
     #>>v<>.#
     #>....<#
     ######.#
@@ -182,14 +182,14 @@ achieve this is:
     Minute 8, move left:
     #.######
     #.<>2^.#
-    #.*    E*    <<.<#
+    #.E<<.<#
     #.22..>#
     #.2v^2.#
     ######.#
     
     Minute 9, move up:
     #.######
-    #<*    E*    2>>.#
+    #<E2>>.#
     #.<<.<.#
     #>2>2^.#
     #.v><^.#
@@ -197,7 +197,7 @@ achieve this is:
     
     Minute 10, move right:
     #.######
-    #.2*    E*    .>2#
+    #.2E.>2#
     #<2v2^.#
     #<>.>2.#
     #..<>..#
@@ -205,7 +205,7 @@ achieve this is:
     
     Minute 11, wait:
     #.######
-    #2^*    E*    ^2>#
+    #2^E^2>#
     #<v<.^<#
     #..2.>2#
     #.<..>.#
@@ -214,7 +214,7 @@ achieve this is:
     Minute 12, move down:
     #.######
     #>>.<^<#
-    #.<*    E*    .<<#
+    #.<E.<<#
     #>v.><>#
     #<^v^^>#
     ######.#
@@ -223,7 +223,7 @@ achieve this is:
     #.######
     #.>3.<.#
     #<..<<.#
-    #>2*    E*    22.#
+    #>2E22.#
     #>v..^<#
     ######.#
     
@@ -231,7 +231,7 @@ achieve this is:
     #.######
     #.2>2..#
     #.^22^<#
-    #.>2*    E*    ^>#
+    #.>2E^>#
     #.>..<.#
     ######.#
     
@@ -239,7 +239,7 @@ achieve this is:
     #.######
     #<^<22.#
     #.2<.2.#
-    #><2>*    E*    .#
+    #><2>E.#
     #..><..#
     ######.#
     
@@ -247,7 +247,7 @@ achieve this is:
     #.######
     #.<..22#
     #<<.<..#
-    #<2.>>*    E*    #
+    #<2.>>E#
     #.^22^.#
     ######.#
     
@@ -256,7 +256,7 @@ achieve this is:
     #2.v.<>#
     #<.<..<#
     #.^>^22#
-    #.2..2*    E*    #
+    #.2..2E#
     ######.#
     
     Minute 18, move down:
@@ -265,7 +265,7 @@ achieve this is:
     #.2v^2<#
     #>..>2>#
     #<....>#
-    ######*    E*    #
+    ######E#
 
 *What is the fewest number of minutes required to avoid the blizzards
 and reach the goal?*
