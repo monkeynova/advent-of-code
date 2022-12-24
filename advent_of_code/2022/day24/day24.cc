@@ -195,25 +195,18 @@ absl::StatusOr<std::string> Day_2022_24::Part2(
   if (!start.end) return Error("No end");
   VLOG(1) << "Route: " << *start.start << " -> " << *start.end;
 
-  BlizzardHistory hist;
-  hist.sets.push_back(std::move(start.blizzards));
-  std::optional<int> stage_1 =
-      BFSWalk(*start.start, *start.end, *board, hist).FindMinSteps();
-  if (!stage_1) return Error("stage 1 not found");
-
-  BlizzardHistory hist2;
-  hist2.sets.push_back(hist.sets.back());
-  std::optional<int> stage_2 =
-      BFSWalk(*start.end, *start.start, *board, hist2).FindMinSteps();
-  if (!stage_2) return Error("stage 2 not found");
-
-  BlizzardHistory hist3;
-  hist3.sets.push_back(hist2.sets.back());
-  std::optional<int> stage_3 =
-      BFSWalk(*start.start, *start.end, *board, hist3).FindMinSteps();
-  if (!stage_3) return Error("stage 3 not found");
-
-  return IntReturn(*stage_1 + *stage_2 + *stage_3);
+  int total_dist = 0;
+  for (int i = 0; i < 3; ++i) {
+    BlizzardHistory hist;
+    hist.sets.push_back(std::move(start.blizzards));
+    std::optional<int> dist =
+        BFSWalk(*start.start, *start.end, *board, hist).FindMinSteps();
+    if (!dist) return Error("stage ", i, " not found");
+    total_dist += *dist;
+    std::swap(*start.start, *start.end);
+    start.blizzards = hist.sets.back();
+  }
+  return IntReturn(total_dist);
 }
 
 }  // namespace advent_of_code
