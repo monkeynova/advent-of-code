@@ -181,7 +181,6 @@ class Droid : public IntCode::IOModule {
     if (val == 2) {
       o2_pos_ = p;
     }
-    range_.ExpandInclude(p);
   }
 
   absl::Status Put(int64_t val) override {
@@ -202,27 +201,18 @@ class Droid : public IntCode::IOModule {
     return absl::OkStatus();
   }
 
-  std::string DebugBoard() const {
-    char render[] = {'#', ' ', '*'};
-    CharBoard board(range_.max.x - range_.min.x + 1,
-                    range_.max.y - range_.min.y + 1);
-    for (Point p : range_) {
-      char c;
-      if (p == Cardinal::kOrigin) {
-        c = '+';
-      } else if (p == pos_) {
-        c = 'R';
-      } else {
-        auto it = board_.find(p);
-        c = it == board_.end() ? '?' : render[it->second];
-      }
-      board[p - range_.min] = c;
+  CharBoard DebugBoard() const {
+    std::vector<Point> wall;
+    for (const auto& [p, v] : board_) {
+      if (v == 0) wall.push_back(p);
     }
-    return board.AsString();
+    PointRectangle bounds;
+    CharBoard draw = CharBoard::Draw(wall, &bounds);
+    draw[o2_pos_ - bounds.min] = '*';
+    draw[pos_ - bounds.min] = 'R';
+    draw[Cardinal::kOrigin - bounds.min] = '+';
+    return draw;
   }
-
-  Point min() const { return range_.min; }
-  Point max() const { return range_.max; }
 
  private:
   absl::BitGen bitgen_;
@@ -236,7 +226,6 @@ class Droid : public IntCode::IOModule {
       Cardinal::kOrigin, Cardinal::kNorth, Cardinal::kSouth, Cardinal::kWest,
       Cardinal::kEast};
 
-  PointRectangle range_ = PointRectangle::Null();
   absl::flat_hash_map<Point, int> board_;
 };
 
@@ -251,7 +240,7 @@ absl::StatusOr<std::string> Day_2019_15::Part1(
   if (absl::Status st = codes->Run(&droid); !st.ok()) {
     return st;
   }
-  VLOG(1) << droid.min() << "-" << droid.max() << "\n" << droid.DebugBoard();
+  VLOG(1) << "Droid:\n" << droid.DebugBoard();
 
   return IntReturn(droid.DistanceToO2());
 }
@@ -265,7 +254,7 @@ absl::StatusOr<std::string> Day_2019_15::Part2(
   if (absl::Status st = codes->Run(&droid); !st.ok()) {
     return st;
   }
-  VLOG(1) << droid.min() << "-" << droid.max() << "\n" << droid.DebugBoard();
+  VLOG(1) << "Droid:\n" << droid.DebugBoard();
 
   return IntReturn(droid.GreatestDistanceFromO2());
 }

@@ -98,7 +98,7 @@ struct PointRectangle {
 
   template <typename Container>
   static PointRectangle Bounding(const Container& set) {
-    PointRectangle ret{*set.begin(), *set.begin()};
+    PointRectangle ret = Null();
     for (Point p : set) ret.ExpandInclude(p);
     return ret;
   }

@@ -26,8 +26,9 @@ class Painter : public IntCode::IOModule {
   void Set(Point p, int val) { panel_to_painted_color_[p] = val; }
 
   absl::Status Put(int64_t val) override {
-    if (val != 0 && val != 1)
+    if (val != 0 && val != 1) {
       return absl::InvalidArgumentError("Bad output value");
+    }
     if (paint) {
       panel_to_painted_color_[cur_] = val;
     } else {
@@ -45,21 +46,12 @@ class Painter : public IntCode::IOModule {
   int UniquePanelsPainted() { return panel_to_painted_color_.size(); }
 
   CharBoard Panels() {
-    PointRectangle r = PointRectangle::Null();
-
-    for (const auto& point_and_color : panel_to_painted_color_) {
-      const Point& p = point_and_color.first;
-      if (point_and_color.second != 1) continue;
-      r.ExpandInclude(p);
+    std::vector<Point> white_points;
+    for (const auto& [point, color] : panel_to_painted_color_) {
+      if (color != 1) continue;
+      white_points.push_back(point);
     }
-    VLOG(1) << r;
-    CharBoard ret(r);
-    for (Point p : r) {
-      auto it = panel_to_painted_color_.find(p);
-      bool is_white = (it != panel_to_painted_color_.end() && it->second == 1);
-      ret[p - r.min] = is_white ? '#' : '.';
-    }
-    return ret;
+    return CharBoard::Draw(white_points);
   }
 
  private:

@@ -21,10 +21,12 @@ class CharBoard {
   static absl::StatusOr<CharBoard> Parse(const Container& in);
 
   template <typename Container>
-  static CharBoard Draw(const Container& points) {
+  static CharBoard Draw(const Container& points,
+                        PointRectangle* bound_ret = nullptr) {
     PointRectangle bounds = PointRectangle::Bounding(points);
     CharBoard ret(bounds);
     for (Point p : points) ret[p - bounds.min] = '#';
+    if (bound_ret != nullptr) *bound_ret = bounds;
     return ret;
   }
 
@@ -38,7 +40,8 @@ class CharBoard {
   }
 
   explicit CharBoard(PointRectangle r)
-      : CharBoard(r.max.x - r.min.x + 1, r.max.y - r.min.y + 1) {}
+      : CharBoard(r.max.x >= r.min.x ? r.max.x - r.min.x + 1 : 0,
+                  r.max.y >= r.min.y ? r.max.y - r.min.y + 1 : 0) {}
 
   CharBoard(const CharBoard&) = default;
   CharBoard& operator=(const CharBoard&) = default;
