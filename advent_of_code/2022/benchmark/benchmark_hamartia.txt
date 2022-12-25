@@ -1,65 +1,29 @@
+Starting local Bazel server and connecting to it...
 Loading: 
 Loading: 0 packages loaded
-DEBUG: Rule 'bazel_skylib' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1667816738 +0100"
-DEBUG: Repository bazel_skylib instantiated at:
-  /home/keith/github/advent-of-code/WORKSPACE:5:15: in <toplevel>
-Repository rule git_repository defined at:
-  /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/external/bazel_tools/tools/build_defs/repo/git.bzl:199:33: in <toplevel>
-Analyzing: target //advent_of_code/2022:benchmark (0 packages loaded, 0 targets configured)
-DEBUG: Rule 'com_monkeynova_gunit_main' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1661523395 -0700"
-DEBUG: Repository com_monkeynova_gunit_main instantiated at:
-  /home/keith/github/advent-of-code/WORKSPACE:53:15: in <toplevel>
-Repository rule git_repository defined at:
-  /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/external/bazel_tools/tools/build_defs/repo/git.bzl:199:33: in <toplevel>
-DEBUG: Rule 'com_google_glog' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1663772402 +0200"
-DEBUG: Repository com_google_glog instantiated at:
-  /home/keith/github/advent-of-code/WORKSPACE:47:15: in <toplevel>
-Repository rule git_repository defined at:
-  /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/external/bazel_tools/tools/build_defs/repo/git.bzl:199:33: in <toplevel>
-DEBUG: Rule 'com_google_absl' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1668201198 -0800"
-DEBUG: Repository com_google_absl instantiated at:
-  /home/keith/github/advent-of-code/WORKSPACE:28:15: in <toplevel>
-Repository rule git_repository defined at:
-  /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/external/bazel_tools/tools/build_defs/repo/git.bzl:199:33: in <toplevel>
-DEBUG: Rule 'com_googlesource_code_re2' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1667962101 +0000"
-DEBUG: Repository com_googlesource_code_re2 instantiated at:
-  /home/keith/github/advent-of-code/WORKSPACE:60:15: in <toplevel>
-Repository rule git_repository defined at:
-  /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/external/bazel_tools/tools/build_defs/repo/git.bzl:199:33: in <toplevel>
-DEBUG: Rule 'com_github_gflags_gflags' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1658955969 +0100"
-DEBUG: Repository com_github_gflags_gflags instantiated at:
-  /home/keith/github/advent-of-code/WORKSPACE:34:15: in <toplevel>
-Repository rule git_repository defined at:
-  /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/external/bazel_tools/tools/build_defs/repo/git.bzl:199:33: in <toplevel>
-DEBUG: Rule 'com_github_google_benchmark' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1668214216 +0300"
-DEBUG: Repository com_github_google_benchmark instantiated at:
-  /home/keith/github/advent-of-code/WORKSPACE:40:15: in <toplevel>
-Repository rule git_repository defined at:
-  /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/external/bazel_tools/tools/build_defs/repo/git.bzl:199:33: in <toplevel>
-DEBUG: Rule 'com_google_file_based_test_driver' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1622670187 -0700"
-DEBUG: Repository com_google_file_based_test_driver instantiated at:
-  /home/keith/github/advent-of-code/WORKSPACE:67:15: in <toplevel>
-Repository rule git_repository defined at:
-  /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/external/bazel_tools/tools/build_defs/repo/git.bzl:199:33: in <toplevel>
-DEBUG: Rule 'com_google_googletest' indicated that a canonical reproducible form can be obtained by modifying arguments shallow_since = "1668200350 -0800"
-DEBUG: Repository com_google_googletest instantiated at:
-  /home/keith/github/advent-of-code/WORKSPACE:21:15: in <toplevel>
-Repository rule git_repository defined at:
-  /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/external/bazel_tools/tools/build_defs/repo/git.bzl:199:33: in <toplevel>
-INFO: Analyzed target //advent_of_code/2022:benchmark (0 packages loaded, 0 targets configured).
+Analyzing: target //advent_of_code/2022:benchmark (1 packages loaded, 0 targets configured)
+Analyzing: target //advent_of_code/2022:benchmark (31 packages loaded, 6 targets configured)
+Analyzing: target //advent_of_code/2022:benchmark (66 packages loaded, 271 targets configured)
+Analyzing: target //advent_of_code/2022:benchmark (74 packages loaded, 449 targets configured)
+Analyzing: target //advent_of_code/2022:benchmark (90 packages loaded, 919 targets configured)
+Analyzing: target //advent_of_code/2022:benchmark (101 packages loaded, 1304 targets configured)
+INFO: Analyzed target //advent_of_code/2022:benchmark (102 packages loaded, 1466 targets configured).
+ checking cached actions
 INFO: Found 1 target...
-[0 / 1] [Prepa] BazelWorkspaceStatusAction stable-status.txt
+[0 / 4] [Prepa] BazelWorkspaceStatusAction stable-status.txt
+[153 / 350] checking cached actions
+[624 / 628] Compiling advent_of_code/infra/file_benchmark.cc; 0s linux-sandbox
+[625 / 628] [Prepa] Linking advent_of_code/infra/libfile_benchmark.so
 Target //advent_of_code/2022:benchmark up-to-date:
   bazel-bin/advent_of_code/2022/benchmark
-INFO: Elapsed time: 0.375s, Critical Path: 0.00s
-INFO: 1 process: 1 internal.
-INFO: Build completed successfully, 1 total action
-INFO: Running command line: external/bazel_tools/tools/test/test-setup.sh advent_of_code/2022/benchmark '--benchmark_out=/home/keith/github/advent-of-code/advent_of_code/2022/benchmark/benchmark_hamartia.json' --benchmark '--run_long_tests=1m' '--advent_day_run_audit=false'
-INFO: Build completed successfully, 1 total action
+INFO: Elapsed time: 21.595s, Critical Path: 4.70s
+INFO: 5 processes: 2 internal, 3 linux-sandbox.
+INFO: Build completed successfully, 5 total actions
+INFO: Running command line: external/bazel_tools/tools/test/test-setup.sh advent_of_code/2022/benchmark '--benchmark_flags=--benchmark_out=/home/keith/github/advent-of-code/advent_of_code/2022/benchmark/benchmark_hamartia.json' --benchmark '--run_long_tests=1m' '--advent_day_run_audit=false'
 exec ${PAGER:-/usr/bin/less} "$0" || exit 1
 Executing tests from //advent_of_code/2022:benchmark
 -----------------------------------------------------------------------------
-2022-11-26T02:34:04+00:00
+2022-12-25T15:13:31+00:00
 Running /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/execroot/com_monkeynova_advent_of_code/bazel-out/k8-opt/bin/advent_of_code/2022/benchmark.runfiles/com_monkeynova_advent_of_code/advent_of_code/2022/benchmark
 Run on (4 X 3000 MHz CPU s)
 CPU Caches:
@@ -67,12 +31,132 @@ CPU Caches:
   L1 Instruction 32 KiB (x4)
   L2 Unified 256 KiB (x4)
   L3 Unified 6144 KiB (x1)
-Load Average: 1.00, 0.93, 0.58
+Load Average: 0.86, 0.19, 0.06
 ----------------------------------------------------------------
 Benchmark                      Time             CPU   Iterations
 ----------------------------------------------------------------
+BM_Day<Day_2022_25>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_25>/1        159 ns          159 ns      4059359 Part: 1
+BM_Day<Day_2022_25>/2      13948 ns        13802 ns        61012 Part: 1
+BM_Day<Day_2022_25>/3      0.000 ns        0.000 ns   1000000000 Part: 2; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_25>/4       21.8 ns         21.8 ns     32250193 Part: 2
+BM_Day<Day_2022_24>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_24>/1      42866 ns        42866 ns        15032 Part: 1
+BM_Day<Day_2022_24>/2   99031250 ns     99022717 ns            6 Part: 1
+BM_Day<Day_2022_24>/3     143422 ns       143422 ns         4885 Part: 2
+BM_Day<Day_2022_24>/4  271659136 ns    271576400 ns            2 Part: 2
+BM_Day<Day_2022_23>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_23>/1      29439 ns        29439 ns        23366 Part: 1
+BM_Day<Day_2022_23>/2    5338896 ns      5338832 ns          129 Part: 1
+BM_Day<Day_2022_23>/3      49956 ns        49956 ns        14436 Part: 2
+BM_Day<Day_2022_23>/4  590457678 ns    590460600 ns            1 Part: 2
+BM_Day<Day_2022_22>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_22>/1       1801 ns         1801 ns       384499 Part: 1
+BM_Day<Day_2022_22>/2     634432 ns       634435 ns         1109 Part: 1
+BM_Day<Day_2022_22>/3      16318 ns        16318 ns        44759 Part: 2
+BM_Day<Day_2022_22>/4    1011209 ns      1011213 ns          668 Part: 2
+BM_Day<Day_2022_21>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_21>/1     225628 ns       225623 ns         2967 Part: 1
+BM_Day<Day_2022_21>/2   21967840 ns     21967993 ns           30 Part: 1
+BM_Day<Day_2022_21>/3     204107 ns       204107 ns         3212 Part: 2
+BM_Day<Day_2022_21>/4   22033173 ns     22033259 ns           29 Part: 2
+BM_Day<Day_2022_20>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_20>/1       4897 ns         4897 ns       141036 Part: 1
+BM_Day<Day_2022_20>/2   70936227 ns     70935180 ns           10 Part: 1
+BM_Day<Day_2022_20>/3       6083 ns         6083 ns       105815 Part: 2
+BM_Day<Day_2022_20>/4  854129314 ns    854122200 ns            1 Part: 2
+BM_Day<Day_2022_19>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_19>/1  302511096 ns    302507500 ns            2 Part: 1
+BM_Day<Day_2022_19>/2 2968605757 ns   2963854200 ns            1 Part: 1
+BM_Day<Day_2022_19>/3 8610987186 ns   8566136900 ns            1 Part: 2
+BM_Day<Day_2022_19>/4 6325830221 ns   6308243900 ns            1 Part: 2
+BM_Day<Day_2022_18>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_18>/1      51443 ns        49423 ns        12819 Part: 1
+BM_Day<Day_2022_18>/2    9346100 ns      9346033 ns           83 Part: 1
+BM_Day<Day_2022_18>/3      59868 ns        59868 ns        10312 Part: 2
+BM_Day<Day_2022_18>/4   14846756 ns     14846787 ns           47 Part: 2
+BM_Day<Day_2022_17>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_17>/1    1528373 ns      1528379 ns          448 Part: 1
+BM_Day<Day_2022_17>/2    1553720 ns      1553725 ns          441 Part: 1
+BM_Day<Day_2022_17>/3     545115 ns       545103 ns         1310 Part: 2
+BM_Day<Day_2022_17>/4   18536523 ns     18535673 ns           37 Part: 2
+BM_Day<Day_2022_16>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_16>/1     879737 ns       879727 ns          827 Part: 1
+BM_Day<Day_2022_16>/2   14897986 ns     14897806 ns           47 Part: 1
+BM_Day<Day_2022_16>/3    6131823 ns      6131969 ns          111 Part: 2
+BM_Day<Day_2022_16>/4 1099182367 ns   1099187000 ns            1 Part: 2
+BM_Day<Day_2022_15>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_15>/1       8122 ns         8122 ns        86176 Part: 1
+BM_Day<Day_2022_15>/2      20174 ns        20174 ns        34303 Part: 1
+BM_Day<Day_2022_15>/3       9484 ns         9484 ns        73026 Part: 2
+BM_Day<Day_2022_15>/4      20550 ns        20550 ns        33611 Part: 2
+BM_Day<Day_2022_14>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_14>/1       3535 ns         3534 ns       194289 Part: 1
+BM_Day<Day_2022_14>/2    1165334 ns      1165328 ns          599 Part: 1
+BM_Day<Day_2022_14>/3       7888 ns         7888 ns        90792 Part: 2
+BM_Day<Day_2022_14>/4   14539585 ns     14539637 ns           48 Part: 2
+BM_Day<Day_2022_13>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_13>/1       5138 ns         5138 ns       137729 Part: 1
+BM_Day<Day_2022_13>/2    1236970 ns      1236975 ns          551 Part: 1
+BM_Day<Day_2022_13>/3       5959 ns         5959 ns       114263 Part: 2
+BM_Day<Day_2022_13>/4    1240994 ns      1240998 ns          564 Part: 2
+BM_Day<Day_2022_12>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_12>/1       4852 ns         4852 ns       143630 Part: 1
+BM_Day<Day_2022_12>/2    1146105 ns      1146058 ns          610 Part: 1
+BM_Day<Day_2022_12>/3       4278 ns         4278 ns       163165 Part: 2
+BM_Day<Day_2022_12>/4     747578 ns       747581 ns          923 Part: 2
+BM_Day<Day_2022_11>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_11>/1    1221526 ns      1221528 ns          579 Part: 1
+BM_Day<Day_2022_11>/2    2419955 ns      2419922 ns          285 Part: 1
+BM_Day<Day_2022_11>/3    4877862 ns      4877718 ns          141 Part: 2
+BM_Day<Day_2022_11>/4   20228400 ns     20228171 ns           34 Part: 2
+BM_Day<Day_2022_10>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_10>/1      10739 ns        10739 ns        63763 Part: 1
+BM_Day<Day_2022_10>/2      11374 ns        11374 ns        64040 Part: 1
+BM_Day<Day_2022_10>/3    6035475 ns      6035491 ns          117 Part: 2
+BM_Day<Day_2022_10>/4   45331081 ns     45331207 ns           15 Part: 2
+BM_Day<Day_2022_09>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_09>/1       1806 ns         1806 ns       382454 Part: 1
+BM_Day<Day_2022_09>/2     591872 ns       591873 ns         1193 Part: 1
+BM_Day<Day_2022_09>/3       5290 ns         5290 ns       131991 Part: 2
+BM_Day<Day_2022_09>/4     718349 ns       718341 ns          974 Part: 2
+BM_Day<Day_2022_08>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_08>/1        288 ns          288 ns      2409915 Part: 1
+BM_Day<Day_2022_08>/2     433882 ns       433877 ns         1621 Part: 1
+BM_Day<Day_2022_08>/3        475 ns          475 ns      1471895 Part: 2
+BM_Day<Day_2022_08>/4     513725 ns       513726 ns         1290 Part: 2
+BM_Day<Day_2022_07>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_07>/1      76094 ns        76094 ns         9388 Part: 1
+BM_Day<Day_2022_07>/2    2338697 ns      2338707 ns          289 Part: 1
+BM_Day<Day_2022_07>/3      77725 ns        77725 ns         9116 Part: 2
+BM_Day<Day_2022_07>/4    2357405 ns      2357413 ns          290 Part: 2
+BM_Day<Day_2022_06>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_06>/1        325 ns          325 ns      2132505 Part: 1
+BM_Day<Day_2022_06>/2      95675 ns        95675 ns         7189 Part: 1
+BM_Day<Day_2022_06>/3       1246 ns         1246 ns       561440 Part: 2
+BM_Day<Day_2022_06>/4     670508 ns       670511 ns         1031 Part: 2
+BM_Day<Day_2022_05>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_05>/1      42938 ns        42937 ns        16161 Part: 1
+BM_Day<Day_2022_05>/2    5344005 ns      5343953 ns          129 Part: 1
+BM_Day<Day_2022_05>/3      42906 ns        42902 ns        16235 Part: 2
+BM_Day<Day_2022_05>/4    5516363 ns      5516320 ns          129 Part: 2
+BM_Day<Day_2022_04>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_04>/1      51962 ns        51962 ns        12886 Part: 1
+BM_Day<Day_2022_04>/2    8441919 ns      8441932 ns           81 Part: 1
+BM_Day<Day_2022_04>/3      52190 ns        52189 ns        13920 Part: 2
+BM_Day<Day_2022_04>/4    8636259 ns      8636289 ns           83 Part: 2
+BM_Day<Day_2022_03>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_03>/1       1725 ns         1725 ns       414258 Part: 1
+BM_Day<Day_2022_03>/2     133351 ns       133352 ns         5185 Part: 1
+BM_Day<Day_2022_03>/3       1318 ns         1318 ns       516737 Part: 2
+BM_Day<Day_2022_03>/4     120679 ns       120678 ns         5550 Part: 2
+BM_Day<Day_2022_02>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_02>/1       1151 ns         1151 ns       606336 Part: 1
+BM_Day<Day_2022_02>/2      37746 ns        37746 ns        18295 Part: 1
+BM_Day<Day_2022_02>/3       1178 ns         1178 ns       559100 Part: 2
+BM_Day<Day_2022_02>/4      37634 ns        37634 ns        18415 Part: 2
 BM_Day<Day_2022_01>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
-BM_Day<Day_2022_01>/1 ERROR OCCURRED: 'UNIMPLEMENTED: Problem not known'
-BM_Day<Day_2022_01>/2      0.000 ns        0.000 ns   1000000000 Part: 1; *** SKIPPED (empty test) ****
-BM_Day<Day_2022_01>/3 ERROR OCCURRED: 'UNIMPLEMENTED: Problem not known'
-BM_Day<Day_2022_01>/4      0.000 ns        0.000 ns   1000000000 Part: 2; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_01>/1        165 ns          165 ns      4169886 Part: 1
+BM_Day<Day_2022_01>/2      33142 ns        33142 ns        20985 Part: 1
+BM_Day<Day_2022_01>/3        296 ns          296 ns      2357892 Part: 2
+BM_Day<Day_2022_01>/4      34505 ns        34505 ns        20303 Part: 2
