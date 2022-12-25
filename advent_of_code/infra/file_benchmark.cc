@@ -86,7 +86,7 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
   std::vector<absl::string_view> lines = absl::StrSplit(test->test, "\n");
   absl::Span<absl::string_view> lines_span = absl::MakeSpan(lines);
   // Pull off HACK: prefix lines from the front...
-  while (!lines_span.empty() && absl::StartsWith(lines_span[0], "HACK: ")) {
+  while (!lines_span.empty() && absl::StartsWith(lines_span[0], "HACK:")) {
     lines_span = lines_span.subspan(1);
   }
   // ... and empty lines from the end.
@@ -128,6 +128,8 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
     }
     return;
   }
+
+  day->set_param(test->options.GetString(kParamOption));
 
   state.SetLabel(absl::StrCat("Part: ", part));
   switch (part) {
