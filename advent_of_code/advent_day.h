@@ -51,55 +51,21 @@ class AdventDay {
 
   void set_param(std::string param) { param_ = param; }
 
-  absl::StatusOr<std::string> IntReturn(int64_t val) const {
-    return absl::StrCat(val);
+  template <typename T>
+  absl::StatusOr<std::string> AdventReturn(const absl::StatusOr<T>& t) const {
+    if (!t.ok()) return t.status();
+    return absl::StrCat(*t);
   }
 
-  absl::StatusOr<std::string> IntReturn(absl::StatusOr<int64_t> val) const {
-    if (!val.ok()) return val.status();
-    return absl::StrCat(*val);
+  template <typename T>
+  absl::StatusOr<std::string> AdventReturn(const std::optional<T>& t) const {
+    if (!t) return absl::NotFoundError("Not found");
+    return absl::StrCat(*t);
   }
 
-  absl::StatusOr<std::string> IntReturn(absl::optional<int64_t> val) const {
-    if (!val) return absl::NotFoundError("Not found");
-    return absl::StrCat(*val);
-  }
-
-  absl::StatusOr<std::string> PointReturn(Point val) const {
-    return absl::StrCat(val);
-  }
-
-  absl::StatusOr<std::string> PointReturn(absl::StatusOr<Point> val) const {
-    if (!val.ok()) return val.status();
-    return absl::StrCat(*val);
-  }
-
-  absl::StatusOr<std::string> PointReturn(absl::optional<Point> val) const {
-    if (!val) return absl::NotFoundError("Not found");
-    return absl::StrCat(*val);
-  }
-
-  absl::StatusOr<std::string> PointReturn(Point3 val) const {
-    return absl::StrCat(val);
-  }
-
-  absl::StatusOr<std::string> PointReturn(absl::StatusOr<Point3> val) const {
-    if (!val.ok()) return val.status();
-    return absl::StrCat(*val);
-  }
-
-  absl::StatusOr<std::string> PointReturn(absl::optional<Point3> val) const {
-    if (!val) return absl::NotFoundError("Not found");
-    return absl::StrCat(*val);
-  }
-
-  absl::StatusOr<CharBoard> ParseAsBoard(
-      absl::Span<absl::string_view> input) const {
-    return CharBoard::Parse(input);
-  }
-
-  absl::StatusOr<std::string> BoardReturn(const CharBoard& val) const {
-    return val.AsString();
+  template <typename T>
+  absl::StatusOr<std::string> AdventReturn(const T& t) const {
+    return absl::StrCat(t);
   }
 
   virtual absl::string_view test_file() const = 0;

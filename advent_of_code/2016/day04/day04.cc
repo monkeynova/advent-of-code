@@ -74,7 +74,7 @@ absl::StatusOr<std::string> Day_2016_04::Part1(
       sector_sum += sector;
     }
   }
-  return IntReturn(sector_sum);
+  return AdventReturn(sector_sum);
 }
 
 absl::StatusOr<std::string> Day_2016_04::Part2(

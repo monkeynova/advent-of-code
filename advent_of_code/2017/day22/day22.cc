@@ -124,7 +124,7 @@ absl::StatusOr<std::string> Day_2017_22::Part1(
     if (Move(n, *sparse_board)) ++infected;
   }
 
-  return IntReturn(infected);
+  return AdventReturn(infected);
 }
 
 absl::StatusOr<std::string> Day_2017_22::Part2(
@@ -138,7 +138,7 @@ absl::StatusOr<std::string> Day_2017_22::Part2(
     if (Move2(n, *sparse_board)) ++infected;
   }
 
-  return IntReturn(infected);
+  return AdventReturn(infected);
 }
 
 }  // namespace advent_of_code

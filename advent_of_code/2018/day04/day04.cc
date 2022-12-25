@@ -82,7 +82,7 @@ absl::StatusOr<std::string> Day_2018_04::Part1(
     }
   }
   if (dupes != 1) return Error("Bad best minute calculation: ", dupes);
-  return IntReturn(max_guard_id * max_sleep_minute);
+  return AdventReturn(max_guard_id * max_sleep_minute);
 }
 
 absl::StatusOr<std::string> Day_2018_04::Part2(
@@ -160,7 +160,7 @@ absl::StatusOr<std::string> Day_2018_04::Part2(
                  max_guard_id);
   }
   if (guard_dupes != 1) return Error("Bad guard calculation: ", guard_dupes);
-  return IntReturn(max_guard_id * max_sleep_minute);
+  return AdventReturn(max_guard_id * max_sleep_minute);
 }
 
 }  // namespace advent_of_code

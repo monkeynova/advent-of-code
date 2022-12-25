@@ -101,7 +101,7 @@ absl::StatusOr<std::string> Day_2022_14::Part1(
     VLOG(2) << "Board:\n" << b;
     ++added;
   }
-  return IntReturn(added);
+  return AdventReturn(added);
 }
 
 absl::StatusOr<std::string> Day_2022_14::Part2(
@@ -133,7 +133,7 @@ absl::StatusOr<std::string> Day_2022_14::Part2(
     VLOG(2) << "Board:\n" << b;
     ++added;
   }
-  return IntReturn(added);
+  return AdventReturn(added);
 }
 
 }  // namespace advent_of_code

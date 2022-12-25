@@ -22,7 +22,7 @@ absl::StatusOr<std::string> Day_2015_02::Part1(
     need += 2 * l * w + 2 * l * h + 2 * w * h;
     need += std::min(l * w, std::min(l * h, w * h));
   }
-  return IntReturn(need);
+  return AdventReturn(need);
 }
 
 absl::StatusOr<std::string> Day_2015_02::Part2(
@@ -36,7 +36,7 @@ absl::StatusOr<std::string> Day_2015_02::Part2(
     need += l * w * h;
     need += 2 * (l + w + h) - 2 * std::max(l, std::max(w, h));
   }
-  return IntReturn(need);
+  return AdventReturn(need);
 }
 
 }  // namespace advent_of_code

@@ -58,7 +58,7 @@ absl::StatusOr<std::string> Day_2017_08::Part1(
   }
   int max = std::numeric_limits<int>::min();
   for (const auto& [_, val] : registers) max = std::max(max, val);
-  return IntReturn(max);
+  return AdventReturn(max);
 }
 
 absl::StatusOr<std::string> Day_2017_08::Part2(
@@ -103,7 +103,7 @@ absl::StatusOr<std::string> Day_2017_08::Part2(
       return Error("Bad fn: ", fn);
     }
   }
-  return IntReturn(max);
+  return AdventReturn(max);
 }
 
 }  // namespace advent_of_code

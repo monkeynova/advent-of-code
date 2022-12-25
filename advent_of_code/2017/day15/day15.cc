@@ -37,7 +37,7 @@ absl::StatusOr<std::string> Day_2017_15::Part1(
     generator_b = (generator_b * b_mult) % mod;
     if ((generator_a & 0xffff) == (generator_b & 0xffff)) ++count;
   }
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 absl::StatusOr<std::string> Day_2017_15::Part2(
@@ -64,7 +64,7 @@ absl::StatusOr<std::string> Day_2017_15::Part2(
     } while (generator_b % 8 != 0);
     if ((generator_a & 0xffff) == (generator_b & 0xffff)) ++count;
   }
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 }  // namespace advent_of_code

@@ -69,7 +69,7 @@ absl::StatusOr<std::string> Day_2015_25::Part1(
           &row, &col)) {
     return Error("Can't parse input");
   }
-  return IntReturn(ComputeCodeValue(ComputeCodePosition(row, col)));
+  return AdventReturn(ComputeCodeValue(ComputeCodePosition(row, col)));
 }
 
 absl::StatusOr<std::string> Day_2015_25::Part2(

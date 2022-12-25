@@ -50,7 +50,7 @@ absl::StatusOr<std::string> Day_2017_06::Part1(
     hist.insert(tmp);
     tmp = RunStep(std::move(tmp));
   }
-  return IntReturn(hist.size());
+  return AdventReturn(hist.size());
 }
 
 absl::StatusOr<std::string> Day_2017_06::Part2(
@@ -66,7 +66,7 @@ absl::StatusOr<std::string> Day_2017_06::Part2(
     hist[tmp] = i;
     tmp = RunStep(std::move(tmp));
   }
-  return IntReturn(hist.size() - hist[tmp]);
+  return AdventReturn(hist.size() - hist[tmp]);
 }
 
 }  // namespace advent_of_code

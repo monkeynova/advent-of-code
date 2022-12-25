@@ -23,7 +23,7 @@ absl::StatusOr<std::string> Day_2020_01::Part1(
     hist.insert(a);
   }
   if (res == -1) return absl::InvalidArgumentError("nothing found");
-  return IntReturn(res);
+  return AdventReturn(res);
 }
 
 absl::StatusOr<std::string> Day_2020_01::Part2(
@@ -45,7 +45,7 @@ absl::StatusOr<std::string> Day_2020_01::Part2(
     hist.insert(a);
   }
   if (res == -1) return absl::InvalidArgumentError("nothing found");
-  return IntReturn(res);
+  return AdventReturn(res);
 }
 
 }  // namespace advent_of_code

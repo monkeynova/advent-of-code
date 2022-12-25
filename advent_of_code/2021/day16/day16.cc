@@ -18,7 +18,7 @@ absl::StatusOr<std::string> Day_2021_16::Part1(
   if (input.size() != 1) return Error("Bad input");
   absl::StatusOr<BitsExpr> expr = BitsExpr::Parse(input[0]);
   if (!expr.ok()) return expr.status();
-  return IntReturn(expr->SumVersions());
+  return AdventReturn(expr->SumVersions());
 }
 
 absl::StatusOr<std::string> Day_2021_16::Part2(
@@ -26,7 +26,7 @@ absl::StatusOr<std::string> Day_2021_16::Part2(
   if (input.size() != 1) return Error("Bad input");
   absl::StatusOr<BitsExpr> expr = BitsExpr::Parse(input[0]);
   if (!expr.ok()) return expr.status();
-  return IntReturn(expr->Evaluate());
+  return AdventReturn(expr->Evaluate());
 }
 
 }  // namespace advent_of_code

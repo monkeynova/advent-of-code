@@ -271,7 +271,7 @@ class GameBoard {
 
 absl::StatusOr<std::string> Day_2018_15::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> b = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
 
   GameBoard game(std::move(*b));
@@ -286,12 +286,12 @@ absl::StatusOr<std::string> Day_2018_15::Part1(
 
   VLOG(1) << "State: [" << game.rounds() << "]\n" << game.DebugString();
 
-  return IntReturn(game.TotalHitPoints() * game.rounds());
+  return AdventReturn(game.TotalHitPoints() * game.rounds());
 }
 
 absl::StatusOr<std::string> Day_2018_15::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> b = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
 
   for (int elf_attack = 3; true; ++elf_attack) {
@@ -311,7 +311,7 @@ absl::StatusOr<std::string> Day_2018_15::Part2(
             << end_elves;
     if (start_elves == end_elves) {
       VLOG(1) << "State: [" << game.rounds() << "]\n" << game.DebugString();
-      return IntReturn(game.TotalHitPoints() * game.rounds());
+      return AdventReturn(game.TotalHitPoints() * game.rounds());
     }
   }
 

@@ -83,7 +83,7 @@ absl::StatusOr<std::string> Day_2018_19::Part1(
   absl::StatusOr<VM> vm = VM::Parse(input);
   if (!vm.ok()) return vm.status();
   if (absl::Status st = vm->Execute(); !st.ok()) return st;
-  return IntReturn(vm->register_value(0));
+  return AdventReturn(vm->register_value(0));
 }
 
 absl::StatusOr<std::string> Day_2018_19::Part2(
@@ -95,7 +95,7 @@ absl::StatusOr<std::string> Day_2018_19::Part2(
   for (int d = 1; d <= a; ++d) {
     if (a % d == 0) z += d;
   }
-  return IntReturn(z);
+  return AdventReturn(z);
 }
 
 }  // namespace advent_of_code

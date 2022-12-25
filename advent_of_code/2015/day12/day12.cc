@@ -94,7 +94,7 @@ absl::StatusOr<std::string> Day_2015_12::Part1(
   while (RE2::FindAndConsume(&json, "(-?\\d+)", &next)) {
     sum += next;
   }
-  return IntReturn(sum);
+  return AdventReturn(sum);
 }
 
 absl::StatusOr<std::string> Day_2015_12::Part2(
@@ -105,7 +105,7 @@ absl::StatusOr<std::string> Day_2015_12::Part2(
   if (!ret.ok()) return ret.status();
   if (!json.empty()) return Error("Json not fully consumed: ", json);
 
-  return IntReturn(*ret);
+  return AdventReturn(*ret);
 }
 
 }  // namespace advent_of_code

@@ -316,7 +316,7 @@ absl::StatusOr<std::string> Day_2022_22::Part1(
   if (!start.ok()) return start.status();
   absl::StatusOr<PointAndDir> end = MovePath(path, *start, move);
   if (!end.ok()) return end.status();
-  return IntReturn(Score(*end));
+  return AdventReturn(Score(*end));
 }
 
 absl::StatusOr<std::string> Day_2022_22::Part2(
@@ -351,7 +351,7 @@ absl::StatusOr<std::string> Day_2022_22::Part2(
   if (!start.ok()) return start.status();
   absl::StatusOr<PointAndDir> end = MovePath(path, *start, move);
   if (!end.ok()) return end.status();
-  return IntReturn(Score(*end));
+  return AdventReturn(Score(*end));
 }
 
 }  // namespace advent_of_code

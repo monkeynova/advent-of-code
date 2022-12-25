@@ -48,7 +48,7 @@ absl::StatusOr<std::string> Day_2019_07::Part1(
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
 
-  return IntReturn(FindBestThrust(*codes, 0));
+  return AdventReturn(FindBestThrust(*codes, 0));
 }
 
 class AssemblyIO : public IntCode::IOModule {
@@ -154,7 +154,7 @@ absl::StatusOr<std::string> Day_2019_07::Part2(
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
 
-  return IntReturn(FindBestThrustFeedback(*codes));
+  return AdventReturn(FindBestThrustFeedback(*codes));
 }
 
 }  // namespace advent_of_code

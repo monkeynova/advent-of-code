@@ -112,7 +112,7 @@ absl::StatusOr<std::string> Day_2017_07::Part2(
       root = node;
     }
   }
-  return IntReturn(FindBadWeight(root, *dag));
+  return AdventReturn(FindBadWeight(root, *dag));
 }
 
 }  // namespace advent_of_code

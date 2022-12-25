@@ -54,7 +54,7 @@ absl::StatusOr<std::string> Day_2017_03::Part1(
   absl::StatusOr<std::vector<int64_t>> nums = ParseAsInts(input);
   if (!nums.ok()) return nums.status();
   if (nums->size() != 1) return Error("Bad size");
-  return IntReturn(FromPosition(nums->at(0)).dist());
+  return AdventReturn(FromPosition(nums->at(0)).dist());
 }
 
 absl::StatusOr<std::string> Day_2017_03::Part2(
@@ -72,7 +72,7 @@ absl::StatusOr<std::string> Day_2017_03::Part2(
       auto it = sums.find(p + dir);
       if (it != sums.end()) this_sum += it->second;
     }
-    if (this_sum > min_val) return IntReturn(this_sum);
+    if (this_sum > min_val) return AdventReturn(this_sum);
     LOG(INFO) << p << ": " << this_sum;
     if (this_sum == 0) return Error("Zero sum!");
     sums[p] = this_sum;

@@ -73,7 +73,7 @@ absl::StatusOr<std::string> Day_2018_08::Part1(
   absl::StatusOr<int> ret = SumMetadata(int_span);
   if (!ret.ok()) return ret.status();
   if (!int_span.empty()) return Error("Bad parse");
-  return IntReturn(*ret);
+  return AdventReturn(*ret);
 }
 
 absl::StatusOr<std::string> Day_2018_08::Part2(
@@ -86,7 +86,7 @@ absl::StatusOr<std::string> Day_2018_08::Part2(
   absl::StatusOr<int> ret = NodeValue(int_span);
   if (!ret.ok()) return ret.status();
   if (!int_span.empty()) return Error("Bad parse");
-  return IntReturn(*ret);
+  return AdventReturn(*ret);
 }
 
 }  // namespace advent_of_code

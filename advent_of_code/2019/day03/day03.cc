@@ -170,7 +170,7 @@ absl::StatusOr<std::string> Day_2019_03::Part1(
     return absl::InvalidArgumentError("No intersect found");
   }
 
-  return IntReturn(min->dist());
+  return AdventReturn(min->dist());
 }
 
 absl::StatusOr<bool> PointOnLine(Point point, Line line) {
@@ -232,7 +232,7 @@ absl::StatusOr<std::string> Day_2019_03::Part2(
     return absl::InvalidArgumentError("No intersect found");
   }
 
-  return IntReturn(min_score);
+  return AdventReturn(min_score);
 }
 
 }  // namespace advent_of_code

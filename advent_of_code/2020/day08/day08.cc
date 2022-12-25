@@ -89,7 +89,7 @@ absl::StatusOr<std::string> Day_2020_08::Part1(
   absl::StatusOr<bool> terminated = boot_code->Execute();
   if (!terminated.ok()) return terminated.status();
 
-  return IntReturn(boot_code->accumulator());
+  return AdventReturn(boot_code->accumulator());
 }
 
 absl::StatusOr<std::string> Day_2020_08::Part2(
@@ -110,7 +110,7 @@ absl::StatusOr<std::string> Day_2020_08::Part2(
     absl::StatusOr<bool> terminated = tmp_code.Execute();
     if (!terminated.ok()) return terminated.status();
     if (*terminated) {
-      return IntReturn(tmp_code.accumulator());
+      return AdventReturn(tmp_code.accumulator());
     }
   }
 

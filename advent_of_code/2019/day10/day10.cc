@@ -88,7 +88,7 @@ absl::StatusOr<std::string> Day_2019_10::Part1(
   if (!asteroids.ok()) return asteroids.status();
   MostVisible most_visible = FindMostVisible(*asteroids);
 
-  return IntReturn(most_visible.seen);
+  return AdventReturn(most_visible.seen);
 }
 
 struct OrderedDestruct {
@@ -132,7 +132,7 @@ absl::StatusOr<std::string> Day_2019_10::Part2(
   }
   std::sort(ordered_destruct.begin(), ordered_destruct.end());
   int ret = ordered_destruct[199].p.x * 100 + ordered_destruct[199].p.y;
-  return IntReturn(ret);
+  return AdventReturn(ret);
 }
 
 }  // namespace advent_of_code

@@ -56,7 +56,7 @@ absl::StatusOr<std::string> Day_2016_14::Part1(
       if (found_5ple) {
         ++found;
         VLOG(1) << "Found Key #" << found << " @" << test_index;
-        if (found == 64) return IntReturn(test_index);
+        if (found == 64) return AdventReturn(test_index);
         break;
       }
     }
@@ -111,7 +111,7 @@ absl::StatusOr<std::string> Day_2016_14::Part2(
     if (has_5ple[hunt] > test_index) {
       ++found;
       VLOG(1) << "Found Key #" << found << " @" << test_index;
-      if (found == 64) return IntReturn(test_index);
+      if (found == 64) return AdventReturn(test_index);
     }
   }
 

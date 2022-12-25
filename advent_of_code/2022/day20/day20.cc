@@ -99,7 +99,7 @@ absl::StatusOr<std::string> Day_2022_20::Part1(
   }
 
   Mix(cycle);
-  return IntReturn(Coordinates(zero_dll));
+  return AdventReturn(Coordinates(zero_dll));
 }
 
 absl::StatusOr<std::string> Day_2022_20::Part2(
@@ -126,7 +126,7 @@ absl::StatusOr<std::string> Day_2022_20::Part2(
   for (int64_t mix = 0; mix < 10; ++mix) {
     Mix(cycle);
   }
-  return IntReturn(Coordinates(zero_dll));
+  return AdventReturn(Coordinates(zero_dll));
 }
 
 }  // namespace advent_of_code

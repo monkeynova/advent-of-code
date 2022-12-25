@@ -71,7 +71,7 @@ absl::StatusOr<std::string> Day_2021_12::Part1(
     map.AddEdge(src, dst);
   }
 
-  return IntReturn(CountPaths(map, /*allow_visit2=*/false));
+  return AdventReturn(CountPaths(map, /*allow_visit2=*/false));
 }
 
 absl::StatusOr<std::string> Day_2021_12::Part2(
@@ -82,7 +82,7 @@ absl::StatusOr<std::string> Day_2021_12::Part2(
     map.AddEdge(src, dst);
   }
 
-  return IntReturn(CountPaths(map, /*allow_visit2=*/true));
+  return AdventReturn(CountPaths(map, /*allow_visit2=*/true));
 }
 
 }  // namespace advent_of_code

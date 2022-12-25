@@ -38,10 +38,10 @@ absl::StatusOr<std::string> Day_2022_10::Part1(
   };
   for (absl::string_view line : input) {
     if (line == "noop") {
-      if (on_step()) return IntReturn(signal_strength);
+      if (on_step()) return AdventReturn(signal_strength);
     } else if (int add; RE2::FullMatch(line, *addx_re, &add)) {
-      if (on_step()) return IntReturn(signal_strength);
-      if (on_step()) return IntReturn(signal_strength);
+      if (on_step()) return AdventReturn(signal_strength);
+      if (on_step()) return AdventReturn(signal_strength);
       x += add;
     }
   }

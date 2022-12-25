@@ -96,7 +96,7 @@ absl::StatusOr<std::string> Day_2016_17::Part2(
   std::string path;
   // We walk until exhausting paths.
   (void)PathWalk(input[0], &path, false).FindMinSteps();
-  return IntReturn(path.size());
+  return AdventReturn(path.size());
 }
 
 }  // namespace advent_of_code

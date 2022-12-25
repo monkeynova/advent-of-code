@@ -39,7 +39,7 @@ absl::StatusOr<std::string> Day_2017_11::Part1(
     else
       return Error("Bad direction: ", dir);
   }
-  return IntReturn(p.dist() / 2);
+  return AdventReturn(p.dist() / 2);
 }
 
 absl::StatusOr<std::string> Day_2017_11::Part2(
@@ -65,7 +65,7 @@ absl::StatusOr<std::string> Day_2017_11::Part2(
       return Error("Bad direction: ", dir);
     max_dist = std::max(max_dist, p.dist() / 2);
   }
-  return IntReturn(max_dist);
+  return AdventReturn(max_dist);
 }
 
 }  // namespace advent_of_code

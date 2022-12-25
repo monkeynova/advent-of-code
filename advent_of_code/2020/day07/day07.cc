@@ -95,7 +95,7 @@ absl::StatusOr<std::string> Day_2020_07::Part1(
   absl::StatusOr<DirectedGraph<BagRule>> bags = Parse(input);
   if (!bags.ok()) return bags.status();
   VLOG(1) << bags->nodes().size();
-  return IntReturn(CountContainingBags(*bags, "shiny gold"));
+  return AdventReturn(CountContainingBags(*bags, "shiny gold"));
 }
 
 absl::StatusOr<std::string> Day_2020_07::Part2(
@@ -105,7 +105,7 @@ absl::StatusOr<std::string> Day_2020_07::Part2(
 
   absl::StatusOr<int> contained_bags = CountContainedBags(*bags, "shiny gold");
   if (!contained_bags.ok()) return bags.status();
-  return IntReturn(*contained_bags - 1); /* don't include top bag */
+  return AdventReturn(*contained_bags - 1); /* don't include top bag */
 }
 
 }  // namespace advent_of_code

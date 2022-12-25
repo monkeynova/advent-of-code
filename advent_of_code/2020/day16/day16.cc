@@ -103,7 +103,7 @@ absl::StatusOr<std::string> Day_2020_16::Part1(
       }
     }
   }
-  return IntReturn(bad_val_sum);
+  return AdventReturn(bad_val_sum);
 }
 
 bool IsValid(const ParseResult& parse, absl::string_view field_name, int pos) {
@@ -233,7 +233,7 @@ absl::StatusOr<std::string> Day_2020_16::Part2(
     }
   }
   if (prefix_count != 6) return Error("Wrong number of prefix=", prefix);
-  return IntReturn(product);
+  return AdventReturn(product);
 }
 
 }  // namespace advent_of_code

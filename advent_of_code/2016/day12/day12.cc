@@ -19,7 +19,7 @@ absl::StatusOr<std::string> Day_2016_12::Part1(
 
   if (absl::Status st = vm->Execute(); !st.ok()) return st;
 
-  return IntReturn(vm->registers().a);
+  return AdventReturn(vm->registers().a);
 }
 
 absl::StatusOr<std::string> Day_2016_12::Part2(
@@ -30,7 +30,7 @@ absl::StatusOr<std::string> Day_2016_12::Part2(
   vm->registers().c = 1;
   if (absl::Status st = vm->Execute(); !st.ok()) return st;
 
-  return IntReturn(vm->registers().a);
+  return AdventReturn(vm->registers().a);
 }
 
 }  // namespace advent_of_code

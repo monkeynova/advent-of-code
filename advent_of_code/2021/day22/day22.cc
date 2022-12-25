@@ -79,7 +79,7 @@ absl::StatusOr<std::string> Day_2021_22::Part1(
                    " != ", s.Volume());
     }
   }
-  return IntReturn(s.Volume());
+  return AdventReturn(s.Volume());
 }
 
 absl::StatusOr<std::string> Day_2021_22::Part2(
@@ -107,7 +107,7 @@ absl::StatusOr<std::string> Day_2021_22::Part2(
       return Error("Neither on nor off?");
     }
   }
-  return IntReturn(s.Volume());
+  return AdventReturn(s.Volume());
 }
 
 }  // namespace advent_of_code

@@ -281,7 +281,7 @@ absl::StatusOr<std::string> Day_2018_24::Part1(
     units += g.units;
   }
 
-  return IntReturn(units);
+  return AdventReturn(units);
 }
 
 absl::StatusOr<std::string> Day_2018_24::Part2(
@@ -320,7 +320,7 @@ absl::StatusOr<std::string> Day_2018_24::Part2(
     }
   }
 
-  return IntReturn(immunity_units_left);
+  return AdventReturn(immunity_units_left);
 }
 
 }  // namespace advent_of_code

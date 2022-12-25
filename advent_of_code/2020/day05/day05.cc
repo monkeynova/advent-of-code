@@ -51,7 +51,7 @@ absl::StatusOr<std::string> Day_2020_05::Part1(
     if (!seat.ok()) return seat.status();
     maxid = std::max(maxid, seat->id());
   }
-  return IntReturn(maxid);
+  return AdventReturn(maxid);
 }
 
 absl::StatusOr<std::string> Day_2020_05::Part2(
@@ -69,7 +69,7 @@ absl::StatusOr<std::string> Day_2020_05::Part2(
       missingid = id;
     }
   }
-  return IntReturn(missingid);
+  return AdventReturn(missingid);
 }
 
 }  // namespace advent_of_code

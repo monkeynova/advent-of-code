@@ -32,7 +32,7 @@ absl::StatusOr<std::string> Day_2017_02::Part1(
     }
     checksum += max - min;
   }
-  return IntReturn(checksum);
+  return AdventReturn(checksum);
 }
 
 absl::StatusOr<std::string> Day_2017_02::Part2(
@@ -55,7 +55,7 @@ absl::StatusOr<std::string> Day_2017_02::Part2(
     }
     if (!found) return Error("No divisors found: ", row);
   }
-  return IntReturn(checksum);
+  return AdventReturn(checksum);
 }
 
 }  // namespace advent_of_code

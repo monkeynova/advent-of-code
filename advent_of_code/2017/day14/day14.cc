@@ -89,7 +89,7 @@ absl::StatusOr<std::string> Day_2017_14::Part1(
   absl::StatusOr<CharBoard> board = BuildBoard(input[0]);
   if (!board.ok()) return board.status();
   VLOG(1) << "Board:\n" << *board;
-  return IntReturn(board->CountChar('.'));
+  return AdventReturn(board->CountChar('.'));
 }
 
 absl::StatusOr<std::string> Day_2017_14::Part2(
@@ -97,7 +97,7 @@ absl::StatusOr<std::string> Day_2017_14::Part2(
   if (input.size() != 1) return Error("Bad size");
   absl::StatusOr<CharBoard> board = BuildBoard(input[0]);
   if (!board.ok()) return board.status();
-  return IntReturn(PathWalk(*board).CountGroups());
+  return AdventReturn(PathWalk(*board).CountGroups());
 }
 
 }  // namespace advent_of_code

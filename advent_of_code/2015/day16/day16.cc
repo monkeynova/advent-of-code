@@ -34,7 +34,7 @@ absl::StatusOr<std::string> Day_2015_16::Part1(
     }
   }
   if (aunts.size() != 1) return Error("Aunt not unique: ", aunts.size());
-  return IntReturn(*aunts.begin());
+  return AdventReturn(*aunts.begin());
 }
 
 absl::StatusOr<std::string> Day_2015_16::Part2(
@@ -66,7 +66,7 @@ absl::StatusOr<std::string> Day_2015_16::Part2(
     }
   }
   if (aunts.size() != 1) return Error("Aunt not unique: ", aunts.size());
-  return IntReturn(*aunts.begin());
+  return AdventReturn(*aunts.begin());
 }
 
 }  // namespace advent_of_code

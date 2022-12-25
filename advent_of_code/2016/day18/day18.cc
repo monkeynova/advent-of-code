@@ -40,7 +40,7 @@ absl::StatusOr<std::string> Day_2016_18::Part1(
     }
   }
   LOG(INFO) << "Board:\n" << b;
-  return IntReturn(b.CountChar('.'));
+  return AdventReturn(b.CountChar('.'));
 }
 
 absl::StatusOr<std::string> Day_2016_18::Part2(
@@ -65,7 +65,7 @@ absl::StatusOr<std::string> Day_2016_18::Part2(
     }
   }
   VLOG(2) << "Board:\n" << b;
-  return IntReturn(b.CountChar('.'));
+  return AdventReturn(b.CountChar('.'));
 }
 
 }  // namespace advent_of_code

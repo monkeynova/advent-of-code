@@ -154,9 +154,9 @@ absl::StatusOr<std::string> Day_2016_10::Part1(
   }
 
   if (saw_61) {
-    return IntReturn(FindCmp(&bots, 17, 61));
+    return AdventReturn(FindCmp(&bots, 17, 61));
   }
-  return IntReturn(FindCmp(&bots, 2, 5));
+  return AdventReturn(FindCmp(&bots, 2, 5));
 }
 
 absl::StatusOr<std::string> Day_2016_10::Part2(
@@ -226,7 +226,7 @@ absl::StatusOr<std::string> Day_2016_10::Part2(
   absl::StatusOr<int> v2 = EvalOutput(&bots, 2, &outputs[2]);
   if (!v2.ok()) return v2.status();
 
-  return IntReturn(*v0 * *v1 * *v2);
+  return AdventReturn(*v0 * *v1 * *v2);
 }
 
 }  // namespace advent_of_code

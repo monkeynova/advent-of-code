@@ -179,7 +179,7 @@ absl::StatusOr<std::string> Day_2020_19::Part1(
     VLOG(1) << m << "; " << (matches ? "MATCH" : "<no match>");
   }
 
-  return IntReturn(match_count);
+  return AdventReturn(match_count);
 }
 
 absl::StatusOr<std::string> Day_2020_19::Part2(
@@ -230,7 +230,7 @@ absl::StatusOr<std::string> Day_2020_19::Part2(
     VLOG(1) << m << "; " << (matches ? "MATCH" : "<no match>");
   }
 
-  return IntReturn(match_count);
+  return AdventReturn(match_count);
 }
 
 }  // namespace advent_of_code

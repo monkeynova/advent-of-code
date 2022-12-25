@@ -299,7 +299,7 @@ absl::StatusOr<std::string> Day_2015_19::Part1(
     }
     map[from].push_back(to);
   }
-  return IntReturn(RunStep(map, final).size());
+  return AdventReturn(RunStep(map, final).size());
 }
 
 absl::StatusOr<std::string> Day_2015_19::Part2(
@@ -324,7 +324,7 @@ absl::StatusOr<std::string> Day_2015_19::Part2(
   if (final.size() < 10) {
     // TODO(@monkeynova): This filter might be better served in a reverse
     // model where we recognize the hack will work.
-    return IntReturn(FindMinPath(map, "e", final));
+    return AdventReturn(FindMinPath(map, "e", final));
   }
 
   // 'Ar' always terminates a rule.
@@ -344,7 +344,7 @@ absl::StatusOr<std::string> Day_2015_19::Part2(
     if (next_elem == "Rn") --steps;
     if (next_elem == "Y") steps -= 2;
   }
-  return IntReturn(steps);
+  return AdventReturn(steps);
 
   absl::flat_hash_set<absl::string_view> terminals = FindTerminalElements(map);
   VLOG(1) << "Terminal Elements = " << absl::StrJoin(terminals, ",");
@@ -353,11 +353,11 @@ absl::StatusOr<std::string> Day_2015_19::Part2(
   VLOG(1) << "Terminal Split = " << absl::StrJoin(terminal_split, ", ");
   PruneRulesFromTerminals(final, terminals, &map, &reverse);
 
-  return IntReturn(MatchFromFrontRnAr(final, map));
+  return AdventReturn(MatchFromFrontRnAr(final, map));
 
-  // return IntReturn(MatchFromFront(reverse, "e", final));
+  // return AdventReturn(MatchFromFront(reverse, "e", final));
 
-  return IntReturn(FindMinPath(map, "e", final));
+  return AdventReturn(FindMinPath(map, "e", final));
 }
 
 }  // namespace advent_of_code

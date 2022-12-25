@@ -52,15 +52,15 @@ class Route : public BFSInterface<Route, Point> {
 
 absl::StatusOr<std::string> Day_2021_15::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> b = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
 
-  return IntReturn(Route(*b).FindMinStepsAStar());
+  return AdventReturn(Route(*b).FindMinStepsAStar());
 }
 
 absl::StatusOr<std::string> Day_2021_15::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> b = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
 
   CharBoard big_board(b->width() * 5, b->height() * 5);
@@ -75,7 +75,7 @@ absl::StatusOr<std::string> Day_2021_15::Part2(
     }
   }
 
-  return IntReturn(Route(big_board).FindMinStepsAStar());
+  return AdventReturn(Route(big_board).FindMinStepsAStar());
 }
 
 }  // namespace advent_of_code

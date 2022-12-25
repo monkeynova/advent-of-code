@@ -42,7 +42,7 @@ absl::StatusOr<std::string> Day_2021_03::Part1(
       epsilon = epsilon * 2 + 1;
     }
   }
-  return IntReturn(gamma * epsilon);
+  return AdventReturn(gamma * epsilon);
 }
 
 absl::StatusOr<std::string> Day_2021_03::Part2(
@@ -105,7 +105,7 @@ absl::StatusOr<std::string> Day_2021_03::Part2(
   for (char c : *co2_set.begin()) {
     co2_val = co2_val * 2 + (c == '1' ? 1 : 0);
   }
-  return IntReturn(o2_val * co2_val);
+  return AdventReturn(o2_val * co2_val);
 }
 
 }  // namespace advent_of_code

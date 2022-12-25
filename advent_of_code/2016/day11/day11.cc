@@ -284,7 +284,7 @@ absl::StatusOr<std::string> Day_2016_11::Part1(
   std::vector<absl::string_view> element_names;
   absl::StatusOr<ElevatorState> s = ElevatorState::Parse(input, &element_names);
   if (!s.ok()) return s.status();
-  return IntReturn(s->FindMinSteps());
+  return AdventReturn(s->FindMinSteps());
 }
 
 absl::StatusOr<std::string> Day_2016_11::Part2(
@@ -294,7 +294,7 @@ absl::StatusOr<std::string> Day_2016_11::Part2(
   s->AddElementAtFloor0("elerium");
   s->AddElementAtFloor0("dilithium");
 
-  return IntReturn(s->FindMinSteps());
+  return AdventReturn(s->FindMinSteps());
 }
 
 }  // namespace advent_of_code

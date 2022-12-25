@@ -36,7 +36,7 @@ absl::StatusOr<std::string> Day_2015_03::Part1(
         return absl::InvalidArgumentError("Bad direction");
     }
   }
-  return IntReturn(visit.size());
+  return AdventReturn(visit.size());
 }
 
 absl::StatusOr<std::string> Day_2015_03::Part2(
@@ -83,7 +83,7 @@ absl::StatusOr<std::string> Day_2015_03::Part2(
         return absl::InvalidArgumentError("Bad direction");
     }
   }
-  return IntReturn(visit.size());
+  return AdventReturn(visit.size());
 }
 
 }  // namespace advent_of_code

@@ -106,7 +106,7 @@ absl::StatusOr<std::string> Day_2019_25::Part1(
     if (RE2::PartialMatch(t.full_output(),
                           "You should be able to get in by typing (\\d+)",
                           &code)) {
-      return IntReturn(code);
+      return AdventReturn(code);
     }
   }
   return absl::InternalError("Not found");

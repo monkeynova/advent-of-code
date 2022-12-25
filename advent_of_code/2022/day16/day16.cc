@@ -457,10 +457,10 @@ absl::StatusOr<std::string> Day_2022_16::Part1(
     }
 
     MinPathMap min_paths = MinValvePaths(*graph);
-    return IntReturn(FindBestOrder(valves, min_paths, 30));
+    return AdventReturn(FindBestOrder(valves, min_paths, 30));
   }
 
-  return IntReturn(BestPath(*graph, 30, /*use_elephant=*/false));
+  return AdventReturn(BestPath(*graph, 30, /*use_elephant=*/false));
 }
 
 absl::StatusOr<std::string> Day_2022_16::Part2(
@@ -478,10 +478,10 @@ absl::StatusOr<std::string> Day_2022_16::Part2(
     }
 
     MinPathMap min_paths = MinValvePaths(*graph);
-    return IntReturn(FindBestOrderElephant(valves, min_paths, 26));
+    return AdventReturn(FindBestOrderElephant(valves, min_paths, 26));
   }
 
-  return IntReturn(BestPath(*graph, 26, /*use_elephant=*/true));
+  return AdventReturn(BestPath(*graph, 26, /*use_elephant=*/true));
 }
 
 }  // namespace advent_of_code

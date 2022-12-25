@@ -100,7 +100,7 @@ absl::StatusOr<std::string> Day_2018_16::Part1(
       return Error("Can't parse line: ", row);
     }
   }
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 absl::StatusOr<std::string> Day_2018_16::Part2(
@@ -160,7 +160,7 @@ absl::StatusOr<std::string> Day_2018_16::Part2(
       return Error("Can't parse line: ", row);
     }
   }
-  return IntReturn(register_in[0]);
+  return AdventReturn(register_in[0]);
 }
 
 }  // namespace advent_of_code

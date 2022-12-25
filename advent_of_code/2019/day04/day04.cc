@@ -56,7 +56,7 @@ absl::StatusOr<std::string> Day_2019_04::Part1(
     if (IsValidPassword(password)) ++valid;
   }
 
-  return IntReturn(valid);
+  return AdventReturn(valid);
 }
 
 absl::StatusOr<std::string> Day_2019_04::Part2(
@@ -72,7 +72,7 @@ absl::StatusOr<std::string> Day_2019_04::Part2(
     if (IsValidPassword2(password)) ++valid;
   }
 
-  return IntReturn(valid);
+  return AdventReturn(valid);
 }
 
 }  // namespace advent_of_code

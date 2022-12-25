@@ -291,7 +291,7 @@ absl::StatusOr<std::string> Day_2018_20::Part1(
       RoomWalk(*room, start, &max_path).FindMinSteps();
   if (null_dist) return Error("Path walk terminated?!?");
 
-  return IntReturn(max_path);
+  return AdventReturn(max_path);
 }
 
 absl::StatusOr<std::string> Day_2018_20::Part2(
@@ -314,7 +314,7 @@ absl::StatusOr<std::string> Day_2018_20::Part2(
       RoomWalkPast(*room, start, 1000, &count).FindMinSteps();
   if (null_dist) return Error("Path walk terminated?!?");
 
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 }  // namespace advent_of_code

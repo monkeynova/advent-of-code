@@ -50,7 +50,7 @@ absl::StatusOr<std::string> Day_2016_08::Part1(
     VLOG(1) << "Board:\n" << display;
   }
   LOG(INFO) << "Board:\n" << display;
-  return IntReturn(display.CountOn());
+  return AdventReturn(display.CountOn());
 }
 
 absl::StatusOr<std::string> Day_2016_08::Part2(

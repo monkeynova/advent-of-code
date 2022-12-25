@@ -38,7 +38,7 @@ absl::StatusOr<std::string> Day_2020_15::Part1(
     last = next;
     VLOG(1) << last;
   }
-  return IntReturn(last);
+  return AdventReturn(last);
 }
 
 absl::StatusOr<std::string> Day_2020_15::Part2(
@@ -68,7 +68,7 @@ absl::StatusOr<std::string> Day_2020_15::Part2(
     last = next;
     VLOG(1) << last;
   }
-  return IntReturn(last);
+  return AdventReturn(last);
 }
 
 }  // namespace advent_of_code

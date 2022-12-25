@@ -44,7 +44,7 @@ absl::StatusOr<std::string> Day_2021_10::Part1(
       stack.pop_back();
     }
   }
-  return IntReturn(total_score);
+  return AdventReturn(total_score);
 }
 
 absl::StatusOr<std::string> Day_2021_10::Part2(
@@ -84,7 +84,7 @@ absl::StatusOr<std::string> Day_2021_10::Part2(
   absl::c_sort(scores);
   if (scores.size() % 2 != 1) return Error("Bad median");
 
-  return IntReturn(scores[scores.size() / 2]);
+  return AdventReturn(scores[scores.size() / 2]);
 }
 
 }  // namespace advent_of_code

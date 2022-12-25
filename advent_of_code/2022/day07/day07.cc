@@ -99,7 +99,7 @@ absl::StatusOr<std::string> Day_2022_07::Part1(
     if (size > kSmallSizeThreshold) continue;
     small_size += size;
   }
-  return IntReturn(small_size);
+  return AdventReturn(small_size);
 }
 
 absl::StatusOr<std::string> Day_2022_07::Part2(
@@ -118,7 +118,7 @@ absl::StatusOr<std::string> Day_2022_07::Part2(
     if (size < min_free) continue;
     best = std::min(size, best);
   }
-  return IntReturn(best);
+  return AdventReturn(best);
 }
 
 }  // namespace advent_of_code

@@ -14,18 +14,18 @@ namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2015_18::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> board = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
 
   Conway conway(*board);
   if (auto st = conway.AdvanceN(100); !st.ok()) return st;
 
-  return IntReturn(conway.board().CountOn());
+  return AdventReturn(conway.board().CountOn());
 }
 
 absl::StatusOr<std::string> Day_2015_18::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> board = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
 
   Conway conway(*board);
@@ -41,7 +41,7 @@ absl::StatusOr<std::string> Day_2015_18::Part2(
       conway.board()[p] = '#';
     }
   }
-  return IntReturn(conway.board().CountOn());
+  return AdventReturn(conway.board().CountOn());
 }
 
 }  // namespace advent_of_code

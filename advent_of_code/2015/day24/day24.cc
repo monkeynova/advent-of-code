@@ -201,7 +201,7 @@ absl::StatusOr<std::string> Day_2015_24::Part1(
     weights_set.max_weight = std::max<int>(weights_set.max_weight, v);
   }
 
-  return IntReturn(FindMinPartition3(weights_set));
+  return AdventReturn(FindMinPartition3(weights_set));
 }
 
 absl::StatusOr<std::string> Day_2015_24::Part2(
@@ -214,7 +214,7 @@ absl::StatusOr<std::string> Day_2015_24::Part2(
     weights_set.max_weight = std::max<int>(weights_set.max_weight, v);
   }
 
-  return IntReturn(FindMinPartition4(weights_set));
+  return AdventReturn(FindMinPartition4(weights_set));
 }
 
 }  // namespace advent_of_code

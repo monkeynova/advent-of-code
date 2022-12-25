@@ -147,7 +147,7 @@ absl::StatusOr<std::string> Day_2018_07::Part2(
     }
     graph.AddEdge(src, dst);
   }
-  return IntReturn(FindMinPath(graph, 5));
+  return AdventReturn(FindMinPath(graph, 5));
 }
 
 }  // namespace advent_of_code

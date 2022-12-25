@@ -97,7 +97,7 @@ absl::StatusOr<std::string> Day_2017_09::Part1(
     }
   }
   if (input.size() != 1) return Error("Bad input");
-  return IntReturn(TotalGroupScore(input[0]));
+  return AdventReturn(TotalGroupScore(input[0]));
 }
 
 absl::StatusOr<std::string> Day_2017_09::Part2(
@@ -117,7 +117,7 @@ absl::StatusOr<std::string> Day_2017_09::Part2(
     }
   }
   if (input.size() != 1) return Error("Bad input");
-  return IntReturn(GarbageCount(input[0]));
+  return AdventReturn(GarbageCount(input[0]));
 }
 
 }  // namespace advent_of_code

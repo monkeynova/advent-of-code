@@ -32,7 +32,7 @@ absl::StatusOr<std::string> Day_2022_01::Part1(
   if (cur > best) {
     best = cur;
   }
-  return IntReturn(best);
+  return AdventReturn(best);
 }
 
 absl::StatusOr<std::string> Day_2022_01::Part2(
@@ -56,7 +56,7 @@ absl::StatusOr<std::string> Day_2022_01::Part2(
   }
   absl::c_sort(elves);
   absl::c_reverse(elves);
-  return IntReturn(elves[0] + elves[1] + elves[2]);
+  return AdventReturn(elves[0] + elves[1] + elves[2]);
 }
 
 }  // namespace advent_of_code

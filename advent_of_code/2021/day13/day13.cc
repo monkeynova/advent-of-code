@@ -71,7 +71,7 @@ absl::StatusOr<std::string> Day_2021_13::Part1(
       absl::StatusOr<absl::flat_hash_set<Point>> folded =
           Fold(std::move(points), *axis);
       if (!folded.ok()) return folded.status();
-      return IntReturn(folded->size());
+      return AdventReturn(folded->size());
     } else {
       Point p;
       if (!RE2::FullMatch(line, "(\\d+,\\d+)", p.Capture())) {

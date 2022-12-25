@@ -22,7 +22,7 @@ absl::StatusOr<std::string> Day_2019_09::Part1(
         absl::StrCat("Bad output: {", absl::StrJoin(output, ","), "}"));
   }
 
-  return IntReturn(output[0]);
+  return AdventReturn(output[0]);
 }
 
 absl::StatusOr<std::string> Day_2019_09::Part2(
@@ -39,7 +39,7 @@ absl::StatusOr<std::string> Day_2019_09::Part2(
         absl::StrCat("Bad output: {", absl::StrJoin(output, ","), "}"));
   }
 
-  return IntReturn(output[0]);
+  return AdventReturn(output[0]);
 }
 
 }  // namespace advent_of_code

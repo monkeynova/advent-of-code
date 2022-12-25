@@ -54,24 +54,24 @@ class HeightBfs : public BFSInterface<HeightBfs, Point> {
 
 absl::StatusOr<std::string> Day_2022_12::Part1(
     absl::Span<absl::string_view> input) const {
-  auto board = ParseAsBoard(input);
+  auto board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
   absl::flat_hash_set<Point> starts = board->Find('S');
   if (starts.size() != 1) return Error("Bad start");
 
   HeightBfs search(*board, *starts.begin(), /*reverse=*/false);
-  return IntReturn(search.FindMinSteps());
+  return AdventReturn(search.FindMinSteps());
 }
 
 absl::StatusOr<std::string> Day_2022_12::Part2(
     absl::Span<absl::string_view> input) const {
-  auto board = ParseAsBoard(input);
+  auto board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
   absl::flat_hash_set<Point> starts = board->Find('E');
   if (starts.size() != 1) return Error("Bad start");
 
   HeightBfs search(*board, *starts.begin(), /*reverse=*/true);
-  return IntReturn(search.FindMinSteps());
+  return AdventReturn(search.FindMinSteps());
 }
 
 }  // namespace advent_of_code

@@ -51,7 +51,7 @@ absl::StatusOr<std::string> Day_2022_03::Part1(
     if (!score.ok()) return score.status();
     total_score += *score;
   }
-  return IntReturn(total_score);
+  return AdventReturn(total_score);
 }
 
 absl::StatusOr<std::string> Day_2022_03::Part2(
@@ -72,7 +72,7 @@ absl::StatusOr<std::string> Day_2022_03::Part2(
     if (!score.ok()) return score.status();
     total_score += *score;
   }
-  return IntReturn(total_score);
+  return AdventReturn(total_score);
 }
 
 }  // namespace advent_of_code

@@ -185,7 +185,7 @@ absl::StatusOr<std::string> Day_2022_17::Part1(
   for (int i = 0; i < 2022; ++i) {
     if (absl::Status st = ds.DropNextRock(i); !st.ok()) return st;
   }
-  return IntReturn(ds.height());
+  return AdventReturn(ds.height());
 }
 
 absl::StatusOr<std::string> Day_2022_17::Part2(
@@ -216,7 +216,7 @@ absl::StatusOr<std::string> Day_2022_17::Part2(
 
       VLOG(1) << "Return " << ret_height;
 
-      return IntReturn(ret_height);
+      return AdventReturn(ret_height);
     }
   }
   return Error("Left infinite loop");

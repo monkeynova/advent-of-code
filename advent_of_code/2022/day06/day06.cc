@@ -28,13 +28,13 @@ absl::StatusOr<int> FindMarker(absl::string_view line, int len) {
 absl::StatusOr<std::string> Day_2022_06::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  return IntReturn(FindMarker(input[0], 4));
+  return AdventReturn(FindMarker(input[0], 4));
 }
 
 absl::StatusOr<std::string> Day_2022_06::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  return IntReturn(FindMarker(input[0], 14));
+  return AdventReturn(FindMarker(input[0], 14));
 }
 
 }  // namespace advent_of_code

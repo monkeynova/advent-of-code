@@ -46,7 +46,7 @@ absl::StatusOr<std::string> Day_2018_25::Part1(
     points.push_back(p);
   }
 
-  return IntReturn(CountConstellations(points));
+  return AdventReturn(CountConstellations(points));
 }
 
 absl::StatusOr<std::string> Day_2018_25::Part2(

@@ -71,7 +71,7 @@ absl::StatusOr<std::string> Day_2019_11::Part1(
   Painter painter;
   if (absl::Status st = codes->Run(&painter); !st.ok()) return st;
 
-  return IntReturn(painter.UniquePanelsPainted());
+  return AdventReturn(painter.UniquePanelsPainted());
 }
 
 absl::StatusOr<std::string> Day_2019_11::Part2(

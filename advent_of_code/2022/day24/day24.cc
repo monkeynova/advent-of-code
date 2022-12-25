@@ -170,7 +170,7 @@ Start ParseAndClearBoard(CharBoard& board) {
 
 absl::StatusOr<std::string> Day_2022_24::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> board = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
 
   Start start = ParseAndClearBoard(*board);
@@ -181,13 +181,13 @@ absl::StatusOr<std::string> Day_2022_24::Part1(
   BlizzardHistory hist;
   hist.sets.push_back(std::move(start.blizzards));
 
-  return IntReturn(
+  return AdventReturn(
       BFSWalk(*start.start, *start.end, *board, hist).FindMinSteps());
 }
 
 absl::StatusOr<std::string> Day_2022_24::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> board = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
 
   Start start = ParseAndClearBoard(*board);
@@ -206,7 +206,7 @@ absl::StatusOr<std::string> Day_2022_24::Part2(
     std::swap(*start.start, *start.end);
     start.blizzards = hist.sets.back();
   }
-  return IntReturn(total_dist);
+  return AdventReturn(total_dist);
 }
 
 }  // namespace advent_of_code

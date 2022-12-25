@@ -199,7 +199,7 @@ absl::StatusOr<std::string> Day_2018_23::Part1(
     }
   }
 
-  return IntReturn(in_range);
+  return AdventReturn(in_range);
 }
 
 absl::StatusOr<std::string> Day_2018_23::Part2(
@@ -211,7 +211,7 @@ absl::StatusOr<std::string> Day_2018_23::Part2(
   absl::StatusOr<Point3> best = FindBest(*bots);
   if (!best.ok()) return best.status();
 
-  return IntReturn(best->dist());
+  return AdventReturn(best->dist());
 }
 
 }  // namespace advent_of_code

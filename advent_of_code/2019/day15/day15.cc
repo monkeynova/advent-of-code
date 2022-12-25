@@ -242,7 +242,7 @@ absl::StatusOr<std::string> Day_2019_15::Part1(
   }
   VLOG(1) << "Droid:\n" << droid.DebugBoard();
 
-  return IntReturn(droid.DistanceToO2());
+  return AdventReturn(droid.DistanceToO2());
 }
 
 absl::StatusOr<std::string> Day_2019_15::Part2(
@@ -256,7 +256,7 @@ absl::StatusOr<std::string> Day_2019_15::Part2(
   }
   VLOG(1) << "Droid:\n" << droid.DebugBoard();
 
-  return IntReturn(droid.GreatestDistanceFromO2());
+  return AdventReturn(droid.GreatestDistanceFromO2());
 }
 
 }  // namespace advent_of_code

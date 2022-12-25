@@ -92,18 +92,18 @@ class PathWalk : public BFSInterface<PathWalk> {
 
 absl::StatusOr<std::string> Day_2016_24::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> b = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
 
-  return IntReturn(PathWalk(*b, false).FindMinSteps());
+  return AdventReturn(PathWalk(*b, false).FindMinSteps());
 }
 
 absl::StatusOr<std::string> Day_2016_24::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> b = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
 
-  return IntReturn(PathWalk(*b, true).FindMinSteps());
+  return AdventReturn(PathWalk(*b, true).FindMinSteps());
 }
 
 }  // namespace advent_of_code

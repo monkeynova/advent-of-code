@@ -122,7 +122,7 @@ absl::StatusOr<std::string> Day_2022_13::Part1(
     if (!right.ok()) return right.status();
     if (!(*right < *left)) ret += (i / 3) + 1;
   }
-  return IntReturn(ret);
+  return AdventReturn(ret);
 }
 
 absl::StatusOr<std::string> Day_2022_13::Part2(
@@ -143,7 +143,7 @@ absl::StatusOr<std::string> Day_2022_13::Part2(
       ++idx2;
     }
   }
-  return IntReturn(idx1 * idx2);
+  return AdventReturn(idx1 * idx2);
 }
 
 }  // namespace advent_of_code

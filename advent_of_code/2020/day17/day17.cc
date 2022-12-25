@@ -90,24 +90,24 @@ class Grid4 {
 
 absl::StatusOr<std::string> Day_2020_17::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> initial = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> initial = CharBoard::Parse(input);
   if (!initial.ok()) return initial.status();
   Grid3 grid(*initial);
   for (int i = 0; i < 6; ++i) {
     grid = grid.Step();
   }
-  return IntReturn(grid.CountTiles());
+  return AdventReturn(grid.CountTiles());
 }
 
 absl::StatusOr<std::string> Day_2020_17::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> initial = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> initial = CharBoard::Parse(input);
   if (!initial.ok()) return initial.status();
   Grid4 grid(*initial);
   for (int i = 0; i < 6; ++i) {
     grid = grid.Step();
   }
-  return IntReturn(grid.CountTiles());
+  return AdventReturn(grid.CountTiles());
 }
 
 }  // namespace advent_of_code

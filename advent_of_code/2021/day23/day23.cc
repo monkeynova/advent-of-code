@@ -247,7 +247,7 @@ absl::optional<int> FindMinCost(
 
 absl::StatusOr<std::string> Day_2021_23::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> b = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
 
   State s{.board = *b};
@@ -309,7 +309,7 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
     }
   }
 
-  return IntReturn(FindMinCost(std::move(s), empty, destinations, all_paths));
+  return AdventReturn(FindMinCost(std::move(s), empty, destinations, all_paths));
 }
 
 absl::StatusOr<std::string> Day_2021_23::Part2(

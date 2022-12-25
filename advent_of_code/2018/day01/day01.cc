@@ -23,7 +23,7 @@ absl::StatusOr<std::string> Day_2018_01::Part1(
   if (!list.ok()) return list.status();
   int sum = 0;
   for (int64_t i : *list) sum += i;
-  return IntReturn(sum);
+  return AdventReturn(sum);
 }
 
 absl::StatusOr<std::string> Day_2018_01::Part2(
@@ -34,7 +34,7 @@ absl::StatusOr<std::string> Day_2018_01::Part2(
   int sum = 0;
   while (true) {
     for (int64_t i : *list) {
-      if (hist.contains(sum)) return IntReturn(sum);
+      if (hist.contains(sum)) return AdventReturn(sum);
       hist.insert(sum);
       sum += i;
     }

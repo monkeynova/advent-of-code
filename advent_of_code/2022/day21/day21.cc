@@ -166,7 +166,7 @@ absl::StatusOr<std::string> Day_2022_21::Part1(
   absl::StatusOr<absl::flat_hash_map<absl::string_view, Monkey>> monkeys =
       ParseMonkeys(input);
   if (!monkeys.ok()) return monkeys.status();
-  return IntReturn(Evaluate(*monkeys, "root"));
+  return AdventReturn(Evaluate(*monkeys, "root"));
 }
 
 absl::StatusOr<std::string> Day_2022_21::Part2(
@@ -180,7 +180,7 @@ absl::StatusOr<std::string> Day_2022_21::Part2(
   humn.unknown = true;
   humn.value = std::nullopt;
 
-  return IntReturn(SolveForRootEquality(*monkeys));
+  return AdventReturn(SolveForRootEquality(*monkeys));
 }
 
 }  // namespace advent_of_code

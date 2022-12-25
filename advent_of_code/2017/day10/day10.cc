@@ -29,7 +29,7 @@ absl::StatusOr<std::string> Day_2017_10::Part1(
   for (int i = 0; i < loop.size(); ++i) loop[i] = i;
   KnotHash().RunLoop(lengths, &loop);
 
-  return IntReturn(loop[0] * loop[1]);
+  return AdventReturn(loop[0] * loop[1]);
 }
 
 absl::StatusOr<std::string> Day_2017_10::Part2(

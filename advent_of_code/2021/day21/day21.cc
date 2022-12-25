@@ -70,12 +70,12 @@ absl::StatusOr<std::string> Day_2021_21::Part1(
     game.SetP1Roll(roll() + roll() + roll());
     VLOG(2) << game;
     if (game.s1 >= 1000) {
-      return IntReturn(3 * turn * game.s2);
+      return AdventReturn(3 * turn * game.s2);
     }
     game.SetP2Roll(roll() + roll() + roll());
     VLOG(2) << game;
     if (game.s2 >= 1000) {
-      return IntReturn(3 * (turn + 1) * game.s1);
+      return AdventReturn(3 * (turn + 1) * game.s1);
     }
   }
   return Error("Left infinite loop");
@@ -132,7 +132,7 @@ absl::StatusOr<std::string> Day_2021_21::Part2(
     state_map = std::move(new_state_map);
   }
 
-  return IntReturn(std::max(p1_wins, p2_wins));
+  return AdventReturn(std::max(p1_wins, p2_wins));
 }
 
 }  // namespace advent_of_code

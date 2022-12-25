@@ -273,7 +273,7 @@ absl::StatusOr<std::string> Day_2019_24::Part1(
     cur = StepGameOfLine(cur);
   }
   VLOG(1) << "Dupe Board:\n" << cur;
-  return IntReturn(BioDiversity(cur));
+  return AdventReturn(BioDiversity(cur));
 }
 
 absl::StatusOr<std::string> Day_2019_24::Part2(
@@ -290,7 +290,7 @@ absl::StatusOr<std::string> Day_2019_24::Part2(
         StepGameOfLineRecursive(level_to_board);
     level_to_board = std::move(next);
   }
-  return IntReturn(CountBugs(level_to_board));
+  return AdventReturn(CountBugs(level_to_board));
 }
 
 }  // namespace advent_of_code

@@ -25,7 +25,7 @@ absl::StatusOr<std::string> Day_2019_02::Part1(
   if (absl::Status st = CorrectBoard(&*codes, 12, 2); !st.ok()) return st;
   if (absl::Status st = codes->Run(); !st.ok()) return st;
 
-  return IntReturn(codes->Peek(0));
+  return AdventReturn(codes->Peek(0));
 }
 
 absl::StatusOr<std::string> Day_2019_02::Part2(
@@ -42,7 +42,7 @@ absl::StatusOr<std::string> Day_2019_02::Part2(
       absl::StatusOr<int> val = codes.Peek(0);
       if (!val.ok()) return val.status();
       if (*val == 19690720) {
-        return IntReturn(100 * noun + verb);
+        return AdventReturn(100 * noun + verb);
       }
     }
   }

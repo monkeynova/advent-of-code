@@ -178,7 +178,7 @@ absl::StatusOr<std::string> Day_2018_22::Part1(
     if (b[p] == '=') ++risk;
     if (b[p] == '|') risk += 2;
   }
-  return IntReturn(risk);
+  return AdventReturn(risk);
 }
 
 absl::StatusOr<std::string> Day_2018_22::Part2(
@@ -193,7 +193,7 @@ absl::StatusOr<std::string> Day_2018_22::Part2(
     return Error("No target");
   }
   Map map(depth, target);
-  return IntReturn(MapWalk(&map).FindMinStepsAStar());
+  return AdventReturn(MapWalk(&map).FindMinStepsAStar());
 }
 
 }  // namespace advent_of_code

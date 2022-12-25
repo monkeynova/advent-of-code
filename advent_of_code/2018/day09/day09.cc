@@ -117,7 +117,7 @@ absl::StatusOr<std::string> Day_2018_09::Part1(
                       &players, &marbles)) {
     return Error("Bad input");
   }
-  return IntReturn(HighScore(players, marbles));
+  return AdventReturn(HighScore(players, marbles));
 }
 
 absl::StatusOr<std::string> Day_2018_09::Part2(
@@ -130,7 +130,7 @@ absl::StatusOr<std::string> Day_2018_09::Part2(
                       &players, &marbles)) {
     return Error("Bad input");
   }
-  return IntReturn(HighScore(players, 100 * marbles));
+  return AdventReturn(HighScore(players, 100 * marbles));
 }
 
 }  // namespace advent_of_code

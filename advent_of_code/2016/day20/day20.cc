@@ -35,13 +35,13 @@ absl::StatusOr<std::string> Day_2016_20::Part1(
     blocks.push_back(b);
   }
   std::sort(blocks.begin(), blocks.end());
-  if (blocks[0].start != 0) return IntReturn(0);
+  if (blocks[0].start != 0) return AdventReturn(0);
   int invalid_through = blocks[0].end;
   for (Block b : blocks) {
     if (b.start <= invalid_through + 1) {
       if (b.end > invalid_through) invalid_through = b.end;
     } else {
-      return IntReturn(invalid_through + 1);
+      return AdventReturn(invalid_through + 1);
     }
   }
 
@@ -59,7 +59,7 @@ absl::StatusOr<std::string> Day_2016_20::Part2(
     blocks.push_back(b);
   }
   std::sort(blocks.begin(), blocks.end());
-  if (blocks[0].start != 0) return IntReturn(0);
+  if (blocks[0].start != 0) return AdventReturn(0);
   int64_t invalid_through = blocks[0].end;
   int64_t allowed = 0;
   for (Block b : blocks) {
@@ -74,7 +74,7 @@ absl::StatusOr<std::string> Day_2016_20::Part2(
     allowed += std::numeric_limits<uint32_t>::max() - invalid_through - 1;
   }
 
-  return IntReturn(allowed);
+  return AdventReturn(allowed);
 }
 
 }  // namespace advent_of_code

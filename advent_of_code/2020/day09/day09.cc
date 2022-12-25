@@ -60,7 +60,7 @@ absl::StatusOr<std::string> Day_2020_09::Part1(
     absl::Span<absl::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> vals = ParseAsInts(input);
   if (!vals.ok()) return vals.status();
-  return IntReturn(FindMissingXMASPair(*vals));
+  return AdventReturn(FindMissingXMASPair(*vals));
 }
 
 absl::StatusOr<std::string> Day_2020_09::Part2(
@@ -69,7 +69,7 @@ absl::StatusOr<std::string> Day_2020_09::Part2(
   if (!vals.ok()) return vals.status();
   absl::StatusOr<int> missing = FindMissingXMASPair(*vals);
   if (!missing.ok()) return missing.status();
-  return IntReturn(FindContiguousRangeMinMaxSum(*vals, *missing));
+  return AdventReturn(FindContiguousRangeMinMaxSum(*vals, *missing));
 }
 
 }  // namespace advent_of_code

@@ -140,7 +140,7 @@ absl::StatusOr<std::string> Day_2017_21::Part1(
     VLOG(1) << "tmp=\n" << *tmp;
   }
 
-  return IntReturn(tmp->CountOn());
+  return AdventReturn(tmp->CountOn());
 }
 
 absl::StatusOr<std::string> Day_2017_21::Part2(
@@ -161,7 +161,7 @@ absl::StatusOr<std::string> Day_2017_21::Part2(
     VLOG(1) << "tmp=\n" << *tmp;
   }
 
-  return IntReturn(tmp->CountOn());
+  return AdventReturn(tmp->CountOn());
 }
 
 }  // namespace advent_of_code

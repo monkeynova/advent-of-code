@@ -72,7 +72,7 @@ absl::StatusOr<std::string> Day_2015_05::Part1(
   for (absl::string_view str : input) {
     if (Classify1(str) == kNice) ++nice;
   }
-  return IntReturn(nice);
+  return AdventReturn(nice);
 }
 
 absl::StatusOr<std::string> Day_2015_05::Part2(
@@ -81,7 +81,7 @@ absl::StatusOr<std::string> Day_2015_05::Part2(
   for (absl::string_view str : input) {
     if (Classify2(str) == kNice) ++nice;
   }
-  return IntReturn(nice);
+  return AdventReturn(nice);
 }
 
 }  // namespace advent_of_code

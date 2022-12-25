@@ -55,7 +55,7 @@ CharBoard Update(const CharBoard& in) {
 
 absl::StatusOr<std::string> Day_2018_18::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> in = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> in = CharBoard::Parse(input);
   if (!in.ok()) return in.status();
   CharBoard step = *in;
   for (int i = 0; i < 10; ++i) {
@@ -64,12 +64,12 @@ absl::StatusOr<std::string> Day_2018_18::Part1(
   }
   int trees = step.CountChar('|');
   int lumber = step.CountChar('#');
-  return IntReturn(trees * lumber);
+  return AdventReturn(trees * lumber);
 }
 
 absl::StatusOr<std::string> Day_2018_18::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> in = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> in = CharBoard::Parse(input);
   if (!in.ok()) return in.status();
   CharBoard step = *in;
   constexpr int kNumSteps = 1'000'000'000;
@@ -97,7 +97,7 @@ absl::StatusOr<std::string> Day_2018_18::Part2(
   }
   int trees = step.CountChar('|');
   int lumber = step.CountChar('#');
-  return IntReturn(trees * lumber);
+  return AdventReturn(trees * lumber);
 }
 
 }  // namespace advent_of_code

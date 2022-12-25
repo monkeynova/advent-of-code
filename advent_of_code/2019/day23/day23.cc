@@ -198,7 +198,7 @@ absl::StatusOr<std::string> Day_2019_23::Part1(
 
   Network network(*code);
 
-  return IntReturn(network.RunUntilAddress255ReturnY());
+  return AdventReturn(network.RunUntilAddress255ReturnY());
 }
 
 absl::StatusOr<std::string> Day_2019_23::Part2(
@@ -208,7 +208,7 @@ absl::StatusOr<std::string> Day_2019_23::Part2(
 
   Network network(*code);
 
-  return IntReturn(network.RunUntilDuplicateNat());
+  return AdventReturn(network.RunUntilDuplicateNat());
 }
 
 }  // namespace advent_of_code

@@ -195,7 +195,7 @@ absl::StatusOr<std::string> Day_2020_18::Part1(
     if (!tree.ok()) return tree.status();
     sum += (*tree)->Eval();
   }
-  return IntReturn(sum);
+  return AdventReturn(sum);
 }
 
 absl::StatusOr<std::string> Day_2020_18::Part2(
@@ -207,7 +207,7 @@ absl::StatusOr<std::string> Day_2020_18::Part2(
     VLOG(1) << (*tree)->DebugString();
     sum += (*tree)->Eval();
   }
-  return IntReturn(sum);
+  return AdventReturn(sum);
 }
 
 }  // namespace advent_of_code

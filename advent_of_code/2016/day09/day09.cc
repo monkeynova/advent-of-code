@@ -100,13 +100,13 @@ absl::StatusOr<std::string> Day_2016_09::Part1(
   absl::StatusOr<std::string> dec = DecompressV1(input[0]);
   if (!dec.ok()) return dec.status();
   VLOG_IF(1, dec->size() < 100) << *dec;
-  return IntReturn(NonWhitespaceLen(*dec));
+  return AdventReturn(NonWhitespaceLen(*dec));
 }
 
 absl::StatusOr<std::string> Day_2016_09::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  return IntReturn(DecompressV2NonWhitespaceLen(input[0]));
+  return AdventReturn(DecompressV2NonWhitespaceLen(input[0]));
 }
 
 }  // namespace advent_of_code

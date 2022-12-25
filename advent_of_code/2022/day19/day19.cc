@@ -155,7 +155,7 @@ absl::StatusOr<std::string> Day_2022_19::Part1(
     VLOG(1) << "id: " << bp->id << " best is " << best_geode;
     cost += bp->id * best_geode;
   }
-  return IntReturn(cost);
+  return AdventReturn(cost);
 }
 
 absl::StatusOr<std::string> Day_2022_19::Part2(
@@ -169,7 +169,7 @@ absl::StatusOr<std::string> Day_2022_19::Part2(
     VLOG(1) << "id: " << bp->id << " best is " << best_geode;
     cost *= best_geode;
   }
-  return IntReturn(cost);
+  return AdventReturn(cost);
 }
 
 }  // namespace advent_of_code

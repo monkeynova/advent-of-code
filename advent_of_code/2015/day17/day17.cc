@@ -27,7 +27,7 @@ absl::StatusOr<std::string> Day_2015_17::Part1(
     if (sum == 150) ++valid;
   }
 
-  return IntReturn(valid);
+  return AdventReturn(valid);
 }
 
 absl::StatusOr<std::string> Day_2015_17::Part2(
@@ -56,7 +56,7 @@ absl::StatusOr<std::string> Day_2015_17::Part2(
     }
   }
 
-  return IntReturn(valid);
+  return AdventReturn(valid);
 }
 
 }  // namespace advent_of_code

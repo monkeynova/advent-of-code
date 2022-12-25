@@ -123,7 +123,7 @@ absl::StatusOr<std::string> Day_2015_23::Part1(
   absl::StatusOr<VM> vm = VM::Parse(input);
   if (!vm.ok()) return vm.status();
   vm->Execute();
-  return IntReturn(vm->register_b());
+  return AdventReturn(vm->register_b());
 }
 
 absl::StatusOr<std::string> Day_2015_23::Part2(
@@ -132,7 +132,7 @@ absl::StatusOr<std::string> Day_2015_23::Part2(
   if (!vm.ok()) return vm.status();
   vm->set_register_a(1);
   vm->Execute();
-  return IntReturn(vm->register_b());
+  return AdventReturn(vm->register_b());
 }
 
 }  // namespace advent_of_code

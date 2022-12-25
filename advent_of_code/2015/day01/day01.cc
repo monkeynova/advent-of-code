@@ -23,7 +23,7 @@ absl::StatusOr<std::string> Day_2015_01::Part1(
     else
       return absl::InvalidArgumentError("Bad char");
   }
-  return IntReturn(floor);
+  return AdventReturn(floor);
 }
 
 absl::StatusOr<std::string> Day_2015_01::Part2(
@@ -38,7 +38,7 @@ absl::StatusOr<std::string> Day_2015_01::Part2(
       --floor;
     else
       return absl::InvalidArgumentError("Bad char");
-    if (floor < 0) return IntReturn(i + 1);
+    if (floor < 0) return AdventReturn(i + 1);
   }
   return absl::InvalidArgumentError("No basement");
 }

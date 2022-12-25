@@ -25,7 +25,7 @@ absl::StatusOr<std::string> Day_2017_05::Part1(
   for (int ip = 0; ip >= 0 && ip < jumps->size(); ++steps) {
     ip += (*jumps)[ip]++;
   }
-  return IntReturn(steps);
+  return AdventReturn(steps);
 }
 
 absl::StatusOr<std::string> Day_2017_05::Part2(
@@ -42,7 +42,7 @@ absl::StatusOr<std::string> Day_2017_05::Part2(
     }
     ip += delta;
   }
-  return IntReturn(steps);
+  return AdventReturn(steps);
 }
 
 }  // namespace advent_of_code

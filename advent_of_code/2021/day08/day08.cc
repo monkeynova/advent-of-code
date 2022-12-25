@@ -153,7 +153,7 @@ absl::StatusOr<std::string> Day_2021_08::Part1(
       if (find_sizes.contains(segment.size())) ++count;
     }
   }
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 absl::StatusOr<std::string> Day_2021_08::Part2(
@@ -175,7 +175,7 @@ absl::StatusOr<std::string> Day_2021_08::Part2(
     }
     sum += decode_val;
   }
-  return IntReturn(sum);
+  return AdventReturn(sum);
 }
 
 }  // namespace advent_of_code

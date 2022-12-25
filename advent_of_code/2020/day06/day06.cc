@@ -24,7 +24,7 @@ absl::StatusOr<std::string> Day_2020_06::Part1(
     }
   }
   group_sum += hist.size();
-  return IntReturn(group_sum);
+  return AdventReturn(group_sum);
 }
 
 absl::StatusOr<std::string> Day_2020_06::Part2(
@@ -57,7 +57,7 @@ absl::StatusOr<std::string> Day_2020_06::Part2(
     }
   }
   group_sum += all_yes;
-  return IntReturn(group_sum);
+  return AdventReturn(group_sum);
 }
 
 }  // namespace advent_of_code

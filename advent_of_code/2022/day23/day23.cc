@@ -64,7 +64,7 @@ int64_t Score(absl::flat_hash_set<Point> elves) {
 
 absl::StatusOr<std::string> Day_2022_23::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> board = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
 
   absl::flat_hash_set<Point> elves = board->Find('#');
@@ -74,12 +74,12 @@ absl::StatusOr<std::string> Day_2022_23::Part1(
     Move(elves, i);
   }
 
-  return IntReturn(Score(elves));
+  return AdventReturn(Score(elves));
 }
 
 absl::StatusOr<std::string> Day_2022_23::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> board = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
 
   absl::flat_hash_set<Point> elves = board->Find('#');
@@ -87,7 +87,7 @@ absl::StatusOr<std::string> Day_2022_23::Part2(
   for (int i = 0; true; ++i) {
     VLOG(2) << "Board:\n" << CharBoard::Draw(elves);
     if (!Move(elves, i)) {
-      return IntReturn(i + 1);
+      return AdventReturn(i + 1);
     }
   }
 

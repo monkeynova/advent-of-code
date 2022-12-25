@@ -260,7 +260,7 @@ absl::StatusOr<std::string> Day_2017_23::Part1(
 
   vm->ExecuteToRecv();
 
-  return IntReturn(vm->mul_count());
+  return AdventReturn(vm->mul_count());
 }
 
 absl::StatusOr<std::string> Day_2017_23::Part2(
@@ -287,7 +287,7 @@ absl::StatusOr<std::string> Day_2017_23::Part2(
     if (!f) ++h;
     if (b == c) break;
   }
-  return IntReturn(h);
+  return AdventReturn(h);
 }
 
 }  // namespace advent_of_code

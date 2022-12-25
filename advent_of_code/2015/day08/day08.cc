@@ -30,7 +30,7 @@ absl::StatusOr<std::string> Day_2015_08::Part1(
       }
     }
   }
-  return IntReturn(delta);
+  return AdventReturn(delta);
 }
 
 absl::StatusOr<std::string> Day_2015_08::Part2(
@@ -48,7 +48,7 @@ absl::StatusOr<std::string> Day_2015_08::Part2(
       }
     }
   }
-  return IntReturn(delta);
+  return AdventReturn(delta);
 }
 
 }  // namespace advent_of_code

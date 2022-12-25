@@ -224,7 +224,7 @@ absl::StatusOr<std::string> Day_2016_22::Part1(
       if (n1.used > 0 && n1.used < n2.avail) ++viable;
     }
   }
-  return IntReturn(viable);
+  return AdventReturn(viable);
 }
 
 absl::StatusOr<std::string> Day_2016_22::Part2(
@@ -253,10 +253,10 @@ absl::StatusOr<std::string> Day_2016_22::Part2(
     grid[p] = n;
   }
   if (grid.size() > 100) {
-    return IntReturn(RunHacks(grid));
+    return AdventReturn(RunHacks(grid));
   }
 
-  return IntReturn(FindMinPath(grid));
+  return AdventReturn(FindMinPath(grid));
 }
 
 }  // namespace advent_of_code

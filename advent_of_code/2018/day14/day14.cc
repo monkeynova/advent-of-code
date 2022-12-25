@@ -63,7 +63,7 @@ absl::StatusOr<std::string> Day_2018_14::Part2(
     elf1_pos = (elf1_pos + 1 + tmp[elf1_pos] - '0') % tmp.size();
     elf2_pos = (elf2_pos + 1 + tmp[elf2_pos] - '0') % tmp.size();
     size_t off = tmp.find(needle, tmp.size() - 2 * needle.size());
-    if (off != std::string::npos) return IntReturn(off);
+    if (off != std::string::npos) return AdventReturn(off);
   }
 
   return Error("Left infinite loop");

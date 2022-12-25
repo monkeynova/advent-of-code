@@ -135,7 +135,7 @@ absl::StatusOr<std::string> Day_2017_24::Part1(
     }
     convs.push_back(c);
   }
-  return IntReturn(StrongestBridge(convs));
+  return AdventReturn(StrongestBridge(convs));
 }
 
 absl::StatusOr<std::string> Day_2017_24::Part2(
@@ -148,7 +148,7 @@ absl::StatusOr<std::string> Day_2017_24::Part2(
     }
     convs.push_back(c);
   }
-  return IntReturn(StrongestLongestBridge(convs).strength);
+  return AdventReturn(StrongestLongestBridge(convs).strength);
 }
 
 }  // namespace advent_of_code

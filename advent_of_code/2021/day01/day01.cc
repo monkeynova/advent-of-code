@@ -27,7 +27,7 @@ absl::StatusOr<std::string> Day_2021_01::Part1(
     if ((*list)[i] < (*list)[i + 1]) ++count;
   }
 
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 absl::StatusOr<std::string> Day_2021_01::Part2(
@@ -40,7 +40,7 @@ absl::StatusOr<std::string> Day_2021_01::Part2(
     if ((*list)[i] < (*list)[i + 3]) ++count;
   }
 
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 }  // namespace advent_of_code

@@ -46,7 +46,7 @@ absl::StatusOr<std::string> Day_2015_06::Part1(
     VLOG(1) << "  on: " << yard.CountOn();
   }
 
-  return IntReturn(yard.CountOn());
+  return AdventReturn(yard.CountOn());
 }
 
 absl::StatusOr<std::string> Day_2015_06::Part2(
@@ -96,7 +96,7 @@ absl::StatusOr<std::string> Day_2015_06::Part2(
     }
   }
 
-  return IntReturn(total_brightness);
+  return AdventReturn(total_brightness);
 }
 
 }  // namespace advent_of_code

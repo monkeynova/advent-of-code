@@ -55,7 +55,7 @@ absl::StatusOr<std::string> Day_2018_11::Part1(
     }
   }
 
-  return PointReturn(max_power_point);
+  return AdventReturn(max_power_point);
 }
 
 absl::StatusOr<std::string> Day_2018_11::Part2(
@@ -104,7 +104,7 @@ absl::StatusOr<std::string> Day_2018_11::Part2(
     // prev_sums = std::move(this_sums);
   }
 
-  return PointReturn(max_power_point);
+  return AdventReturn(max_power_point);
 }
 
 }  // namespace advent_of_code

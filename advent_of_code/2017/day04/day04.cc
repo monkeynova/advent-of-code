@@ -25,7 +25,7 @@ absl::StatusOr<std::string> Day_2017_04::Part1(
     absl::flat_hash_set<absl::string_view> uniq(list.begin(), list.end());
     if (list.size() == uniq.size()) ++valid;
   }
-  return IntReturn(valid);
+  return AdventReturn(valid);
 }
 
 absl::StatusOr<std::string> Day_2017_04::Part2(
@@ -41,7 +41,7 @@ absl::StatusOr<std::string> Day_2017_04::Part2(
     }
     if (list.size() == uniq.size()) ++valid;
   }
-  return IntReturn(valid);
+  return AdventReturn(valid);
 }
 
 }  // namespace advent_of_code

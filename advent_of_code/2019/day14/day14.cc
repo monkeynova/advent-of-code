@@ -142,7 +142,7 @@ absl::StatusOr<std::string> Day_2019_14::Part1(
   absl::StatusOr<DirectedGraph<Rule>> rule_set = ParseRuleSet(input);
   if (!rule_set.ok()) return rule_set.status();
 
-  return IntReturn(ComputeOreNeedForFuel(*rule_set));
+  return AdventReturn(ComputeOreNeedForFuel(*rule_set));
 }
 
 absl::StatusOr<std::string> Day_2019_14::Part2(
@@ -150,7 +150,7 @@ absl::StatusOr<std::string> Day_2019_14::Part2(
   absl::StatusOr<DirectedGraph<Rule>> rule_set = ParseRuleSet(input);
   if (!rule_set.ok()) return rule_set.status();
 
-  return IntReturn(FuelFromOre(*rule_set, 1000000000000));
+  return AdventReturn(FuelFromOre(*rule_set, 1000000000000));
 }
 
 }  // namespace advent_of_code

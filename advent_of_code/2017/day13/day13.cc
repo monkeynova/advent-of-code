@@ -32,7 +32,7 @@ absl::StatusOr<std::string> Day_2017_13::Part1(
       severity += depth * range;
     }
   }
-  return IntReturn(severity);
+  return AdventReturn(severity);
 }
 
 absl::StatusOr<std::string> Day_2017_13::Part2(
@@ -67,7 +67,7 @@ absl::StatusOr<std::string> Day_2017_13::Part2(
       }
     }
   }
-  return IntReturn(delay);
+  return AdventReturn(delay);
 }
 
 }  // namespace advent_of_code

@@ -63,12 +63,12 @@ absl::StatusOr<int> DragRope(absl::Span<absl::string_view> input,
 
 absl::StatusOr<std::string> Day_2022_09::Part1(
     absl::Span<absl::string_view> input) const {
-  return IntReturn(DragRope(input, /*rope_len=*/2));
+  return AdventReturn(DragRope(input, /*rope_len=*/2));
 }
 
 absl::StatusOr<std::string> Day_2022_09::Part2(
     absl::Span<absl::string_view> input) const {
-  return IntReturn(DragRope(input, /*rope_len=*/10));
+  return AdventReturn(DragRope(input, /*rope_len=*/10));
 }
 
 }  // namespace advent_of_code

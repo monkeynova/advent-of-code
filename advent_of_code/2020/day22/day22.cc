@@ -116,10 +116,10 @@ absl::StatusOr<std::string> Day_2020_22::Part1(
   }
   PlayWar(&deck1, &deck2);
   if (deck1.empty()) {
-    return IntReturn(ScoreDeck(deck2));
+    return AdventReturn(ScoreDeck(deck2));
   }
   if (deck2.empty()) {
-    return IntReturn(ScoreDeck(deck1));
+    return AdventReturn(ScoreDeck(deck1));
   }
   return Error("Can't find empty deck");
 }
@@ -148,9 +148,9 @@ absl::StatusOr<std::string> Day_2020_22::Part2(
     }
   }
   if (PlayWarRecursive(&deck1, &deck2)) {
-    return IntReturn(ScoreDeck(deck1));
+    return AdventReturn(ScoreDeck(deck1));
   } else {
-    return IntReturn(ScoreDeck(deck2));
+    return AdventReturn(ScoreDeck(deck2));
   }
 }
 

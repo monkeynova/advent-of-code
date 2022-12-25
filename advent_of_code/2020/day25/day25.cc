@@ -20,10 +20,10 @@ absl::StatusOr<std::string> Day_2020_25::Part1(
 
   for (int i = 1; i <= 20201227; ++i) {
     if (PowerMod<int64_t>(7, i, 20201227) == (*ints)[0]) {
-      return IntReturn(PowerMod<int64_t>((*ints)[1], i, 20201227));
+      return AdventReturn(PowerMod<int64_t>((*ints)[1], i, 20201227));
     }
     if (PowerMod<int64_t>(7, i, 20201227) == (*ints)[1]) {
-      return IntReturn(PowerMod<int64_t>((*ints)[0], i, 20201227));
+      return AdventReturn(PowerMod<int64_t>((*ints)[0], i, 20201227));
     }
   }
 

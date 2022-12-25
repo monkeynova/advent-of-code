@@ -209,7 +209,7 @@ absl::StatusOr<std::string> Day_2017_20::Part1(
     }
   }
 
-  return IntReturn(min_idx);
+  return AdventReturn(min_idx);
 }
 
 absl::StatusOr<std::string> Day_2017_20::Part2(
@@ -237,7 +237,7 @@ absl::StatusOr<std::string> Day_2017_20::Part2(
     }
   }
 
-  return IntReturn(IntersectPaths(*particles));
+  return AdventReturn(IntersectPaths(*particles));
 }
 
 }  // namespace advent_of_code

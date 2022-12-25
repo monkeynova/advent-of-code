@@ -35,7 +35,7 @@ absl::StatusOr<std::string> Day_2015_10::Part1(
     VLOG(1) << str;
     str = LookAndSay(str);
   }
-  return IntReturn(str.size());
+  return AdventReturn(str.size());
 }
 
 absl::StatusOr<std::string> Day_2015_10::Part2(
@@ -46,7 +46,7 @@ absl::StatusOr<std::string> Day_2015_10::Part2(
     VLOG(1) << str;
     str = LookAndSay(str);
   }
-  return IntReturn(str.size());
+  return AdventReturn(str.size());
 }
 
 }  // namespace advent_of_code

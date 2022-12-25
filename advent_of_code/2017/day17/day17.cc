@@ -34,7 +34,7 @@ absl::StatusOr<std::string> Day_2017_17::Part1(
     }
     buf[pos] = i + 1;
   }
-  return IntReturn(buf[(pos + 1) % buf.size()]);
+  return AdventReturn(buf[(pos + 1) % buf.size()]);
 }
 
 absl::StatusOr<std::string> Day_2017_17::Part2(
@@ -51,7 +51,7 @@ absl::StatusOr<std::string> Day_2017_17::Part2(
     ++pos;
     if (pos == 1) last_after_zero = i + 1;
   }
-  return IntReturn(last_after_zero);
+  return AdventReturn(last_after_zero);
 }
 
 }  // namespace advent_of_code

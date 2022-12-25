@@ -195,7 +195,7 @@ absl::StatusOr<std::string> Day_2019_20::Part1(
   absl::StatusOr<Maze> maze = Maze::Parse(input);
   if (!maze.ok()) return maze.status();
 
-  return IntReturn(maze->FindPath());
+  return AdventReturn(maze->FindPath());
 }
 
 absl::StatusOr<std::string> Day_2019_20::Part2(
@@ -203,7 +203,7 @@ absl::StatusOr<std::string> Day_2019_20::Part2(
   absl::StatusOr<Maze> maze = Maze::Parse(input);
   if (!maze.ok()) return maze.status();
 
-  return IntReturn(maze->FindRecursivePath());
+  return AdventReturn(maze->FindRecursivePath());
 }
 
 }  // namespace advent_of_code

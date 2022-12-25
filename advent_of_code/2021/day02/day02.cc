@@ -36,7 +36,7 @@ absl::StatusOr<std::string> Day_2021_02::Part1(
       return Error("Bad line: ", line);
     }
   }
-  return IntReturn(p.x * p.y);
+  return AdventReturn(p.x * p.y);
 }
 
 absl::StatusOr<std::string> Day_2021_02::Part2(
@@ -59,7 +59,7 @@ absl::StatusOr<std::string> Day_2021_02::Part2(
       return Error("Bad line: ", line);
     }
   }
-  return IntReturn(p.x * p.y);
+  return AdventReturn(p.x * p.y);
 }
 
 }  // namespace advent_of_code

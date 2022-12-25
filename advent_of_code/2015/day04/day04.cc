@@ -25,7 +25,7 @@ absl::StatusOr<std::string> Day_2015_04::Part1(
     }
     absl::string_view md5_result = md5.Digest(str);
     if (md5_result[0] == 0 && md5_result[1] == 0 && (md5_result[2] >> 4) == 0) {
-      return IntReturn(i);
+      return AdventReturn(i);
     }
   }
   return absl::InvalidArgumentError("Unreachable");
@@ -44,7 +44,7 @@ absl::StatusOr<std::string> Day_2015_04::Part2(
     }
     absl::string_view md5_result = md5.Digest(str);
     if (md5_result[0] == 0 && md5_result[1] == 0 && md5_result[2] == 0) {
-      return IntReturn(i);
+      return AdventReturn(i);
     }
   }
   return absl::InvalidArgumentError("Unreachable");

@@ -81,7 +81,7 @@ absl::StatusOr<std::string> Day_2018_12::Part1(
       count += i + offset;
     }
   }
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 absl::StatusOr<std::string> Day_2018_12::Part2(
@@ -126,7 +126,7 @@ absl::StatusOr<std::string> Day_2018_12::Part2(
       count += i + offset;
     }
   }
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 }  // namespace advent_of_code

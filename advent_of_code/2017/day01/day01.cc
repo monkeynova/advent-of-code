@@ -27,7 +27,7 @@ absl::StatusOr<std::string> Day_2017_01::Part1(
       sum += input[0][i] - '0';
     }
   }
-  return IntReturn(sum);
+  return AdventReturn(sum);
 }
 
 absl::StatusOr<std::string> Day_2017_01::Part2(
@@ -40,7 +40,7 @@ absl::StatusOr<std::string> Day_2017_01::Part2(
       sum += input[0][i] - '0';
     }
   }
-  return IntReturn(sum);
+  return AdventReturn(sum);
 }
 
 }  // namespace advent_of_code

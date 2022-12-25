@@ -315,7 +315,7 @@ absl::StatusOr<std::string> Day_2019_17::Part1(
     return st;
   }
 
-  return IntReturn(view_port.ComputeAlignment());
+  return AdventReturn(view_port.ComputeAlignment());
 }
 
 absl::StatusOr<std::string> Day_2019_17::Part2(
@@ -331,7 +331,7 @@ absl::StatusOr<std::string> Day_2019_17::Part2(
     return st;
   }
 
-  return IntReturn(view_port.dust_collected());
+  return AdventReturn(view_port.dust_collected());
 }
 
 }  // namespace advent_of_code

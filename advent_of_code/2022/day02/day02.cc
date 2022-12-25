@@ -61,12 +61,12 @@ absl::StatusOr<int> Play(absl::Span<absl::string_view> input,
 
 absl::StatusOr<std::string> Day_2022_02::Part1(
     absl::Span<absl::string_view> input) const {
-  return IntReturn(Play(input, Score1));
+  return AdventReturn(Play(input, Score1));
 }
 
 absl::StatusOr<std::string> Day_2022_02::Part2(
     absl::Span<absl::string_view> input) const {
-  return IntReturn(Play(input, Score2));
+  return AdventReturn(Play(input, Score2));
 }
 
 }  // namespace advent_of_code

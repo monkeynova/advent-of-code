@@ -197,7 +197,7 @@ absl::StatusOr<std::string> Day_2019_19::Part1(
 
   TractorSearch search(std::move(*codes));
 
-  return IntReturn(search.ScanRange(Point{0, 0}, Point{50, 50}));
+  return AdventReturn(search.ScanRange(Point{0, 0}, Point{50, 50}));
 }
 
 absl::StatusOr<std::string> Day_2019_19::Part2(
@@ -209,7 +209,7 @@ absl::StatusOr<std::string> Day_2019_19::Part2(
   absl::StatusOr<Point> space = search.FindSquareSpace(100);
   if (!space.ok()) return space.status();
 
-  return IntReturn(space->x * 10000 + space->y);
+  return AdventReturn(space->x * 10000 + space->y);
 }
 
 }  // namespace advent_of_code

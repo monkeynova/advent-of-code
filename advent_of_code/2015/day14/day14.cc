@@ -62,7 +62,7 @@ absl::StatusOr<std::string> Day_2015_14::Part1(
     }
     flights.push_back(next);
   }
-  return IntReturn(RunRace(flights, 2503).dist);
+  return AdventReturn(RunRace(flights, 2503).dist);
 }
 
 absl::StatusOr<std::string> Day_2015_14::Part2(
@@ -90,7 +90,7 @@ absl::StatusOr<std::string> Day_2015_14::Part2(
   for (const auto& pair : points) {
     max = opt_max(max, pair.second);
   }
-  return IntReturn(max);
+  return AdventReturn(max);
 }
 
 }  // namespace advent_of_code

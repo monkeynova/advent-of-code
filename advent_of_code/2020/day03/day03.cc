@@ -22,7 +22,7 @@ absl::StatusOr<std::string> Day_2020_03::Part1(
     }
     product *= trees;
   }
-  return IntReturn(product);
+  return AdventReturn(product);
 }
 
 absl::StatusOr<std::string> Day_2020_03::Part2(
@@ -37,7 +37,7 @@ absl::StatusOr<std::string> Day_2020_03::Part2(
     }
     product *= trees;
   }
-  return IntReturn(product);
+  return AdventReturn(product);
 }
 
 }  // namespace advent_of_code

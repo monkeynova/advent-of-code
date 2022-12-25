@@ -16,7 +16,7 @@ absl::StatusOr<std::string> Day_2019_01::Part1(
     total_fuel += module_cost / 3 - 2;
   }
 
-  return IntReturn(total_fuel);
+  return AdventReturn(total_fuel);
 }
 
 absl::StatusOr<std::string> Day_2019_01::Part2(
@@ -36,7 +36,7 @@ absl::StatusOr<std::string> Day_2019_01::Part2(
     total_fuel += module_fuel;
   }
 
-  return IntReturn(total_fuel);
+  return AdventReturn(total_fuel);
 }
 
 }  // namespace advent_of_code

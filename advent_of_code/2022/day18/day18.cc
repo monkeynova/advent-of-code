@@ -57,7 +57,7 @@ absl::StatusOr<std::string> Day_2022_18::Part1(
       ++sides;
     }
   }
-  return IntReturn(sides);
+  return AdventReturn(sides);
 };
 
 absl::StatusOr<std::string> Day_2022_18::Part2(
@@ -105,7 +105,7 @@ absl::StatusOr<std::string> Day_2022_18::Part2(
       ++sides;
     }
   }
-  return IntReturn(sides);
+  return AdventReturn(sides);
 }
 
 }  // namespace advent_of_code

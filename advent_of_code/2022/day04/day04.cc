@@ -29,7 +29,7 @@ absl::StatusOr<std::string> Day_2022_04::Part1(
       ++count;
   }
 
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 absl::StatusOr<std::string> Day_2022_04::Part2(
@@ -46,7 +46,7 @@ absl::StatusOr<std::string> Day_2022_04::Part2(
     if (p1e >= p2s && p2e >= p1s) ++count;
   }
 
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 }  // namespace advent_of_code

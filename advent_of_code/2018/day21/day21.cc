@@ -108,7 +108,7 @@ absl::StatusOr<std::string> Day_2018_21::Part1(
   });
   if (!st.ok()) return st;
 
-  return IntReturn(first_test);
+  return AdventReturn(first_test);
 }
 
 absl::StatusOr<std::string> Day_2018_21::Part2(
@@ -126,7 +126,7 @@ absl::StatusOr<std::string> Day_2018_21::Part2(
     last_new = v;
     return false;
   });
-  if (was_run) return IntReturn(last_new);
+  if (was_run) return AdventReturn(last_new);
 
   LOG(ERROR) << "Falling back to interpreted mode...";
 
@@ -153,7 +153,7 @@ absl::StatusOr<std::string> Day_2018_21::Part2(
   });
   if (!st.ok()) return st;
 
-  return IntReturn(last_new);
+  return AdventReturn(last_new);
 }
 
 }  // namespace advent_of_code

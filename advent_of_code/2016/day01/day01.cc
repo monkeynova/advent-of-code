@@ -35,7 +35,7 @@ absl::StatusOr<std::string> Day_2016_01::Part1(
     }
     p += dist * heading;
   }
-  return IntReturn(p.dist());
+  return AdventReturn(p.dist());
 }
 
 absl::StatusOr<std::string> Day_2016_01::Part2(
@@ -56,7 +56,7 @@ absl::StatusOr<std::string> Day_2016_01::Part2(
     }
     for (int i = 0; i < dist; ++i) {
       p += heading;
-      if (hist.contains(p)) return IntReturn(p.dist());
+      if (hist.contains(p)) return AdventReturn(p.dist());
       hist.insert(p);
     }
   }

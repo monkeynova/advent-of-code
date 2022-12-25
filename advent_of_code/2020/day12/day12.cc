@@ -77,7 +77,7 @@ absl::StatusOr<std::string> Day_2020_12::Part1(
         return absl::InvalidArgumentError("Bad command");
     }
   }
-  return IntReturn(p.dist());
+  return AdventReturn(p.dist());
 }
 
 absl::StatusOr<std::string> Day_2020_12::Part2(
@@ -148,7 +148,7 @@ absl::StatusOr<std::string> Day_2020_12::Part2(
         return absl::InvalidArgumentError("Bad command");
     }
   }
-  return IntReturn(ship.dist());
+  return AdventReturn(ship.dist());
 }
 
 }  // namespace advent_of_code

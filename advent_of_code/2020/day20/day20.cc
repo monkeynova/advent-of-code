@@ -405,19 +405,19 @@ absl::StatusOr<std::string> Day_2020_20::Part1(
       cur_tile_index = i + 1;
     } else if (input[i].empty()) {
       absl::StatusOr<CharBoard> board =
-          ParseAsBoard(input.subspan(cur_tile_index, i - cur_tile_index));
+          CharBoard::Parse(input.subspan(cur_tile_index, i - cur_tile_index));
       if (!board.ok()) return board.status();
       if (tiles.contains(cur_tile_num)) return Error("Dup tile:", cur_tile_num);
       tiles.emplace(cur_tile_num, std::move(*board));
     }
   }
   absl::StatusOr<CharBoard> board =
-      ParseAsBoard(input.subspan(cur_tile_index, input.size()));
+      CharBoard::Parse(input.subspan(cur_tile_index, input.size()));
   if (!board.ok()) return board.status();
   if (tiles.contains(cur_tile_num)) return Error("Dup tile:", cur_tile_num);
   tiles.emplace(cur_tile_num, std::move(*board));
 
-  return IntReturn(AlignTileCorners(tiles));
+  return AdventReturn(AlignTileCorners(tiles));
 }
 
 absl::StatusOr<std::string> Day_2020_20::Part2(
@@ -430,14 +430,14 @@ absl::StatusOr<std::string> Day_2020_20::Part2(
       cur_tile_index = i + 1;
     } else if (input[i].empty()) {
       absl::StatusOr<CharBoard> board =
-          ParseAsBoard(input.subspan(cur_tile_index, i - cur_tile_index));
+          CharBoard::Parse(input.subspan(cur_tile_index, i - cur_tile_index));
       if (!board.ok()) return board.status();
       if (tiles.contains(cur_tile_num)) return Error("Dup tile:", cur_tile_num);
       tiles.emplace(cur_tile_num, std::move(*board));
     }
   }
   absl::StatusOr<CharBoard> board =
-      ParseAsBoard(input.subspan(cur_tile_index, input.size()));
+      CharBoard::Parse(input.subspan(cur_tile_index, input.size()));
   if (!board.ok()) return board.status();
   if (tiles.contains(cur_tile_num)) return Error("Dup tile:", cur_tile_num);
   tiles.emplace(cur_tile_num, std::move(*board));
@@ -447,7 +447,7 @@ absl::StatusOr<std::string> Day_2020_20::Part2(
 
   VLOG(1) << "Merged Board:\n" << *merged;
 
-  return IntReturn(CountNonSeaMonster(*merged));
+  return AdventReturn(CountNonSeaMonster(*merged));
 }
 
 }  // namespace advent_of_code

@@ -55,7 +55,7 @@ absl::StatusOr<std::string> Day_2020_14::Part1(
   for (const auto& pair : mem) {
     sum += pair.second;
   }
-  return IntReturn(sum);
+  return AdventReturn(sum);
 }
 
 absl::StatusOr<std::string> Day_2020_14::Part2(
@@ -127,7 +127,7 @@ absl::StatusOr<std::string> Day_2020_14::Part2(
   for (const auto& pair : mem) {
     sum += pair.second;
   }
-  return IntReturn(sum);
+  return AdventReturn(sum);
 }
 
 }  // namespace advent_of_code

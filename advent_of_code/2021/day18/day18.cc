@@ -377,7 +377,7 @@ absl::StatusOr<std::string> Day_2021_18::Part1(
     VLOG(2) << "Total: " << *total;
   }
   if (!total) return absl::NotFoundError("No snailfish record");
-  return IntReturn(total->Magnitude());
+  return AdventReturn(total->Magnitude());
 }
 
 absl::StatusOr<std::string> Day_2021_18::Part2(
@@ -396,7 +396,7 @@ absl::StatusOr<std::string> Day_2021_18::Part2(
     }
   }
   if (values.empty()) return absl::NotFoundError("No snailfish record");
-  return IntReturn(max);
+  return AdventReturn(max);
 }
 
 }  // namespace advent_of_code

@@ -68,13 +68,13 @@ absl::StatusOr<std::string> Day_2016_23::Part1(
   if (!vm.ok()) return vm.status();
   vm->registers().a = 7;
   if (absl::Status st = vm->Execute(); !st.ok()) return st;
-  return IntReturn(vm->registers().a);
+  return AdventReturn(vm->registers().a);
 }
 
 absl::StatusOr<std::string> Day_2016_23::Part2(
     absl::Span<absl::string_view> input) const {
   if (std::optional<int64_t> ret = MatchesDecompiled(input)) {
-    return IntReturn(ret);
+    return AdventReturn(ret);
   }
 
   LOG(ERROR) << "Falling back to full execution...";
@@ -83,7 +83,7 @@ absl::StatusOr<std::string> Day_2016_23::Part2(
   if (!vm.ok()) return vm.status();
   vm->registers().a = 12;
   if (absl::Status st = vm->Execute(); !st.ok()) return st;
-  return IntReturn(vm->registers().a);
+  return AdventReturn(vm->registers().a);
 }
 
 }  // namespace advent_of_code

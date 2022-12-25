@@ -73,7 +73,7 @@ absl::StatusOr<std::string> Day_2019_12::Part1(
     }
   }
 
-  return IntReturn(TotalEnergy(moons));
+  return AdventReturn(TotalEnergy(moons));
 }
 
 absl::StatusOr<std::string> Day_2019_12::Part2(
@@ -151,7 +151,7 @@ absl::StatusOr<std::string> Day_2019_12::Part2(
   product = product * *y_cycle_size / std::gcd(product, *y_cycle_size);
   product = product * *z_cycle_size / std::gcd(product, *z_cycle_size);
 
-  return IntReturn(product);
+  return AdventReturn(product);
 }
 
 }  // namespace advent_of_code

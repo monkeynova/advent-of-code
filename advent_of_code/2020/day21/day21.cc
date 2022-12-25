@@ -107,7 +107,7 @@ absl::StatusOr<std::string> Day_2020_21::Part1(
       if (!ingredient_to_allergen->contains(ingredient)) ++count;
     }
   }
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 absl::StatusOr<std::string> Day_2020_21::Part2(

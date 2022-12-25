@@ -71,7 +71,7 @@ absl::StatusOr<std::string> Day_2019_21::Part1(
       "WALK\n");
   if (absl::Status st = codes->Run(&spring_bot); !st.ok()) return st;
 
-  return IntReturn(spring_bot.damage());
+  return AdventReturn(spring_bot.damage());
 }
 
 absl::StatusOr<std::string> Day_2019_21::Part2(
@@ -98,7 +98,7 @@ absl::StatusOr<std::string> Day_2019_21::Part2(
       "RUN\n");
   if (absl::Status st = codes->Run(&spring_bot); !st.ok()) return st;
 
-  return IntReturn(spring_bot.damage());
+  return AdventReturn(spring_bot.damage());
 }
 
 }  // namespace advent_of_code

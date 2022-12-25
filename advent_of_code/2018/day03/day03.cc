@@ -45,7 +45,7 @@ absl::StatusOr<std::string> Day_2018_03::Part1(
       }
     }
   }
-  return IntReturn(dupes);
+  return AdventReturn(dupes);
 }
 
 absl::StatusOr<std::string> Day_2018_03::Part2(
@@ -88,7 +88,7 @@ absl::StatusOr<std::string> Day_2018_03::Part2(
       clean_id = i + 1;
     }
   }
-  return IntReturn(clean_id);
+  return AdventReturn(clean_id);
 }
 
 }  // namespace advent_of_code

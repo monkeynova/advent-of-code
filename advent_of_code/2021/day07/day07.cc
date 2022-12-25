@@ -34,7 +34,7 @@ absl::StatusOr<std::string> Day_2021_07::Part1(
   for (int64_t n : *nums) {
     cost += abs(n - dest);
   }
-  return IntReturn(cost);
+  return AdventReturn(cost);
 }
 
 absl::StatusOr<std::string> Day_2021_07::Part2(
@@ -59,7 +59,7 @@ absl::StatusOr<std::string> Day_2021_07::Part2(
     if (cost > best_cost) break;
   }
 
-  return IntReturn(best_cost);
+  return AdventReturn(best_cost);
 }
 
 }  // namespace advent_of_code

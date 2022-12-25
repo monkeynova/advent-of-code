@@ -112,7 +112,7 @@ absl::StatusOr<std::string> Day_2015_15::Part1(
     ingredients.push_back(i);
   }
 
-  return IntReturn(FindBestScore(absl::MakeSpan(ingredients), 100));
+  return AdventReturn(FindBestScore(absl::MakeSpan(ingredients), 100));
 }
 
 absl::StatusOr<std::string> Day_2015_15::Part2(
@@ -131,7 +131,7 @@ absl::StatusOr<std::string> Day_2015_15::Part2(
     ingredients.push_back(i);
   }
 
-  return IntReturn(
+  return AdventReturn(
       FindBestScoreRequiredCalories(absl::MakeSpan(ingredients), 100, 500));
 }
 

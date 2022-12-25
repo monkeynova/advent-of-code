@@ -36,7 +36,7 @@ absl::StatusOr<std::string> Day_2016_19::Part1(
     cycle = next_cycle;
   }
   if (cycle.size() != 1) return Error("WTF?");
-  return IntReturn(cycle[0]);
+  return AdventReturn(cycle[0]);
 }
 
 absl::StatusOr<std::string> Day_2016_19::Part2(
@@ -66,7 +66,7 @@ absl::StatusOr<std::string> Day_2016_19::Part2(
     }
   }
   if (cycle.size() != 1) return Error("WTF?");
-  return IntReturn(cycle[0]);
+  return AdventReturn(cycle[0]);
 }
 
 }  // namespace advent_of_code

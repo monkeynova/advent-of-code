@@ -120,7 +120,7 @@ absl::StatusOr<std::string> Day_2020_23::Part2(
   next_idx = cups.cups[next_idx].next;
   product *= cups.cups[next_idx].val;
 
-  return IntReturn(product);
+  return AdventReturn(product);
 }
 
 }  // namespace advent_of_code

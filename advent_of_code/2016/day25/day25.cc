@@ -59,7 +59,7 @@ absl::StatusOr<std::string> Day_2016_25::Part1(
       if (output[i] == output[(i + 1) % output.size()]) check = false;
     }
     if (check) {
-      return IntReturn(a);
+      return AdventReturn(a);
     }
   }
   return Error("Impossible");

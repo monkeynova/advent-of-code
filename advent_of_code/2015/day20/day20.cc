@@ -75,7 +75,7 @@ absl::StatusOr<std::string> Day_2015_20::Part1(
   int present_count = (*present_count_list)[0];
 
   for (int house_num = 1; house_num < present_count / 10; ++house_num) {
-    if (PresentCount(house_num) > present_count) return IntReturn(house_num);
+    if (PresentCount(house_num) > present_count) return AdventReturn(house_num);
   }
 
   return Error("Not found");
@@ -90,7 +90,7 @@ absl::StatusOr<std::string> Day_2015_20::Part2(
 
   for (int house_num = 1; house_num < present_count / 11; ++house_num) {
     if (PresentCountPart2(house_num) > present_count)
-      return IntReturn(house_num);
+      return AdventReturn(house_num);
   }
 
   return Error("Not found");

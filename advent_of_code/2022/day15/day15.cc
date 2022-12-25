@@ -75,7 +75,7 @@ absl::StatusOr<std::string> Day_2022_15::Part1(
     no_closer = no_closer.Union(NoCloser(sandb, y));
   }
   VLOG(1) << "Final: " << no_closer.Minus(beacons);
-  return IntReturn(no_closer.Minus(beacons).Size());
+  return AdventReturn(no_closer.Minus(beacons).Size());
 }
 
 absl::StatusOr<std::string> Day_2022_15::Part2(
@@ -127,7 +127,7 @@ absl::StatusOr<std::string> Day_2022_15::Part2(
   for (Point d : Cardinal::kFourDirs) {
     if (!HasCloser(*list, *found + d)) return Error("Not unique");
   }
-  return IntReturn(found->x * 4000000ll + found->y);
+  return AdventReturn(found->x * 4000000ll + found->y);
 }
 
 }  // namespace advent_of_code

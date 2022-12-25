@@ -117,7 +117,7 @@ absl::StatusOr<std::string> Day_2019_13::Part1(
   DrawBoard draw_board;
   if (absl::Status st = codes->Run(&draw_board); !st.ok()) return st;
 
-  return IntReturn(draw_board.CountBlockTiles());
+  return AdventReturn(draw_board.CountBlockTiles());
 }
 
 absl::StatusOr<std::string> Day_2019_13::Part2(
@@ -129,7 +129,7 @@ absl::StatusOr<std::string> Day_2019_13::Part2(
   DrawBoard draw_board;
   if (absl::Status st = codes->Run(&draw_board); !st.ok()) return st;
 
-  return IntReturn(draw_board.score());
+  return AdventReturn(draw_board.score());
 }
 
 }  // namespace advent_of_code

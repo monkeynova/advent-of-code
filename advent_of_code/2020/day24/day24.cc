@@ -94,7 +94,7 @@ absl::StatusOr<std::string> Day_2020_24::Part1(
   for (const auto& [_, is_black] : *grid) {
     if (is_black) ++black_count;
   }
-  return IntReturn(black_count);
+  return AdventReturn(black_count);
 }
 
 absl::StatusOr<std::string> Day_2020_24::Part2(
@@ -111,7 +111,7 @@ absl::StatusOr<std::string> Day_2020_24::Part2(
   for (const auto& [_, is_black] : *grid) {
     if (is_black) ++black_count;
   }
-  return IntReturn(black_count);
+  return AdventReturn(black_count);
 }
 
 }  // namespace advent_of_code

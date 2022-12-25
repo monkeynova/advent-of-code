@@ -56,7 +56,7 @@ int64_t BasinSize(const CharBoard& board, Point p) {
 
 absl::StatusOr<std::string> Day_2021_09::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> board = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
 
   std::vector<Point> basins = FindLow(*board);
@@ -65,12 +65,12 @@ absl::StatusOr<std::string> Day_2021_09::Part1(
     sum_risk += (*board)[p] + 1 - '0';
   }
 
-  return IntReturn(sum_risk);
+  return AdventReturn(sum_risk);
 }
 
 absl::StatusOr<std::string> Day_2021_09::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> board = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
 
   std::vector<Point> basins = FindLow(*board);
@@ -82,7 +82,7 @@ absl::StatusOr<std::string> Day_2021_09::Part2(
   }
   absl::c_sort(sizes, [](int64_t a, int64_t b) { return b < a; });
 
-  return IntReturn(sizes[0] * sizes[1] * sizes[2]);
+  return AdventReturn(sizes[0] * sizes[1] * sizes[2]);
 }
 
 }  // namespace advent_of_code

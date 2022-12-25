@@ -74,7 +74,7 @@ absl::StatusOr<std::string> Day_2021_17::Part1(
     VLOG(2) << v0 << " => " << *max_y;
     max_max = std::max(*max_y, max_max);
   }
-  return IntReturn(max_max);
+  return AdventReturn(max_max);
 }
 
 absl::StatusOr<std::string> Day_2021_17::Part2(
@@ -96,7 +96,7 @@ absl::StatusOr<std::string> Day_2021_17::Part2(
     VLOG(2) << v0 << " => " << *max_y;
     ++count;
   }
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 }  // namespace advent_of_code

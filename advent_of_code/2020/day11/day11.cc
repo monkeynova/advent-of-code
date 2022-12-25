@@ -78,7 +78,7 @@ CharBoard Update2(CharBoard in, const VisMap& vis_map) {
 
 absl::StatusOr<std::string> Day_2020_11::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> parsed = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> parsed = CharBoard::Parse(input);
   if (!parsed.ok()) return parsed.status();
 
   CharBoard cur = *parsed;
@@ -88,12 +88,12 @@ absl::StatusOr<std::string> Day_2020_11::Part1(
     if (next == cur) break;
     cur = next;
   }
-  return IntReturn(cur.CountOn());
+  return AdventReturn(cur.CountOn());
 }
 
 absl::StatusOr<std::string> Day_2020_11::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> parsed = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> parsed = CharBoard::Parse(input);
   if (!parsed.ok()) return parsed.status();
 
   CharBoard cur = *parsed;
@@ -104,7 +104,7 @@ absl::StatusOr<std::string> Day_2020_11::Part2(
     if (next == cur) break;
     cur = next;
   }
-  return IntReturn(cur.CountOn());
+  return AdventReturn(cur.CountOn());
 }
 
 }  // namespace advent_of_code

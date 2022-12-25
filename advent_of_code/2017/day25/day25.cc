@@ -118,7 +118,7 @@ absl::StatusOr<std::string> Day_2017_25::Part1(
 
   if (absl::Status st = tm->Run(); !st.ok()) return st;
 
-  return IntReturn(tm->Checksum());
+  return AdventReturn(tm->Checksum());
 }
 
 absl::StatusOr<std::string> Day_2017_25::Part2(

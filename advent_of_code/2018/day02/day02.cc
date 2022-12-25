@@ -33,7 +33,7 @@ absl::StatusOr<std::string> Day_2018_02::Part1(
     if (has_two) ++twos;
     if (has_three) ++threes;
   }
-  return IntReturn(twos * threes);
+  return AdventReturn(twos * threes);
 }
 
 absl::StatusOr<std::string> Day_2018_02::Part2(

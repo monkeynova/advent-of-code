@@ -28,7 +28,7 @@ absl::StatusOr<std::string> Day_2020_02::Part1(
       ++valid;
     }
   }
-  return IntReturn(valid);
+  return AdventReturn(valid);
 }
 
 absl::StatusOr<std::string> Day_2020_02::Part2(
@@ -47,7 +47,7 @@ absl::StatusOr<std::string> Day_2020_02::Part2(
       ++valid;
     }
   }
-  return IntReturn(valid);
+  return AdventReturn(valid);
 }
 
 }  // namespace advent_of_code

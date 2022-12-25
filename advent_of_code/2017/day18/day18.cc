@@ -169,7 +169,7 @@ absl::StatusOr<std::string> Day_2017_18::Part1(
   vm->set_part1();
   vm->ExecuteToRecv();
   std::vector<int> send_queue = vm->ConsumeSendQueue();
-  return IntReturn(send_queue.back());
+  return AdventReturn(send_queue.back());
 }
 
 absl::StatusOr<std::string> Day_2017_18::Part2(
@@ -196,7 +196,7 @@ absl::StatusOr<std::string> Day_2017_18::Part2(
     saw_send |= !send_queue.empty();
     p0.AddRecvQueue(send_queue);
   }
-  return IntReturn(p1_sends);
+  return AdventReturn(p1_sends);
 }
 
 }  // namespace advent_of_code

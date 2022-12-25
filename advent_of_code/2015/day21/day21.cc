@@ -202,7 +202,7 @@ absl::StatusOr<std::string> Day_2015_21::Part1(
   if (boss.damage == 0) return Error("No Damage");
   if (boss.armor == 0) return Error("No Armor");
 
-  return IntReturn(MinCostToWin(boss));
+  return AdventReturn(MinCostToWin(boss));
 }
 
 absl::StatusOr<std::string> Day_2015_21::Part2(
@@ -219,7 +219,7 @@ absl::StatusOr<std::string> Day_2015_21::Part2(
   if (boss.damage == 0) return Error("No Damage");
   if (boss.armor == 0) return Error("No Armor");
 
-  return IntReturn(MaxCostToLose(boss));
+  return AdventReturn(MaxCostToLose(boss));
 }
 
 }  // namespace advent_of_code

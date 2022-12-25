@@ -119,7 +119,7 @@ absl::StatusOr<std::string> Day_2021_04::Part1(
     }
     for (const Board& b : boards) {
       if (b.IsWin()) {
-        return IntReturn(b.Score() * num);
+        return AdventReturn(b.Score() * num);
       }
     }
   }
@@ -153,7 +153,7 @@ absl::StatusOr<std::string> Day_2021_04::Part2(
                              [](const Board& b) { return b.IsWin(); });
     if (it == boards.begin()) {
       if (boards.size() != 1) return Error("Non unique");
-      return IntReturn(boards[0].Score() * num);
+      return AdventReturn(boards[0].Score() * num);
     }
     boards.erase(it, boards.end());
   }

@@ -24,7 +24,7 @@ absl::StatusOr<std::string> Day_2020_10::Part1(
   }
   // Final adapter.
   ++deltas[3];
-  return IntReturn(deltas[1] * deltas[3]);
+  return AdventReturn(deltas[1] * deltas[3]);
 }
 
 absl::StatusOr<int64_t> CountValidArrangements(
@@ -60,7 +60,7 @@ absl::StatusOr<std::string> Day_2020_10::Part2(
 
   absl::flat_hash_map<std::pair<int, int>, int64_t> memo;
   // TODO(@monkeynova): Maybe handle if max is not unique.
-  return IntReturn(CountValidArrangements(*jolts, &memo, 0, 0));
+  return AdventReturn(CountValidArrangements(*jolts, &memo, 0, 0));
 }
 
 }  // namespace advent_of_code

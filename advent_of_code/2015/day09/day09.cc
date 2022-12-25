@@ -109,7 +109,7 @@ absl::StatusOr<std::string> Day_2015_09::Part1(
     src_routes[r.src].push_back(r);
     src_routes[r.dst].push_back({r.dst, r.src, r.weight});
   }
-  return IntReturn(ShortestAllVisit(src_routes));
+  return AdventReturn(ShortestAllVisit(src_routes));
 }
 
 absl::StatusOr<std::string> Day_2015_09::Part2(
@@ -124,7 +124,7 @@ absl::StatusOr<std::string> Day_2015_09::Part2(
     src_routes[r.src].push_back(r);
     src_routes[r.dst].push_back({r.dst, r.src, r.weight});
   }
-  return IntReturn(LongestAllVisit(src_routes));
+  return AdventReturn(LongestAllVisit(src_routes));
 }
 
 }  // namespace advent_of_code

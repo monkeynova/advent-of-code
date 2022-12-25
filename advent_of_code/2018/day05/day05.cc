@@ -46,7 +46,7 @@ absl::StatusOr<std::string> Day_2018_05::Part1(
   while (true) {
     VLOG(1) << comp;
     std::string new_comp = React(comp);
-    if (new_comp.size() == comp.size()) return IntReturn(new_comp.size());
+    if (new_comp.size() == comp.size()) return AdventReturn(new_comp.size());
     comp = std::move(new_comp);
   }
   return Error("left infinite loop");
@@ -79,7 +79,7 @@ absl::StatusOr<std::string> Day_2018_05::Part2(
     VLOG(1) << comp;
     min_size = std::min<int>(min_size, comp.size());
   }
-  return IntReturn(min_size);
+  return AdventReturn(min_size);
 }
 
 }  // namespace advent_of_code

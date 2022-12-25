@@ -155,7 +155,7 @@ absl::StatusOr<std::string> Day_2021_19::Part1(
     }
   }
 
-  return IntReturn(absolute_becons.size());
+  return AdventReturn(absolute_becons.size());
 }
 
 absl::StatusOr<std::string> Day_2021_19::Part2(
@@ -173,7 +173,7 @@ absl::StatusOr<std::string> Day_2021_19::Part2(
     }
   }
 
-  return IntReturn(max_dist);
+  return AdventReturn(max_dist);
 }
 
 }  // namespace advent_of_code

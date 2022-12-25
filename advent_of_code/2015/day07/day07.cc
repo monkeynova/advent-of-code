@@ -120,7 +120,7 @@ absl::StatusOr<std::string> Day_2015_07::Part1(
   absl::StatusOr<absl::flat_hash_map<std::string, Operation>> ops_by_dest =
       Parse(input);
   if (!ops_by_dest.ok()) return ops_by_dest.status();
-  return IntReturn(Evaluate(*ops_by_dest, "a"));
+  return AdventReturn(Evaluate(*ops_by_dest, "a"));
 }
 
 absl::StatusOr<std::string> Day_2015_07::Part2(
@@ -132,7 +132,7 @@ absl::StatusOr<std::string> Day_2015_07::Part2(
   if (!a_val.ok()) return a_val.status();
 
   (*ops_by_dest)["b"] = Operation{.arg1 = absl::StrCat(*a_val)};
-  return IntReturn(Evaluate(*ops_by_dest, "a"));
+  return AdventReturn(Evaluate(*ops_by_dest, "a"));
 }
 
 }  // namespace advent_of_code

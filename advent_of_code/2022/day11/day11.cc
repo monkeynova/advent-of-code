@@ -153,7 +153,7 @@ absl::StatusOr<std::string> Day_2022_11::Part1(
       m.items.clear();
     }
   }
-  return IntReturn(ScoreMonkeys(*monkeys));
+  return AdventReturn(ScoreMonkeys(*monkeys));
 }
 
 absl::StatusOr<std::string> Day_2022_11::Part2(
@@ -176,7 +176,7 @@ absl::StatusOr<std::string> Day_2022_11::Part2(
       m.items.clear();
     }
   }
-  return IntReturn(ScoreMonkeys(*monkeys));
+  return AdventReturn(ScoreMonkeys(*monkeys));
 }
 
 }  // namespace advent_of_code

@@ -187,7 +187,7 @@ absl::StatusOr<std::string> Day_2015_22::Part1(
   if (boss.hit_points == 0) return Error("No Hit Points");
   if (boss.damage == 0) return Error("No Damage");
 
-  return IntReturn(MinManaSpendForWin(me, boss));
+  return AdventReturn(MinManaSpendForWin(me, boss));
 }
 
 absl::StatusOr<std::string> Day_2015_22::Part2(
@@ -203,7 +203,7 @@ absl::StatusOr<std::string> Day_2015_22::Part2(
   if (boss.hit_points == 0) return Error("No Hit Points");
   if (boss.damage == 0) return Error("No Damage");
 
-  return IntReturn(MinManaSpendForWinHard(me, boss));
+  return AdventReturn(MinManaSpendForWinHard(me, boss));
 }
 
 }  // namespace advent_of_code

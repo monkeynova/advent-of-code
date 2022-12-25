@@ -111,7 +111,7 @@ absl::StatusOr<std::string> Day_2016_13::Part1(
   int v;
   if (!absl::SimpleAtoi(input[0], &v)) return Error("Bad atoi: ", input[0]);
   SparseBoard board(v);
-  return IntReturn(PathWalkToEnd(board, {1, 1}, {31, 39}).FindMinSteps());
+  return AdventReturn(PathWalkToEnd(board, {1, 1}, {31, 39}).FindMinSteps());
 }
 
 absl::StatusOr<std::string> Day_2016_13::Part2(
@@ -123,7 +123,7 @@ absl::StatusOr<std::string> Day_2016_13::Part2(
   int visited = 0;
   // PathWalkToDistance is built to always return 'not found'.
   (void)PathWalkToDistance(board, {1, 1}, 50, &visited).FindMinSteps();
-  return IntReturn(visited);
+  return AdventReturn(visited);
 }
 
 }  // namespace advent_of_code

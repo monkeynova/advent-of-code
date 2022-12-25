@@ -87,7 +87,7 @@ absl::StatusOr<std::string> Day_2019_06::Part1(
   if (!orbits.ok()) return orbits.status();
 
   int count_orbits = CountOrbits(*orbits, "COM", 0);
-  return IntReturn(count_orbits);
+  return AdventReturn(count_orbits);
 }
 
 absl::StatusOr<std::string> Day_2019_06::Part2(
@@ -97,7 +97,7 @@ absl::StatusOr<std::string> Day_2019_06::Part2(
   if (!orbits.ok()) return orbits.status();
 
   TransferRet transfer = FindTransfer(*orbits, "COM", "YOU", "SAN");
-  return IntReturn(transfer.transfer_size);
+  return AdventReturn(transfer.transfer_size);
 }
 
 }  // namespace advent_of_code

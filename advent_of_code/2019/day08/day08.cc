@@ -44,7 +44,7 @@ absl::StatusOr<std::string> Day_2019_08::Part1(
     if (layer[j] == '1') ++num_ones;
     if (layer[j] == '2') ++num_twos;
   }
-  return IntReturn(num_ones * num_twos);
+  return AdventReturn(num_ones * num_twos);
 }
 
 absl::StatusOr<std::string> Day_2019_08::Part2(

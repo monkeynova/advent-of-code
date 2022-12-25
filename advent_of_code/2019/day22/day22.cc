@@ -99,7 +99,7 @@ absl::StatusOr<std::string> Day_2019_22::Part1(
   if (!pair.ok()) return pair.status();
 
   auto [t, _] = *pair;
-  return IntReturn(t.Apply(2019));
+  return AdventReturn(t.Apply(2019));
 }
 
 absl::StatusOr<std::string> Day_2019_22::Part2(
@@ -118,6 +118,6 @@ absl::StatusOr<std::string> Day_2019_22::Part2(
     }
     power_reverse_transform = power_reverse_transform * power_reverse_transform;
   }
-  return IntReturn(full_reverse_transform.Apply(2020));
+  return AdventReturn(full_reverse_transform.Apply(2020));
 }
 }  // namespace advent_of_code

@@ -68,7 +68,7 @@ absl::StatusOr<std::string> Day_2018_06::Part1(
   for (const auto& [id, count] : point_counts) {
     max_count = std::max(max_count, count);
   }
-  return IntReturn(max_count);
+  return AdventReturn(max_count);
 }
 
 absl::StatusOr<std::string> Day_2018_06::Part2(
@@ -91,7 +91,7 @@ absl::StatusOr<std::string> Day_2018_06::Part2(
     }
     if (total_dist < 10'000) ++count;
   }
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 }  // namespace advent_of_code

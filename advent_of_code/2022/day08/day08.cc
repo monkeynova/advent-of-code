@@ -14,7 +14,7 @@ namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2022_08::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> board = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
 
   int count = 0;
@@ -35,12 +35,12 @@ absl::StatusOr<std::string> Day_2022_08::Part1(
     }
     if (visible_any) ++count;
   }
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 absl::StatusOr<std::string> Day_2022_08::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<CharBoard> board = ParseAsBoard(input);
+  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
 
   int best_score = 0;
@@ -58,7 +58,7 @@ absl::StatusOr<std::string> Day_2022_08::Part2(
     }
     best_score = std::max(best_score, score);
   }
-  return IntReturn(best_score);
+  return AdventReturn(best_score);
 }
 
 }  // namespace advent_of_code

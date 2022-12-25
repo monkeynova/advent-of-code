@@ -50,7 +50,7 @@ absl::StatusOr<std::string> Day_2016_15::Part1(
     delta *= d.positions / std::gcd(d.positions, delta);
   }
 
-  return IntReturn(start);
+  return AdventReturn(start);
 }
 
 absl::StatusOr<std::string> Day_2016_15::Part2(
@@ -83,7 +83,7 @@ absl::StatusOr<std::string> Day_2016_15::Part2(
     delta *= d.positions / std::gcd(d.positions, delta);
   }
 
-  return IntReturn(start);
+  return AdventReturn(start);
 }
 
 }  // namespace advent_of_code

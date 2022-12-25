@@ -74,7 +74,7 @@ absl::StatusOr<std::string> Day_2016_07::Part1(
     VLOG(1) << str << ": " << supports;
     if (supports) ++count;
   }
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 absl::StatusOr<std::string> Day_2016_07::Part2(
@@ -85,7 +85,7 @@ absl::StatusOr<std::string> Day_2016_07::Part2(
     VLOG(1) << str << ": " << supports;
     if (supports) ++count;
   }
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 }  // namespace advent_of_code

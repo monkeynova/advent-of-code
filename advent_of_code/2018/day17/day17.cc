@@ -174,7 +174,7 @@ absl::StatusOr<std::string> Day_2018_17::Part1(
     if (p.y < min_y) continue;
     if ((*b)[p] == '~' || (*b)[p] == '|') ++count;
   }
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 absl::StatusOr<std::string> Day_2018_17::Part2(
@@ -191,7 +191,7 @@ absl::StatusOr<std::string> Day_2018_17::Part2(
     if (p.y < min_y) continue;
     if ((*b)[p] == '~') ++count;
   }
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 }  // namespace advent_of_code

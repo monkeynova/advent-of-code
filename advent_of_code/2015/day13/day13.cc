@@ -111,7 +111,7 @@ absl::StatusOr<std::string> Day_2015_13::Part1(
     cost_map[cost_pair.from][cost_pair.to] = cost_pair;
   }
 
-  return IntReturn(FindBestSeating(cost_map));
+  return AdventReturn(FindBestSeating(cost_map));
 }
 
 absl::StatusOr<std::string> Day_2015_13::Part2(
@@ -148,7 +148,7 @@ absl::StatusOr<std::string> Day_2015_13::Part2(
     cost_map[cost_pair_to.from][cost_pair_to.to] = cost_pair_to;
   }
 
-  return IntReturn(FindBestSeating(cost_map));
+  return AdventReturn(FindBestSeating(cost_map));
 }
 
 }  // namespace advent_of_code

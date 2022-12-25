@@ -40,7 +40,7 @@ absl::StatusOr<std::string> Day_2021_05::Part1(
   for (const auto& [_, count] : counts) {
     if (count > 1) ++ret;
   }
-  return IntReturn(ret);
+  return AdventReturn(ret);
 }
 
 absl::StatusOr<std::string> Day_2021_05::Part2(
@@ -66,7 +66,7 @@ absl::StatusOr<std::string> Day_2021_05::Part2(
   for (const auto& [_, count] : counts) {
     if (count > 1) ++ret;
   }
-  return IntReturn(ret);
+  return AdventReturn(ret);
 }
 
 }  // namespace advent_of_code

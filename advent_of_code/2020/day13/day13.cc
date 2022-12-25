@@ -30,7 +30,7 @@ absl::StatusOr<std::string> Day_2020_13::Part1(
     }
   }
   if (min_id == -1) return Error("Can't find minimum delta");
-  return IntReturn(min_delta * min_id);
+  return AdventReturn(min_delta * min_id);
 }
 
 absl::StatusOr<std::string> Day_2020_13::Part2(
@@ -67,7 +67,7 @@ absl::StatusOr<std::string> Day_2020_13::Part2(
   for (Route r : routes) {
     remainders.emplace_back((r.id - r.offset) % r.id, r.id);
   }
-  return IntReturn(ChineseRemainder(remainders));
+  return AdventReturn(ChineseRemainder(remainders));
 }
 
 }  // namespace advent_of_code

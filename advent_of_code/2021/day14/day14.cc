@@ -86,7 +86,7 @@ absl::StatusOr<std::string> Day_2021_14::Part1(
     if (c > max) max = c;
     if (c < min) min = c;
   }
-  return IntReturn(max - min);
+  return AdventReturn(max - min);
 }
 
 absl::StatusOr<std::string> Day_2021_14::Part2(
@@ -121,7 +121,7 @@ absl::StatusOr<std::string> Day_2021_14::Part2(
     if (count > max) max = count;
     if (count < min) min = count;
   }
-  return IntReturn(max - min);
+  return AdventReturn(max - min);
 }
 
 }  // namespace advent_of_code

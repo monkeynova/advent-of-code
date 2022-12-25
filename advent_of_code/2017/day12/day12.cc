@@ -33,7 +33,7 @@ absl::StatusOr<std::string> Day_2017_12::Part1(
   absl::StatusOr<DirectedGraph<bool>> graph = Parse(input);
   if (!graph.ok()) return graph.status();
 
-  return IntReturn(graph->Reachable("0").size());
+  return AdventReturn(graph->Reachable("0").size());
 }
 
 absl::StatusOr<std::string> Day_2017_12::Part2(
@@ -41,7 +41,7 @@ absl::StatusOr<std::string> Day_2017_12::Part2(
   absl::StatusOr<DirectedGraph<bool>> graph = Parse(input);
   if (!graph.ok()) return graph.status();
 
-  return IntReturn(graph->Forest().size());
+  return AdventReturn(graph->Forest().size());
 }
 
 }  // namespace advent_of_code

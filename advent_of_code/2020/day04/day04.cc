@@ -95,7 +95,7 @@ absl::StatusOr<std::string> Day_2020_04::Part1(
   if (Valid(passport).ok()) {
     ++valid;
   }
-  return IntReturn(valid);
+  return AdventReturn(valid);
 }
 
 absl::StatusOr<std::string> Day_2020_04::Part2(
@@ -118,7 +118,7 @@ absl::StatusOr<std::string> Day_2020_04::Part2(
   if (Valid2(passport).ok()) {
     ++valid;
   }
-  return IntReturn(valid);
+  return AdventReturn(valid);
 }
 
 }  // namespace advent_of_code

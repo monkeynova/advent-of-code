@@ -103,7 +103,7 @@ absl::StatusOr<std::string> Day_2021_06::Part1(
     }
   }
 
-  return IntReturn(CountPopulationAfter(*nums, kDays));
+  return AdventReturn(CountPopulationAfter(*nums, kDays));
 }
 
 absl::StatusOr<std::string> Day_2021_06::Part2(
@@ -122,7 +122,7 @@ absl::StatusOr<std::string> Day_2021_06::Part2(
     }
   }
 
-  return IntReturn(CountPopulationAfter(*nums, kDays));
+  return AdventReturn(CountPopulationAfter(*nums, kDays));
 }
 
 }  // namespace advent_of_code

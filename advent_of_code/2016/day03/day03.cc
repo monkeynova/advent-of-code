@@ -33,7 +33,7 @@ absl::StatusOr<std::string> Day_2016_03::Part1(
     }
     if (IsValid(t1)) ++count;
   }
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 absl::StatusOr<std::string> Day_2016_03::Part2(
@@ -60,7 +60,7 @@ absl::StatusOr<std::string> Day_2016_03::Part2(
     if (IsValid(t2)) ++count;
     if (IsValid(t3)) ++count;
   }
-  return IntReturn(count);
+  return AdventReturn(count);
 }
 
 }  // namespace advent_of_code
