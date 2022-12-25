@@ -1,33 +1,168 @@
+Starting local Bazel server and connecting to it...
 Loading: 
 Loading: 0 packages loaded
-Analyzing: target //advent_of_code/2022:benchmark (0 packages loaded, 0 targets configured)
-INFO: Analyzed target //advent_of_code/2022:benchmark (0 packages loaded, 1 target configured).
+Analyzing: target //advent_of_code/2022:benchmark (1 packages loaded)
+Analyzing: target //advent_of_code/2022:benchmark (1 packages loaded, 0 targets configured)
+Analyzing: target //advent_of_code/2022:benchmark (5 packages loaded, 7 targets configured)
+Analyzing: target //advent_of_code/2022:benchmark (31 packages loaded, 37 targets configured)
+Analyzing: target //advent_of_code/2022:benchmark (61 packages loaded, 129 targets configured)
+Analyzing: target //advent_of_code/2022:benchmark (64 packages loaded, 252 targets configured)
+Analyzing: target //advent_of_code/2022:benchmark (67 packages loaded, 384 targets configured)
+Analyzing: target //advent_of_code/2022:benchmark (79 packages loaded, 564 targets configured)
+Analyzing: target //advent_of_code/2022:benchmark (87 packages loaded, 627 targets configured)
+Analyzing: target //advent_of_code/2022:benchmark (93 packages loaded, 891 targets configured)
+Analyzing: target //advent_of_code/2022:benchmark (97 packages loaded, 1185 targets configured)
+Analyzing: target //advent_of_code/2022:benchmark (102 packages loaded, 1389 targets configured)
+INFO: Analyzed target //advent_of_code/2022:benchmark (103 packages loaded, 1569 targets configured).
+ checking cached actions
 INFO: Found 1 target...
-[0 / 2] [Prepa] BazelWorkspaceStatusAction stable-status.txt
+[0 / 6] [Prepa] BazelWorkspaceStatusAction stable-status.txt
+[63 / 242] checking cached actions
+[199 / 420] Compiling advent_of_code/infra/file_benchmark.cc; 0s linux-sandbox
+[625 / 628] [Prepa] Linking advent_of_code/infra/libfile_benchmark.so
 Target //advent_of_code/2022:benchmark up-to-date:
   bazel-bin/advent_of_code/2022/benchmark
-INFO: Elapsed time: 0.803s, Critical Path: 0.02s
-INFO: 1 process: 1 internal.
-INFO: Build completed successfully, 1 total action
-INFO: Running command line: external/bazel_tools/tools/test/test-setup.sh advent_of_code/2022/benchmark '--benchmark_out=/home/keith/github/advent-of-code/advent_of_code/2022/benchmark/benchmark_hubris.json' --benchmark '--run_long_tests=1m' '--advent_day_run_audit=false'
-INFO: Build completed successfully, 1 total action
+INFO: Elapsed time: 42.457s, Critical Path: 11.68s
+INFO: 5 processes: 2 internal, 3 linux-sandbox.
+INFO: Build completed successfully, 5 total actions
+INFO: Running command line: external/bazel_tools/tools/test/test-setup.sh advent_of_code/2022/benchmark '--benchmark_flags=--benchmark_out=/home/keith/github/advent-of-code/advent_of_code/2022/benchmark/benchmark_hubris.json' --benchmark '--run_long_tests=1m' '--advent_day_run_audit=false'
 exec ${PAGER:-/usr/bin/less} "$0" || exit 1
 Executing tests from //advent_of_code/2022:benchmark
 -----------------------------------------------------------------------------
-2022-11-26T00:27:44+00:00
+2022-12-25T15:13:49+00:00
 Running /home/keith/.cache/bazel/_bazel_keith/c68a1098141ff45dd04a9f7869af4c34/execroot/com_monkeynova_advent_of_code/bazel-out/aarch64-opt/bin/advent_of_code/2022/benchmark.runfiles/com_monkeynova_advent_of_code/advent_of_code/2022/benchmark
 Run on (4 X 1800 MHz CPU s)
 CPU Caches:
   L1 Data 32 KiB (x4)
   L1 Instruction 48 KiB (x4)
   L2 Unified 1024 KiB (x1)
-Load Average: 1.29, 1.31, 2.22
+Load Average: 2.58, 0.96, 0.59
 ***WARNING*** CPU scaling is enabled, the benchmark real time measurements may be noisy and will incur extra overhead.
 ----------------------------------------------------------------
 Benchmark                      Time             CPU   Iterations
 ----------------------------------------------------------------
+BM_Day<Day_2022_25>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_25>/1        520 ns          515 ns      1358076 Part: 1
+BM_Day<Day_2022_25>/2      17794 ns        17670 ns        39604 Part: 1
+BM_Day<Day_2022_25>/3      0.000 ns        0.000 ns   1000000000 Part: 2; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_25>/4       56.1 ns         55.8 ns     12541011 Part: 2
+BM_Day<Day_2022_24>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_24>/1      85066 ns        84623 ns         8080 Part: 1
+BM_Day<Day_2022_24>/2  198282957 ns    196214919 ns            3 Part: 1
+BM_Day<Day_2022_24>/3     272806 ns       270786 ns         2599 Part: 2
+BM_Day<Day_2022_24>/4  547429323 ns    544717646 ns            1 Part: 2
+BM_Day<Day_2022_23>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_23>/1      78494 ns        78370 ns         8803 Part: 1
+BM_Day<Day_2022_23>/2   11857736 ns     11841870 ns           59 Part: 1
+BM_Day<Day_2022_23>/3     141997 ns       141663 ns         4933 Part: 2
+BM_Day<Day_2022_23>/4 1103687048 ns   1101209349 ns            1 Part: 2
+BM_Day<Day_2022_22>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_22>/1       2954 ns         2906 ns       243057 Part: 1
+BM_Day<Day_2022_22>/2     673461 ns       671215 ns          995 Part: 1
+BM_Day<Day_2022_22>/3      28141 ns        28114 ns        24833 Part: 2
+BM_Day<Day_2022_22>/4     875576 ns       874775 ns          793 Part: 2
+BM_Day<Day_2022_21>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_21>/1     564717 ns       564162 ns         1237 Part: 1
+BM_Day<Day_2022_21>/2   59422215 ns     59403173 ns           12 Part: 1
+BM_Day<Day_2022_21>/3     568813 ns       568206 ns         1228 Part: 2
+BM_Day<Day_2022_21>/4   59433341 ns     59389571 ns           12 Part: 2
+BM_Day<Day_2022_20>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_20>/1       8044 ns         8032 ns        87545 Part: 1
+BM_Day<Day_2022_20>/2  206128677 ns    205664462 ns            3 Part: 1
+BM_Day<Day_2022_20>/3       9819 ns         9798 ns        71461 Part: 2
+BM_Day<Day_2022_20>/4 2645636559 ns   2644082803 ns            1 Part: 2
+BM_Day<Day_2022_19>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_19>/1  935046911 ns    934135959 ns            1 Part: 1
+BM_Day<Day_2022_19>/2 9916594028 ns   9893910436 ns            1 Part: 1
+BM_Day<Day_2022_19>/3 2.6333e+10 ns   2.6302e+10 ns            1 Part: 2
+BM_Day<Day_2022_19>/4 1.9794e+10 ns   1.9757e+10 ns            1 Part: 2
+BM_Day<Day_2022_18>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_18>/1     175084 ns       174530 ns         4031 Part: 1
+BM_Day<Day_2022_18>/2   29417326 ns     29327936 ns           24 Part: 1
+BM_Day<Day_2022_18>/3     201751 ns       200815 ns         3522 Part: 2
+BM_Day<Day_2022_18>/4   44315116 ns     44293644 ns           15 Part: 2
+BM_Day<Day_2022_17>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_17>/1    2864746 ns      2864226 ns          244 Part: 1
+BM_Day<Day_2022_17>/2    2991531 ns      2990539 ns          234 Part: 1
+BM_Day<Day_2022_17>/3    1104115 ns      1103789 ns          628 Part: 2
+BM_Day<Day_2022_17>/4   38655215 ns     38649394 ns           18 Part: 2
+BM_Day<Day_2022_16>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_16>/1    1983030 ns      1982456 ns          353 Part: 1
+BM_Day<Day_2022_16>/2   35048115 ns     35041762 ns           20 Part: 1
+BM_Day<Day_2022_16>/3   14378572 ns     14376851 ns           49 Part: 2
+BM_Day<Day_2022_16>/4 3441977501 ns   3434342967 ns            1 Part: 2
+BM_Day<Day_2022_15>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_15>/1      19563 ns        19339 ns        35792 Part: 1
+BM_Day<Day_2022_15>/2      49090 ns        49057 ns        14153 Part: 1
+BM_Day<Day_2022_15>/3      21234 ns        21230 ns        32860 Part: 2
+BM_Day<Day_2022_15>/4      48911 ns        48911 ns        14402 Part: 2
+BM_Day<Day_2022_14>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_14>/1       7264 ns         7264 ns        97021 Part: 1
+BM_Day<Day_2022_14>/2    2854427 ns      2852942 ns          245 Part: 1
+BM_Day<Day_2022_14>/3      15991 ns        15989 ns        43737 Part: 2
+BM_Day<Day_2022_14>/4   34067608 ns     34067440 ns           21 Part: 2
+BM_Day<Day_2022_13>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_13>/1      13699 ns        13699 ns        50929 Part: 1
+BM_Day<Day_2022_13>/2    2819872 ns      2819697 ns          248 Part: 1
+BM_Day<Day_2022_13>/3      15697 ns        15697 ns        44752 Part: 2
+BM_Day<Day_2022_13>/4    2848537 ns      2848583 ns          248 Part: 2
+BM_Day<Day_2022_12>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_12>/1       9427 ns         9427 ns        73557 Part: 1
+BM_Day<Day_2022_12>/2    2180151 ns      2180122 ns          321 Part: 1
+BM_Day<Day_2022_12>/3       7790 ns         7790 ns        89792 Part: 2
+BM_Day<Day_2022_12>/4    1359437 ns      1359346 ns          514 Part: 2
+BM_Day<Day_2022_11>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_11>/1    3136921 ns      3136774 ns          223 Part: 1
+BM_Day<Day_2022_11>/2    6230452 ns      6230339 ns          112 Part: 1
+BM_Day<Day_2022_11>/3    5262124 ns      5262192 ns          133 Part: 2
+BM_Day<Day_2022_11>/4   15525315 ns     15525571 ns           45 Part: 2
+BM_Day<Day_2022_10>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_10>/1      31582 ns        31580 ns        22134 Part: 1
+BM_Day<Day_2022_10>/2      32816 ns        32815 ns        21193 Part: 1
+BM_Day<Day_2022_10>/3    2892362 ns      2892192 ns          242 Part: 2
+BM_Day<Day_2022_10>/4   22539477 ns     22539808 ns           31 Part: 2
+BM_Day<Day_2022_09>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_09>/1       4576 ns         4576 ns       153953 Part: 1
+BM_Day<Day_2022_09>/2    1424700 ns      1424687 ns          494 Part: 1
+BM_Day<Day_2022_09>/3      11818 ns        11819 ns        59493 Part: 2
+BM_Day<Day_2022_09>/4    1696162 ns      1696155 ns          414 Part: 2
+BM_Day<Day_2022_08>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_08>/1        687 ns          687 ns      1020140 Part: 1
+BM_Day<Day_2022_08>/2     727317 ns       727329 ns          961 Part: 1
+BM_Day<Day_2022_08>/3       1236 ns         1236 ns       563980 Part: 2
+BM_Day<Day_2022_08>/4     874638 ns       874553 ns          799 Part: 2
+BM_Day<Day_2022_07>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_07>/1     224785 ns       224784 ns         3089 Part: 1
+BM_Day<Day_2022_07>/2    6980255 ns      6980220 ns          100 Part: 1
+BM_Day<Day_2022_07>/3     226066 ns       226069 ns         3098 Part: 2
+BM_Day<Day_2022_07>/4    6979382 ns      6979493 ns          100 Part: 2
+BM_Day<Day_2022_06>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_06>/1        644 ns          643 ns      1087483 Part: 1
+BM_Day<Day_2022_06>/2     188959 ns       188946 ns         3705 Part: 1
+BM_Day<Day_2022_06>/3       2379 ns         2379 ns       293642 Part: 2
+BM_Day<Day_2022_06>/4    1245652 ns      1245608 ns          562 Part: 2
+BM_Day<Day_2022_05>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_05>/1     115964 ns       115956 ns         6037 Part: 1
+BM_Day<Day_2022_05>/2   14260136 ns     14244127 ns           49 Part: 1
+BM_Day<Day_2022_05>/3     115448 ns       115447 ns         6050 Part: 2
+BM_Day<Day_2022_05>/4   14209504 ns     14206478 ns           49 Part: 2
+BM_Day<Day_2022_04>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_04>/1     140091 ns       140089 ns         5004 Part: 1
+BM_Day<Day_2022_04>/2   23309612 ns     23309402 ns           30 Part: 1
+BM_Day<Day_2022_04>/3     138455 ns       138457 ns         5033 Part: 2
+BM_Day<Day_2022_04>/4   23436578 ns     23436935 ns           30 Part: 2
+BM_Day<Day_2022_03>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_03>/1       4178 ns         4178 ns       169770 Part: 1
+BM_Day<Day_2022_03>/2     280676 ns       280672 ns         2541 Part: 1
+BM_Day<Day_2022_03>/3       3143 ns         3142 ns       222450 Part: 2
+BM_Day<Day_2022_03>/4     255292 ns       255296 ns         2744 Part: 2
+BM_Day<Day_2022_02>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_02>/1       2912 ns         2912 ns       241976 Part: 1
+BM_Day<Day_2022_02>/2     104236 ns       104230 ns         6698 Part: 1
+BM_Day<Day_2022_02>/3       2901 ns         2901 ns       239581 Part: 2
+BM_Day<Day_2022_02>/4     104641 ns       104638 ns         6686 Part: 2
 BM_Day<Day_2022_01>/0      0.000 ns        0.000 ns   1000000000 Part: 0; *** SKIPPED (empty test) ****
-BM_Day<Day_2022_01>/1 ERROR OCCURRED: 'UNIMPLEMENTED: Problem not known'
-BM_Day<Day_2022_01>/2      0.000 ns        0.000 ns   1000000000 Part: 1; *** SKIPPED (empty test) ****
-BM_Day<Day_2022_01>/3 ERROR OCCURRED: 'UNIMPLEMENTED: Problem not known'
-BM_Day<Day_2022_01>/4      0.000 ns        0.000 ns   1000000000 Part: 2; *** SKIPPED (empty test) ****
+BM_Day<Day_2022_01>/1        421 ns          421 ns      1663401 Part: 1
+BM_Day<Day_2022_01>/2      72154 ns        72152 ns         9681 Part: 1
+BM_Day<Day_2022_01>/3        786 ns          786 ns       892210 Part: 2
+BM_Day<Day_2022_01>/4      82881 ns        82882 ns         8409 Part: 2
