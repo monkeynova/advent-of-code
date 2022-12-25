@@ -2,15 +2,30 @@
 ==
 
 [part=1]
-Example input
+1=-0-2
+12111
+2=0=
+21
+2=01
+111
+20012
+112
+1=-1=
+1-12
+12
+1=
+122
 --
-ERROR: UNIMPLEMENTED: Problem not known
+2=-1=0
 ==
 
+# 1467625562 - didn't encode
+# 1100121=01-222 - used 32 bit integers
+# 11=21=02=-21=-1-02=2 -- screwed up carry
 [part=1]
 @include{advent_of_code/2022/day25/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+20-=0=02=-21=00-02=2
 ==
 
 [part=2]
