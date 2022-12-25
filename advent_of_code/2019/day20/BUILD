@@ -8,7 +8,7 @@ cc_library(
         "//advent_of_code:advent_day",
         "//advent_of_code:bfs",
         "//advent_of_code:char_board",
-        "//advent_of_code:point",
+        "//advent_of_code:point3",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/log",

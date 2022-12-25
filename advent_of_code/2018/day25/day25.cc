@@ -8,7 +8,7 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/directed_graph.h"
-#include "advent_of_code/point.h"
+#include "advent_of_code/point4.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {

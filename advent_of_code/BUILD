@@ -33,6 +33,29 @@ cc_library(
 )
 
 cc_library(
+    name = "point3",
+    srcs = ["point3.cc"],
+    hdrs = ["point3.h"],
+    deps = [
+        "@com_google_absl//absl/hash",
+        "@com_google_absl//absl/log:check",
+        "@com_google_absl//absl/strings",
+        "@com_googlesource_code_re2//:re2",
+    ],
+)
+
+cc_library(
+    name = "point4",
+    hdrs = ["point4.h"],
+    deps = [
+        "@com_google_absl//absl/hash",
+        "@com_google_absl//absl/log:check",
+        "@com_google_absl//absl/strings",
+        "@com_googlesource_code_re2//:re2",
+    ],
+)
+
+cc_library(
     name = "opt_cmp",
     hdrs = ["opt_cmp.h"],
     deps = [
@@ -133,6 +156,7 @@ cc_library(
     hdrs = ["interval.h"],
     deps = [
         ":point",
+        ":point3",
         ":vlog",
         "@com_google_absl//absl/functional:function_ref",
         "@com_google_absl//absl/log",

@@ -6,6 +6,7 @@
 #include "absl/functional/function_ref.h"
 #include "absl/strings/str_format.h"
 #include "advent_of_code/point.h"
+#include "advent_of_code/point3.h"
 
 namespace advent_of_code {
 

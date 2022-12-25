@@ -8,7 +8,8 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/char_board.h"
-#include "advent_of_code/point.h"
+#include "advent_of_code/point3.h"
+#include "advent_of_code/point4.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
