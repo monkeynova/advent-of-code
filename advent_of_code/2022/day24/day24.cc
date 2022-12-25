@@ -11,7 +11,6 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/bfs.h"
-#include "advent_of_code/point3.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
@@ -84,45 +83,58 @@ struct BlizzardHistory {
   }
 };
 
-// We use a Point3 for state because the world changes with each step, so we
-// use the step # as a z coordinate to consider {x,y},step1 distinct from
-// {x,y},step2.
-class BFSWalk : public BFSInterface<BFSWalk, Point3> { 
+struct PointAndSteps {
+  using BFSRefType = PointAndSteps;
+  Point p;
+  int steps;
+
+  template <typename H>
+  friend H AbslHashValue(H h, PointAndSteps ps) {
+    return H::combine(std::move(h), ps.p, ps.steps);
+  }
+  bool operator==(PointAndSteps o) const {
+    return p == o.p && steps == o.steps;
+  }
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, PointAndSteps ps) {
+    absl::Format(&sink, "%v@%v", ps.p, ps.steps);
+  }
+};
+
+class BFSWalk : public BFSInterface<BFSWalk, PointAndSteps> { 
  public:
   BFSWalk(Point start, Point end, const CharBoard& b, BlizzardHistory& h)
-   : cur_({start.x, start.y, 0}), end_(end), b_(b), h_(h) {}
+   : cur_({start, 0}), end_(end), b_(b), h_(h) {}
 
-  Point3 identifier() const override { return cur_; }
+  PointAndSteps identifier() const override { return cur_; }
 
-  Point cur() const { return Point{cur_.x, cur_.y}; }
-
-  bool IsFinal() const override { return cur() == end_; }
+  bool IsFinal() const override { return cur_.p == end_; }
   void AddNextSteps(State* state) const override {
     while (h_.sets.size() <= num_steps() + 1) {
       h_.BuildNext(b_);
     }
     const BlizzardSet& blizzards = h_.sets[num_steps() + 1];
-    if (!blizzards.AnyOn(cur())) {
+    if (!blizzards.AnyOn(cur_.p)) {
       // Wait on.
       VLOG(2) << num_steps() << ": " << cur_ << " (wait)";
       BFSWalk next = *this;
-      ++next.cur_.z;
+      ++next.cur_.steps;
       state->AddNextStep(next);
     }
     for (Point d : Cardinal::kFourDirs) {
-      Point t = cur() + d;
+      Point t = cur_.p + d;
       if (!b_.OnBoard(t)) continue;
       if (b_[t] == '#') continue;
       if (blizzards.AnyOn(t)) continue;
       VLOG(2) << num_steps() << ": " << cur_ << " -> " << t;
       BFSWalk next = *this;
-      next.cur_ = {t.x, t.y, num_steps() + 1};
+      next.cur_ = {t, num_steps() + 1};
       state->AddNextStep(next);
     }
   }
 
  private:
-  Point3 cur_;
+  PointAndSteps cur_;
   Point end_;
   const CharBoard& b_;
   BlizzardHistory& h_;

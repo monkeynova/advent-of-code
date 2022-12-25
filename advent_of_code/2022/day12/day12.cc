@@ -17,26 +17,31 @@ namespace advent_of_code {
 
 namespace {
 
-class HeightBfs : public BFSInterface<HeightBfs, Point> {
+template <bool run_reverse>
+class HeightBfs : public BFSInterface<HeightBfs<run_reverse>, Point> {
  public:
-  HeightBfs(const CharBoard& b, Point c, bool reverse)
-      : b_(b), cur_(c), reverse_(reverse) {}
+  using State = typename BFSInterface<HeightBfs<run_reverse>, Point>::State;
+
+  HeightBfs(const CharBoard& b, Point c)
+      : b_(b), cur_(c) {}
 
   Point identifier() const override { return cur_; }
   void AddNextSteps(State* state) const override {
     for (Point d : Cardinal::kFourDirs) {
       Point n = cur_ + d;
       if (b_.OnBoard(n) && CanStep(cur_, n)) {
-        HeightBfs next = *this;
+        HeightBfs<run_reverse> next = *this;
         next.cur_ = n;
         state->AddNextStep(next);
       }
     }
   }
-  bool IsFinal() const override { return b_[cur_] == (reverse_ ? 'a' : 'E'); }
+  bool IsFinal() const override {
+    return b_[cur_] == (run_reverse ? 'a' : 'E');
+  }
 
   bool CanStep(Point from, Point to) const {
-    if (reverse_) {
+    if (run_reverse) {
       std::swap(from, to);
     }
     if (b_[from] == 'S') return true;
@@ -47,7 +52,6 @@ class HeightBfs : public BFSInterface<HeightBfs, Point> {
  private:
   const CharBoard& b_;
   Point cur_;
-  bool reverse_;
 };
 
 }  // namespace
@@ -59,7 +63,7 @@ absl::StatusOr<std::string> Day_2022_12::Part1(
   absl::flat_hash_set<Point> starts = board->Find('S');
   if (starts.size() != 1) return Error("Bad start");
 
-  HeightBfs search(*board, *starts.begin(), /*reverse=*/false);
+  HeightBfs</*reverse=*/false> search(*board, *starts.begin());
   return AdventReturn(search.FindMinSteps());
 }
 
@@ -70,7 +74,7 @@ absl::StatusOr<std::string> Day_2022_12::Part2(
   absl::flat_hash_set<Point> starts = board->Find('E');
   if (starts.size() != 1) return Error("Bad start");
 
-  HeightBfs search(*board, *starts.begin(), /*reverse=*/true);
+  HeightBfs</*reverse=*/true> search(*board, *starts.begin());
   return AdventReturn(search.FindMinSteps());
 }
 

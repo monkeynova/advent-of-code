@@ -22,9 +22,14 @@ class AStarGT {
   }
 };
 
-template <typename T>
+template <typename T, typename = void>
 struct BFSInterfaceTraits {
   using RefType = const T&;
+};
+
+template <typename T>
+struct BFSInterfaceTraits<T, std::void_t<decltype(sizeof(typename T::BFSRefType))>> {
+  using RefType = typename T::BFSRefType;
 };
 
 template <>

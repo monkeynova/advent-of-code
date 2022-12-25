@@ -16,32 +16,6 @@
 
 namespace advent_of_code {
 
-namespace {
-
-class CanReach : public BFSInterface<CanReach, Point3> {
- public:
-  CanReach(const absl::flat_hash_set<Point3>& g, Point3 start, Point3 end)
-      : g_(g), cur_(start), end_(end) {}
-
-  Point3 identifier() const override { return cur_; }
-  bool IsFinal() const override { return cur_ == end_; }
-  void AddNextSteps(State* state) const override {
-    for (Point3 dir : Cardinal3::kSixDirs) {
-      if (g_.contains(cur_ + dir)) continue;
-      CanReach next = *this;
-      next.cur_ += dir;
-      state->AddNextStep(next);
-    }
-  }
-
- private:
-  const absl::flat_hash_set<Point3>& g_;
-  Point3 cur_;
-  Point3 end_;
-};
-
-}  // namespace
-
 absl::StatusOr<std::string> Day_2022_18::Part1(
     absl::Span<absl::string_view> input) const {
   absl::flat_hash_set<Point3> points;
