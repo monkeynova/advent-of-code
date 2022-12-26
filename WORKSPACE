@@ -50,3 +50,9 @@ git_repository(
     remote = "https://github.com/google/file-based-test-driver.git",
     commit = "fd7661b168f640f68da39f97dad26e426eb6c339",
 )
+
+git_repository(
+    name = "com_monkeynova_gunit_main",
+    remote = "https://github.com/monkeynova/gunit-main.git",
+    commit = "12e3a4ffb0ae2c2e4d1f65fbf41cd073ceedd59d",
+)

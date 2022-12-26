@@ -47,7 +47,7 @@ cc_library(
     deps = [
         ":day16_input",
         "//advent_of_code/infra:file_benchmark",
-        "//advent_of_code/infra:gunit_main",
+        "@com_monkeynova_gunit_main//:test_main",
     ],
     alwayslink = 1,
 )
@@ -58,6 +58,6 @@ cc_test(
     tags = ["benchmark"],
     deps = [
         ":day16_benchmark_lib",
-        "//advent_of_code/infra:gunit_main",
+        "@com_monkeynova_gunit_main//:test_main",
     ],
 )

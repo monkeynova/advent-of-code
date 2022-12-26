@@ -31,7 +31,7 @@ cc_test(
         "@com_google_file_based_test_driver//file_based_test_driver",
         "@com_google_file_based_test_driver//file_based_test_driver:run_test_case_result",
         "@com_google_file_based_test_driver//file_based_test_driver:test_case_options",
-        "//advent_of_code/infra:gunit_main",
+        "@com_monkeynova_gunit_main//:test_main",
     ],
 )
 
@@ -65,6 +65,6 @@ cc_test(
         "//advent_of_code/2019/day23:day23_benchmark_lib",
         "//advent_of_code/2019/day24:day24_benchmark_lib",
         "//advent_of_code/2019/day25:day25_benchmark_lib",
-        "//advent_of_code/infra:gunit_main",
+        "@com_monkeynova_gunit_main//:test_main",
     ],
 )

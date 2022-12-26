@@ -48,6 +48,6 @@ cc_test(
         "//advent_of_code/2016/day23:day23_benchmark_lib",
         "//advent_of_code/2016/day24:day24_benchmark_lib",
         "//advent_of_code/2016/day25:day25_benchmark_lib",
-        "//advent_of_code/infra:gunit_main",
+        "@com_monkeynova_gunit_main//:test_main",
     ],
 )

@@ -25,7 +25,7 @@ cc_test(
         # bazelisk test ... --test_arg=<file arg>.
         "//advent_of_code/infra:file_flags",
         "@com_google_googletest//:gtest",
-        "//advent_of_code/infra:gunit_main",
+        "@com_monkeynova_gunit_main//:test_main",
     ],
 )
 
@@ -59,6 +59,6 @@ cc_test(
         "//advent_of_code/2017/day23:day23_benchmark_lib",
         "//advent_of_code/2017/day24:day24_benchmark_lib",
         "//advent_of_code/2017/day25:day25_benchmark_lib",
-        "//advent_of_code/infra:gunit_main",
+        "@com_monkeynova_gunit_main//:test_main",
     ],
 )
