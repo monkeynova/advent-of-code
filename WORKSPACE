@@ -6,7 +6,7 @@ git_repository(
     name = "bazel_skylib",
     remote = "https://github.com/bazelbuild/bazel-skylib.git",
     # branch = "main",
-    commit = "5bfcb1a684550626ce138fe0fe8f5f702b3764c3",
+    commit = "288731ef9f7f688932bd50e704a91a45ec185f9b",
 )
 load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 bazel_skylib_workspace()
@@ -15,34 +15,34 @@ git_repository(
    name = "com_monkeynova_base_workspace",
    remote = "https://github.com/monkeynova/base-workspace.git",
    # branch = "main",
-   commit = "21c3632e277633820f20a81b084e3c764c243a97",
+   commit = "079048a672da87d2cede89febac49f54a5cbb165",
 )
 
 git_repository(
     name = "com_google_googletest",
     remote = "https://github.com/google/googletest.git",
     # branch = "main",
-    commit = "71140c3ca7a87bb1b5b9c9f1500fea8858cce344",
+    commit = "455fcb7773dedc70ab489109fb12d8abc7fd59b6",
 )
 
 git_repository(
     name = "com_google_absl",
     remote = "https://github.com/abseil/abseil-cpp.git",
-    commit = "f7affaf32a6a396465507dd10520a3fe183d4e40",
+    commit = "70172ada858b8739ce07e8c2f1ecd8c11c8768c7",
 )
 
 git_repository(
     name = "com_github_google_benchmark",
     remote = "https://github.com/google/benchmark.git",
     # branch = "main",
-    commit = "62edc4fb00e1aeab86cc69c70eafffb17219d047",
+    commit = "02a354f3f323ae8256948e1dc77ddcb1dfc297da",
 )
 
 git_repository(
     name = "com_googlesource_code_re2",
     remote = "https://github.com/google/re2.git",
     # branch = "abseil"
-    commit = "d0b1f8f2ecc2ea74956c7608b6f915175314ff0e",
+    commit = "578843a516fd1da7084ae46209a75f3613b6065e",
 )
 
 git_repository(
@@ -54,5 +54,13 @@ git_repository(
 git_repository(
     name = "com_monkeynova_gunit_main",
     remote = "https://github.com/monkeynova/gunit-main.git",
-    commit = "12e3a4ffb0ae2c2e4d1f65fbf41cd073ceedd59d",
+    # branch = "main"
+    commit = "7008f2cc0f8639d49282bc6a5bd46cdd206c4ab7",
+)
+
+git_repository(
+    name = "aspect_bazel_lib",
+    remote = "https://github.com/aspect-build/bazel-lib.git",
+    # branch = "main",
+    commit = "e54912501619f34b7b2172a428ba0c4ebc2331af",
 )
