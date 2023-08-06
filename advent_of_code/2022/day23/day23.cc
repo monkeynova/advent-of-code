@@ -18,16 +18,16 @@ namespace {
 
 bool Move(absl::flat_hash_set<Point>& elves, int turn) {
   constexpr std::array<Point, 4> kDirProposeOrder = {
-    Cardinal::kNorth, Cardinal::kSouth, Cardinal::kWest, Cardinal::kEast};
+      Cardinal::kNorth, Cardinal::kSouth, Cardinal::kWest, Cardinal::kEast};
   constexpr std::array<std::array<Point, 3>, 4> kDirTestOrder = {
-    std::array<Point, 3>{Cardinal::kNorth, Cardinal::kNorthWest,
-                         Cardinal::kNorthEast},
-    std::array<Point, 3>{Cardinal::kSouth, Cardinal::kSouthWest,
-                         Cardinal::kSouthEast},
-    std::array<Point, 3>{Cardinal::kWest, Cardinal::kNorthWest,
-                         Cardinal::kSouthWest},
-    std::array<Point, 3>{Cardinal::kEast, Cardinal::kNorthEast,
-                         Cardinal::kSouthEast},
+      std::array<Point, 3>{Cardinal::kNorth, Cardinal::kNorthWest,
+                           Cardinal::kNorthEast},
+      std::array<Point, 3>{Cardinal::kSouth, Cardinal::kSouthWest,
+                           Cardinal::kSouthEast},
+      std::array<Point, 3>{Cardinal::kWest, Cardinal::kNorthWest,
+                           Cardinal::kSouthWest},
+      std::array<Point, 3>{Cardinal::kEast, Cardinal::kNorthEast,
+                           Cardinal::kSouthEast},
   };
 
   absl::flat_hash_map<Point, std::vector<Point>> proposals;
@@ -45,7 +45,7 @@ bool Move(absl::flat_hash_set<Point>& elves, int turn) {
       proposal_added = true;
       break;
     }
-  } 
+  }
   bool moved = false;
   for (const auto& [to, from_set] : proposals) {
     if (from_set.size() != 1) continue;

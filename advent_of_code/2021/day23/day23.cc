@@ -309,7 +309,8 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
     }
   }
 
-  return AdventReturn(FindMinCost(std::move(s), empty, destinations, all_paths));
+  return AdventReturn(
+      FindMinCost(std::move(s), empty, destinations, all_paths));
 }
 
 absl::StatusOr<std::string> Day_2021_23::Part2(

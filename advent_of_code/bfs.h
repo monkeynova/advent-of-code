@@ -28,7 +28,8 @@ struct BFSInterfaceTraits {
 };
 
 template <typename T>
-struct BFSInterfaceTraits<T, std::void_t<decltype(sizeof(typename T::BFSRefType))>> {
+struct BFSInterfaceTraits<
+    T, std::void_t<decltype(sizeof(typename T::BFSRefType))>> {
   using RefType = typename T::BFSRefType;
 };
 

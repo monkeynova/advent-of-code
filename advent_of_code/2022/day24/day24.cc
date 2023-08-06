@@ -101,10 +101,10 @@ struct PointAndSteps {
   }
 };
 
-class BFSWalk : public BFSInterface<BFSWalk, PointAndSteps> { 
+class BFSWalk : public BFSInterface<BFSWalk, PointAndSteps> {
  public:
   BFSWalk(Point start, Point end, const CharBoard& b, BlizzardHistory& h)
-   : cur_({start, 0}), end_(end), b_(b), h_(h) {}
+      : cur_({start, 0}), end_(end), b_(b), h_(h) {}
 
   PointAndSteps identifier() const override { return cur_; }
 

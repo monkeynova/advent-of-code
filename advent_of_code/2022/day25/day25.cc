@@ -21,12 +21,23 @@ absl::StatusOr<int64_t> DecodeSnafu(absl::string_view line) {
   for (char c : line) {
     int next = 0;
     switch (c) {
-      case '0': next = 0; break;
-      case '1': next = 1; break;
-      case '2': next = 2; break;
-      case '-': next = -1; break;
-      case '=': next = -2; break;
-      default: return Error("Bad snafu encoding: ", line);
+      case '0':
+        next = 0;
+        break;
+      case '1':
+        next = 1;
+        break;
+      case '2':
+        next = 2;
+        break;
+      case '-':
+        next = -1;
+        break;
+      case '=':
+        next = -2;
+        break;
+      default:
+        return Error("Bad snafu encoding: ", line);
     }
     num = num * 5 + next;
   }
@@ -37,12 +48,25 @@ absl::StatusOr<std::string> EncodeSnafu(int64_t total) {
   std::string ret;
   for (int64_t c = total; c; c /= 5) {
     switch (c % 5) {
-      case 0: ret.append(1, '0'); break;
-      case 1: ret.append(1, '1'); break;
-      case 2: ret.append(1, '2'); break;
-      case 3: ret.append(1, '='); c += 5; break;
-      case 4: ret.append(1, '-'); c += 5; break;
-      default: return Error("MOD 5 not handled");
+      case 0:
+        ret.append(1, '0');
+        break;
+      case 1:
+        ret.append(1, '1');
+        break;
+      case 2:
+        ret.append(1, '2');
+        break;
+      case 3:
+        ret.append(1, '=');
+        c += 5;
+        break;
+      case 4:
+        ret.append(1, '-');
+        c += 5;
+        break;
+      default:
+        return Error("MOD 5 not handled");
     }
   }
   absl::c_reverse(ret);

@@ -22,8 +22,7 @@ class HeightBfs : public BFSInterface<HeightBfs<run_reverse>, Point> {
  public:
   using State = typename BFSInterface<HeightBfs<run_reverse>, Point>::State;
 
-  HeightBfs(const CharBoard& b, Point c)
-      : b_(b), cur_(c) {}
+  HeightBfs(const CharBoard& b, Point c) : b_(b), cur_(c) {}
 
   Point identifier() const override { return cur_; }
   void AddNextSteps(State* state) const override {

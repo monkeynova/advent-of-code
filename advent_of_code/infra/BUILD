@@ -41,7 +41,6 @@ cc_library(
         ":file_flags",
         ":file_test_options",
         ":file_util",
-        "@com_monkeynova_gunit_main//:test_main",
         "//advent_of_code:advent_day",
         "@com_google_absl//absl/debugging:failure_signal_handler",
         "@com_google_absl//absl/flags:commandlineflag",
@@ -53,6 +52,7 @@ cc_library(
         "@com_google_file_based_test_driver//file_based_test_driver:run_test_case_result",
         "@com_google_file_based_test_driver//file_based_test_driver:test_case_options",
         "@com_googlesource_code_re2//:re2",
+        "@com_monkeynova_gunit_main//:test_main",
     ],
 )
 
