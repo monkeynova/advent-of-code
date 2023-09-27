@@ -1,5 +1,6 @@
 #include "advent_of_code/infra/file_test_options.h"
 
+#include "absl/strings/str_cat.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
