@@ -29,6 +29,10 @@ std::string Conway::DefaultLookup() {
 }
 
 absl::Status Conway::Advance() {
+  if (lookup_.size() != 512) {
+    return absl::InternalError(absl::StrCat(
+      "Bad lookup size:", lookup_.size()));
+  }
   Point dst_to_src = infinite_ ? Cardinal::kNorthWest : Cardinal::kOrigin;
   int buffer = infinite_ ? 2 : 0;
   CharBoard new_b(b_.width() + buffer, b_.height() + buffer);
@@ -39,15 +43,16 @@ absl::Status Conway::Advance() {
           Cardinal::kWest, Cardinal::kOrigin, Cardinal::kEast,
           Cardinal::kSouthWest, Cardinal::kSouth, Cardinal::kSouthEast}) {
       Point src = p + d + dst_to_src;
-      bv *= 2;
-      char src_val = b_.OnBoard(src) ? b_[src] : fill_;
-      if (src_val == '#') {
-        ++bv;
-      } else if (src_val != '.') {
-        return absl::InternalError("Bad board");
+      bv <<= 1;
+      switch (char test = b_.OnBoard(src) ? b_[src] : fill_) {
+        case '#': bv |= 1; continue;
+        case '.': continue;
+        default: {
+          return absl::InternalError(absl::StrCat(
+            "Bad board character: '", absl::string_view(&test, 1), "'"));
+        }
       }
     }
-    if (bv >= lookup_.size()) return absl::InternalError("Bad lookup size");
     new_b[p] = lookup_[bv];
   }
   if (!infinite_) {
@@ -58,42 +63,50 @@ absl::Status Conway::Advance() {
   if (fill_ == '.') {
     fill_ = lookup_[0];
   } else if (fill_ == '#') {
-    if (511 >= lookup_.size()) return absl::InternalError("Bad lookup size");
     fill_ = lookup_[511];
-  } else {
-    return absl::InternalError("Bad board fill");
   }
 
+  absl::StatusOr<CharBoard> pruned = PruneFill(std::move(new_b));
+  if (!pruned.ok()) return pruned.status();
+  b_ = *std::move(pruned);
+  return absl::OkStatus();
+}
+
+absl::StatusOr<CharBoard> Conway::PruneFill(CharBoard new_b) {
   PointRectangle non_fill_rect = new_b.range();
-  {
-    bool top_is_fill = true;
-    bool bottom_is_fill = true;
-    for (int x = 0; x < new_b.width(); ++x) {
-      if (new_b[{x, 0}] != fill_) top_is_fill = false;
-      if (new_b[{x, new_b.height() - 1}] != fill_) bottom_is_fill = false;
+  for (bool is_fill = true;
+       is_fill && non_fill_rect.min.y < non_fill_rect.max.y;) {
+    for (int x = non_fill_rect.min.x; x < non_fill_rect.max.x; ++x) {
+      if (new_b[{x, non_fill_rect.min.y}] != fill_) is_fill = false;
     }
-    if (top_is_fill) ++non_fill_rect.min.x;
-    if (bottom_is_fill) --non_fill_rect.max.x;
+    if (is_fill) ++non_fill_rect.min.y;
   }
-  {
-    bool left_is_fill = true;
-    bool right_is_fill = true;
-    for (int y = 0; y < new_b.height(); ++y) {
-      if (new_b[{0, y}] != fill_) left_is_fill = false;
-      if (new_b[{new_b.height() - 1, y}] != fill_) right_is_fill = false;
+  for (bool is_fill = true;
+       is_fill && non_fill_rect.min.y < non_fill_rect.max.y;) {
+    for (int x = non_fill_rect.min.x; x < non_fill_rect.max.x; ++x) {
+      if (new_b[{x, non_fill_rect.max.y}] != fill_) is_fill = false;
     }
-    if (left_is_fill) ++non_fill_rect.min.y;
-    if (right_is_fill) --non_fill_rect.max.y;
+    if (is_fill) --non_fill_rect.max.y;
+  }
+  for (bool is_fill = true;
+       is_fill && non_fill_rect.min.x < non_fill_rect.max.x;) {
+    for (int y = non_fill_rect.min.y; y < non_fill_rect.max.y; ++y) {
+      if (new_b[{non_fill_rect.min.x, y}] != fill_) is_fill = false;
+    }
+    if (is_fill) ++non_fill_rect.min.x;
+  }
+  for (bool is_fill = true;
+       is_fill && non_fill_rect.min.x < non_fill_rect.max.x;) {
+    for (int y = non_fill_rect.min.y; y < non_fill_rect.max.y; ++y) {
+      if (new_b[{non_fill_rect.max.x, y}] != fill_) is_fill = false;
+    }
+    if (is_fill) --non_fill_rect.max.x;
   }
   if (non_fill_rect == new_b.range()) {
-    b_ = std::move(new_b);
-    return absl::OkStatus();
+    return new_b;
   }
 
-  absl::StatusOr<CharBoard> non_fill = new_b.SubBoard(non_fill_rect);
-  if (!non_fill.ok()) return non_fill.status();
-  b_ = std::move(*non_fill);
-  return absl::OkStatus();
+  return new_b.SubBoard(non_fill_rect);
 }
 
 absl::Status Conway::AdvanceN(int count) {
