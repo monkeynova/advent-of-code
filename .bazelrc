@@ -9,3 +9,6 @@ run:compete --file_based_test_driver_individual_tests=false
 run:compete --stderrthreshold=0 --v=1
 
 run:benchmark -- --benchmark --run_long_tests=1m --advent_day_run_audit=false
+
+test --test_verbose_timeout_warnings
+test --test_summary=terse

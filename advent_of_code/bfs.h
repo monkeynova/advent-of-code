@@ -10,47 +10,21 @@
 
 namespace advent_of_code {
 
-template <typename BFSImpl>
-class AStarGT {
- public:
-  bool operator()(const BFSImpl& a, const BFSImpl& b) {
-    // Tie break with num_steps sp we can't add to the history a backtrack.
-    int a_steps = a.num_steps() + a.min_steps_to_final();
-    int b_steps = b.num_steps() + b.min_steps_to_final();
-    if (a_steps != b_steps) return a_steps > b_steps;
-    return a.num_steps() > b.num_steps();
-  }
-};
-
-template <typename T, typename = void>
-struct BFSInterfaceTraits {
-  using RefType = const T&;
-};
-
-template <typename T>
-struct BFSInterfaceTraits<
-    T, std::void_t<decltype(sizeof(typename T::BFSRefType))>> {
-  using RefType = typename T::BFSRefType;
-};
-
-template <>
-struct BFSInterfaceTraits<absl::string_view> {
-  using RefType = absl::string_view;
-};
-
-struct Point;
-template <>
-struct BFSInterfaceTraits<Point> {
-  using RefType = Point;
-};
-
-struct Point3;
-template <>
-struct BFSInterfaceTraits<Point3> {
-  using RefType = Point3;
-};
-
-template <typename BFSImpl, typename HistType = BFSImpl>
+// General implementation of a breadth-first-search algorithm. The class uses
+// the curiously recurring template pattern
+// (https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern) in
+// order to build a base class that can store a container of the specific
+// sub-class in order to queue states to explore.
+//
+// Expected usage is to subclass BFSInterface templated on a representation of
+// a state during the search. An optional second parameter is used to store
+// a history of visited states, and may be used if, for example, there is
+// signficant redundany in the state (like, say a reference to a CharBoard
+// where the relevant state is simply a Point).
+//
+// State subclasses are expected to override the abstract methods in order
+// to perform the search. 
+template <typename BFSImpl, typename HistType = const BFSImpl&>
 class BFSInterface {
  public:
   class State;
@@ -59,13 +33,37 @@ class BFSInterface {
 
   virtual ~BFSInterface() = default;
 
-  virtual typename BFSInterfaceTraits<HistType>::RefType identifier() const = 0;
+  // Returns a historical identifier. This type must have a valid AbslHash
+  // implementation.
+  virtual HistType identifier() const = 0;
+
+  // When called, should add to `state` all rechable forms of BFSImpl from
+  // `this` (for example all Points reachable on the CharBoard from the
+  // current location).
   virtual void AddNextSteps(State* state) const = 0;
+
+  // Must return true if and only if the desired breadth-first search is
+  // complete in `this` (e.g. the we've reached the desired end Point).
   virtual bool IsFinal() const = 0;
 
+  // Controls the behavior of FindMinStepsAStar(). It must be the case that any
+  // path from `this` to a state returning true in IsFinal must take at least
+  // this man steps. For example (Point{end} - Point{start}).dist() would
+  // return the minimal (unobstructed) distance from the end point and meet the
+  // requirements. 
   virtual int min_steps_to_final() const { return 0; }
 
+  // Implements a standard breadth-first search from `this` to a subsequent
+  // BFSImpl such that IsFinal returns true and returns the number of steps
+  // required to go from `this` to the final state (or absl::nullopt if such a
+  // state is unreachable).
   absl::optional<int> FindMinSteps() { return FindMinStepsImpl<DequeState>(); }
+
+  // Implements an A* algorithm search like `FindMinSteps` where
+  // `min_steps_to_final` is used to prioitize the search space. For example,
+  // if min_steps_to_final where to return (Point{end} - Point{start}).dist()
+  // the search space would prioritize more direct paths over a fully breadth
+  // first search space. 
   absl::optional<int> FindMinStepsAStar() {
     static_assert(std::is_copy_assignable_v<BFSImpl>,
                   "BFSImpl must be copy-assignable for AStar");
@@ -78,6 +76,11 @@ class BFSInterface {
  protected:
   BFSInterface() = default;
 
+  // In the event that going from `this` to an entry added by AddNextSteps
+  // needs to account for more than a single action, add_steps can adjust the
+  // distance. 
+  // If used, `FindMinSteps` will not return an accurate answer and
+  // `FindMinStepsAStar` must be used instead.
   void add_steps(int num_steps) { num_steps_ += num_steps; }
 
  private:
@@ -100,11 +103,16 @@ class BFSInterface {
   int num_steps_ = 0;
 };
 
+// Stores the queue of work for performing a breadth-first search. The base
+// State class stores the history while the specific sub classes store the
+// implementation of the queuing behavior.
 template <typename BFSImpl, typename HistType>
 class BFSInterface<BFSImpl, HistType>::State {
  public:
   explicit State(const BFSImpl& start) { hist_[start.identifier()] = 0; }
 
+  // Adds `next` to the processing queue if it is not present in `hist_`.
+  // next.num_steps() is incremented in the process.
   void AddNextStep(BFSImpl next) {
     ++next.num_steps_;
     auto it = hist_.find(next.identifier());
@@ -113,18 +121,20 @@ class BFSInterface<BFSImpl, HistType>::State {
     AddToFrontier(std::move(next));
   }
 
-  virtual void AddToFrontier(BFSImpl next) = 0;
-
   absl::optional<int> ret() const { return ret_; }
 
  protected:
+  virtual void AddToFrontier(BFSImpl next) = 0;
+
   void set_ret(int ret) { ret_ = ret; }
 
  private:
-  absl::flat_hash_map<HistType, int> hist_;
+  absl::flat_hash_map<std::remove_reference_t<HistType>, int> hist_;
   absl::optional<int> ret_;
 };
 
+// Uses a std::deque to process work, so all states are processed in a FIFO
+// manner.
 template <typename BFSImpl, typename HistType>
 class BFSInterface<BFSImpl, HistType>::DequeState
     : public BFSInterface<BFSImpl, HistType>::State {
@@ -147,6 +157,8 @@ class BFSInterface<BFSImpl, HistType>::DequeState
   std::deque<BFSImpl> frontier_;
 };
 
+// Uses a std::priority_queue to process work, so all states are processed
+// ordered by num_steps() + min_steps_to_final().
 template <typename BFSImpl, typename HistType>
 class BFSInterface<BFSImpl, HistType>::QueueState
     : public BFSInterface<BFSImpl, HistType>::State {
@@ -167,7 +179,18 @@ class BFSInterface<BFSImpl, HistType>::QueueState
   void pop() { return frontier_.pop(); }
 
  private:
-  std::priority_queue<BFSImpl, std::vector<BFSImpl>, AStarGT<BFSImpl>>
+  class AStarGT {
+   public:
+    bool operator()(const BFSImpl& a, const BFSImpl& b) {
+      // Tie break with num_steps so we can't add to the history a backtrack.
+      int a_steps = a.num_steps() + a.min_steps_to_final();
+      int b_steps = b.num_steps() + b.min_steps_to_final();
+      if (a_steps != b_steps) return a_steps > b_steps;
+      return a.num_steps() > b.num_steps();
+    }
+  };
+
+  std::priority_queue<BFSImpl, std::vector<BFSImpl>, AStarGT>
       frontier_;
 };
 

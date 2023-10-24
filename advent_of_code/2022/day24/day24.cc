@@ -84,7 +84,6 @@ struct BlizzardHistory {
 };
 
 struct PointAndSteps {
-  using BFSRefType = PointAndSteps;
   Point p;
   int steps;
 
