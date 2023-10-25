@@ -15,6 +15,14 @@ namespace advent_of_code {
 // mutable cells within the board. While any characters can be stored, the
 // most common form of use in AOC stores '#' as "on" and '.' as "off", and as
 // such methods like 'Draw' and 'CountOn' lean into those defaults.
+// An example board might look like the following:
+// 
+// #######
+// #.#...#
+// #.###.#
+// #..#..#
+// ## ..##
+// #######
 class CharBoard {
  public:
   // Constructs a CharBoard by iterating over `in` and adding one row to the
@@ -107,10 +115,9 @@ class CharBoard {
   bool operator!=(const CharBoard& o) const { return !operator==(o); }
 
   // For debugging purposes, implements stringification.
-  // TODO(@monkeynova): Use AbslStringify instead?
-  std::string AsString() const { return buf_; }
-  friend std::ostream& operator<<(std::ostream& out, const CharBoard& b) {
-    return out << b.buf_;
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const CharBoard& b) {
+    absl::Format(&sink, "%s", b.buf_);
   }
 
  private:

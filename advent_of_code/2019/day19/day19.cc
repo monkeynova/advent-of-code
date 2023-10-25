@@ -86,7 +86,7 @@ class TractorSearch {
       absl::StatusOr<int> out = ScanPoint(p);
       if (out.ok() && *out) board[p - r.min] = '#';
     }
-    return board.AsString();
+    return absl::StrCat(board);
   }
 
   absl::StatusOr<Point> FindSquareSpace(int size) {

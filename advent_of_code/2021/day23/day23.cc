@@ -87,9 +87,9 @@ struct Actor {
   friend H AbslHashValue(H h, const Actor& a) {
     return H::combine(std::move(h), a.c, a.cur, a.moved, a.done);
   }
-  friend std::ostream& operator<<(std::ostream& o, const Actor& a) {
-    return o << absl::string_view(&a.c, 1) << ": " << a.cur << " " << a.moved
-             << " " << a.done;
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const Actor& a) {
+    absl::Format(&sink, "%c: %v %v %v", a.c, a.cur, a.moved, a.done);
   }
 
   Point Destination(
@@ -174,14 +174,10 @@ struct State {
     return new_state;
   }
 
-  friend std::ostream& operator<<(std::ostream& o, const State& s) {
-    o << "Cost=" << s.cost << "; Board:\n"
-      << s.board << "\n"
-      << "Actors:\n";
-    for (const auto& a : s.actors) {
-      o << a << "\n";
-    }
-    return o;
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const State& s) {
+    absl::Format(&sink, "Cost=%d; Board:\n%v\nActors:\n%s",
+                 s.cost, s.board, absl::StrJoin(s.actors, "\n"));
   }
 };
 

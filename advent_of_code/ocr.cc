@@ -286,7 +286,7 @@ double Score(const CharBoard& test, const CharBoard& exemplar) {
 absl::StatusOr<char> OCRChar(
     const CharBoard& board,
     const std::vector<std::pair<char, CharBoard>>& exemplars) {
-  VLOG(3) << board.AsString();
+  VLOG(3) << board;
   char best_c;
   double best_score = -1;
   for (const auto& [e_char, e_board] : exemplars) {
@@ -305,7 +305,7 @@ absl::StatusOr<char> OCRChar(
 absl::StatusOr<std::string> OCRExtract(const CharBoard& board) {
   static std::vector<std::pair<char, CharBoard>> exemplars = Exemplars();
   if (absl::GetFlag(FLAGS_ocr_mode) == kInput) {
-    return board.AsString();
+    return absl::StrCat(board);
   }
 
   std::string ret;
@@ -324,7 +324,7 @@ absl::StatusOr<std::string> OCRExtract(const CharBoard& board) {
     return ret;
   }
   CHECK_EQ(absl::GetFlag(FLAGS_ocr_mode), kBoth);
-  return absl::StrCat(board.AsString(), "\n", ret);
+  return absl::StrCat(board, "\n", ret);
 }
 
 }  // namespace advent_of_code
