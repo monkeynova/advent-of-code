@@ -10,6 +10,11 @@
 
 namespace advent_of_code {
 
+// Stores a two dimension board of ascii characters as is commonly used within
+// AOC puzzles. A board has a fixed width and height upon construction but
+// mutable cells within the board. While any characters can be stored, the
+// most common form of use in AOC stores '#' as "on" and '.' as "off", and as
+// such methods like 'Draw' and 'CountOn' lean into those defaults.
 class CharBoard {
  public:
   // Constructs a CharBoard by iterating over `in` and adding one row to the
@@ -20,6 +25,9 @@ class CharBoard {
   template <typename Container>
   static absl::StatusOr<CharBoard> Parse(const Container& in);
 
+  // Sets each point in `points` in the board to '#'. If `bounds_ret` is not
+  // nullptr, it contains the (inclusive) axis aligned bounding box for those
+  // points.
   template <typename Container>
   static CharBoard Draw(const Container& points,
                         PointRectangle* bound_ret = nullptr) {
@@ -46,29 +54,17 @@ class CharBoard {
   CharBoard(const CharBoard&) = default;
   CharBoard& operator=(const CharBoard&) = default;
 
-  int CountOn() const { return CountChar('#'); }
-  int CountChar(char test) const;
-
   int height() const { return stride_ == 1 ? 0 : buf_.size() / stride_; }
   int width() const { return stride_ - 1; }
 
+  // Returns the (inclusive) bounds for the the board. This is use for, among
+  // other things, for (Point p : board.range()) { ... }.
   PointRectangle range() const {
     return PointRectangle{.min = {.x = 0, .y = 0},
                           .max = {.x = width() - 1, .y = height() - 1}};
   }
 
-  absl::flat_hash_set<Point> Find(char c) const;
-
-  Point TorusPoint(Point p) const;
-
-  char at(Point p) const { return buf_[p.y * stride_ + p.x]; }
-  void set(Point p, char c) { buf_[p.y * stride_ + p.x] = c; }
-
-  char operator[](Point p) const { return buf_[p.y * stride_ + p.x]; }
-  char& operator[](Point p) { return buf_[p.y * stride_ + p.x]; }
-
-  std::string AsString() const { return buf_; }
-
+  // Returns true if `p` is a valid point on the board.
   bool OnBoard(Point p) const {
     if (p.y < 0) return false;
     if (p.y >= height()) return false;
@@ -77,16 +73,42 @@ class CharBoard {
     return true;
   }
 
+  // at, set and operator[] all provide pointwise getter and setters for the
+  // individual cells on the board. It is undefined behavior to call with a
+  // point outside of range().
+  char at(Point p) const { return buf_[p.y * stride_ + p.x]; }
+  void set(Point p, char c) { buf_[p.y * stride_ + p.x] = c; }
+
+  char operator[](Point p) const { return buf_[p.y * stride_ + p.x]; }
+  char& operator[](Point p) { return buf_[p.y * stride_ + p.x]; }
+
+  // Retuns the set of points p such that at(p) == c.
+  absl::flat_hash_set<Point> Find(char c) const;
+
+  // Returns Find(test).size(), though doesn't use the temporary space.
+  int CountChar(char test) const;
+  int CountOn() const { return CountChar('#'); }
+
+  // Returns the canonical value for `p` assuming the board is a torus (that 
+  // is, assuming the edges wrap around like in Asteroids).
+  Point TorusPoint(Point p) const;
+
+  // Returns a CharBoard which represent the subset of `this` defined in
+  // `sub_range`. If any part of `sub_range` is off of the board, returns an
+  // error.
   absl::StatusOr<CharBoard> SubBoard(PointRectangle sub_range) const;
 
+  // A board is hashable, so implements AbslHashValue and operator==.
   template <typename H>
   friend H AbslHashValue(H h, const CharBoard& b) {
     return H::combine(std::move(h), b.buf_);
   }
-
   bool operator==(const CharBoard& o) const { return buf_ == o.buf_; }
   bool operator!=(const CharBoard& o) const { return !operator==(o); }
 
+  // For debugging purposes, implements stringification.
+  // TODO(@monkeynova): Use AbslStringify instead?
+  std::string AsString() const { return buf_; }
   friend std::ostream& operator<<(std::ostream& out, const CharBoard& b) {
     return out << b.buf_;
   }
@@ -95,6 +117,9 @@ class CharBoard {
   char* stride(int y) { return buf_.data() + stride_ * y; }
   const char* stride(int y) const { return buf_.data() + stride_ * y; }
 
+  // The board is implemented as a single contiguous buffer where each row is
+  // `stride_` bytes further in. `stride_` is width() + 1 so that we can
+  // include '\n' on each line and make stringification trivial.
   int stride_;
   std::string buf_;
 };
