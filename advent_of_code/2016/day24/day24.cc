@@ -56,9 +56,9 @@ class PathWalk : public BFSInterface<PathWalk> {
     return H::combine(std::move(h), pw.cur_, pw.have_keys_);
   }
 
-  friend std::ostream& operator<<(std::ostream& o, const PathWalk& pw) {
-    return o << "{" << pw.cur_ << "," << std::hex << pw.have_keys_ << std::dec
-             << "}";
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const PathWalk& pw) {
+    absl::Format(&sink, "{%v,%x}", pw.cur_, pw.have_keys_);
   }
 
  private:

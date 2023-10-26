@@ -30,8 +30,9 @@ struct Particle {
     return H::combine(std::move(h), p.p, p.v, p.a);
   }
 
-  friend std::ostream& operator<<(std::ostream& o, const Particle& p) {
-    return o << "p:" << p.p << ", v:" << p.v << ", a:" << p.a;
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const Particle& p) {
+    absl::Format(&sink, "p:%v, v:%v, a:%v", p.p, p.v, p.a);
   }
 };
 

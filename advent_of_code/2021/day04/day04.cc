@@ -34,17 +34,14 @@ class Board {
     return build;
   }
 
-  friend std::ostream& operator<<(std::ostream& o, const Board& b) {
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const Board& b) {
     for (int i = 0; i < 5; ++i) {
       for (int j = 0; j < 5; ++j) {
-        o << b.board_[i][j] << " ";
-        if (b.selected_[i][j]) {
-          o << "* ";
-        }
+        absl::Format(&sink, "%d %s", b.board_[i][j], b.selected_[i][j] ? "* " : "");
       }
-      o << "\n";
+      absl::Format(&sink, "\n");
     }
-    return o;
   }
 
   int64_t Score() const {

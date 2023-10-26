@@ -71,11 +71,6 @@ struct Point4 {
 
   int dist() const { return abs(x) + abs(y) + abs(z) + abs(w); }
 
-  template <typename Sink>
-  friend void AbslStringify(Sink& sink, const Point4& p) {
-    absl::Format(&sink, "{%v,%v,%v,%v}", p.x, p.y, p.z, p.w);
-  }
-
   friend constexpr Point4 operator*(int s, Point4 p) {
     return {.x = s * p.x, .y = s * p.y, .z = s * p.z, .w = s * p.w};
   }
@@ -85,9 +80,9 @@ struct Point4 {
     return H::combine(std::move(h), p.x, p.y, p.z, p.w);
   }
 
-  friend std::ostream& operator<<(std::ostream& out, const Point4& p) {
-    out << "{" << p.x << "," << p.y << "," << p.z << "," << p.w << "}";
-    return out;
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const Point4& p) {
+    absl::Format(&sink, "{%v,%v,%v,%v}", p.x, p.y, p.z, p.w);
   }
 };
 

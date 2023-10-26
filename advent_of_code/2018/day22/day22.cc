@@ -147,8 +147,9 @@ class MapWalk : public BFSInterface<MapWalk> {
     return H::combine(std::move(h), m.cur_, m.equipped_);
   }
 
-  friend std::ostream& operator<<(std::ostream& o, const MapWalk& m) {
-    return o << "{" << m.cur_ << ";" << m.equipped_ << "}";
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const MapWalk& m) {
+    absl::Format(&sink, "{%v;%v}", m.cur_, m.equipped_);
   }
 
  private:

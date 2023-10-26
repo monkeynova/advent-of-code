@@ -69,22 +69,22 @@ struct Point {
 
   int dist() const { return abs(x) + abs(y); }
 
+  friend Point operator*(int s, Point p) {
+    return {.x = s * p.x, .y = s * p.y};
+  }
+
   template <typename Sink>
   friend void AbslStringify(Sink& sink, const Point& p) {
     absl::Format(&sink, "{%v,%v}", p.x, p.y);
   }
 
-  friend Point operator*(int s, Point p) {
-    return {.x = s * p.x, .y = s * p.y};
+  friend std::ostream& operator<<(std::ostream& o, const Point& p) {
+    return o << absl::StreamFormat("%v", p);
   }
 
   template <typename H>
   friend H AbslHashValue(H h, const Point& p) {
     return H::combine(std::move(h), p.x, p.y);
-  }
-
-  friend std::ostream& operator<<(std::ostream& out, const Point& p) {
-    return out << absl::StreamFormat("%v", p);
   }
 };
 
@@ -173,10 +173,6 @@ struct PointRectangle {
   template <typename Sink>
   friend void AbslStringify(Sink& sink, const PointRectangle& r) {
     absl::Format(&sink, "%v-%v", r.min, r.max);
-  }
-
-  friend std::ostream& operator<<(std::ostream& out, const PointRectangle& r) {
-    return out << absl::StreamFormat("%v", r);
   }
 
   void SetDifference(const PointRectangle& o,

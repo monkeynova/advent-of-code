@@ -26,14 +26,14 @@ class AssemBunny {
       return a == o.a && b == o.b && c == o.c && d == o.d;
     }
 
-    friend std::ostream& operator<<(std::ostream& out,
-                                    const AssemBunny::Registers& r) {
-      return out << "{" << r.a << "," << r.b << "," << r.c << "," << r.d << "}";
-    }
-
     template <typename H>
     friend H AbslHashValue(H h, const AssemBunny::Registers& r) {
       return H::combine(std::move(h), r.a, r.b, r.c, r.d);
+    }
+
+    template <typename Sink>
+    friend void AbslStringify(Sink& sink, const AssemBunny::Registers& r) {
+      absl::Format(&sink, "{%d,%d,%d,%d}", r.a, r.b, r.c, r.d);
     }
   };
 

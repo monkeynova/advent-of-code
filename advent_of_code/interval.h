@@ -37,10 +37,6 @@ class Interval1D {
     }
   }
 
-  friend std::ostream& operator<<(std::ostream& out, const Interval1D& i) {
-    return out << absl::StreamFormat("%v", i);
-  }
-
  private:
   Interval1D Merge(const Interval1D& o,
                    absl::FunctionRef<bool(bool, bool)> merge_fn) const;
@@ -86,10 +82,6 @@ class RectangleSet {
     for (const PointRectangle& r : s.set_) {
       absl::Format(&sink, "%v,", r);
     }
-  }
-
-  friend std::ostream& operator<<(std::ostream& o, const RectangleSet& s) {
-    return o << absl::StreamFormat("%v", s);
   }
 
  private:

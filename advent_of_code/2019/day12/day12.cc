@@ -25,8 +25,9 @@ struct Moon {
     return H::combine(std::move(h), m.position, m.velocity);
   }
 
-  friend std::ostream& operator<<(std::ostream& out, const Moon& m) {
-    return out << "{" << m.position << "," << m.velocity << "}";
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const Moon& m) {
+    absl::Format(&sink, "{%v,%v}", m.position, m.velocity);
   }
 };
 

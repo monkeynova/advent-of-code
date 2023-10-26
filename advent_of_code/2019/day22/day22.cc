@@ -29,11 +29,12 @@ struct Transform {
     return static_cast<int64_t>(
         absl::Uint128Low64((cp_i128 * mult + add) % mod));
   }
-};
 
-std::ostream& operator<<(std::ostream& out, const Transform t) {
-  return out << "(" << t.mult << "*n + " << t.add << ")%" << t.mod;
-}
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const Transform& t) {
+    absl::Format(&sink, "(%v*n+%v)%%%v", t.mult, t.add, t.mod);
+  }
+};
 
 Transform NewStack(int64_t deck_size) {
   return Transform{

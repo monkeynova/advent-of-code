@@ -52,11 +52,11 @@ struct State {
   char geode = 0;
   char geode_robot = 0;
 
-  friend std::ostream& operator<<(std::ostream& o, const State& s) {
-    return o << "O:+" << (int)s.ore << "*" << (int)s.ore_robot << ";"
-             << "O:+" << (int)s.clay << "*" << (int)s.clay_robot << ";"
-             << "O:+" << (int)s.obsidian << "*" << (int)s.obsidian_robot << ";"
-             << "O:+" << (int)s.geode << "*" << (int)s.geode_robot << ";";
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const State& s) {
+    absl::Format(&sink, "O:+%d*%d;O:+%d*%d;O:+%d*%d;O:+%d*%d",
+                 s.ore, s.ore_robot, s.clay, s.clay_robot,
+                 s.obsidian, s.obsidian_robot, s.geode, s.geode_robot);
   }
 
   template <typename H>

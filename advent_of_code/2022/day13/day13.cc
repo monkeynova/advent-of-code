@@ -34,14 +34,15 @@ struct Packet {
 
   absl::variant<int, std::vector<Packet>> val;
 
-  friend std::ostream& operator<<(std::ostream& o, const Packet& cmp) {
-    if (cmp.IsInt()) return o << cmp.AsInt();
-    o << "[";
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const Packet& cmp) {
+    if (cmp.IsInt()) return absl::Format(&sink, "%v", cmp.AsInt());
+    absl::Format(&sink, "[");
     for (int i = 0; i < cmp.AsList().size(); ++i) {
-      if (i > 0) o << ",";
-      o << cmp.AsList()[i];
+      if (i > 0)     absl::Format(&sink, ",");
+      absl::Format(&sink, "%v", cmp.AsList()[i]);
     }
-    return o << "]";
+    absl::Format(&sink, "]");
   }
 
   bool operator==(const Packet& o) const { return cmp(o) == 0; }

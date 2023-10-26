@@ -66,10 +66,6 @@ struct GameState {
     if (marble_idx != 0) absl::Format(&sink, ",...");
   }
 
-  friend std::ostream& operator<<(std::ostream& out, const GameState& s) {
-    return out << absl::StreamFormat("%v", s);
-  }
-
   void IntegrityCheck() {
     int marble_idx = cur_position;
     int start = marble_idx;

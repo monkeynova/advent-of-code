@@ -76,11 +76,6 @@ struct Point3 {
 
   int dist() const { return abs(x) + abs(y) + abs(z); }
 
-  template <typename Sink>
-  friend void AbslStringify(Sink& sink, const Point3& p) {
-    absl::Format(&sink, "{%v,%v,%v}", p.x, p.y, p.z);
-  }
-
   friend constexpr Point3 operator*(int s, Point3 p) {
     return {.x = s * p.x, .y = s * p.y, .z = s * p.z};
   }
@@ -90,9 +85,9 @@ struct Point3 {
     return H::combine(std::move(h), p.x, p.y, p.z);
   }
 
-  friend std::ostream& operator<<(std::ostream& out, const Point3& p) {
-    out << "{" << p.x << "," << p.y << "," << p.z << "}";
-    return out;
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const Point3& p) {
+    absl::Format(&sink, "{%v,%v,%v}", p.x, p.y, p.z);
   }
 };
 
@@ -241,8 +236,9 @@ class Orientation3 {
     return ret;
   }
 
-  friend std::ostream& operator<<(std::ostream& out, const Orientation3& o) {
-    return out << o.x_hat_ << "/" << o.y_hat_ << "/" << o.z_hat_;
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const Orientation3& o) {
+    absl::Format(&sink, "%v/%v/%v", o.x_hat_, o.y_hat_, o.z_hat_);
   }
 
  private:
