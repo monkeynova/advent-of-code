@@ -52,40 +52,46 @@ struct State {
   int16_t el;
   int open_set;
 
-  void NextForMe(const DirectedGraph<Valve>& graph,
-                 const absl::flat_hash_map<absl::string_view, int>& pack,
-                 absl::FunctionRef<void(State)> on_next) const {
+  absl::Status NextForMe(
+      const DirectedGraph<Valve>& graph,
+      const absl::flat_hash_map<absl::string_view, int>& pack,
+      absl::FunctionRef<absl::Status(State)> on_next) const {
     if (open_set == (1 << pack.size()) - 1) {
-      on_next(*this);
-      return;
+      return on_next(*this);
     }
     TryOpenMe(pack, on_next);
     std::string me_str = {static_cast<char>(me >> 8),
                           static_cast<char>(me & 0xFF)};
-    CHECK(graph.Outgoing(me_str) != nullptr) << me_str;
+    if (graph.Outgoing(me_str) == nullptr) {
+      return Error("No outgoing for me from: ", me_str);
+    }
     for (absl::string_view out : *graph.Outgoing(me_str)) {
       State s = *this;
       s.MoveMe(out);
-      on_next(s);
+      if (absl::Status st = on_next(s); !st.ok()) return st;
     }
+    return absl::OkStatus();
   }
 
-  void NextForEl(const DirectedGraph<Valve>& graph,
-                 const absl::flat_hash_map<absl::string_view, int>& pack,
-                 absl::FunctionRef<void(State)> on_next) const {
+  absl::Status NextForEl(
+      const DirectedGraph<Valve>& graph,
+      const absl::flat_hash_map<absl::string_view, int>& pack,
+      absl::FunctionRef<absl::Status(State)> on_next) const {
     if (open_set == (1 << pack.size()) - 1) {
-      on_next(*this);
-      return;
+      return on_next(*this);
     }
     TryOpenEl(pack, on_next);
     std::string el_str = {static_cast<char>(el >> 8),
                           static_cast<char>(el & 0xFF)};
-    CHECK(graph.Outgoing(el_str) != nullptr) << el_str;
+    if (graph.Outgoing(el_str) == nullptr) {
+      return Error("No outgoing for el from: ", el_str);
+    }
     for (absl::string_view out : *graph.Outgoing(el_str)) {
       State s = *this;
       s.MoveEl(out);
-      on_next(s);
+      if (absl::Status st = on_next(s); !st.ok()) return st;
     }
+    return absl::Status();
   }
 
   void TryOpenMe(const absl::flat_hash_map<absl::string_view, int>& pack,
@@ -224,15 +230,19 @@ absl::StatusOr<int> BestPath(const DirectedGraph<Valve>& graph, int minutes,
         }
       }
 
-      s.NextForMe(graph, pack, [&](State s1) {
+      absl::Status st = s.NextForMe(graph, pack, [&](State s1) {
         if (use_elephant) {
-          s1.NextForEl(graph, pack, [&](State s2) {
+          absl::Status st = s1.NextForEl(graph, pack, [&](State s2) {
             InsertOrUpdateMax(new_state_to_pressure, s2, new_pressure);
+            return absl::OkStatus();
           });
+          if (!st.ok()) return st;
         } else {
           InsertOrUpdateMax(new_state_to_pressure, s1, new_pressure);
         }
+        return absl::OkStatus();
       });
+      if (!st.ok()) return st;
     }
     state_to_pressure = std::move(new_state_to_pressure);
   }
