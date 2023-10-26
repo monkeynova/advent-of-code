@@ -42,9 +42,9 @@ struct PointAndDir {
 
 class StitchMap {
  public:
-  StitchMap() = default;
+  explicit StitchMap(int tile_width) : tile_width_(tile_width) {}
 
-  void Add(Point s1, Point s2, Point d1, Point e1, Point e2, Point d2);
+  absl::Status Add(Point s1, Point s2, Point d1, Point e1, Point e2, Point d2);
   std::optional<PointAndDir> Find(PointAndDir src) const {
     if (auto it = map_.find(src); it != map_.end()) {
       return it->second;
@@ -52,14 +52,20 @@ class StitchMap {
     return std::nullopt;
   }
 
+  // Find the entry in `set` on the same face with the same direction as `f`.
+  absl::StatusOr<std::optional<PointAndDir>> SameEdge(
+      std::vector<PointAndDir>& set, PointAndDir f) const;
+
  private:
+  int tile_width_;
   absl::flat_hash_map<PointAndDir, PointAndDir> map_;
 };
 
-void StitchMap::Add(Point s1, Point s2, Point d1, Point e1, Point e2,
+absl::Status StitchMap::Add(Point s1, Point s2, Point d1, Point e1, Point e2,
                     Point d2) {
-  CHECK_EQ((s2 - s1).dist(), (e2 - e1).dist())
-      << s1 << "-" << s2 << "; " << e1 << "-" << e2;
+  if ((s2 - s1).dist() != (e2 - e1).dist()) {
+    return Error(s1, "-", s1, "; ", e1, "-", e2);
+  }
   Point ds = (s2 - s1).min_step();
   Point de = (e2 - e1).min_step();
 
@@ -73,6 +79,25 @@ void StitchMap::Add(Point s1, Point s2, Point d1, Point e1, Point e2,
     VLOG(2) << e << "," << -d2 << " => " << s << "," << -d1;
     if (s == s2) break;
   }
+
+  return absl::OkStatus();
+}
+
+  // Find the entry in `set` on the same face with the same direction as `f`.
+absl::StatusOr<std::optional<PointAndDir>> StitchMap::SameEdge(
+    std::vector<PointAndDir>& set, PointAndDir f) const {
+  std::optional<PointAndDir> ret;
+  for (PointAndDir pd : set) {
+    if (f.d != pd.d) continue;
+    if (f.p.x / tile_width_ == pd.p.x / tile_width_ &&
+        f.p.y / tile_width_ == pd.p.y / tile_width_) {
+      if (ret) {
+        return Error("Duplicate at ", *ret, " and " , pd);
+      }
+      ret = pd;
+    }
+  }
+  return ret;
 }
 
 struct StitchFace {
@@ -96,7 +121,7 @@ struct PaintCorner {
   }
 };
 
-StitchMap BuildStitchMap(const CharBoard& board) {
+absl::StatusOr<StitchMap> BuildStitchMap(const CharBoard& board) {
   int tile_width = std::gcd(board.width(), board.height());
 
   std::optional<Point> face_start;
@@ -154,7 +179,9 @@ StitchMap BuildStitchMap(const CharBoard& board) {
       if (hist.contains(next_face)) continue;
       hist.insert(next_face);
       auto it = kRotations.find(dir);
-      CHECK(it != kRotations.end());
+      if (it == kRotations.end()) {
+        return Error("Could not find ", dir);
+      }
       queue.push_back({next_face, stitch_face.to_cube.Apply(it->second)});
     }
   }
@@ -162,7 +189,9 @@ StitchMap BuildStitchMap(const CharBoard& board) {
   // Every corner should have 3 faces attached, each face attached in two
   // directions.
   for (auto [p3, p2v] : corner_maps) {
-    CHECK_EQ(p2v.size(), 6);
+    if (p2v.size() != 6) {
+      return Error("Bad face stitch");
+    }
   }
 
   std::vector<std::pair<Point3, Point3>> cube_edges = {
@@ -185,41 +214,38 @@ StitchMap BuildStitchMap(const CharBoard& board) {
       {{1, 1, -1}, {1, 1, 1}},
   };
 
-  // Find the entry in `set` on the same face with the same direction as `f`.
-  auto same_edge = [&](std::vector<PointAndDir>& set, PointAndDir f) {
-    std::optional<PointAndDir> ret;
-    for (PointAndDir pd : set) {
-      if (f.d != pd.d) continue;
-      if (f.p.x / tile_width == pd.p.x / tile_width &&
-          f.p.y / tile_width == pd.p.y / tile_width) {
-        CHECK(!ret);
-        ret = pd;
-      }
-    }
-    return ret;
-  };
-
-  StitchMap stitch_map;
+  StitchMap stitch_map(tile_width);
   for (auto [s, e] : cube_edges) {
-    CHECK(corner_maps.contains(s));
-    CHECK(corner_maps.contains(e));
+    if (!corner_maps.contains(s)) {
+      return Error("Could not find start: ", s);
+    }
+    if (!corner_maps.contains(e)) {
+      return Error("Could not find end : ", e);
+    }
     std::vector<PointAndDir> s_set = corner_maps[s];
     std::vector<PointAndDir> e_set = corner_maps[e];
     int stitch_count = 0;
     for (int i = 0; i < 6; ++i) {
       PointAndDir s1 = s_set[i];
-      std::optional<PointAndDir> e1 = same_edge(e_set, s1);
-      if (!e1) continue;
+      absl::StatusOr<std::optional<PointAndDir>> e1 =
+          stitch_map.SameEdge(e_set, s1);
+      if (!e1.ok()) return e1.status();
+      if (!*e1) continue;
       for (int j = i + 1; j < 6; ++j) {
         PointAndDir s2 = s_set[j];
-        std::optional<PointAndDir> e2 = same_edge(e_set, s2);
-        if (!e2) continue;
+        absl::StatusOr<std::optional<PointAndDir>> e2 =
+            stitch_map.SameEdge(e_set, s2);
+        if (!e2.ok()) return e1.status();
+        if (!*e2) continue;
         ++stitch_count;
-        stitch_map.Add(s1.p, e1->p, s1.d, s2.p, e2->p, -s2.d);
+        absl::Status st = stitch_map.Add(s1.p, (*e1)->p, s1.d, s2.p, (*e2)->p, -s2.d);
+        if (!st.ok()) return st;
       }
     }
-    CHECK_EQ(stitch_count, 1) << "s_set: " << absl::StrJoin(s_set, ",") << "; "
-                              << "e_set: " << absl::StrJoin(e_set, ",");
+    if (stitch_count != 1) {
+      return Error("s_set: ", absl::StrJoin(s_set, ","), "; e_set: ",
+                   absl::StrJoin(e_set, ","));
+    }
   }
   return stitch_map;
 }
@@ -250,26 +276,88 @@ absl::StatusOr<PointAndDir> FindStart(const CharBoard& board) {
   return PointAndDir{.p = *start, .d = Cardinal::kEast};
 }
 
+class Mover {
+ public:
+  virtual absl::StatusOr<PointAndDir> Move(PointAndDir, int) const = 0;
+};
+
+class Part1Mover : public Mover {
+ public:
+  explicit Part1Mover(const CharBoard& board) : board_(board) {}
+
+  absl::StatusOr<PointAndDir> Move(PointAndDir cur, int dist) const override {
+    VLOG(2) << cur << "; move=" << dist;
+    for (int i = 0; i < dist; ++i) {
+      PointAndDir next = cur.Advance();
+      next.p = board_.TorusPoint(next.p);
+      while (board_[next.p] == ' ') {
+        next = next.Advance();
+        next.p = board_.TorusPoint(next.p);
+      }
+      if (board_[next.p] == '#') break;
+      cur = next;
+    }
+    VLOG(2) << cur;
+    return cur;
+  }
+
+ private:
+  const CharBoard& board_;
+};
+
+class Part2Mover : public Mover {
+ public:
+  Part2Mover(const CharBoard& board, const StitchMap& stitch_map)
+   : board_(board), stitch_map_(stitch_map) {}
+
+  absl::StatusOr<PointAndDir> Move(PointAndDir cur, int dist) const override {
+    VLOG(2) << cur << " move: " << dist;
+    for (int i = 0; i < dist; ++i) {
+      std::optional<PointAndDir> next = stitch_map_.Find(cur);
+      if (!next) {
+        next = cur.Advance();
+      }
+      if (!board_.OnBoard(next->p)) {
+        return Error(*next, " not on board");
+      }
+      if (board_[next->p] == ' ') {
+        return Error(*next, " isn't empty");
+      }
+      if (board_[next->p] == '#') break;
+      cur = *next;
+    }
+    return cur;
+  }
+
+ private:
+  const CharBoard& board_;
+  const StitchMap& stitch_map_;
+};
+
 absl::StatusOr<PointAndDir> MovePath(
     absl::string_view path, PointAndDir cur,
-    absl::FunctionRef<PointAndDir(PointAndDir, int)> move) {
+    const Mover& mover) {
   int dist = 0;
   for (char c : path) {
     if (c >= '0' && c <= '9')
       dist = dist * 10 + c - '0';
     else if (c == 'R') {
-      cur = move(cur, dist);
+      absl::StatusOr<PointAndDir> next = mover.Move(cur, dist);
+      if (!next.ok()) return next.status();
+      cur = *next;
       dist = 0;
       cur = cur.rotate_right();
     } else if (c == 'L') {
-      cur = move(cur, dist);
+      absl::StatusOr<PointAndDir> next = mover.Move(cur, dist);
+      if (!next.ok()) return next.status();
+      cur = *next;
       dist = 0;
       cur = cur.rotate_left();
     } else {
       return Error("Bad path");
     }
   }
-  return move(cur, dist);
+  return mover.Move(cur, dist);
 }
 
 absl::StatusOr<int> Score(PointAndDir pd) {
@@ -301,25 +389,11 @@ absl::StatusOr<std::string> Day_2022_22::Part1(
   std::vector<std::string> storage;
   absl::StatusOr<CharBoard> board = PadAndParseBoard(input, storage);
 
-  auto move = [&board](PointAndDir cur, int dist) {
-    VLOG(2) << cur << "; move=" << dist;
-    for (int i = 0; i < dist; ++i) {
-      PointAndDir next = cur.Advance();
-      next.p = board->TorusPoint(next.p);
-      while ((*board)[next.p] == ' ') {
-        next = next.Advance();
-        next.p = board->TorusPoint(next.p);
-      }
-      if ((*board)[next.p] == '#') break;
-      cur = next;
-    }
-    VLOG(2) << cur;
-    return cur;
-  };
-
   absl::StatusOr<PointAndDir> start = FindStart(*board);
   if (!start.ok()) return start.status();
-  absl::StatusOr<PointAndDir> end = MovePath(path, *start, move);
+
+  Part1Mover mover(*board);
+  absl::StatusOr<PointAndDir> end = MovePath(path, *start, mover);
   if (!end.ok()) return end.status();
   return AdventReturn(Score(*end));
 }
@@ -335,26 +409,14 @@ absl::StatusOr<std::string> Day_2022_22::Part2(
   absl::StatusOr<CharBoard> board = PadAndParseBoard(input, storage);
   if (!board.ok()) return board.status();
 
-  StitchMap stitch_map = BuildStitchMap(*board);
-
-  auto move = [&board, &stitch_map](PointAndDir cur, int dist) {
-    VLOG(2) << cur << " move: " << dist;
-    for (int i = 0; i < dist; ++i) {
-      std::optional<PointAndDir> next = stitch_map.Find(cur);
-      if (!next) {
-        next = cur.Advance();
-      }
-      CHECK(board->OnBoard(next->p)) << *next;
-      CHECK((*board)[next->p] != ' ') << *next;
-      if ((*board)[next->p] == '#') break;
-      cur = *next;
-    }
-    return cur;
-  };
-
   absl::StatusOr<PointAndDir> start = FindStart(*board);
   if (!start.ok()) return start.status();
-  absl::StatusOr<PointAndDir> end = MovePath(path, *start, move);
+
+  absl::StatusOr<StitchMap> stitch_map = BuildStitchMap(*board);
+  if (!stitch_map.ok()) return stitch_map.status();
+
+  Part2Mover mover(*board, *stitch_map);
+  absl::StatusOr<PointAndDir> end = MovePath(path, *start, mover);
   if (!end.ok()) return end.status();
   return AdventReturn(Score(*end));
 }
