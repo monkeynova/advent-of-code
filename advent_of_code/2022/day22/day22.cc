@@ -62,7 +62,7 @@ class StitchMap {
 };
 
 absl::Status StitchMap::Add(Point s1, Point s2, Point d1, Point e1, Point e2,
-                    Point d2) {
+                            Point d2) {
   if ((s2 - s1).dist() != (e2 - e1).dist()) {
     return Error(s1, "-", s1, "; ", e1, "-", e2);
   }
@@ -83,7 +83,7 @@ absl::Status StitchMap::Add(Point s1, Point s2, Point d1, Point e1, Point e2,
   return absl::OkStatus();
 }
 
-  // Find the entry in `set` on the same face with the same direction as `f`.
+// Find the entry in `set` on the same face with the same direction as `f`.
 absl::StatusOr<std::optional<PointAndDir>> StitchMap::SameEdge(
     std::vector<PointAndDir>& set, PointAndDir f) const {
   std::optional<PointAndDir> ret;
@@ -92,7 +92,7 @@ absl::StatusOr<std::optional<PointAndDir>> StitchMap::SameEdge(
     if (f.p.x / tile_width_ == pd.p.x / tile_width_ &&
         f.p.y / tile_width_ == pd.p.y / tile_width_) {
       if (ret) {
-        return Error("Duplicate at ", *ret, " and " , pd);
+        return Error("Duplicate at ", *ret, " and ", pd);
       }
       ret = pd;
     }
@@ -238,13 +238,14 @@ absl::StatusOr<StitchMap> BuildStitchMap(const CharBoard& board) {
         if (!e2.ok()) return e1.status();
         if (!*e2) continue;
         ++stitch_count;
-        absl::Status st = stitch_map.Add(s1.p, (*e1)->p, s1.d, s2.p, (*e2)->p, -s2.d);
+        absl::Status st =
+            stitch_map.Add(s1.p, (*e1)->p, s1.d, s2.p, (*e2)->p, -s2.d);
         if (!st.ok()) return st;
       }
     }
     if (stitch_count != 1) {
-      return Error("s_set: ", absl::StrJoin(s_set, ","), "; e_set: ",
-                   absl::StrJoin(e_set, ","));
+      return Error("s_set: ", absl::StrJoin(s_set, ","),
+                   "; e_set: ", absl::StrJoin(e_set, ","));
     }
   }
   return stitch_map;
@@ -308,7 +309,7 @@ class Part1Mover : public Mover {
 class Part2Mover : public Mover {
  public:
   Part2Mover(const CharBoard& board, const StitchMap& stitch_map)
-   : board_(board), stitch_map_(stitch_map) {}
+      : board_(board), stitch_map_(stitch_map) {}
 
   absl::StatusOr<PointAndDir> Move(PointAndDir cur, int dist) const override {
     VLOG(2) << cur << " move: " << dist;
@@ -334,9 +335,8 @@ class Part2Mover : public Mover {
   const StitchMap& stitch_map_;
 };
 
-absl::StatusOr<PointAndDir> MovePath(
-    absl::string_view path, PointAndDir cur,
-    const Mover& mover) {
+absl::StatusOr<PointAndDir> MovePath(absl::string_view path, PointAndDir cur,
+                                     const Mover& mover) {
   int dist = 0;
   for (char c : path) {
     if (c >= '0' && c <= '9')

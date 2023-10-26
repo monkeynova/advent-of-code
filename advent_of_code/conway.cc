@@ -30,8 +30,8 @@ std::string Conway::DefaultLookup() {
 
 absl::Status Conway::Advance() {
   if (lookup_.size() != 512) {
-    return absl::InternalError(absl::StrCat(
-      "Bad lookup size:", lookup_.size()));
+    return absl::InternalError(
+        absl::StrCat("Bad lookup size:", lookup_.size()));
   }
   Point dst_to_src = infinite_ ? Cardinal::kNorthWest : Cardinal::kOrigin;
   int buffer = infinite_ ? 2 : 0;
@@ -45,11 +45,14 @@ absl::Status Conway::Advance() {
       Point src = p + d + dst_to_src;
       bv <<= 1;
       switch (char test = b_.OnBoard(src) ? b_[src] : fill_) {
-        case '#': bv |= 1; continue;
-        case '.': continue;
+        case '#':
+          bv |= 1;
+          continue;
+        case '.':
+          continue;
         default: {
           return absl::InternalError(absl::StrCat(
-            "Bad board character: '", absl::string_view(&test, 1), "'"));
+              "Bad board character: '", absl::string_view(&test, 1), "'"));
         }
       }
     }

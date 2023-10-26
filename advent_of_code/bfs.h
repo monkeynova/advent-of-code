@@ -23,7 +23,7 @@ namespace advent_of_code {
 // where the relevant state is simply a Point).
 //
 // State subclasses are expected to override the abstract methods in order
-// to perform the search. 
+// to perform the search.
 template <typename BFSImpl, typename HistType = const BFSImpl&>
 class BFSInterface {
  public:
@@ -50,7 +50,7 @@ class BFSInterface {
   // path from `this` to a state returning true in IsFinal must take at least
   // this man steps. For example (Point{end} - Point{start}).dist() would
   // return the minimal (unobstructed) distance from the end point and meet the
-  // requirements. 
+  // requirements.
   virtual int min_steps_to_final() const { return 0; }
 
   // Implements a standard breadth-first search from `this` to a subsequent
@@ -63,7 +63,7 @@ class BFSInterface {
   // `min_steps_to_final` is used to prioitize the search space. For example,
   // if min_steps_to_final where to return (Point{end} - Point{start}).dist()
   // the search space would prioritize more direct paths over a fully breadth
-  // first search space. 
+  // first search space.
   absl::optional<int> FindMinStepsAStar() {
     static_assert(std::is_copy_assignable_v<BFSImpl>,
                   "BFSImpl must be copy-assignable for AStar");
@@ -78,7 +78,7 @@ class BFSInterface {
 
   // In the event that going from `this` to an entry added by AddNextSteps
   // needs to account for more than a single action, add_steps can adjust the
-  // distance. 
+  // distance.
   // If used, `FindMinSteps` will not return an accurate answer and
   // `FindMinStepsAStar` must be used instead.
   void add_steps(int num_steps) { num_steps_ += num_steps; }
@@ -190,8 +190,7 @@ class BFSInterface<BFSImpl, HistType>::QueueState
     }
   };
 
-  std::priority_queue<BFSImpl, std::vector<BFSImpl>, AStarGT>
-      frontier_;
+  std::priority_queue<BFSImpl, std::vector<BFSImpl>, AStarGT> frontier_;
 };
 
 }  // namespace advent_of_code

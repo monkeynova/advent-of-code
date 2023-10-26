@@ -38,7 +38,8 @@ class Board {
   friend void AbslStringify(Sink& sink, const Board& b) {
     for (int i = 0; i < 5; ++i) {
       for (int j = 0; j < 5; ++j) {
-        absl::Format(&sink, "%d %s", b.board_[i][j], b.selected_[i][j] ? "* " : "");
+        absl::Format(&sink, "%d %s", b.board_[i][j],
+                     b.selected_[i][j] ? "* " : "");
       }
       absl::Format(&sink, "\n");
     }

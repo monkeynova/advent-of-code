@@ -16,7 +16,7 @@ namespace advent_of_code {
 // most common form of use in AOC stores '#' as "on" and '.' as "off", and as
 // such methods like 'Draw' and 'CountOn' lean into those defaults.
 // An example board might look like the following:
-// 
+//
 // #######
 // #.#...#
 // #.###.#
@@ -97,7 +97,7 @@ class CharBoard {
   int CountChar(char test) const;
   int CountOn() const { return CountChar('#'); }
 
-  // Returns the canonical value for `p` assuming the board is a torus (that 
+  // Returns the canonical value for `p` assuming the board is a torus (that
   // is, assuming the edges wrap around like in Asteroids).
   Point TorusPoint(Point p) const;
 

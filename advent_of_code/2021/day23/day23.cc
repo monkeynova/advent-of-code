@@ -72,7 +72,8 @@ absl::StatusOr<AllPathsMap> ComputeAllPaths(
         return absl::InternalError(absl::StrFormat("%v != %v", path[0], from));
       }
       if (path.back() != to) {
-        return absl::InternalError(absl::StrFormat("%v != %v", path.back(), to));
+        return absl::InternalError(
+            absl::StrFormat("%v != %v", path.back(), to));
       }
     }
   }
@@ -182,8 +183,8 @@ struct State {
 
   template <typename Sink>
   friend void AbslStringify(Sink& sink, const State& s) {
-    absl::Format(&sink, "Cost=%d; Board:\n%v\nActors:\n%s",
-                 s.cost, s.board, absl::StrJoin(s.actors, "\n"));
+    absl::Format(&sink, "Cost=%d; Board:\n%v\nActors:\n%s", s.cost, s.board,
+                 absl::StrJoin(s.actors, "\n"));
   }
 };
 

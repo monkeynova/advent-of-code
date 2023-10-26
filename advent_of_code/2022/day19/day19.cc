@@ -54,9 +54,9 @@ struct State {
 
   template <typename Sink>
   friend void AbslStringify(Sink& sink, const State& s) {
-    absl::Format(&sink, "O:+%d*%d;O:+%d*%d;O:+%d*%d;O:+%d*%d",
-                 s.ore, s.ore_robot, s.clay, s.clay_robot,
-                 s.obsidian, s.obsidian_robot, s.geode, s.geode_robot);
+    absl::Format(&sink, "O:+%d*%d;O:+%d*%d;O:+%d*%d;O:+%d*%d", s.ore,
+                 s.ore_robot, s.clay, s.clay_robot, s.obsidian,
+                 s.obsidian_robot, s.geode, s.geode_robot);
   }
 
   template <typename H>

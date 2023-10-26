@@ -39,7 +39,7 @@ struct Packet {
     if (cmp.IsInt()) return absl::Format(&sink, "%v", cmp.AsInt());
     absl::Format(&sink, "[");
     for (int i = 0; i < cmp.AsList().size(); ++i) {
-      if (i > 0)     absl::Format(&sink, ",");
+      if (i > 0) absl::Format(&sink, ",");
       absl::Format(&sink, "%v", cmp.AsList()[i]);
     }
     absl::Format(&sink, "]");
