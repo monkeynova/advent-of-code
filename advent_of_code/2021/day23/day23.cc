@@ -59,15 +59,21 @@ class CanMoveBFS : public BFSInterface<CanMoveBFS, Point> {
 using AllPathsMap =
     absl::flat_hash_map<std::pair<Point, Point>, std::vector<Point>>;
 
-AllPathsMap ComputeAllPaths(const CharBoard& b,
-                            const std::vector<Point>& point_list) {
+absl::StatusOr<AllPathsMap> ComputeAllPaths(
+    const CharBoard& b, const std::vector<Point>& point_list) {
   AllPathsMap ret;
   for (Point from : point_list) {
     for (Point to : point_list) {
       std::vector<Point>& path = ret[std::make_pair(from, to)];
-      CHECK(CanMoveBFS(&b, from, to, &path).FindMinSteps());
-      CHECK_EQ(path[0], from);
-      CHECK_EQ(path.back(), to);
+      if (!CanMoveBFS(&b, from, to, &path).FindMinSteps()) {
+        return absl::NotFoundError("No path found");
+      }
+      if (path[0] != from) {
+        return absl::InternalError(absl::StrFormat("%v != %v", path[0], from));
+      }
+      if (path.back() != to) {
+        return absl::InternalError(absl::StrFormat("%v != %v", path.back(), to));
+      }
     }
   }
 
@@ -271,7 +277,8 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
   std::vector<Point> all_points;
   all_points.insert(all_points.end(), empty.begin(), empty.end());
   all_points.insert(all_points.end(), srcs.begin(), srcs.end());
-  AllPathsMap all_paths = ComputeAllPaths(*b, all_points);
+  absl::StatusOr<AllPathsMap> all_paths = ComputeAllPaths(*b, all_points);
+  if (!all_paths.ok()) return all_paths.status();
 
   // Identify the destination locations for each set of actors.
   if (srcs.size() % 4 != 0) return Error("Bad srcs");
@@ -306,7 +313,7 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
   }
 
   return AdventReturn(
-      FindMinCost(std::move(s), empty, destinations, all_paths));
+      FindMinCost(std::move(s), empty, destinations, *all_paths));
 }
 
 absl::StatusOr<std::string> Day_2021_23::Part2(

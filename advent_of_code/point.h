@@ -78,10 +78,6 @@ struct Point {
     absl::Format(&sink, "{%v,%v}", p.x, p.y);
   }
 
-  friend std::ostream& operator<<(std::ostream& o, const Point& p) {
-    return o << absl::StreamFormat("%v", p);
-  }
-
   template <typename H>
   friend H AbslHashValue(H h, const Point& p) {
     return H::combine(std::move(h), p.x, p.y);
