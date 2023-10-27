@@ -45,7 +45,9 @@ absl::StatusOr<int> DragRope(absl::Span<absl::string_view> input,
     if (!RE2::FullMatch(line, *parse_re, &dir_char, &dist)) {
       return Error("Bad line: ", line);
     }
-    CHECK(char2dir.contains(dir_char));
+    if(!char2dir.contains(dir_char)) {
+      return Error("No direction for: ", absl::string_view(&dir_char, 1));
+    }
     Point head_dir = char2dir[dir_char];
 
     for (int i = 0; i < dist; ++i) {

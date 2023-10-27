@@ -27,7 +27,7 @@ int max_dist(Point3 p) {
   return std::max(abs(p.x), std::max(abs(p.y), abs(p.z)));
 }
 
-int CountOverlap(const Scanner& l, const Scanner& r) {
+absl::StatusOr<int> CountOverlap(const Scanner& l, const Scanner& r) {
   absl::flat_hash_set<Point3> absolute_beacons;
   for (const auto& b : l.relative_beacons) {
     absolute_beacons.insert(l.RelativeToAbsolute(b));
@@ -48,7 +48,9 @@ int CountOverlap(const Scanner& l, const Scanner& r) {
     // Validate the problems assertion that if 12 overlap and we put these
     // together that there aren't any beacons that should have been visble
     // that we didn't align.
-    CHECK_EQ(visible_l_in_r, 0);
+    if (visible_l_in_r != 0) {
+      return Error("visible_l_in_r = ", visible_l_in_r);
+    }
     int visible_r_in_l = 0;
     for (Point3 a_b : absolute_beacons) {
       if (found_both.contains(a_b)) continue;
@@ -56,12 +58,14 @@ int CountOverlap(const Scanner& l, const Scanner& r) {
         ++visible_r_in_l;
       }
     }
-    CHECK_EQ(visible_r_in_l, 0);
+    if (visible_r_in_l != 0) {
+      return Error("visible_r_in_l = ", visible_r_in_l);
+    }
   }
   return found_both.size();
 }
 
-bool TryPosition(Scanner* dest, const Scanner& src) {
+absl::StatusOr<bool> TryPosition(Scanner* dest, const Scanner& src) {
   for (const Orientation3& o : Orientation3::All()) {
     dest->o = o;
     VLOG(2) << "Trying o=" << o;
@@ -80,7 +84,9 @@ bool TryPosition(Scanner* dest, const Scanner& src) {
     for (const auto& [p, c] : try_absolute_counts) {
       if (c < 12) continue;
       dest->absolute = p;
-      if (CountOverlap(*dest, src) >= 12) {
+      absl::StatusOr<int> overlap = CountOverlap(*dest, src);
+      if (!overlap.ok()) return overlap.status();
+      if (*overlap >= 12) {
         return true;
       }
     }
@@ -123,7 +129,10 @@ absl::Status PositionScanners(std::vector<Scanner>& scanners) {
         if (this_attempt.contains(p_idx)) continue;
 
         VLOG(2) << "Trying " << i << " with " << p_idx;
-        if (TryPosition(&scanners[i], scanners[p_idx])) {
+        absl::StatusOr<bool> collapsed =
+            TryPosition(&scanners[i], scanners[p_idx]);
+        if (!collapsed.ok()) return collapsed.status();
+        if (*collapsed) {
           VLOG(1) << "Collapsed " << i << " with " << p_idx;
           new_positioned.insert(i);
           break;

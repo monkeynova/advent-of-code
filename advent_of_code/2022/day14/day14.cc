@@ -51,15 +51,15 @@ CharBoard DrawGrid(PointRectangle grid,
   return b;
 }
 
-bool AddSand(CharBoard& b, Point at) {
-  CHECK(b.OnBoard(at));
+absl::StatusOr<bool> AddSand(CharBoard& b, Point at) {
+  if(!b.OnBoard(at)) return Error("Not on board: ", at);
   if (b[at] != '.') return false;
   while (b.OnBoard(at + Cardinal::kSouth)) {
     bool fell = false;
     for (Point d :
          {Cardinal::kSouth, Cardinal::kSouthWest, Cardinal::kSouthEast}) {
       Point t = at + d;
-      CHECK(b.OnBoard(t));
+      if(!b.OnBoard(at)) return Error("Not on board: ", t);
       if (b[t] == '.') {
         at = t;
         fell = true;
@@ -95,13 +95,15 @@ absl::StatusOr<std::string> Day_2022_14::Part1(
   VLOG(2) << "Board:\n" << b;
 
   Point add = kAddAt - grid.min;
-  int added = 0;
+  int add_count = 0;
   while (b[add] == '.') {
-    if (!AddSand(b, add)) break;
+    absl::StatusOr<bool> added = AddSand(b, add);
+    if (!added.ok()) return added.status();
+    if (!*added) break;
     VLOG(2) << "Board:\n" << b;
-    ++added;
+    ++add_count;
   }
-  return AdventReturn(added);
+  return AdventReturn(add_count);
 }
 
 absl::StatusOr<std::string> Day_2022_14::Part2(
@@ -127,13 +129,15 @@ absl::StatusOr<std::string> Day_2022_14::Part2(
 
   VLOG(2) << "Board:\n" << b;
   Point add = kAddAt - grid.min;
-  int added = 0;
+  int add_count = 0;
   while (b[add] == '.') {
-    if (!AddSand(b, add)) break;
+    absl::StatusOr<bool> added = AddSand(b, add);
+    if (!added.ok()) return added.status();
+    if (!*added) break;
     VLOG(2) << "Board:\n" << b;
-    ++added;
+    ++add_count;
   }
-  return AdventReturn(added);
+  return AdventReturn(add_count);
 }
 
 }  // namespace advent_of_code
