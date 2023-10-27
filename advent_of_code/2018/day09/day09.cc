@@ -65,20 +65,6 @@ struct GameState {
     }
     if (marble_idx != 0) absl::Format(&sink, ",...");
   }
-
-  void IntegrityCheck() {
-    int marble_idx = cur_position;
-    int start = marble_idx;
-    int active = 0;
-    do {
-      VLOG(2) << marble_idx;
-      ++active;
-      CHECK_EQ(marble_idx, marbles[marbles[marble_idx].next].prev);
-      CHECK_EQ(marble_idx, marbles[marbles[marble_idx].prev].next);
-      marble_idx = marbles[marble_idx].next;
-    } while (marble_idx != start);
-    CHECK_EQ(active, marbles.size() - 2 * ((marbles.size() - 1) / 23));
-  }
 };
 
 int64_t HighScore(int num_players, int num_marbles) {
@@ -88,7 +74,6 @@ int64_t HighScore(int num_players, int num_marbles) {
   state.marbles = {{0, 0, 0}};
   for (int64_t i = 1; i <= num_marbles; ++i) {
     VLOG(2) << state;
-    // state.IntegrityCheck();
     state.AddMarble(i);
   }
   int64_t max = 0;
