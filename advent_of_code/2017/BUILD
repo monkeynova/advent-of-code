@@ -34,6 +34,18 @@ cc_test(
     size = "small",
     tags = ["benchmark"],
     deps = [
+        ":benchmark_lib",
+        "@com_monkeynova_gunit_main//:test_main",
+    ],
+)
+
+cc_library(
+    name = "benchmark_lib",
+    testonly = 1,
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
         "//advent_of_code/2017/day01:day01_benchmark_lib",
         "//advent_of_code/2017/day02:day02_benchmark_lib",
         "//advent_of_code/2017/day03:day03_benchmark_lib",
@@ -59,6 +71,5 @@ cc_test(
         "//advent_of_code/2017/day23:day23_benchmark_lib",
         "//advent_of_code/2017/day24:day24_benchmark_lib",
         "//advent_of_code/2017/day25:day25_benchmark_lib",
-        "@com_monkeynova_gunit_main//:test_main",
     ],
 )

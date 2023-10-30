@@ -174,3 +174,31 @@ cc_library(
     ],
     alwayslink = 1,
 )
+
+cc_test(
+    name = "benchmark",
+    size = "small",
+    tags = ["benchmark"],
+    deps = [
+        ":benchmark_lib",
+        "@com_monkeynova_gunit_main//:test_main",
+    ],
+)
+
+cc_library(
+    name = "benchmark_lib",
+    testonly = 1,
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "//advent_of_code/2015:benchmark_lib",
+        "//advent_of_code/2016:benchmark_lib",
+        "//advent_of_code/2017:benchmark_lib",
+        "//advent_of_code/2018:benchmark_lib",
+        "//advent_of_code/2019:benchmark_lib",
+        "//advent_of_code/2020:benchmark_lib",
+        "//advent_of_code/2021:benchmark_lib",
+        "//advent_of_code/2022:benchmark_lib",
+    ],
+)
