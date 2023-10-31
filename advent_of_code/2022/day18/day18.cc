@@ -57,7 +57,7 @@ absl::StatusOr<std::string> Day_2022_18::Part2(
       bool escaped = false;
       auto hist = Point3Walk({
         .start = p,
-        .is_good = [&](Point3 test) { return !points.contains(test); },
+        .is_good = [&](Point3 test, int) { return !points.contains(test); },
         .is_final = [&](Point3 test) {
           if (cube.Contains(test)) return false;
           escaped = true;

@@ -7,11 +7,12 @@ cc_library(
     deps = [
         "//advent_of_code:advent_day",
         "//advent_of_code:bfs",
-        "//advent_of_code:char_board",
         "//advent_of_code:point",
+        "//advent_of_code:point_walk",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/log",
+        "@com_google_absl//absl/numeric:bits",
         "@com_google_absl//absl/strings",
         "@com_googlesource_code_re2//:re2",
     ],

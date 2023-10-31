@@ -39,7 +39,7 @@ std::vector<Point> FindLow(const CharBoard& board) {
 int64_t BasinSize(const CharBoard& board, Point p) {
   return PointWalk({
     .start = p,
-    .is_good = [&](Point test) {
+    .is_good = [&](Point test, int) {
       return board.OnBoard(test) && board[test] != '9';
     },
     .is_final = [](Point) { return false; },

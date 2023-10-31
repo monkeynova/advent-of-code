@@ -12,7 +12,7 @@ class PointWalk : public BFSInterface<PointWalk, Point> {
  public:
   struct Options {
     Point start;
-    absl::FunctionRef<bool(Point)> is_good;
+    absl::FunctionRef<bool(Point, int)> is_good;
     absl::FunctionRef<bool(Point)> is_final;
   };
 
@@ -25,7 +25,7 @@ class PointWalk : public BFSInterface<PointWalk, Point> {
   void AddNextSteps(State* state) const override {
     for (Point d : Cardinal::kFourDirs) {
       Point n = cur_ + d;
-      if (!is_good_(n)) continue;
+      if (!is_good_(n, num_steps() + 1)) continue;
       PointWalk next = *this;
       next.cur_ = n;
       state->AddNextStep(next);
@@ -33,7 +33,7 @@ class PointWalk : public BFSInterface<PointWalk, Point> {
   }
 
  private:
-  absl::FunctionRef<bool(Point)> is_good_;
+  absl::FunctionRef<bool(Point, int)> is_good_;
   absl::FunctionRef<bool(Point)> is_final_;
   Point cur_;
 };
@@ -42,7 +42,7 @@ class Point3Walk : public BFSInterface<Point3Walk, Point3> {
  public:
   struct Options {
     Point3 start;
-    absl::FunctionRef<bool(Point3)> is_good;
+    absl::FunctionRef<bool(Point3, int)> is_good;
     absl::FunctionRef<bool(Point3)> is_final;
   };
 
@@ -55,7 +55,7 @@ class Point3Walk : public BFSInterface<Point3Walk, Point3> {
   void AddNextSteps(State* state) const override {
     for (Point3 dir : Cardinal3::kSixDirs) {
       Point3 test = cur_ + dir;
-      if (!is_good_(test)) continue;
+      if (!is_good_(test, num_steps() + 1)) continue;
       Point3Walk next = *this;
       next.cur_ = test;
       state->AddNextStep(std::move(next));
@@ -63,7 +63,7 @@ class Point3Walk : public BFSInterface<Point3Walk, Point3> {
   }
 
  private:
-  absl::FunctionRef<bool(Point3)> is_good_;
+  absl::FunctionRef<bool(Point3, int)> is_good_;
   absl::FunctionRef<bool(Point3)> is_final_;
   Point3 cur_;
 };
