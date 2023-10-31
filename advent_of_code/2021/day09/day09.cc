@@ -10,6 +10,7 @@
 #include "absl/strings/str_split.h"
 #include "advent_of_code/char_board.h"
 #include "advent_of_code/point.h"
+#include "advent_of_code/point_walk.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
@@ -36,20 +37,13 @@ std::vector<Point> FindLow(const CharBoard& board) {
 }
 
 int64_t BasinSize(const CharBoard& board, Point p) {
-  absl::flat_hash_set<Point> history = {p};
-  for (std::deque<Point> frontier = {p}; !frontier.empty();
-       frontier.pop_front()) {
-    Point cur = frontier.front();
-    for (Point d : Cardinal::kFourDirs) {
-      Point n = cur + d;
-      if (!board.OnBoard(n)) continue;
-      if (board[n] == '9') continue;
-      if (history.contains(n)) continue;
-      history.insert(n);
-      frontier.push_back(n);
-    }
-  }
-  return history.size();
+  return PointWalk({
+    .start = p,
+    .is_good = [&](Point test) {
+      return board.OnBoard(test) && board[test] != '9';
+    },
+    .is_final = [](Point) { return false; },
+  }).FindReachable().size();
 }
 
 }  // namespace

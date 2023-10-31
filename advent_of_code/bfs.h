@@ -57,7 +57,16 @@ class BFSInterface {
   // BFSImpl such that IsFinal returns true and returns the number of steps
   // required to go from `this` to the final state (or absl::nullopt if such a
   // state is unreachable).
-  absl::optional<int> FindMinSteps() { return FindMinStepsImpl<DequeState>(); }
+  absl::optional<int> FindMinSteps() {
+    DequeState state;
+    return FindMinStepsImpl(state);
+  }
+
+  absl::flat_hash_map<std::remove_reference_t<HistType>, int> FindReachable() {
+    DequeState state;
+    (void)FindMinStepsImpl(state);
+    return state.ConsumeHist();
+  }
 
   // Implements an A* algorithm search like `FindMinSteps` where
   // `min_steps_to_final` is used to prioitize the search space. For example,
@@ -68,7 +77,8 @@ class BFSInterface {
     static_assert(std::is_copy_assignable_v<BFSImpl>,
                   "BFSImpl must be copy-assignable for AStar");
     VLOG(3) << "New AStar: " << identifier();
-    return FindMinStepsImpl<QueueState>();
+    QueueState state;
+    return FindMinStepsImpl(state);
   }
 
   int num_steps() const { return num_steps_; }
@@ -85,12 +95,12 @@ class BFSInterface {
 
  private:
   template <typename QueueType>
-  absl::optional<int> FindMinStepsImpl() {
+  absl::optional<int> FindMinStepsImpl(QueueType& state) {
     static_assert(std::is_base_of<BFSInterface<BFSImpl, HistType>, BFSImpl>(),
                   "BFSInterface must be templated with a subclass");
     if (IsFinal()) return 0;
     BFSImpl& start = *dynamic_cast<BFSImpl*>(this);
-    for (QueueType state(start); !state.empty(); state.pop()) {
+    for (state.Start(start); !state.empty(); state.pop()) {
       const BFSImpl& cur = state.next();
       if (cur.IsFinal()) return cur.num_steps();
       VLOG(3) << "@" << cur.num_steps_ << "; " << cur.identifier();
@@ -109,7 +119,13 @@ class BFSInterface {
 template <typename BFSImpl, typename HistType>
 class BFSInterface<BFSImpl, HistType>::State {
  public:
-  explicit State(const BFSImpl& start) { hist_[start.identifier()] = 0; }
+  State() = default;
+
+  void Start(BFSImpl start) {
+    CHECK(hist_.empty());
+    hist_.emplace(start.identifier(), 0);
+    AddToFrontier(std::move(start));
+  }
 
   // Adds `next` to the processing queue if it is not present in `hist_`.
   // next.num_steps() is incremented in the process.
@@ -122,6 +138,10 @@ class BFSInterface<BFSImpl, HistType>::State {
   }
 
   absl::optional<int> ret() const { return ret_; }
+
+  absl::flat_hash_map<std::remove_reference_t<HistType>, int> ConsumeHist() {
+    return std::move(hist_);
+  }
 
  protected:
   virtual void AddToFrontier(BFSImpl next) = 0;
@@ -139,10 +159,7 @@ template <typename BFSImpl, typename HistType>
 class BFSInterface<BFSImpl, HistType>::DequeState
     : public BFSInterface<BFSImpl, HistType>::State {
  public:
-  explicit DequeState(BFSImpl start)
-      : BFSInterface<BFSImpl, HistType>::State(start) {
-    AddToFrontier(std::move(start));
-  }
+  DequeState() : BFSInterface<BFSImpl, HistType>::State() {}
 
   void AddToFrontier(BFSImpl next) final {
     if (next.IsFinal()) this->set_ret(next.num_steps());
@@ -163,10 +180,7 @@ template <typename BFSImpl, typename HistType>
 class BFSInterface<BFSImpl, HistType>::QueueState
     : public BFSInterface<BFSImpl, HistType>::State {
  public:
-  explicit QueueState(BFSImpl start)
-      : BFSInterface<BFSImpl, HistType>::State(start) {
-    AddToFrontier(std::move(start));
-  }
+  QueueState() : BFSInterface<BFSImpl, HistType>::State() {}
 
   void AddToFrontier(BFSImpl next) final {
     VLOG(4) << "    Add: " << next.identifier() << " (" << next.num_steps()

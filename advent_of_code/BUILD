@@ -87,6 +87,17 @@ cc_library(
 )
 
 cc_library(
+    name = "point_walk",
+    hdrs = ["point_walk.h"],
+    deps = [
+        ":bfs",
+        ":point",
+        ":point3",
+        "@com_google_absl//absl/functional:function_ref",
+    ],
+)
+
+cc_library(
     name = "char_board",
     srcs = ["char_board.cc"],
     hdrs = ["char_board.h"],
