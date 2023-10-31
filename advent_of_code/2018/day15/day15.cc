@@ -9,6 +9,7 @@
 #include "absl/strings/str_split.h"
 #include "advent_of_code/bfs.h"
 #include "advent_of_code/char_board.h"
+#include "advent_of_code/point_walk.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
@@ -25,47 +26,17 @@ struct PointLT {
   }
 };
 
-class PathWalk : public BFSInterface<PathWalk, Point> {
- public:
-  PathWalk(const CharBoard& b, Point start, Point end)
-      : board_(&b), cur_(start), end_(end) {}
-
-  Point identifier() const override { return cur_; }
-
-  int min_steps_to_final() const override { return (end_ - cur_).dist(); }
-
-  bool IsFinal() const override { return cur_ == end_; }
-
-  void AddNextSteps(State* state) const override {
-    for (Point dir : kOrderedDirs) {
-      Point next = cur_ + dir;
-      if (!board_->OnBoard(next)) continue;
-      if ((*board_)[next] == '.') {
-        PathWalk add = *this;
-        add.cur_ = next;
-        state->AddNextStep(add);
-      }
-    }
+struct PointAndDistance {
+  int d = std::numeric_limits<int>::max();
+  Point p;
+  bool operator<(const PointAndDistance& o) const {
+    if (d != o.d) return d < o.d;
+    return PointLT()(p, o.p);
   }
-
- private:
-  // Pointer rather than reference to be swap'able for AStar's use of a
-  // priority queue.
-  const CharBoard* board_;
-  Point cur_;
-  Point end_;
 };
 
 class FindEnemyAdjacent : public BFSInterface<FindEnemyAdjacent, Point> {
  public:
-  struct PointAndDistance {
-    int d = std::numeric_limits<int>::max();
-    Point p;
-    bool operator<(const PointAndDistance& o) const {
-      if (d != o.d) return d < o.d;
-      return PointLT()(p, o.p);
-    }
-  };
 
   FindEnemyAdjacent(const CharBoard& b, Point start, char find,
                     PointAndDistance* ret)
@@ -77,7 +48,7 @@ class FindEnemyAdjacent : public BFSInterface<FindEnemyAdjacent, Point> {
 
   void AddNextSteps(State* state) const override {
     // Stop exploring if we've found a match.
-    // if (num_steps() > ret_->d) return;
+    if (num_steps() > ret_->d) return;
 
     for (Point dir : kOrderedDirs) {
       Point next = cur_ + dir;
@@ -179,7 +150,7 @@ class GameBoard {
     else
       return Error("HP at bad location (move): ", p);
 
-    FindEnemyAdjacent::PointAndDistance p_and_d;
+    PointAndDistance p_and_d;
     (void)FindEnemyAdjacent(board_, p, find, &p_and_d).FindMinSteps();
     Point move_to = p;
     if (p_and_d.d == 0) return move_to;
@@ -191,8 +162,15 @@ class GameBoard {
     for (Point dir : kOrderedDirs) {
       Point check = p + dir;
       if (!board_.OnBoard(check) || board_[check] != '.') continue;
-      absl::optional<int> dist =
-          PathWalk(board_, check, p_and_d.p).FindMinSteps();
+      absl::optional<int> dist = PointWalk({
+        .start = check,
+        .is_good = [&](Point test, int) {
+          return board_.OnBoard(test) && board_[test] == '.';
+        },
+        .is_final = [&](Point test) {
+          return test == p_and_d.p;
+        }
+      }).FindMinSteps();
       if (dist && *dist < min_path_length) {
         min_path_length = *dist;
         move_to = check;
