@@ -167,7 +167,7 @@ class GameBoard {
         .is_good = [&](Point test, int) {
           return board_.OnBoard(test) && board_[test] == '.';
         },
-        .is_final = [&](Point test) {
+        .is_final = [&](Point test, int) {
           return test == p_and_d.p;
         }
       }).FindMinSteps();

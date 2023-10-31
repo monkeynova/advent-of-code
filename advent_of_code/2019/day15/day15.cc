@@ -11,6 +11,7 @@
 #include "advent_of_code/bfs.h"
 #include "advent_of_code/char_board.h"
 #include "advent_of_code/point.h"
+#include "advent_of_code/point_walk.h"
 
 namespace advent_of_code {
 namespace {
@@ -99,34 +100,15 @@ class Droid : public IntCode::IOModule {
   }
 
   absl::optional<int> DistanceToO2() {
-    class PathWalk : public BFSInterface<PathWalk, Point> {
-     public:
-      PathWalk(const absl::flat_hash_map<Point, int>& board, Point start,
-               Point end)
-          : board_(board), cur_(start), end_(end) {}
-
-      Point identifier() const override { return cur_; }
-
-      bool IsFinal() const override { return cur_ == end_; }
-
-      void AddNextSteps(State* state) const override {
-        for (Point dir : Cardinal::kFourDirs) {
-          Point next_cur = cur_ + dir;
-          auto it = board_.find(next_cur);
-          CHECK(it != board_.end());
-          if (it->second == 0) continue;
-          PathWalk next = *this;
-          next.cur_ = next_cur;
-          state->AddNextStep(next);
-        }
-      }
-
-     private:
-      const absl::flat_hash_map<Point, int>& board_;
-      Point cur_;
-      Point end_;
-    };
-    return PathWalk(board_, Cardinal::kOrigin, o2_pos_).FindMinSteps();
+    return PointWalk({
+      .start = Cardinal::kOrigin,
+      .is_good = [&](Point test, int num_steps) {
+        auto it = board_.find(test);
+        CHECK(it != board_.end());
+        return it->second != 0;
+      },
+      .is_final = [&](Point test, int) { return test == o2_pos_; }
+    }).FindMinSteps();
   }
 
   absl::StatusOr<int> GreatestDistanceFromO2() {
@@ -139,11 +121,11 @@ class Droid : public IntCode::IOModule {
       Point identifier() const override { return cur_; }
 
       bool IsFinal() const override {
-        *max_dist_ = std::max(*max_dist_, num_steps());
         return false;
       }
 
       void AddNextSteps(State* state) const override {
+        *max_dist_ = std::max(*max_dist_, num_steps());
         for (Point dir : Cardinal::kFourDirs) {
           Point next_cur = cur_ + dir;
           auto it = board_.find(next_cur);
@@ -162,8 +144,24 @@ class Droid : public IntCode::IOModule {
     };
 
     int max_dist = -1;
+#if 1
+    absl::optional<int> should_be_empty = PointWalk({
+      .start = o2_pos_,
+      .is_good = [&](Point test, int num_steps) {
+        auto it = board_.find(test);
+        CHECK(it != board_.end());
+        if (it->second == 0) return false;
+        return true;
+      },
+      .is_final = [&](Point, int num_steps) {
+        max_dist = std::max(max_dist, num_steps);
+        return false;
+      }
+    }).FindMinSteps();
+#else
     absl::optional<int> should_be_empty =
         PathWalk(board_, o2_pos_, &max_dist).FindMinSteps();
+#endif
     if (should_be_empty) {
       return Error("Internal error: GreatestDistanceFromO2 (found path)");
     }

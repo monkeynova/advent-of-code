@@ -13,7 +13,7 @@ class PointWalk : public BFSInterface<PointWalk, Point> {
   struct Options {
     Point start;
     absl::FunctionRef<bool(Point, int)> is_good;
-    absl::FunctionRef<bool(Point)> is_final;
+    absl::FunctionRef<bool(Point, int)> is_final;
   };
 
   PointWalk(Options options)
@@ -21,7 +21,7 @@ class PointWalk : public BFSInterface<PointWalk, Point> {
      cur_(options.start) {}
 
   Point identifier() const override { return cur_; }
-  bool IsFinal() const override { return is_final_(cur_); }
+  bool IsFinal() const override { return is_final_(cur_, num_steps()); }
   void AddNextSteps(State* state) const override {
     for (Point d : Cardinal::kFourDirs) {
       Point n = cur_ + d;
@@ -34,7 +34,7 @@ class PointWalk : public BFSInterface<PointWalk, Point> {
 
  private:
   absl::FunctionRef<bool(Point, int)> is_good_;
-  absl::FunctionRef<bool(Point)> is_final_;
+  absl::FunctionRef<bool(Point, int)> is_final_;
   Point cur_;
 };
 
@@ -43,7 +43,7 @@ class Point3Walk : public BFSInterface<Point3Walk, Point3> {
   struct Options {
     Point3 start;
     absl::FunctionRef<bool(Point3, int)> is_good;
-    absl::FunctionRef<bool(Point3)> is_final;
+    absl::FunctionRef<bool(Point3, int)> is_final;
   };
 
   Point3Walk(Options options)
@@ -51,7 +51,7 @@ class Point3Walk : public BFSInterface<Point3Walk, Point3> {
       cur_(options.start) {}
 
   Point3 identifier() const override { return cur_; }
-  bool IsFinal() const override { return is_final_(cur_); }
+  bool IsFinal() const override { return is_final_(cur_, num_steps()); }
   void AddNextSteps(State* state) const override {
     for (Point3 dir : Cardinal3::kSixDirs) {
       Point3 test = cur_ + dir;
@@ -64,7 +64,7 @@ class Point3Walk : public BFSInterface<Point3Walk, Point3> {
 
  private:
   absl::FunctionRef<bool(Point3, int)> is_good_;
-  absl::FunctionRef<bool(Point3)> is_final_;
+  absl::FunctionRef<bool(Point3, int)> is_final_;
   Point3 cur_;
 };
 
