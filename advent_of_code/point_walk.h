@@ -70,4 +70,4 @@ class Point3Walk : public BFSInterface<Point3Walk, Point3> {
 
 }  // namespace advent_of_code
 
-#endif  // #define ADVENT_OF_CODE_POINT_WALK_H
+#endif  // ADVENT_OF_CODE_POINT_WALK_H

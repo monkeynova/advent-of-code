@@ -151,7 +151,7 @@ class GameBoard {
       return Error("HP at bad location (move): ", p);
 
     PointAndDistance p_and_d;
-    (void)FindEnemyAdjacent(board_, p, find, &p_and_d).FindMinSteps();
+    FindEnemyAdjacent(board_, p, find, &p_and_d).Walk();
     Point move_to = p;
     if (p_and_d.d == 0) return move_to;
     if (p_and_d.d == std::numeric_limits<int>::max()) return move_to;

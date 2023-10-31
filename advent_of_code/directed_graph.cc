@@ -1,5 +1,7 @@
 #include "advent_of_code/directed_graph.h"
 
+#include "advent_of_code/graph_walk.h"
+
 namespace advent_of_code {
 
 absl::flat_hash_set<absl::string_view> DirectedGraphBase::Reachable(
@@ -25,20 +27,20 @@ std::vector<std::vector<absl::string_view>> DirectedGraphBase::Forest() const {
 
   absl::flat_hash_set<absl::string_view> to_assign = nodes();
   while (!to_assign.empty()) {
+    absl::string_view start = *to_assign.begin();
     forest.push_back({});
-    std::deque<absl::string_view> frontier = {*to_assign.begin()};
-    while (!frontier.empty()) {
-      absl::string_view name = frontier.front();
-      forest.back().push_back(name);
-      frontier.pop_front();
-      to_assign.erase(name);
-      const std::vector<absl::string_view>* outgoing = Outgoing(name);
-      if (outgoing != nullptr) {
-        for (absl::string_view tmp : *outgoing) {
-          if (to_assign.contains(tmp)) frontier.push_back(tmp);
-        }
-      }
-    }
+    GraphWalk({
+      .graph = this,
+      .start = start,
+      .is_good = [&](absl::string_view node, int) {
+        return to_assign.contains(node);
+      },
+      .is_final = [&](absl::string_view node, int) {
+        forest.back().push_back(node);
+        to_assign.erase(node);
+        return false;
+      },
+    }).Walk();
   }
 
   return forest;

@@ -83,6 +83,7 @@ cc_library(
     hdrs = ["bfs.h"],
     deps = [
         "@com_google_absl//absl/log",
+        "@com_google_absl//absl/log:check",
     ],
 )
 
@@ -148,8 +149,12 @@ cc_library(
 cc_library(
     name = "directed_graph",
     srcs = ["directed_graph.cc"],
-    hdrs = ["directed_graph.h"],
+    hdrs = [
+        "directed_graph.h",
+        "graph_walk.h",
+    ],
     deps = [
+        ":bfs",
         ":vlog",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",

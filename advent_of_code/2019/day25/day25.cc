@@ -101,13 +101,17 @@ absl::StatusOr<std::string> Day_2019_25::Part1(
     absl::StrAppend(&command, "west\n");
     Terminal t(command);
     absl::Status st = tmp_codes.Run(&t);
-    (void)st;  // Input exhausted...
-    int code;
-    if (RE2::PartialMatch(t.full_output(),
-                          "You should be able to get in by typing (\\d+)",
-                          &code)) {
-      return AdventReturn(code);
+    if (st.message() == "Input exhausted") {
+      continue;
     }
+    if (!st.ok()) return AdventReturn(st);
+    int code;
+    if (!RE2::PartialMatch(t.full_output(),
+                           "You should be able to get in by typing (\\d+)",
+                           &code)) {
+      return Error("Could not get code");
+    }
+    return AdventReturn(code);
   }
   return absl::InternalError("Not found");
 }

@@ -8,55 +8,13 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/2017/knot_hash.h"
-#include "advent_of_code/bfs.h"
 #include "advent_of_code/char_board.h"
+#include "advent_of_code/directed_graph.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
 
 namespace {
-
-class PathWalk : public BFSInterface<PathWalk, Point> {
- public:
-  explicit PathWalk(const CharBoard& board) : board_(board) {}
-
-  int CountGroups() {
-    absl::flat_hash_set<Point> to_find;
-    for (Point p : board_.range()) {
-      if (board_[p] == '.') to_find.insert(p);
-    }
-    to_find_ = &to_find;
-    int groups = 0;
-    while (!to_find.empty()) {
-      ++groups;
-      cur_ = *to_find.begin();
-      FindMinSteps();
-    }
-    return groups;
-  }
-
-  Point identifier() const override { return cur_; }
-
-  bool IsFinal() const override { return false; }
-
-  void AddNextSteps(State* state) const override {
-    to_find_->erase(cur_);
-    for (Point dir : Cardinal::kFourDirs) {
-      Point next_cur = cur_ + dir;
-      if (!board_.OnBoard(next_cur)) continue;
-      if (board_[next_cur] == '#') continue;
-
-      PathWalk next = *this;
-      next.cur_ = next_cur;
-      state->AddNextStep(next);
-    }
-  }
-
- private:
-  const CharBoard& board_;
-  Point cur_;
-  absl::flat_hash_set<Point>* to_find_ = nullptr;
-};
 
 absl::StatusOr<CharBoard> BuildBoard(absl::string_view input) {
   CharBoard board(128, 128);
@@ -97,7 +55,22 @@ absl::StatusOr<std::string> Day_2017_14::Part2(
   if (input.size() != 1) return Error("Bad size");
   absl::StatusOr<CharBoard> board = BuildBoard(input[0]);
   if (!board.ok()) return board.status();
-  return AdventReturn(PathWalk(*board).CountGroups());
+
+  absl::flat_hash_map<Point, std::string> storage;
+  for (Point p : board->range()) {
+    if ((*board)[p] == '.') storage[p] = absl::StrCat(p);
+  }
+  DirectedGraph<bool> dg;
+  for (Point p : board->range()) {
+    if ((*board)[p] != '.') continue;
+    dg.AddNode(storage[p], true);
+    for (Point d : Cardinal::kFourDirs) {
+      if ((*board)[p+d] == '.') {
+        dg.AddEdge(storage[p], storage[p+d]);
+      }
+    }
+  }
+  return AdventReturn(dg.Forest().size());
 }
 
 }  // namespace advent_of_code

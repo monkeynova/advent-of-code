@@ -96,7 +96,7 @@ absl::StatusOr<std::string> Day_2016_17::Part2(
   if (input.size() != 1) return Error("Input size");
   std::string path;
   // We walk until exhausting paths.
-  (void)PathWalk(input[0], &path, false).FindMinSteps();
+  PathWalk(input[0], &path, false).Walk();
   return AdventReturn(path.size());
 }
 

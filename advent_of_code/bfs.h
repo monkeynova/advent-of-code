@@ -6,6 +6,7 @@
 #include <queue>
 #include <vector>
 
+#include "absl/log/check.h"
 #include "absl/log/log.h"
 
 namespace advent_of_code {
@@ -62,10 +63,24 @@ class BFSInterface {
     return FindMinStepsImpl(state);
   }
 
+  // Performs the same breadth-first search as `FindMinSteps`, but rather than
+  // returning the lenght of the shortest path, returns a map of all reachable
+  // identifiers to the shortest path length to reach that identifier. It is
+  // generally expected that calls to this are on instances where IsFinal
+  // always returns false.
   absl::flat_hash_map<std::remove_reference_t<HistType>, int> FindReachable() {
     DequeState state;
     (void)FindMinStepsImpl(state);
     return state.ConsumeHist();
+  }
+
+  // Performs the same breadth-first search as `FindMinSteps`, but rather than
+  // returning the lenght of the shortest path, returns nothing. It is
+  // generally expected that calls to this are doing additional tracking in
+  // their callbacks.
+  void Walk() {
+    DequeState state;
+    (void)FindMinStepsImpl(state);
   }
 
   // Implements an A* algorithm search like `FindMinSteps` where
