@@ -193,6 +193,13 @@ struct Cardinal {
                                          kSouthWest, kSouthEast};
 };
 
+struct PointYThenXLT {
+  bool operator()(Point p1, Point p2) const {
+    if (p1.y != p2.y) return p1.y < p2.y;
+    return p1.x < p2.x;
+  }
+};
+
 }  // namespace advent_of_code
 
 #endif  // ADVENT_OF_CODE_POINT_H

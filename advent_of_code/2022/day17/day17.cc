@@ -10,6 +10,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/point_walk.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
@@ -151,25 +152,20 @@ DropState::SummaryState DropState::Summarize() const {
 
   Point start = {0, height_};
   absl::flat_hash_set<Point> visited = {start};
-  absl::flat_hash_set<Point> edge;
-  for (std::deque queue = {{start}}; !queue.empty(); queue.pop_front()) {
-    for (Point d : Cardinal::kFourDirs) {
-      Point t = d + queue.front();
-      if (!bounds.Contains(t)) continue;
-      if (stopped_.contains(t)) {
-        edge.insert(t - start);
-        continue;
-      }
-      if (visited.insert(t).second) {
-        queue.push_back(t);
-      }
-    }
+  absl::flat_hash_map<Point, int> reachable = PointWalk({
+    .start = start,
+    .is_good = [&](Point test, int) {
+      if (!bounds.Contains(test)) return false;
+      return !stopped_.contains(test);
+    },
+    .is_final = [](Point, int) { return false; }
+  }).FindReachable();
+  ret.bounds = std::vector<Point>();
+  ret.bounds.reserve(reachable.size());
+  for (const auto& [point, _] : reachable) {
+    ret.bounds.push_back(point - start);
   }
-  ret.bounds = std::vector<Point>(edge.begin(), edge.end());
-  auto point_x_then_y = [](Point a, Point b) {
-    return a.x != b.x ? a.x < b.x : a.y < b.y;
-  };
-  absl::c_sort(ret.bounds, point_x_then_y);
+  absl::c_sort(ret.bounds, PointYThenXLT());
   return ret;
 }
 
@@ -197,19 +193,23 @@ absl::StatusOr<std::string> Day_2022_17::Part2(
 
   absl::flat_hash_map<DropState::SummaryState, int> state_to_idx;
   std::vector<int> heights;
-  for (int i = 0; true; ++i) {
+  for (int64_t i = 0; i < 1000000000000; ++i) {
     if (absl::Status st = ds.DropNextRock(i); !st.ok()) return st;
 
     heights.push_back(ds.height());
     auto [it, inserted] = state_to_idx.emplace(ds.Summarize(), i);
     VLOG(2) << "Summary:\n" << it->first.Draw();
-    if (!inserted) {
+    if (!inserted &&
+        // Ensure same rock type.
+        (prev_i % 5) == (i % 5)) {
       VLOG(1) << "Repeat @" << i << " == " << it->second;
-      int64_t find = 1000000000000 - 1;  // Problem is 1-indexed.
       int prev_i = it->second;
+      if (prev_i % 5 != i % 5) {
+        return Error("Rock index doesn't match");
+      }
 
-      int64_t cycles = (find - prev_i) / (i - prev_i);
-      int64_t offset = (find - prev_i) % (i - prev_i);
+      int64_t cycles = (999'999'999'999 - prev_i) / (i - prev_i);
+      int64_t offset = (999'999'999'999 - prev_i) % (i - prev_i);
 
       int64_t ret_height =
           (heights[i] - heights[prev_i]) * cycles + heights[offset + prev_i];
@@ -219,7 +219,7 @@ absl::StatusOr<std::string> Day_2022_17::Part2(
       return AdventReturn(ret_height);
     }
   }
-  return Error("Left infinite loop");
+  return AdventReturn(ds.height());
 }
 
 }  // namespace advent_of_code

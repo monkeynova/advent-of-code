@@ -19,19 +19,12 @@ namespace {
 constexpr Point kOrderedDirs[] = {Cardinal::kNorth, Cardinal::kWest,
                                   Cardinal::kEast, Cardinal::kSouth};
 
-struct PointLT {
-  bool operator()(Point p1, Point p2) const {
-    if (p1.y != p2.y) return p1.y < p2.y;
-    return p1.x < p2.x;
-  }
-};
-
 struct PointAndDistance {
   int d = std::numeric_limits<int>::max();
   Point p;
   bool operator<(const PointAndDistance& o) const {
     if (d != o.d) return d < o.d;
-    return PointLT()(p, o.p);
+    return PointYThenXLT()(p, o.p);
   }
 };
 
@@ -241,7 +234,7 @@ class GameBoard {
  private:
   CharBoard board_;
   int rounds_ = 0;
-  std::map<Point, int, PointLT> hit_points_;
+  std::map<Point, int, PointYThenXLT> hit_points_;
   int elf_attack_;
 };
 
