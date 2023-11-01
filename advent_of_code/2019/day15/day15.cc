@@ -112,40 +112,8 @@ class Droid : public IntCode::IOModule {
   }
 
   absl::StatusOr<int> GreatestDistanceFromO2() {
-    class PathWalk : public BFSInterface<PathWalk, Point> {
-     public:
-      PathWalk(const absl::flat_hash_map<Point, int>& board, Point start,
-               int* max_dist)
-          : board_(board), cur_(start), max_dist_(max_dist) {}
-
-      Point identifier() const override { return cur_; }
-
-      bool IsFinal() const override {
-        return false;
-      }
-
-      void AddNextSteps(State* state) const override {
-        *max_dist_ = std::max(*max_dist_, num_steps());
-        for (Point dir : Cardinal::kFourDirs) {
-          Point next_cur = cur_ + dir;
-          auto it = board_.find(next_cur);
-          CHECK(it != board_.end());
-          if (it->second == 0) continue;
-          PathWalk next = *this;
-          next.cur_ = next_cur;
-          state->AddNextStep(next);
-        }
-      }
-
-     private:
-      const absl::flat_hash_map<Point, int>& board_;
-      Point cur_;
-      int* max_dist_;
-    };
-
     int max_dist = -1;
-#if 1
-    absl::optional<int> should_be_empty = PointWalk({
+    PointWalk({
       .start = o2_pos_,
       .is_good = [&](Point test, int num_steps) {
         auto it = board_.find(test);
@@ -157,14 +125,7 @@ class Droid : public IntCode::IOModule {
         max_dist = std::max(max_dist, num_steps);
         return false;
       }
-    }).FindMinSteps();
-#else
-    absl::optional<int> should_be_empty =
-        PathWalk(board_, o2_pos_, &max_dist).FindMinSteps();
-#endif
-    if (should_be_empty) {
-      return Error("Internal error: GreatestDistanceFromO2 (found path)");
-    }
+    }).Walk();
     return max_dist;
   }
 
