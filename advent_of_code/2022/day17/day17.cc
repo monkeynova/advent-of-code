@@ -204,9 +204,6 @@ absl::StatusOr<std::string> Day_2022_17::Part2(
         (prev_i % 5) == (i % 5)) {
       VLOG(1) << "Repeat @" << i << " == " << it->second;
       int prev_i = it->second;
-      if (prev_i % 5 != i % 5) {
-        return Error("Rock index doesn't match");
-      }
 
       int64_t cycles = (999'999'999'999 - prev_i) / (i - prev_i);
       int64_t offset = (999'999'999'999 - prev_i) % (i - prev_i);
