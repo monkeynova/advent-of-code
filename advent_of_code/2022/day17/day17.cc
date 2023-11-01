@@ -160,7 +160,6 @@ DropState::SummaryState DropState::Summarize() const {
     },
     .is_final = [](Point, int) { return false; }
   }).FindReachable();
-  ret.bounds = std::vector<Point>();
   ret.bounds.reserve(reachable.size());
   for (const auto& [point, _] : reachable) {
     ret.bounds.push_back(point - start);
@@ -199,9 +198,7 @@ absl::StatusOr<std::string> Day_2022_17::Part2(
     heights.push_back(ds.height());
     auto [it, inserted] = state_to_idx.emplace(ds.Summarize(), i);
     VLOG(2) << "Summary:\n" << it->first.Draw();
-    if (!inserted &&
-        // Ensure same rock type.
-        (prev_i % 5) == (i % 5)) {
+    if (!inserted) {
       VLOG(1) << "Repeat @" << i << " == " << it->second;
       int prev_i = it->second;
 
