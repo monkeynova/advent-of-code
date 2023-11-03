@@ -23,9 +23,9 @@ absl::StatusOr<std::string> Day_2016_24::Part1(
   Point start = *start_set.begin();
 
   int need = 0;
-  for (Point p : b->range()) {
-    if ((*b)[p] > '0' && (*b)[p] <= '9') {
-      need |= 1 << ((*b)[p] - '1');
+  for (const auto [_, c] : *b) {
+    if (c > '0' && c <= '9') {
+      need |= 1 << (c - '1');
     }
   }
 
@@ -56,9 +56,9 @@ absl::StatusOr<std::string> Day_2016_24::Part2(
   Point start = *start_set.begin();
 
   int need = 0;
-  for (Point p : b->range()) {
-    if ((*b)[p] > '0' && (*b)[p] <= '9') {
-      need |= 1 << ((*b)[p] - '1');
+  for (const auto [_, c] : *b) {
+    if (c > '0' && c <= '9') {
+      need |= 1 << (c - '1');
     }
   }
 

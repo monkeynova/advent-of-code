@@ -25,6 +25,41 @@ namespace advent_of_code {
 // #######
 class CharBoard {
  public:
+  class const_iterator {
+   public:
+    static const_iterator begin(const CharBoard& board) {
+      return const_iterator(board);
+    }
+    static const_iterator end(const CharBoard& board) {
+      const_iterator ret(board);
+      ret.it_ = ret.range_.end();
+      return ret;
+    }
+
+    const_iterator& operator++() {
+      ++it_;
+      return *this;
+    }
+
+    bool operator==(const const_iterator& o) const {
+      return &board_ == &o.board_ && it_ == o.it_;
+    }
+    bool operator!=(const const_iterator& o) const { return !operator==(o); }
+
+    std::pair<Point, char> operator*() const { return std::make_pair(*it_, board_[*it_]); }
+
+   private:
+    const_iterator(const CharBoard& board)
+     : board_(board), range_(board.range()), it_(range_.begin()) {}
+
+    const CharBoard& board_;
+    PointRectangle range_;
+    PointRectangle::iterator it_;
+  };
+
+  const_iterator begin() const { return const_iterator::begin(*this); }
+  const_iterator end() const { return const_iterator::end(*this); }
+
   // Constructs a CharBoard by iterating over `in` and adding one row to the
   // board for each iteration (line). Returns an error if board construction
   // fails (for example if not all lines have the same size).

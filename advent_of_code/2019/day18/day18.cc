@@ -36,11 +36,11 @@ class Board {
   Board(const CharBoard& board) : board_(board){};
 
   absl::Status InitializeBoard() {
-    for (Point cur_point : board_.range()) {
-      if (board_[cur_point] == '@') {
-        robots_.push_back(cur_point);
-      } else if (board_[cur_point] >= 'a' && board_[cur_point] <= 'z') {
-        keys_[board_[cur_point]] = cur_point;
+    for (const auto& [p, c] : board_) {
+      if (c == '@') {
+        robots_.push_back(p);
+      } else if (c >= 'a' && c <= 'z') {
+        keys_[c] = p;
       }
     }
     return absl::OkStatus();

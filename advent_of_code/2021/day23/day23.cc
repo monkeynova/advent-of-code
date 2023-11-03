@@ -259,14 +259,14 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
   // store them.
   std::vector<Point> empty;
   std::vector<Point> srcs;
-  for (Point p : b->range()) {
-    if ((*b)[p] >= 'A' && (*b)[p] <= 'D') {
-      s.actors.push_back({.c = (*b)[p], .cur = p});
+  for (const auto& [p, c] : *b) {
+    if (c >= 'A' && c <= 'D') {
+      s.actors.push_back({.c = c, .cur = p});
       srcs.push_back(p);
     }
     // p + south = '#' is the stupid test for not stopping at a hallway
     // entrance.
-    if ((*b)[p] == '.' && (*b)[p + Cardinal::kSouth] == '#') {
+    if (c == '.' && (*b)[p + Cardinal::kSouth] == '#') {
       empty.push_back(p);
     }
   };
