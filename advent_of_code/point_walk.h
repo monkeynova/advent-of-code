@@ -38,6 +38,60 @@ class PointWalk : public BFSInterface<PointWalk, Point> {
   Point cur_;
 };
 
+template <typename DataType>
+struct PointAndData {
+  Point p;
+  DataType d;
+  bool operator==(const PointAndData& pd) const {
+    return p == pd.p && d == pd.d;
+  }
+  template <typename H>
+  friend H AbslHashValue(H h, const PointAndData& pd) {
+    return H::combine(std::move(h), pd.p, pd.d);
+  }
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const PointAndData& ks) {
+    absl::Format(&sink, "%v@%v", ks.d, ks.p);
+  }
+};
+
+template <typename DataType>
+class PointWalkData
+ : public BFSInterface<PointWalkData<DataType>, PointAndData<DataType>> {
+ public:
+  using Base = BFSInterface<PointWalkData<DataType>, PointAndData<DataType>>;
+
+  struct Options {
+    PointAndData<DataType> start;
+    absl::FunctionRef<bool(PointAndData<DataType>&, int)> is_good;
+    absl::FunctionRef<bool(PointAndData<DataType>, int)> is_final;
+  };
+
+  PointWalkData(Options options)
+   : is_good_(options.is_good), is_final_(options.is_final),
+     cur_(options.start) {}
+
+  PointAndData<DataType> identifier() const override { return cur_; }
+  bool IsFinal() const override {
+    return is_final_(cur_, Base::num_steps());
+  }
+  void AddNextSteps(typename Base::State* state) const override {
+    for (Point d : Cardinal::kFourDirs) {
+      PointAndData<DataType> n = cur_;
+      n.p += d;
+      if (!is_good_(n, Base::num_steps() + 1)) continue;
+      PointWalkData next = *this;
+      next.cur_ = n;
+      state->AddNextStep(next);
+    }
+  }
+
+ private:
+  absl::FunctionRef<bool(PointAndData<DataType>&, int)> is_good_;
+  absl::FunctionRef<bool(PointAndData<DataType>, int)> is_final_;
+  PointAndData<DataType> cur_;
+};
+
 class Point3Walk : public BFSInterface<Point3Walk, Point3> {
  public:
   struct Options {
