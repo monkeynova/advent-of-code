@@ -259,7 +259,7 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
   // store them.
   std::vector<Point> empty;
   std::vector<Point> srcs;
-  for (const auto& [p, c] : *b) {
+  for (const auto [p, c] : *b) {
     if (c >= 'A' && c <= 'D') {
       s.actors.push_back({.c = c, .cur = p});
       srcs.push_back(p);

@@ -10,8 +10,6 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
 #include "absl/types/span.h"
-#include "advent_of_code/char_board.h"
-#include "advent_of_code/point.h"
 #include "advent_of_code/vlog.h"
 
 extern absl::Flag<bool> FLAGS_advent_day_run_audit;

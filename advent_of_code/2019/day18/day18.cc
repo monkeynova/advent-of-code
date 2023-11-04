@@ -36,7 +36,7 @@ class Board {
   Board(const CharBoard& board) : board_(board){};
 
   absl::Status InitializeBoard() {
-    for (const auto& [p, c] : board_) {
+    for (const auto [p, c] : board_) {
       if (c == '@') {
         robots_.push_back(p);
       } else if (c >= 'a' && c <= 'z') {

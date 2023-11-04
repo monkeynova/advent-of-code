@@ -7,8 +7,6 @@ cc_library(
     srcs = ["advent_day.cc"],
     hdrs = ["advent_day.h"],
     deps = [
-        ":char_board",
-        ":point",
         ":vlog",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/log:check",

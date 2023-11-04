@@ -46,7 +46,9 @@ class CharBoard {
     }
     bool operator!=(const const_iterator& o) const { return !operator==(o); }
 
-    std::pair<Point, char> operator*() const { return std::make_pair(*it_, board_[*it_]); }
+    std::pair<Point, char> operator*() const {
+      return std::make_pair(*it_, board_[*it_]);
+    }
 
    private:
     const_iterator(const CharBoard& board)
@@ -56,9 +58,6 @@ class CharBoard {
     PointRectangle range_;
     PointRectangle::iterator it_;
   };
-
-  const_iterator begin() const { return const_iterator::begin(*this); }
-  const_iterator end() const { return const_iterator::end(*this); }
 
   // Constructs a CharBoard by iterating over `in` and adding one row to the
   // board for each iteration (line). Returns an error if board construction
@@ -106,6 +105,9 @@ class CharBoard {
     return PointRectangle{.min = {.x = 0, .y = 0},
                           .max = {.x = width() - 1, .y = height() - 1}};
   }
+
+  const_iterator begin() const { return const_iterator::begin(*this); }
+  const_iterator end() const { return const_iterator::end(*this); }
 
   // Returns true if `p` is a valid point on the board.
   bool OnBoard(Point p) const {

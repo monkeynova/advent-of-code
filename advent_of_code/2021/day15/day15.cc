@@ -64,7 +64,7 @@ absl::StatusOr<std::string> Day_2021_15::Part2(
   if (!b.ok()) return b.status();
 
   CharBoard big_board(b->width() * 5, b->height() * 5);
-  for (const auto& [p, c] : *b) {
+  for (const auto [p, c] : *b) {
     int base = c - '1';
     for (int i = 0; i < 5; i++) {
       Point dx = i * Cardinal::kXHat * b->width();

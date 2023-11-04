@@ -11,6 +11,7 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/interval.h"
+#include "advent_of_code/point.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {

@@ -10,6 +10,15 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/bfs.h"
+#include "advent_of_code/char_board.h"
+#include "advent_of_code/conway.h"
+#include "advent_of_code/directed_graph.h"
+#include "advent_of_code/graph_walk.h"
+#include "advent_of_code/interval.h"
+#include "advent_of_code/point.h"
+#include "advent_of_code/point_walk.h"
+#include "advent_of_code/point3.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
