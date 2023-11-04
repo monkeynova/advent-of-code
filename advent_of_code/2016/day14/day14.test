@@ -14,14 +14,12 @@ abc
 15168
 ==
 
-[long=45s (15s opt) 2021.01.17]
 [part=2]
 abc
 --
 22551
 ==
 
-[long=45s (15s opt) 2021.01.17]
 [part=2]
 @include{advent_of_code/2016/day14/input.txt}
 --

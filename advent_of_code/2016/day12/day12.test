@@ -18,7 +18,6 @@ dec a
 317993
 ==
 
-[long=5s (0s opt) 2020.12.22]
 [part=2]
 @include{advent_of_code/2016/day12/input.txt}
 --

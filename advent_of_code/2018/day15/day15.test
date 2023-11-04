@@ -85,7 +85,6 @@
 237996
 ==
 
-[long=1m (1s opt) 2021.01.01]
 [part=2]
 @include{advent_of_code/2018/day15/input.txt}
 --

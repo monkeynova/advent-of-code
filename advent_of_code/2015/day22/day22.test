@@ -7,7 +7,6 @@
 900
 ==
 
-[long=3s (0s opt) 2020.12.18]
 [part=2]
 @include{advent_of_code/2015/day22/input.txt}
 --

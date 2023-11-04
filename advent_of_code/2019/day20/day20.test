@@ -144,7 +144,6 @@ RE....#.#                           #......RF
 ==
 
 [part=2]
-[long=14s (1s opt) 2020.12.06]
 HACK: Ignore Starting Whitespace
 @include{advent_of_code/2019/day20/input.txt}
 --

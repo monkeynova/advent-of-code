@@ -1,28 +1,24 @@
 # http://adventofcode.com/2021/day/24
 ==
 
-[long=5s (0s opt) 2021.12.24]
 [part=1]
 @include{advent_of_code/2021/day24/input.txt}
 --
 29989297949519
 ==
 
-[long=5s (0s opt) 2021.12.24]
 [part=1]
 @include{advent_of_code/2021/day24/input.cshabsin.txt}
 --
 91897399498995
 ==
 
-[long=5s (0s opt) 2021.12.24]
 [part=2]
 @include{advent_of_code/2021/day24/input.txt}
 --
 19518121316118
 ==
 
-[long=5s (0s opt) 2021.12.24]
 [part=2]
 @include{advent_of_code/2021/day24/input.cshabsin.txt}
 --

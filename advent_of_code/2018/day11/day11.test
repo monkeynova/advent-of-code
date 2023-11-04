@@ -19,14 +19,12 @@
 {21,41}
 ==
 
-[long=1m (4s opt) 2021.01.16]
 [part=2]
 18
 --
 {90,269,16}
 ==
 
-[long=1m (4s opt) 2021.01.16]
 [part=2]
 42
 --
@@ -35,7 +33,6 @@
 
 # 235,203,11 <- Stupid bug on Box calculation
 # 226,199,20 <- Double counted upper left
-[long=1m (4s opt) 2021.01.16]
 [part=2]
 @include{advent_of_code/2018/day11/input.txt}
 --

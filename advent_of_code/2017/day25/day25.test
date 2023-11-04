@@ -28,7 +28,6 @@ In state B:
 3
 ==
 
-[long=13s (0s opt) 2020.12.29]
 [part=1]
 @include{advent_of_code/2017/day25/input.txt}
 --

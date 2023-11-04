@@ -19,7 +19,6 @@ dabAcCaCBAcCcaDA
 4
 ==
 
-[long=1m (2s opt) 2020.12.31]
 [part=2]
 @include{advent_of_code/2018/day05/input.txt}
 --

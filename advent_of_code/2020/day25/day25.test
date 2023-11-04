@@ -8,7 +8,6 @@
 14897079
 ==
 
-[long=4s (1s opt) 2020.12.24]
 [part=1]
 @include{advent_of_code/2020/day25/input.txt}
 --
