@@ -33,24 +33,22 @@ void Mix(
       // Do nothing.
     } else if (*it > 0) {
       int64_t incs = *it % (list.size() - 1);
-      for (int i = 0; i < incs; ++i) {
-        std::list<int64_t>::iterator next = AddOne(it);
-        if (next == list.end()) {
-          list.splice(AddOne(list.begin()), list, it, AddOne(it));
-        } else {
-          list.splice(it, list, next, AddOne(next));
-        }
+      std::list<int64_t>::iterator move_it = it;
+      // Splice inserts before the iterator, so when going forward a no-op is
+      // it+1. Hence we do one more loop on increment than decrement.
+      for (int i = 0; i <= incs; ++i) {
+        ++move_it;
+        if (move_it == list.end()) move_it = list.begin();
       }
+      list.splice(move_it, list, it, AddOne(it));
     } else {
       int64_t decs = (-*it) % (list.size() - 1);
+      std::list<int64_t>::iterator move_it = it;
       for (int i = 0; i < decs; ++i) {
-        if (it == list.begin()) {
-          list.splice(SubOne(list.end()), list, it, AddOne(it));
-        } else {
-          std::list<int64_t>::iterator prev = SubOne(it);
-          list.splice(prev, list, it, AddOne(it));
-        }
+        if (move_it == list.begin()) move_it = list.end();
+        --move_it;
       }
+      list.splice(move_it, list, it, AddOne(it));
     }
     VLOG(3) << "Step List: " << absl::StrJoin(list, ",");
   }
