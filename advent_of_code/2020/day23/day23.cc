@@ -19,7 +19,7 @@ class Cups {
 
   void AddCup(int val);
   absl::Status Finalize();
-  void RunMove2();
+  void RunMove();
 
   absl::StatusOr<std::string> Label() const;
   absl::StatusOr<int64_t> Next2Product() const;
@@ -63,7 +63,7 @@ absl::Status Cups::Finalize() {
   return absl::OkStatus();
 }
 
-void Cups::RunMove2() {
+void Cups::RunMove() {
   std::array<int, 3> next3;
   {
     auto it = cur_;
@@ -136,7 +136,7 @@ absl::StatusOr<std::string> Day_2020_23::Part1(
   if (absl::Status st = cups.Finalize(); !st.ok()) return st;
   for (int i = 0; i < 100; ++i) {
     VLOG(1) << cups;
-    cups.RunMove2();
+    cups.RunMove();
   }
   VLOG(1) << cups;
   return AdventReturn(cups.Label());
@@ -149,13 +149,13 @@ absl::StatusOr<std::string> Day_2020_23::Part2(
   for (int i = 0; i < input[0].size(); ++i) {
     cups.AddCup(input[0][i] - '0');
   }
-  for (int i = input[0].size(); i < 1000000; ++i) {
+  for (int i = input[0].size(); i < 1'000'000; ++i) {
     cups.AddCup(i + 1);
   }
   if (absl::Status st = cups.Finalize(); !st.ok()) return st;
   for (int i = 0; i < 10'000'000; ++i) {
     VLOG_IF(1, i % 777'777 == 0) << i;
-    cups.RunMove2();
+    cups.RunMove();
   }
 
   return AdventReturn(cups.Next2Product());
