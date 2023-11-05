@@ -13,35 +13,35 @@ namespace advent_of_code {
 
 namespace {
 
-struct Marble {
-  int64_t score;
-  int next;
-  int prev;
-};
+class GameState {
+ public:
+  GameState(int num_players)
+   : scores_(num_players, 0) {}
 
-struct GameState {
-  int cur_position;
-  std::vector<int64_t> scores;
-  std::vector<Marble> marbles;
+  const std::vector<int64_t>& scores() const { return scores_; }
 
   void AddMarble(int64_t marble) {
+    if (marbles_.empty()) {
+      CHECK_EQ(marble, 0);
+      marbles_.push_back({0, 0, 0});
+    }
     if (marble % 23 == 0) {
-      scores[marble % scores.size()] += marble;
+      scores_[marble % scores_.size()] += marble;
       for (int i = 0; i < 7; ++i) {
-        cur_position = marbles[cur_position].prev;
+        cur_position_ = marbles_[cur_position_].prev;
       }
-      marbles[marbles[cur_position].prev].next = marbles[cur_position].next;
-      marbles[marbles[cur_position].next].prev = marbles[cur_position].prev;
-      scores[marble % scores.size()] += marbles[cur_position].score;
-      cur_position = marbles[cur_position].next;
+      marbles_[marbles_[cur_position_].prev].next = marbles_[cur_position_].next;
+      marbles_[marbles_[cur_position_].next].prev = marbles_[cur_position_].prev;
+      scores_[marble % scores_.size()] += marbles_[cur_position_].score;
+      cur_position_ = marbles_[cur_position_].next;
 
     } else {
-      int next = marbles[cur_position].next;
-      int next_next = marbles[marbles[cur_position].next].next;
-      marbles.push_back({marble, next_next, next});
-      marbles[next].next = marbles.size() - 1;
-      marbles[next_next].prev = marbles.size() - 1;
-      cur_position = marbles.size() - 1;
+      int next = marbles_[cur_position_].next;
+      int next_next = marbles_[marbles_[cur_position_].next].next;
+      marbles_.push_back({marble, next_next, next});
+      marbles_[next].next = marbles_.size() - 1;
+      marbles_[next_next].prev = marbles_.size() - 1;
+      cur_position_ = marbles_.size() - 1;
     }
   }
 
@@ -51,33 +51,41 @@ struct GameState {
     int marble_idx = 0;
     for (int j = 0; j < 30; ++j) {
       if (j > 0) absl::Format(&out, ",");
-      if (marble_idx == s.cur_position) {
-        absl::Format(&sink, "(%d)", s.marbles[marble_idx].score);
+      if (marble_idx == s.cur_position_) {
+        absl::Format(&sink, "(%d)", s.marbles_[marble_idx].score);
       } else {
-        absl::Format(&sink, "%d", s.marbles[marble_idx].score);
+        absl::Format(&sink, "%d", s.marbles_[marble_idx].score);
       }
-      if (s.marbles[s.marbles[marble_idx].next].prev != marble_idx) {
+      if (s.marbles_[s.marbles_[marble_idx].next].prev != marble_idx) {
         LOG(ERROR) << "Integrity check!";
       }
-      marble_idx = s.marbles[marble_idx].next;
+      marble_idx = s.marbles_[marble_idx].next;
       // Looped before size.
       if (marble_idx == 0) break;
     }
     if (marble_idx != 0) absl::Format(&sink, ",...");
   }
+
+ private:
+  struct Marble {
+    int64_t score;
+    int next;
+    int prev;
+  };
+
+  std::vector<int64_t> scores_;
+  std::vector<Marble> marbles_;
+  int cur_position_ = 0;
 };
 
 int64_t HighScore(int num_players, int num_marbles) {
-  GameState state;
-  state.cur_position = 0;
-  state.scores = std::vector<int64_t>(num_players, 0);
-  state.marbles = {{0, 0, 0}};
-  for (int64_t i = 1; i <= num_marbles; ++i) {
+  GameState state(num_players);
+  for (int64_t i = 0; i <= num_marbles; ++i) {
     VLOG(2) << state;
     state.AddMarble(i);
   }
   int64_t max = 0;
-  for (int64_t score : state.scores) {
+  for (int64_t score : state.scores()) {
     VLOG(1) << "Score: " << score;
     max = std::max(max, score);
   }
