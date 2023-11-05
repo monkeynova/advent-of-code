@@ -13,56 +13,102 @@ namespace advent_of_code {
 
 namespace {
 
-struct Cups {
+class Cups {
+ public:
+  Cups() = default;
+
+  void AddCup(int val);
+  void Finalize();
+  void RunMove2();
+
+  absl::StatusOr<std::string> Label() const;
+  absl::StatusOr<int64_t> Next2Product() const;
+
+  friend std::ostream& operator<<(std::ostream& o, const Cups& c) {
+    o << "1";
+    for (int idx = c.cups[c.cup_to_index.find(1)->second].next;
+         c.cups[idx].val != 1; idx = c.cups[idx].next) {
+      o << ",";
+      if (idx == c.cur_idx) o << "(";
+      o << c.cups[idx].val;
+      if (idx == c.cur_idx) o << ")";
+    }
+    return o;
+  }
+
+ private:
   struct LLCup {
     int val;
     int next;
   };
 
-  int cur_idx;
+  int cur_idx = 0;
   absl::flat_hash_map<int, int> cup_to_index;
   std::vector<LLCup> cups;
 };
 
-std::ostream& operator<<(std::ostream& o, const Cups& c) {
-  o << "1";
-  for (int idx = c.cups[c.cup_to_index.find(1)->second].next;
-       c.cups[idx].val != 1; idx = c.cups[idx].next) {
-    o << ",";
-    if (idx == c.cur_idx) o << "(";
-    o << c.cups[idx].val;
-    if (idx == c.cur_idx) o << ")";
-  }
-  return o;
+void Cups::AddCup(int val) {
+  int idx = cups.size();
+  cup_to_index[val] = idx;
+  cups.push_back({.val = val, .next = idx + 1});
 }
 
-void RunMove2(Cups* cups) {
-  int cur_cup = cups->cups[cups->cur_idx].val;
+void Cups::Finalize() {
+  cups.back().next = 0;
+}
+
+void Cups::RunMove2() {
+  int cur_cup = cups[cur_idx].val;
   int dest_cup = cur_cup - 1;
-  if (dest_cup < 1) dest_cup = cups->cups.size();
+  if (dest_cup < 1) dest_cup = cups.size();
   bool found = true;
   int plus_three_idx;
   while (found) {
     found = false;
-    int idx = cups->cups[cups->cur_idx].next;
+    int idx = cups[cur_idx].next;
     for (int i = 0; i < 3; ++i) {
-      if (cups->cups[idx].val == dest_cup) {
+      if (cups[idx].val == dest_cup) {
         --dest_cup;
-        if (dest_cup < 1) dest_cup = cups->cups.size();
+        if (dest_cup < 1) dest_cup = cups.size();
         found = true;
         break;
       }
       plus_three_idx = idx;
-      idx = cups->cups[idx].next;
+      idx = cups[idx].next;
     }
   }
   VLOG(2) << "  dest_cup=" << dest_cup;
-  int dest_cup_idx = cups->cup_to_index[dest_cup];
-  int tmp = cups->cups[dest_cup_idx].next;
-  cups->cups[dest_cup_idx].next = cups->cups[cups->cur_idx].next;
-  cups->cups[cups->cur_idx].next = cups->cups[plus_three_idx].next;
-  cups->cups[plus_three_idx].next = tmp;
-  cups->cur_idx = cups->cups[cups->cur_idx].next;
+  int dest_cup_idx = cup_to_index[dest_cup];
+  int tmp = cups[dest_cup_idx].next;
+  cups[dest_cup_idx].next = cups[cur_idx].next;
+  cups[cur_idx].next = cups[plus_three_idx].next;
+  cups[plus_three_idx].next = tmp;
+  cur_idx = cups[cur_idx].next;
+}
+
+absl::StatusOr<std::string> Cups::Label() const {
+  std::string ret;
+  int ret_i = 0;
+  ret.resize(cups.size() - 1);
+  auto it = cup_to_index.find(1);
+  if (it == cup_to_index.end()) return Error("Could not find 1");
+  for (int idx = cups[it->second].next; cups[idx].val != 1;
+       idx = cups[idx].next) {
+    ret[ret_i] = cups[idx].val + '0';
+    ++ret_i;
+  }
+  return ret;
+}
+
+absl::StatusOr<int64_t> Cups::Next2Product() const {
+  auto it = cup_to_index.find(1);
+  if (it == cup_to_index.end()) return Error("Could not find 1");
+  int next_idx = cups[it->second].next;
+  int64_t product = 1;
+  product *= cups[next_idx].val;
+  next_idx = cups[next_idx].next;
+  product *= cups[next_idx].val;
+  return product;
 }
 
 }  // namespace
@@ -70,57 +116,37 @@ void RunMove2(Cups* cups) {
 absl::StatusOr<std::string> Day_2020_23::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
+
   Cups cups;
-  cups.cur_idx = 0;
   for (int i = 0; i < input[0].size(); ++i) {
-    int cup_num = input[0][i] - '0';
-    cups.cup_to_index[cup_num] = cups.cups.size();
-    cups.cups.push_back({.val = cup_num, .next = i + 1});
+    cups.AddCup(input[0][i] - '0');
   }
-  cups.cups.back().next = 0;
+  cups.Finalize();
   for (int i = 0; i < 100; ++i) {
     VLOG(1) << cups;
-    RunMove2(&cups);
+    cups.RunMove2();
   }
   VLOG(1) << cups;
-  std::string ret;
-  int ret_i = 0;
-  ret.resize(cups.cups.size() - 1);
-  for (int idx = cups.cups[cups.cup_to_index[1]].next; cups.cups[idx].val != 1;
-       idx = cups.cups[idx].next) {
-    ret[ret_i] = cups.cups[idx].val + '0';
-    ++ret_i;
-  }
-  return ret;
+  return AdventReturn(cups.Label());
 }
 
 absl::StatusOr<std::string> Day_2020_23::Part2(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   Cups cups;
-  cups.cur_idx = 0;
   for (int i = 0; i < input[0].size(); ++i) {
-    int cup_num = input[0][i] - '0';
-    cups.cup_to_index[cup_num] = cups.cups.size();
-    cups.cups.push_back({.val = cup_num, .next = i + 1});
+    cups.AddCup(input[0][i] - '0');
   }
   for (int i = input[0].size(); i < 1000000; ++i) {
-    int cup_num = i + 1;
-    cups.cup_to_index[cup_num] = cups.cups.size();
-    cups.cups.push_back({.val = cup_num, .next = i + 1});
+    cups.AddCup(i + 1);
   }
-  cups.cups.back().next = 0;
+  cups.Finalize();
   for (int i = 0; i < 10000000; ++i) {
     VLOG_IF(1, i % 777777 == 0) << i;
-    RunMove2(&cups);
+    cups.RunMove2();
   }
-  int next_idx = cups.cups[cups.cup_to_index[1]].next;
-  int64_t product = 1;
-  product *= cups.cups[next_idx].val;
-  next_idx = cups.cups[next_idx].next;
-  product *= cups.cups[next_idx].val;
 
-  return AdventReturn(product);
+  return AdventReturn(cups.Next2Product());
 }
 
 }  // namespace advent_of_code
