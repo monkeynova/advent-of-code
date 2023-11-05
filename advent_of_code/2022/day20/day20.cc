@@ -16,61 +16,55 @@ namespace advent_of_code {
 
 namespace {
 
-struct DLL {
-  explicit DLL(int64_t v) : value(v) {}
-  const int64_t value;
-  struct DLL* prev;
-  struct DLL* next;
-};
-
-std::string DebugString(DLL* root) {
-  std::string ret = absl::StrCat(root->value);
-  for (DLL* add = root->next; add != root; add = add->next) {
-    absl::StrAppend(&ret, ",", add->value);
-  }
-  return ret;
+std::list<int64_t>::iterator AddOne(std::list<int64_t>::iterator in) {
+  return ++in;
 }
 
-void Mix(std::vector<std::unique_ptr<DLL>>& list) {
-  DLL* root = list[0].get();
-  for (const std::unique_ptr<DLL>& ent : list) {
-    if (ent->value == 0) {
+std::list<int64_t>::iterator SubOne(std::list<int64_t>::iterator in) {
+  return --in;
+}
+
+void Mix(
+    std::list<int64_t>& list,
+    const std::vector<std::list<int64_t>::iterator>& it_list) {
+  VLOG(2) << "Mix List: " << absl::StrJoin(list, ",");
+  for (std::list<int64_t>::iterator it : it_list) {
+    if (*it == 0) {
       // Do nothing.
-    } else if (ent->value > 0) {
-      int64_t incs = ent->value % (list.size() - 1);
-      DLL* cur = ent.get();
+    } else if (*it > 0) {
+      int64_t incs = *it % (list.size() - 1);
       for (int i = 0; i < incs; ++i) {
-        DLL* next = cur->next;
-        cur->next = next->next;
-        cur->next->prev = cur;
-        next->prev = cur->prev;
-        next->prev->next = next;
-        cur->prev = next;
-        next->next = cur;
+        std::list<int64_t>::iterator next = AddOne(it);
+        if (next == list.end()) {
+          list.splice(AddOne(list.begin()), list, it, AddOne(it));
+        } else {
+          list.splice(it, list, next, AddOne(next));
+        }
       }
     } else {
-      int64_t decs = (-ent->value) % (list.size() - 1);
-      DLL* cur = ent.get();
+      int64_t decs = (-*it) % (list.size() - 1);
       for (int i = 0; i < decs; ++i) {
-        DLL* prev = cur->prev;
-        cur->prev = prev->prev;
-        cur->prev->next = cur;
-        prev->next = cur->next;
-        prev->next->prev = prev;
-        cur->next = prev;
-        prev->prev = cur;
+        if (it == list.begin()) {
+          list.splice(SubOne(list.end()), list, it, AddOne(it));
+        } else {
+          std::list<int64_t>::iterator prev = SubOne(it);
+          list.splice(prev, list, it, AddOne(it));
+        }
       }
     }
+    VLOG(3) << "Step List: " << absl::StrJoin(list, ",");
   }
 }
 
-int64_t Coordinates(DLL* from_val) {
+int64_t Coordinates(const std::list<int64_t>& list,
+                    std::list<int64_t>::const_iterator it) {
   int64_t sum = 0;
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 1000; ++j) {
-      from_val = from_val->next;
+      ++it;
+      if (it == list.end()) it = list.begin();
     }
-    sum += from_val->value;
+    sum += *it;
   }
   return sum;
 }
@@ -79,54 +73,50 @@ int64_t Coordinates(DLL* from_val) {
 
 absl::StatusOr<std::string> Day_2022_20::Part1(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
-  if (!list.ok()) return list.status();
+  absl::StatusOr<std::vector<int64_t>> input_ints = ParseAsInts(input);
+  if (!input_ints.ok()) return input_ints.status();
 
-  DLL* zero_dll = nullptr;
-  std::vector<std::unique_ptr<DLL>> cycle;
-  for (int64_t v : *list) {
-    cycle.push_back(absl::make_unique<DLL>(v));
+  std::list<int64_t> list;
+  std::vector<std::list<int64_t>::iterator> list_it;
+  std::list<int64_t>::iterator zero_it = list.end();
+
+  for (int64_t v : *input_ints) {
+    list.push_back(v);
+    list_it.push_back(SubOne(list.end()));
     if (v == 0) {
-      if (zero_dll != nullptr) return Error("Duplicate 0");
-      zero_dll = cycle.back().get();
+      if (zero_it != list.end()) return Error("Duplicate 0");
+      zero_it = list_it.back();
     }
   }
-  if (zero_dll == nullptr) return Error("No zero found");
+  if (zero_it == list.end()) return Error("No zero found");
 
-  for (int i = 0; i < cycle.size(); ++i) {
-    cycle[i]->prev = cycle[(cycle.size() + i - 1) % cycle.size()].get();
-    cycle[i]->next = cycle[(i + 1) % cycle.size()].get();
-  }
-
-  Mix(cycle);
-  return AdventReturn(Coordinates(zero_dll));
+  Mix(list, list_it);
+  return AdventReturn(Coordinates(list, zero_it));
 }
 
 absl::StatusOr<std::string> Day_2022_20::Part2(
     absl::Span<absl::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
-  if (!list.ok()) return list.status();
+  absl::StatusOr<std::vector<int64_t>> input_ints = ParseAsInts(input);
+  if (!input_ints.ok()) return input_ints.status();
 
-  DLL* zero_dll = nullptr;
-  std::vector<std::unique_ptr<DLL>> cycle;
-  for (int64_t v : *list) {
-    cycle.push_back(absl::make_unique<DLL>(811589153 * v));
+  std::list<int64_t> list;
+  std::vector<std::list<int64_t>::iterator> list_it;
+  std::list<int64_t>::iterator zero_it = list.end();
+
+  for (int64_t v : *input_ints) {
+    list.push_back(811589153 * v);
+    list_it.push_back(SubOne(list.end()));
     if (v == 0) {
-      if (zero_dll != nullptr) return Error("Duplicate 0");
-      zero_dll = cycle.back().get();
+      if (zero_it != list.end()) return Error("Duplicate 0");
+      zero_it = list_it.back();
     }
   }
-  if (zero_dll == nullptr) return Error("No zero found");
+  if (zero_it == list.end()) return Error("No zero found");
 
-  for (int i = 0; i < cycle.size(); ++i) {
-    cycle[i]->prev = cycle[(cycle.size() + i - 1) % cycle.size()].get();
-    cycle[i]->next = cycle[(i + 1) % cycle.size()].get();
+  for (int mix = 0; mix < 10; ++mix) {
+    Mix(list, list_it);
   }
-
-  for (int64_t mix = 0; mix < 10; ++mix) {
-    Mix(cycle);
-  }
-  return AdventReturn(Coordinates(zero_dll));
+  return AdventReturn(Coordinates(list, zero_it));
 }
 
 }  // namespace advent_of_code
