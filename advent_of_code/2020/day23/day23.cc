@@ -18,7 +18,7 @@ class Cups {
   Cups() = default;
 
   void AddCup(int val);
-  void Finalize();
+  absl::Status Finalize();
   void RunMove2();
 
   absl::StatusOr<std::string> Label() const;
@@ -48,45 +48,51 @@ void Cups::AddCup(int val) {
   cups_.push_back(val);
 }
 
-void Cups::Finalize() {
+absl::Status Cups::Finalize() {
   cups_it_.resize(cups_.size() + 1, cups_.end());
   for (auto it = cups_.begin(); it != cups_.end(); ++it) {
-    CHECK_LE(*it, cups_.size());
+    if (*it > cups_it_.size()) {
+      return Error("Bad value: ", *it);
+    }
+    if (cups_it_[*it] != cups_.end()) {
+      return Error("Duplicate value: ", *it);
+    }
     cups_it_[*it] = it;
   }
   cur_ = cups_.begin();
+  return absl::OkStatus();
 }
 
 void Cups::RunMove2() {
-  int cur_cup = *cur_;
-  int dest_cup = cur_cup - 1;
-  if (dest_cup < 1) dest_cup = cups_.size();
-
-  std::list<int> save3;
+  std::array<int, 3> next3;
   {
-    auto start = cur_;
-    ++start;
-    auto end = start;
+    auto it = cur_;
     for (int i = 0; i < 3; ++i) {
-      if (end == cups_.end()) {
-        save3.splice(save3.end(), cups_, start, end);
-        start = cups_.begin();
-        end = start;
-      }
-      ++end;
+      ++it;
+      if (it == cups_.end()) it = cups_.begin();
+      next3[i] = *it;
     }
-    save3.splice(save3.end(), cups_, start, end);
   }
-  while(absl::c_any_of(
-            save3, [dest_cup](int cup) { return cup == dest_cup; })) {
+
+  int dest_cup = *cur_;
+  do {
     --dest_cup;
-    if (dest_cup < 1) dest_cup = cups_.size() + 3;
-  }
+    if (dest_cup < 1) dest_cup = cups_.size();
+  } while(absl::c_any_of(
+              next3, [dest_cup](int cup) { return cup == dest_cup; }));
   VLOG(2) << "  dest_cup=" << dest_cup;
+
   auto dest_it = cups_it_[dest_cup];
   // Splice inserts before.
   ++dest_it;
-  cups_.splice(dest_it, save3);
+  for (int i = 0; i < 3; ++i) {
+    auto start = cur_;
+    ++start;
+    if (start == cups_.end()) start = cups_.begin();
+    auto end = start;
+    ++end;
+    cups_.splice(dest_it, cups_, start, end);
+  }
   ++cur_;
   if (cur_ == cups_.end()) cur_ = cups_.begin();
 }
@@ -127,7 +133,7 @@ absl::StatusOr<std::string> Day_2020_23::Part1(
   for (int i = 0; i < input[0].size(); ++i) {
     cups.AddCup(input[0][i] - '0');
   }
-  cups.Finalize();
+  if (absl::Status st = cups.Finalize(); !st.ok()) return st;
   for (int i = 0; i < 100; ++i) {
     VLOG(1) << cups;
     cups.RunMove2();
@@ -146,7 +152,7 @@ absl::StatusOr<std::string> Day_2020_23::Part2(
   for (int i = input[0].size(); i < 1000000; ++i) {
     cups.AddCup(i + 1);
   }
-  cups.Finalize();
+  if (absl::Status st = cups.Finalize(); !st.ok()) return st;
   for (int i = 0; i < 10'000'000; ++i) {
     VLOG_IF(1, i % 777'777 == 0) << i;
     cups.RunMove2();
