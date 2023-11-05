@@ -48,7 +48,7 @@ cc_test(
     tags = ["benchmark"],
     deps = [
         "//advent_of_code/${year}/day${day}:day${day}_benchmark_lib",
-        "@com_monkeynova_gunit_main//:test_main",
+        "\@com_monkeynova_gunit_main//:test_main",
     ],
 )
 EOF
@@ -59,7 +59,7 @@ EOF
   $build_contents =~ s{
     (cc_test\([^\)]+
      name\s*=\s*"benchmark"[^\)]+)
-    ("@com_monkeynova_gunit_main//:test_main",[^\)]+\))
+    ("\@com_monkeynova_gunit_main//:test_main",[^\)]+\))
   }{$1
     "//advent_of_code/${year}/day${day}:day${day}_benchmark_lib",
     $2

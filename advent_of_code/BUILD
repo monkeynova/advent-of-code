@@ -214,5 +214,6 @@ cc_library(
         "//advent_of_code/2020:benchmark_lib",
         "//advent_of_code/2021:benchmark_lib",
         "//advent_of_code/2022:benchmark_lib",
+        "//advent_of_code/2023:benchmark_lib",
     ],
 )
