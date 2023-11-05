@@ -29,21 +29,23 @@ absl::StatusOr<std::string> Day_2016_24::Part1(
     }
   }
 
-  return AdventReturn(PointWalkData<int>({
-    .start = {.p = start, .d = need},
-    .is_good = [&](PointAndData<int>& cur, int) {
-      if (!b->OnBoard(cur.p)) return false;
-      char board_char = (*b)[cur.p];
-      if (board_char == '#') return false;
-      if (board_char > '0' && board_char <= '9') {
-        cur.d &= ~(1 << (board_char - '1'));
-      }
-      return true;
-    },
-    .is_final = [&](PointAndData<int> cur, int) {
-      return cur.d == 0;
-    },
-  }).FindMinSteps());
+  return AdventReturn(
+      PointWalkData<int>({
+                             .start = {.p = start, .d = need},
+                             .is_good =
+                                 [&](PointAndData<int>& cur, int) {
+                                   if (!b->OnBoard(cur.p)) return false;
+                                   char board_char = (*b)[cur.p];
+                                   if (board_char == '#') return false;
+                                   if (board_char > '0' && board_char <= '9') {
+                                     cur.d &= ~(1 << (board_char - '1'));
+                                   }
+                                   return true;
+                                 },
+                             .is_final = [&](PointAndData<int> cur,
+                                             int) { return cur.d == 0; },
+                         })
+          .FindMinSteps());
 }
 
 absl::StatusOr<std::string> Day_2016_24::Part2(
@@ -62,21 +64,24 @@ absl::StatusOr<std::string> Day_2016_24::Part2(
     }
   }
 
-  return AdventReturn(PointWalkData<int>({
-    .start = {.p = start, .d = need},
-    .is_good = [&](PointAndData<int>& cur, int) {
-      if (!b->OnBoard(cur.p)) return false;
-      char board_char = (*b)[cur.p];
-      if (board_char == '#') return false;
-      if (board_char > '0' && board_char <= '9') {
-        cur.d &= ~(1 << (board_char - '1'));
-      }
-      return true;
-    },
-    .is_final = [&](PointAndData<int> cur, int) {
-      return cur.d == 0 && cur.p == start;
-    },
-  }).FindMinSteps());
+  return AdventReturn(
+      PointWalkData<int>(
+          {
+              .start = {.p = start, .d = need},
+              .is_good =
+                  [&](PointAndData<int>& cur, int) {
+                    if (!b->OnBoard(cur.p)) return false;
+                    char board_char = (*b)[cur.p];
+                    if (board_char == '#') return false;
+                    if (board_char > '0' && board_char <= '9') {
+                      cur.d &= ~(1 << (board_char - '1'));
+                    }
+                    return true;
+                  },
+              .is_final = [&](PointAndData<int> cur,
+                              int) { return cur.d == 0 && cur.p == start; },
+          })
+          .FindMinSteps());
 }
 
 }  // namespace advent_of_code

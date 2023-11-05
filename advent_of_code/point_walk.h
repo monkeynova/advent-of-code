@@ -17,8 +17,9 @@ class PointWalk : public BFSInterface<PointWalk, Point> {
   };
 
   PointWalk(Options options)
-   : is_good_(options.is_good), is_final_(options.is_final),
-     cur_(options.start) {}
+      : is_good_(options.is_good),
+        is_final_(options.is_final),
+        cur_(options.start) {}
 
   Point identifier() const override { return cur_; }
   bool IsFinal() const override { return is_final_(cur_, num_steps()); }
@@ -57,7 +58,7 @@ struct PointAndData {
 
 template <typename DataType>
 class PointWalkData
- : public BFSInterface<PointWalkData<DataType>, PointAndData<DataType>> {
+    : public BFSInterface<PointWalkData<DataType>, PointAndData<DataType>> {
  public:
   using Base = BFSInterface<PointWalkData<DataType>, PointAndData<DataType>>;
 
@@ -68,13 +69,12 @@ class PointWalkData
   };
 
   PointWalkData(Options options)
-   : is_good_(options.is_good), is_final_(options.is_final),
-     cur_(options.start) {}
+      : is_good_(options.is_good),
+        is_final_(options.is_final),
+        cur_(options.start) {}
 
   PointAndData<DataType> identifier() const override { return cur_; }
-  bool IsFinal() const override {
-    return is_final_(cur_, Base::num_steps());
-  }
+  bool IsFinal() const override { return is_final_(cur_, Base::num_steps()); }
   void AddNextSteps(typename Base::State* state) const override {
     for (Point d : Cardinal::kFourDirs) {
       PointAndData<DataType> n = cur_;
@@ -101,8 +101,9 @@ class Point3Walk : public BFSInterface<Point3Walk, Point3> {
   };
 
   Point3Walk(Options options)
-    : is_good_(options.is_good), is_final_(options.is_final),
-      cur_(options.start) {}
+      : is_good_(options.is_good),
+        is_final_(options.is_final),
+        cur_(options.start) {}
 
   Point3 identifier() const override { return cur_; }
   bool IsFinal() const override { return is_final_(cur_, num_steps()); }

@@ -30,17 +30,18 @@ std::vector<std::vector<absl::string_view>> DirectedGraphBase::Forest() const {
     absl::string_view start = *to_assign.begin();
     forest.push_back({});
     GraphWalk({
-      .graph = this,
-      .start = start,
-      .is_good = [&](absl::string_view node, int) {
-        return to_assign.contains(node);
-      },
-      .is_final = [&](absl::string_view node, int) {
-        forest.back().push_back(node);
-        to_assign.erase(node);
-        return false;
-      },
-    }).Walk();
+                  .graph = this,
+                  .start = start,
+                  .is_good = [&](absl::string_view node,
+                                 int) { return to_assign.contains(node); },
+                  .is_final =
+                      [&](absl::string_view node, int) {
+                        forest.back().push_back(node);
+                        to_assign.erase(node);
+                        return false;
+                      },
+              })
+        .Walk();
   }
 
   return forest;

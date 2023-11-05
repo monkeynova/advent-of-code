@@ -10,8 +10,8 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
-#include "advent_of_code/point_walk.h"
 #include "advent_of_code/point3.h"
+#include "advent_of_code/point_walk.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
@@ -55,15 +55,17 @@ absl::StatusOr<std::string> Day_2022_18::Part2(
       if (points.contains(p)) continue;
 
       bool escaped = false;
-      auto hist = Point3Walk({
-        .start = p,
-        .is_good = [&](Point3 test, int) { return !points.contains(test); },
-        .is_final = [&](Point3 test, int) {
-          if (cube.Contains(test)) return false;
-          escaped = true;
-          return true;
-        }
-      }).FindReachable();
+      auto hist =
+          Point3Walk({.start = p,
+                      .is_good = [&](Point3 test,
+                                     int) { return !points.contains(test); },
+                      .is_final =
+                          [&](Point3 test, int) {
+                            if (cube.Contains(test)) return false;
+                            escaped = true;
+                            return true;
+                          }})
+              .FindReachable();
       if (!escaped) {
         for (const auto& [p2, _] : hist) points.insert(p2);
       }

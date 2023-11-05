@@ -52,7 +52,7 @@ class CharBoard {
 
    private:
     const_iterator(const CharBoard& board)
-     : board_(board), range_(board.range()), it_(range_.begin()) {}
+        : board_(board), range_(board.range()), it_(range_.begin()) {}
 
     const CharBoard& board_;
     PointRectangle range_;

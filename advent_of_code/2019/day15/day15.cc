@@ -100,32 +100,34 @@ class Droid : public IntCode::IOModule {
   }
 
   absl::optional<int> DistanceToO2() {
-    return PointWalk({
-      .start = Cardinal::kOrigin,
-      .is_good = [&](Point test, int num_steps) {
-        auto it = board_.find(test);
-        CHECK(it != board_.end());
-        return it->second != 0;
-      },
-      .is_final = [&](Point test, int) { return test == o2_pos_; }
-    }).FindMinSteps();
+    return PointWalk(
+               {.start = Cardinal::kOrigin,
+                .is_good =
+                    [&](Point test, int num_steps) {
+                      auto it = board_.find(test);
+                      CHECK(it != board_.end());
+                      return it->second != 0;
+                    },
+                .is_final = [&](Point test, int) { return test == o2_pos_; }})
+        .FindMinSteps();
   }
 
   absl::StatusOr<int> GreatestDistanceFromO2() {
     int max_dist = -1;
-    PointWalk({
-      .start = o2_pos_,
-      .is_good = [&](Point test, int num_steps) {
-        auto it = board_.find(test);
-        CHECK(it != board_.end());
-        if (it->second == 0) return false;
-        return true;
-      },
-      .is_final = [&](Point, int num_steps) {
-        max_dist = std::max(max_dist, num_steps);
-        return false;
-      }
-    }).Walk();
+    PointWalk({.start = o2_pos_,
+               .is_good =
+                   [&](Point test, int num_steps) {
+                     auto it = board_.find(test);
+                     CHECK(it != board_.end());
+                     if (it->second == 0) return false;
+                     return true;
+                   },
+               .is_final =
+                   [&](Point, int num_steps) {
+                     max_dist = std::max(max_dist, num_steps);
+                     return false;
+                   }})
+        .Walk();
     return max_dist;
   }
 

@@ -65,8 +65,8 @@ absl::StatusOr<std::string> Day_2017_14::Part2(
     if ((*board)[p] != '.') continue;
     dg.AddNode(storage[p], true);
     for (Point d : Cardinal::kFourDirs) {
-      if ((*board)[p+d] == '.') {
-        dg.AddEdge(storage[p], storage[p+d]);
+      if ((*board)[p + d] == '.') {
+        dg.AddEdge(storage[p], storage[p + d]);
       }
     }
   }

@@ -6,8 +6,8 @@ cc_library(
     hdrs = ["day15.h"],
     deps = [
         "//advent_of_code:advent_day",
-        "//advent_of_code:point",
         "//advent_of_code:interval",
+        "//advent_of_code:point",
         "@com_google_absl//absl/algorithm:container",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",

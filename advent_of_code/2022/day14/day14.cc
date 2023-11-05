@@ -54,14 +54,14 @@ CharBoard DrawGrid(PointRectangle grid,
 }
 
 absl::StatusOr<bool> AddSand(CharBoard& b, Point at) {
-  if(!b.OnBoard(at)) return Error("Not on board: ", at);
+  if (!b.OnBoard(at)) return Error("Not on board: ", at);
   if (b[at] != '.') return false;
   while (b.OnBoard(at + Cardinal::kSouth)) {
     bool fell = false;
     for (Point d :
          {Cardinal::kSouth, Cardinal::kSouthWest, Cardinal::kSouthEast}) {
       Point t = at + d;
-      if(!b.OnBoard(at)) return Error("Not on board: ", t);
+      if (!b.OnBoard(at)) return Error("Not on board: ", t);
       if (b[t] == '.') {
         at = t;
         fell = true;

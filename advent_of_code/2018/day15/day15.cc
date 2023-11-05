@@ -30,7 +30,6 @@ struct PointAndDistance {
 
 class FindEnemyAdjacent : public BFSInterface<FindEnemyAdjacent, Point> {
  public:
-
   FindEnemyAdjacent(const CharBoard& b, Point start, char find,
                     PointAndDistance* ret)
       : board_(b), cur_(start), ret_(ret), find_(find) {}
@@ -155,15 +154,15 @@ class GameBoard {
     for (Point dir : kOrderedDirs) {
       Point check = p + dir;
       if (!board_.OnBoard(check) || board_[check] != '.') continue;
-      absl::optional<int> dist = PointWalk({
-        .start = check,
-        .is_good = [&](Point test, int) {
-          return board_.OnBoard(test) && board_[test] == '.';
-        },
-        .is_final = [&](Point test, int) {
-          return test == p_and_d.p;
-        }
-      }).FindMinSteps();
+      absl::optional<int> dist =
+          PointWalk(
+              {.start = check,
+               .is_good =
+                   [&](Point test, int) {
+                     return board_.OnBoard(test) && board_[test] == '.';
+                   },
+               .is_final = [&](Point test, int) { return test == p_and_d.p; }})
+              .FindMinSteps();
       if (dist && *dist < min_path_length) {
         min_path_length = *dist;
         move_to = check;

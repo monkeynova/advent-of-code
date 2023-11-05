@@ -17,8 +17,10 @@ class GraphWalk : public BFSInterface<GraphWalk, absl::string_view> {
   };
 
   GraphWalk(Options options)
-   : is_good_(options.is_good), is_final_(options.is_final),
-     graph_(options.graph), cur_(options.start) {}
+      : is_good_(options.is_good),
+        is_final_(options.is_final),
+        graph_(options.graph),
+        cur_(options.start) {}
 
   absl::string_view identifier() const override { return cur_; }
   bool IsFinal() const override { return is_final_(cur_, num_steps()); }
