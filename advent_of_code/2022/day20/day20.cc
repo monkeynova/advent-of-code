@@ -59,16 +59,20 @@ absl::StatusOr<std::string> Day_2022_20::Part1(
 
   RingType list;
   std::vector<RingType::const_iterator> list_it;
-  for (int64_t v : *input_ints) {
-    list.InsertSomewhere(v);
-  }
-  RingType::const_iterator start = list.SomePoint();
-  RingType::const_iterator it = start;
   RingType::const_iterator zero_it;
-  list_it.push_back(it);
-  if (*it == 0) {
-    zero_it = list_it.back();
+  for (int64_t v : *input_ints) {
+    if (list.empty()) {
+      list.InsertFirst(v);
+      list_it.push_back(list.SomePoint());
+      if (v == 0) {
+        zero_it = list_it.back();
+      }
+    } else {
+      list.InsertBefore(list_it[0], v);
+    }
   }
+  RingType::const_iterator start = list_it[0];
+  RingType::const_iterator it = start;
   for (++it; it != start; ++it) {
     list_it.push_back(it);
     if (*it == 0) {
@@ -89,16 +93,20 @@ absl::StatusOr<std::string> Day_2022_20::Part2(
 
   RingType list;
   std::vector<RingType::const_iterator> list_it;
-  for (int64_t v : *input_ints) {
-    list.InsertSomewhere(811589153 * v);
-  }
-  RingType::const_iterator start = list.SomePoint();
-  RingType::const_iterator it = start;
   RingType::const_iterator zero_it;
-  list_it.push_back(it);
-  if (*it == 0) {
-    zero_it = list_it.back();
+  for (int64_t v : *input_ints) {
+    if (list.empty()) {
+      list.InsertFirst(811589153 * v);
+      list_it.push_back(list.SomePoint());
+      if (v == 0) {
+        zero_it = list_it.back();
+      }
+    } else {
+      list.InsertBefore(list_it[0], 811589153 * v);
+    }
   }
+  RingType::const_iterator start = list_it[0];
+  RingType::const_iterator it = start;
   for (++it; it != start; ++it) {
     list_it.push_back(it);
     if (*it == 0) {

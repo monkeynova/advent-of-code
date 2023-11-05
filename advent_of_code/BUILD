@@ -194,6 +194,7 @@ cc_library(
     hdrs = ["splice_ring.h"],
     deps = [
         ":vlog",
+        "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/log",
     ],
     alwayslink = 1,

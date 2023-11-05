@@ -16,15 +16,17 @@ namespace {
 
 class GameState {
  public:
-  GameState(int num_players)
-   : scores_(num_players, 0) {}
+  GameState(int num_players, int num_marbles)
+   : scores_(num_players, 0) {
+    marbles_.reserve(num_marbles);
+  }
 
   const std::vector<int64_t>& scores() const { return scores_; }
 
   void AddMarble(int64_t marble, int player) {
     if (marbles_.empty()) {
       CHECK_EQ(marble, 0);
-      marbles_.InsertSomewhere(0);
+      marbles_.InsertFirst(0);
       cur_position_ = marbles_.SomePoint();
       return;
     }
@@ -66,7 +68,7 @@ class GameState {
 };
 
 int64_t HighScore(int num_players, int num_marbles) {
-  GameState state(num_players);
+  GameState state(num_players, num_marbles);
   for (int64_t i = 0; i <= num_marbles; ++i) {
     VLOG(2) << state;
     state.AddMarble(i, i % num_players);

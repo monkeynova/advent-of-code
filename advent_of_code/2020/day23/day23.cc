@@ -39,14 +39,14 @@ class Cups {
   }
 
  private:
-  using RingType =  SpliceRing<int64_t, SpliceRingIndexType::kSparse>;
+  using RingType =  SpliceRing<int, SpliceRingIndexType::kDense>;
   RingType cups_;
   RingType::const_iterator cur_;
 };
 
 void Cups::AddCup(int val) {
   if (cur_ == RingType::const_iterator()) {
-    cups_.InsertSomewhere(val);
+    cups_.InsertFirst(val);
     cur_ = cups_.SomePoint();
     return;
   }
@@ -71,6 +71,7 @@ void Cups::RunMove() {
   VLOG(2) << "  dest_cup=" << dest_cup;
 
   auto dest_it = cups_.Find(dest_cup);
+  CHECK_EQ(*dest_it, dest_cup);
   // Splice inserts before.
   ++dest_it;
   auto src_it = cur_;
