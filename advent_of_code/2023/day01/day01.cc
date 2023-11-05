@@ -19,6 +19,7 @@
 #include "advent_of_code/point.h"
 #include "advent_of_code/point3.h"
 #include "advent_of_code/point_walk.h"
+#include "advent_of_code/splice_ring.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
