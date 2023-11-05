@@ -7,6 +7,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/splice_ring.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
@@ -18,7 +19,6 @@ class Cups {
   Cups() = default;
 
   void AddCup(int val);
-  absl::Status Finalize();
   void RunMove();
 
   absl::StatusOr<std::string> Label() const;
@@ -27,9 +27,9 @@ class Cups {
   template <typename Sink>
   friend void AbslStringify(Sink& sink, const Cups& c) {
     absl::Format(&sink, "1");
-    auto it = c.cups_it_[1];
-    for (++it; it != c.cups_it_[1];
-         ++it == c.cups_.end() ? (it = c.cups_.begin()) : it) {
+    auto it = c.cups_.Find(1);
+    auto start = it;
+    for (++it; it != start; ++it) {
       if (it == c.cur_) {
         absl::Format(&sink, ",(%v)", *it);
       } else {
@@ -39,28 +39,18 @@ class Cups {
   }
 
  private:
-  std::list<int> cups_;
-  std::vector<std::list<int>::const_iterator> cups_it_;
-  std::list<int>::const_iterator cur_;
+  using RingType =  SpliceRing<int64_t, SpliceRingIndexType::kSparse>;
+  RingType cups_;
+  RingType::const_iterator cur_;
 };
 
 void Cups::AddCup(int val) {
-  cups_.push_back(val);
-}
-
-absl::Status Cups::Finalize() {
-  cups_it_.resize(cups_.size() + 1, cups_.end());
-  for (auto it = cups_.begin(); it != cups_.end(); ++it) {
-    if (*it > cups_it_.size()) {
-      return Error("Bad value: ", *it);
-    }
-    if (cups_it_[*it] != cups_.end()) {
-      return Error("Duplicate value: ", *it);
-    }
-    cups_it_[*it] = it;
+  if (cur_ == RingType::const_iterator()) {
+    cups_.InsertSomewhere(val);
+    cur_ = cups_.SomePoint();
+    return;
   }
-  cur_ = cups_.begin();
-  return absl::OkStatus();
+  cups_.InsertBefore(cur_, val);
 }
 
 void Cups::RunMove() {
@@ -68,9 +58,7 @@ void Cups::RunMove() {
   {
     auto it = cur_;
     for (int i = 0; i < 3; ++i) {
-      ++it;
-      if (it == cups_.end()) it = cups_.begin();
-      next3[i] = *it;
+      next3[i] = *++it;
     }
   }
 
@@ -82,29 +70,24 @@ void Cups::RunMove() {
               next3, [dest_cup](int cup) { return cup == dest_cup; }));
   VLOG(2) << "  dest_cup=" << dest_cup;
 
-  auto dest_it = cups_it_[dest_cup];
+  auto dest_it = cups_.Find(dest_cup);
   // Splice inserts before.
   ++dest_it;
+  auto src_it = cur_;
+  ++src_it;
   for (int i = 0; i < 3; ++i) {
-    auto start = cur_;
-    ++start;
-    if (start == cups_.end()) start = cups_.begin();
-    auto end = start;
-    ++end;
-    cups_.splice(dest_it, cups_, start, end);
+    src_it = cups_.MoveBefore(dest_it, src_it);
   }
   ++cur_;
-  if (cur_ == cups_.end()) cur_ = cups_.begin();
 }
 
 absl::StatusOr<std::string> Cups::Label() const {
   std::string ret;
   int ret_i = 0;
   ret.resize(cups_.size() - 1);
-  auto it = cups_it_[1];
-  if (it == cups_.end()) return Error("Could not find 1");
-  for (++it; it != cups_it_[1];
-       ++it == cups_.end() ? (it = cups_.begin()) : it) {
+  auto it = cups_.Find(1);
+  auto start = it;
+  for (++it; it != start; ++it) {
     ret[ret_i] = *it + '0';
     ++ret_i;
   }
@@ -112,14 +95,9 @@ absl::StatusOr<std::string> Cups::Label() const {
 }
 
 absl::StatusOr<int64_t> Cups::Next2Product() const {
-  auto it = cups_it_[1];
-  if (it == cups_.end()) return Error("Could not find 1");
-  ++it;
-  if (it == cups_.end()) it = cups_.begin();
-  int64_t product = *it;
-  ++it;
-  if (it == cups_.end()) it = cups_.begin();
-  product *= *it;
+  auto it = cups_.Find(1);
+  int64_t product = *++it;
+  product *= *++it;
   return product;
 }
 
@@ -133,7 +111,6 @@ absl::StatusOr<std::string> Day_2020_23::Part1(
   for (int i = 0; i < input[0].size(); ++i) {
     cups.AddCup(input[0][i] - '0');
   }
-  if (absl::Status st = cups.Finalize(); !st.ok()) return st;
   for (int i = 0; i < 100; ++i) {
     VLOG(1) << cups;
     cups.RunMove();
@@ -152,7 +129,6 @@ absl::StatusOr<std::string> Day_2020_23::Part2(
   for (int i = input[0].size(); i < 1'000'000; ++i) {
     cups.AddCup(i + 1);
   }
-  if (absl::Status st = cups.Finalize(); !st.ok()) return st;
   for (int i = 0; i < 10'000'000; ++i) {
     VLOG_IF(1, i % 777'777 == 0) << i;
     cups.RunMove();

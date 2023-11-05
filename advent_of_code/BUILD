@@ -189,6 +189,16 @@ cc_library(
     alwayslink = 1,
 )
 
+cc_library(
+    name = "splice_ring",
+    hdrs = ["splice_ring.h"],
+    deps = [
+        ":vlog",
+        "@com_google_absl//absl/log",
+    ],
+    alwayslink = 1,
+)
+
 cc_test(
     name = "benchmark",
     size = "small",

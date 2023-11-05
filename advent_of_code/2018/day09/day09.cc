@@ -7,6 +7,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/splice_ring.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
@@ -23,33 +24,27 @@ class GameState {
   void AddMarble(int64_t marble, int player) {
     if (marbles_.empty()) {
       CHECK_EQ(marble, 0);
-      marbles_.push_back(0);
-      cur_position_ = marbles_.begin();
+      marbles_.InsertSomewhere(0);
+      cur_position_ = marbles_.SomePoint();
       return;
     }
     if (marble % 23 == 0) {
       scores_[player] += marble;
-      for (int i = 0; i < 7; ++i) {
-        if (cur_position_ == marbles_.begin()) cur_position_ = marbles_.end();
-        --cur_position_;
-      }
+      cur_position_ -= 7;
       scores_[player] += *cur_position_;
-      cur_position_ = marbles_.erase(cur_position_);
-      if (cur_position_ == marbles_.end()) cur_position_ = marbles_.begin();
+      cur_position_ = marbles_.Erase(cur_position_);
 
     } else {
-      ++cur_position_;
-      if (cur_position_ == marbles_.end()) cur_position_ = marbles_.begin();
-      ++cur_position_;
-      if (cur_position_ == marbles_.end()) cur_position_ = marbles_.begin();
-      marbles_.insert(cur_position_, marble);
+      cur_position_ += 2;
+      marbles_.InsertBefore(cur_position_, marble);
       --cur_position_;
     }
   }
 
   template <typename Sink>
   friend void AbslStringify(Sink& sink, const GameState& s) {
-    auto marble_it = s.marbles_.begin();
+    auto marble_it = s.marbles_.SomePoint();
+    auto start_it = marble_it;
     for (int j = 0; j < 30; ++j) {
       if (j > 0) absl::Format(&sink, ",");
       if (marble_it == s.cur_position_) {
@@ -59,15 +54,15 @@ class GameState {
       }
       ++marble_it;
       // Looped before size.
-      if (marble_it == s.marbles_.end()) break;
+      if (marble_it == start_it) break;
     }
-    if (marble_it != s.marbles_.end()) absl::Format(&sink, ",...");
+    if (marble_it != start_it) absl::Format(&sink, ",...");
   }
 
  private:
   std::vector<int64_t> scores_;
-  std::list<int> marbles_;
-  std::list<int>::iterator cur_position_;
+  SpliceRing<int> marbles_;
+  SpliceRing<int>::const_iterator cur_position_;
 };
 
 int64_t HighScore(int num_players, int num_marbles) {
