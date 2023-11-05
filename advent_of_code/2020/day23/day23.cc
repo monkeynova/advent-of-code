@@ -24,90 +24,96 @@ class Cups {
   absl::StatusOr<std::string> Label() const;
   absl::StatusOr<int64_t> Next2Product() const;
 
-  friend std::ostream& operator<<(std::ostream& o, const Cups& c) {
-    o << "1";
-    for (int idx = c.cups[c.cup_to_index.find(1)->second].next;
-         c.cups[idx].val != 1; idx = c.cups[idx].next) {
-      o << ",";
-      if (idx == c.cur_idx) o << "(";
-      o << c.cups[idx].val;
-      if (idx == c.cur_idx) o << ")";
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const Cups& c) {
+    absl::Format(&sink, "1");
+    auto it = c.cups_it_[1];
+    for (++it; it != c.cups_it_[1];
+         ++it == c.cups_.end() ? (it = c.cups_.begin()) : it) {
+      if (it == c.cur_) {
+        absl::Format(&sink, ",(%v)", *it);
+      } else {
+        absl::Format(&sink, ",%v", *it);
+      }
     }
-    return o;
   }
 
  private:
-  struct LLCup {
-    int val;
-    int next;
-  };
-
-  int cur_idx = 0;
-  absl::flat_hash_map<int, int> cup_to_index;
-  std::vector<LLCup> cups;
+  std::list<int> cups_;
+  std::vector<std::list<int>::const_iterator> cups_it_;
+  std::list<int>::const_iterator cur_;
 };
 
 void Cups::AddCup(int val) {
-  int idx = cups.size();
-  cup_to_index[val] = idx;
-  cups.push_back({.val = val, .next = idx + 1});
+  cups_.push_back(val);
 }
 
 void Cups::Finalize() {
-  cups.back().next = 0;
+  cups_it_.resize(cups_.size() + 1, cups_.end());
+  for (auto it = cups_.begin(); it != cups_.end(); ++it) {
+    CHECK_LE(*it, cups_.size());
+    cups_it_[*it] = it;
+  }
+  cur_ = cups_.begin();
 }
 
 void Cups::RunMove2() {
-  int cur_cup = cups[cur_idx].val;
+  int cur_cup = *cur_;
   int dest_cup = cur_cup - 1;
-  if (dest_cup < 1) dest_cup = cups.size();
-  bool found = true;
-  int plus_three_idx;
-  while (found) {
-    found = false;
-    int idx = cups[cur_idx].next;
+  if (dest_cup < 1) dest_cup = cups_.size();
+
+  std::list<int> save3;
+  {
+    auto start = cur_;
+    ++start;
+    auto end = start;
     for (int i = 0; i < 3; ++i) {
-      if (cups[idx].val == dest_cup) {
-        --dest_cup;
-        if (dest_cup < 1) dest_cup = cups.size();
-        found = true;
-        break;
+      if (end == cups_.end()) {
+        save3.splice(save3.end(), cups_, start, end);
+        start = cups_.begin();
+        end = start;
       }
-      plus_three_idx = idx;
-      idx = cups[idx].next;
+      ++end;
     }
+    save3.splice(save3.end(), cups_, start, end);
+  }
+  while(absl::c_any_of(
+            save3, [dest_cup](int cup) { return cup == dest_cup; })) {
+    --dest_cup;
+    if (dest_cup < 1) dest_cup = cups_.size() + 3;
   }
   VLOG(2) << "  dest_cup=" << dest_cup;
-  int dest_cup_idx = cup_to_index[dest_cup];
-  int tmp = cups[dest_cup_idx].next;
-  cups[dest_cup_idx].next = cups[cur_idx].next;
-  cups[cur_idx].next = cups[plus_three_idx].next;
-  cups[plus_three_idx].next = tmp;
-  cur_idx = cups[cur_idx].next;
+  auto dest_it = cups_it_[dest_cup];
+  // Splice inserts before.
+  ++dest_it;
+  cups_.splice(dest_it, save3);
+  ++cur_;
+  if (cur_ == cups_.end()) cur_ = cups_.begin();
 }
 
 absl::StatusOr<std::string> Cups::Label() const {
   std::string ret;
   int ret_i = 0;
-  ret.resize(cups.size() - 1);
-  auto it = cup_to_index.find(1);
-  if (it == cup_to_index.end()) return Error("Could not find 1");
-  for (int idx = cups[it->second].next; cups[idx].val != 1;
-       idx = cups[idx].next) {
-    ret[ret_i] = cups[idx].val + '0';
+  ret.resize(cups_.size() - 1);
+  auto it = cups_it_[1];
+  if (it == cups_.end()) return Error("Could not find 1");
+  for (++it; it != cups_it_[1];
+       ++it == cups_.end() ? (it = cups_.begin()) : it) {
+    ret[ret_i] = *it + '0';
     ++ret_i;
   }
   return ret;
 }
 
 absl::StatusOr<int64_t> Cups::Next2Product() const {
-  auto it = cup_to_index.find(1);
-  if (it == cup_to_index.end()) return Error("Could not find 1");
-  int next_idx = cups[it->second].next;
-  int64_t product = 1;
-  product *= cups[next_idx].val;
-  next_idx = cups[next_idx].next;
-  product *= cups[next_idx].val;
+  auto it = cups_it_[1];
+  if (it == cups_.end()) return Error("Could not find 1");
+  ++it;
+  if (it == cups_.end()) it = cups_.begin();
+  int64_t product = *it;
+  ++it;
+  if (it == cups_.end()) it = cups_.begin();
+  product *= *it;
   return product;
 }
 
@@ -141,8 +147,8 @@ absl::StatusOr<std::string> Day_2020_23::Part2(
     cups.AddCup(i + 1);
   }
   cups.Finalize();
-  for (int i = 0; i < 10000000; ++i) {
-    VLOG_IF(1, i % 777777 == 0) << i;
+  for (int i = 0; i < 10'000'000; ++i) {
+    VLOG_IF(1, i % 777'777 == 0) << i;
     cups.RunMove2();
   }
 
