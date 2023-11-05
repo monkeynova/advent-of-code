@@ -25,4 +25,4 @@ The organization of this repository is as follows:
  5. After solving part 1: ```bazelisk run --config=compete advent_of_code/YYYY/dayDD:dayDD_test -- --part_filter=2```
  6. After solving part 2: ```git add .; git commit -m 'YYYY/DD Answer'``` -- Ensure "as solved" is visible in the repo
  7. After solving part 2: ```tools/get_problem.pl YYYY DD`` -- Downloads the problem and builds a README.md
- 8. After ensuring enough folks (300?) have solved: ```git push```
+ 8. After ensuring a full leaderboard: ```git push```
