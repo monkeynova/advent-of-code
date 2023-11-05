@@ -20,69 +20,61 @@ class GameState {
 
   const std::vector<int64_t>& scores() const { return scores_; }
 
-  void AddMarble(int64_t marble) {
+  void AddMarble(int64_t marble, int player) {
     if (marbles_.empty()) {
       CHECK_EQ(marble, 0);
-      marbles_.push_back({0, 0, 0});
+      marbles_.push_back(0);
+      cur_position_ = marbles_.begin();
+      return;
     }
     if (marble % 23 == 0) {
-      scores_[marble % scores_.size()] += marble;
+      scores_[player] += marble;
       for (int i = 0; i < 7; ++i) {
-        cur_position_ = marbles_[cur_position_].prev;
+        if (cur_position_ == marbles_.begin()) cur_position_ = marbles_.end();
+        --cur_position_;
       }
-      marbles_[marbles_[cur_position_].prev].next = marbles_[cur_position_].next;
-      marbles_[marbles_[cur_position_].next].prev = marbles_[cur_position_].prev;
-      scores_[marble % scores_.size()] += marbles_[cur_position_].score;
-      cur_position_ = marbles_[cur_position_].next;
+      scores_[player] += *cur_position_;
+      cur_position_ = marbles_.erase(cur_position_);
+      if (cur_position_ == marbles_.end()) cur_position_ = marbles_.begin();
 
     } else {
-      int next = marbles_[cur_position_].next;
-      int next_next = marbles_[marbles_[cur_position_].next].next;
-      marbles_.push_back({marble, next_next, next});
-      marbles_[next].next = marbles_.size() - 1;
-      marbles_[next_next].prev = marbles_.size() - 1;
-      cur_position_ = marbles_.size() - 1;
+      ++cur_position_;
+      if (cur_position_ == marbles_.end()) cur_position_ = marbles_.begin();
+      ++cur_position_;
+      if (cur_position_ == marbles_.end()) cur_position_ = marbles_.begin();
+      marbles_.insert(cur_position_, marble);
+      --cur_position_;
     }
   }
 
   template <typename Sink>
   friend void AbslStringify(Sink& sink, const GameState& s) {
-    std::string out;
-    int marble_idx = 0;
+    auto marble_it = s.marbles_.begin();
     for (int j = 0; j < 30; ++j) {
-      if (j > 0) absl::Format(&out, ",");
-      if (marble_idx == s.cur_position_) {
-        absl::Format(&sink, "(%d)", s.marbles_[marble_idx].score);
+      if (j > 0) absl::Format(&sink, ",");
+      if (marble_it == s.cur_position_) {
+        absl::Format(&sink, "(%d)", *marble_it);
       } else {
-        absl::Format(&sink, "%d", s.marbles_[marble_idx].score);
+        absl::Format(&sink, "%d", *marble_it);
       }
-      if (s.marbles_[s.marbles_[marble_idx].next].prev != marble_idx) {
-        LOG(ERROR) << "Integrity check!";
-      }
-      marble_idx = s.marbles_[marble_idx].next;
+      ++marble_it;
       // Looped before size.
-      if (marble_idx == 0) break;
+      if (marble_it == s.marbles_.end()) break;
     }
-    if (marble_idx != 0) absl::Format(&sink, ",...");
+    if (marble_it != s.marbles_.end()) absl::Format(&sink, ",...");
   }
 
  private:
-  struct Marble {
-    int64_t score;
-    int next;
-    int prev;
-  };
-
   std::vector<int64_t> scores_;
-  std::vector<Marble> marbles_;
-  int cur_position_ = 0;
+  std::list<int> marbles_;
+  std::list<int>::iterator cur_position_;
 };
 
 int64_t HighScore(int num_players, int num_marbles) {
   GameState state(num_players);
   for (int64_t i = 0; i <= num_marbles; ++i) {
     VLOG(2) << state;
-    state.AddMarble(i);
+    state.AddMarble(i, i % num_players);
   }
   int64_t max = 0;
   for (int64_t score : state.scores()) {
