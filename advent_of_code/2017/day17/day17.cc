@@ -7,6 +7,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/splice_ring.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
@@ -22,19 +23,16 @@ absl::StatusOr<std::string> Day_2017_17::Part1(
   if (input.size() != 1) return Error("Bad size");
   int n;
   if (!absl::SimpleAtoi(input[0], &n)) return Error("Bad int:", input[0]);
-  int pos = 0;
-  std::vector<int> buf = {0};
+  SpliceRing<int> buf;
+  buf.InsertFirst(0);
+  SpliceRing<int>::const_iterator pos = buf.SomePoint();
   for (int i = 0; i < 2017; ++i) {
-    VLOG(1) << absl::StrJoin(absl::MakeSpan(buf).subspan(0, 20), ",");
-    pos = (pos + n) % buf.size();
-    buf.push_back(0);
+    VLOG(2) << "Buf: " << buf;
+    pos += n;
+    buf.InsertBefore(pos + 1, i + 1);
     ++pos;
-    for (int j = buf.size() - 1; j > pos; --j) {
-      buf[j] = buf[j - 1];
-    }
-    buf[pos] = i + 1;
   }
-  return AdventReturn(buf[(pos + 1) % buf.size()]);
+  return AdventReturn(*(pos + 1));
 }
 
 absl::StatusOr<std::string> Day_2017_17::Part2(
@@ -43,11 +41,17 @@ absl::StatusOr<std::string> Day_2017_17::Part2(
   int n;
   if (!absl::SimpleAtoi(input[0], &n)) return Error("Bad int:", input[0]);
   int pos = 0;
-  int buf_size = 1;
   int last_after_zero = 0;
-  for (int i = 0; i < 50'000'000; ++i) {
-    pos = (pos + n) % buf_size;
-    ++buf_size;
+  // Split the loop at n so we can do the expensive full mod when the increment
+  // could be larger than 2i, but do a cheaper if+subtract after that.
+  for (int i = 0; i < n; ++i) {
+    pos = (pos + n) % (i + 1);
+    ++pos;
+    if (pos == 1) last_after_zero = i + 1;
+  }
+  for (int i = n; i < 50'000'000; ++i) {
+    pos += n;
+    if (pos > i) pos -= i + 1;
     ++pos;
     if (pos == 1) last_after_zero = i + 1;
   }
