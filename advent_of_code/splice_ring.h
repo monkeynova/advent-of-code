@@ -38,11 +38,13 @@ class SpliceRing {
     }
     const_iterator& operator+=(int num) {
       if (num < 0) return operator-=(-num);
+      num %= list_->size();
       for (int i = 0; i < num; ++i) operator++();
       return *this;
     }
     const_iterator& operator-=(int num) {
       if (num < 0) return operator+=(-num);
+      num %= list_->size();
       for (int i = 0; i < num; ++i) operator--();
       return *this;
     }
@@ -156,13 +158,12 @@ class SpliceRing {
 
   template <typename Sink>
   friend void AbslStringify(Sink& sink, const SpliceRing& r) {
-    absl::Format(
-        &sink, "%s",
-        absl::StrJoin(
-            r.list_, ",",
-            [](std::string* out, const DoubleLinkedList& dll) {
-                absl::StrAppendFormat(out, "%v", dll.val);
-            }));
+    auto it = r.SomePoint();
+    auto start = it;
+    absl::Format(&sink, "%v", *it);
+    for (++it; it != start; ++it) {
+      absl::Format(&sink, ",%v", *it);
+    }
   }
 
  private:
