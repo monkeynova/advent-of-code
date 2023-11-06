@@ -38,24 +38,24 @@ class SpliceRing {
       idx_ = (ring_->list_)[idx_].prev;
       return *this;
     }
-    const_iterator& operator+=(int num) {
+    const_iterator& operator+=(int64_t num) {
       if (num < 0) return operator-=(-num);
       num %= ring_->size();
       for (int i = 0; i < num; ++i) operator++();
       return *this;
     }
-    const_iterator& operator-=(int num) {
+    const_iterator& operator-=(int64_t num) {
       if (num < 0) return operator+=(-num);
       num %= ring_->size();
       for (int i = 0; i < num; ++i) operator--();
       return *this;
     }
-    const_iterator operator+(int num) {
+    const_iterator operator+(int64_t num) {
       const_iterator ret = *this;
       ret += num;
       return ret;
     }
-    const_iterator operator-(int num) {
+    const_iterator operator-(int64_t num) {
       const_iterator ret = *this;
       ret -= num;
       return ret;
@@ -134,15 +134,16 @@ class SpliceRing {
     // Deliberate fall through to produce a compile error for new type.
   }
   const_iterator MoveBefore(const_iterator dest_it, const_iterator src_it) {
-    if (list_[src_it.idx_].prev == -1) {
-      CHECK_EQ(list_[src_it.idx_].next, -1);
-      ++size_;
-    }
     const_iterator ret = src_it;
     ++ret;
 
-    list_[list_[src_it.idx_].prev].next = list_[src_it.idx_].next;
-    list_[list_[src_it.idx_].next].prev = list_[src_it.idx_].prev;
+    if (list_[src_it.idx_].prev == -1) {
+      CHECK_EQ(list_[src_it.idx_].next, -1);
+      ++size_;
+    } else {
+      list_[list_[src_it.idx_].prev].next = list_[src_it.idx_].next;
+      list_[list_[src_it.idx_].next].prev = list_[src_it.idx_].prev;
+    }
 
     list_[list_[dest_it.idx_].prev].next = src_it.idx_;
     list_[src_it.idx_].prev = list_[dest_it.idx_].prev;
@@ -197,7 +198,7 @@ class SpliceRing {
   }
 
   std::vector<DoubleLinkedList> list_;
-  int size_ = 0;
+  size_t size_ = 0;
 
   absl::flat_hash_map<Storage, int> sparse_idx_;
   std::vector<int> dense_idx_;

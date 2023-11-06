@@ -24,17 +24,9 @@ void Mix(
     const std::vector<RingType::const_iterator>& it_list) {
   VLOG(2) << "Mix List: " << list;
   for (RingType::const_iterator src_it : it_list) {
-    if (*src_it == 0) {
-      // Do nothing.
-    } else if (*src_it > 0) {
-      int64_t incs = *src_it % (list.size() - 1);
-      RingType::const_iterator dest_it = src_it + incs;
-      list.MoveBefore(dest_it + 1, src_it);
-    } else {
-      int64_t decs = (-*src_it) % (list.size() - 1);
-      RingType::const_iterator dest_it = src_it - decs;
-      list.MoveBefore(dest_it, src_it);
-    }
+    RingType::const_iterator dest_it = list.Erase(src_it);
+    dest_it += *src_it;
+    list.MoveBefore(dest_it, src_it);
     VLOG(3) << "Step List: " << list;
   }
 }
