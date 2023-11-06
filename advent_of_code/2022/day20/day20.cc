@@ -23,19 +23,17 @@ void Mix(
     RingType& list,
     const std::vector<RingType::const_iterator>& it_list) {
   VLOG(2) << "Mix List: " << list;
-  for (RingType::const_iterator it : it_list) {
-    if (*it == 0) {
+  for (RingType::const_iterator src_it : it_list) {
+    if (*src_it == 0) {
       // Do nothing.
-    } else if (*it > 0) {
-      int64_t incs = *it % (list.size() - 1);
-      // Splice inserts before the iterator, so when going forward a no-op is
-      // it+1. Hence we do one more loop on increment than decrement.
-      RingType::const_iterator move_it = it + incs + 1;
-      list.MoveBefore(move_it, it);
+    } else if (*src_it > 0) {
+      int64_t incs = *src_it % (list.size() - 1);
+      RingType::const_iterator dest_it = src_it + incs;
+      list.MoveBefore(dest_it + 1, src_it);
     } else {
-      int64_t decs = (-*it) % (list.size() - 1);
-      RingType::const_iterator move_it = it - decs;
-      list.MoveBefore(move_it, it);
+      int64_t decs = (-*src_it) % (list.size() - 1);
+      RingType::const_iterator dest_it = src_it - decs;
+      list.MoveBefore(dest_it, src_it);
     }
     VLOG(3) << "Step List: " << list;
   }
@@ -62,8 +60,7 @@ absl::StatusOr<std::string> Day_2022_20::Part1(
   RingType::const_iterator zero_it;
   for (int64_t v : *input_ints) {
     if (list.empty()) {
-      list.InsertFirst(v);
-      list_it.push_back(list.SomePoint());
+      list_it.push_back(list.InsertFirst(v));
       if (v == 0) {
         zero_it = list_it.back();
       }
@@ -96,8 +93,7 @@ absl::StatusOr<std::string> Day_2022_20::Part2(
   RingType::const_iterator zero_it;
   for (int64_t v : *input_ints) {
     if (list.empty()) {
-      list.InsertFirst(811589153 * v);
-      list_it.push_back(list.SomePoint());
+      list_it.push_back(list.InsertFirst(811589153 * v));
       if (v == 0) {
         zero_it = list_it.back();
       }

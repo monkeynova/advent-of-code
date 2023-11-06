@@ -24,8 +24,7 @@ absl::StatusOr<std::string> Day_2017_17::Part1(
   int n;
   if (!absl::SimpleAtoi(input[0], &n)) return Error("Bad int:", input[0]);
   SpliceRing<int> buf;
-  buf.InsertFirst(0);
-  SpliceRing<int>::const_iterator pos = buf.SomePoint();
+  SpliceRing<int>::const_iterator pos = buf.InsertFirst(0);
   for (int i = 0; i < 2017; ++i) {
     VLOG(2) << "Buf: " << buf;
     pos += n;

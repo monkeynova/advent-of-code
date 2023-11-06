@@ -26,8 +26,7 @@ class GameState {
   void AddMarble(int64_t marble, int player) {
     if (marbles_.empty()) {
       CHECK_EQ(marble, 0);
-      marbles_.InsertFirst(0);
-      cur_position_ = marbles_.SomePoint();
+      cur_position_ = marbles_.InsertFirst(0);
       return;
     }
     if (marble % 23 == 0) {
@@ -45,20 +44,7 @@ class GameState {
 
   template <typename Sink>
   friend void AbslStringify(Sink& sink, const GameState& s) {
-    auto marble_it = s.marbles_.SomePoint();
-    auto start_it = marble_it;
-    for (int j = 0; j < 30; ++j) {
-      if (j > 0) absl::Format(&sink, ",");
-      if (marble_it == s.cur_position_) {
-        absl::Format(&sink, "(%d)", *marble_it);
-      } else {
-        absl::Format(&sink, "%d", *marble_it);
-      }
-      ++marble_it;
-      // Looped before size.
-      if (marble_it == start_it) break;
-    }
-    if (marble_it != start_it) absl::Format(&sink, ",...");
+    AbslStringify(sink, s.marbles_, /*limit=*/30);
   }
 
  private:

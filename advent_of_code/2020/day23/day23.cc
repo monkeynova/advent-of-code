@@ -46,8 +46,7 @@ class Cups {
 
 void Cups::AddCup(int val) {
   if (cur_ == RingType::const_iterator()) {
-    cups_.InsertFirst(val);
-    cur_ = cups_.SomePoint();
+    cur_ = cups_.InsertFirst(val);
     return;
   }
   cups_.InsertBefore(cur_, val);

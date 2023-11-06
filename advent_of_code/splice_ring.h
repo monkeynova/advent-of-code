@@ -81,7 +81,7 @@ class SpliceRing {
     list_.reserve(size);
   }
 
-  void InsertFirst(Storage s) {
+  const_iterator InsertFirst(Storage s) {
     CHECK(list_.empty());
     list_.push_back({.val = std::move(s), .prev = 0, .next = 0});
     if constexpr (index_type == SpliceRingIndexType::kSparse) {
@@ -93,6 +93,7 @@ class SpliceRing {
       }
       dense_idx_[list_.back().val] = 0;
     }
+    return const_iterator(&list_, 0);
   }
   void InsertBefore(const_iterator it, Storage s) {
     list_.push_back({.val = std::move(s), .prev = -1, .next = -1});
@@ -115,9 +116,6 @@ class SpliceRing {
       }
       dense_idx_[list_.back().val] = list_.size() - 1;
     }
-  }
-  const_iterator SomePoint() const {
-    return const_iterator(&list_, 0);
   }
   const_iterator Find(const Storage& s) const {
     static_assert(index_type != SpliceRingIndexType::kNone,
@@ -151,22 +149,39 @@ class SpliceRing {
     if constexpr (index_type == SpliceRingIndexType::kSparse) {
       sparse_idx_.erase(*it);
     }
+    if constexpr (index_type == SpliceRingIndexType::kDense) {
+      dense_idx_[*it] = -1;
+    }
     list_[list_[it.idx_].prev].next = list_[it.idx_].next;
     list_[list_[it.idx_].next].prev = list_[it.idx_].prev;
     return const_iterator(&list_, list_[it.idx_].next);
   }
 
   template <typename Sink>
-  friend void AbslStringify(Sink& sink, const SpliceRing& r) {
-    auto it = r.SomePoint();
+  friend void AbslStringify(Sink& sink, const SpliceRing& r,
+                            int limit = std::numeric_limits<int>::max()) {
+    if (r.empty()) {
+      sink.Append("()");
+      return;
+    }
+    auto it = r.FirstAdded();
     auto start = it;
-    absl::Format(&sink, "%v", *it);
+    absl::Format(&sink, "(%v", *it);
     for (++it; it != start; ++it) {
+      if (--limit == 0) {
+        sink.Append(",...");
+        break;
+      }
       absl::Format(&sink, ",%v", *it);
     }
+    sink.Append(")");
   }
 
  private:
+  const_iterator FirstAdded() const {
+    return const_iterator(&list_, 0);
+  }
+
   std::vector<DoubleLinkedList> list_;
 
   absl::flat_hash_map<Storage, int> sparse_idx_;
