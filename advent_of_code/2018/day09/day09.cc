@@ -33,12 +33,10 @@ class GameState {
       scores_[player] += marble;
       cur_position_ -= 7;
       scores_[player] += *cur_position_;
-      cur_position_ = marbles_.Erase(cur_position_);
+      cur_position_ = marbles_.Remove(cur_position_);
 
     } else {
-      cur_position_ += 2;
-      marbles_.InsertBefore(cur_position_, marble);
-      --cur_position_;
+      cur_position_ = marbles_.InsertAfter(cur_position_ + 1, marble);
     }
   }
 

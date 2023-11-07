@@ -20,12 +20,6 @@ class SpliceRing {
  public:
   friend class const_iterator;
 
-  struct DoubleLinkedList {
-    Storage val;
-    int prev;
-    int next;
-  };
-
   class const_iterator {
    public:
     const_iterator() = default;
@@ -87,18 +81,24 @@ class SpliceRing {
     ++size_;
     CHECK(list_.empty());
     list_.push_back({.val = std::move(s), .prev = 0, .next = 0});
-    if constexpr (index_type == SpliceRingIndexType::kSparse) {
+    if constexpr (index_type == SpliceRingIndexType::kNone) {
+      // Nothing to do.
+    } else if constexpr (index_type == SpliceRingIndexType::kSparse) {
       sparse_idx_[list_.back().val] = 0;
-    }
-    if constexpr (index_type == SpliceRingIndexType::kDense) {
+    } else if constexpr (index_type == SpliceRingIndexType::kDense) {
       if (dense_idx_.size() < list_.back().val + 1) {
         dense_idx_.resize(list_.back().val + 1, -1);
       }
       dense_idx_[list_.back().val] = 0;
+    } else {
+      LOG(FATAL) << "Unhandled index_type: " << index_type;      
     }
     return const_iterator(this, 0);
   }
-  void InsertBefore(const_iterator it, Storage s) {
+  const_iterator InsertAfter(const_iterator it, Storage s) {
+    return InsertBefore(it + 1, std::move(s));
+  }
+  const_iterator InsertBefore(const_iterator it, Storage s) {
     ++size_;
     list_.push_back({.val = std::move(s), .prev = -1, .next = -1});
 
@@ -109,17 +109,18 @@ class SpliceRing {
     list_[it.idx_].prev = list_.size() - 1;
 
     if constexpr (index_type == SpliceRingIndexType::kNone) {
-      return;
-    }
-    if constexpr (index_type == SpliceRingIndexType::kSparse) {
+      // Nothing to do.
+    } else if constexpr (index_type == SpliceRingIndexType::kSparse) {
       sparse_idx_[list_.back().val] = list_.size() - 1;
-    }
-    if constexpr (index_type == SpliceRingIndexType::kDense) {
+    } else if constexpr (index_type == SpliceRingIndexType::kDense) {
       if (dense_idx_.size() < list_.back().val + 1) {
         dense_idx_.resize(list_.back().val + 1, -1);
       }
       dense_idx_[list_.back().val] = list_.size() - 1;
+    } else {
+      LOG(FATAL) << "Unhandled index_type: " << index_type;
     }
+    return const_iterator(this, list_.size() - 1);
   }
   const_iterator Find(const Storage& s) const {
     static_assert(index_type != SpliceRingIndexType::kNone,
@@ -127,11 +128,11 @@ class SpliceRing {
     if constexpr (index_type == SpliceRingIndexType::kSparse) {
       auto idx_it = sparse_idx_.find(s);
       return const_iterator(this, idx_it->second);
-    }
-    if constexpr (index_type == SpliceRingIndexType::kDense) {
+    } else if constexpr (index_type == SpliceRingIndexType::kDense) {
       return const_iterator(this, dense_idx_[s]);
+    } else {
+      LOG(FATAL) << "Unhandled index_type: " << index_type;
     }
-    // Deliberate fall through to produce a compile error for new type.
   }
   const_iterator MoveBefore(const_iterator dest_it, const_iterator src_it) {
     const_iterator ret = src_it;
@@ -154,13 +155,16 @@ class SpliceRing {
     return ret;
   }
 
-  const_iterator Erase(const_iterator it) {
+  const_iterator Remove(const_iterator it) {
     --size_;
-    if constexpr (index_type == SpliceRingIndexType::kSparse) {
+    if constexpr (index_type == SpliceRingIndexType::kNone) {
+      // Nothing to do.
+    } else if constexpr (index_type == SpliceRingIndexType::kSparse) {
       sparse_idx_.erase(*it);
-    }
-    if constexpr (index_type == SpliceRingIndexType::kDense) {
+    } else if constexpr (index_type == SpliceRingIndexType::kDense) {
       dense_idx_[*it] = -1;
+    } else {
+      LOG(FATAL) << "Unhandled index_type: " << index_type;
     }
     list_[list_[it.idx_].prev].next = list_[it.idx_].next;
     list_[list_[it.idx_].next].prev = list_[it.idx_].prev;
@@ -179,10 +183,9 @@ class SpliceRing {
       sink.Append("()");
       return;
     }
-    auto it = r.FirstAdded();
-    auto start = it;
-    absl::Format(&sink, "(%v", *it);
-    for (++it; it != start; ++it) {
+    auto start = r.FirstAdded();
+    absl::Format(&sink, "(%v", *start);
+    for (auto it = start + 1; it != start; ++it) {
       if (--limit == 0) {
         sink.Append(",...");
         break;
@@ -193,6 +196,12 @@ class SpliceRing {
   }
 
  private:
+  struct DoubleLinkedList {
+    Storage val;
+    int prev;
+    int next;
+  };
+
   const_iterator FirstAdded() const {
     return const_iterator(this, 0);
   }

@@ -27,9 +27,8 @@ class Cups {
   template <typename Sink>
   friend void AbslStringify(Sink& sink, const Cups& c) {
     absl::Format(&sink, "1");
-    auto it = c.cups_.Find(1);
-    auto start = it;
-    for (++it; it != start; ++it) {
+    auto start = c.cups_.Find(1);
+    for (auto it = start + 1; it != start; ++it) {
       if (it == c.cur_) {
         absl::Format(&sink, ",(%v)", *it);
       } else {
@@ -85,9 +84,8 @@ absl::StatusOr<std::string> Cups::Label() const {
   std::string ret;
   int ret_i = 0;
   ret.resize(cups_.size() - 1);
-  auto it = cups_.Find(1);
-  auto start = it;
-  for (++it; it != start; ++it) {
+  auto start = cups_.Find(1);
+  for (auto it = start + 1; it != start; ++it) {
     ret[ret_i] = *it + '0';
     ++ret_i;
   }

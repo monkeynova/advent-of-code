@@ -27,9 +27,7 @@ absl::StatusOr<std::string> Day_2017_17::Part1(
   SpliceRing<int>::const_iterator pos = buf.InsertFirst(0);
   for (int i = 0; i < 2017; ++i) {
     VLOG(2) << "Buf: " << buf;
-    pos += n;
-    buf.InsertBefore(pos + 1, i + 1);
-    ++pos;
+    pos = buf.InsertAfter(pos + n, i + 1);
   }
   return AdventReturn(*(pos + 1));
 }

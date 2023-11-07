@@ -24,7 +24,7 @@ void Mix(
     const std::vector<RingType::const_iterator>& it_list) {
   VLOG(2) << "Mix List: " << list;
   for (RingType::const_iterator src_it : it_list) {
-    RingType::const_iterator dest_it = list.Erase(src_it);
+    RingType::const_iterator dest_it = list.Remove(src_it);
     dest_it += *src_it;
     list.MoveBefore(dest_it, src_it);
     VLOG(3) << "Step List: " << list;
@@ -61,8 +61,7 @@ absl::StatusOr<std::string> Day_2022_20::Part1(
     }
   }
   RingType::const_iterator start = list_it[0];
-  RingType::const_iterator it = start;
-  for (++it; it != start; ++it) {
+  for (auto it = start + 1; it != start; ++it) {
     list_it.push_back(it);
     if (*it == 0) {
       if (zero_it != RingType::const_iterator()) return Error("Duplicate 0");
@@ -94,8 +93,7 @@ absl::StatusOr<std::string> Day_2022_20::Part2(
     }
   }
   RingType::const_iterator start = list_it[0];
-  RingType::const_iterator it = start;
-  for (++it; it != start; ++it) {
+  for (auto it = start + 1; it != start; ++it) {
     list_it.push_back(it);
     if (*it == 0) {
       if (zero_it != RingType::const_iterator()) return Error("Duplicate 0");
