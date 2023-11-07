@@ -14,12 +14,19 @@ enum class SpliceRingIndexType {
   kDense = 2,
 };
 
+// Stores a circular buffer with fast random insert and deletes of elements.
+// If index_type != kNone, also stores an index for fast lookup of elements.
+// For kDense, uses a std::vector indexed by the stored values, while kSparse
+// uses an absl::flat_hash_map.
 template <typename Storage,
           SpliceRingIndexType index_type = SpliceRingIndexType::kNone>
 class SpliceRing {
  public:
   friend class const_iterator;
 
+  // Iterator returned by SpliceRing which supports addition and subtraction as
+  // well as (const) value retrieval. Both addition and subtraction support
+  // arbitrary addition, but do so through a linear advance through the ring.
   class const_iterator {
    public:
     const_iterator() = default;
@@ -71,33 +78,47 @@ class SpliceRing {
 
   SpliceRing() = default;
 
+  // Is the ring empty?
   bool empty() const { return size_ == 0; }
+
+  // How many elements are stored within the iteration ring.
   size_t size() const { return size_; }
+
+  // Pre-reserve space to store `size` elements.
   void reserve(size_t size) {
     list_.reserve(size);
   }
 
+  // Inserts the first elemnt in the ring and returns an iterator pointing to
+  // that element. Can only be called when the ring is empty (otherwise call
+  // InsertAfter or InsertBefore).
   const_iterator InsertFirst(Storage s) {
+    CHECK(empty());
     ++size_;
-    CHECK(list_.empty());
     list_.push_back({.val = std::move(s), .prev = 0, .next = 0});
     if constexpr (index_type == SpliceRingIndexType::kNone) {
       // Nothing to do.
     } else if constexpr (index_type == SpliceRingIndexType::kSparse) {
-      sparse_idx_[list_.back().val] = 0;
+      sparse_idx_[list_.back().val] = list_.size() - 1;
     } else if constexpr (index_type == SpliceRingIndexType::kDense) {
       if (dense_idx_.size() < list_.back().val + 1) {
         dense_idx_.resize(list_.back().val + 1, -1);
       }
-      dense_idx_[list_.back().val] = 0;
+      dense_idx_[list_.back().val] = list_.size() - 1;
     } else {
       LOG(FATAL) << "Unhandled index_type: " << index_type;      
     }
     return const_iterator(this, 0);
   }
+
+  // Inserts `s` after `it` in the ring and returns an iterator pointing to the
+  // newly inserted element.
   const_iterator InsertAfter(const_iterator it, Storage s) {
     return InsertBefore(it + 1, std::move(s));
   }
+
+  // Inserts `s` before `it` in the ring and returns an iterator pointing to
+  // the newly inserted element.
   const_iterator InsertBefore(const_iterator it, Storage s) {
     ++size_;
     list_.push_back({.val = std::move(s), .prev = -1, .next = -1});
@@ -122,6 +143,9 @@ class SpliceRing {
     }
     return const_iterator(this, list_.size() - 1);
   }
+
+  // Returns an iterator pointing to `s` which must have already been added to
+  // the ring. Only valid if index_type ~= kNone.
   const_iterator Find(const Storage& s) const {
     static_assert(index_type != SpliceRingIndexType::kNone,
                   "Find does not work without indexing");
@@ -134,6 +158,11 @@ class SpliceRing {
       LOG(FATAL) << "Unhandled index_type: " << index_type;
     }
   }
+
+  // Moves the element pointed at by `src_it` to be just before `dest_it`.
+  // Returns an iterator pointing at the value one after where src started.
+  // `src_it` may have been removed from the ring prior with a call to Remove
+  // in which case the return value is undefined.
   const_iterator MoveBefore(const_iterator dest_it, const_iterator src_it) {
     const_iterator ret = src_it;
     ++ret;
@@ -155,6 +184,10 @@ class SpliceRing {
     return ret;
   }
 
+  // Removes the elemnt pointed at by `it` from the ring and returns an
+  // iterator to the next element in the ring.
+  // `it` continues to be valid and can still be used to retrieve the value
+  // as well as be re-added with MoveBefore.
   const_iterator Remove(const_iterator it) {
     --size_;
     if constexpr (index_type == SpliceRingIndexType::kNone) {
