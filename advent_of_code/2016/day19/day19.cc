@@ -46,10 +46,13 @@ absl::StatusOr<std::string> Day_2016_19::Part2(
   while (ring.size() > 1) {
     remove = ring.Remove(remove);
     ++remove;
+    ++cur;
     if (ring.size() % 2) {
       --delta;
       --remove;
     }
+    DCHECK(delta == ring.size() / 2);
+    DCHECK(cur + delta == remove);
   }
   return AdventReturn(*remove);
 }
