@@ -77,16 +77,6 @@ class SpliceRing {
   };
 
   SpliceRing() = default;
-  SpliceRing(const std::vector<Storage>& init)
-   : list_(init.size()), size_(init.size()) {
-   for (int i = 0; i < init.size(); ++i) {
-     list_[i].val = init[i];
-     list_[i].prev = i - 1;
-     list_[i].next = i + 1;
-   }
-   list_[0].prev = list_.size() - 1;
-   list_.back().next = 0;
-  }
 
   // Is the ring empty?
   bool empty() const { return size_ == 0; }
@@ -196,7 +186,6 @@ class SpliceRing {
   // `it` continues to be valid and can still be used to retrieve the value
   // as well as be re-added with MoveBefore.
   const_iterator Remove(const_iterator it) {
-    VLOG(2) << " ...Removing... " << *it;
     --size_;
     if constexpr (index_type == SpliceRingIndexType::kNone) {
       // Nothing to do.
