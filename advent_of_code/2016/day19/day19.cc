@@ -7,36 +7,27 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/splice_ring.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
-
-namespace {
-
-// Helper methods go here.
-
-}  // namespace
 
 absl::StatusOr<std::string> Day_2016_19::Part1(
     absl::Span<absl::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   int size;
   if (!absl::SimpleAtoi(input[0], &size)) return Error("Bad int");
-  std::vector<int> cycle(size, 0);
-  for (int i = 0; i < cycle.size(); ++i) cycle[i] = i + 1;
-  int offset = 0;
-  while (cycle.size() > 1) {
-    VLOG_IF(2, cycle.size() < 100) << absl::StrJoin(cycle, ",");
-    std::vector<int> next_cycle;
-    next_cycle.reserve(cycle.size() / 2 + 1);
-    for (int i = offset; i < cycle.size(); i += 2) {
-      next_cycle.push_back(cycle[i]);
-    }
-    offset = (offset + cycle.size()) % 2;
-    cycle = next_cycle;
+
+  SpliceRing<int> ring;
+  SpliceRing<int>::const_iterator cur = ring.InsertFirst(1);
+  for (int i = 1; i < size; ++i) {
+    cur = ring.InsertAfter(cur, i + 1);
   }
-  if (cycle.size() != 1) return Error("WTF?");
-  return AdventReturn(cycle[0]);
+  ++cur;
+  while (ring.size() > 1) {
+    cur = ring.Remove(cur + 1);
+  }
+  return AdventReturn(*cur);
 }
 
 absl::StatusOr<std::string> Day_2016_19::Part2(
@@ -44,29 +35,23 @@ absl::StatusOr<std::string> Day_2016_19::Part2(
   if (input.size() != 1) return Error("Bad input");
   int size;
   if (!absl::SimpleAtoi(input[0], &size)) return Error("Bad int");
-  std::vector<int> cycle(size, 0);
-  for (int i = 0; i < cycle.size(); ++i) cycle[i] = i + 1;
-  int offset = cycle.size() / 2;
-  int pos = cycle.size() % 2;
-  while (cycle.size() > 1) {
-    VLOG_IF(2, cycle.size() < 100) << absl::StrJoin(cycle, ",");
-    std::vector<int> next_cycle;
-    for (int i = 0; i < offset; ++i) {
-      next_cycle.push_back(cycle[i]);
-    }
-    for (int i = offset; i < cycle.size(); ++i) {
-      if (pos == 2) next_cycle.push_back(cycle[i]);
-      pos = (pos + 1) % 3;
-    }
-    offset = 0;
-    if (next_cycle.empty()) {
-      cycle = {cycle.back()};
-    } else {
-      cycle = next_cycle;
+  SpliceRing<int> ring;
+  SpliceRing<int>::const_iterator cur = ring.InsertFirst(1);
+  for (int i = 1; i < size; ++i) {
+    cur = ring.InsertAfter(cur, i + 1);
+  }
+  ++cur;
+  int delta = ring.size() / 2;
+  auto remove = cur + delta;
+  while (ring.size() > 1) {
+    remove = ring.Remove(remove);
+    ++remove;
+    if (ring.size() % 2) {
+      --delta;
+      --remove;
     }
   }
-  if (cycle.size() != 1) return Error("WTF?");
-  return AdventReturn(cycle[0]);
+  return AdventReturn(*remove);
 }
 
 }  // namespace advent_of_code

@@ -77,6 +77,16 @@ class SpliceRing {
   };
 
   SpliceRing() = default;
+  SpliceRing(const std::vector<Storage>& init)
+   : list_(init.size()), size_(init.size()) {
+   for (int i = 0; i < init.size(); ++i) {
+     list_[i].val = init[i];
+     list_[i].prev = i - 1;
+     list_[i].next = i + 1;
+   }
+   list_[0].prev = list_.size() - 1;
+   list_.back().next = 0;
+  }
 
   // Is the ring empty?
   bool empty() const { return size_ == 0; }
@@ -121,12 +131,9 @@ class SpliceRing {
   // the newly inserted element.
   const_iterator InsertBefore(const_iterator it, Storage s) {
     ++size_;
-    list_.push_back({.val = std::move(s), .prev = -1, .next = -1});
+    list_.push_back({.val = std::move(s), .prev = list_[it.idx_].prev, .next = it.idx_});
 
-    list_.back().prev = list_[it.idx_].prev;
     list_[list_.back().prev].next = list_.size() - 1;
-
-    list_.back().next = it.idx_;
     list_[it.idx_].prev = list_.size() - 1;
 
     if constexpr (index_type == SpliceRingIndexType::kNone) {
@@ -189,6 +196,7 @@ class SpliceRing {
   // `it` continues to be valid and can still be used to retrieve the value
   // as well as be re-added with MoveBefore.
   const_iterator Remove(const_iterator it) {
+    VLOG(2) << " ...Removing... " << *it;
     --size_;
     if constexpr (index_type == SpliceRingIndexType::kNone) {
       // Nothing to do.
@@ -199,6 +207,7 @@ class SpliceRing {
     } else {
       LOG(FATAL) << "Unhandled index_type: " << index_type;
     }
+
     list_[list_[it.idx_].prev].next = list_[it.idx_].next;
     list_[list_[it.idx_].next].prev = list_[it.idx_].prev;
 
@@ -236,7 +245,12 @@ class SpliceRing {
   };
 
   const_iterator FirstAdded() const {
-    return const_iterator(this, 0);
+    for (int i = 0; i < list_.size(); ++i) {
+      if (list_[i].prev != -1) {
+        return const_iterator(this, i);
+      }
+    }
+    return const_iterator(this, -1);
   }
 
   std::vector<DoubleLinkedList> list_;
