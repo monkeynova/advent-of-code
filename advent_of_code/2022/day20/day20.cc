@@ -47,27 +47,23 @@ absl::StatusOr<std::string> Day_2022_20::Part1(
   absl::StatusOr<std::vector<int64_t>> input_ints = ParseAsInts(input);
   if (!input_ints.ok()) return input_ints.status();
 
-  RingType list;
-  std::vector<RingType::const_iterator> list_it;
+  RingType list(*input_ints);
   RingType::const_iterator zero_it;
-  for (int64_t v : *input_ints) {
-    if (list.empty()) {
-      list_it.push_back(list.InsertFirst(v));
-      if (v == 0) {
-        zero_it = list_it.back();
-      }
-    } else {
-      list.InsertBefore(list_it[0], v);
-    }
-  }
-  RingType::const_iterator start = list_it[0];
-  for (auto it = start + 1; it != start; ++it) {
+  RingType::const_iterator start = list.FirstAdded();
+
+  std::vector<RingType::const_iterator> list_it;
+  list_it.reserve(input_ints->size());
+
+  auto it = start;
+  do {
     list_it.push_back(it);
     if (*it == 0) {
       if (zero_it != RingType::const_iterator()) return Error("Duplicate 0");
-      zero_it = list_it.back();
+      zero_it = it;
     }
-  }
+    ++it;
+  } while (it != start);
+
   if (zero_it == RingType::const_iterator()) return Error("No zero found");
 
   Mix(list, list_it);
@@ -79,27 +75,27 @@ absl::StatusOr<std::string> Day_2022_20::Part2(
   absl::StatusOr<std::vector<int64_t>> input_ints = ParseAsInts(input);
   if (!input_ints.ok()) return input_ints.status();
 
-  RingType list;
-  std::vector<RingType::const_iterator> list_it;
-  RingType::const_iterator zero_it;
-  for (int64_t v : *input_ints) {
-    if (list.empty()) {
-      list_it.push_back(list.InsertFirst(811589153 * v));
-      if (v == 0) {
-        zero_it = list_it.back();
-      }
-    } else {
-      list.InsertBefore(list_it[0], 811589153 * v);
-    }
+  for (auto& i : *input_ints) {
+    i *= 811589153;
   }
-  RingType::const_iterator start = list_it[0];
-  for (auto it = start + 1; it != start; ++it) {
+
+  RingType list(*input_ints);
+  RingType::const_iterator zero_it;
+  RingType::const_iterator start = list.FirstAdded();
+
+  std::vector<RingType::const_iterator> list_it;
+  list_it.reserve(input_ints->size());
+
+  auto it = start;
+  do {
     list_it.push_back(it);
     if (*it == 0) {
       if (zero_it != RingType::const_iterator()) return Error("Duplicate 0");
-      zero_it = list_it.back();
+      zero_it = it;
     }
-  }
+    ++it;
+  } while (it != start);
+
   if (zero_it == RingType::const_iterator()) return Error("No zero found");
 
   for (int mix = 0; mix < 10; ++mix) {

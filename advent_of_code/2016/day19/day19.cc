@@ -18,12 +18,8 @@ absl::StatusOr<std::string> Day_2016_19::Part1(
   int size;
   if (!absl::SimpleAtoi(input[0], &size)) return Error("Bad int");
 
-  SpliceRing<int> ring;
-  SpliceRing<int>::const_iterator cur = ring.InsertFirst(1);
-  for (int i = 1; i < size; ++i) {
-    cur = ring.InsertAfter(cur, i + 1);
-  }
-  ++cur;
+  SpliceRing<int> ring(1, size);
+  SpliceRing<int>::const_iterator cur = ring.FirstAdded();
   while (ring.size() > 1) {
     cur = ring.Remove(cur + 1);
   }
@@ -35,12 +31,8 @@ absl::StatusOr<std::string> Day_2016_19::Part2(
   if (input.size() != 1) return Error("Bad input");
   int size;
   if (!absl::SimpleAtoi(input[0], &size)) return Error("Bad int");
-  SpliceRing<int> ring;
-  SpliceRing<int>::const_iterator cur = ring.InsertFirst(1);
-  for (int i = 1; i < size; ++i) {
-    cur = ring.InsertAfter(cur, i + 1);
-  }
-  ++cur;
+  SpliceRing<int> ring(1, size);
+  SpliceRing<int>::const_iterator cur = ring.FirstAdded();
   int delta = ring.size() / 2;
   auto remove = cur + delta;
   while (ring.size() > 1) {

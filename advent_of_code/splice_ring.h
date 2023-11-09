@@ -77,6 +77,30 @@ class SpliceRing {
   };
 
   SpliceRing() = default;
+  explicit SpliceRing(const std::vector<Storage>& init) {
+    size_ = init.size();
+    list_.resize(size_);
+    for (int i = 0; i < size_; ++i) {
+      list_[i].val = init[i];
+      list_[i].prev = i - 1;
+      list_[i].next = i + 1;
+      AddToIndex(init[i], i);
+    }
+    list_[0].prev = size_ - 1;
+    list_.back().next = 0;
+  }
+  SpliceRing(int first, int last) {
+    size_ = last - first + 1;
+    list_.resize(size_);
+    for (int i = 0; i < size_; ++i) {
+      list_[i].val = first + i;
+      list_[i].prev = i - 1;
+      list_[i].next = i + 1;
+      AddToIndex(first + i, i);
+    }
+    list_[0].prev = size_ - 1;
+    list_.back().next = 0;
+  }
 
   // Is the ring empty?
   bool empty() const { return size_ == 0; }
@@ -96,18 +120,7 @@ class SpliceRing {
     CHECK(empty());
     ++size_;
     list_.push_back({.val = std::move(s), .prev = 0, .next = 0});
-    if constexpr (index_type == SpliceRingIndexType::kNone) {
-      // Nothing to do.
-    } else if constexpr (index_type == SpliceRingIndexType::kSparse) {
-      sparse_idx_[list_.back().val] = list_.size() - 1;
-    } else if constexpr (index_type == SpliceRingIndexType::kDense) {
-      if (dense_idx_.size() < list_.back().val + 1) {
-        dense_idx_.resize(list_.back().val + 1, -1);
-      }
-      dense_idx_[list_.back().val] = list_.size() - 1;
-    } else {
-      LOG(FATAL) << "Unhandled index_type: " << index_type;      
-    }
+    AddToIndex(list_.back().val, list_.size() - 1);
     return const_iterator(this, 0);
   }
 
@@ -126,23 +139,12 @@ class SpliceRing {
     list_[list_.back().prev].next = list_.size() - 1;
     list_[it.idx_].prev = list_.size() - 1;
 
-    if constexpr (index_type == SpliceRingIndexType::kNone) {
-      // Nothing to do.
-    } else if constexpr (index_type == SpliceRingIndexType::kSparse) {
-      sparse_idx_[list_.back().val] = list_.size() - 1;
-    } else if constexpr (index_type == SpliceRingIndexType::kDense) {
-      if (dense_idx_.size() < list_.back().val + 1) {
-        dense_idx_.resize(list_.back().val + 1, -1);
-      }
-      dense_idx_[list_.back().val] = list_.size() - 1;
-    } else {
-      LOG(FATAL) << "Unhandled index_type: " << index_type;
-    }
+    AddToIndex(list_.back().val, list_.size() - 1);
     return const_iterator(this, list_.size() - 1);
   }
 
   // Returns an iterator pointing to `s` which must have already been added to
-  // the ring. Only valid if index_type ~= kNone.
+  // the ring. Only valid if index_type != kNone.
   const_iterator Find(const Storage& s) const {
     static_assert(index_type != SpliceRingIndexType::kNone,
                   "Find does not work without indexing");
@@ -203,7 +205,7 @@ class SpliceRing {
     const_iterator ret(this, list_[it.idx_].next);
 
     list_[it.idx_].prev = list_[it.idx_].next = -1;
- 
+
     return ret;
   }
 
@@ -226,13 +228,6 @@ class SpliceRing {
     sink.Append(")");
   }
 
- private:
-  struct DoubleLinkedList {
-    Storage val;
-    int prev;
-    int next;
-  };
-
   const_iterator FirstAdded() const {
     for (int i = 0; i < list_.size(); ++i) {
       if (list_[i].prev != -1) {
@@ -240,6 +235,28 @@ class SpliceRing {
       }
     }
     return const_iterator(this, -1);
+  }
+
+ private:
+  struct DoubleLinkedList {
+    Storage val;
+    int prev;
+    int next;
+  };
+
+  void AddToIndex(int val, int offset) {
+    if constexpr (index_type == SpliceRingIndexType::kNone) {
+      // Nothing to do.
+    } else if constexpr (index_type == SpliceRingIndexType::kSparse) {
+      sparse_idx_[val] = offset;
+    } else if constexpr (index_type == SpliceRingIndexType::kDense) {
+      if (dense_idx_.size() < val + 1) {
+        dense_idx_.resize(val + 1, -1);
+      }
+      dense_idx_[val] = offset;
+    } else {
+      LOG(FATAL) << "Unhandled index_type: " << index_type;
+    }
   }
 
   std::vector<DoubleLinkedList> list_;
