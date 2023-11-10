@@ -26,8 +26,7 @@ struct NanoBot {
   }
 };
 
-absl::StatusOr<std::vector<NanoBot>> Parse(
-    absl::Span<std::string_view> input) {
+absl::StatusOr<std::vector<NanoBot>> Parse(absl::Span<std::string_view> input) {
   std::vector<NanoBot> ret;
   for (std::string_view row : input) {
     NanoBot nb;

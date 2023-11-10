@@ -26,8 +26,7 @@ Point DragPoint(Point head, Point tail) {
   return tail + Sign(delta);
 }
 
-absl::StatusOr<int> DragRope(absl::Span<std::string_view> input,
-                             int rope_len) {
+absl::StatusOr<int> DragRope(absl::Span<std::string_view> input, int rope_len) {
   static absl::flat_hash_map<char, Point> char2dir = {
       // Up or down.
       {'U', Cardinal::kNorth},

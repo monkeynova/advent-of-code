@@ -38,7 +38,7 @@ class Cups {
   }
 
  private:
-  using RingType =  SpliceRing<int, SpliceRingIndexType::kDense>;
+  using RingType = SpliceRing<int, SpliceRingIndexType::kDense>;
   RingType cups_;
   RingType::const_iterator cur_;
 };
@@ -64,8 +64,8 @@ void Cups::RunMove() {
   do {
     --dest_cup;
     if (dest_cup < 1) dest_cup = cups_.size();
-  } while(absl::c_any_of(
-              next3, [dest_cup](int cup) { return cup == dest_cup; }));
+  } while (
+      absl::c_any_of(next3, [dest_cup](int cup) { return cup == dest_cup; }));
   VLOG(2) << "  dest_cup=" << dest_cup;
 
   auto dest_it = cups_.Find(dest_cup);

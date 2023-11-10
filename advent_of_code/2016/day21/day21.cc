@@ -238,7 +238,7 @@ absl::Status RunReverseTest() {
       "rotate based on position of letter d",
   };
   std::vector<std::string_view> reverse(instructions.begin(),
-                                         instructions.end());
+                                        instructions.end());
   std::reverse(reverse.begin(), reverse.end());
   VLOG(1) << "Test: " << pw;
   for (std::string_view in : reverse) {

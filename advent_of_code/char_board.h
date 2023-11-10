@@ -173,9 +173,9 @@ absl::StatusOr<CharBoard> CharBoard::Parse(const Container& in) {
   // We do a 2-pass read of 'in' to allow Container to not support
   // empty()/operator[] calls. This is necessary to allow the value returned
   // by absl::StrSplit to be passed directly in.
-  static_assert(std::is_same_v<std::string_view,
-                               decltype(std::string_view(*in.begin()))>,
-                "Container must iterate over std::string_view");
+  static_assert(
+      std::is_same_v<std::string_view, decltype(std::string_view(*in.begin()))>,
+      "Container must iterate over std::string_view");
   int width = -1;
   int height = 0;
   for (std::string_view line : in) {

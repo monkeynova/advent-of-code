@@ -171,8 +171,7 @@ absl::StatusOr<absl::flat_hash_set<Point>> WalkAllPaths(
   return ret;
 }
 
-absl::StatusOr<CharBoard> ConstructRoom(std::string_view re,
-                                        Point* start_ret) {
+absl::StatusOr<CharBoard> ConstructRoom(std::string_view re, Point* start_ret) {
   Point start = {0, 0};
 
   absl::StatusOr<ParsedRE> parsed_re = Parse(re);

@@ -52,10 +52,9 @@ struct State {
   int16_t el;
   int open_set;
 
-  absl::Status NextForMe(
-      const DirectedGraph<Valve>& graph,
-      const absl::flat_hash_map<std::string_view, int>& pack,
-      absl::FunctionRef<absl::Status(State)> on_next) const {
+  absl::Status NextForMe(const DirectedGraph<Valve>& graph,
+                         const absl::flat_hash_map<std::string_view, int>& pack,
+                         absl::FunctionRef<absl::Status(State)> on_next) const {
     if (open_set == (1 << pack.size()) - 1) {
       return on_next(*this);
     }
@@ -73,10 +72,9 @@ struct State {
     return absl::OkStatus();
   }
 
-  absl::Status NextForEl(
-      const DirectedGraph<Valve>& graph,
-      const absl::flat_hash_map<std::string_view, int>& pack,
-      absl::FunctionRef<absl::Status(State)> on_next) const {
+  absl::Status NextForEl(const DirectedGraph<Valve>& graph,
+                         const absl::flat_hash_map<std::string_view, int>& pack,
+                         absl::FunctionRef<absl::Status(State)> on_next) const {
     if (open_set == (1 << pack.size()) - 1) {
       return on_next(*this);
     }

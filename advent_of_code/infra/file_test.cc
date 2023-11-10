@@ -21,8 +21,7 @@ namespace advent_of_code {
 
 constexpr absl::Duration kMinAllowedTestTime = absl::Seconds(15);
 
-void RunTestCase(AdventDay* advent_day,
-                 std::string_view test_case_with_options,
+void RunTestCase(AdventDay* advent_day, std::string_view test_case_with_options,
                  file_based_test_driver::RunTestCaseResult* test_result) {
   std::unique_ptr<absl::FlagSaver> flag_saver;
 
@@ -50,9 +49,8 @@ void RunTestCase(AdventDay* advent_day,
       !flag_opt.empty()) {
     flag_saver = absl::make_unique<absl::FlagSaver>();
     for (std::string_view key_value : absl::StrSplit(flag_opt, ",")) {
-      const auto& [key, value] =
-          std::pair<std::string_view, std::string_view>(
-              absl::StrSplit(key_value, absl::MaxSplits("=", 2)));
+      const auto& [key, value] = std::pair<std::string_view, std::string_view>(
+          absl::StrSplit(key_value, absl::MaxSplits("=", 2)));
       absl::CommandLineFlag* flag = absl::FindCommandLineFlag(key);
       if (!flag) {
         test_result->AddTestOutput(

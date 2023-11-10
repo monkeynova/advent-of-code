@@ -94,8 +94,7 @@ absl::StatusOr<bool> TryPosition(Scanner* dest, const Scanner& src) {
   return false;
 }
 
-absl::StatusOr<std::vector<Scanner>> Parse(
-    absl::Span<std::string_view> input) {
+absl::StatusOr<std::vector<Scanner>> Parse(absl::Span<std::string_view> input) {
   std::vector<Scanner> scanners;
   Scanner cur;
   for (std::string_view line : input) {

@@ -19,9 +19,7 @@ namespace {
 
 using RingType = SpliceRing<int64_t, SpliceRingIndexType::kNone>;
 
-void Mix(
-    RingType& list,
-    const std::vector<RingType::const_iterator>& it_list) {
+void Mix(RingType& list, const std::vector<RingType::const_iterator>& it_list) {
   VLOG(2) << "Mix List: " << list;
   for (RingType::const_iterator src_it : it_list) {
     RingType::const_iterator dest_it = list.Remove(src_it);

@@ -16,8 +16,7 @@ namespace {
 
 class GameState {
  public:
-  GameState(int num_players, int num_marbles)
-   : scores_(num_players, 0) {
+  GameState(int num_players, int num_marbles) : scores_(num_players, 0) {
     marbles_.reserve(num_marbles);
   }
 

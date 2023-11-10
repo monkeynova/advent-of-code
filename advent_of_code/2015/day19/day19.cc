@@ -13,8 +13,8 @@ namespace advent_of_code {
 namespace {
 
 absl::flat_hash_set<std::string> RunStep(
-    const absl::flat_hash_map<std::string_view,
-                              std::vector<std::string_view>>& map,
+    const absl::flat_hash_map<std::string_view, std::vector<std::string_view>>&
+        map,
     std::string_view input) {
   absl::flat_hash_set<std::string> unique;
   for (const auto& pair : map) {
@@ -172,8 +172,8 @@ absl::optional<int> MatchFromFront(
 }
 
 absl::flat_hash_set<std::string_view> FindTerminalElements(
-    const absl::flat_hash_map<std::string_view,
-                              std::vector<std::string_view>>& map) {
+    const absl::flat_hash_map<std::string_view, std::vector<std::string_view>>&
+        map) {
   absl::flat_hash_set<std::string_view> ret;
   for (const auto& [src, dest_list] : map) {
     for (std::string_view dest : dest_list) {
@@ -246,8 +246,8 @@ std::vector<std::string_view> SplitOnTerminalElements(
 
 absl::StatusOr<int> MatchFromFrontRnAr(
     std::string_view str,
-    const absl::flat_hash_map<std::string_view,
-                              std::vector<std::string_view>>& map) {
+    const absl::flat_hash_map<std::string_view, std::vector<std::string_view>>&
+        map) {
   std::string_view first_elem = FirstElement(str);
   std::string_view second_elem = FirstElement(str.substr(first_elem.size()));
   if (second_elem != "Rn") return Error("Not XRn");

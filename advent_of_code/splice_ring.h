@@ -70,8 +70,7 @@ class SpliceRing {
 
    private:
     friend class SpliceRing;
-    const_iterator(const SpliceRing* ring, int idx)
-     : ring_(ring), idx_(idx) {}
+    const_iterator(const SpliceRing* ring, int idx) : ring_(ring), idx_(idx) {}
     const SpliceRing* ring_ = nullptr;
     int idx_ = -1;
   };
@@ -109,9 +108,7 @@ class SpliceRing {
   size_t size() const { return size_; }
 
   // Pre-reserve space to store `size` elements.
-  void reserve(size_t size) {
-    list_.reserve(size);
-  }
+  void reserve(size_t size) { list_.reserve(size); }
 
   // Inserts the first elemnt in the ring and returns an iterator pointing to
   // that element. Can only be called when the ring is empty (otherwise call
@@ -134,7 +131,8 @@ class SpliceRing {
   // the newly inserted element.
   const_iterator InsertBefore(const_iterator it, Storage s) {
     ++size_;
-    list_.push_back({.val = std::move(s), .prev = list_[it.idx_].prev, .next = it.idx_});
+    list_.push_back(
+        {.val = std::move(s), .prev = list_[it.idx_].prev, .next = it.idx_});
 
     list_[list_.back().prev].next = list_.size() - 1;
     list_[it.idx_].prev = list_.size() - 1;
@@ -210,8 +208,7 @@ class SpliceRing {
   }
 
   template <typename Sink>
-  friend void AbslStringify(Sink& sink, const SpliceRing& r,
-                            int limit = 30) {
+  friend void AbslStringify(Sink& sink, const SpliceRing& r, int limit = 30) {
     if (r.empty()) {
       sink.Append("()");
       return;

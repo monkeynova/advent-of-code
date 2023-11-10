@@ -141,8 +141,8 @@ bool FindRemainingFieldOrder(
   return false;
 }
 
-void BurnIsValid(absl::flat_hash_map<std::string_view,
-                                     absl::flat_hash_set<int>>* is_valid) {
+void BurnIsValid(
+    absl::flat_hash_map<std::string_view, absl::flat_hash_set<int>>* is_valid) {
   std::vector<std::string_view> singletons;
   for (const auto& [field, map] : *is_valid) {
     if (map.size() == 1) singletons.push_back(field);

@@ -13,8 +13,7 @@
 
 namespace advent_of_code {
 
-static absl::Status NullFreeString(std::string_view str,
-                                   std::string* out_str) {
+static absl::Status NullFreeString(std::string_view str, std::string* out_str) {
   if (str.find('\0') != std::string_view::npos) {
     return absl::InvalidArgumentError(
         absl::StrCat("filename contains null characters: ", str));

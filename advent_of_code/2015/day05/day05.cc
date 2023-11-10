@@ -22,7 +22,7 @@ Classification Classify1(std::string_view input) {
   const absl::flat_hash_set<char> vowels = {'a', 'e', 'i', 'o', 'u'};
   bool has_double = false;
   const absl::flat_hash_set<std::string_view> bad_pairs = {"ab", "cd", "pq",
-                                                            "xy"};
+                                                           "xy"};
   bool has_bad_pair = false;
 
   for (int i = 0; i < input.size(); ++i) {

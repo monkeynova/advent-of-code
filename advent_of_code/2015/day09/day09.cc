@@ -20,8 +20,7 @@ struct Route {
 };
 
 absl::optional<int> ShortestAllVisitFrom(
-    const absl::flat_hash_map<std::string_view, std::vector<Route>>&
-        src_routes,
+    const absl::flat_hash_map<std::string_view, std::vector<Route>>& src_routes,
     std::string_view from, absl::flat_hash_set<std::string_view>* visited) {
   std::string prefix;
   prefix.resize(visited->size() * 2 - 2, ' ');
@@ -58,8 +57,7 @@ absl::optional<int> ShortestAllVisit(
 }
 
 absl::optional<int> LongestAllVisitFrom(
-    const absl::flat_hash_map<std::string_view, std::vector<Route>>&
-        src_routes,
+    const absl::flat_hash_map<std::string_view, std::vector<Route>>& src_routes,
     std::string_view from, absl::flat_hash_set<std::string_view>* visited) {
   std::string prefix;
   prefix.resize(visited->size() * 2 - 2, ' ');
