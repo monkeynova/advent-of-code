@@ -99,11 +99,11 @@ struct PointRectangle {
     return ret;
   }
 
-  struct iterator {
+  struct const_iterator {
     Point cur = Point{0, 0};
     const PointRectangle* base = nullptr;
 
-    iterator operator++() {
+    const_iterator operator++() {
       if (++cur.x > base->max.x) {
         cur.x = base->min.x;
         if (++cur.y > base->max.y) {
@@ -114,10 +114,10 @@ struct PointRectangle {
       return *this;
     }
 
-    bool operator==(const iterator& o) const {
+    bool operator==(const const_iterator& o) const {
       return base == o.base && cur == o.cur;
     }
-    bool operator!=(const iterator& o) const { return !operator==(o); }
+    bool operator!=(const const_iterator& o) const { return !operator==(o); }
 
     Point operator*() const { return cur; }
     const Point* operator->() const { return &cur; }
@@ -159,8 +159,8 @@ struct PointRectangle {
     max.y = std::max(max.y, p.y);
   }
 
-  iterator begin() const { return iterator{.cur = min, .base = this}; }
-  iterator end() const { return iterator{}; }
+  const_iterator begin() const { return const_iterator{.cur = min, .base = this}; }
+  const_iterator end() const { return const_iterator{}; }
 
   bool operator==(const PointRectangle& o) const {
     return min == o.min && max == o.max;

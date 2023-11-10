@@ -56,7 +56,7 @@ class CharBoard {
 
     const CharBoard& board_;
     PointRectangle range_;
-    PointRectangle::iterator it_;
+    PointRectangle::const_iterator it_;
   };
 
   // Constructs a CharBoard by iterating over `in` and adding one row to the
