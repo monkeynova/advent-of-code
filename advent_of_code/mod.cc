@@ -91,4 +91,8 @@ std::optional<int64_t> ChineseRemainder(
   return cur_v;
 }
 
+std::optional<int64_t> InverseMod(int64_t n, int64_t mod) {
+  return ExtendedEuclideanAlgorithmInvert(n, mod);
+}
+
 }  // namespace advent_of_code

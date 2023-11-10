@@ -3,6 +3,7 @@
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
 #include "absl/log/log.h"
+#include "absl/numeric/int128.h"
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
@@ -14,25 +15,28 @@ namespace advent_of_code {
 namespace {
 
 struct Transform {
-  absl::uint128 mult;
-  absl::uint128 add;
-  absl::uint128 mod;
+  int64_t mult;
+  int64_t add;
+  int64_t mod;
 
   Transform operator*(const Transform& o) const {
-    return {.mult = (mult * o.mult) % mod,
-            .add = (mult * o.add + add) % mod,
+    return {.mult = Lower((Raise(mult) * o.mult) % mod),
+            .add = Lower((Raise(mult) * o.add + add) % mod),
             .mod = mod};
   }
 
   int64_t Apply(int64_t card_position) const {
-    absl::uint128 cp_i128 = card_position;
-    return static_cast<int64_t>(
-        absl::Uint128Low64((cp_i128 * mult + add) % mod));
+    return Lower((Raise(card_position) * mult + add) % mod);
   }
 
   template <typename Sink>
   friend void AbslStringify(Sink& sink, const Transform& t) {
     absl::Format(&sink, "(%v*n+%v)%%%v", t.mult, t.add, t.mod);
+  }
+
+  static absl::int128 Raise(int64_t n) { return absl::int128(n); }
+  static int64_t Lower(absl::int128 n) {
+    return static_cast<int64_t>(absl::Uint128Low64(n));
   }
 };
 
@@ -59,7 +63,7 @@ Transform CutNInverse(int64_t n, int64_t deck_size) {
 }
 
 Transform IncrementNInverse(int64_t n, int64_t deck_size) {
-  return Transform{.mult = InverseMod<absl::uint128>(n, deck_size),
+  return Transform{.mult = *InverseMod(n, deck_size),
                    .add = 0,
                    .mod = deck_size};
 }

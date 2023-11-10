@@ -22,17 +22,7 @@ T PowerMod(T base, T exp, T mod) {
   return product;
 }
 
-template <typename T>
-T InverseMod(T n, T mod) {
-  // Inverse only exists if GCD is one. This method of calculating the inverse
-  // is only valid if mod is prime.
-  // If 'mod' is prime, n ** (mod - 1) == 1, which means
-  // n ** -1 == n ** (mod - 2).
-  // TODO(@monkeynova): Better checking if GCD as well as handling cases
-  //                    where these values aren't relatively prime.
-  CHECK(std::gcd(static_cast<int64_t>(n), static_cast<int64_t>(mod)) == 1);
-  return PowerMod<T>(n, mod - 2, mod);
-}
+std::optional<int64_t> InverseMod(int64_t n, int64_t mod);
 
 using OnExtendedEuclidean = absl::FunctionRef<std::optional<int64_t>(
     int64_t, int64_t, int64_t, int64_t, int64_t, int64_t)>;
