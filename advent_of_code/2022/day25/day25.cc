@@ -16,7 +16,7 @@ namespace advent_of_code {
 
 namespace {
 
-absl::StatusOr<int64_t> DecodeSnafu(absl::string_view line) {
+absl::StatusOr<int64_t> DecodeSnafu(std::string_view line) {
   int64_t num = 0;
   for (char c : line) {
     int next = 0;
@@ -76,9 +76,9 @@ absl::StatusOr<std::string> EncodeSnafu(int64_t total) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_25::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int64_t total = 0;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     absl::StatusOr<int64_t> decoded = DecodeSnafu(line);
     if (!decoded.ok()) return decoded.status();
     total += *decoded;
@@ -87,7 +87,7 @@ absl::StatusOr<std::string> Day_2022_25::Part1(
 }
 
 absl::StatusOr<std::string> Day_2022_25::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   return "Merry Christmas!";
 }
 

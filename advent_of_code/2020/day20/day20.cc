@@ -396,7 +396,7 @@ absl::StatusOr<int> CountNonSeaMonster(const CharBoard& board) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2020_20::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::flat_hash_map<int, CharBoard> tiles;
   int cur_tile_num;
   int cur_tile_index;
@@ -421,7 +421,7 @@ absl::StatusOr<std::string> Day_2020_20::Part1(
 }
 
 absl::StatusOr<std::string> Day_2020_20::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::flat_hash_map<int, CharBoard> tiles;
   int cur_tile_num;
   int cur_tile_index;

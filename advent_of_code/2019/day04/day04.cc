@@ -16,7 +16,7 @@ void AdvancePassword(std::string& password) {
   }
 }
 
-bool IsValidPassword(absl::string_view password) {
+bool IsValidPassword(std::string_view password) {
   if (password.size() != 6) return false;
   bool has_pair = false;
   for (int i = 0; i < 5; ++i) {
@@ -26,7 +26,7 @@ bool IsValidPassword(absl::string_view password) {
   return has_pair;
 }
 
-bool IsValidPassword2(absl::string_view password) {
+bool IsValidPassword2(std::string_view password) {
   if (password.size() != 6) return false;
 
   bool has_pair = false;
@@ -44,7 +44,7 @@ bool IsValidPassword2(absl::string_view password) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2019_04::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Empty input");
   const auto [min, max] = PairSplit(input[0], "-");
   if (min.size() != 6) return absl::InvalidArgumentError("Bad min");
@@ -60,7 +60,7 @@ absl::StatusOr<std::string> Day_2019_04::Part1(
 }
 
 absl::StatusOr<std::string> Day_2019_04::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Empty input");
   const auto [min, max] = PairSplit(input[0], "-");
   if (min.size() != 6) return absl::InvalidArgumentError("Bad min");

@@ -45,7 +45,7 @@ class SnailFishStack {
     return o;
   }
 
-  static absl::StatusOr<SnailFishStack> Parse(absl::string_view& line) {
+  static absl::StatusOr<SnailFishStack> Parse(std::string_view& line) {
     int depth = 0;
     SnailFishStack ret;
     for (int i = 0; i < line.size(); ++i) {
@@ -181,7 +181,7 @@ class SnailFishTree {
   }
 
   static absl::StatusOr<std::unique_ptr<SnailFishTree>> Parse(
-      absl::string_view line) {
+      std::string_view line) {
     absl::StatusOr<std::unique_ptr<SnailFishTree>> rec = ParseImpl(line);
     if (!rec.ok()) return rec.status();
     if (!line.empty()) return absl::InvalidArgumentError("No full parse");
@@ -189,7 +189,7 @@ class SnailFishTree {
   }
 
   static absl::StatusOr<std::unique_ptr<SnailFishTree>> ParseImpl(
-      absl::string_view& line) {
+      std::string_view& line) {
     std::unique_ptr<SnailFishTree> ret = absl::make_unique<SnailFishTree>();
     if (line.empty()) return Error("Empty");
     if (line[0] == '[') {
@@ -325,11 +325,11 @@ class SnailFishTree {
   SnailFishTree* parent = nullptr;
 };
 
-absl::Status Audit(absl::Span<absl::string_view> input) {
+absl::Status Audit(absl::Span<std::string_view> input) {
   absl::optional<SnailFishStack> total_stack;
   std::unique_ptr<SnailFishTree> total_tree;
 
-  for (absl::string_view in_str : input) {
+  for (std::string_view in_str : input) {
     absl::StatusOr<SnailFishStack> in_stack = SnailFishStack::Parse(in_str);
     if (!in_stack.ok()) return in_stack.status();
     if (!total_stack) {
@@ -357,14 +357,14 @@ absl::Status Audit(absl::Span<absl::string_view> input) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_18::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (run_audit()) {
     if (auto st = Audit(input); !st.ok()) return st;
     VLOG(1) << "Audit: OK";
   }
 
   absl::optional<SnailFishStack> total;
-  for (absl::string_view in_str : input) {
+  for (std::string_view in_str : input) {
     absl::StatusOr<SnailFishStack> in = SnailFishStack::Parse(in_str);
     if (!in.ok()) return in.status();
     VLOG(2) << in_str;
@@ -381,9 +381,9 @@ absl::StatusOr<std::string> Day_2021_18::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_18::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::vector<SnailFishStack> values;
-  for (absl::string_view in_str : input) {
+  for (std::string_view in_str : input) {
     absl::StatusOr<SnailFishStack> in = SnailFishStack::Parse(in_str);
     if (!in.ok()) return in.status();
     values.push_back(std::move(*in));

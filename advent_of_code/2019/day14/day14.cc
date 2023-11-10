@@ -15,13 +15,13 @@ namespace {
 struct Rule {
   std::string name;
   int quantity_out;
-  absl::flat_hash_map<absl::string_view, int> in;
+  absl::flat_hash_map<std::string_view, int> in;
 };
 
 absl::StatusOr<DirectedGraph<Rule>> ParseRuleSet(
-    absl::Span<absl::string_view> input) {
+    absl::Span<std::string_view> input) {
   DirectedGraph<Rule> rule_set;
-  for (absl::string_view rule_str : input) {
+  for (std::string_view rule_str : input) {
     const auto [inputs, output] = PairSplit(rule_str, " => ");
 
     Rule rule;
@@ -33,7 +33,7 @@ absl::StatusOr<DirectedGraph<Rule>> ParseRuleSet(
       return absl::InvalidArgumentError("Bad quantity");
     }
 
-    for (absl::string_view in : absl::StrSplit(inputs, ", ")) {
+    for (std::string_view in : absl::StrSplit(inputs, ", ")) {
       const auto [dest_q, dest] = PairSplit(in, " ");
       int quantity;
       if (!absl::SimpleAtoi(dest_q, &quantity)) {
@@ -49,18 +49,18 @@ absl::StatusOr<DirectedGraph<Rule>> ParseRuleSet(
 
 absl::StatusOr<int64_t> ComputeOreNeedForFuel(
     const DirectedGraph<Rule>& rule_set,
-    const std::vector<absl::string_view>& ordered_ingredients,
+    const std::vector<std::string_view>& ordered_ingredients,
     int64_t fuel_needed) {
   // TODO(@monkeynova): Remember this ordering...
-  absl::flat_hash_map<absl::string_view, int64_t> needs;
+  absl::flat_hash_map<std::string_view, int64_t> needs;
   needs.emplace("FUEL", fuel_needed);
-  for (absl::string_view node : ordered_ingredients) {
+  for (std::string_view node : ordered_ingredients) {
     if (node == "ORE") continue;
     const Rule* rule = rule_set.GetData(node);
     if (rule == nullptr) return Error("Cannot find ", node);
     VLOG(1) << absl::StrJoin(
         needs, ", ",
-        [](std::string* out, const std::pair<absl::string_view, int>& need) {
+        [](std::string* out, const std::pair<std::string_view, int>& need) {
           absl::StrAppend(out, need.first, ":", need.second);
         });
     int64_t needed = needs[node];
@@ -83,7 +83,7 @@ absl::StatusOr<int64_t> ComputeOreNeedForFuel(
 
 absl::StatusOr<int64_t> ComputeOreNeedForFuel(
     const DirectedGraph<Rule>& rule_set) {
-  absl::StatusOr<std::vector<absl::string_view>> ordered_ingredients =
+  absl::StatusOr<std::vector<std::string_view>> ordered_ingredients =
       rule_set.DAGSort();
   if (!ordered_ingredients.ok()) return ordered_ingredients.status();
   if (ordered_ingredients->at(0) != "FUEL") {
@@ -97,7 +97,7 @@ absl::StatusOr<int64_t> ComputeOreNeedForFuel(
 
 absl::StatusOr<int> FuelFromOre(const DirectedGraph<Rule>& rule_set,
                                 uint64_t ore_supply) {
-  absl::StatusOr<std::vector<absl::string_view>> ordered_ingredients =
+  absl::StatusOr<std::vector<std::string_view>> ordered_ingredients =
       rule_set.DAGSort();
   if (!ordered_ingredients.ok()) return ordered_ingredients.status();
   if (ordered_ingredients->at(0) != "FUEL") {
@@ -138,7 +138,7 @@ absl::StatusOr<int> FuelFromOre(const DirectedGraph<Rule>& rule_set,
 }  // namespace
 
 absl::StatusOr<std::string> Day_2019_14::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<DirectedGraph<Rule>> rule_set = ParseRuleSet(input);
   if (!rule_set.ok()) return rule_set.status();
 
@@ -146,7 +146,7 @@ absl::StatusOr<std::string> Day_2019_14::Part1(
 }
 
 absl::StatusOr<std::string> Day_2019_14::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<DirectedGraph<Rule>> rule_set = ParseRuleSet(input);
   if (!rule_set.ok()) return rule_set.status();
 

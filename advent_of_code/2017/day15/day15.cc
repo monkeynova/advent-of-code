@@ -18,14 +18,14 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_15::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 2) return Error("Bad size");
   int64_t a_mult = 16807;
   int64_t b_mult = 48271;
   int64_t mod = 2147483647;
   int64_t generator_a;
   int64_t generator_b;
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     if (!RE2::FullMatch(row, "Generator A starts with (\\d+)", &generator_a) &&
         !RE2::FullMatch(row, "Generator B starts with (\\d+)", &generator_b)) {
       return Error("Bad line: ", row);
@@ -41,14 +41,14 @@ absl::StatusOr<std::string> Day_2017_15::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_15::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 2) return Error("Bad size");
   int64_t a_mult = 16807;
   int64_t b_mult = 48271;
   int64_t mod = 2147483647;
   int64_t generator_a;
   int64_t generator_b;
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     if (!RE2::FullMatch(row, "Generator A starts with (\\d+)", &generator_a) &&
         !RE2::FullMatch(row, "Generator B starts with (\\d+)", &generator_b)) {
       return Error("Bad line: ", row);

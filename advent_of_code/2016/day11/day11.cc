@@ -69,12 +69,12 @@ class Floor {
 class ElevatorState : public BFSInterface<ElevatorState> {
  public:
   static absl::StatusOr<ElevatorState> Parse(
-      absl::Span<absl::string_view> input,
-      std::vector<absl::string_view>* elements);
+      absl::Span<std::string_view> input,
+      std::vector<std::string_view>* elements);
 
   const ElevatorState& identifier() const override { return *this; }
 
-  void AddElementAtFloor0(absl::string_view element_name) {
+  void AddElementAtFloor0(std::string_view element_name) {
     int e_index = elements->size();
     elements->push_back(element_name);
     floors[0].AddGenerator(e_index);
@@ -120,7 +120,7 @@ class ElevatorState : public BFSInterface<ElevatorState> {
   int cur_floor_num = 0;
   int steps = 0;
   std::array<Floor, 4> floors;
-  std::vector<absl::string_view>* elements;
+  std::vector<std::string_view>* elements;
 };
 
 std::ostream& operator<<(std::ostream& out, const ElevatorState& s) {
@@ -222,15 +222,15 @@ void ElevatorState::AddNextSteps(State* state) const {
 }
 
 absl::StatusOr<ElevatorState> ElevatorState::Parse(
-    absl::Span<absl::string_view> input,
-    std::vector<absl::string_view>* elements) {
+    absl::Span<std::string_view> input,
+    std::vector<std::string_view>* elements) {
   if (input.size() != 4) return Error("Bad input size");
   ElevatorState s;
   s.elements = elements;
   int floor = 0;
-  absl::string_view kFloorNames[] = {"first", "second", "third", "fourth"};
-  absl::flat_hash_map<absl::string_view, int> element_to_id;
-  for (absl::string_view in : input) {
+  std::string_view kFloorNames[] = {"first", "second", "third", "fourth"};
+  absl::flat_hash_map<std::string_view, int> element_to_id;
+  for (std::string_view in : input) {
     std::string prefix =
         absl::StrCat("The ", kFloorNames[floor], " floor contains ");
     if (in.substr(0, prefix.size()) != prefix) {
@@ -238,24 +238,24 @@ absl::StatusOr<ElevatorState> ElevatorState::Parse(
     }
     in = in.substr(prefix.size());
     if (in == "nothing relevant.") continue;
-    std::vector<absl::string_view> components = absl::StrSplit(in, ", ");
+    std::vector<std::string_view> components = absl::StrSplit(in, ", ");
     // There have been two forms seen of a line with two elements.
     // Originally we saw "... contains $foo, and $bar", but a re-download of
     // the input shows a newer "... contains $foo and $bar" (no comma). We
     // attempt to parse both forms.
     if (components.back().find("and ") != std::string::npos) {
-      std::vector<absl::string_view> sub_components =
+      std::vector<std::string_view> sub_components =
           absl::StrSplit(components.back(), "and ");
       components.pop_back();
-      for (absl::string_view sc : sub_components) {
+      for (std::string_view sc : sub_components) {
         if (sc.empty()) continue;
         absl::ConsumeSuffix(&sc, " ");
         components.push_back(sc);
       }
     }
     absl::ConsumeSuffix(&components.back(), ".");
-    for (absl::string_view comp : components) {
-      absl::string_view e;
+    for (std::string_view comp : components) {
+      std::string_view e;
       if (RE2::FullMatch(comp, "a (.*) generator", &e)) {
         if (!element_to_id.contains(e)) {
           element_to_id[e] = s.elements->size();
@@ -280,16 +280,16 @@ absl::StatusOr<ElevatorState> ElevatorState::Parse(
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_11::Part1(
-    absl::Span<absl::string_view> input) const {
-  std::vector<absl::string_view> element_names;
+    absl::Span<std::string_view> input) const {
+  std::vector<std::string_view> element_names;
   absl::StatusOr<ElevatorState> s = ElevatorState::Parse(input, &element_names);
   if (!s.ok()) return s.status();
   return AdventReturn(s->FindMinSteps());
 }
 
 absl::StatusOr<std::string> Day_2016_11::Part2(
-    absl::Span<absl::string_view> input) const {
-  std::vector<absl::string_view> element_names;
+    absl::Span<std::string_view> input) const {
+  std::vector<std::string_view> element_names;
   absl::StatusOr<ElevatorState> s = ElevatorState::Parse(input, &element_names);
   s->AddElementAtFloor0("elerium");
   s->AddElementAtFloor0("dilithium");

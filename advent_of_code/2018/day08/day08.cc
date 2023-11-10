@@ -64,9 +64,9 @@ absl::StatusOr<int> NodeValue(absl::Span<int64_t>& range) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_08::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
-  std::vector<absl::string_view> int_strs = absl::StrSplit(input[0], " ");
+  std::vector<std::string_view> int_strs = absl::StrSplit(input[0], " ");
   absl::StatusOr<std::vector<int64_t>> ints = ParseAsInts(int_strs);
   if (!ints.ok()) return ints.status();
   absl::Span<int64_t> int_span = absl::MakeSpan(*ints);
@@ -77,9 +77,9 @@ absl::StatusOr<std::string> Day_2018_08::Part1(
 }
 
 absl::StatusOr<std::string> Day_2018_08::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
-  std::vector<absl::string_view> int_strs = absl::StrSplit(input[0], " ");
+  std::vector<std::string_view> int_strs = absl::StrSplit(input[0], " ");
   absl::StatusOr<std::vector<int64_t>> ints = ParseAsInts(int_strs);
   if (!ints.ok()) return ints.status();
   absl::Span<int64_t> int_span = absl::MakeSpan(*ints);

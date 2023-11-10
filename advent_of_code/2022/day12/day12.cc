@@ -58,7 +58,7 @@ class HeightBfs : public BFSInterface<HeightBfs<run_reverse>, Point> {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_12::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   auto board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
   absl::flat_hash_set<Point> starts = board->Find('S');
@@ -69,7 +69,7 @@ absl::StatusOr<std::string> Day_2022_12::Part1(
 }
 
 absl::StatusOr<std::string> Day_2022_12::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   auto board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
   absl::flat_hash_set<Point> starts = board->Find('E');

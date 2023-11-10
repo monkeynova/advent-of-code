@@ -19,7 +19,7 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_17::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   int n;
   if (!absl::SimpleAtoi(input[0], &n)) return Error("Bad int:", input[0]);
@@ -33,7 +33,7 @@ absl::StatusOr<std::string> Day_2017_17::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_17::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   int n;
   if (!absl::SimpleAtoi(input[0], &n)) return Error("Bad int:", input[0]);

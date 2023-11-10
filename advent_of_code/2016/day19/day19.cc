@@ -13,7 +13,7 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2016_19::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   int size;
   if (!absl::SimpleAtoi(input[0], &size)) return Error("Bad int");
@@ -27,7 +27,7 @@ absl::StatusOr<std::string> Day_2016_19::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_19::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   int size;
   if (!absl::SimpleAtoi(input[0], &size)) return Error("Bad int");

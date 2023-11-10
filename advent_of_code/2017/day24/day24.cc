@@ -126,9 +126,9 @@ LengthStrength StrongestLongestBridge(const std::vector<Converter>& ordered) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_24::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::vector<Converter> convs;
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     Converter c;
     if (!RE2::FullMatch(row, "(\\d+)/(\\d+)", &c.in, &c.out)) {
       return Error("Bad line: ", row);
@@ -139,9 +139,9 @@ absl::StatusOr<std::string> Day_2017_24::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_24::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::vector<Converter> convs;
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     Converter c;
     if (!RE2::FullMatch(row, "(\\d+)/(\\d+)", &c.in, &c.out)) {
       return Error("Bad line: ", row);

@@ -12,12 +12,12 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2020_14::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::flat_hash_map<int64_t, int64_t> mem;
   int64_t mask = 0;
   int64_t mask_val = 0;
-  for (absl::string_view str : input) {
-    absl::string_view mask_str;
+  for (std::string_view str : input) {
+    std::string_view mask_str;
     int64_t addr;
     int64_t val;
     if (RE2::FullMatch(str, "mask = ([10X]+)", &mask_str)) {
@@ -59,13 +59,13 @@ absl::StatusOr<std::string> Day_2020_14::Part1(
 }
 
 absl::StatusOr<std::string> Day_2020_14::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::flat_hash_map<int64_t, int64_t> mem;
   int64_t mask = 0;
   int64_t mask_val = 0;
   std::vector<int64_t> floating;
-  for (absl::string_view str : input) {
-    absl::string_view mask_str;
+  for (std::string_view str : input) {
+    std::string_view mask_str;
     int64_t addr;
     int64_t val;
     if (RE2::FullMatch(str, "mask = ([10X]+)", &mask_str)) {

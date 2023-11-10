@@ -14,12 +14,12 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2015_06::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   CharBoard yard(1000, 1000);
 
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     PointRectangle r;
-    absl::string_view cmd;
+    std::string_view cmd;
     if (!RE2::FullMatch(str, "(.*) (\\d+,\\d+) through (\\d+,\\d+)", &cmd,
                         r.min.Capture(), r.max.Capture())) {
       return absl::InvalidArgumentError(absl::StrCat("Bad instruction: ", str));
@@ -50,7 +50,7 @@ absl::StatusOr<std::string> Day_2015_06::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_06::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::vector<std::vector<int>> yard;
   std::vector<int> empty_row;
   empty_row.resize(1000);
@@ -58,10 +58,10 @@ absl::StatusOr<std::string> Day_2015_06::Part2(
     yard.push_back(empty_row);
   }
 
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     Point min;
     Point max;
-    absl::string_view cmd;
+    std::string_view cmd;
     if (!RE2::FullMatch(str, "(.*) (\\d+,\\d+) through (\\d+,\\d+)", &cmd,
                         min.Capture(), max.Capture())) {
       return absl::InvalidArgumentError(absl::StrCat("Bad instruction: ", str));

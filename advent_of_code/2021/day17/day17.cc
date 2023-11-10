@@ -56,7 +56,7 @@ absl::optional<int> Fire(Point v0, PointRectangle target) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_17::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   int minx, maxx, miny, maxy;
   if (!RE2::FullMatch(input[0],
@@ -78,7 +78,7 @@ absl::StatusOr<std::string> Day_2021_17::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_17::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   int minx, maxx, miny, maxy;
   if (!RE2::FullMatch(input[0],

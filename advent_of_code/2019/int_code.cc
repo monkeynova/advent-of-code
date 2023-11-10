@@ -51,7 +51,7 @@ static const std::vector<OpCodeMeta>& CodeTypes() {
   return code_types;
 };
 
-absl::StatusOr<IntCode> IntCode::Parse(absl::Span<absl::string_view> input) {
+absl::StatusOr<IntCode> IntCode::Parse(absl::Span<std::string_view> input) {
   if (input.empty()) {
     return absl::InvalidArgumentError("input is empty");
   }
@@ -59,10 +59,10 @@ absl::StatusOr<IntCode> IntCode::Parse(absl::Span<absl::string_view> input) {
     return absl::InvalidArgumentError(
         absl::StrCat("input is to large: 1 !=", input.size()));
   }
-  std::vector<absl::string_view> code_strs = absl::StrSplit(input[0], ",");
+  std::vector<std::string_view> code_strs = absl::StrSplit(input[0], ",");
   std::vector<int64_t> codes;
   codes.reserve(code_strs.size());
-  for (absl::string_view str : code_strs) {
+  for (std::string_view str : code_strs) {
     codes.push_back(0);
     if (!absl::SimpleAtoi(str, &codes.back())) {
       return absl::InvalidArgumentError(

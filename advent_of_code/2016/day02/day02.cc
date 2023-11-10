@@ -19,14 +19,14 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_02::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::string code;
   Point p = {1, 1};
   absl::flat_hash_map<Point, std::string> codes = {
       {{0, 0}, "1"}, {{1, 0}, "2"}, {{2, 0}, "3"}, {{0, 1}, "4"}, {{1, 1}, "5"},
       {{2, 1}, "6"}, {{0, 2}, "7"}, {{1, 2}, "8"}, {{2, 2}, "9"},
   };
-  for (absl::string_view ins : input) {
+  for (std::string_view ins : input) {
     for (char c : ins) {
       Point dir;
       switch (c) {
@@ -58,7 +58,7 @@ absl::StatusOr<std::string> Day_2016_02::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_02::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::string code;
   Point p = {0, 2};
   absl::flat_hash_map<Point, std::string> codes = {
@@ -66,7 +66,7 @@ absl::StatusOr<std::string> Day_2016_02::Part2(
       {{1, 2}, "6"}, {{2, 2}, "7"}, {{3, 2}, "8"}, {{4, 2}, "9"}, {{1, 3}, "A"},
       {{2, 3}, "B"}, {{3, 3}, "C"}, {{2, 4}, "D"},
   };
-  for (absl::string_view ins : input) {
+  for (std::string_view ins : input) {
     for (char c : ins) {
       Point dir;
       switch (c) {

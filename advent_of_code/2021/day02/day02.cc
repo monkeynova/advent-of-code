@@ -19,12 +19,12 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_02::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   static const RE2 kForwardRE("forward (\\d+)");
   static const RE2 kUpRE("up (\\d+)");
   static const RE2 kDownRE("down (\\d+)");
   Point p{0, 0};
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     int64_t delta = 0;
     if (RE2::FullMatch(line, kForwardRE, &delta)) {
       p.x += delta;
@@ -40,13 +40,13 @@ absl::StatusOr<std::string> Day_2021_02::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_02::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   static const RE2 kForwardRE("forward (\\d+)");
   static const RE2 kUpRE("up (\\d+)");
   static const RE2 kDownRE("down (\\d+)");
   Point p{0, 0};
   int64_t aim = 0;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     int64_t delta = 0;
     if (RE2::FullMatch(line, kForwardRE, &delta)) {
       p.x += delta;

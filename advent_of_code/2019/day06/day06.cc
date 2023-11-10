@@ -11,12 +11,12 @@ namespace advent_of_code {
 namespace {
 
 absl::StatusOr<absl::flat_hash_map<std::string, std::vector<std::string>>>
-ParseOrbits(absl::Span<absl::string_view> input) {
+ParseOrbits(absl::Span<std::string_view> input) {
   absl::flat_hash_map<std::string, std::vector<std::string>> orbits;
   RE2 orbit_pattern{"(...)\\)(...)"};
-  for (absl::string_view rec : input) {
-    absl::string_view from;
-    absl::string_view to;
+  for (std::string_view rec : input) {
+    std::string_view from;
+    std::string_view to;
     if (!RE2::FullMatch(rec, orbit_pattern, &from, &to)) {
       return absl::InvalidArgumentError("Input not an orbit");
     }
@@ -30,7 +30,7 @@ ParseOrbits(absl::Span<absl::string_view> input) {
 
 int CountOrbits(
     const absl::flat_hash_map<std::string, std::vector<std::string>>& orbits,
-    absl::string_view src, int depth) {
+    std::string_view src, int depth) {
   // Current src contains `depth` orbits.
   int orbit_count = depth;
   auto it = orbits.find(src);
@@ -51,7 +51,7 @@ struct TransferRet {
 
 TransferRet FindTransfer(
     const absl::flat_hash_map<std::string, std::vector<std::string>>& orbits,
-    absl::string_view cur, absl::string_view from, absl::string_view to) {
+    std::string_view cur, std::string_view from, std::string_view to) {
   if (cur == from) {
     return {.transfer_size = -1, .from_depth = 0, .to_depth = -1};
   }
@@ -81,7 +81,7 @@ TransferRet FindTransfer(
 }  // namespace
 
 absl::StatusOr<std::string> Day_2019_06::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<std::string, std::vector<std::string>>>
       orbits = ParseOrbits(input);
   if (!orbits.ok()) return orbits.status();
@@ -91,7 +91,7 @@ absl::StatusOr<std::string> Day_2019_06::Part1(
 }
 
 absl::StatusOr<std::string> Day_2019_06::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<std::string, std::vector<std::string>>>
       orbits = ParseOrbits(input);
   if (!orbits.ok()) return orbits.status();

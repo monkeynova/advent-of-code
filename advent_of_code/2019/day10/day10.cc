@@ -57,7 +57,7 @@ MostVisible FindMostVisible(const Board& board) {
   return ret;
 }
 
-absl::StatusOr<Board> ParseBoard(absl::Span<absl::string_view> input) {
+absl::StatusOr<Board> ParseBoard(absl::Span<std::string_view> input) {
   absl::StatusOr<CharBoard> char_board = CharBoard::Parse(input);
   if (!char_board.ok()) return char_board.status();
 
@@ -83,7 +83,7 @@ absl::StatusOr<Board> ParseBoard(absl::Span<absl::string_view> input) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2019_10::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<Board> asteroids = ParseBoard(input);
   if (!asteroids.ok()) return asteroids.status();
   MostVisible most_visible = FindMostVisible(*asteroids);
@@ -106,7 +106,7 @@ struct OrderedDestruct {
 };
 
 absl::StatusOr<std::string> Day_2019_10::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<Board> board = ParseBoard(input);
   if (!board.ok()) return board.status();
   if (board->asteroids.size() < 201) {

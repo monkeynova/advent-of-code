@@ -24,9 +24,9 @@ struct Disc {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_15::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::vector<Disc> discs;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     Disc d;
     if (!RE2::FullMatch(str,
                         "Disc #(\\d+) has (\\d+) positions; at time=0, it is "
@@ -54,9 +54,9 @@ absl::StatusOr<std::string> Day_2016_15::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_15::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::vector<Disc> discs;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     Disc d;
     if (!RE2::FullMatch(str,
                         "Disc #(\\d+) has (\\d+) positions; at time=0, it is "

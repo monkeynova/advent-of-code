@@ -43,7 +43,7 @@ int64_t Coordinates(RingType::const_iterator it) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_20::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> input_ints = ParseAsInts(input);
   if (!input_ints.ok()) return input_ints.status();
 
@@ -71,7 +71,7 @@ absl::StatusOr<std::string> Day_2022_20::Part1(
 }
 
 absl::StatusOr<std::string> Day_2022_20::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> input_ints = ParseAsInts(input);
   if (!input_ints.ok()) return input_ints.status();
 

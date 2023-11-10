@@ -15,7 +15,7 @@ constexpr char kParamOption[] = "param";
 void SetupTestCaseOptions(file_based_test_driver::TestCaseOptions* options);
 
 absl::StatusOr<absl::Duration> ParseLongTestDuration(
-    absl::string_view long_option_value);
+    std::string_view long_option_value);
 
 }  // namespace advent_of_code
 

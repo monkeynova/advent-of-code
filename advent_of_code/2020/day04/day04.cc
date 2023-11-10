@@ -14,7 +14,7 @@ namespace {
 
 absl::Status Valid(
     const absl::flat_hash_map<std::string, std::string>& passport) {
-  for (absl::string_view test :
+  for (std::string_view test :
        {"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"}) {
     if (!passport.contains(test)) {
       return absl::InvalidArgumentError(absl::StrCat("Missing field: ", test));
@@ -76,17 +76,17 @@ absl::Status Valid2(absl::flat_hash_map<std::string, std::string> passport) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2020_04::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::flat_hash_map<std::string, std::string> passport;
   int valid = 0;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     if (line.empty()) {
       if (Valid(passport).ok()) {
         ++valid;
       }
       passport.clear();
     }
-    for (absl::string_view r : absl::StrSplit(line, " ")) {
+    for (std::string_view r : absl::StrSplit(line, " ")) {
       if (r.empty()) continue;
       const auto [it, inserted] = passport.emplace(PairSplit(r, ":"));
       if (!inserted) return Error("Duplicate key: ", r);
@@ -99,17 +99,17 @@ absl::StatusOr<std::string> Day_2020_04::Part1(
 }
 
 absl::StatusOr<std::string> Day_2020_04::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::flat_hash_map<std::string, std::string> passport;
   int valid = 0;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     if (line.empty()) {
       if (Valid2(passport).ok()) {
         ++valid;
       }
       passport.clear();
     }
-    for (absl::string_view r : absl::StrSplit(line, " ")) {
+    for (std::string_view r : absl::StrSplit(line, " ")) {
       if (r.empty()) continue;
       const auto [it, inserted] = passport.emplace(PairSplit(r, ":"));
       if (!inserted) return Error("Duplicate key: ", r);

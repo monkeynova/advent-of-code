@@ -21,7 +21,7 @@ struct ParsedRE {
     kBranch = 2,
     kSequence = 3,
   } type;
-  absl::string_view val;
+  std::string_view val;
   std::vector<std::unique_ptr<ParsedRE>> children;
 
   std::string DebugString(std::string prefix = "") {
@@ -38,8 +38,8 @@ struct ParsedRE {
   }
 };
 
-std::vector<absl::string_view> Tokenize(absl::string_view re) {
-  std::vector<absl::string_view> ret;
+std::vector<std::string_view> Tokenize(std::string_view re) {
+  std::vector<std::string_view> ret;
   int tok_start = 0;
   for (int i = 0; i < re.size(); ++i) {
     if (re[i] == '(' || re[i] == ')' || re[i] == '|') {
@@ -52,12 +52,12 @@ std::vector<absl::string_view> Tokenize(absl::string_view re) {
   return ret;
 }
 
-absl::StatusOr<ParsedRE> Parse(absl::string_view re) {
-  std::vector<absl::string_view> tokens = Tokenize(re);
+absl::StatusOr<ParsedRE> Parse(std::string_view re) {
+  std::vector<std::string_view> tokens = Tokenize(re);
   ParsedRE ret;
   ret.type = ParsedRE::kSequence;
   std::vector<ParsedRE*> stack = {&ret};
-  for (absl::string_view tok : tokens) {
+  for (std::string_view tok : tokens) {
     if (stack.empty()) return Error("Empty stack");
     if (tok == "(") {
       auto next = absl::make_unique<ParsedRE>();
@@ -171,7 +171,7 @@ absl::StatusOr<absl::flat_hash_set<Point>> WalkAllPaths(
   return ret;
 }
 
-absl::StatusOr<CharBoard> ConstructRoom(absl::string_view re,
+absl::StatusOr<CharBoard> ConstructRoom(std::string_view re,
                                         Point* start_ret) {
   Point start = {0, 0};
 
@@ -272,9 +272,9 @@ class RoomWalkPast : public BFSInterface<RoomWalkPast, Point> {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_20::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
-  absl::string_view re = input[0];
+  std::string_view re = input[0];
   if (re[0] != '^') return Error("No front anchor: ", re);
   re = re.substr(1);
   if (re[re.size() - 1] != '$') return Error("No back anchor");
@@ -295,9 +295,9 @@ absl::StatusOr<std::string> Day_2018_20::Part1(
 }
 
 absl::StatusOr<std::string> Day_2018_20::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
-  absl::string_view re = input[0];
+  std::string_view re = input[0];
   if (re[0] != '^') return Error("No front anchor: ", re);
   re = re.substr(1);
   if (re[re.size() - 1] != '$') return Error("No back anchor");

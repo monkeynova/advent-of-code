@@ -70,7 +70,7 @@ int64_t HighScore(int num_players, int num_marbles) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_09::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
   int players;
   int marbles;
@@ -83,7 +83,7 @@ absl::StatusOr<std::string> Day_2018_09::Part1(
 }
 
 absl::StatusOr<std::string> Day_2018_09::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
   int players;
   int marbles;

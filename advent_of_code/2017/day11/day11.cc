@@ -19,11 +19,11 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_11::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   Point p = Cardinal::kOrigin;
-  std::vector<absl::string_view> dirs = absl::StrSplit(input[0], ",");
-  for (absl::string_view dir : dirs) {
+  std::vector<std::string_view> dirs = absl::StrSplit(input[0], ",");
+  for (std::string_view dir : dirs) {
     if (dir == "nw")
       p += Cardinal::kNorthWest;
     else if (dir == "ne")
@@ -43,12 +43,12 @@ absl::StatusOr<std::string> Day_2017_11::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_11::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   Point p = Cardinal::kOrigin;
   int max_dist = std::numeric_limits<int>::min();
-  std::vector<absl::string_view> dirs = absl::StrSplit(input[0], ",");
-  for (absl::string_view dir : dirs) {
+  std::vector<std::string_view> dirs = absl::StrSplit(input[0], ",");
+  for (std::string_view dir : dirs) {
     if (dir == "nw")
       p += Cardinal::kNorthWest;
     else if (dir == "ne")

@@ -24,10 +24,10 @@ struct Light {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_10::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.empty()) return Error("No input");
   std::vector<Light> lights;
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     Light l;
     if (!RE2::FullMatch(row,
                         "position=<\\s*(-?\\d+,\\s*-?\\d+)> "
@@ -60,10 +60,10 @@ absl::StatusOr<std::string> Day_2018_10::Part1(
 }
 
 absl::StatusOr<std::string> Day_2018_10::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.empty()) return Error("No input");
   std::vector<Light> lights;
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     Light l;
     if (!RE2::FullMatch(row,
                         "position=<\\s*(-?\\d+,\\s*-?\\d+)> "

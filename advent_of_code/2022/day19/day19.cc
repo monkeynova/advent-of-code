@@ -26,7 +26,7 @@ struct Blueprint {
   int geode_robot_obsidian_cost;
 };
 
-absl::StatusOr<Blueprint> Parse(absl::string_view line) {
+absl::StatusOr<Blueprint> Parse(std::string_view line) {
   Blueprint bp;
   if (!RE2::FullMatch(line,
                       "Blueprint (\\d+): Each ore robot costs (\\d+) ore. "
@@ -146,9 +146,9 @@ int BestGeode(Blueprint bp, int minutes) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_19::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int cost = 0;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     absl::StatusOr<Blueprint> bp = Parse(line);
     if (!bp.ok()) return bp.status();
     int best_geode = BestGeode(*bp, 24);
@@ -159,10 +159,10 @@ absl::StatusOr<std::string> Day_2022_19::Part1(
 }
 
 absl::StatusOr<std::string> Day_2022_19::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int64_t cost = 1;
   input = input.subspan(0, 3);
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     absl::StatusOr<Blueprint> bp = Parse(line);
     if (!bp.ok()) return bp.status();
     int best_geode = BestGeode(*bp, 32);

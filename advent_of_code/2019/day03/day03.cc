@@ -16,13 +16,13 @@ struct Line {
   Point to;
 };
 
-absl::StatusOr<std::vector<Line>> Parse(absl::string_view input) {
-  std::vector<absl::string_view> runs = absl::StrSplit(input, ",");
+absl::StatusOr<std::vector<Line>> Parse(std::string_view input) {
+  std::vector<std::string_view> runs = absl::StrSplit(input, ",");
 
   std::vector<Line> ret;
   ret.reserve(runs.size());
   Point cur = Cardinal::kOrigin;
-  for (absl::string_view run : runs) {
+  for (std::string_view run : runs) {
     Line next;
     next.from = cur;
     next.to = cur;
@@ -148,7 +148,7 @@ absl::StatusOr<std::vector<Point>> Intersect(std::vector<Line> wire1,
 }  // namespace
 
 absl::StatusOr<std::string> Day_2019_03::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 2) {
     return absl::InvalidArgumentError("input does not contain 2 lines");
   }
@@ -200,7 +200,7 @@ absl::StatusOr<int> CostToOverlap(Point intersect,
 }
 
 absl::StatusOr<std::string> Day_2019_03::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 2) {
     return absl::InvalidArgumentError("input does not contain 2 lines");
   }

@@ -25,10 +25,10 @@ struct DanceMove {
   char c2;
 };
 
-absl::StatusOr<std::vector<DanceMove>> Parse(absl::string_view in) {
-  std::vector<absl::string_view> ins = absl::StrSplit(in, ",");
+absl::StatusOr<std::vector<DanceMove>> Parse(std::string_view in) {
+  std::vector<std::string_view> ins = absl::StrSplit(in, ",");
   std::vector<DanceMove> ret;
-  for (absl::string_view i : ins) {
+  for (std::string_view i : ins) {
     DanceMove next;
     if (RE2::FullMatch(i, "s(\\d+)", &next.n1)) {
       next.op = DanceMove::kSpin;
@@ -52,7 +52,7 @@ void RunDance(const std::vector<DanceMove>& moves, Line* line) {
   for (const DanceMove& m : moves) {
     switch (m.op) {
       case DanceMove::kSpin: {
-        absl::string_view line_view = line->vals;
+        std::string_view line_view = line->vals;
         int split = line_view.size() - m.n1;
         line->vals =
             absl::StrCat(line_view.substr(split), line_view.substr(0, split));
@@ -80,7 +80,7 @@ void RunDance(const std::vector<DanceMove>& moves, Line* line) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_16::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   absl::StatusOr<std::vector<DanceMove>> moves = Parse(input[0]);
   if (!moves.ok()) return moves.status();
@@ -90,7 +90,7 @@ absl::StatusOr<std::string> Day_2017_16::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_16::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   absl::StatusOr<std::vector<DanceMove>> moves = Parse(input[0]);
   if (!moves.ok()) return moves.status();

@@ -36,9 +36,9 @@ int CountConstellations(const std::vector<Point4>& points) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_25::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::vector<Point4> points;
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     Point4 p;
     if (!RE2::FullMatch(row, "(-?\\d+,-?\\d+,-?\\d+,-?\\d+)", p.Capture())) {
       return Error("Bad input: ", row);
@@ -50,7 +50,7 @@ absl::StatusOr<std::string> Day_2018_25::Part1(
 }
 
 absl::StatusOr<std::string> Day_2018_25::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   return "Merry Christmas!";
 }
 

@@ -31,12 +31,12 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> NewDay::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   return absl::UnimplementedError("Problem not known");
 }
 
 absl::StatusOr<std::string> NewDay::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   return absl::UnimplementedError("Problem not known");
 }
 

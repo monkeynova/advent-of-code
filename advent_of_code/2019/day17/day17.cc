@@ -102,7 +102,7 @@ bool FindA(Program* program) {
   return false;
 }
 
-Program FindProgram(absl::string_view command) {
+Program FindProgram(std::string_view command) {
   Program ret;
   ret.main = command;
   if (FindA(&ret)) {
@@ -294,7 +294,7 @@ class ViewPort : public IntCode::IOModule {
 
  private:
   Program program_;
-  absl::string_view current_output_;
+  std::string_view current_output_;
   int current_output_pos_;
 
   std::string current_input_;
@@ -306,7 +306,7 @@ class ViewPort : public IntCode::IOModule {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2019_17::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
 
@@ -319,7 +319,7 @@ absl::StatusOr<std::string> Day_2019_17::Part1(
 }
 
 absl::StatusOr<std::string> Day_2019_17::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
 

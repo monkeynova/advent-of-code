@@ -18,7 +18,7 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_01::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   int sum = 0;
   int size = input[0].size();
@@ -31,7 +31,7 @@ absl::StatusOr<std::string> Day_2017_01::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_01::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   int sum = 0;
   int size = input[0].size();

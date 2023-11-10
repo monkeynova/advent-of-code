@@ -16,7 +16,7 @@ namespace advent_of_code {
 
 namespace {
 
-absl::StatusOr<CharBoard> BuildBoard(absl::string_view input) {
+absl::StatusOr<CharBoard> BuildBoard(std::string_view input) {
   CharBoard board(128, 128);
   for (Point p : board.range()) board[p] = '#';
   KnotHash digest;
@@ -42,7 +42,7 @@ absl::StatusOr<CharBoard> BuildBoard(absl::string_view input) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_14::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   absl::StatusOr<CharBoard> board = BuildBoard(input[0]);
   if (!board.ok()) return board.status();
@@ -51,7 +51,7 @@ absl::StatusOr<std::string> Day_2017_14::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_14::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   absl::StatusOr<CharBoard> board = BuildBoard(input[0]);
   if (!board.ok()) return board.status();

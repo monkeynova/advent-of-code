@@ -24,7 +24,7 @@ static LazyRE2 addx_re = {"addx (-?\\d+)"};
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_10::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int x = 1;
   std::vector<int> at = {20, 60, 100, 140, 180, 220};
   std::vector<int>::iterator it = at.begin();
@@ -38,7 +38,7 @@ absl::StatusOr<std::string> Day_2022_10::Part1(
     }
     return false;
   };
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     if (line == "noop") {
       if (on_step()) return AdventReturn(signal_strength);
     } else if (int add; RE2::FullMatch(line, *addx_re, &add)) {
@@ -51,7 +51,7 @@ absl::StatusOr<std::string> Day_2022_10::Part1(
 }
 
 absl::StatusOr<std::string> Day_2022_10::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   CharBoard board(40, 6);
   PointRectangle board_rect = board.range();
   auto pos_it = board_rect.begin();
@@ -63,7 +63,7 @@ absl::StatusOr<std::string> Day_2022_10::Part2(
   };
 
   on_step();
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     if (line == "noop") {
       on_step();
     } else if (int add; RE2::FullMatch(line, *addx_re, &add)) {

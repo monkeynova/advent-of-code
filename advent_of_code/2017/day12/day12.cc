@@ -15,11 +15,11 @@ namespace advent_of_code {
 
 namespace {
 
-absl::StatusOr<DirectedGraph<bool>> Parse(absl::Span<absl::string_view> input) {
+absl::StatusOr<DirectedGraph<bool>> Parse(absl::Span<std::string_view> input) {
   DirectedGraph<bool> ret;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     const auto [node, cons] = PairSplit(str, " <-> ");
-    for (absl::string_view con : absl::StrSplit(cons, ", ")) {
+    for (std::string_view con : absl::StrSplit(cons, ", ")) {
       ret.AddEdge(node, con);
     }
   }
@@ -29,7 +29,7 @@ absl::StatusOr<DirectedGraph<bool>> Parse(absl::Span<absl::string_view> input) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_12::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<DirectedGraph<bool>> graph = Parse(input);
   if (!graph.ok()) return graph.status();
 
@@ -37,7 +37,7 @@ absl::StatusOr<std::string> Day_2017_12::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_12::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<DirectedGraph<bool>> graph = Parse(input);
   if (!graph.ok()) return graph.status();
 

@@ -12,9 +12,9 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2015_08::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int delta = 0;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     if (str[0] != '"') return Error("Bad input");
     if (str.back() != '"') return Error("Bad input");
     delta += 2;
@@ -34,9 +34,9 @@ absl::StatusOr<std::string> Day_2015_08::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_08::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int delta = 0;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     if (str[0] != '"') return Error("Bad input");
     if (str.back() != '"') return Error("Bad input");
     delta += 4;

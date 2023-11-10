@@ -56,10 +56,10 @@ struct Monkey {
 };
 
 absl::StatusOr<std::vector<Monkey>> ParseMonkeys(
-    absl::Span<absl::string_view> input) {
+    absl::Span<std::string_view> input) {
   std::vector<Monkey> monkeys;
   Monkey* cur_monkey = nullptr;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     if (line.empty()) {
       if (cur_monkey != nullptr && !cur_monkey->IsValid()) {
         return Error("Invalid monkey");
@@ -68,7 +68,7 @@ absl::StatusOr<std::vector<Monkey>> ParseMonkeys(
       continue;
     }
     int i;
-    absl::string_view str;
+    std::string_view str;
     if (RE2::FullMatch(line, "Monkey (\\d+):", &i)) {
       if (monkeys.size() != i) return Error("Bad monkey order");
       monkeys.push_back({});
@@ -76,7 +76,7 @@ absl::StatusOr<std::vector<Monkey>> ParseMonkeys(
 
     } else if (RE2::FullMatch(line, "  Starting items: ([\\d, ]+)", &str)) {
       if (cur_monkey == nullptr) return Error("No monkey");
-      for (absl::string_view item : absl::StrSplit(str, ",")) {
+      for (std::string_view item : absl::StrSplit(str, ",")) {
         item = absl::StripAsciiWhitespace(item);
         if (!absl::SimpleAtoi(item, &i)) {
           return Error("Bad item: ", item);
@@ -138,7 +138,7 @@ int64_t ScoreMonkeys(const std::vector<Monkey>& monkeys) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_11::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<Monkey>> monkeys = ParseMonkeys(input);
   if (!monkeys.ok()) return monkeys.status();
 
@@ -157,7 +157,7 @@ absl::StatusOr<std::string> Day_2022_11::Part1(
 }
 
 absl::StatusOr<std::string> Day_2022_11::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<Monkey>> monkeys = ParseMonkeys(input);
   if (!monkeys.ok()) return monkeys.status();
 

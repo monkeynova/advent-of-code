@@ -253,13 +253,13 @@ absl::StatusOr<StitchMap> BuildStitchMap(const CharBoard& board) {
   return stitch_map;
 }
 
-absl::StatusOr<CharBoard> PadAndParseBoard(absl::Span<absl::string_view> input,
+absl::StatusOr<CharBoard> PadAndParseBoard(absl::Span<std::string_view> input,
                                            std::vector<std::string>& storage) {
   int max = 0;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     max = std::max<int>(max, line.size());
   }
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     storage.push_back(std::string(line));
     storage.back().resize(max, ' ');
   }
@@ -337,7 +337,7 @@ class Part2Mover : public Mover {
   const StitchMap& stitch_map_;
 };
 
-absl::StatusOr<PointAndDir> MovePath(absl::string_view path, PointAndDir cur,
+absl::StatusOr<PointAndDir> MovePath(std::string_view path, PointAndDir cur,
                                      const Mover& mover) {
   int dist = 0;
   for (char c : path) {
@@ -382,10 +382,10 @@ absl::StatusOr<int> Score(PointAndDir pd) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_22::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() < 2) return Error("Bad input");
   if (!input[input.size() - 2].empty()) return Error("Bad input");
-  absl::string_view path = input.back();
+  std::string_view path = input.back();
   input = input.subspan(0, input.size() - 2);
 
   std::vector<std::string> storage;
@@ -401,10 +401,10 @@ absl::StatusOr<std::string> Day_2022_22::Part1(
 }
 
 absl::StatusOr<std::string> Day_2022_22::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() < 2) return Error("Bad input");
   if (!input[input.size() - 2].empty()) return Error("Bad input");
-  absl::string_view path = input.back();
+  std::string_view path = input.back();
   input = input.subspan(0, input.size() - 2);
 
   std::vector<std::string> storage;

@@ -65,7 +65,7 @@ int64_t Score(absl::flat_hash_set<Point> elves) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_23::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
 
@@ -80,7 +80,7 @@ absl::StatusOr<std::string> Day_2022_23::Part1(
 }
 
 absl::StatusOr<std::string> Day_2022_23::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
 

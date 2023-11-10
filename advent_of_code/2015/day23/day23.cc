@@ -15,9 +15,9 @@ namespace {
 
 class VM {
  public:
-  static absl::StatusOr<VM> Parse(absl::Span<absl::string_view> input) {
+  static absl::StatusOr<VM> Parse(absl::Span<std::string_view> input) {
     VM ret;
-    for (absl::string_view ins_str : input) {
+    for (std::string_view ins_str : input) {
       Instruction ins;
       if (RE2::FullMatch(ins_str, "hlf ([ab])", &ins.reg)) {
         ins.op = OpCode::kHlf;
@@ -103,7 +103,7 @@ class VM {
   };
   struct Instruction {
     OpCode op;
-    absl::string_view reg;
+    std::string_view reg;
     int64_t literal;
   };
 
@@ -119,7 +119,7 @@ class VM {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2015_23::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<VM> vm = VM::Parse(input);
   if (!vm.ok()) return vm.status();
   vm->Execute();
@@ -127,7 +127,7 @@ absl::StatusOr<std::string> Day_2015_23::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_23::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<VM> vm = VM::Parse(input);
   if (!vm.ok()) return vm.status();
   vm->set_register_a(1);

@@ -15,7 +15,7 @@ namespace {
 
 class DragonCurve {
  public:
-  static std::string Expand(absl::string_view tmp) {
+  static std::string Expand(std::string_view tmp) {
     std::string copy = std::string(tmp);
     std::reverse(copy.begin(), copy.end());
     for (int i = 0; i < copy.size(); ++i) {
@@ -26,7 +26,7 @@ class DragonCurve {
     return ret;
   }
 
-  static std::string Checksum(absl::string_view tmp) {
+  static std::string Checksum(std::string_view tmp) {
     std::string ret;
     ret.resize((tmp.size() + 1) / 2);
     for (int i = 0; i < tmp.size(); i += 2) {
@@ -40,7 +40,7 @@ class DragonCurve {
     return ret;
   }
 
-  explicit DragonCurve(absl::string_view str) : str_(str) {}
+  explicit DragonCurve(std::string_view str) : str_(str) {}
 
   char CharAt(int p) {
     // TODO(@monkeynova) We could be more efficient by calculating the needed
@@ -57,10 +57,10 @@ class DragonCurve {
   }
 
  private:
-  absl::string_view str_;
+  std::string_view str_;
 };
 
-std::string RunPart1(absl::string_view input, int size) {
+std::string RunPart1(std::string_view input, int size) {
   std::string s = std::string(input);
   VLOG(1) << "Start: " << s;
   while (s.size() < size) {
@@ -79,7 +79,7 @@ std::string RunPart1(absl::string_view input, int size) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_16::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (run_audit()) {
     if (RunPart1("10000", 20) != "01100") return Error("Bad code");
   }
@@ -88,7 +88,7 @@ absl::StatusOr<std::string> Day_2016_16::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_16::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
   return RunPart1(input[0], 35651584);
 }

@@ -14,13 +14,13 @@ namespace advent_of_code {
 
 namespace {
 
-absl::optional<int> FindBadWeight(absl::string_view root,
+absl::optional<int> FindBadWeight(std::string_view root,
                                   const DirectedGraph<int>& dag,
                                   int* this_weight_out = nullptr) {
   const int* weight = dag.GetData(root);
   CHECK(weight != nullptr);
 
-  const std::vector<absl::string_view>* children = dag.Outgoing(root);
+  const std::vector<std::string_view>* children = dag.Outgoing(root);
   if (children == nullptr) {
     if (this_weight_out != nullptr) {
       *this_weight_out = *weight;
@@ -62,12 +62,12 @@ absl::optional<int> FindBadWeight(absl::string_view root,
   return absl::nullopt;
 }
 
-absl::StatusOr<DirectedGraph<int>> Parse(absl::Span<absl::string_view> input) {
+absl::StatusOr<DirectedGraph<int>> Parse(absl::Span<std::string_view> input) {
   DirectedGraph<int> dag;
-  for (absl::string_view str : input) {
-    std::vector<absl::string_view> p_and_c_list = absl::StrSplit(str, " -> ");
+  for (std::string_view str : input) {
+    std::vector<std::string_view> p_and_c_list = absl::StrSplit(str, " -> ");
     if (p_and_c_list.size() > 2) return Error("Bad input: ", str);
-    absl::string_view parent;
+    std::string_view parent;
     int weight;
     if (!RE2::FullMatch(p_and_c_list[0], "(.*) \\((\\d+)\\)", &parent,
                         &weight)) {
@@ -76,7 +76,7 @@ absl::StatusOr<DirectedGraph<int>> Parse(absl::Span<absl::string_view> input) {
     dag.AddNode(parent, weight);
 
     if (p_and_c_list.size() == 1) continue;
-    for (absl::string_view child : absl::StrSplit(p_and_c_list[1], ", ")) {
+    for (std::string_view child : absl::StrSplit(p_and_c_list[1], ", ")) {
       dag.AddEdge(parent, child);
     }
   }
@@ -86,12 +86,12 @@ absl::StatusOr<DirectedGraph<int>> Parse(absl::Span<absl::string_view> input) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_07::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<DirectedGraph<int>> dag = Parse(input);
   if (!dag.ok()) return dag.status();
-  absl::string_view root;
-  for (absl::string_view node : dag->nodes()) {
-    const std::vector<absl::string_view>* incoming = dag->Incoming(node);
+  std::string_view root;
+  for (std::string_view node : dag->nodes()) {
+    const std::vector<std::string_view>* incoming = dag->Incoming(node);
     if (incoming == nullptr) {
       if (root != "") return Error("Dupe roots");
       root = node;
@@ -101,12 +101,12 @@ absl::StatusOr<std::string> Day_2017_07::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_07::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<DirectedGraph<int>> dag = Parse(input);
   if (!dag.ok()) return dag.status();
-  absl::string_view root;
-  for (absl::string_view node : dag->nodes()) {
-    const std::vector<absl::string_view>* incoming = dag->Incoming(node);
+  std::string_view root;
+  for (std::string_view node : dag->nodes()) {
+    const std::vector<std::string_view>* incoming = dag->Incoming(node);
     if (incoming == nullptr) {
       if (root != "") return Error("Dupe roots");
       root = node;

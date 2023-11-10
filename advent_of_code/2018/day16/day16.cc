@@ -73,13 +73,13 @@ absl::StatusOr<absl::flat_hash_map<int, VM::OpCode>> ComputeMap(
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_16::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::vector<int> register_in(4, 0);
   std::vector<int> op(4, 0);
   std::vector<int> register_out(4, 0);
   int count = 0;
   int empty_count = 0;
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     if (!row.empty()) empty_count = 0;
     if (RE2::FullMatch(row, "Before: \\[(\\d+), (\\d+), (\\d+), (\\d+)\\]",
                        &register_in[0], &register_in[1], &register_in[2],
@@ -104,14 +104,14 @@ absl::StatusOr<std::string> Day_2018_16::Part1(
 }
 
 absl::StatusOr<std::string> Day_2018_16::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::vector<int> register_in(4, 0);
   std::vector<int> op(4, 0);
   std::vector<int> register_out(4, 0);
   int empty_count = 0;
   absl::flat_hash_map<int, absl::flat_hash_set<VM::OpCode>> possible;
   absl::flat_hash_map<int, VM::OpCode> map;
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     if (!row.empty()) empty_count = 0;
     if (RE2::FullMatch(row, "Before: \\[(\\d+), (\\d+), (\\d+), (\\d+)\\]",
                        &register_in[0], &register_in[1], &register_in[2],

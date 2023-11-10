@@ -15,13 +15,13 @@ namespace advent_of_code {
 namespace {
 
 absl::StatusOr<absl::flat_hash_map<std::string, int>> ParseFileSizes(
-    absl::Span<absl::string_view> input) {
+    absl::Span<std::string_view> input) {
   std::string cur_dir = "";
   absl::flat_hash_map<std::string, int> file2size;
   bool listing = false;
-  for (absl::string_view line : input) {
-    absl::string_view dname;
-    absl::string_view fname;
+  for (std::string_view line : input) {
+    std::string_view dname;
+    std::string_view fname;
     int size;
     if (line == "$ ls") {
       listing = true;
@@ -77,7 +77,7 @@ absl::flat_hash_map<std::string, int> FileSizes2DirSizes(
 }
 
 absl::StatusOr<absl::flat_hash_map<std::string, int>> ParseDirSizes(
-    absl::Span<absl::string_view> input) {
+    absl::Span<std::string_view> input) {
   absl::StatusOr<absl::flat_hash_map<std::string, int>> file2size =
       ParseFileSizes(input);
   if (!file2size.ok()) return file2size.status();
@@ -87,7 +87,7 @@ absl::StatusOr<absl::flat_hash_map<std::string, int>> ParseDirSizes(
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_07::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   const int kSmallSizeThreshold = 100'000;
 
   absl::StatusOr<absl::flat_hash_map<std::string, int>> dir2size =
@@ -103,7 +103,7 @@ absl::StatusOr<std::string> Day_2022_07::Part1(
 }
 
 absl::StatusOr<std::string> Day_2022_07::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   const int kDiskSize = 70'000'000;
   const int kFreeSize = 30'000'000;
 

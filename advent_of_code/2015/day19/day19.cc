@@ -13,16 +13,16 @@ namespace advent_of_code {
 namespace {
 
 absl::flat_hash_set<std::string> RunStep(
-    const absl::flat_hash_map<absl::string_view,
-                              std::vector<absl::string_view>>& map,
-    absl::string_view input) {
+    const absl::flat_hash_map<std::string_view,
+                              std::vector<std::string_view>>& map,
+    std::string_view input) {
   absl::flat_hash_set<std::string> unique;
   for (const auto& pair : map) {
-    absl::string_view src = pair.first;
-    const std::vector<absl::string_view>& dest_list = pair.second;
+    std::string_view src = pair.first;
+    const std::vector<std::string_view>& dest_list = pair.second;
     for (int i = 0; i < input.size() - src.size() + 1; ++i) {
       if (input.substr(i, src.size()) == src) {
-        for (absl::string_view dest : dest_list) {
+        for (std::string_view dest : dest_list) {
           unique.insert(absl::StrCat(input.substr(0, i), dest,
                                      input.substr(i + src.size())));
         }
@@ -34,16 +34,16 @@ absl::flat_hash_set<std::string> RunStep(
 
 #if 0
 ParseTree BuildParseTree(
-    const std::map<absl::string_view, absl::string_view>& map) {
+    const std::map<std::string_view, std::string_view>& map) {
   for (const auto& [dest, src] : map) {
     //...
   }
 }
 #endif
 
-int FindMinPath(const absl::flat_hash_map<absl::string_view,
-                                          std::vector<absl::string_view>>& map,
-                absl::string_view src, absl::string_view dest) {
+int FindMinPath(const absl::flat_hash_map<std::string_view,
+                                          std::vector<std::string_view>>& map,
+                std::string_view src, std::string_view dest) {
   struct Path {
     std::string str;
     int dist;
@@ -59,7 +59,7 @@ int FindMinPath(const absl::flat_hash_map<absl::string_view,
     for (const auto& [src, dest_list] : map) {
       for (int j = 0; j < p.str.size() - src.size() + 1; ++j) {
         if (p.str.substr(j, src.size()) == src) {
-          for (absl::string_view test_dest : dest_list) {
+          for (std::string_view test_dest : dest_list) {
             std::string next = absl::StrCat(p.str.substr(0, j), test_dest,
                                             p.str.substr(j + src.size()));
             if (next == dest) return p.dist + 1;
@@ -78,10 +78,10 @@ int FindMinPath(const absl::flat_hash_map<absl::string_view,
 }
 
 absl::optional<int> FindMinPathReverseImpl(
-    const std::map<absl::string_view, absl::string_view>& map,
-    const std::vector<absl::string_view>& map_by_len,
+    const std::map<std::string_view, std::string_view>& map,
+    const std::vector<std::string_view>& map_by_len,
     absl::flat_hash_map<std::string, absl::optional<int>>* memo,
-    absl::string_view src, absl::string_view dest) {
+    std::string_view src, std::string_view dest) {
   if (auto it = memo->find(dest); it != memo->end()) {
     return it->second;
   }
@@ -91,7 +91,7 @@ absl::optional<int> FindMinPathReverseImpl(
   // If we find a cycle, bomb out as impossible.
   memo->emplace(dest, min);
   int found_len;
-  for (absl::string_view find : map_by_len) {
+  for (std::string_view find : map_by_len) {
     if (find.size() > dest.size()) continue;
     auto it = map.find(find);
     CHECK(it != map.end());
@@ -119,12 +119,12 @@ absl::optional<int> FindMinPathReverseImpl(
 }
 
 absl::optional<int> FindMinPathReverse(
-    const std::map<absl::string_view, absl::string_view>& map,
-    absl::string_view src, absl::string_view dest) {
-  std::vector<absl::string_view> map_by_len;
+    const std::map<std::string_view, std::string_view>& map,
+    std::string_view src, std::string_view dest) {
+  std::vector<std::string_view> map_by_len;
   for (const auto& pair : map) map_by_len.push_back(pair.first);
   std::sort(map_by_len.begin(), map_by_len.end(),
-            [](absl::string_view a, absl::string_view b) {
+            [](std::string_view a, std::string_view b) {
               if (a.size() != b.size()) return a.size() > b.size();
               return a < b;
             });
@@ -132,7 +132,7 @@ absl::optional<int> FindMinPathReverse(
   return FindMinPathReverseImpl(map, map_by_len, &memo, src, dest);
 }
 
-absl::string_view FirstElement(absl::string_view str) {
+std::string_view FirstElement(std::string_view str) {
   if (str.size() < 2) return str;
   if (str[1] >= 'a' && str[1] <= 'z') {
     return str.substr(0, 2);
@@ -141,14 +141,14 @@ absl::string_view FirstElement(absl::string_view str) {
 }
 
 absl::optional<int> MatchFromFront(
-    const std::map<absl::string_view, absl::string_view>& map,
-    absl::string_view src, absl::string_view dest) {
-  absl::string_view first_elem = FirstElement(dest);
+    const std::map<std::string_view, std::string_view>& map,
+    std::string_view src, std::string_view dest) {
+  std::string_view first_elem = FirstElement(dest);
   VLOG(1) << "Looking how to produce " << first_elem << " for " << dest;
   absl::optional<int> min;
   for (auto it = map.lower_bound(first_elem); it != map.end(); ++it) {
-    absl::string_view rule_dest = it->first;
-    absl::string_view rule_src = it->second;
+    std::string_view rule_dest = it->first;
+    std::string_view rule_src = it->second;
     // No more rules that produce the first Element.
     if (rule_dest.substr(0, first_elem.size()) != first_elem) break;
     // This rule can't match since rules only make strings longer.
@@ -171,14 +171,14 @@ absl::optional<int> MatchFromFront(
   return absl::nullopt;
 }
 
-absl::flat_hash_set<absl::string_view> FindTerminalElements(
-    const absl::flat_hash_map<absl::string_view,
-                              std::vector<absl::string_view>>& map) {
-  absl::flat_hash_set<absl::string_view> ret;
+absl::flat_hash_set<std::string_view> FindTerminalElements(
+    const absl::flat_hash_map<std::string_view,
+                              std::vector<std::string_view>>& map) {
+  absl::flat_hash_set<std::string_view> ret;
   for (const auto& [src, dest_list] : map) {
-    for (absl::string_view dest : dest_list) {
+    for (std::string_view dest : dest_list) {
       while (!dest.empty()) {
-        absl::string_view first_elem = FirstElement(dest);
+        std::string_view first_elem = FirstElement(dest);
         if (!map.contains(first_elem)) {
           ret.insert(first_elem);
         }
@@ -190,13 +190,13 @@ absl::flat_hash_set<absl::string_view> FindTerminalElements(
 }
 
 void PruneRulesFromTerminals(
-    absl::string_view str,
-    const absl::flat_hash_set<absl::string_view>& terminals,
-    absl::flat_hash_map<absl::string_view, std::vector<absl::string_view>>* map,
-    std::map<absl::string_view, absl::string_view>* reverse) {
-  absl::flat_hash_set<absl::string_view> unused_terminals = terminals;
+    std::string_view str,
+    const absl::flat_hash_set<std::string_view>& terminals,
+    absl::flat_hash_map<std::string_view, std::vector<std::string_view>>* map,
+    std::map<std::string_view, std::string_view>* reverse) {
+  absl::flat_hash_set<std::string_view> unused_terminals = terminals;
   for (int off = 0; off < str.size();) {
-    absl::string_view first_elem = FirstElement(str.substr(off));
+    std::string_view first_elem = FirstElement(str.substr(off));
     unused_terminals.erase(first_elem);
     off += first_elem.size();
   }
@@ -204,10 +204,10 @@ void PruneRulesFromTerminals(
   VLOG(1) << "Pruning terminals: " << absl::StrJoin(unused_terminals, ",");
   for (auto& [src, dest_list] : *map) {
     std::vector<std::string_view> new_dest_list;
-    for (absl::string_view dest : dest_list) {
+    for (std::string_view dest : dest_list) {
       bool prune_rule = false;
       for (int off = 0; off < dest.size();) {
-        absl::string_view first_elem = FirstElement(dest.substr(off));
+        std::string_view first_elem = FirstElement(dest.substr(off));
         if (unused_terminals.contains(first_elem)) {
           prune_rule = true;
           break;
@@ -228,13 +228,13 @@ void PruneRulesFromTerminals(
   return;
 }
 
-std::vector<absl::string_view> SplitOnTerminalElements(
-    absl::string_view str,
-    const absl::flat_hash_set<absl::string_view>& terminals) {
-  std::vector<absl::string_view> ret;
+std::vector<std::string_view> SplitOnTerminalElements(
+    std::string_view str,
+    const absl::flat_hash_set<std::string_view>& terminals) {
+  std::vector<std::string_view> ret;
   int last_start = 0;
   for (int off = 0; off < str.size();) {
-    absl::string_view first_elem = FirstElement(str.substr(off));
+    std::string_view first_elem = FirstElement(str.substr(off));
     off += first_elem.size();
     if (terminals.contains(first_elem) || off == str.size()) {
       ret.push_back(str.substr(last_start, off - last_start));
@@ -245,19 +245,19 @@ std::vector<absl::string_view> SplitOnTerminalElements(
 }
 
 absl::StatusOr<int> MatchFromFrontRnAr(
-    absl::string_view str,
-    const absl::flat_hash_map<absl::string_view,
-                              std::vector<absl::string_view>>& map) {
-  absl::string_view first_elem = FirstElement(str);
-  absl::string_view second_elem = FirstElement(str.substr(first_elem.size()));
+    std::string_view str,
+    const absl::flat_hash_map<std::string_view,
+                              std::vector<std::string_view>>& map) {
+  std::string_view first_elem = FirstElement(str);
+  std::string_view second_elem = FirstElement(str.substr(first_elem.size()));
   if (second_elem != "Rn") return Error("Not XRn");
   std::string replaced_string;
   int replace_steps = 0;
   for (int off = first_elem.size() + second_elem.size(); off < str.size();) {
-    absl::string_view next_elem = FirstElement(str.substr(off));
+    std::string_view next_elem = FirstElement(str.substr(off));
     if (next_elem == "Ar") {
       int min = std::numeric_limits<int>::max();
-      absl::string_view next_start;
+      std::string_view next_start;
       for (const auto& [start, _] : map) {
         int next_min =
             FindMinPath(map, start, str.substr(0, off + next_elem.size()));
@@ -273,7 +273,7 @@ absl::StatusOr<int> MatchFromFrontRnAr(
           absl::StrCat(next_start, str.substr(off + next_elem.size()));
       str = replaced_string;
       off = next_start.size();
-      absl::string_view check_rn = FirstElement(str.substr(off));
+      std::string_view check_rn = FirstElement(str.substr(off));
       if (check_rn != "Rn") return Error("Not XRn");
     } else {
       off += next_elem.size();
@@ -286,14 +286,14 @@ absl::StatusOr<int> MatchFromFrontRnAr(
 }  // namespace
 
 absl::StatusOr<std::string> Day_2015_19::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() < 3) return Error("Bad input");
-  absl::string_view final = input.back();
+  std::string_view final = input.back();
   if (!input[input.size() - 2].empty()) return Error("Bad input");
-  absl::flat_hash_map<absl::string_view, std::vector<absl::string_view>> map;
-  for (absl::string_view rule : input.subspan(0, input.size() - 2)) {
-    absl::string_view from;
-    absl::string_view to;
+  absl::flat_hash_map<std::string_view, std::vector<std::string_view>> map;
+  for (std::string_view rule : input.subspan(0, input.size() - 2)) {
+    std::string_view from;
+    std::string_view to;
     if (!RE2::FullMatch(rule, "([A-Za-z]+) => ([A-Za-z]+)", &from, &to)) {
       return Error("Bad rule: ", rule);
     }
@@ -303,15 +303,15 @@ absl::StatusOr<std::string> Day_2015_19::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_19::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() < 3) return Error("Bad input");
-  absl::string_view final = input.back();
+  std::string_view final = input.back();
   if (!input[input.size() - 2].empty()) return Error("Bad input");
-  absl::flat_hash_map<absl::string_view, std::vector<absl::string_view>> map;
-  std::map<absl::string_view, absl::string_view> reverse;
-  for (absl::string_view rule : input.subspan(0, input.size() - 2)) {
-    absl::string_view from;
-    absl::string_view to;
+  absl::flat_hash_map<std::string_view, std::vector<std::string_view>> map;
+  std::map<std::string_view, std::string_view> reverse;
+  for (std::string_view rule : input.subspan(0, input.size() - 2)) {
+    std::string_view from;
+    std::string_view to;
     if (!RE2::FullMatch(rule, "(e|[A-Z][a-z]?) => ([A-Za-z]+)", &from, &to)) {
       return Error("Bad rule: ", rule);
     }
@@ -337,7 +337,7 @@ absl::StatusOr<std::string> Day_2015_19::Part2(
   // 'Y'.
   int steps = -1;
   for (int off = 0; off < final.size();) {
-    absl::string_view next_elem = FirstElement(final.substr(off));
+    std::string_view next_elem = FirstElement(final.substr(off));
     off += next_elem.size();
     ++steps;
     if (next_elem == "Ar") --steps;
@@ -346,9 +346,9 @@ absl::StatusOr<std::string> Day_2015_19::Part2(
   }
   return AdventReturn(steps);
 
-  absl::flat_hash_set<absl::string_view> terminals = FindTerminalElements(map);
+  absl::flat_hash_set<std::string_view> terminals = FindTerminalElements(map);
   VLOG(1) << "Terminal Elements = " << absl::StrJoin(terminals, ",");
-  std::vector<absl::string_view> terminal_split =
+  std::vector<std::string_view> terminal_split =
       SplitOnTerminalElements(final, {"Ar"});  // terminals);
   VLOG(1) << "Terminal Split = " << absl::StrJoin(terminal_split, ", ");
   PruneRulesFromTerminals(final, terminals, &map, &reverse);

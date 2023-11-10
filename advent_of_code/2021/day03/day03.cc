@@ -18,13 +18,13 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_03::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int64_t gamma = 0;
   int64_t epsilon = 0;
   for (int i = 0; i < input[0].size(); ++i) {
     int64_t ones = 0;
     int64_t zeros = 0;
-    for (absl::string_view rec : input) {
+    for (std::string_view rec : input) {
       if (rec.size() <= i) return Error("Bad line: ", rec);
       if (rec[i] == '1')
         ++ones;
@@ -46,12 +46,12 @@ absl::StatusOr<std::string> Day_2021_03::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_03::Part2(
-    absl::Span<absl::string_view> input) const {
-  absl::flat_hash_set<absl::string_view> o2_set(input.begin(), input.end());
+    absl::Span<std::string_view> input) const {
+  absl::flat_hash_set<std::string_view> o2_set(input.begin(), input.end());
   for (int i = 0; i < input[0].size(); ++i) {
     int64_t ones = 0;
     int64_t zeros = 0;
-    for (absl::string_view rec : o2_set) {
+    for (std::string_view rec : o2_set) {
       if (rec.size() <= i) return Error("Bad line: ", rec);
       if (rec[i] == '1')
         ++ones;
@@ -72,11 +72,11 @@ absl::StatusOr<std::string> Day_2021_03::Part2(
   }
   if (o2_set.size() != 1) return Error("Cannot find o2_set");
 
-  absl::flat_hash_set<absl::string_view> co2_set(input.begin(), input.end());
+  absl::flat_hash_set<std::string_view> co2_set(input.begin(), input.end());
   for (int i = 0; i < input[0].size(); ++i) {
     int64_t ones = 0;
     int64_t zeros = 0;
-    for (absl::string_view rec : co2_set) {
+    for (std::string_view rec : co2_set) {
       if (rec.size() <= i) return Error("Bad line: ", rec);
       if (rec[i] == '1')
         ++ones;

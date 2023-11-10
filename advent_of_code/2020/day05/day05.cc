@@ -17,7 +17,7 @@ struct Seat {
   int id() const { return col * 8 + row; }
 };
 
-absl::StatusOr<Seat> ParseSeat(absl::string_view seat_str) {
+absl::StatusOr<Seat> ParseSeat(std::string_view seat_str) {
   Seat seat{0, 0};
   if (seat_str.size() != 10) return absl::InvalidArgumentError("");
   for (int i = 0; i < 7; ++i) {
@@ -44,9 +44,9 @@ absl::StatusOr<Seat> ParseSeat(absl::string_view seat_str) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2020_05::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int maxid = 0;
-  for (absl::string_view rec : input) {
+  for (std::string_view rec : input) {
     absl::StatusOr<Seat> seat = ParseSeat(rec);
     if (!seat.ok()) return seat.status();
     maxid = std::max(maxid, seat->id());
@@ -55,10 +55,10 @@ absl::StatusOr<std::string> Day_2020_05::Part1(
 }
 
 absl::StatusOr<std::string> Day_2020_05::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::vector<bool> present;
   present.resize(1 << 10);
-  for (absl::string_view rec : input) {
+  for (std::string_view rec : input) {
     absl::StatusOr<Seat> seat = ParseSeat(rec);
     if (!seat.ok()) return seat.status();
     present[seat->id()] = true;

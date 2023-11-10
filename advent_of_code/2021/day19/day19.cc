@@ -95,10 +95,10 @@ absl::StatusOr<bool> TryPosition(Scanner* dest, const Scanner& src) {
 }
 
 absl::StatusOr<std::vector<Scanner>> Parse(
-    absl::Span<absl::string_view> input) {
+    absl::Span<std::string_view> input) {
   std::vector<Scanner> scanners;
   Scanner cur;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     if (line.empty()) continue;
     Point3 beacon;
     if (RE2::FullMatch(line, "--- scanner \\d+ ---")) {
@@ -151,7 +151,7 @@ absl::Status PositionScanners(std::vector<Scanner>& scanners) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_19::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<Scanner>> scanners = Parse(input);
   if (!scanners.ok()) return scanners.status();
 
@@ -168,7 +168,7 @@ absl::StatusOr<std::string> Day_2021_19::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_19::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<Scanner>> scanners = Parse(input);
   if (!scanners.ok()) return scanners.status();
 

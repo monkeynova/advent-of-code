@@ -9,7 +9,7 @@ struct AssemBunnyArg {
   std::variant<int64_t*, int64_t>* arg;
 
   static bool Parse(const char* raw_str, size_t n, void* dest_untyped) {
-    absl::string_view str(raw_str, n);
+    std::string_view str(raw_str, n);
     AssemBunnyArg* dest = static_cast<AssemBunnyArg*>(dest_untyped);
 
     bool ret = true;
@@ -36,7 +36,7 @@ struct AssemBunnyArg {
 
 // static
 absl::StatusOr<AssemBunny::Instruction> AssemBunny::Instruction::Parse(
-    absl::string_view in, AssemBunny::Registers* registers) {
+    std::string_view in, AssemBunny::Registers* registers) {
   Instruction i;
   AssemBunnyArg arg1{.registers = registers, .arg = &i.arg1};
   AssemBunnyArg arg2{.registers = registers, .arg = &i.arg2};
@@ -74,9 +74,9 @@ void AssemBunny::Instruction::RemapRegisters(Registers* from, Registers* to) {
 
 // static
 absl::StatusOr<AssemBunny> AssemBunny ::Parse(
-    absl::Span<absl::string_view> input) {
+    absl::Span<std::string_view> input) {
   AssemBunny ret;
-  for (absl::string_view in : input) {
+  for (std::string_view in : input) {
     absl::StatusOr<Instruction> i =
         Instruction::Parse(in, ret.registers_.get());
     if (!i.ok()) return i.status();

@@ -12,7 +12,7 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2020_03::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int product = 1;
   for (Point dir : {Point{3, 1}}) {
     int trees = 0;
@@ -26,7 +26,7 @@ absl::StatusOr<std::string> Day_2020_03::Part1(
 }
 
 absl::StatusOr<std::string> Day_2020_03::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int64_t product = 1;
   for (Point dir :
        {Point{1, 1}, Point{3, 1}, Point{5, 1}, Point{7, 1}, Point{1, 2}}) {

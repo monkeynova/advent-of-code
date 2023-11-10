@@ -9,9 +9,9 @@ namespace advent_of_code {
 
 class KnotHash {
  public:
-  std::string DigestHex(absl::string_view input);
+  std::string DigestHex(std::string_view input);
 
-  void RunLoop(absl::string_view lengths, std::vector<unsigned char>* loop,
+  void RunLoop(std::string_view lengths, std::vector<unsigned char>* loop,
                int round_count = 1);
 };
 

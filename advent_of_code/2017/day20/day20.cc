@@ -37,9 +37,9 @@ struct Particle {
 };
 
 absl::StatusOr<std::vector<Particle>> Parse(
-    absl::Span<absl::string_view> input) {
+    absl::Span<std::string_view> input) {
   std::vector<Particle> particles;
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     Particle p;
     if (!RE2::FullMatch(
             row,
@@ -190,7 +190,7 @@ int IntersectSimulation(const std::vector<Particle>& particles) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_20::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<Particle>> particles = Parse(input);
   if (!particles.ok()) return particles.status();
 
@@ -214,7 +214,7 @@ absl::StatusOr<std::string> Day_2017_20::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_20::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<Particle>> particles = Parse(input);
   if (!particles.ok()) return particles.status();
 

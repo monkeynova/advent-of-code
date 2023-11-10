@@ -12,7 +12,7 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2015_01::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
   int floor = 0;
   for (char c : input[0]) {
@@ -27,7 +27,7 @@ absl::StatusOr<std::string> Day_2015_01::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_01::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
   int floor = 0;
   for (int i = 0; i < input[0].size(); ++i) {

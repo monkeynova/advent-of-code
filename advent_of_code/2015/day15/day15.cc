@@ -13,7 +13,7 @@ namespace advent_of_code {
 namespace {
 
 struct Ingredient {
-  absl::string_view name;
+  std::string_view name;
   int64_t capacity = 0;
   int64_t durability = 0;
   int64_t flavor = 0;
@@ -97,10 +97,10 @@ int64_t FindBestScoreRequiredCalories(absl::Span<Ingredient> ingredients,
 }  // namespace
 
 absl::StatusOr<std::string> Day_2015_15::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   // Sprinkles: capacity 5, durability -1, flavor 0, texture 0, calories 5
   std::vector<Ingredient> ingredients;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     Ingredient i;
     if (!RE2::FullMatch(str,
                         "(.*): capacity (-?\\d+), durability (-?\\d+), flavor "
@@ -116,10 +116,10 @@ absl::StatusOr<std::string> Day_2015_15::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_15::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   // Sprinkles: capacity 5, durability -1, flavor 0, texture 0, calories 5
   std::vector<Ingredient> ingredients;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     Ingredient i;
     if (!RE2::FullMatch(str,
                         "(.*): capacity (-?\\d+), durability (-?\\d+), flavor "

@@ -73,7 +73,7 @@ struct Packet {
   }
 };
 
-Packet Parse(absl::string_view& line) {
+Packet Parse(std::string_view& line) {
   Packet ret;
   if (line[0] == '[') {
     line = line.substr(1);
@@ -103,8 +103,8 @@ bool ByPointerLt(const std::unique_ptr<Packet>& a,
   return *a < *b;
 }
 
-absl::StatusOr<Packet> ParseFull(absl::string_view line) {
-  absl::string_view tmp = line;
+absl::StatusOr<Packet> ParseFull(std::string_view line) {
+  std::string_view tmp = line;
   Packet ret = Parse(tmp);
   if (!tmp.empty()) return Error("Bad line: ", line);
   return ret;
@@ -113,7 +113,7 @@ absl::StatusOr<Packet> ParseFull(absl::string_view line) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_13::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int ret = 0;
   for (int i = 0; i < input.size(); i += 3) {
     if (!input[i + 2].empty()) return Error("Bad input: empty");
@@ -127,7 +127,7 @@ absl::StatusOr<std::string> Day_2022_13::Part1(
 }
 
 absl::StatusOr<std::string> Day_2022_13::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<Packet> m1 = ParseFull("[[2]]");
   absl::StatusOr<Packet> m2 = ParseFull("[[6]]");
 

@@ -17,9 +17,9 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2022_18::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::flat_hash_set<Point3> points;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     Point3 p;
     if (!RE2::FullMatch(line, "([\\d,]+)", p.Capture()))
       return Error("Bad line");
@@ -36,9 +36,9 @@ absl::StatusOr<std::string> Day_2022_18::Part1(
 };
 
 absl::StatusOr<std::string> Day_2022_18::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::flat_hash_set<Point3> points;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     Point3 p;
     if (!RE2::FullMatch(line, "([\\d,]+)", p.Capture()))
       return Error("Bad line");

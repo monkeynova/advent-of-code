@@ -13,13 +13,13 @@ namespace advent_of_code {
 
 namespace {
 
-absl::StatusOr<std::string> DecompressV1(absl::string_view in) {
+absl::StatusOr<std::string> DecompressV1(std::string_view in) {
   std::string ret;
   for (int i = 0; i < in.size(); ++i) {
     if (in[i] == '(') {
       int count;
       int len;
-      absl::string_view skip;
+      std::string_view skip;
       if (!RE2::FullMatch(in.substr(i), "(\\((\\d+)x(\\d+)\\)).*", &skip, &len,
                           &count)) {
         return Error("Bad parse: ", in.substr(i));
@@ -35,13 +35,13 @@ absl::StatusOr<std::string> DecompressV1(absl::string_view in) {
   return ret;
 }
 
-absl::StatusOr<std::string> DecompressV2(absl::string_view in) {
+absl::StatusOr<std::string> DecompressV2(std::string_view in) {
   std::string ret;
   for (int i = 0; i < in.size(); ++i) {
     if (in[i] == '(') {
       int count;
       int len;
-      absl::string_view skip;
+      std::string_view skip;
       if (!RE2::FullMatch(in.substr(i), "(\\((\\d+)x(\\d+)\\)).*", &skip, &len,
                           &count)) {
         return Error("Bad parse: ", in.substr(i));
@@ -60,13 +60,13 @@ absl::StatusOr<std::string> DecompressV2(absl::string_view in) {
   return ret;
 }
 
-absl::StatusOr<int64_t> DecompressV2NonWhitespaceLen(absl::string_view in) {
+absl::StatusOr<int64_t> DecompressV2NonWhitespaceLen(std::string_view in) {
   int64_t ret = 0;
   for (int i = 0; i < in.size(); ++i) {
     if (in[i] == '(') {
       int64_t count;
       int64_t len;
-      absl::string_view skip;
+      std::string_view skip;
       if (!RE2::FullMatch(in.substr(i), "(\\((\\d+)x(\\d+)\\)).*", &skip, &len,
                           &count)) {
         return Error("Bad parse: ", in.substr(i));
@@ -83,7 +83,7 @@ absl::StatusOr<int64_t> DecompressV2NonWhitespaceLen(absl::string_view in) {
   return ret;
 }
 
-int NonWhitespaceLen(absl::string_view s) {
+int NonWhitespaceLen(std::string_view s) {
   int len = s.size();
   for (char s : s)
     if (s == ' ') --len;
@@ -95,7 +95,7 @@ int NonWhitespaceLen(absl::string_view s) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_09::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   absl::StatusOr<std::string> dec = DecompressV1(input[0]);
   if (!dec.ok()) return dec.status();
@@ -104,7 +104,7 @@ absl::StatusOr<std::string> Day_2016_09::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_09::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   return AdventReturn(DecompressV2NonWhitespaceLen(input[0]));
 }

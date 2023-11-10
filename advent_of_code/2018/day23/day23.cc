@@ -27,9 +27,9 @@ struct NanoBot {
 };
 
 absl::StatusOr<std::vector<NanoBot>> Parse(
-    absl::Span<absl::string_view> input) {
+    absl::Span<std::string_view> input) {
   std::vector<NanoBot> ret;
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     NanoBot nb;
     if (!RE2::FullMatch(row, "pos=<(-?\\d+,-?\\d+,-?\\d+)>, r=(-?\\d+)",
                         nb.p.Capture(), &nb.r)) {
@@ -183,7 +183,7 @@ absl::StatusOr<Point3> FindBest(std::vector<NanoBot> bots_in) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_23::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<NanoBot>> bots = Parse(input);
   if (!bots.ok()) return bots.status();
   if (bots->empty()) return Error("No bots");
@@ -203,7 +203,7 @@ absl::StatusOr<std::string> Day_2018_23::Part1(
 }
 
 absl::StatusOr<std::string> Day_2018_23::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<NanoBot>> bots = Parse(input);
   if (!bots.ok()) return bots.status();
   if (bots->empty()) return Error("No bots");

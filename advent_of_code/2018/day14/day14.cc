@@ -18,7 +18,7 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_14::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> ints = ParseAsInts(input);
   if (!ints.ok()) return ints.status();
   if (ints->size() != 1) return Error("Bad size");
@@ -42,7 +42,7 @@ absl::StatusOr<std::string> Day_2018_14::Part1(
 }
 
 absl::StatusOr<std::string> Day_2018_14::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> ints = ParseAsInts(input);
   if (!ints.ok()) return ints.status();
   if (ints->size() != 1) return Error("Bad size");

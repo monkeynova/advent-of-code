@@ -13,17 +13,17 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2015_04::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
   for (int i = 0;; ++i) {
     VLOG(1) << i;
     MD5 md5;
     std::string str = absl::StrCat(input[0], i);
     if (VLOG_IS_ON(2)) {
-      absl::string_view hex = md5.DigestHex(str);
+      std::string_view hex = md5.DigestHex(str);
       VLOG(2) << "MD5(" << str << "): " << hex;
     }
-    absl::string_view md5_result = md5.Digest(str);
+    std::string_view md5_result = md5.Digest(str);
     if (md5_result[0] == 0 && md5_result[1] == 0 && (md5_result[2] >> 4) == 0) {
       return AdventReturn(i);
     }
@@ -32,17 +32,17 @@ absl::StatusOr<std::string> Day_2015_04::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_04::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
   for (int i = 0;; ++i) {
     VLOG(1) << i;
     MD5 md5;
     std::string str = absl::StrCat(input[0], i);
     if (VLOG_IS_ON(2)) {
-      absl::string_view hex = md5.DigestHex(str);
+      std::string_view hex = md5.DigestHex(str);
       VLOG(2) << "MD5(" << str << "): " << hex;
     }
-    absl::string_view md5_result = md5.Digest(str);
+    std::string_view md5_result = md5.Digest(str);
     if (md5_result[0] == 0 && md5_result[1] == 0 && md5_result[2] == 0) {
       return AdventReturn(i);
     }

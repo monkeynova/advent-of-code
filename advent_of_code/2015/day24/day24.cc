@@ -192,7 +192,7 @@ absl::StatusOr<int64_t> FindMinPartition4(const WeightsSet& weights_set) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2015_24::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> weights = ParseAsInts(input);
   WeightsSet weights_set;
   for (int64_t v : *weights) {
@@ -205,7 +205,7 @@ absl::StatusOr<std::string> Day_2015_24::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_24::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> weights = ParseAsInts(input);
   WeightsSet weights_set;
   for (int64_t v : *weights) {

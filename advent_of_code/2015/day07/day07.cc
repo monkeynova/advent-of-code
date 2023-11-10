@@ -20,9 +20,9 @@ struct Operation {
 };
 
 absl::StatusOr<int> EvaluateMemo(
-    absl::flat_hash_map<absl::string_view, int>* memo,
+    absl::flat_hash_map<std::string_view, int>* memo,
     const absl::flat_hash_map<std::string, Operation>& ops_by_dest,
-    absl::string_view dest) {
+    std::string_view dest) {
   if (auto it = memo->find(dest); it != memo->end()) return it->second;
 
   int ret;
@@ -73,16 +73,16 @@ absl::StatusOr<int> EvaluateMemo(
 
 absl::StatusOr<int> Evaluate(
     const absl::flat_hash_map<std::string, Operation>& ops_by_dest,
-    absl::string_view dest) {
-  absl::flat_hash_map<absl::string_view, int> memo;
+    std::string_view dest) {
+  absl::flat_hash_map<std::string_view, int> memo;
   return EvaluateMemo(&memo, ops_by_dest, dest);
 }
 
 absl::StatusOr<absl::flat_hash_map<std::string, Operation>> Parse(
-    absl::Span<absl::string_view> input) {
+    absl::Span<std::string_view> input) {
   absl::flat_hash_map<std::string, Operation> ops_by_dest;
 
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     const auto [op_str, dest] = PairSplit(str, " -> ");
     Operation op;
     op.dest = dest;
@@ -116,7 +116,7 @@ absl::StatusOr<absl::flat_hash_map<std::string, Operation>> Parse(
 }  // namespace
 
 absl::StatusOr<std::string> Day_2015_07::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<std::string, Operation>> ops_by_dest =
       Parse(input);
   if (!ops_by_dest.ok()) return ops_by_dest.status();
@@ -124,7 +124,7 @@ absl::StatusOr<std::string> Day_2015_07::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_07::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<std::string, Operation>> ops_by_dest =
       Parse(input);
   if (!ops_by_dest.ok()) return ops_by_dest.status();

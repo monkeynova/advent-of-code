@@ -33,15 +33,15 @@ class VM {
   };
 
   struct Op {
-    static const absl::flat_hash_map<absl::string_view, OpCode> kNameMap;
-    static const std::vector<absl::string_view> kCodeMap;
+    static const absl::flat_hash_map<std::string_view, OpCode> kNameMap;
+    static const std::vector<std::string_view> kCodeMap;
 
     OpCode op_code;
     int32_t arg1;
     int32_t arg2;
     int32_t arg3;
 
-    static absl::StatusOr<Op> Parse(absl::string_view str);
+    static absl::StatusOr<Op> Parse(std::string_view str);
 
     void Apply(std::vector<int32_t>& registers) const {
       switch (op_code) {
@@ -118,7 +118,7 @@ class VM {
     }
   };
 
-  static absl::StatusOr<VM> Parse(absl::Span<absl::string_view> input);
+  static absl::StatusOr<VM> Parse(absl::Span<std::string_view> input);
 
   absl::Status Execute() {
     return Execute([](int) { return false; });

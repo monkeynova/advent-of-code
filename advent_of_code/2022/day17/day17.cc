@@ -47,7 +47,7 @@ class DropState {
 
   int height() const { return height_; }
 
-  absl::Status ParseWind(absl::string_view wind);
+  absl::Status ParseWind(std::string_view wind);
   absl::Status DropNextRock(int i);
   SummaryState Summarize() const;
 
@@ -87,7 +87,7 @@ const std::vector<DropState::Rock> DropState::kRockTypes = {
     Rock{.off = {0, 0}, .delta = {{1, 0}, {1, 1}, {0, 0}, {0, 1}}},
 };
 
-absl::Status DropState::ParseWind(absl::string_view wind_str) {
+absl::Status DropState::ParseWind(std::string_view wind_str) {
   for (char c : wind_str) {
     if (c == '<')
       wind_.push_back(Cardinal::kWest);
@@ -174,7 +174,7 @@ DropState::SummaryState DropState::Summarize() const {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_17::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
 
   DropState ds;
@@ -187,7 +187,7 @@ absl::StatusOr<std::string> Day_2022_17::Part1(
 }
 
 absl::StatusOr<std::string> Day_2022_17::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
 
   DropState ds;

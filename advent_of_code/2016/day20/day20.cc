@@ -25,9 +25,9 @@ struct Block {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_20::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::vector<Block> blocks;
-  for (absl::string_view s : input) {
+  for (std::string_view s : input) {
     Block b;
     if (!RE2::FullMatch(s, "(\\d+)-(\\d+)", &b.start, &b.end)) {
       return Error("Bad range: ", s);
@@ -49,9 +49,9 @@ absl::StatusOr<std::string> Day_2016_20::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_20::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::vector<Block> blocks;
-  for (absl::string_view s : input) {
+  for (std::string_view s : input) {
     Block b;
     if (!RE2::FullMatch(s, "(\\d+)-(\\d+)", &b.start, &b.end)) {
       return Error("Bad range: ", s);

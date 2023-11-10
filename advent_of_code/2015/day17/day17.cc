@@ -12,7 +12,7 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2015_17::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> cap = ParseAsInts(input);
   if (!cap.ok()) return cap.status();
 
@@ -31,7 +31,7 @@ absl::StatusOr<std::string> Day_2015_17::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_17::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> cap = ParseAsInts(input);
   if (!cap.ok()) return cap.status();
 

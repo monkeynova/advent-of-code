@@ -41,15 +41,15 @@ absl::Status Audit() {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_22::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   Cube bound{{-50, -50, -50}, {50, 50, 50}};
   CubeSet s;
   absl::optional<absl::flat_hash_set<Point3>> map;
   if (run_audit()) {
     map = absl::flat_hash_set<Point3>{};
   }
-  for (absl::string_view line : input) {
-    absl::string_view type;
+  for (std::string_view line : input) {
+    std::string_view type;
     int x0, x1, y0, y1, z0, z1;
     if (!RE2::FullMatch(
             line,
@@ -83,13 +83,13 @@ absl::StatusOr<std::string> Day_2021_22::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_22::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (run_audit()) {
     if (auto st = Audit(); !st.ok()) return st;
   }
   CubeSet s;
-  for (absl::string_view line : input) {
-    absl::string_view type;
+  for (std::string_view line : input) {
+    std::string_view type;
     int x0, x1, y0, y1, z0, z1;
     if (!RE2::FullMatch(
             line,

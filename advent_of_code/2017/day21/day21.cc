@@ -99,9 +99,9 @@ absl::StatusOr<CharBoard> RunIteration(
 }
 
 absl::StatusOr<absl::flat_hash_map<CharBoard, CharBoard>> Parse(
-    absl::Span<absl::string_view> input) {
+    absl::Span<std::string_view> input) {
   absl::flat_hash_map<CharBoard, CharBoard> ret;
-  for (absl::string_view rule : input) {
+  for (std::string_view rule : input) {
     const auto [in, out] = PairSplit(rule, " => ");
 
     absl::StatusOr<CharBoard> board_in =
@@ -123,12 +123,12 @@ absl::StatusOr<absl::flat_hash_map<CharBoard, CharBoard>> Parse(
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_21::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<CharBoard, CharBoard>> patterns =
       Parse(input);
   if (!patterns.ok()) return patterns.status();
 
-  std::vector<absl::string_view> init = {".#.", "..#", "###"};
+  std::vector<std::string_view> init = {".#.", "..#", "###"};
   absl::StatusOr<CharBoard> tmp = CharBoard::Parse(absl::MakeSpan(init));
   if (!tmp.ok()) return tmp.status();
 
@@ -144,12 +144,12 @@ absl::StatusOr<std::string> Day_2017_21::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_21::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<CharBoard, CharBoard>> patterns =
       Parse(input);
   if (!patterns.ok()) return patterns.status();
 
-  std::vector<absl::string_view> init = {".#.", "..#", "###"};
+  std::vector<std::string_view> init = {".#.", "..#", "###"};
   absl::StatusOr<CharBoard> tmp = CharBoard::Parse(absl::MakeSpan(init));
   if (!tmp.ok()) return tmp.status();
 

@@ -22,7 +22,7 @@ class BootCode {
   BootCode(std::vector<Statement> statements)
       : statements_(std::move(statements)) {}
 
-  static absl::StatusOr<BootCode> Parse(absl::Span<absl::string_view> input);
+  static absl::StatusOr<BootCode> Parse(absl::Span<std::string_view> input);
 
   absl::StatusOr<bool> Execute();
 
@@ -35,14 +35,14 @@ class BootCode {
 };
 
 // static
-absl::StatusOr<BootCode> BootCode::Parse(absl::Span<absl::string_view> input) {
-  absl::flat_hash_map<absl::string_view, Instruction> imap = {
+absl::StatusOr<BootCode> BootCode::Parse(absl::Span<std::string_view> input) {
+  absl::flat_hash_map<std::string_view, Instruction> imap = {
       {"jmp", Instruction::kJmp},
       {"acc", Instruction::kAcc},
       {"nop", Instruction::kNop}};
   std::vector<Statement> statements;
-  for (absl::string_view str : input) {
-    absl::string_view cmd;
+  for (std::string_view str : input) {
+    std::string_view cmd;
     int arg;
     static LazyRE2 statement_re{"([a-z]*) ([\\-+]?\\d+)"};
     if (!RE2::FullMatch(str, *statement_re, &cmd, &arg)) {
@@ -82,7 +82,7 @@ absl::StatusOr<bool> BootCode::Execute() {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2020_08::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<BootCode> boot_code = BootCode::Parse(input);
   if (!boot_code.ok()) return boot_code.status();
 
@@ -93,7 +93,7 @@ absl::StatusOr<std::string> Day_2020_08::Part1(
 }
 
 absl::StatusOr<std::string> Day_2020_08::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<BootCode> boot_code = BootCode::Parse(input);
   if (!boot_code.ok()) return boot_code.status();
 

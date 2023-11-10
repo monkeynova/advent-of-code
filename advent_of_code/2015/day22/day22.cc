@@ -49,7 +49,7 @@ struct GameState {
 
 void ApplyEffects(absl::flat_hash_map<std::string, Effect>& active_effects,
                   Character& me, Character& boss) {
-  std::vector<absl::string_view> to_remove;
+  std::vector<std::string_view> to_remove;
   for (auto& [_, effect] : active_effects) {
     effect.on_turn(me, boss);
     if (--effect.duration == 0) {
@@ -57,7 +57,7 @@ void ApplyEffects(absl::flat_hash_map<std::string, Effect>& active_effects,
       to_remove.push_back(effect.name);
     }
   }
-  for (absl::string_view name : to_remove) {
+  for (std::string_view name : to_remove) {
     active_effects.erase(name);
   }
 }
@@ -175,10 +175,10 @@ absl::optional<int> MinManaSpendForWinHard(Character me, Character boss) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2015_22::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   Character me{50, 0, 0, 500};
   Character boss{0, 0, 0, 0};
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     if (!RE2::FullMatch(str, "Hit Points: (\\d+)", &boss.hit_points) &&
         !RE2::FullMatch(str, "Damage: (\\d+)", &boss.damage)) {
       return Error("Bad input: ", str);
@@ -191,10 +191,10 @@ absl::StatusOr<std::string> Day_2015_22::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_22::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   Character me{50, 0, 0, 500};
   Character boss{0, 0, 0, 0};
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     if (!RE2::FullMatch(str, "Hit Points: (\\d+)", &boss.hit_points) &&
         !RE2::FullMatch(str, "Damage: (\\d+)", &boss.damage)) {
       return Error("Bad input: ", str);

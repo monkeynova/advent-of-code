@@ -102,7 +102,7 @@ absl::StatusOr<int64_t> Cups::Next2Product() const {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2020_23::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
 
   Cups cups;
@@ -118,7 +118,7 @@ absl::StatusOr<std::string> Day_2020_23::Part1(
 }
 
 absl::StatusOr<std::string> Day_2020_23::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   Cups cups;
   for (int i = 0; i < input[0].size(); ++i) {

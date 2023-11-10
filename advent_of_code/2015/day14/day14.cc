@@ -14,14 +14,14 @@ namespace advent_of_code {
 namespace {
 
 struct Flight {
-  absl::string_view name;
+  std::string_view name;
   int speed;
   int run_time;
   int rest_time;
 };
 
 struct RaceResult {
-  std::vector<absl::string_view> winners;
+  std::vector<std::string_view> winners;
   int dist = std::numeric_limits<int>::min();
 };
 
@@ -48,13 +48,13 @@ RaceResult RunRace(const std::vector<Flight>& flights, int time) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2015_14::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   static LazyRE2 parse = {
       "(.*) can fly (\\d+) km/s for (\\d+) seconds, but then "
       "must rest for (\\d+) seconds\\."};
   // Prancer can fly 25 km/s for 6 seconds, but then must rest for 143 seconds.
   std::vector<Flight> flights;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     Flight next;
     if (!RE2::FullMatch(str, *parse, &next.name, &next.speed, &next.run_time,
                         &next.rest_time)) {
@@ -66,12 +66,12 @@ absl::StatusOr<std::string> Day_2015_14::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_14::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   static LazyRE2 parse = {
       "(.*) can fly (\\d+) km/s for (\\d+) seconds, but then "
       "must rest for (\\d+) seconds\\."};
   std::vector<Flight> flights;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     Flight next;
     if (!RE2::FullMatch(str, *parse, &next.name, &next.speed, &next.run_time,
                         &next.rest_time)) {
@@ -79,10 +79,10 @@ absl::StatusOr<std::string> Day_2015_14::Part2(
     }
     flights.push_back(next);
   }
-  absl::flat_hash_map<absl::string_view, int> points;
+  absl::flat_hash_map<std::string_view, int> points;
   for (int i = 1; i <= 2503; ++i) {
     RaceResult rr = RunRace(flights, i);
-    for (absl::string_view name : rr.winners) {
+    for (std::string_view name : rr.winners) {
       ++points[name];
     }
   }

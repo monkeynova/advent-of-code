@@ -67,7 +67,7 @@ absl::StatusOr<WalkRet> WalkBoard(const CharBoard& b) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_19::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.empty()) return Error("Bad input");
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
@@ -77,7 +77,7 @@ absl::StatusOr<std::string> Day_2017_19::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_19::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.empty()) return Error("Bad input");
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();

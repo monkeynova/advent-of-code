@@ -42,7 +42,7 @@ class OutputWatch : public AssemBunny::OutputInterface,
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_25::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<AssemBunny> vm = AssemBunny::Parse(input);
   if (!vm.ok()) return vm.status();
   for (int a = 0; true; ++a) {
@@ -66,7 +66,7 @@ absl::StatusOr<std::string> Day_2016_25::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_25::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   return "Merry Christmas!";
 }
 

@@ -5,7 +5,7 @@
 
 namespace advent_of_code {
 
-absl::StatusOr<BitsExpr> BitsExpr::Parse(absl::string_view hex) {
+absl::StatusOr<BitsExpr> BitsExpr::Parse(std::string_view hex) {
   std::vector<bool> bits;
   for (const char c : hex) {
     int nibble = -1;
@@ -15,7 +15,7 @@ absl::StatusOr<BitsExpr> BitsExpr::Parse(absl::string_view hex) {
       nibble = c - 'A' + 10;
     } else {
       return absl::InvalidArgumentError(
-          absl::StrCat("Bad hex: ", absl::string_view(&c, 1)));
+          absl::StrCat("Bad hex: ", std::string_view(&c, 1)));
     }
     for (int bit = 3; bit >= 0; --bit) {
       bits.push_back(nibble & (1 << bit));
@@ -178,7 +178,7 @@ absl::StatusOr<int64_t> BitsExpr::Evaluate() const {
   return absl::InternalError("Left fully covered switch");
 }
 
-absl::string_view BitsExpr::DebugString(BitsExpr::EvaluateType type) {
+std::string_view BitsExpr::DebugString(BitsExpr::EvaluateType type) {
   switch (type) {
     case EvaluateType::kSum:
       return "Sum";

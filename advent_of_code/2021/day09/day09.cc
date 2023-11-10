@@ -52,7 +52,7 @@ int64_t BasinSize(const CharBoard& board, Point p) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_09::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
 
@@ -66,7 +66,7 @@ absl::StatusOr<std::string> Day_2021_09::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_09::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
 

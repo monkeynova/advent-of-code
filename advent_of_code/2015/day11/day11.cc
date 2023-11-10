@@ -19,11 +19,11 @@ void Increment(std::string* password) {
   }
 }
 
-bool IsValid(absl::string_view password) {
+bool IsValid(std::string_view password) {
   static absl::flat_hash_set<char> kBadChars = {'i', 'o', 'l'};
   bool has_inc_triple = false;
   bool has_two_pairs = false;
-  absl::string_view last_pair;
+  std::string_view last_pair;
   for (int i = 0; i < password.size(); ++i) {
     // TODO(@monkeynova): Push to Increment.
     if (kBadChars.contains(password[i])) return false;
@@ -52,7 +52,7 @@ bool IsValid(absl::string_view password) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2015_11::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   std::string password = std::string(input[0]);
   do {
@@ -63,7 +63,7 @@ absl::StatusOr<std::string> Day_2015_11::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_11::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::string password = std::string(input[0]);
   do {
     Increment(&password);

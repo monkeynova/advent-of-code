@@ -20,9 +20,9 @@ class PathWalk : public BFSInterface<PathWalk> {
  public:
   static constexpr Point kKeyDirs[] = {Cardinal::kNorth, Cardinal::kSouth,
                                        Cardinal::kWest, Cardinal::kEast};
-  static constexpr absl::string_view kDirNames = "UDLR";
+  static constexpr std::string_view kDirNames = "UDLR";
 
-  PathWalk(absl::string_view input, std::string* path_dest, bool stop_on_end)
+  PathWalk(std::string_view input, std::string* path_dest, bool stop_on_end)
       : input_(input),
         cur_(Point{0, 0}),
         path_dest_(path_dest),
@@ -40,7 +40,7 @@ class PathWalk : public BFSInterface<PathWalk> {
     if (cur_ == Point{3, 3}) return;
 
     MD5 digest;
-    absl::string_view md5 = digest.DigestHex(absl::StrCat(input_, path_));
+    std::string_view md5 = digest.DigestHex(absl::StrCat(input_, path_));
     for (int i = 0; i < 4; ++i) {
       if (md5[i] >= 'b') {
         PathWalk next = *this;
@@ -72,7 +72,7 @@ class PathWalk : public BFSInterface<PathWalk> {
   }
 
  private:
-  absl::string_view input_;
+  std::string_view input_;
   std::string path_;
   Point cur_;
   std::string* path_dest_;
@@ -82,7 +82,7 @@ class PathWalk : public BFSInterface<PathWalk> {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_17::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Input size");
   std::string path;
   if (!PathWalk(input[0], &path, true).FindMinSteps()) {
@@ -92,7 +92,7 @@ absl::StatusOr<std::string> Day_2016_17::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_17::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Input size");
   std::string path;
   // We walk until exhausting paths.

@@ -19,7 +19,7 @@ bool IsCapAlpha(char c) { return c >= 'A' && c <= 'Z'; }
 
 class Maze {
  public:
-  static absl::StatusOr<Maze> Parse(absl::Span<absl::string_view> input) {
+  static absl::StatusOr<Maze> Parse(absl::Span<std::string_view> input) {
     while (!input.empty() && input.back() == "") {
       input = input.subspan(0, input.size() - 1);
     }
@@ -191,7 +191,7 @@ class Maze {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2019_20::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<Maze> maze = Maze::Parse(input);
   if (!maze.ok()) return maze.status();
 
@@ -199,7 +199,7 @@ absl::StatusOr<std::string> Day_2019_20::Part1(
 }
 
 absl::StatusOr<std::string> Day_2019_20::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<Maze> maze = Maze::Parse(input);
   if (!maze.ok()) return maze.status();
 

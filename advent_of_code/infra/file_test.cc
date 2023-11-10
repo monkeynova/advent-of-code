@@ -22,7 +22,7 @@ namespace advent_of_code {
 constexpr absl::Duration kMinAllowedTestTime = absl::Seconds(15);
 
 void RunTestCase(AdventDay* advent_day,
-                 absl::string_view test_case_with_options,
+                 std::string_view test_case_with_options,
                  file_based_test_driver::RunTestCaseResult* test_result) {
   std::unique_ptr<absl::FlagSaver> flag_saver;
 
@@ -49,9 +49,9 @@ void RunTestCase(AdventDay* advent_day,
   if (std::string flag_opt = options.GetString(kFlagOption);
       !flag_opt.empty()) {
     flag_saver = absl::make_unique<absl::FlagSaver>();
-    for (absl::string_view key_value : absl::StrSplit(flag_opt, ",")) {
+    for (std::string_view key_value : absl::StrSplit(flag_opt, ",")) {
       const auto& [key, value] =
-          std::pair<absl::string_view, absl::string_view>(
+          std::pair<std::string_view, std::string_view>(
               absl::StrSplit(key_value, absl::MaxSplits("=", 2)));
       absl::CommandLineFlag* flag = absl::FindCommandLineFlag(key);
       if (!flag) {
@@ -92,8 +92,8 @@ void RunTestCase(AdventDay* advent_day,
     }
   }
 
-  std::vector<absl::string_view> lines = absl::StrSplit(test_case, "\n");
-  absl::Span<absl::string_view> lines_span = absl::MakeSpan(lines);
+  std::vector<std::string_view> lines = absl::StrSplit(test_case, "\n");
+  absl::Span<std::string_view> lines_span = absl::MakeSpan(lines);
   // Pull off HACK: prefix lines from the front...
   while (!lines_span.empty() && absl::StartsWith(lines_span[0], "HACK:")) {
     lines_span = lines_span.subspan(1);

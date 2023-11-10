@@ -110,12 +110,12 @@ absl::Status FillWithWater(CharBoard& b) {
   return DropFrom(b, start + Point{0, 1});
 }
 
-absl::StatusOr<CharBoard> Parse(absl::Span<absl::string_view> input,
+absl::StatusOr<CharBoard> Parse(absl::Span<std::string_view> input,
                                 int* min_y) {
   std::vector<PointRectangle> strips;
   PointRectangle grid = {{500, 0}, {500, 0}};
   *min_y = std::numeric_limits<int>::max();
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     int fixed;
     int r1;
     int r2;
@@ -153,7 +153,7 @@ absl::StatusOr<CharBoard> Parse(absl::Span<absl::string_view> input,
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_17::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int min_y;
   absl::StatusOr<CharBoard> b = Parse(input, &min_y);
   if (!b.ok()) return b.status();
@@ -178,7 +178,7 @@ absl::StatusOr<std::string> Day_2018_17::Part1(
 }
 
 absl::StatusOr<std::string> Day_2018_17::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int min_y;
   absl::StatusOr<CharBoard> b = Parse(input, &min_y);
   if (!b.ok()) return b.status();

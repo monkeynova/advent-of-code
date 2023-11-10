@@ -18,7 +18,7 @@ namespace advent_of_code {
 
 constexpr char kInputOption[] = "input";
 
-void RunTestCase(absl::string_view test_case_with_options,
+void RunTestCase(std::string_view test_case_with_options,
                  file_based_test_driver::RunTestCaseResult* test_result) {
   file_based_test_driver::TestCaseOptions options;
   options.RegisterString(kInputOption, "");
@@ -30,7 +30,7 @@ void RunTestCase(absl::string_view test_case_with_options,
     return;
   }
 
-  std::vector<absl::string_view> test_lines = absl::StrSplit(test_case, "\n");
+  std::vector<std::string_view> test_lines = absl::StrSplit(test_case, "\n");
   while (test_lines.back().empty()) {
     test_lines.pop_back();
   }
@@ -40,11 +40,11 @@ void RunTestCase(absl::string_view test_case_with_options,
                                             codes.status().ToString()));
     return;
   }
-  std::vector<absl::string_view> input_str =
+  std::vector<std::string_view> input_str =
       absl::StrSplit(options.GetString(kInputOption), ",");
   std::vector<int64_t> input;
   input.reserve(input_str.size());
-  for (absl::string_view str : input_str) {
+  for (std::string_view str : input_str) {
     input.push_back(0);
     if (!absl::SimpleAtoi(str, &input.back())) {
       test_result->AddTestOutput(

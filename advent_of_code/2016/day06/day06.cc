@@ -18,11 +18,11 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_06::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::vector<absl::flat_hash_map<char, int>> freqs;
   if (input.empty()) return Error("Bad Input");
   freqs.resize(input[0].size());
-  for (absl::string_view txt : input) {
+  for (std::string_view txt : input) {
     if (freqs.size() != txt.size()) return Error("Mismatch input");
     for (int i = 0; i < txt.size(); ++i) {
       ++freqs[i][txt[i]];
@@ -45,11 +45,11 @@ absl::StatusOr<std::string> Day_2016_06::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_06::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::vector<absl::flat_hash_map<char, int>> freqs;
   if (input.empty()) return Error("Bad Input");
   freqs.resize(input[0].size());
-  for (absl::string_view txt : input) {
+  for (std::string_view txt : input) {
     if (freqs.size() != txt.size()) return Error("Mismatch input");
     for (int i = 0; i < txt.size(); ++i) {
       ++freqs[i][txt[i]];

@@ -21,9 +21,9 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_08::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   CharBoard display(50, 6);
-  for (absl::string_view ins : input) {
+  for (std::string_view ins : input) {
     int x;
     int y;
     int r;
@@ -54,9 +54,9 @@ absl::StatusOr<std::string> Day_2016_08::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_08::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   CharBoard display(50, 6);
-  for (absl::string_view ins : input) {
+  for (std::string_view ins : input) {
     int x;
     int y;
     int r;

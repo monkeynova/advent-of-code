@@ -22,8 +22,8 @@ struct Point4 {
   int w;
 
   static bool RE2Parse(const char* str, size_t n, void* dest) {
-    std::vector<absl::string_view> coord_str = absl::StrSplit(
-        absl::string_view(str, n), absl::MaxSplits(absl::ByAnyChar(",x"), 4));
+    std::vector<std::string_view> coord_str = absl::StrSplit(
+        std::string_view(str, n), absl::MaxSplits(absl::ByAnyChar(",x"), 4));
     if (coord_str.size() != 4) return false;
     if (!absl::SimpleAtoi(coord_str[0], &((Point4*)dest)->x)) return false;
     if (!absl::SimpleAtoi(coord_str[1], &((Point4*)dest)->y)) return false;

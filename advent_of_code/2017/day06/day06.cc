@@ -38,9 +38,9 @@ std::vector<int64_t> RunStep(std::vector<int64_t> in) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_06::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
-  std::vector<absl::string_view> split = absl::StrSplit(input[0], "\t");
+  std::vector<std::string_view> split = absl::StrSplit(input[0], "\t");
   absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(split);
   if (!list.ok()) return list.status();
   std::vector<int64_t> tmp = *list;
@@ -54,9 +54,9 @@ absl::StatusOr<std::string> Day_2017_06::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_06::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
-  std::vector<absl::string_view> split = absl::StrSplit(input[0], "\t");
+  std::vector<std::string_view> split = absl::StrSplit(input[0], "\t");
   absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(split);
   if (!list.ok()) return list.status();
   std::vector<int64_t> tmp = *list;

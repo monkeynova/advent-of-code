@@ -12,7 +12,7 @@
 namespace advent_of_code {
 namespace {
 
-std::string LookAndSay(absl::string_view input) {
+std::string LookAndSay(std::string_view input) {
   std::string out;
   for (int i = 0; i < input.size();) {
     int j;
@@ -28,7 +28,7 @@ std::string LookAndSay(absl::string_view input) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2015_10::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   std::string str = std::string(input[0]);
   for (int i = 0; i < 40; ++i) {
@@ -39,7 +39,7 @@ absl::StatusOr<std::string> Day_2015_10::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_10::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   std::string str = std::string(input[0]);
   for (int i = 0; i < 50; ++i) {

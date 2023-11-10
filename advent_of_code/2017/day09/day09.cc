@@ -13,7 +13,7 @@ namespace advent_of_code {
 
 namespace {
 
-int TotalGroupScore(absl::string_view str) {
+int TotalGroupScore(std::string_view str) {
   int total_score = 0;
   int group_level = 0;
   bool in_garbage = false;
@@ -43,7 +43,7 @@ int TotalGroupScore(absl::string_view str) {
   return total_score;
 }
 
-int GarbageCount(absl::string_view str) {
+int GarbageCount(std::string_view str) {
   int garbage_count = 0;
   int group_level = 0;
   bool in_garbage = false;
@@ -81,9 +81,9 @@ int GarbageCount(absl::string_view str) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_09::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (run_audit()) {
-    std::vector<std::pair<absl::string_view, int>> tests = {
+    std::vector<std::pair<std::string_view, int>> tests = {
         {"{}", 1},
         {"{{{}}}", 6},
         {"{{}{}}", 5},
@@ -101,9 +101,9 @@ absl::StatusOr<std::string> Day_2017_09::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_09::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (run_audit()) {
-    std::vector<std::pair<absl::string_view, int>> tests = {
+    std::vector<std::pair<std::string_view, int>> tests = {
         {"<>", 0},
         {"<random characters>", 17},
         {"<{o\"i!a,<{i<a>", 10},

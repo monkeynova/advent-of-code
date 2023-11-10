@@ -3,7 +3,7 @@
 namespace advent_of_code {
 
 // static
-const absl::flat_hash_map<absl::string_view, VM::OpCode> VM::Op::kNameMap = {
+const absl::flat_hash_map<std::string_view, VM::OpCode> VM::Op::kNameMap = {
     {"addr", OpCode::kAddr}, {"addi", OpCode::kAddi}, {"mulr", OpCode::kMulr},
     {"muli", OpCode::kMuli}, {"banr", OpCode::kBanr}, {"bani", OpCode::kBani},
     {"borr", OpCode::kBorr}, {"bori", OpCode::kBori}, {"setr", OpCode::kSetr},
@@ -13,15 +13,15 @@ const absl::flat_hash_map<absl::string_view, VM::OpCode> VM::Op::kNameMap = {
 };
 
 // static
-const std::vector<absl::string_view> VM::Op::kCodeMap = {
+const std::vector<std::string_view> VM::Op::kCodeMap = {
     "<NONE>", "kAddr", "kAddi", "kMulr", "kMuli", "kBanr",
     "kBani",  "kBorr", "kBori", "kSetr", "kSeti", "kGtir",
     "kGtri",  "kGtrr", "kEqir", "kEqri", "kEqrr"};
 
 // static
-absl::StatusOr<VM::Op> VM::Op::Parse(absl::string_view str) {
+absl::StatusOr<VM::Op> VM::Op::Parse(std::string_view str) {
   Op op;
-  absl::string_view op_name;
+  std::string_view op_name;
   if (!RE2::FullMatch(str, "([a-z]+) (-?\\d+) (-?\\d+) (-?\\d+)", &op_name,
                       &op.arg1, &op.arg2, &op.arg3)) {
     return absl::InvalidArgumentError(absl::StrCat("Bad instruction: ", str));
@@ -35,9 +35,9 @@ absl::StatusOr<VM::Op> VM::Op::Parse(absl::string_view str) {
 }
 
 // static
-absl::StatusOr<VM> VM::Parse(absl::Span<absl::string_view> input) {
+absl::StatusOr<VM> VM::Parse(absl::Span<std::string_view> input) {
   VM vm;
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     if (RE2::FullMatch(row, "#ip (\\d+)", &vm.ip_register_)) {
       if (vm.ip_register_ > vm.registers_.size()) {
         return absl::InvalidArgumentError(

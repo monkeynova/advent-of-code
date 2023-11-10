@@ -16,15 +16,15 @@ namespace advent_of_code {
 namespace {
 
 struct State {
-  absl::string_view cur;
-  absl::flat_hash_set<absl::string_view> small_visit;
+  std::string_view cur;
+  absl::flat_hash_set<std::string_view> small_visit;
   bool has_visit2;
 };
 
 absl::StatusOr<int64_t> CountPaths(const Graph<int64_t>& map,
                                    bool allow_visit2) {
-  constexpr absl::string_view kStartNode = "start";
-  constexpr absl::string_view kEndNode = "end";
+  constexpr std::string_view kStartNode = "start";
+  constexpr std::string_view kEndNode = "end";
 
   if (!map.nodes().contains(kStartNode)) {
     return absl::NotFoundError("No start");
@@ -37,9 +37,9 @@ absl::StatusOr<int64_t> CountPaths(const Graph<int64_t>& map,
   State start{.cur = kStartNode, .small_visit = {kStartNode}};
   for (std::deque<State> queue = {start}; !queue.empty(); queue.pop_front()) {
     const State& cur = queue.front();
-    const std::vector<absl::string_view>* out = map.Outgoing(cur.cur);
+    const std::vector<std::string_view>* out = map.Outgoing(cur.cur);
     if (!out) continue;
-    for (absl::string_view next : *out) {
+    for (std::string_view next : *out) {
       if (next == kEndNode) {
         ++path_count;
         continue;
@@ -64,9 +64,9 @@ absl::StatusOr<int64_t> CountPaths(const Graph<int64_t>& map,
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_12::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   Graph<int64_t> map;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     auto [src, dst] = PairSplit(line, "-");
     map.AddEdge(src, dst);
   }
@@ -75,9 +75,9 @@ absl::StatusOr<std::string> Day_2021_12::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_12::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   Graph<int64_t> map;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     auto [src, dst] = PairSplit(line, "-");
     map.AddEdge(src, dst);
   }

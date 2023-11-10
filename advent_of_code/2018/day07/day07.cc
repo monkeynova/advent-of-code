@@ -15,25 +15,25 @@ namespace advent_of_code {
 namespace {
 
 struct Worker {
-  absl::string_view item = "";
+  std::string_view item = "";
   int complete_time = 0;
 };
 
 struct WorkState {
   const DirectedGraph<bool>& graph;
   int time = 0;
-  absl::flat_hash_set<absl::string_view> completed;
-  absl::flat_hash_set<absl::string_view> to_do;
-  absl::flat_hash_set<absl::string_view> available;
+  absl::flat_hash_set<std::string_view> completed;
+  absl::flat_hash_set<std::string_view> to_do;
+  absl::flat_hash_set<std::string_view> available;
   std::vector<Worker> workers;
 };
 
 void FindNextAvailable(WorkState* work) {
-  for (absl::string_view test : work->to_do) {
-    const std::vector<absl::string_view>* incoming = work->graph.Incoming(test);
+  for (std::string_view test : work->to_do) {
+    const std::vector<std::string_view>* incoming = work->graph.Incoming(test);
     bool can_add = true;
     if (incoming != nullptr) {
-      for (absl::string_view in : *incoming) {
+      for (std::string_view in : *incoming) {
         if (!work->completed.contains(in)) can_add = false;
       }
     }
@@ -89,7 +89,7 @@ int FindMinPathAssignWork(WorkState* work) {
           << absl::StrJoin(work->available, ",");
 
   int min_to_complete = std::numeric_limits<int>::max();
-  for (absl::string_view next : work->available) {
+  for (std::string_view next : work->available) {
     free_worker->item = next;
     free_worker->complete_time = work->time + 60 + next[0] - 'A' + 1;
     work->to_do.erase(next);
@@ -116,11 +116,11 @@ int FindMinPath(const DirectedGraph<bool>& graph, int num_workers) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_07::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   DirectedGraph<bool> graph;
-  for (absl::string_view row : input) {
-    absl::string_view src;
-    absl::string_view dst;
+  for (std::string_view row : input) {
+    std::string_view src;
+    std::string_view dst;
     if (!RE2::FullMatch(
             row, "Step (.*) must be finished before step (.*) can begin.", &src,
             &dst)) {
@@ -128,18 +128,18 @@ absl::StatusOr<std::string> Day_2018_07::Part1(
     }
     graph.AddEdge(src, dst);
   }
-  absl::StatusOr<std::vector<absl::string_view>> ordered = graph.DAGSort(
-      [](absl::string_view a, absl::string_view b) { return a < b; });
+  absl::StatusOr<std::vector<std::string_view>> ordered = graph.DAGSort(
+      [](std::string_view a, std::string_view b) { return a < b; });
   if (!ordered.ok()) return ordered.status();
   return absl::StrJoin(*ordered, "");
 }
 
 absl::StatusOr<std::string> Day_2018_07::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   DirectedGraph<bool> graph;
-  for (absl::string_view row : input) {
-    absl::string_view src;
-    absl::string_view dst;
+  for (std::string_view row : input) {
+    std::string_view src;
+    std::string_view dst;
     if (!RE2::FullMatch(
             row, "Step (.*) must be finished before step (.*) can begin.", &src,
             &dst)) {

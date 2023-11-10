@@ -16,7 +16,7 @@ namespace {
 
 class SpringBot : public IntCode::IOModule {
  public:
-  SpringBot(absl::string_view program) : in_buf_(program) {}
+  SpringBot(std::string_view program) : in_buf_(program) {}
 
   int64_t damage() const { return damage_; }
 
@@ -54,7 +54,7 @@ class SpringBot : public IntCode::IOModule {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2019_21::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
 
@@ -75,7 +75,7 @@ absl::StatusOr<std::string> Day_2019_21::Part1(
 }
 
 absl::StatusOr<std::string> Day_2019_21::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
 

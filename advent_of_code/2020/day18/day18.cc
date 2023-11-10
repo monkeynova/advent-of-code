@@ -62,9 +62,9 @@ class Add : public ExprTree {
   std::unique_ptr<ExprTree> right_;
 };
 
-absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree(absl::string_view* str);
+absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree(std::string_view* str);
 
-absl::StatusOr<std::unique_ptr<ExprTree>> ParseValue(absl::string_view* str) {
+absl::StatusOr<std::unique_ptr<ExprTree>> ParseValue(std::string_view* str) {
   if (str->empty()) return Error("No value");
   while ((*str)[0] == ' ') *str = str->substr(1);
   if ((*str)[0] == '(') {
@@ -87,7 +87,7 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseValue(absl::string_view* str) {
   return Error("can't get value from: ", *str);
 }
 
-absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree(absl::string_view* str) {
+absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree(std::string_view* str) {
   absl::StatusOr<std::unique_ptr<ExprTree>> last_val = ParseValue(str);
   if (!last_val.ok()) return last_val.status();
   while (!str->empty()) {
@@ -114,15 +114,15 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree(absl::string_view* str) {
   return last_val;
 }
 
-absl::StatusOr<std::unique_ptr<ExprTree>> Parse(absl::string_view str) {
+absl::StatusOr<std::unique_ptr<ExprTree>> Parse(std::string_view str) {
   absl::StatusOr<std::unique_ptr<ExprTree>> ret = ParseOpTree(&str);
   if (!str.empty()) return Error("Bad parse remain=", str);
   return ret;
 }
 
-absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree2(absl::string_view* str);
+absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree2(std::string_view* str);
 
-absl::StatusOr<std::unique_ptr<ExprTree>> ParseValue2(absl::string_view* str) {
+absl::StatusOr<std::unique_ptr<ExprTree>> ParseValue2(std::string_view* str) {
   if (str->empty()) return Error("No value");
   while ((*str)[0] == ' ') *str = str->substr(1);
   if ((*str)[0] == '(') {
@@ -145,7 +145,7 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseValue2(absl::string_view* str) {
   return Error("can't get value from: ", *str);
 }
 
-absl::StatusOr<std::unique_ptr<ExprTree>> ParseAddTree(absl::string_view* str) {
+absl::StatusOr<std::unique_ptr<ExprTree>> ParseAddTree(std::string_view* str) {
   absl::StatusOr<std::unique_ptr<ExprTree>> last_val = ParseValue2(str);
   if (!last_val.ok()) return last_val.status();
   while (!str->empty()) {
@@ -160,7 +160,7 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseAddTree(absl::string_view* str) {
   return last_val;
 }
 
-absl::StatusOr<std::unique_ptr<ExprTree>> ParseMulTree(absl::string_view* str) {
+absl::StatusOr<std::unique_ptr<ExprTree>> ParseMulTree(std::string_view* str) {
   absl::StatusOr<std::unique_ptr<ExprTree>> last_val = ParseAddTree(str);
   if (!last_val.ok()) return last_val.status();
   while (!str->empty()) {
@@ -175,11 +175,11 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseMulTree(absl::string_view* str) {
   return last_val;
 }
 
-absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree2(absl::string_view* str) {
+absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree2(std::string_view* str) {
   return ParseMulTree(str);
 }
 
-absl::StatusOr<std::unique_ptr<ExprTree>> Parse2(absl::string_view str) {
+absl::StatusOr<std::unique_ptr<ExprTree>> Parse2(std::string_view str) {
   absl::StatusOr<std::unique_ptr<ExprTree>> ret = ParseOpTree2(&str);
   if (!str.empty()) return Error("Bad parse remain=", str);
   return ret;
@@ -188,9 +188,9 @@ absl::StatusOr<std::unique_ptr<ExprTree>> Parse2(absl::string_view str) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2020_18::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int64_t sum = 0;
-  for (absl::string_view expr : input) {
+  for (std::string_view expr : input) {
     absl::StatusOr<std::unique_ptr<ExprTree>> tree = Parse(expr);
     if (!tree.ok()) return tree.status();
     sum += (*tree)->Eval();
@@ -199,9 +199,9 @@ absl::StatusOr<std::string> Day_2020_18::Part1(
 }
 
 absl::StatusOr<std::string> Day_2020_18::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int64_t sum = 0;
-  for (absl::string_view expr : input) {
+  for (std::string_view expr : input) {
     absl::StatusOr<std::unique_ptr<ExprTree>> tree = Parse2(expr);
     if (!tree.ok()) return tree.status();
     VLOG(1) << (*tree)->DebugString();

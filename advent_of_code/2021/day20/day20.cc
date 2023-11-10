@@ -14,9 +14,9 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2021_20::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() < 3) return Error("Bad input (too small)");
-  absl::string_view lookup = input[0];
+  std::string_view lookup = input[0];
   if (lookup.size() != 512) return Error("Bad input (lookup size)");
   if (!input[1].empty()) return Error("Bad input (missing empty line)");
 
@@ -34,9 +34,9 @@ absl::StatusOr<std::string> Day_2021_20::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_20::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() < 3) return Error("Bad input (too small)");
-  absl::string_view lookup = input[0];
+  std::string_view lookup = input[0];
   if (lookup.size() != 512) return Error("Bad input (lookup size)");
   if (!input[1].empty()) return Error("Bad input (missing empty line)");
 

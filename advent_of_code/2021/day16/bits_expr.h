@@ -11,7 +11,7 @@ namespace advent_of_code {
 
 class BitsExpr {
  public:
-  static absl::StatusOr<BitsExpr> Parse(absl::string_view hex);
+  static absl::StatusOr<BitsExpr> Parse(std::string_view hex);
 
   int64_t SumVersions() const;
   absl::StatusOr<int64_t> Evaluate() const;
@@ -50,7 +50,7 @@ class BitsExpr {
     int64_t offset_ = 0;
   };
 
-  static absl::string_view DebugString(BitsExpr::EvaluateType type);
+  static std::string_view DebugString(BitsExpr::EvaluateType type);
   void DebugStringImpl(std::string* out, std::string prefix) const;
 
   int version_;

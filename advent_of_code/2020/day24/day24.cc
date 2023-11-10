@@ -17,9 +17,9 @@ namespace {
 // Helper methods go here.
 
 absl::StatusOr<absl::flat_hash_map<Point, bool>> ParseGrid(
-    absl::Span<absl::string_view> input) {
+    absl::Span<std::string_view> input) {
   absl::flat_hash_map<Point, bool> grid;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     Point p = {0, 0};
     for (int i = 0; i < str.size(); ++i) {
       if (str[i] == 'w') {
@@ -87,7 +87,7 @@ absl::StatusOr<absl::flat_hash_map<Point, bool>> RunStep(
 }  // namespace
 
 absl::StatusOr<std::string> Day_2020_24::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<Point, bool>> grid = ParseGrid(input);
   if (!grid.ok()) return grid.status();
   int black_count = 0;
@@ -98,7 +98,7 @@ absl::StatusOr<std::string> Day_2020_24::Part1(
 }
 
 absl::StatusOr<std::string> Day_2020_24::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<Point, bool>> grid = ParseGrid(input);
   if (!grid.ok()) return grid.status();
 

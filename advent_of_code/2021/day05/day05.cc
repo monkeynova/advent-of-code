@@ -20,10 +20,10 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_05::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   RE2 line_re("(\\d+,\\d+) -> (\\d+,\\d+)");
   absl::flat_hash_map<Point, int64_t> counts;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     Point p1;
     Point p2;
     if (!RE2::FullMatch(line, line_re, p1.Capture(), p2.Capture())) {
@@ -44,10 +44,10 @@ absl::StatusOr<std::string> Day_2021_05::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_05::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   RE2 line_re("(\\d+,\\d+) -> (\\d+,\\d+)");
   absl::flat_hash_map<Point, int64_t> counts;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     Point p1;
     Point p2;
     if (!RE2::FullMatch(line, line_re, p1.Capture(), p2.Capture())) {

@@ -12,9 +12,9 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2015_02::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int need = 0;
-  for (absl::string_view dims : input) {
+  for (std::string_view dims : input) {
     int l, w, h;
     if (!RE2::FullMatch(dims, "(\\d+)x(\\d+)x(\\d+)", &l, &w, &h)) {
       return absl::InvalidArgumentError(absl::StrCat("Bad input: ", dims));
@@ -26,9 +26,9 @@ absl::StatusOr<std::string> Day_2015_02::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_02::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int need = 0;
-  for (absl::string_view dims : input) {
+  for (std::string_view dims : input) {
     int l, w, h;
     if (!RE2::FullMatch(dims, "(\\d+)x(\\d+)x(\\d+)", &l, &w, &h)) {
       return absl::InvalidArgumentError(absl::StrCat("Bad input: ", dims));

@@ -67,7 +67,7 @@ class IntCode {
                    public OutputSink,
                    public PauseCondition {};
 
-  static absl::StatusOr<IntCode> Parse(absl::Span<absl::string_view> input);
+  static absl::StatusOr<IntCode> Parse(absl::Span<std::string_view> input);
 
   IntCode(IntCode&&) = default;
   IntCode& operator=(IntCode&&) = default;

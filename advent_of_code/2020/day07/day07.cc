@@ -13,13 +13,13 @@ namespace advent_of_code {
 namespace {
 
 struct BagRule {
-  absl::flat_hash_map<absl::string_view, int> bag_to_count;
+  absl::flat_hash_map<std::string_view, int> bag_to_count;
 };
 
 absl::StatusOr<DirectedGraph<BagRule>> Parse(
-    absl::Span<absl::string_view> input) {
+    absl::Span<std::string_view> input) {
   DirectedGraph<BagRule> ret;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     const auto [outer, inner] = PairSplit(str, " bags contain ");
     if (ret.GetData(outer) != nullptr) {
       return Error("color dupe: ", outer);
@@ -29,10 +29,10 @@ absl::StatusOr<DirectedGraph<BagRule>> Parse(
       ret.AddNode(outer, BagRule{});
     } else {
       BagRule bag_rule;
-      for (absl::string_view bag_rule_str : absl::StrSplit(inner, ", ")) {
+      for (std::string_view bag_rule_str : absl::StrSplit(inner, ", ")) {
         static LazyRE2 bag_pattern{"(\\d+) (.*) bags?\\.?"};
         int count;
-        absl::string_view color;
+        std::string_view color;
         if (!RE2::FullMatch(bag_rule_str, *bag_pattern, &count, &color)) {
           return Error("bag rule: ", bag_rule_str);
         }
@@ -46,15 +46,15 @@ absl::StatusOr<DirectedGraph<BagRule>> Parse(
 }
 
 int CountContainingBags(const DirectedGraph<BagRule>& bags,
-                        absl::string_view bag) {
-  absl::flat_hash_set<absl::string_view> can_contain;
-  absl::flat_hash_set<absl::string_view> added = {bag};
+                        std::string_view bag) {
+  absl::flat_hash_set<std::string_view> can_contain;
+  absl::flat_hash_set<std::string_view> added = {bag};
   while (!added.empty()) {
-    absl::flat_hash_set<absl::string_view> new_added;
-    for (const absl::string_view& color : added) {
-      const std::vector<absl::string_view>* incoming = bags.Incoming(color);
+    absl::flat_hash_set<std::string_view> new_added;
+    for (const std::string_view& color : added) {
+      const std::vector<std::string_view>* incoming = bags.Incoming(color);
       if (incoming != nullptr) {
-        for (absl::string_view parent_color : *incoming) {
+        for (std::string_view parent_color : *incoming) {
           if (can_contain.contains(parent_color)) continue;
           new_added.insert(parent_color);
           can_contain.insert(parent_color);
@@ -67,15 +67,15 @@ int CountContainingBags(const DirectedGraph<BagRule>& bags,
 }
 
 absl::StatusOr<int> CountContainedBags(const DirectedGraph<BagRule>& bags,
-                                       absl::string_view bag) {
+                                       std::string_view bag) {
   const BagRule* bag_rule = bags.GetData(bag);
   if (bag_rule == nullptr) {
     return Error("Cannot find bag: ", bag);
   }
-  const std::vector<absl::string_view>* outgoing = bags.Outgoing(bag);
+  const std::vector<std::string_view>* outgoing = bags.Outgoing(bag);
   int bag_count = 1;
   if (outgoing != nullptr) {
-    for (absl::string_view sub_bag : *outgoing) {
+    for (std::string_view sub_bag : *outgoing) {
       absl::StatusOr<int> sub_bags = CountContainedBags(bags, sub_bag);
       if (!sub_bags.ok()) return sub_bags.status();
       auto sub_bag_count_it = bag_rule->bag_to_count.find(sub_bag);
@@ -91,7 +91,7 @@ absl::StatusOr<int> CountContainedBags(const DirectedGraph<BagRule>& bags,
 }  // namespace
 
 absl::StatusOr<std::string> Day_2020_07::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<DirectedGraph<BagRule>> bags = Parse(input);
   if (!bags.ok()) return bags.status();
   VLOG(1) << bags->nodes().size();
@@ -99,7 +99,7 @@ absl::StatusOr<std::string> Day_2020_07::Part1(
 }
 
 absl::StatusOr<std::string> Day_2020_07::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<DirectedGraph<BagRule>> bags = Parse(input);
   if (!bags.ok()) return bags.status();
 

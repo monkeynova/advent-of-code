@@ -7,13 +7,13 @@
 
 namespace advent_of_code {
 
-class GraphWalk : public BFSInterface<GraphWalk, absl::string_view> {
+class GraphWalk : public BFSInterface<GraphWalk, std::string_view> {
  public:
   struct Options {
     const DirectedGraphBase* graph;
-    absl::string_view start;
-    absl::FunctionRef<bool(absl::string_view, int)> is_good;
-    absl::FunctionRef<bool(absl::string_view, int)> is_final;
+    std::string_view start;
+    absl::FunctionRef<bool(std::string_view, int)> is_good;
+    absl::FunctionRef<bool(std::string_view, int)> is_final;
   };
 
   GraphWalk(Options options)
@@ -22,12 +22,12 @@ class GraphWalk : public BFSInterface<GraphWalk, absl::string_view> {
         graph_(options.graph),
         cur_(options.start) {}
 
-  absl::string_view identifier() const override { return cur_; }
+  std::string_view identifier() const override { return cur_; }
   bool IsFinal() const override { return is_final_(cur_, num_steps()); }
   void AddNextSteps(State* state) const override {
-    const std::vector<absl::string_view>* outgoing = graph_->Outgoing(cur_);
+    const std::vector<std::string_view>* outgoing = graph_->Outgoing(cur_);
     if (outgoing == nullptr) return;
-    for (absl::string_view test : *outgoing) {
+    for (std::string_view test : *outgoing) {
       if (!is_good_(test, num_steps() + 1)) continue;
       GraphWalk next = *this;
       next.cur_ = test;
@@ -36,10 +36,10 @@ class GraphWalk : public BFSInterface<GraphWalk, absl::string_view> {
   }
 
  private:
-  absl::FunctionRef<bool(absl::string_view, int)> is_good_;
-  absl::FunctionRef<bool(absl::string_view, int)> is_final_;
+  absl::FunctionRef<bool(std::string_view, int)> is_good_;
+  absl::FunctionRef<bool(std::string_view, int)> is_final_;
   const DirectedGraphBase* graph_;
-  absl::string_view cur_;
+  std::string_view cur_;
 };
 
 }  // namespace advent_of_code

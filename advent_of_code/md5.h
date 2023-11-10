@@ -11,14 +11,14 @@ class MD5 {
       : md5_result_view_(reinterpret_cast<char*>(md5_result_), 16),
         md5_result_hex_view_(reinterpret_cast<char*>(md5_result_hex_), 32) {}
 
-  absl::string_view Digest(absl::string_view in) {
+  std::string_view Digest(std::string_view in) {
     MD5_Init(&ctx);
     MD5_Update(&ctx, in.data(), in.size());
     MD5_Final(md5_result_, &ctx);
     return md5_result_view_;
   }
 
-  absl::string_view DigestHex(absl::string_view in) {
+  std::string_view DigestHex(std::string_view in) {
     static constexpr char hexchar[] = {'0', '1', '2', '3', '4', '5', '6', '7',
                                        '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
     Digest(in);
@@ -31,9 +31,9 @@ class MD5 {
 
  private:
   unsigned char md5_result_[16];
-  absl::string_view md5_result_view_;
+  std::string_view md5_result_view_;
   unsigned char md5_result_hex_[32];
-  absl::string_view md5_result_hex_view_;
+  std::string_view md5_result_hex_view_;
   MD5_CTX ctx;
 };
 

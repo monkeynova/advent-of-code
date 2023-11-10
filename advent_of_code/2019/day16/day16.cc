@@ -12,7 +12,7 @@
 namespace advent_of_code {
 namespace {
 
-int CalcSumRange(absl::string_view input, int begin, int end) {
+int CalcSumRange(std::string_view input, int begin, int end) {
   int ret = 0;
   for (int i = begin; i < end; ++i) {
     ret += input[i] - '0';
@@ -22,7 +22,7 @@ int CalcSumRange(absl::string_view input, int begin, int end) {
 
 class SumRangeState {
  public:
-  SumRangeState(absl::string_view input) : input_(input) {
+  SumRangeState(std::string_view input) : input_(input) {
     Build();
     DCHECK(Audit().ok());
   }
@@ -99,13 +99,13 @@ class SumRangeState {
     }
   }
 
-  absl::string_view input_;
+  std::string_view input_;
   // sums_[a][b] stores CalcSumRange(input_, b * (2 ** a), (b + 1) * (2 ** a)).
   std::vector<std::vector<int>> sums_;
 };
 
-std::string RunPhase(int phase, absl::string_view input, int min_position) {
-  absl::string_view sub_input = input.substr(min_position);
+std::string RunPhase(int phase, std::string_view input, int min_position) {
+  std::string_view sub_input = input.substr(min_position);
 
   SumRangeState sum_range(sub_input);
   std::string ret;
@@ -132,7 +132,7 @@ std::string RunPhase(int phase, absl::string_view input, int min_position) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2019_16::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Need only 1 line");
 
   std::string ret;
@@ -146,7 +146,7 @@ absl::StatusOr<std::string> Day_2019_16::Part1(
 }
 
 absl::StatusOr<std::string> Day_2019_16::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int offset;
   if (!absl::SimpleAtoi(input[0].substr(0, 7), &offset)) {
     return absl::InvalidArgumentError("bad atoi");

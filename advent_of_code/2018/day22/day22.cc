@@ -161,7 +161,7 @@ class MapWalk : public BFSInterface<MapWalk> {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_22::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 2) return Error("Bad size");
   int depth;
   if (!RE2::FullMatch(input[0], "depth: (\\d+)", &depth)) {
@@ -183,7 +183,7 @@ absl::StatusOr<std::string> Day_2018_22::Part1(
 }
 
 absl::StatusOr<std::string> Day_2018_22::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 2) return Error("Bad size");
   int depth;
   if (!RE2::FullMatch(input[0], "depth: (\\d+)", &depth)) {

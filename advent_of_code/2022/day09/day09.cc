@@ -26,7 +26,7 @@ Point DragPoint(Point head, Point tail) {
   return tail + Sign(delta);
 }
 
-absl::StatusOr<int> DragRope(absl::Span<absl::string_view> input,
+absl::StatusOr<int> DragRope(absl::Span<std::string_view> input,
                              int rope_len) {
   static absl::flat_hash_map<char, Point> char2dir = {
       // Up or down.
@@ -39,7 +39,7 @@ absl::StatusOr<int> DragRope(absl::Span<absl::string_view> input,
 
   std::vector<Point> rope(rope_len, Point{0, 0});
   absl::flat_hash_set<Point> tail_seen = {rope.back()};
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     char dir_char;
     int dist;
     static LazyRE2 parse_re = {"([RULD]) (\\d+)"};
@@ -47,7 +47,7 @@ absl::StatusOr<int> DragRope(absl::Span<absl::string_view> input,
       return Error("Bad line: ", line);
     }
     if (!char2dir.contains(dir_char)) {
-      return Error("No direction for: ", absl::string_view(&dir_char, 1));
+      return Error("No direction for: ", std::string_view(&dir_char, 1));
     }
     Point head_dir = char2dir[dir_char];
 
@@ -65,12 +65,12 @@ absl::StatusOr<int> DragRope(absl::Span<absl::string_view> input,
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_09::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   return AdventReturn(DragRope(input, /*rope_len=*/2));
 }
 
 absl::StatusOr<std::string> Day_2022_09::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   return AdventReturn(DragRope(input, /*rope_len=*/10));
 }
 

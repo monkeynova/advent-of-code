@@ -9,7 +9,7 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2019_09::Part1(
-    absl::Span<absl::string_view> input_text) const {
+    absl::Span<std::string_view> input_text) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input_text);
   if (!codes.ok()) return codes.status();
 
@@ -26,7 +26,7 @@ absl::StatusOr<std::string> Day_2019_09::Part1(
 }
 
 absl::StatusOr<std::string> Day_2019_09::Part2(
-    absl::Span<absl::string_view> input_text) const {
+    absl::Span<std::string_view> input_text) const {
   absl::StatusOr<IntCode> codes = IntCode::Parse(input_text);
   if (!codes.ok()) return codes.status();
 

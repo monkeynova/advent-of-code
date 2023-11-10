@@ -31,12 +31,12 @@ Interval1D NoCloser(const SAndB& sandb, int y) {
 }
 
 absl::StatusOr<std::vector<SAndB>> ParseList(
-    absl::Span<absl::string_view> input) {
+    absl::Span<std::string_view> input) {
   static LazyRE2 parse_re = {
       "Sensor at x=(-?\\d+), y=(-?\\d+): closest beacon is at "
       "x=(-?\\d+), y=(-?\\d+)"};
   std::vector<SAndB> list;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     SAndB add;
     if (!RE2::FullMatch(line, *parse_re, &add.sensor.x, &add.sensor.y,
                         &add.beacon.x, &add.beacon.y)) {
@@ -61,7 +61,7 @@ bool HasCloser(const std::vector<SAndB>& list, Point t) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_15::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<SAndB>> list = ParseList(input);
   if (!list.ok()) return list.status();
 
@@ -80,7 +80,7 @@ absl::StatusOr<std::string> Day_2022_15::Part1(
 }
 
 absl::StatusOr<std::string> Day_2022_15::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<SAndB>> list = ParseList(input);
   if (!list.ok()) return list.status();
 

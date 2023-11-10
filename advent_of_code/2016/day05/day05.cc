@@ -13,13 +13,13 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2016_05::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
   std::string out;
   for (int i = 0;; ++i) {
     MD5 digest;
     std::string str = absl::StrCat(input[0], i);
-    absl::string_view md5_result = digest.DigestHex(str);
+    std::string_view md5_result = digest.DigestHex(str);
     VLOG(2) << "MD5(" << str << "): " << md5_result;
     if (md5_result.substr(0, 5) == "00000") {
       VLOG(1) << "Adding: " << md5_result.substr(5, 1) << " (" << i << ")";
@@ -32,7 +32,7 @@ absl::StatusOr<std::string> Day_2016_05::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_05::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
   std::string out;
   out.resize(8, '_');
@@ -40,7 +40,7 @@ absl::StatusOr<std::string> Day_2016_05::Part2(
   for (int i = 0;; ++i) {
     MD5 digest;
     std::string str = absl::StrCat(input[0], i);
-    absl::string_view md5_result = digest.DigestHex(str);
+    std::string_view md5_result = digest.DigestHex(str);
     VLOG(2) << "MD5(" << str << "): " << md5_result;
     if (md5_result.substr(0, 5) == "00000") {
       int pos = md5_result[5] - '0';

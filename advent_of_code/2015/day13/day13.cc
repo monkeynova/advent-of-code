@@ -14,17 +14,17 @@ namespace advent_of_code {
 namespace {
 
 struct CostPair {
-  absl::string_view from;
-  absl::string_view to;
+  std::string_view from;
+  std::string_view to;
   int happiness;
 };
 
 using CostMap =
-    absl::flat_hash_map<absl::string_view,
-                        absl::flat_hash_map<absl::string_view, CostPair>>;
+    absl::flat_hash_map<std::string_view,
+                        absl::flat_hash_map<std::string_view, CostPair>>;
 
-absl::StatusOr<int> PairDelta(const CostMap& cost_map, absl::string_view from,
-                              absl::string_view to) {
+absl::StatusOr<int> PairDelta(const CostMap& cost_map, std::string_view from,
+                              std::string_view to) {
   auto it1 = cost_map.find(from);
   if (it1 == cost_map.end()) return Error("Can't find: ", from);
   auto it2 = it1->second.find(to);
@@ -42,8 +42,8 @@ absl::StatusOr<int> PairDelta(const CostMap& cost_map, absl::string_view from,
 
 absl::StatusOr<int> BestFillRemainingSeats(
     const CostMap& cost_map, int delta_happiness,
-    std::vector<absl::string_view>* seating,
-    absl::flat_hash_set<absl::string_view>* seated) {
+    std::vector<std::string_view>* seating,
+    absl::flat_hash_set<std::string_view>* seated) {
   VLOG(1) << "BestFillRemainingSeats(" << absl::StrJoin(*seating, ",")
           << "): " << delta_happiness;
 
@@ -56,7 +56,7 @@ absl::StatusOr<int> BestFillRemainingSeats(
 
   absl::optional<int> max_happiness;
   for (const auto& to_seat_pair : cost_map) {
-    absl::string_view to_seat = to_seat_pair.first;
+    std::string_view to_seat = to_seat_pair.first;
     if (seated->contains(to_seat)) continue;
 
     int this_delta = 0;
@@ -84,20 +84,20 @@ absl::StatusOr<int> BestFillRemainingSeats(
 }
 
 absl::StatusOr<int> FindBestSeating(const CostMap& cost_map) {
-  std::vector<absl::string_view> seating;
-  absl::flat_hash_set<absl::string_view> seated;
+  std::vector<std::string_view> seating;
+  absl::flat_hash_set<std::string_view> seated;
   return BestFillRemainingSeats(cost_map, 0, &seating, &seated);
 }
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2015_13::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   // Alice would gain 2 happiness units by sitting next to Bob.
   CostMap cost_map;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     CostPair cost_pair;
-    absl::string_view dir;
+    std::string_view dir;
     if (!RE2::FullMatch(str,
                         "(.*) would (gain|lose) (\\d+) happiness units by "
                         "sitting next to (.*).",
@@ -115,12 +115,12 @@ absl::StatusOr<std::string> Day_2015_13::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_13::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   // Alice would gain 2 happiness units by sitting next to Bob.
   CostMap cost_map;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     CostPair cost_pair;
-    absl::string_view dir;
+    std::string_view dir;
     if (!RE2::FullMatch(str,
                         "(.*) would (gain|lose) (\\d+) happiness units by "
                         "sitting next to (.*).",
@@ -134,7 +134,7 @@ absl::StatusOr<std::string> Day_2015_13::Part2(
     cost_map[cost_pair.from][cost_pair.to] = cost_pair;
   }
   for (const auto& pair : cost_map) {
-    absl::string_view who = pair.first;
+    std::string_view who = pair.first;
     CostPair cost_pair_from;
     cost_pair_from.from = "me";
     cost_pair_from.to = who;

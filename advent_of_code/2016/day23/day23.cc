@@ -15,7 +15,7 @@ namespace advent_of_code {
 std::optional<int64_t> MatchesDecompiled(absl::Span<std::string_view> input) {
   // Keep the regex strings as a vertical list.
   // clang-format off
-  std::vector<absl::string_view> decompilable_res = {
+  std::vector<std::string_view> decompilable_res = {
     "cpy a b",
     "dec b",
     "cpy a d",
@@ -63,7 +63,7 @@ std::optional<int64_t> MatchesDecompiled(absl::Span<std::string_view> input) {
 }
 
 absl::StatusOr<std::string> Day_2016_23::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<AssemBunny> vm = AssemBunny::Parse(input);
   if (!vm.ok()) return vm.status();
   vm->registers().a = 7;
@@ -72,7 +72,7 @@ absl::StatusOr<std::string> Day_2016_23::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_23::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (std::optional<int64_t> ret = MatchesDecompiled(input)) {
     return AdventReturn(ret);
   }

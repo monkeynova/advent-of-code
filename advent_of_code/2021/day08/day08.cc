@@ -21,7 +21,7 @@ std::string DebugSet(const absl::flat_hash_set<char>& possible) {
 }
 
 absl::flat_hash_set<char> Restrict(const absl::flat_hash_set<char>& possible,
-                                   absl::string_view set) {
+                                   std::string_view set) {
   absl::flat_hash_set<char> new_possible;
   for (char c : set) {
     if (possible.contains(c)) new_possible.insert(c);
@@ -34,7 +34,7 @@ static const absl::flat_hash_map<std::string, int64_t> kLookup = {
     {"abdfg", 5},  {"abdefg", 6}, {"acf", 7},   {"abcdefg", 8}, {"abcdfg", 9},
 };
 
-absl::StatusOr<int64_t> Decode(absl::string_view digit,
+absl::StatusOr<int64_t> Decode(std::string_view digit,
                                const absl::flat_hash_map<char, char>& map) {
   std::string digit_copy(digit);
   for (char& c : digit_copy) {
@@ -53,9 +53,9 @@ absl::StatusOr<int64_t> Decode(absl::string_view digit,
 }
 
 bool TryMap(absl::flat_hash_map<char, char>& map, char next,
-            const std::vector<absl::string_view>& digits) {
+            const std::vector<std::string_view>& digits) {
   if (next == 'h') {
-    for (absl::string_view d : digits) {
+    for (std::string_view d : digits) {
       absl::StatusOr<int64_t> v = Decode(d, map);
       if (!v.ok()) return false;
     }
@@ -72,7 +72,7 @@ bool TryMap(absl::flat_hash_map<char, char>& map, char next,
 }
 
 absl::StatusOr<absl::flat_hash_map<char, char>> FindMap(
-    const std::vector<absl::string_view>& left) {
+    const std::vector<std::string_view>& left) {
   if (left.size() != 10) return Error("Bad exemplars");
 
   absl::flat_hash_map<int64_t, absl::flat_hash_set<char>> countToSegments = {
@@ -80,7 +80,7 @@ absl::StatusOr<absl::flat_hash_map<char, char>> FindMap(
   };
 
   absl::flat_hash_map<char, int64_t> observed;
-  for (absl::string_view in : left) {
+  for (std::string_view in : left) {
     for (char c : in) {
       ++observed[c];
     }
@@ -95,8 +95,8 @@ absl::StatusOr<absl::flat_hash_map<char, char>> FindMap(
     if (it2 == countToSegments.end()) return Error("Bad count");
     possible[c1] = it2->second;
   }
-  for (absl::string_view test : left) {
-    absl::string_view allowed = "";
+  for (std::string_view test : left) {
+    std::string_view allowed = "";
     switch (test.size()) {
       case 2:
         allowed = "cf";
@@ -144,12 +144,12 @@ absl::StatusOr<absl::flat_hash_map<char, char>> FindMap(
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_08::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int64_t count = 0;
   absl::flat_hash_set<int64_t> find_sizes = {2, 3, 4, 7};
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     const auto& [_, find] = PairSplit(line, " | ");
-    for (absl::string_view segment : absl::StrSplit(find, " ")) {
+    for (std::string_view segment : absl::StrSplit(find, " ")) {
       if (find_sizes.contains(segment.size())) ++count;
     }
   }
@@ -157,9 +157,9 @@ absl::StatusOr<std::string> Day_2021_08::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_08::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int64_t sum = 0;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     const auto& [exemplars, decode] = PairSplit(line, " | ");
     absl::StatusOr<absl::flat_hash_map<char, char>> map =
         FindMap(absl::StrSplit(exemplars, " "));
@@ -168,7 +168,7 @@ absl::StatusOr<std::string> Day_2021_08::Part2(
                    exemplars);
     }
     int64_t decode_val = 0;
-    for (absl::string_view digit : absl::StrSplit(decode, " ")) {
+    for (std::string_view digit : absl::StrSplit(decode, " ")) {
       absl::StatusOr<int64_t> v = Decode(digit, *map);
       if (!v.ok()) return v.status();
       decode_val = decode_val * 10 + *v;

@@ -15,8 +15,8 @@ namespace advent_of_code {
 
 namespace {
 
-absl::StatusOr<std::string> ApplyRule(absl::string_view rule,
-                                      absl::string_view str) {
+absl::StatusOr<std::string> ApplyRule(std::string_view rule,
+                                      std::string_view str) {
   int x;
   int y;
   char a;
@@ -102,8 +102,8 @@ absl::StatusOr<std::string> ApplyRule(absl::string_view rule,
   return Error("Bad rule: ", rule);
 }
 
-absl::StatusOr<std::string> ApplyRuleReverse(absl::string_view rule,
-                                             absl::string_view str) {
+absl::StatusOr<std::string> ApplyRuleReverse(std::string_view rule,
+                                             std::string_view str) {
   int x;
   int y;
   char a;
@@ -212,7 +212,7 @@ absl::Status RunTest() {
       "rotate based on position of letter d",
   };
   VLOG(1) << "Test: " << pw;
-  for (absl::string_view in : instructions) {
+  for (std::string_view in : instructions) {
     VLOG(1) << "Test: " << in;
     absl::StatusOr<std::string> next = ApplyRule(in, pw);
     if (!next.ok()) return next.status();
@@ -237,11 +237,11 @@ absl::Status RunReverseTest() {
       "rotate based on position of letter b",
       "rotate based on position of letter d",
   };
-  std::vector<absl::string_view> reverse(instructions.begin(),
+  std::vector<std::string_view> reverse(instructions.begin(),
                                          instructions.end());
   std::reverse(reverse.begin(), reverse.end());
   VLOG(1) << "Test: " << pw;
-  for (absl::string_view in : reverse) {
+  for (std::string_view in : reverse) {
     VLOG(1) << "Test: " << in;
     absl::StatusOr<std::string> next = ApplyRuleReverse(in, pw);
     if (!next.ok()) return next.status();
@@ -257,14 +257,14 @@ absl::Status RunReverseTest() {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_21::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (run_audit()) {
     if (absl::Status st = RunTest(); !st.ok()) return st;
   }
 
   std::string pw = "abcdefgh";
   VLOG(2) << pw;
-  for (absl::string_view in : input) {
+  for (std::string_view in : input) {
     VLOG(2) << in;
     absl::StatusOr<std::string> next = ApplyRule(in, pw);
     if (!next.ok()) return next.status();
@@ -275,14 +275,14 @@ absl::StatusOr<std::string> Day_2016_21::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_21::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (absl::Status st = RunReverseTest(); !st.ok()) return st;
 
   std::string pw = "fbgdceah";
   VLOG(2) << pw;
-  std::vector<absl::string_view> reverse(input.begin(), input.end());
+  std::vector<std::string_view> reverse(input.begin(), input.end());
   std::reverse(reverse.begin(), reverse.end());
-  for (absl::string_view in : reverse) {
+  for (std::string_view in : reverse) {
     VLOG(2) << in;
     absl::StatusOr<std::string> next = ApplyRuleReverse(in, pw);
     if (!next.ok()) return next.status();

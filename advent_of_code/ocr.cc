@@ -13,7 +13,7 @@ enum OCRMode {
   kBoth = 3,
 };
 
-bool AbslParseFlag(absl::string_view str, OCRMode* ocr_mode,
+bool AbslParseFlag(std::string_view str, OCRMode* ocr_mode,
                    std::string* error) {
   if (str == "input") {
     *ocr_mode = kInput;
@@ -291,7 +291,7 @@ absl::StatusOr<char> OCRChar(
   double best_score = -1;
   for (const auto& [e_char, e_board] : exemplars) {
     double score = Score(board, e_board);
-    VLOG(3) << absl::string_view(&e_char, 1) << " -> " << score;
+    VLOG(3) << std::string_view(&e_char, 1) << " -> " << score;
     if (score > best_score) {
       best_score = score;
       best_c = e_char;

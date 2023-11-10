@@ -11,10 +11,10 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2020_06::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int group_sum = 0;
   absl::flat_hash_set<char> hist;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     if (str.empty()) {
       group_sum += hist.size();
       hist.clear();
@@ -28,11 +28,11 @@ absl::StatusOr<std::string> Day_2020_06::Part1(
 }
 
 absl::StatusOr<std::string> Day_2020_06::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int group_sum = 0;
   absl::flat_hash_map<char, int> hist;
   int group_size = 0;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     if (str.empty()) {
       int all_yes = 0;
       for (const auto& pair : hist) {

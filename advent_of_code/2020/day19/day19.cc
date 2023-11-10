@@ -20,14 +20,14 @@ struct Rule {
   std::vector<std::vector<int64_t>> sub_rules;
 };
 
-absl::StatusOr<Rule> ParseRule(absl::string_view in) {
+absl::StatusOr<Rule> ParseRule(std::string_view in) {
   Rule ret = {0, '\0', {}};
   const auto [rule, dest] = PairSplit(in, ": ");
   if (!absl::SimpleAtoi(rule, &ret.rule_num)) {
     return Error("Bad number: ", rule);
   }
   if (!RE2::FullMatch(dest, "\"(.)\"", &ret.token)) {
-    for (absl::string_view piece : absl::StrSplit(dest, " | ")) {
+    for (std::string_view piece : absl::StrSplit(dest, " | ")) {
       absl::StatusOr<std::vector<int64_t>> sub_rule =
           ParseAsInts(absl::StrSplit(piece, " "));
       if (!sub_rule.ok()) return sub_rule.status();
@@ -39,7 +39,7 @@ absl::StatusOr<Rule> ParseRule(absl::string_view in) {
 }
 
 bool MatchRulePartial(const absl::flat_hash_map<int, Rule>& rule_set,
-                      int rule_num, absl::string_view* str) {
+                      int rule_num, std::string_view* str) {
   auto it = rule_set.find(rule_num);
   // TODO(@monkeynova): Error.
   CHECK(it != rule_set.end());
@@ -51,7 +51,7 @@ bool MatchRulePartial(const absl::flat_hash_map<int, Rule>& rule_set,
   }
 
   for (const std::vector<int64_t>& sub_rule : r.sub_rules) {
-    absl::string_view tmp = *str;
+    std::string_view tmp = *str;
     bool match_all = true;
     for (int rule_num : sub_rule) {
       if (!MatchRulePartial(rule_set, rule_num, &tmp)) {
@@ -69,14 +69,14 @@ bool MatchRulePartial(const absl::flat_hash_map<int, Rule>& rule_set,
 }
 
 bool MatchRuleSet(const absl::flat_hash_map<int, Rule>& rule_set,
-                  absl::string_view str) {
+                  std::string_view str) {
   if (!MatchRulePartial(rule_set, 0, &str)) return false;
   if (!str.empty()) return false;
   return true;
 }
 
 struct RuleHist {
-  absl::string_view str;
+  std::string_view str;
   int rule_num;
   bool operator==(const RuleHist& o) const {
     return str == o.str && rule_num == o.rule_num;
@@ -90,7 +90,7 @@ struct RuleHist {
 
 struct State {
   std::vector<int> rule_chain;
-  absl::string_view str;
+  std::string_view str;
   absl::flat_hash_set<RuleHist> rule_hist;
   bool operator<(const State& o) const {
     // Priority queue orders by greater-than.
@@ -100,7 +100,7 @@ struct State {
 };
 
 bool MatchRuleSetWalk(const absl::flat_hash_map<int, Rule>& rule_set,
-                      absl::string_view str) {
+                      std::string_view str) {
   std::priority_queue<State> frontier;
   frontier.push({.rule_chain = {0}, .str = str});
   while (!frontier.empty()) {
@@ -151,11 +151,11 @@ bool MatchRuleSetWalk(const absl::flat_hash_map<int, Rule>& rule_set,
 }  // namespace
 
 absl::StatusOr<std::string> Day_2020_19::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::flat_hash_map<int, Rule> rule_set;
   bool parse_rules = true;
-  std::vector<absl::string_view> messages;
-  for (absl::string_view in : input) {
+  std::vector<std::string_view> messages;
+  for (std::string_view in : input) {
     if (in.empty()) {
       parse_rules = false;
       continue;
@@ -173,7 +173,7 @@ absl::StatusOr<std::string> Day_2020_19::Part1(
   }
 
   int match_count = 0;
-  for (absl::string_view m : messages) {
+  for (std::string_view m : messages) {
     bool matches = MatchRuleSet(rule_set, m);
     if (matches) ++match_count;
     VLOG(1) << m << "; " << (matches ? "MATCH" : "<no match>");
@@ -183,11 +183,11 @@ absl::StatusOr<std::string> Day_2020_19::Part1(
 }
 
 absl::StatusOr<std::string> Day_2020_19::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::flat_hash_map<int, Rule> rule_set;
   bool parse_rules = true;
-  std::vector<absl::string_view> messages;
-  for (absl::string_view in : input) {
+  std::vector<std::string_view> messages;
+  for (std::string_view in : input) {
     if (in.empty()) {
       parse_rules = false;
       continue;
@@ -224,7 +224,7 @@ absl::StatusOr<std::string> Day_2020_19::Part2(
   }
 
   int match_count = 0;
-  for (absl::string_view m : messages) {
+  for (std::string_view m : messages) {
     bool matches = MatchRuleSetWalk(rule_set, m);
     if (matches) ++match_count;
     VLOG(1) << m << "; " << (matches ? "MATCH" : "<no match>");

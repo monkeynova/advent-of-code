@@ -32,9 +32,9 @@ absl::StatusOr<int> Score(char c) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_03::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int total_score = 0;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     if (line.size() % 2 != 0) return Error("Line size isn't even");
 
     std::string_view first = line.substr(0, line.size() / 2);
@@ -55,7 +55,7 @@ absl::StatusOr<std::string> Day_2022_03::Part1(
 }
 
 absl::StatusOr<std::string> Day_2022_03::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int total_score = 0;
   if (input.size() % 3 != 0) return Error("Input isn't groups of 3");
   for (int i = 0; i < input.size(); i += 3) {

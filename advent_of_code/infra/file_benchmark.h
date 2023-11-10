@@ -11,7 +11,7 @@ namespace advent_of_code {
 absl::StatusOr<int> FileBenchmarkTestCount(AdventDay* day);
 
 inline void BM_Day_SetError(benchmark::State& state,
-                            absl::string_view message) {
+                            std::string_view message) {
   std::string message_str = std::string(message);
   state.SkipWithError(message_str.c_str());
 }

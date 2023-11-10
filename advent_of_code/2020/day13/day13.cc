@@ -13,13 +13,13 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2020_13::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 2) return Error("Bad input");
   int start;
   if (!absl::SimpleAtoi(input[0], &start)) return Error("Bad input");
   int min_delta = std::numeric_limits<int>::max();
   int min_id = 1;
-  for (absl::string_view piece : absl::StrSplit(input[1], ",")) {
+  for (std::string_view piece : absl::StrSplit(input[1], ",")) {
     if (piece == "x") continue;
     int id;
     if (!absl::SimpleAtoi(piece, &id)) return Error("Bad id:", id);
@@ -34,12 +34,12 @@ absl::StatusOr<std::string> Day_2020_13::Part1(
 }
 
 absl::StatusOr<std::string> Day_2020_13::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 2) return Error("Bad input");
   int start;
   if (!absl::SimpleAtoi(input[0], &start)) return Error("Bad input");
 
-  std::vector<absl::string_view> ids = absl::StrSplit(input[1], ",");
+  std::vector<std::string_view> ids = absl::StrSplit(input[1], ",");
   int max_id = -1;
   struct Route {
     int64_t id;

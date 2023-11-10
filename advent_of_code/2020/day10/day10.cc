@@ -11,7 +11,7 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2020_10::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> jolts = ParseAsInts(input);
   if (!jolts.ok()) return jolts.status();
   std::sort(jolts->begin(), jolts->end());
@@ -53,7 +53,7 @@ absl::StatusOr<int64_t> CountValidArrangements(
 }
 
 absl::StatusOr<std::string> Day_2020_10::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> jolts = ParseAsInts(input);
   if (!jolts.ok()) return jolts.status();
   std::sort(jolts->begin(), jolts->end());

@@ -14,15 +14,15 @@ namespace advent_of_code {
 namespace {
 
 struct Route {
-  absl::string_view src;
-  absl::string_view dst;
+  std::string_view src;
+  std::string_view dst;
   int weight;
 };
 
 absl::optional<int> ShortestAllVisitFrom(
-    const absl::flat_hash_map<absl::string_view, std::vector<Route>>&
+    const absl::flat_hash_map<std::string_view, std::vector<Route>>&
         src_routes,
-    absl::string_view from, absl::flat_hash_set<absl::string_view>* visited) {
+    std::string_view from, absl::flat_hash_set<std::string_view>* visited) {
   std::string prefix;
   prefix.resize(visited->size() * 2 - 2, ' ');
   VLOG(1) << prefix << "ShortestAllVisitFrom(" << from << ", "
@@ -45,10 +45,10 @@ absl::optional<int> ShortestAllVisitFrom(
 }
 
 absl::optional<int> ShortestAllVisit(
-    const absl::flat_hash_map<absl::string_view, std::vector<Route>>&
+    const absl::flat_hash_map<std::string_view, std::vector<Route>>&
         src_routes) {
   absl::optional<int> min;
-  absl::flat_hash_set<absl::string_view> visited;
+  absl::flat_hash_set<std::string_view> visited;
   for (const auto& pair : src_routes) {
     visited.insert(pair.first);
     min = opt_min(min, ShortestAllVisitFrom(src_routes, pair.first, &visited));
@@ -58,9 +58,9 @@ absl::optional<int> ShortestAllVisit(
 }
 
 absl::optional<int> LongestAllVisitFrom(
-    const absl::flat_hash_map<absl::string_view, std::vector<Route>>&
+    const absl::flat_hash_map<std::string_view, std::vector<Route>>&
         src_routes,
-    absl::string_view from, absl::flat_hash_set<absl::string_view>* visited) {
+    std::string_view from, absl::flat_hash_set<std::string_view>* visited) {
   std::string prefix;
   prefix.resize(visited->size() * 2 - 2, ' ');
   VLOG(1) << prefix << "LongestAllVisitFrom(" << from << ", " << visited->size()
@@ -83,10 +83,10 @@ absl::optional<int> LongestAllVisitFrom(
 }
 
 absl::optional<int> LongestAllVisit(
-    const absl::flat_hash_map<absl::string_view, std::vector<Route>>&
+    const absl::flat_hash_map<std::string_view, std::vector<Route>>&
         src_routes) {
   absl::optional<int> max;
-  absl::flat_hash_set<absl::string_view> visited;
+  absl::flat_hash_set<std::string_view> visited;
   for (const auto& pair : src_routes) {
     visited.insert(pair.first);
     max = opt_max(max, LongestAllVisitFrom(src_routes, pair.first, &visited));
@@ -98,9 +98,9 @@ absl::optional<int> LongestAllVisit(
 }  // namespace
 
 absl::StatusOr<std::string> Day_2015_09::Part1(
-    absl::Span<absl::string_view> input) const {
-  absl::flat_hash_map<absl::string_view, std::vector<Route>> src_routes;
-  for (absl::string_view str : input) {
+    absl::Span<std::string_view> input) const {
+  absl::flat_hash_map<std::string_view, std::vector<Route>> src_routes;
+  for (std::string_view str : input) {
     Route r;
     if (!RE2::FullMatch(str, "(.*) to (.*) = (\\d+)", &r.src, &r.dst,
                         &r.weight)) {
@@ -113,9 +113,9 @@ absl::StatusOr<std::string> Day_2015_09::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_09::Part2(
-    absl::Span<absl::string_view> input) const {
-  absl::flat_hash_map<absl::string_view, std::vector<Route>> src_routes;
-  for (absl::string_view str : input) {
+    absl::Span<std::string_view> input) const {
+  absl::flat_hash_map<std::string_view, std::vector<Route>> src_routes;
+  for (std::string_view str : input) {
     Route r;
     if (!RE2::FullMatch(str, "(.*) to (.*) = (\\d+)", &r.src, &r.dst,
                         &r.weight)) {

@@ -40,7 +40,7 @@ int Score2(char c1, char c2) {
   return score;
 }
 
-absl::StatusOr<int> Play(absl::Span<absl::string_view> input,
+absl::StatusOr<int> Play(absl::Span<std::string_view> input,
                          absl::FunctionRef<int(char, char)> score) {
   absl::flat_hash_map<std::string, int> line2score;
   for (char c1 : {'A', 'B', 'C'}) {
@@ -49,7 +49,7 @@ absl::StatusOr<int> Play(absl::Span<absl::string_view> input,
     }
   }
   int total_score = 0;
-  for (absl::string_view round : input) {
+  for (std::string_view round : input) {
     auto it = line2score.find(round);
     if (it == line2score.end()) return Error("Bad round: ", round);
     total_score += it->second;
@@ -60,12 +60,12 @@ absl::StatusOr<int> Play(absl::Span<absl::string_view> input,
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_02::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   return AdventReturn(Play(input, Score1));
 }
 
 absl::StatusOr<std::string> Day_2022_02::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   return AdventReturn(Play(input, Score2));
 }
 

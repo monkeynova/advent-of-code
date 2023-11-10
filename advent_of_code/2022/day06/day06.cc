@@ -14,9 +14,9 @@ namespace advent_of_code {
 
 namespace {
 
-absl::StatusOr<int> FindMarker(absl::string_view line, int len) {
+absl::StatusOr<int> FindMarker(std::string_view line, int len) {
   for (int i = 0; i < line.size() - len; ++i) {
-    absl::string_view sub = line.substr(i, len);
+    std::string_view sub = line.substr(i, len);
     absl::flat_hash_set<char> set(sub.begin(), sub.end());
     if (sub.size() == set.size()) return i + len;
   }
@@ -26,13 +26,13 @@ absl::StatusOr<int> FindMarker(absl::string_view line, int len) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_06::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   return AdventReturn(FindMarker(input[0], 4));
 }
 
 absl::StatusOr<std::string> Day_2022_06::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   return AdventReturn(FindMarker(input[0], 14));
 }

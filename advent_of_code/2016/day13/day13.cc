@@ -36,7 +36,7 @@ class SparseBoard {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_13::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (run_audit()) {
     SparseBoard test_board(10);
     absl::optional<int> test_dist =
@@ -77,7 +77,7 @@ absl::StatusOr<std::string> Day_2016_13::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_13::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
   int v;
   if (!absl::SimpleAtoi(input[0], &v)) return Error("Bad atoi: ", input[0]);

@@ -50,7 +50,7 @@ Point FromPosition(int position) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_03::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> nums = ParseAsInts(input);
   if (!nums.ok()) return nums.status();
   if (nums->size() != 1) return Error("Bad size");
@@ -58,7 +58,7 @@ absl::StatusOr<std::string> Day_2017_03::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_03::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> nums = ParseAsInts(input);
   if (!nums.ok()) return nums.status();
   if (nums->size() != 1) return Error("Bad size");

@@ -17,11 +17,11 @@ enum Classification {
   kNice = 2,
 };
 
-Classification Classify1(absl::string_view input) {
+Classification Classify1(std::string_view input) {
   int vowel_count = 0;
   const absl::flat_hash_set<char> vowels = {'a', 'e', 'i', 'o', 'u'};
   bool has_double = false;
-  const absl::flat_hash_set<absl::string_view> bad_pairs = {"ab", "cd", "pq",
+  const absl::flat_hash_set<std::string_view> bad_pairs = {"ab", "cd", "pq",
                                                             "xy"};
   bool has_bad_pair = false;
 
@@ -40,7 +40,7 @@ Classification Classify1(absl::string_view input) {
   return kNice;
 }
 
-Classification Classify2(absl::string_view input) {
+Classification Classify2(std::string_view input) {
   bool found_repeat_around = false;
   for (int i = 2; i < input.size(); ++i) {
     if (input[i] == input[i - 2]) {
@@ -67,18 +67,18 @@ Classification Classify2(absl::string_view input) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2015_05::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int nice = 0;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     if (Classify1(str) == kNice) ++nice;
   }
   return AdventReturn(nice);
 }
 
 absl::StatusOr<std::string> Day_2015_05::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int nice = 0;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     if (Classify2(str) == kNice) ++nice;
   }
   return AdventReturn(nice);

@@ -18,10 +18,10 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_02::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int twos = 0;
   int threes = 0;
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     absl::flat_hash_map<char, int> counts;
     for (char c : row) ++counts[c];
     int has_two = false;
@@ -37,7 +37,7 @@ absl::StatusOr<std::string> Day_2018_02::Part1(
 }
 
 absl::StatusOr<std::string> Day_2018_02::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   for (int i = 0; i < input.size(); ++i) {
     for (int j = 0; j < i; ++j) {
       if (input[i].size() != input[j].size()) return Error("Bad length");

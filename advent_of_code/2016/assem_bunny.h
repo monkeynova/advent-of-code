@@ -49,7 +49,7 @@ class AssemBunny {
     virtual bool Pause() = 0;
   };
 
-  static absl::StatusOr<AssemBunny> Parse(absl::Span<absl::string_view> input);
+  static absl::StatusOr<AssemBunny> Parse(absl::Span<std::string_view> input);
 
   AssemBunny Clone() const;
 
@@ -104,7 +104,7 @@ class AssemBunny {
       }
     }
 
-    static absl::StatusOr<Instruction> Parse(absl::string_view in,
+    static absl::StatusOr<Instruction> Parse(std::string_view in,
                                              Registers* registers);
 
     void RemapRegisters(Registers* from, Registers* to);

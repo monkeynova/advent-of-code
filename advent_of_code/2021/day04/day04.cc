@@ -16,7 +16,7 @@ namespace {
 
 class Board {
  public:
-  static absl::StatusOr<Board> Parse(absl::Span<absl::string_view> data) {
+  static absl::StatusOr<Board> Parse(absl::Span<std::string_view> data) {
     Board build;
     if (data.size() != 5) return Error("Bad size");
     static const RE2 line_re(
@@ -94,10 +94,10 @@ class Board {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_04::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() % 6 != 1) return Error("Bad boards: ", input.size());
   std::vector<int64_t> numbers;
-  for (absl::string_view num_str : absl::StrSplit(input[0], ",")) {
+  for (std::string_view num_str : absl::StrSplit(input[0], ",")) {
     int64_t num;
     if (!absl::SimpleAtoi(num_str, &num)) return Error("Bad num: ", num_str);
     numbers.push_back(num);
@@ -126,10 +126,10 @@ absl::StatusOr<std::string> Day_2021_04::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_04::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() % 6 != 1) return Error("Bad boards: ", input.size());
   std::vector<int64_t> numbers;
-  for (absl::string_view num_str : absl::StrSplit(input[0], ",")) {
+  for (std::string_view num_str : absl::StrSplit(input[0], ",")) {
     int64_t num;
     if (!absl::SimpleAtoi(num_str, &num)) return Error("Bad num: ", num_str);
     numbers.push_back(num);

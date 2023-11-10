@@ -18,8 +18,8 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_04::Part1(
-    absl::Span<absl::string_view> input) const {
-  std::vector<absl::string_view> sorted(input.begin(), input.end());
+    absl::Span<std::string_view> input) const {
+  std::vector<std::string_view> sorted(input.begin(), input.end());
   std::sort(sorted.begin(), sorted.end());
   int cur_guard = -1;
   struct SleepWindow {
@@ -28,7 +28,7 @@ absl::StatusOr<std::string> Day_2018_04::Part1(
   };
   absl::flat_hash_map<int, std::vector<SleepWindow>> schedule;
   SleepWindow cur_sleep_window = {-1, -1};
-  for (absl::string_view row : sorted) {
+  for (std::string_view row : sorted) {
     int min;
     VLOG(1) << row;
     if (RE2::PartialMatch(row, "Guard \\#(\\d+) begins shift", &cur_guard)) {
@@ -86,8 +86,8 @@ absl::StatusOr<std::string> Day_2018_04::Part1(
 }
 
 absl::StatusOr<std::string> Day_2018_04::Part2(
-    absl::Span<absl::string_view> input) const {
-  std::vector<absl::string_view> sorted(input.begin(), input.end());
+    absl::Span<std::string_view> input) const {
+  std::vector<std::string_view> sorted(input.begin(), input.end());
   std::sort(sorted.begin(), sorted.end());
   int cur_guard = -1;
   struct SleepWindow {
@@ -96,7 +96,7 @@ absl::StatusOr<std::string> Day_2018_04::Part2(
   };
   absl::flat_hash_map<int, std::vector<SleepWindow>> schedule;
   SleepWindow cur_sleep_window = {-1, -1};
-  for (absl::string_view row : sorted) {
+  for (std::string_view row : sorted) {
     int min;
     VLOG(1) << row;
     if (RE2::PartialMatch(row, "Guard \\#(\\d+) begins shift", &cur_guard)) {

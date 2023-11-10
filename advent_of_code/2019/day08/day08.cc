@@ -9,7 +9,7 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2019_08::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   const int kWidth = 25;
   const int kHeight = 6;
   const int kLayerSize = kWidth * kHeight;
@@ -48,7 +48,7 @@ absl::StatusOr<std::string> Day_2019_08::Part1(
 }
 
 absl::StatusOr<std::string> Day_2019_08::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   const int kWidth = 25;
   const int kHeight = 6;
   const int kLayerSize = kWidth * kHeight;

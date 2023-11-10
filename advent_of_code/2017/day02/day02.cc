@@ -18,13 +18,13 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_02::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int checksum = 0;
-  for (absl::string_view row : input) {
-    std::vector<absl::string_view> nums = absl::StrSplit(row, "\t");
+  for (std::string_view row : input) {
+    std::vector<std::string_view> nums = absl::StrSplit(row, "\t");
     int max = std::numeric_limits<int>::min();
     int min = std::numeric_limits<int>::max();
-    for (absl::string_view num_str : nums) {
+    for (std::string_view num_str : nums) {
       int num;
       if (!absl::SimpleAtoi(num_str, &num)) return Error("Bad num: ", num_str);
       max = std::max(max, num);
@@ -36,10 +36,10 @@ absl::StatusOr<std::string> Day_2017_02::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_02::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int checksum = 0;
-  for (absl::string_view row : input) {
-    std::vector<absl::string_view> num_strs = absl::StrSplit(row, "\t");
+  for (std::string_view row : input) {
+    std::vector<std::string_view> num_strs = absl::StrSplit(row, "\t");
     absl::StatusOr<std::vector<int64_t>> nums = ParseAsInts(num_strs);
     if (!nums.ok()) return nums.status();
     bool found = false;

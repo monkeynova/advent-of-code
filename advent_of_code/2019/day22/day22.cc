@@ -65,10 +65,10 @@ Transform IncrementNInverse(int64_t n, int64_t deck_size) {
 }
 
 absl::StatusOr<std::pair<Transform, Transform>> CreateTransform(
-    absl::Span<absl::string_view> input, int64_t deck_size) {
+    absl::Span<std::string_view> input, int64_t deck_size) {
   Transform t{.mult = 1, .add = 0, .mod = deck_size};
   Transform inv_t{.mult = 1, .add = 0, .mod = deck_size};
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     if (RE2::FullMatch(str, "deal into new stack")) {
       t = NewStack(deck_size) * t;
       inv_t = inv_t * NewStackInverse(deck_size);
@@ -94,7 +94,7 @@ absl::StatusOr<std::pair<Transform, Transform>> CreateTransform(
 }  // namespace
 
 absl::StatusOr<std::string> Day_2019_22::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::pair<Transform, Transform>> pair =
       CreateTransform(input, /*deck_size=*/10'007);
   if (!pair.ok()) return pair.status();
@@ -104,7 +104,7 @@ absl::StatusOr<std::string> Day_2019_22::Part1(
 }
 
 absl::StatusOr<std::string> Day_2019_22::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int64_t run_count = 101'741'582'076'661;
   absl::StatusOr<std::pair<Transform, Transform>> pair =
       CreateTransform(input, /*deck_size=*/119'315'717'514'047);

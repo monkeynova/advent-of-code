@@ -63,7 +63,7 @@ int RunInteractive(int argc, char** argv) {
     LOG(FATAL) << st.ToString();
   }
 
-  std::vector<absl::string_view> tmp = {absl::string_view(data)};
+  std::vector<std::string_view> tmp = {std::string_view(data)};
   absl::StatusOr<IntCode> codes = IntCode::Parse(absl::MakeSpan(tmp));
   if (!codes.ok()) LOG(FATAL) << codes.status().ToString();
 

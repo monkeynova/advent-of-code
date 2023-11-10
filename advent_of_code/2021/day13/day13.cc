@@ -17,8 +17,8 @@ namespace advent_of_code {
 
 namespace {
 
-absl::StatusOr<Point> ParseFold(absl::string_view fold_str) {
-  absl::string_view axis_name;
+absl::StatusOr<Point> ParseFold(std::string_view fold_str) {
+  std::string_view axis_name;
   int64_t val;
   if (!RE2::FullMatch(fold_str, "fold along (x|y)=(\\d+)", &axis_name, &val)) {
     return Error("Bad fold");
@@ -58,10 +58,10 @@ absl::StatusOr<absl::flat_hash_set<Point>> Fold(
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_13::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::flat_hash_set<Point> points;
   bool folds = false;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     if (line.empty()) {
       folds = true;
       continue;
@@ -84,10 +84,10 @@ absl::StatusOr<std::string> Day_2021_13::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_13::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::flat_hash_set<Point> points;
   bool folds = false;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     if (line.empty()) {
       folds = true;
       continue;

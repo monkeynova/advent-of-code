@@ -195,9 +195,9 @@ absl::StatusOr<int> RunHacks(const absl::flat_hash_map<Point, Node>& grid) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_22::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::flat_hash_map<Point, Node> grid;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     Point p;
     if (RE2::FullMatch(str, "root@ebhq-gridcenter# df -h")) continue;
     // Filesystem            Size  Used  Avail  Use%
@@ -228,9 +228,9 @@ absl::StatusOr<std::string> Day_2016_22::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_22::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::flat_hash_map<Point, Node> grid;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     Point p;
     if (RE2::FullMatch(str, "root@ebhq-gridcenter# df -h")) continue;
     // Filesystem            Size  Used  Avail  Use%

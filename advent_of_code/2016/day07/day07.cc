@@ -13,7 +13,7 @@ namespace advent_of_code {
 
 namespace {
 
-bool SupportsTLS(absl::string_view str) {
+bool SupportsTLS(std::string_view str) {
   int level = 0;
   bool match_outside = false;
   bool match_inside = false;
@@ -33,7 +33,7 @@ bool SupportsTLS(absl::string_view str) {
   return match_outside && !match_inside;
 }
 
-bool SupportsSSL(absl::string_view str) {
+bool SupportsSSL(std::string_view str) {
   int level = 0;
   absl::flat_hash_set<std::string> outside;
   absl::flat_hash_set<std::string> inside;
@@ -67,9 +67,9 @@ bool SupportsSSL(absl::string_view str) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_07::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int count = 0;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     bool supports = SupportsTLS(str);
     VLOG(1) << str << ": " << supports;
     if (supports) ++count;
@@ -78,9 +78,9 @@ absl::StatusOr<std::string> Day_2016_07::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_07::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int count = 0;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     bool supports = SupportsSSL(str);
     VLOG(1) << str << ": " << supports;
     if (supports) ++count;

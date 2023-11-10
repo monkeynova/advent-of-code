@@ -23,10 +23,10 @@ struct Instruction {
     kRcv = 6,
     kJgz = 7,
   } op_code;
-  absl::string_view arg1;
-  absl::string_view arg2;
+  std::string_view arg1;
+  std::string_view arg2;
 
-  static absl::StatusOr<Instruction> Parse(absl::string_view str) {
+  static absl::StatusOr<Instruction> Parse(std::string_view str) {
     Instruction ret;
     if (RE2::FullMatch(str, "snd (-?\\d+|[a-z])", &ret.arg1)) {
       ret.op_code = Instruction::kSnd;
@@ -56,9 +56,9 @@ struct Instruction {
 
 class VM {
  public:
-  static absl::StatusOr<VM> Parse(absl::Span<absl::string_view> input) {
+  static absl::StatusOr<VM> Parse(absl::Span<std::string_view> input) {
     VM ret;
-    for (absl::string_view ins : input) {
+    for (std::string_view ins : input) {
       absl::StatusOr<Instruction> next = Instruction::Parse(ins);
       if (!next.ok()) return next.status();
       ret.instructions_.push_back(*next);
@@ -135,13 +135,13 @@ class VM {
 
  private:
   VM() {
-    absl::string_view reg_names = "abcdefghijklmnopqrstuvwxyz";
+    std::string_view reg_names = "abcdefghijklmnopqrstuvwxyz";
     for (int i = 0; i < reg_names.size(); ++i) {
       registers_[reg_names.substr(i, 1)] = 0;
     }
   }
 
-  int GetValue(absl::string_view name) const {
+  int GetValue(std::string_view name) const {
     if (auto it = registers_.find(name); it != registers_.end())
       return it->second;
     int n;
@@ -163,7 +163,7 @@ class VM {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_18::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<VM> vm = VM::Parse(input);
   if (!vm.ok()) return vm.status();
   vm->set_part1();
@@ -173,7 +173,7 @@ absl::StatusOr<std::string> Day_2017_18::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_18::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<VM> vm = VM::Parse(input);
   if (!vm.ok()) return vm.status();
   VM p0 = *vm;

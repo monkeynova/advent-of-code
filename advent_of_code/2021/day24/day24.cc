@@ -17,16 +17,16 @@ namespace {
 
 class VM {
  public:
-  static VM Parse(absl::Span<absl::string_view> input) {
+  static VM Parse(absl::Span<std::string_view> input) {
     VM ret;
-    for (absl::string_view line : input) {
+    for (std::string_view line : input) {
       ret.ops_.push_back(
-          std::vector<absl::string_view>(absl::StrSplit(line, " ")));
+          std::vector<std::string_view>(absl::StrSplit(line, " ")));
     }
     return ret;
   }
 
-  int64_t RegisterValue(absl::string_view name) const {
+  int64_t RegisterValue(std::string_view name) const {
     auto it = registers.find(name);
     if (it == registers.end()) return 0;
     return it->second;
@@ -85,13 +85,13 @@ class VM {
     }
   }
 
-  int64_t* FindRegister(absl::string_view name) {
+  int64_t* FindRegister(std::string_view name) {
     auto it = registers.find(name);
     if (it == registers.end()) return nullptr;
     return &it->second;
   }
 
-  absl::StatusOr<int64_t> RegisterOrLiteral(absl::string_view name) const {
+  absl::StatusOr<int64_t> RegisterOrLiteral(std::string_view name) const {
     auto it = registers.find(name);
     if (it != registers.end()) {
       return it->second;
@@ -103,8 +103,8 @@ class VM {
     return literal;
   }
 
-  std::vector<std::vector<absl::string_view>> ops_;
-  absl::flat_hash_map<absl::string_view, int64_t> registers = {
+  std::vector<std::vector<std::string_view>> ops_;
+  absl::flat_hash_map<std::string_view, int64_t> registers = {
       {"w", 0},
       {"x", 0},
       {"y", 0},
@@ -119,7 +119,7 @@ struct DecompiledConstants {
 };
 
 absl::StatusOr<DecompiledConstants> ExtractConstants(
-    absl::Span<absl::string_view> input) {
+    absl::Span<std::string_view> input) {
   std::vector<std::string> per_input = {
       "inp w",          "mul x 0", "add x z", "mod x 26", "div z (1|26)",
       "add x (-?\\d+)", "eql x w", "eql x 0", "mul y 0",  "add y 25",
@@ -186,7 +186,7 @@ absl::flat_hash_set<std::pair<int64_t, char>> ReversePartial(
     const DecompiledConstants& dc, int64_t off, const int64_t z) {
   absl::flat_hash_set<std::pair<int64_t, char>> ret;
   for (char input = '1'; input <= '9'; ++input) {
-    absl::string_view input_view(&input, 1);
+    std::string_view input_view(&input, 1);
     int64_t prev_mod_26 = (input - '0') - dc.x_array[off];
     {
       // if is true
@@ -230,10 +230,10 @@ absl::flat_hash_set<std::pair<int64_t, char>> ReversePartial(
   if (false) {
     // Check precision...
     for (const auto& [this_z, i] : ret) {
-      VLOG(3) << this_z << "/" << absl::string_view(&i, 1);
+      VLOG(3) << this_z << "/" << std::string_view(&i, 1);
       int64_t next_z = DecompiledPartial(dc, i, off, this_z);
       VLOG(3) << next_z << "/" << z;
-      CHECK_EQ(next_z, z) << "[" << this_z << ", " << absl::string_view(&i, 1)
+      CHECK_EQ(next_z, z) << "[" << this_z << ", " << std::string_view(&i, 1)
                           << "]";
     }
   }
@@ -244,7 +244,7 @@ absl::flat_hash_set<std::pair<int64_t, char>> ReversePartial(
         int64_t next_z = DecompiledPartial(dc, i, off, this_z);
         if (next_z == z) {
           CHECK(ret.contains(std::make_pair(this_z, i)))
-              << "[" << this_z << ", " << absl::string_view(&i, 1) << "]";
+              << "[" << this_z << ", " << std::string_view(&i, 1) << "]";
         }
       }
     }
@@ -329,7 +329,7 @@ std::string FindBestInputMiddle(const DecompiledConstants& dc,
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_24::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<DecompiledConstants> dc = ExtractConstants(input);
   if (!dc.ok()) return dc.status();
   std::string ret = FindBestInputMiddle(*dc, BetterInputMax);
@@ -340,7 +340,7 @@ absl::StatusOr<std::string> Day_2021_24::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_24::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<DecompiledConstants> dc = ExtractConstants(input);
   if (!dc.ok()) return dc.status();
   std::string ret = FindBestInputMiddle(*dc, BetterInputMin);

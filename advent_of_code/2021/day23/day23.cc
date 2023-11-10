@@ -249,7 +249,7 @@ absl::optional<int> FindMinCost(
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_23::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
 
@@ -318,11 +318,11 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_23::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 5) return Error("Bad input");
   const std::string insert1 = "  #D#C#B#A#  ";
   const std::string insert2 = "  #D#B#A#C#  ";
-  std::vector<absl::string_view> spliced = {
+  std::vector<std::string_view> spliced = {
       input[0], input[1], input[2], insert1, insert2, input[3], input[4],
   };
   return Part1(absl::MakeSpan(spliced));

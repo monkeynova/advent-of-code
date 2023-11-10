@@ -94,10 +94,10 @@ struct Instruction {
     kSub = 8,
     kJnz = 9,
   } op_code;
-  absl::string_view arg1;
-  absl::string_view arg2;
+  std::string_view arg1;
+  std::string_view arg2;
 
-  static absl::StatusOr<Instruction> Parse(absl::string_view str) {
+  static absl::StatusOr<Instruction> Parse(std::string_view str) {
     Instruction ret;
     if (RE2::FullMatch(str, "snd (-?\\d+|[a-z])", &ret.arg1)) {
       ret.op_code = Instruction::kSnd;
@@ -133,9 +133,9 @@ struct Instruction {
 
 class VM {
  public:
-  static absl::StatusOr<VM> Parse(absl::Span<absl::string_view> input) {
+  static absl::StatusOr<VM> Parse(absl::Span<std::string_view> input) {
     VM ret;
-    for (absl::string_view ins : input) {
+    for (std::string_view ins : input) {
       absl::StatusOr<Instruction> next = Instruction::Parse(ins);
       if (!next.ok()) return next.status();
       ret.instructions_.push_back(*next);
@@ -143,9 +143,9 @@ class VM {
     return ret;
   }
 
-  int get_register(absl::string_view r) { return registers_[r]; }
+  int get_register(std::string_view r) { return registers_[r]; }
 
-  void set_register(absl::string_view r, int id) { registers_[r] = id; }
+  void set_register(std::string_view r, int id) { registers_[r] = id; }
 
   void ExecuteToRecv() {
     bool recv = false;
@@ -227,13 +227,13 @@ class VM {
 
  private:
   VM() {
-    absl::string_view reg_names = "abcdefghijklmnopqrstuvwxyz";
+    std::string_view reg_names = "abcdefghijklmnopqrstuvwxyz";
     for (int i = 0; i < reg_names.size(); ++i) {
       registers_[reg_names.substr(i, 1)] = 0;
     }
   }
 
-  int GetValue(absl::string_view name) const {
+  int GetValue(std::string_view name) const {
     if (auto it = registers_.find(name); it != registers_.end())
       return it->second;
     int n;
@@ -254,7 +254,7 @@ class VM {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_23::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<VM> vm = VM::Parse(input);
   if (!vm.ok()) return vm.status();
 
@@ -264,7 +264,7 @@ absl::StatusOr<std::string> Day_2017_23::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_23::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   // Hand converted, then optimized form of the assembly.
   // TODO(@monkeynova): Can we identify and optimize this?
   int b = 65;

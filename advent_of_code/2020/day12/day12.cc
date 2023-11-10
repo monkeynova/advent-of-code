@@ -13,10 +13,10 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2020_12::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   Point p{0, 0};
   Point dir = Cardinal::kEast;
-  for (absl::string_view cmd : input) {
+  for (std::string_view cmd : input) {
     int v;
     char c = cmd[0];
     if (!absl::SimpleAtoi(cmd.substr(1), &v))
@@ -81,10 +81,10 @@ absl::StatusOr<std::string> Day_2020_12::Part1(
 }
 
 absl::StatusOr<std::string> Day_2020_12::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   Point ship{0, 0};
   Point waypoint = 10 * Cardinal::kEast + Cardinal::kNorth;
-  for (absl::string_view cmd : input) {
+  for (std::string_view cmd : input) {
     int v;
     char c = cmd[0];
     if (!absl::SimpleAtoi(cmd.substr(1), &v))

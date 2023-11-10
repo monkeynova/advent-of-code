@@ -36,7 +36,7 @@ int UpdateSouth(CharBoard& b) { return Update(b, 'v', Cardinal::kSouth); }
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_25::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
 
@@ -53,7 +53,7 @@ absl::StatusOr<std::string> Day_2021_25::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_25::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   return "Merry Christmas!";
 }
 

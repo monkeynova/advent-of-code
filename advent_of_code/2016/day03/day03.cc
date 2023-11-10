@@ -23,9 +23,9 @@ bool IsValid(int t1[3]) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_03::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int count = 0;
-  for (absl::string_view in : input) {
+  for (std::string_view in : input) {
     int t1[3];
     if (!RE2::FullMatch(in, "\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)", &t1[0], &t1[1],
                         &t1[2])) {
@@ -37,7 +37,7 @@ absl::StatusOr<std::string> Day_2016_03::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_03::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int count = 0;
   if (input.size() % 3 != 0) return Error("Bad size");
   for (int i = 0; i < input.size(); i += 3) {

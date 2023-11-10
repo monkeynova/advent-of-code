@@ -19,14 +19,14 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_10::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   static const absl::flat_hash_map<char, int64_t> kScoreMap = {
       {')', 3}, {']', 57}, {'}', 1197}, {'>', 25137}};
   static const absl::flat_hash_map<char, char> kPairMap = {
       {'}', '{'}, {']', '['}, {')', '('}, {'>', '<'}};
 
   int64_t total_score = 0;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     std::vector<char> stack;
     for (char c : line) {
       auto it = kPairMap.find(c);
@@ -48,14 +48,14 @@ absl::StatusOr<std::string> Day_2021_10::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_10::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   static const absl::flat_hash_map<char, int64_t> kScoreMap = {
       {'(', 1}, {'[', 2}, {'{', 3}, {'<', 4}};
   static const absl::flat_hash_map<char, char> kPairMap = {
       {'}', '{'}, {']', '['}, {')', '('}, {'>', '<'}};
 
   std::vector<int64_t> scores;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     std::vector<char> stack;
     bool corrupted = false;
     for (char c : line) {

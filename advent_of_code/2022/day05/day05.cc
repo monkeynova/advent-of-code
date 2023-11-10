@@ -17,15 +17,15 @@ namespace {
 using CargoStack = std::vector<char>;
 
 absl::StatusOr<std::vector<std::unique_ptr<CargoStack>>> ParseStacks(
-    absl::Span<absl::string_view> lines) {
+    absl::Span<std::string_view> lines) {
   std::vector<std::unique_ptr<CargoStack>> stacks;
-  for (absl::string_view line : lines) {
+  for (std::string_view line : lines) {
     if (line.size() % 4 != 3) return Error("Bad line");
     for (int i = 0; 4 * i < line.size(); ++i) {
       while (stacks.size() <= i) {
         stacks.push_back(absl::make_unique<CargoStack>());
       }
-      absl::string_view crate = line.substr(4 * i, 3);
+      std::string_view crate = line.substr(4 * i, 3);
       if (crate == "   ") {
         if (!stacks[i]->empty()) return Error("Hole in stack");
       } else if (crate[0] == '[' && crate[2] == ']') {
@@ -53,10 +53,10 @@ struct Move {
 };
 
 absl::StatusOr<std::vector<Move>> ParseMoves(
-    absl::Span<absl::string_view> moves,
+    absl::Span<std::string_view> moves,
     std::vector<std::unique_ptr<CargoStack>>& stacks) {
   std::vector<Move> ret;
-  for (absl::string_view line : moves) {
+  for (std::string_view line : moves) {
     int count, from_idx, to_idx;
     if (!RE2::FullMatch(line, "move (\\d+) from (\\d+) to (\\d+)", &count,
                         &from_idx, &to_idx)) {
@@ -84,7 +84,7 @@ struct Day {
   }
 };
 
-absl::StatusOr<Day> Parse(absl::Span<absl::string_view> input) {
+absl::StatusOr<Day> Parse(absl::Span<std::string_view> input) {
   std::optional<int> split_at;
   for (int i = 0; i < input.size(); ++i) {
     if (input[i].empty()) {
@@ -107,7 +107,7 @@ absl::StatusOr<Day> Parse(absl::Span<absl::string_view> input) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_05::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<Day> day = Parse(input);
 
   for (const Move& m : day->moves) {
@@ -122,7 +122,7 @@ absl::StatusOr<std::string> Day_2022_05::Part1(
 }
 
 absl::StatusOr<std::string> Day_2022_05::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<Day> day = Parse(input);
 
   for (const Move& m : day->moves) {

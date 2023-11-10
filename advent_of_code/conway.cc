@@ -52,7 +52,7 @@ absl::Status Conway::Advance() {
           continue;
         default: {
           return absl::InternalError(absl::StrCat(
-              "Bad board character: '", absl::string_view(&test, 1), "'"));
+              "Bad board character: '", std::string_view(&test, 1), "'"));
         }
       }
     }

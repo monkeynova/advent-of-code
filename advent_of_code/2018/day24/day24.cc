@@ -25,9 +25,9 @@ struct Group {
   int per_unit_hit_points;
   int initiative;
   int attack;
-  absl::string_view attack_type;
-  absl::flat_hash_set<absl::string_view> immune;
-  absl::flat_hash_set<absl::string_view> weak;
+  std::string_view attack_type;
+  absl::flat_hash_set<std::string_view> immune;
+  absl::flat_hash_set<std::string_view> weak;
 
   int effective_power() const { return units * attack; }
 
@@ -49,13 +49,13 @@ std::ostream& operator<<(std::ostream& o, const Group& g) {
            << "}";
 }
 
-absl::StatusOr<std::vector<Group>> Parse(absl::Span<absl::string_view> input) {
+absl::StatusOr<std::vector<Group>> Parse(absl::Span<std::string_view> input) {
   std::vector<Group> groups;
 
   Group::Type cur_type = Group::kNone;
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     Group g;
-    absl::string_view special;
+    std::string_view special;
     if (row.empty()) {
       cur_type = Group::kNone;
     } else if (row == "Immune System:") {
@@ -73,8 +73,8 @@ absl::StatusOr<std::vector<Group>> Parse(absl::Span<absl::string_view> input) {
       g.type = cur_type;
       g.id = groups.size();
       if (!special.empty()) {
-        std::vector<absl::string_view> pieces = absl::StrSplit(special, "; ");
-        for (absl::string_view p : pieces) {
+        std::vector<std::string_view> pieces = absl::StrSplit(special, "; ");
+        for (std::string_view p : pieces) {
           if (absl::ConsumePrefix(&p, "weak to ")) {
             g.weak = absl::StrSplit(p, ", ");
           } else if (absl::ConsumePrefix(&p, "immune to ")) {
@@ -270,7 +270,7 @@ int ImmuneLeftAfterFightWithBoost(const std::vector<Group>& start, int boost) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_24::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<Group>> groups = Parse(input);
   if (!groups.ok()) return groups.status();
 
@@ -285,7 +285,7 @@ absl::StatusOr<std::string> Day_2018_24::Part1(
 }
 
 absl::StatusOr<std::string> Day_2018_24::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<Group>> groups = Parse(input);
   if (!groups.ok()) return groups.status();
 

@@ -180,7 +180,7 @@ absl::StatusOr<State> FindKarts(const CharBoard& b) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_13::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.empty()) return Error("bad input");
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
@@ -199,7 +199,7 @@ absl::StatusOr<std::string> Day_2018_13::Part1(
 }
 
 absl::StatusOr<std::string> Day_2018_13::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.empty()) return Error("bad input");
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();

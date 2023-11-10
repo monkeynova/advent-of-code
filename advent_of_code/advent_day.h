@@ -24,7 +24,7 @@ inline absl::Status Error(Args... args) {
 template <class Container>
 inline absl::StatusOr<std::vector<int64_t>> ParseAsInts(Container input) {
   std::vector<int64_t> vals;
-  for (absl::string_view in : input) {
+  for (std::string_view in : input) {
     int64_t v;
     if (!absl::SimpleAtoi(in, &v)) {
       return absl::InvalidArgumentError(absl::StrCat("parse as int: ", in));
@@ -34,9 +34,9 @@ inline absl::StatusOr<std::vector<int64_t>> ParseAsInts(Container input) {
   return vals;
 }
 
-inline std::pair<absl::string_view, absl::string_view> PairSplit(
-    absl::string_view in, absl::string_view delim) {
-  return std::pair<absl::string_view, absl::string_view>(
+inline std::pair<std::string_view, std::string_view> PairSplit(
+    std::string_view in, std::string_view delim) {
+  return std::pair<std::string_view, std::string_view>(
       absl::StrSplit(in, absl::MaxSplits(delim, 2)));
 }
 
@@ -45,7 +45,7 @@ class AdventDay {
   virtual ~AdventDay() = default;
 
   bool run_audit() const { return absl::GetFlag(FLAGS_advent_day_run_audit); }
-  absl::string_view param() const { return param_; }
+  std::string_view param() const { return param_; }
 
   void set_param(std::string param) { param_ = param; }
 
@@ -66,12 +66,12 @@ class AdventDay {
     return absl::StrCat(t);
   }
 
-  virtual absl::string_view test_file() const = 0;
+  virtual std::string_view test_file() const = 0;
 
   virtual absl::StatusOr<std::string> Part1(
-      absl::Span<absl::string_view> input) const = 0;
+      absl::Span<std::string_view> input) const = 0;
   virtual absl::StatusOr<std::string> Part2(
-      absl::Span<absl::string_view> input) const = 0;
+      absl::Span<std::string_view> input) const = 0;
 
  private:
   std::string param_;

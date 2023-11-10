@@ -57,7 +57,7 @@ int PresentCountPart2(int house_num) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2015_20::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (run_audit()) {
     std::vector<std::pair<int, int>> test_suite = {
         {1, 10}, {2, 30}, {6, 120}, {8, 150}};
@@ -82,7 +82,7 @@ absl::StatusOr<std::string> Day_2015_20::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_20::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> present_count_list = ParseAsInts(input);
   if (!present_count_list.ok()) return present_count_list.status();
   if (present_count_list->size() != 1) return Error("Bad count");

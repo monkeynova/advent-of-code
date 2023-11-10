@@ -15,14 +15,14 @@ namespace advent_of_code {
 namespace {
 
 struct Problem {
-  absl::string_view start;
-  absl::flat_hash_map<absl::string_view, absl::string_view> rules;
+  std::string_view start;
+  absl::flat_hash_map<std::string_view, std::string_view> rules;
 };
 
 using CharPair = std::array<char, 2>;
 using CharPairCounts = absl::flat_hash_map<CharPair, int64_t>;
 
-absl::StatusOr<Problem> Parse(absl::Span<absl::string_view> input) {
+absl::StatusOr<Problem> Parse(absl::Span<std::string_view> input) {
   Problem ret;
   if (input.size() < 3) return Error("Bad input");
   ret.start = input[0];
@@ -36,7 +36,7 @@ absl::StatusOr<Problem> Parse(absl::Span<absl::string_view> input) {
   return ret;
 }
 
-absl::StatusOr<std::string> Expand(absl::string_view rec, const Problem& p) {
+absl::StatusOr<std::string> Expand(std::string_view rec, const Problem& p) {
   std::string next;
   for (int j = 0; j < rec.size() - 1; ++j) {
     next.append(rec.substr(j, 1));
@@ -52,7 +52,7 @@ absl::StatusOr<CharPairCounts> Expand(const CharPairCounts& pair_counts,
                                       const Problem& p) {
   CharPairCounts new_pair_counts;
   for (const auto& [str, count] : pair_counts) {
-    auto it = p.rules.find(absl::string_view(str.data(), 2));
+    auto it = p.rules.find(std::string_view(str.data(), 2));
     if (it == p.rules.end()) return Error("Bad");
     CharPair left = {str[0], it->second[0]};
     CharPair right = {it->second[0], str[1]};
@@ -65,7 +65,7 @@ absl::StatusOr<CharPairCounts> Expand(const CharPairCounts& pair_counts,
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_14::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<Problem> p = Parse(input);
   if (!p.ok()) return p.status();
 
@@ -75,8 +75,8 @@ absl::StatusOr<std::string> Day_2021_14::Part1(
     if (!next.ok()) return next.status();
     rec = std::move(*next);
   }
-  absl::flat_hash_map<absl::string_view, int64_t> counts;
-  absl::string_view rec_view = rec;
+  absl::flat_hash_map<std::string_view, int64_t> counts;
+  std::string_view rec_view = rec;
   for (int i = 0; i < rec.size(); ++i) {
     ++counts[rec_view.substr(i, 1)];
   }
@@ -90,7 +90,7 @@ absl::StatusOr<std::string> Day_2021_14::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_14::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<Problem> p = Parse(input);
   if (!p.ok()) return p.status();
 

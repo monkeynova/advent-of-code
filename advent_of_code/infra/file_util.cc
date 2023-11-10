@@ -13,9 +13,9 @@
 
 namespace advent_of_code {
 
-static absl::Status NullFreeString(absl::string_view str,
+static absl::Status NullFreeString(std::string_view str,
                                    std::string* out_str) {
-  if (str.find('\0') != absl::string_view::npos) {
+  if (str.find('\0') != std::string_view::npos) {
     return absl::InvalidArgumentError(
         absl::StrCat("filename contains null characters: ", str));
   }
@@ -23,7 +23,7 @@ static absl::Status NullFreeString(absl::string_view str,
   return absl::OkStatus();
 }
 
-absl::Status GetContents(absl::string_view filename,
+absl::Status GetContents(std::string_view filename,
                          std::string* file_contents) {
   // Because we are using a c api, check for in-string nulls.
   std::string filename_str;
@@ -58,7 +58,7 @@ absl::Status GetContents(absl::string_view filename,
 }
 
 absl::Status HandleTestIncludes(std::string* test_case) {
-  absl::string_view include_fname;
+  std::string_view include_fname;
   RE2 include_pattern{"@include{([^}]*)}"};
   while (RE2::PartialMatch(*test_case, include_pattern, &include_fname)) {
     std::string contents;

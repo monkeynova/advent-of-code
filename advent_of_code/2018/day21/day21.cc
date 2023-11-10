@@ -14,7 +14,7 @@ namespace advent_of_code {
 
 namespace {
 
-bool RunDecompiled(absl::Span<absl::string_view> input,
+bool RunDecompiled(absl::Span<std::string_view> input,
                    absl::FunctionRef<bool(int)> on_test) {
   // Keep the regex strings as a vertical list.
   // clang-format off
@@ -83,7 +83,7 @@ bool RunDecompiled(absl::Span<absl::string_view> input,
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_21::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<VM> vm = VM::Parse(input);
   if (!vm.ok()) return vm.status();
 
@@ -112,7 +112,7 @@ absl::StatusOr<std::string> Day_2018_21::Part1(
 }
 
 absl::StatusOr<std::string> Day_2018_21::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<VM> vm = VM::Parse(input);
   if (!vm.ok()) return vm.status();
 

@@ -13,9 +13,9 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2022_04::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int count = 0;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     int p1s, p1e, p2s, p2e;
     if (!RE2::FullMatch(line, "(\\d+)-(\\d+),(\\d+)-(\\d+)", &p1s, &p1e, &p2s,
                         &p2e)) {
@@ -33,9 +33,9 @@ absl::StatusOr<std::string> Day_2022_04::Part1(
 }
 
 absl::StatusOr<std::string> Day_2022_04::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int count = 0;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     int p1s, p1e, p2s, p2e;
     if (!RE2::FullMatch(line, "(\\d+)-(\\d+),(\\d+)-(\\d+)", &p1s, &p1e, &p2s,
                         &p2e)) {

@@ -18,9 +18,9 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_13::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int severity = 0;
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     int depth;
     int range;
     if (!RE2::FullMatch(row, "(\\d+): (\\d+)", &depth, &range)) {
@@ -36,13 +36,13 @@ absl::StatusOr<std::string> Day_2017_13::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_13::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   struct Firewall {
     int depth;
     int range;
   };
   std::vector<Firewall> firewalls;
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     Firewall fw;
     if (!RE2::FullMatch(row, "(\\d+): (\\d+)", &fw.depth, &fw.range)) {
       return Error("Bad row: ", row);

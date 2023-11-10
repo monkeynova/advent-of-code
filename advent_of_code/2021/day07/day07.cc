@@ -19,7 +19,7 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_07::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   absl::StatusOr<std::vector<int64_t>> nums =
       ParseAsInts(absl::StrSplit(input[0], ","));
@@ -38,7 +38,7 @@ absl::StatusOr<std::string> Day_2021_07::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_07::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   absl::StatusOr<std::vector<int64_t>> nums =
       ParseAsInts(absl::StrSplit(input[0], ","));

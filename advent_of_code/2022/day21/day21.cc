@@ -18,9 +18,9 @@ namespace {
 
 struct Monkey {
   std::optional<int64_t> value;
-  absl::string_view left;
-  absl::string_view right;
-  absl::string_view op;
+  std::string_view left;
+  std::string_view right;
+  std::string_view op;
   bool unknown = false;
 
   friend std::ostream& operator<<(std::ostream& out, const Monkey& m) {
@@ -31,8 +31,8 @@ struct Monkey {
 };
 
 absl::StatusOr<int64_t> ConstantFold(
-    absl::flat_hash_map<absl::string_view, Monkey>& monkeys,
-    absl::string_view name) {
+    absl::flat_hash_map<std::string_view, Monkey>& monkeys,
+    std::string_view name) {
   VLOG(2) << "ConstantFold(" << name << ")";
 
   if (!monkeys.contains(name)) return Error("Bad monkey: ", name);
@@ -64,16 +64,16 @@ absl::StatusOr<int64_t> ConstantFold(
 }
 
 absl::StatusOr<int64_t> Evaluate(
-    absl::flat_hash_map<absl::string_view, Monkey>& monkeys,
-    absl::string_view name) {
+    absl::flat_hash_map<std::string_view, Monkey>& monkeys,
+    std::string_view name) {
   absl::StatusOr<int64_t> val = ConstantFold(monkeys, name);
   if (!val.ok()) return val.status();
   return *val;
 }
 
 absl::StatusOr<int64_t> SolveForVal(
-    absl::flat_hash_map<absl::string_view, Monkey>& monkeys, int64_t val,
-    absl::string_view node) {
+    absl::flat_hash_map<std::string_view, Monkey>& monkeys, int64_t val,
+    std::string_view node) {
   if (!monkeys.contains(node)) return Error("Bad monkey: ", node);
   const Monkey& me = monkeys[node];
   if (me.unknown) return val;
@@ -125,7 +125,7 @@ bool OkOrNotFound(absl::Status st) {
 }
 
 absl::StatusOr<int64_t> SolveForRootEquality(
-    absl::flat_hash_map<absl::string_view, Monkey>& monkeys) {
+    absl::flat_hash_map<std::string_view, Monkey>& monkeys) {
   if (!monkeys.contains("root")) return Error("No root");
   Monkey& root = monkeys["root"];
   absl::StatusOr<int64_t> left = ConstantFold(monkeys, root.left);
@@ -139,12 +139,12 @@ absl::StatusOr<int64_t> SolveForRootEquality(
   return SolveForVal(monkeys, *right, root.left);
 }
 
-absl::StatusOr<absl::flat_hash_map<absl::string_view, Monkey>> ParseMonkeys(
-    absl::Span<absl::string_view> input) {
-  absl::flat_hash_map<absl::string_view, Monkey> monkeys;
-  for (absl::string_view line : input) {
+absl::StatusOr<absl::flat_hash_map<std::string_view, Monkey>> ParseMonkeys(
+    absl::Span<std::string_view> input) {
+  absl::flat_hash_map<std::string_view, Monkey> monkeys;
+  for (std::string_view line : input) {
     Monkey m;
-    absl::string_view name;
+    std::string_view name;
     int64_t value;
     if (RE2::FullMatch(line, "([a-z]+): ([a-z]+) ([\\+\\-\\*\\/]) ([a-z]+)",
                        &name, &m.left, &m.op, &m.right)) {
@@ -162,16 +162,16 @@ absl::StatusOr<absl::flat_hash_map<absl::string_view, Monkey>> ParseMonkeys(
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_21::Part1(
-    absl::Span<absl::string_view> input) const {
-  absl::StatusOr<absl::flat_hash_map<absl::string_view, Monkey>> monkeys =
+    absl::Span<std::string_view> input) const {
+  absl::StatusOr<absl::flat_hash_map<std::string_view, Monkey>> monkeys =
       ParseMonkeys(input);
   if (!monkeys.ok()) return monkeys.status();
   return AdventReturn(Evaluate(*monkeys, "root"));
 }
 
 absl::StatusOr<std::string> Day_2022_21::Part2(
-    absl::Span<absl::string_view> input) const {
-  absl::StatusOr<absl::flat_hash_map<absl::string_view, Monkey>> monkeys =
+    absl::Span<std::string_view> input) const {
+  absl::StatusOr<absl::flat_hash_map<std::string_view, Monkey>> monkeys =
       ParseMonkeys(input);
   if (!monkeys.ok()) return monkeys.status();
 

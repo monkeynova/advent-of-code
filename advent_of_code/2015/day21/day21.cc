@@ -189,9 +189,9 @@ absl::optional<int> MaxCostToLose(Character boss) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2015_21::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   Character boss{0, 0, 0};
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     if (!RE2::FullMatch(str, "Hit Points: (\\d+)", &boss.hit_points) &&
         !RE2::FullMatch(str, "Damage: (\\d+)", &boss.damage) &&
         !RE2::FullMatch(str, "Armor: (\\d+)", &boss.armor)) {
@@ -206,9 +206,9 @@ absl::StatusOr<std::string> Day_2015_21::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_21::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   Character boss{0, 0, 0};
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     if (!RE2::FullMatch(str, "Hit Points: (\\d+)", &boss.hit_points) &&
         !RE2::FullMatch(str, "Damage: (\\d+)", &boss.damage) &&
         !RE2::FullMatch(str, "Armor: (\\d+)", &boss.armor)) {

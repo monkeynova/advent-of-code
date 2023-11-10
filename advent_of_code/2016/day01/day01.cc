@@ -19,12 +19,12 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_01::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
-  std::vector<absl::string_view> instructions = absl::StrSplit(input[0], ", ");
+  std::vector<std::string_view> instructions = absl::StrSplit(input[0], ", ");
   Point p = {0, 0};
   Point heading = Cardinal::kNorth;
-  for (absl::string_view ins : instructions) {
+  for (std::string_view ins : instructions) {
     int dist;
     if (RE2::FullMatch(ins, "L(\\d+)", &dist)) {
       heading = heading.rotate_left();
@@ -39,13 +39,13 @@ absl::StatusOr<std::string> Day_2016_01::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_01::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
-  std::vector<absl::string_view> instructions = absl::StrSplit(input[0], ", ");
+  std::vector<std::string_view> instructions = absl::StrSplit(input[0], ", ");
   Point p = {0, 0};
   Point heading = Cardinal::kNorth;
   absl::flat_hash_set<Point> hist = {p};
-  for (absl::string_view ins : instructions) {
+  for (std::string_view ins : instructions) {
     int dist;
     if (RE2::FullMatch(ins, "L(\\d+)", &dist)) {
       heading = heading.rotate_left();

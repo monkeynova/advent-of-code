@@ -15,7 +15,7 @@
 namespace advent_of_code {
 namespace {
 
-absl::StatusOr<CharBoard> ParseBoard(absl::Span<absl::string_view> input) {
+absl::StatusOr<CharBoard> ParseBoard(absl::Span<std::string_view> input) {
   absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board;
   if (board->height() != 5) {
@@ -261,7 +261,7 @@ int64_t CountBugs(absl::flat_hash_map<int, CharBoard> depth_to_board) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2019_24::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<CharBoard> board = ParseBoard(input);
   if (!board.ok()) return board.status();
 
@@ -277,7 +277,7 @@ absl::StatusOr<std::string> Day_2019_24::Part1(
 }
 
 absl::StatusOr<std::string> Day_2019_24::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<CharBoard> cur = ParseBoard(input);
   if (!cur.ok()) return cur.status();
 

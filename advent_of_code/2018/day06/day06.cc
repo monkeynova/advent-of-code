@@ -19,10 +19,10 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_06::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::vector<Point> points;
   PointRectangle r{{0, 0}, {0, 0}};
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     Point p;
     if (!RE2::FullMatch(row, "(\\d+, \\d+)", p.Capture())) {
       return Error("Bad point: ", row);
@@ -72,10 +72,10 @@ absl::StatusOr<std::string> Day_2018_06::Part1(
 }
 
 absl::StatusOr<std::string> Day_2018_06::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::vector<Point> points;
   PointRectangle r{{0, 0}, {0, 0}};
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     Point p;
     if (!RE2::FullMatch(row, "(\\d+, \\d+)", p.Capture())) {
       return Error("Bad point: ", row);

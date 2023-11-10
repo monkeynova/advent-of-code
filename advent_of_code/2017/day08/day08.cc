@@ -18,12 +18,12 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_08::Part1(
-    absl::Span<absl::string_view> input) const {
-  absl::flat_hash_map<absl::string_view, int> registers;
-  for (absl::string_view in : input) {
+    absl::Span<std::string_view> input) const {
+  absl::flat_hash_map<std::string_view, int> registers;
+  for (std::string_view in : input) {
     const auto [op, cond] = PairSplit(in, " if ");
-    absl::string_view reg;
-    absl::string_view fn;
+    std::string_view reg;
+    std::string_view fn;
     int num;
     if (!RE2::FullMatch(cond, "([a-z]+) (<|>|<=|>=|==|!=) (-?\\d+)", &reg, &fn,
                         &num)) {
@@ -62,13 +62,13 @@ absl::StatusOr<std::string> Day_2017_08::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_08::Part2(
-    absl::Span<absl::string_view> input) const {
-  absl::flat_hash_map<absl::string_view, int> registers;
+    absl::Span<std::string_view> input) const {
+  absl::flat_hash_map<std::string_view, int> registers;
   int max = std::numeric_limits<int>::min();
-  for (absl::string_view in : input) {
+  for (std::string_view in : input) {
     const auto [op, cond] = PairSplit(in, " if ");
-    absl::string_view reg;
-    absl::string_view fn;
+    std::string_view reg;
+    std::string_view fn;
     int num;
     if (!RE2::FullMatch(cond, "([a-z]+) (<|>|<=|>=|==|!=) (-?\\d+)", &reg, &fn,
                         &num)) {

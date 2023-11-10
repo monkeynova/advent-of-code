@@ -12,7 +12,7 @@
 namespace advent_of_code {
 namespace {
 
-absl::StatusOr<int> ParseAndCountNonRed(absl::string_view* json,
+absl::StatusOr<int> ParseAndCountNonRed(std::string_view* json,
                                         bool* is_red = nullptr) {
   if (is_red) *is_red = false;
 
@@ -22,7 +22,7 @@ absl::StatusOr<int> ParseAndCountNonRed(absl::string_view* json,
     while (len < json->size() && (*json)[len] <= '9' && (*json)[len] >= '0') {
       ++len;
     }
-    absl::string_view num = json->substr(0, len);
+    std::string_view num = json->substr(0, len);
     int val;
     if (!absl::SimpleAtoi(num, &val)) return Error("Not numeric: ", *json);
     *json = json->substr(len);
@@ -86,9 +86,9 @@ absl::StatusOr<int> ParseAndCountNonRed(absl::string_view* json,
 }  // namespace
 
 absl::StatusOr<std::string> Day_2015_12::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  absl::string_view json = input[0];
+  std::string_view json = input[0];
   int sum = 0;
   int next = 0;
   while (RE2::FindAndConsume(&json, "(-?\\d+)", &next)) {
@@ -98,9 +98,9 @@ absl::StatusOr<std::string> Day_2015_12::Part1(
 }
 
 absl::StatusOr<std::string> Day_2015_12::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  absl::string_view json = input[0];
+  std::string_view json = input[0];
   absl::StatusOr<int> ret = ParseAndCountNonRed(&json);
   if (!ret.ok()) return ret.status();
   if (!json.empty()) return Error("Json not fully consumed: ", json);

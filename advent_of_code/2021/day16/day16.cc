@@ -14,7 +14,7 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2021_16::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   absl::StatusOr<BitsExpr> expr = BitsExpr::Parse(input[0]);
   if (!expr.ok()) return expr.status();
@@ -22,7 +22,7 @@ absl::StatusOr<std::string> Day_2021_16::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_16::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   absl::StatusOr<BitsExpr> expr = BitsExpr::Parse(input[0]);
   if (!expr.ok()) return expr.status();

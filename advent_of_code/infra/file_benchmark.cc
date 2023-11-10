@@ -27,12 +27,12 @@ absl::Status FinishTest(DirtyTestParseResult* result) {
 }
 
 absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>>
-DirtyTestParse(absl::string_view contents) {
+DirtyTestParse(std::string_view contents) {
   std::vector<std::unique_ptr<DirtyTestParseResult>> ret;
   auto next = absl::make_unique<DirtyTestParseResult>();
   bool in_answer = false;
   bool in_test = false;
-  for (absl::string_view line : absl::StrSplit(contents, "\n")) {
+  for (std::string_view line : absl::StrSplit(contents, "\n")) {
     if (line == "--") {
       in_answer = true;
     } else if (line == "==") {
@@ -58,7 +58,7 @@ DirtyTestParse(absl::string_view contents) {
 }
 
 absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>>
-FileBenchmarkTests(absl::string_view test_file) {
+FileBenchmarkTests(std::string_view test_file) {
   std::string file_contents;
   if (absl::Status st = GetContents(test_file, &file_contents); !st.ok()) {
     return st;
@@ -83,8 +83,8 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
     return BM_Day_SetError(state, "Bad test");
   }
   const DirtyTestParseResult* test = (*tests)[state.range(0)].get();
-  std::vector<absl::string_view> lines = absl::StrSplit(test->test, "\n");
-  absl::Span<absl::string_view> lines_span = absl::MakeSpan(lines);
+  std::vector<std::string_view> lines = absl::StrSplit(test->test, "\n");
+  absl::Span<std::string_view> lines_span = absl::MakeSpan(lines);
   // Pull off HACK: prefix lines from the front...
   while (!lines_span.empty() && absl::StartsWith(lines_span[0], "HACK:")) {
     lines_span = lines_span.subspan(1);

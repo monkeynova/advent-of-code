@@ -51,7 +51,7 @@ class Route : public BFSInterface<Route, Point> {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2021_15::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
 
@@ -59,7 +59,7 @@ absl::StatusOr<std::string> Day_2021_15::Part1(
 }
 
 absl::StatusOr<std::string> Day_2021_15::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
 

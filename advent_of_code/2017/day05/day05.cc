@@ -18,7 +18,7 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_05::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> jumps = ParseAsInts(input);
   if (!jumps.ok()) return jumps.status();
   int steps = 0;
@@ -29,7 +29,7 @@ absl::StatusOr<std::string> Day_2017_05::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_05::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<std::vector<int64_t>> jumps = ParseAsInts(input);
   if (!jumps.ok()) return jumps.status();
   int steps = 0;

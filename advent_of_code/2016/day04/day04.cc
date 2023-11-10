@@ -13,7 +13,7 @@ namespace advent_of_code {
 
 namespace {
 
-bool Validate(absl::string_view room, absl::string_view sum) {
+bool Validate(std::string_view room, std::string_view sum) {
   absl::flat_hash_map<char, int> counts;
   for (char c : room) {
     if (c != '-') {
@@ -43,7 +43,7 @@ bool Validate(absl::string_view room, absl::string_view sum) {
   ;
 }
 
-std::string Decrypt(absl::string_view name, int sector) {
+std::string Decrypt(std::string_view name, int sector) {
   std::string ret = std::string(name);
   for (int i = 0; i < ret.size(); ++i) {
     if (ret[i] == '-') {
@@ -60,12 +60,12 @@ std::string Decrypt(absl::string_view name, int sector) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_04::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   int sector_sum = 0;
-  for (absl::string_view in : input) {
-    absl::string_view room;
+  for (std::string_view in : input) {
+    std::string_view room;
     int sector;
-    absl::string_view sum;
+    std::string_view sum;
     if (!RE2::FullMatch(in, "([a-z\\-]+)-(\\d+)\\[(.....)\\]", &room, &sector,
                         &sum)) {
       return Error("Bad input: ", in);
@@ -78,12 +78,12 @@ absl::StatusOr<std::string> Day_2016_04::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_04::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::string ret;
-  for (absl::string_view in : input) {
-    absl::string_view room;
+  for (std::string_view in : input) {
+    std::string_view room;
     int sector;
-    absl::string_view sum;
+    std::string_view sum;
     if (!RE2::FullMatch(in, "([a-z\\-]+)-(\\d+)\\[(.....)\\]", &room, &sector,
                         &sum)) {
       return Error("Bad input: ", in);

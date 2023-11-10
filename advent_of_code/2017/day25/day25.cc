@@ -16,13 +16,13 @@ namespace {
 class TuringMachine {
  public:
   static absl::StatusOr<TuringMachine> Parse(
-      absl::Span<absl::string_view> input) {
+      absl::Span<std::string_view> input) {
     TuringMachine ret;
     Rule cur_rule;
     Rule::If* cur_if = nullptr;
-    for (absl::string_view row : input) {
+    for (std::string_view row : input) {
       int n;
-      absl::string_view str;
+      std::string_view str;
       if (RE2::FullMatch(row, "Begin in state (.*).", &ret.cur_state_)) {
         // OK.
       } else if (RE2::FullMatch(
@@ -96,23 +96,23 @@ class TuringMachine {
   struct Rule {
     struct If {
       int dir = 0;
-      absl::string_view next_state;
+      std::string_view next_state;
       int write = -1;
     } if0, if1;
-    absl::string_view in_state;
+    std::string_view in_state;
   };
 
   absl::flat_hash_set<int> tape_;
   int head_pos_ = 0;
-  absl::string_view cur_state_;
-  absl::flat_hash_map<absl::string_view, Rule> state_to_rule_;
+  std::string_view cur_state_;
+  absl::flat_hash_map<std::string_view, Rule> state_to_rule_;
   int stop_steps_;
 };
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_25::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<TuringMachine> tm = TuringMachine::Parse(input);
   if (!tm.ok()) return tm.status();
 
@@ -122,7 +122,7 @@ absl::StatusOr<std::string> Day_2017_25::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_25::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   return "Merry Christmas!";
 }
 

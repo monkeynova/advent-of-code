@@ -19,12 +19,12 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_03::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   // #1372 @ 119,13: 29x16
   CharBoard board(1'000, 1'000);
   for (Point p : board.range()) board[p] = '.';
   int dupes = 0;
-  for (absl::string_view row : input) {
+  for (std::string_view row : input) {
     PointRectangle r;
     if (!RE2::FullMatch(row, "#\\d+ @ (\\d+,\\d+): (\\d+x\\d+)",
                         r.min.Capture(), r.max.Capture())) {
@@ -49,10 +49,10 @@ absl::StatusOr<std::string> Day_2018_03::Part1(
 }
 
 absl::StatusOr<std::string> Day_2018_03::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::vector<PointRectangle> claims;
   for (int i = 0; i < input.size(); ++i) {
-    absl::string_view row = input[i];
+    std::string_view row = input[i];
     PointRectangle r;
     int idx = -1;
     if (!RE2::FullMatch(row, "#(\\d+) @ (\\d+,\\d+): (\\d+x\\d+)", &idx,

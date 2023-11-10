@@ -20,7 +20,7 @@ struct Nav {
 };
 
 absl::StatusOr<absl::flat_hash_set<Point>> Parse(
-    absl::Span<absl::string_view> input) {
+    absl::Span<std::string_view> input) {
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
   if (b->width() % 2 != 1) return Error("Bad width");
@@ -59,7 +59,7 @@ enum State {
 };
 
 absl::StatusOr<absl::flat_hash_map<Point, State>> Parse2(
-    absl::Span<absl::string_view> input) {
+    absl::Span<std::string_view> input) {
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
   if (!b.ok()) return b.status();
   if (b->width() % 2 != 1) return Error("Bad width");
@@ -112,7 +112,7 @@ bool Move2(Nav& nav, absl::flat_hash_map<Point, State>& board) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_22::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<absl::flat_hash_set<Point>> sparse_board = Parse(input);
 
   Nav n;
@@ -128,7 +128,7 @@ absl::StatusOr<std::string> Day_2017_22::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_22::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<absl::flat_hash_map<Point, State>> sparse_board =
       Parse2(input);
 

@@ -13,9 +13,9 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2017_10::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
-  std::vector<absl::string_view> length_strs = absl::StrSplit(input[0], ",");
+  std::vector<std::string_view> length_strs = absl::StrSplit(input[0], ",");
   absl::StatusOr<std::vector<int64_t>> lengths_long = ParseAsInts(length_strs);
 
   std::string lengths;
@@ -33,7 +33,7 @@ absl::StatusOr<std::string> Day_2017_10::Part1(
 }
 
 absl::StatusOr<std::string> Day_2017_10::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
 
   return KnotHash().DigestHex(input[0]);

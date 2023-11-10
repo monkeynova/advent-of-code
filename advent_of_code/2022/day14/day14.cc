@@ -21,11 +21,11 @@ namespace {
 constexpr Point kAddAt = {500, 0};
 
 absl::StatusOr<absl::flat_hash_set<Point>> AllPoints(
-    absl::Span<absl::string_view> input) {
+    absl::Span<std::string_view> input) {
   absl::flat_hash_set<Point> ret;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     std::optional<Point> last;
-    for (absl::string_view p_str : absl::StrSplit(line, " -> ")) {
+    for (std::string_view p_str : absl::StrSplit(line, " -> ")) {
       Point p;
       if (!Point::RE2Parse(p_str.data(), p_str.size(), &p)) {
         return Error("Bad point");
@@ -81,7 +81,7 @@ absl::StatusOr<bool> AddSand(CharBoard& b, Point at) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_14::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<absl::flat_hash_set<Point>> points = AllPoints(input);
   if (!points.ok()) return points.status();
 
@@ -109,7 +109,7 @@ absl::StatusOr<std::string> Day_2022_14::Part1(
 }
 
 absl::StatusOr<std::string> Day_2022_14::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<absl::flat_hash_set<Point>> points = AllPoints(input);
   if (!points.ok()) return points.status();
 

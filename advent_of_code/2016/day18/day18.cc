@@ -19,7 +19,7 @@ namespace {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2016_18::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
   CharBoard b(input[0].size(), 40);
   absl::flat_hash_set<int> next_traps = {6, 3, 4, 1};
@@ -44,7 +44,7 @@ absl::StatusOr<std::string> Day_2016_18::Part1(
 }
 
 absl::StatusOr<std::string> Day_2016_18::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
   CharBoard b(input[0].size(), 400000);
   absl::flat_hash_set<int> next_traps = {6, 3, 4, 1};

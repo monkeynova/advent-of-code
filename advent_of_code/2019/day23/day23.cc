@@ -192,7 +192,7 @@ absl::Status Computer::SendCurrentPacket() {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2019_23::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<IntCode> code = IntCode::Parse(input);
   if (!code.ok()) return code.status();
 
@@ -202,7 +202,7 @@ absl::StatusOr<std::string> Day_2019_23::Part1(
 }
 
 absl::StatusOr<std::string> Day_2019_23::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<IntCode> code = IntCode::Parse(input);
   if (!code.ok()) return code.status();
 

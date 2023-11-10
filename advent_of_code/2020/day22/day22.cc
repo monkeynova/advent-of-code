@@ -92,11 +92,11 @@ int ScoreDeck(const std::deque<int>& deck) {
 }  // namespace
 
 absl::StatusOr<std::string> Day_2020_22::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::deque<int> deck1;
   std::deque<int> deck2;
   std::deque<int>* cur_deck = nullptr;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     if (str.empty()) continue;
     int player;
     int card;
@@ -125,11 +125,11 @@ absl::StatusOr<std::string> Day_2020_22::Part1(
 }
 
 absl::StatusOr<std::string> Day_2020_22::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   std::deque<int> deck1;
   std::deque<int> deck2;
   std::deque<int>* cur_deck = nullptr;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     if (str.empty()) continue;
     int player;
     int card;

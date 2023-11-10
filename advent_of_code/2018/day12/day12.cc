@@ -14,9 +14,9 @@ namespace advent_of_code {
 namespace {
 
 std::string Advance(
-    const absl::flat_hash_map<absl::string_view, absl::string_view>& rules,
-    absl::string_view cur_view, int64_t* offset) {
-  constexpr absl::string_view kEmpty = ".....";
+    const absl::flat_hash_map<std::string_view, std::string_view>& rules,
+    std::string_view cur_view, int64_t* offset) {
+  constexpr std::string_view kEmpty = ".....";
   std::string next;
   int cur_size = cur_view.size();  // Not an unsigned int!
   for (int j = -4; j < cur_size; ++j) {
@@ -37,7 +37,7 @@ std::string Advance(
     VLOG(2) << j << ": " << test << " => " << next.back();
   }
   *offset -= 2;
-  absl::string_view next_view = next;
+  std::string_view next_view = next;
   while (next_view[0] == '.') {
     ++*offset;
     next_view = next_view.substr(1);
@@ -50,12 +50,12 @@ std::string Advance(
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_12::Part1(
-    absl::Span<absl::string_view> input) const {
-  absl::string_view initial_state;
-  absl::flat_hash_map<absl::string_view, absl::string_view> rules;
-  for (absl::string_view row : input) {
-    absl::string_view from;
-    absl::string_view to;
+    absl::Span<std::string_view> input) const {
+  std::string_view initial_state;
+  absl::flat_hash_map<std::string_view, std::string_view> rules;
+  for (std::string_view row : input) {
+    std::string_view from;
+    std::string_view to;
     if (row.empty()) continue;
     if (RE2::FullMatch(row, "initial state: ([\\.\\#]*)", &initial_state)) {
       // OK.
@@ -85,12 +85,12 @@ absl::StatusOr<std::string> Day_2018_12::Part1(
 }
 
 absl::StatusOr<std::string> Day_2018_12::Part2(
-    absl::Span<absl::string_view> input) const {
-  absl::string_view initial_state;
-  absl::flat_hash_map<absl::string_view, absl::string_view> rules;
-  for (absl::string_view row : input) {
-    absl::string_view from;
-    absl::string_view to;
+    absl::Span<std::string_view> input) const {
+  std::string_view initial_state;
+  absl::flat_hash_map<std::string_view, std::string_view> rules;
+  for (std::string_view row : input) {
+    std::string_view from;
+    std::string_view to;
     if (row.empty()) continue;
     if (RE2::FullMatch(row, "initial state: ([\\.\\#]*)", &initial_state)) {
       // OK.

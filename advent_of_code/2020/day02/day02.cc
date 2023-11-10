@@ -9,10 +9,10 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2020_02::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   static LazyRE2 pattern{"(\\d+)-(\\d+) (.): (.*)"};
   int valid = 0;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     int min;
     int max;
     std::string c;
@@ -32,10 +32,10 @@ absl::StatusOr<std::string> Day_2020_02::Part1(
 }
 
 absl::StatusOr<std::string> Day_2020_02::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   static LazyRE2 pattern{"(\\d+)-(\\d+) (.): (.*)"};
   int valid = 0;
-  for (absl::string_view str : input) {
+  for (std::string_view str : input) {
     int min;
     int max;
     std::string c;

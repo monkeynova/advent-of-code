@@ -19,17 +19,17 @@ namespace advent_of_code {
 namespace {
 
 struct Valve {
-  absl::string_view name;
+  std::string_view name;
   int flow;
 };
 
 absl::StatusOr<DirectedGraph<Valve>> ParseGraph(
-    absl::Span<absl::string_view> input) {
+    absl::Span<std::string_view> input) {
   DirectedGraph<Valve> graph;
   int full_flow = 0;
-  for (absl::string_view line : input) {
+  for (std::string_view line : input) {
     Valve v;
-    absl::string_view out;
+    std::string_view out;
     if (!RE2::FullMatch(line,
                         "Valve ([A-Z]+) has flow rate=(\\d+); "
                         "tunnels? leads? to valves? ([A-Z ,]+)",
@@ -39,7 +39,7 @@ absl::StatusOr<DirectedGraph<Valve>> ParseGraph(
     if (v.name.size() != 2) return Error("Bad valve: ", v.name);
     full_flow += v.flow;
     graph.AddNode(v.name, v);
-    for (absl::string_view out_name : absl::StrSplit(out, ", ")) {
+    for (std::string_view out_name : absl::StrSplit(out, ", ")) {
       if (out_name.size() != 2) return Error("Bad valve: ", out_name);
       graph.AddEdge(v.name, out_name);
     }
@@ -54,7 +54,7 @@ struct State {
 
   absl::Status NextForMe(
       const DirectedGraph<Valve>& graph,
-      const absl::flat_hash_map<absl::string_view, int>& pack,
+      const absl::flat_hash_map<std::string_view, int>& pack,
       absl::FunctionRef<absl::Status(State)> on_next) const {
     if (open_set == (1 << pack.size()) - 1) {
       return on_next(*this);
@@ -65,7 +65,7 @@ struct State {
     if (graph.Outgoing(me_str) == nullptr) {
       return Error("No outgoing for me from: ", me_str);
     }
-    for (absl::string_view out : *graph.Outgoing(me_str)) {
+    for (std::string_view out : *graph.Outgoing(me_str)) {
       State s = *this;
       s.MoveMe(out);
       if (absl::Status st = on_next(s); !st.ok()) return st;
@@ -75,7 +75,7 @@ struct State {
 
   absl::Status NextForEl(
       const DirectedGraph<Valve>& graph,
-      const absl::flat_hash_map<absl::string_view, int>& pack,
+      const absl::flat_hash_map<std::string_view, int>& pack,
       absl::FunctionRef<absl::Status(State)> on_next) const {
     if (open_set == (1 << pack.size()) - 1) {
       return on_next(*this);
@@ -86,7 +86,7 @@ struct State {
     if (graph.Outgoing(el_str) == nullptr) {
       return Error("No outgoing for el from: ", el_str);
     }
-    for (absl::string_view out : *graph.Outgoing(el_str)) {
+    for (std::string_view out : *graph.Outgoing(el_str)) {
       State s = *this;
       s.MoveEl(out);
       if (absl::Status st = on_next(s); !st.ok()) return st;
@@ -94,7 +94,7 @@ struct State {
     return absl::Status();
   }
 
-  void TryOpenMe(const absl::flat_hash_map<absl::string_view, int>& pack,
+  void TryOpenMe(const absl::flat_hash_map<std::string_view, int>& pack,
                  absl::FunctionRef<void(State)> on_next) const {
     std::string me_str = {static_cast<char>(me >> 8),
                           static_cast<char>(me & 0xFF)};
@@ -109,9 +109,9 @@ struct State {
     ;
   }
 
-  void MoveMe(absl::string_view dest) { me = (dest[0] << 8) | dest[1]; }
+  void MoveMe(std::string_view dest) { me = (dest[0] << 8) | dest[1]; }
 
-  void TryOpenEl(const absl::flat_hash_map<absl::string_view, int>& pack,
+  void TryOpenEl(const absl::flat_hash_map<std::string_view, int>& pack,
                  absl::FunctionRef<void(State)> on_next) const {
     std::string el_str = {static_cast<char>(el >> 8),
                           static_cast<char>(el & 0xFF)};
@@ -125,7 +125,7 @@ struct State {
     on_next(new_state);
   }
 
-  void MoveEl(absl::string_view dest) { el = (dest[0] << 8) | dest[1]; }
+  void MoveEl(std::string_view dest) { el = (dest[0] << 8) | dest[1]; }
 
   bool operator==(const State& o) const {
     return open_set == o.open_set &&
@@ -149,11 +149,11 @@ void InsertOrUpdateMax(absl::flat_hash_map<State, int>& map, State s,
 
 absl::StatusOr<int> BestPath(const DirectedGraph<Valve>& graph, int minutes,
                              bool use_elephant) {
-  absl::flat_hash_map<absl::string_view, int> pack;
+  absl::flat_hash_map<std::string_view, int> pack;
   int64_t all_on = 0;
   int full_flow = 0;
   std::vector<const Valve*> ordered_valves;
-  for (absl::string_view n : graph.nodes()) {
+  for (std::string_view n : graph.nodes()) {
     ordered_valves.push_back(graph.GetData(n));
   }
   auto by_flow = [](const Valve* a, const Valve* b) {
@@ -256,7 +256,7 @@ absl::StatusOr<int> BestPath(const DirectedGraph<Valve>& graph, int minutes,
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_16::Part1(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<DirectedGraph<Valve>> graph = ParseGraph(input);
   if (!graph.ok()) return graph.status();
 
@@ -264,7 +264,7 @@ absl::StatusOr<std::string> Day_2022_16::Part1(
 }
 
 absl::StatusOr<std::string> Day_2022_16::Part2(
-    absl::Span<absl::string_view> input) const {
+    absl::Span<std::string_view> input) const {
   absl::StatusOr<DirectedGraph<Valve>> graph = ParseGraph(input);
   if (!graph.ok()) return graph.status();
 
