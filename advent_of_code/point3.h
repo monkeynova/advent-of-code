@@ -122,11 +122,11 @@ struct Cube {
   Point3 min;
   Point3 max;
 
-  struct iterator {
+  struct const_iterator {
     Point3 cur = Point3{0, 0, 0};
     const Cube* base = nullptr;
 
-    iterator operator++() {
+    const_iterator operator++() {
       if (++cur.x > base->max.x) {
         cur.x = base->min.x;
         if (++cur.y > base->max.y) {
@@ -140,16 +140,16 @@ struct Cube {
       return *this;
     }
 
-    bool operator==(const iterator& o) const {
+    bool operator==(const const_iterator& o) const {
       return base == o.base && cur == o.cur;
     }
-    bool operator!=(const iterator& o) const { return !operator==(o); }
+    bool operator!=(const const_iterator& o) const { return !operator==(o); }
 
     Point3 operator*() const { return cur; }
   };
 
-  iterator begin() const { return iterator{.cur = min, .base = this}; }
-  iterator end() const { return iterator{}; }
+  const_iterator begin() const { return const_iterator{.cur = min, .base = this}; }
+  const_iterator end() const { return const_iterator{}; }
 
   int64_t Volume() const {
     // 1ll forces the addition to return int64 before multiplying.
