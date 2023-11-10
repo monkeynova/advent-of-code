@@ -193,7 +193,7 @@ struct Cube {
     return true;
   }
 
-  absl::optional<Cube> Intersect(const Cube& o) const {
+  std::optional<Cube> Intersect(const Cube& o) const {
     if (!Overlaps(o)) return {};
     return Cube{
         {std::max(min.x, o.min.x), std::max(min.y, o.min.y),

@@ -19,7 +19,7 @@ struct Route {
   int weight;
 };
 
-absl::optional<int> ShortestAllVisitFrom(
+std::optional<int> ShortestAllVisitFrom(
     const absl::flat_hash_map<std::string_view, std::vector<Route>>& src_routes,
     std::string_view from, absl::flat_hash_set<std::string_view>* visited) {
   std::string prefix;
@@ -27,7 +27,7 @@ absl::optional<int> ShortestAllVisitFrom(
   VLOG(1) << prefix << "ShortestAllVisitFrom(" << from << ", "
           << visited->size() << ")";
   if (visited->size() == src_routes.size()) return 0;
-  absl::optional<int> min;
+  std::optional<int> min;
   auto it = src_routes.find(from);
   if (it == src_routes.end()) return absl::nullopt;
 
@@ -43,10 +43,10 @@ absl::optional<int> ShortestAllVisitFrom(
   return min;
 }
 
-absl::optional<int> ShortestAllVisit(
+std::optional<int> ShortestAllVisit(
     const absl::flat_hash_map<std::string_view, std::vector<Route>>&
         src_routes) {
-  absl::optional<int> min;
+  std::optional<int> min;
   absl::flat_hash_set<std::string_view> visited;
   for (const auto& pair : src_routes) {
     visited.insert(pair.first);
@@ -56,7 +56,7 @@ absl::optional<int> ShortestAllVisit(
   return *min;
 }
 
-absl::optional<int> LongestAllVisitFrom(
+std::optional<int> LongestAllVisitFrom(
     const absl::flat_hash_map<std::string_view, std::vector<Route>>& src_routes,
     std::string_view from, absl::flat_hash_set<std::string_view>* visited) {
   std::string prefix;
@@ -64,7 +64,7 @@ absl::optional<int> LongestAllVisitFrom(
   VLOG(1) << prefix << "LongestAllVisitFrom(" << from << ", " << visited->size()
           << ")";
   if (visited->size() == src_routes.size()) return 0;
-  absl::optional<int> max;
+  std::optional<int> max;
   auto it = src_routes.find(from);
   if (it == src_routes.end()) return absl::nullopt;
 
@@ -80,10 +80,10 @@ absl::optional<int> LongestAllVisitFrom(
   return max;
 }
 
-absl::optional<int> LongestAllVisit(
+std::optional<int> LongestAllVisit(
     const absl::flat_hash_map<std::string_view, std::vector<Route>>&
         src_routes) {
-  absl::optional<int> max;
+  std::optional<int> max;
   absl::flat_hash_set<std::string_view> visited;
   for (const auto& pair : src_routes) {
     visited.insert(pair.first);

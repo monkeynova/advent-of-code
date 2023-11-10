@@ -5,7 +5,7 @@
 
 namespace advent_of_code {
 
-absl::optional<int64_t> ExtendedEuclideanAlgorithm(
+std::optional<int64_t> ExtendedEuclideanAlgorithm(
     int64_t a, int64_t b, OnExtendedEuclidean on_result) {
   int64_t r_0 = a;
   int64_t r_1 = b;
@@ -26,19 +26,19 @@ absl::optional<int64_t> ExtendedEuclideanAlgorithm(
   return on_result(r_0, r_1, s_0, s_1, t_0, t_1);
 }
 
-absl::optional<int64_t> ExtendedEuclideanAlgorithmInvert(int64_t n,
-                                                         int64_t mod) {
+std::optional<int64_t> ExtendedEuclideanAlgorithmInvert(int64_t n,
+                                                        int64_t mod) {
   return ExtendedEuclideanAlgorithm(
       n, mod,
       [&](int64_t r_0, int64_t r_1, int64_t s_0, int64_t s_1, int64_t t_0,
-          int64_t t_1) -> absl::optional<int64_t> {
+          int64_t t_1) -> std::optional<int64_t> {
         if (r_0 != 1) return {};
         return t_0 < 0 ? t_0 + mod : t_0;
       });
 }
 
-absl::optional<int64_t> ChineseRemainder(int64_t mod_a, int64_t a,
-                                         int64_t mod_b, int64_t b) {
+std::optional<int64_t> ChineseRemainder(int64_t mod_a, int64_t a, int64_t mod_b,
+                                        int64_t b) {
   VLOG(2) << "  " << mod_a << " MOD " << a << " AND " << mod_b << " MOD " << b;
   if (b < a) {
     std::swap(a, b);
@@ -48,7 +48,7 @@ absl::optional<int64_t> ChineseRemainder(int64_t mod_a, int64_t a,
     return ExtendedEuclideanAlgorithm(
         b, a,
         [&](int64_t r_0, int64_t r_1, int64_t s_0, int64_t s_1, int64_t t_0,
-            int64_t t_1) -> absl::optional<int64_t> {
+            int64_t t_1) -> std::optional<int64_t> {
           if (r_0 != 1) return {};
           DCHECK_EQ(s_0 * b + t_0 * a, r_0);
           if (s_0 < 0) s_0 += a;
@@ -59,7 +59,7 @@ absl::optional<int64_t> ChineseRemainder(int64_t mod_a, int64_t a,
     return ExtendedEuclideanAlgorithm(
         b, a,
         [&](int64_t r_0, int64_t r_1, int64_t s_0, int64_t s_1, int64_t t_0,
-            int64_t t_1) -> absl::optional<int64_t> {
+            int64_t t_1) -> std::optional<int64_t> {
           if (r_0 != 1) return {};
           DCHECK_EQ(s_0 * b + t_0 * a, r_0);
           if (s_0 < 0) s_0 += a;
@@ -75,14 +75,14 @@ absl::optional<int64_t> ChineseRemainder(int64_t mod_a, int64_t a,
   }
 }
 
-absl::optional<int64_t> ChineseRemainder(
+std::optional<int64_t> ChineseRemainder(
     std::vector<std::pair<int64_t, int64_t>> list) {
   if (list.empty()) return {};
   int64_t cur_v = list.begin()->first;
   int64_t cur_mod = list.begin()->second;
   for (auto it = list.begin() + 1; it != list.end(); ++it) {
     auto [next_v, next_mod] = *it;
-    absl::optional<int64_t> merged =
+    std::optional<int64_t> merged =
         ChineseRemainder(cur_v, cur_mod, next_v, next_mod);
     if (!merged) return {};
     cur_v = *merged;

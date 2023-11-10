@@ -24,7 +24,7 @@ absl::StatusOr<std::string> Day_2019_08::Part1(
     return absl::InvalidArgumentError("Image is empty");
   }
 
-  absl::optional<int> min_zeros;
+  std::optional<int> min_zeros;
   int min_layer;
   for (int i = 0; i < layer_count; ++i) {
     const char* layer = input[0].data() + i * kLayerSize;

@@ -72,16 +72,16 @@ class AssemblyIO : public IntCode::IOModule {
     return absl::InvalidArgumentError("Input is exhausted");
   }
 
-  absl::optional<int64_t> output() { return output_; }
-  absl::optional<int64_t> last_nonempty_output() {
+  std::optional<int64_t> output() { return output_; }
+  std::optional<int64_t> last_nonempty_output() {
     return last_nonempty_output_;
   }
 
  private:
   std::vector<int64_t> input_;
   int input_pos_ = 0;
-  absl::optional<int64_t> output_;
-  absl::optional<int64_t> last_nonempty_output_;
+  std::optional<int64_t> output_;
+  std::optional<int64_t> last_nonempty_output_;
 };
 
 absl::StatusOr<int> RunAssembly(const IntCode& base_codes,

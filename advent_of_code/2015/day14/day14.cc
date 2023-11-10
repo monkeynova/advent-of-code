@@ -86,7 +86,7 @@ absl::StatusOr<std::string> Day_2015_14::Part2(
       ++points[name];
     }
   }
-  absl::optional<int> max;
+  std::optional<int> max;
   for (const auto& pair : points) {
     max = opt_max(max, pair.second);
   }

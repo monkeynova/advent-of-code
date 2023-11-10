@@ -14,9 +14,9 @@ namespace advent_of_code {
 
 namespace {
 
-absl::optional<int> FindBadWeight(std::string_view root,
-                                  const DirectedGraph<int>& dag,
-                                  int* this_weight_out = nullptr) {
+std::optional<int> FindBadWeight(std::string_view root,
+                                 const DirectedGraph<int>& dag,
+                                 int* this_weight_out = nullptr) {
   const int* weight = dag.GetData(root);
   CHECK(weight != nullptr);
 
@@ -31,7 +31,7 @@ absl::optional<int> FindBadWeight(std::string_view root,
   absl::flat_hash_map<int, int> sub_weight_example;
   for (int i = 0; i < children->size(); ++i) {
     int this_weight;
-    absl::optional<int> bad = FindBadWeight((*children)[i], dag, &this_weight);
+    std::optional<int> bad = FindBadWeight((*children)[i], dag, &this_weight);
     VLOG(1) << (*children)[i] << ": " << this_weight;
     if (bad) return bad;
     ++sub_weight_counts[this_weight];

@@ -54,7 +54,7 @@ absl::StatusOr<int> BestFillRemainingSeats(
     return *wrap_around + delta_happiness;
   }
 
-  absl::optional<int> max_happiness;
+  std::optional<int> max_happiness;
   for (const auto& to_seat_pair : cost_map) {
     std::string_view to_seat = to_seat_pair.first;
     if (seated->contains(to_seat)) continue;

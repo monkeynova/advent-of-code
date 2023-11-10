@@ -238,7 +238,7 @@ class TileMerger {
     VLOG(3) << "Orienting";
     VLOG(3) << "  x_align: " << x_align;
     VLOG(3) << "  y_align: " << y_align;
-    absl::optional<int> tile_num;
+    std::optional<int> tile_num;
     if (x_align.empty() && y_align.empty()) {
       // First corner. Pick arbitrarily.
       if (corners_.empty()) return Error("No corners?");
@@ -370,7 +370,7 @@ bool IsSeaMonster(const CharBoard& board, Point p) {
 absl::StatusOr<int> CountNonSeaMonster(const CharBoard& board) {
   const int kSeaMonsterOn = 15;
   int on = board.CountOn();
-  absl::optional<int> sea_monster_count;
+  std::optional<int> sea_monster_count;
   for (std::function<Point(Point)> t : Transforms(board.range())) {
     CharBoard tmp = Transform(board, t);
     LOG(INFO) << "Looking for monsters in\n" << tmp;

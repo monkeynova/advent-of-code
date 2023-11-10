@@ -56,7 +56,7 @@ int64_t BioDiversity(const CharBoard& input) {
   return ret;
 }
 
-absl::optional<CharBoard> NewBoardPlusOneLevel(const CharBoard& in_board) {
+std::optional<CharBoard> NewBoardPlusOneLevel(const CharBoard& in_board) {
   CharBoard new_board(in_board.width(), in_board.height());
   bool added = false;
   if (in_board[{2, 1}] == '#') {
@@ -87,7 +87,7 @@ absl::optional<CharBoard> NewBoardPlusOneLevel(const CharBoard& in_board) {
   return new_board;
 }
 
-absl::optional<CharBoard> NewBoardMinusOneLevel(const CharBoard& in_board) {
+std::optional<CharBoard> NewBoardMinusOneLevel(const CharBoard& in_board) {
   CharBoard new_board(in_board.width(), in_board.height());
   bool added = false;
   int count = 0;
@@ -127,8 +127,8 @@ absl::optional<CharBoard> NewBoardMinusOneLevel(const CharBoard& in_board) {
 }
 
 int CountNeighborsRecursive(const CharBoard& in_board, Point p,
-                            absl::optional<CharBoard> board_minus_one,
-                            absl::optional<CharBoard> board_plus_one) {
+                            std::optional<CharBoard> board_minus_one,
+                            std::optional<CharBoard> board_plus_one) {
   int neighbors = 0;
   for (Point dir : Cardinal::kFourDirs) {
     Point n = dir + p;
@@ -184,14 +184,14 @@ absl::flat_hash_map<int, CharBoard> StepGameOfLineRecursive(
     int depth = depth_and_board.first;
     const CharBoard& in_board = depth_and_board.second;
     CharBoard out_board = in_board;
-    absl::optional<CharBoard> board_minus_one =
+    std::optional<CharBoard> board_minus_one =
         opt_find(depth_to_board, depth - 1);
-    absl::optional<CharBoard> board_plus_one =
+    std::optional<CharBoard> board_plus_one =
         opt_find(depth_to_board, depth + 1);
     for (Point p : in_board.range()) {
       if (p == Point{2, 2}) {
         if (!board_plus_one) {
-          absl::optional<CharBoard> new_board = NewBoardPlusOneLevel(in_board);
+          std::optional<CharBoard> new_board = NewBoardPlusOneLevel(in_board);
           if (new_board) {
             out.emplace(depth + 1, std::move(*new_board));
           }
@@ -208,7 +208,7 @@ absl::flat_hash_map<int, CharBoard> StepGameOfLineRecursive(
         }
       }
       if (!board_minus_one) {
-        absl::optional<CharBoard> new_board = NewBoardMinusOneLevel(in_board);
+        std::optional<CharBoard> new_board = NewBoardMinusOneLevel(in_board);
         if (new_board) {
           out.emplace(depth - 1, std::move(*new_board));
         }

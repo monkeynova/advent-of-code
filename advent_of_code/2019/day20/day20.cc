@@ -107,7 +107,7 @@ class Maze {
     return false;
   }
 
-  absl::optional<int> FindPath() {
+  std::optional<int> FindPath() {
     class PathWalk : public BFSInterface<PathWalk, Point> {
      public:
       PathWalk(const Maze& maze, Point start, Point end)
@@ -140,7 +140,7 @@ class Maze {
     return PathWalk(*this, start_, end_).FindMinSteps();
   }
 
-  absl::optional<int> FindRecursivePath() {
+  std::optional<int> FindRecursivePath() {
     class PathWalk : public BFSInterface<PathWalk, Point3> {
      public:
       PathWalk(const Maze& maze, Point start, Point end)

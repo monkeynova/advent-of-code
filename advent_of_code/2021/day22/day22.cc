@@ -44,7 +44,7 @@ absl::StatusOr<std::string> Day_2021_22::Part1(
     absl::Span<std::string_view> input) const {
   Cube bound{{-50, -50, -50}, {50, 50, 50}};
   CubeSet s;
-  absl::optional<absl::flat_hash_set<Point3>> map;
+  std::optional<absl::flat_hash_set<Point3>> map;
   if (run_audit()) {
     map = absl::flat_hash_set<Point3>{};
   }
@@ -59,7 +59,7 @@ absl::StatusOr<std::string> Day_2021_22::Part1(
       return Error("Bad line: ", line);
     }
 
-    absl::optional<Cube> c = bound.Intersect(Cube{{x0, y0, z0}, {x1, y1, z1}});
+    std::optional<Cube> c = bound.Intersect(Cube{{x0, y0, z0}, {x1, y1, z1}});
     if (!c) continue;
     if (type == "on") {
       if (map)

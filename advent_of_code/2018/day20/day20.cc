@@ -286,7 +286,7 @@ absl::StatusOr<std::string> Day_2018_20::Part1(
   VLOG(1) << "Start @" << start << " in Room:\n" << *room;
 
   int max_path = -1;
-  absl::optional<int> null_dist =
+  std::optional<int> null_dist =
       RoomWalk(*room, start, &max_path).FindMinSteps();
   if (null_dist) return Error("Path walk terminated?!?");
 
@@ -309,7 +309,7 @@ absl::StatusOr<std::string> Day_2018_20::Part2(
   VLOG(1) << "Start @" << start << " in Room:\n" << *room;
 
   int count = -1;
-  absl::optional<int> null_dist =
+  std::optional<int> null_dist =
       RoomWalkPast(*room, start, 1000, &count).FindMinSteps();
   if (null_dist) return Error("Path walk terminated?!?");
 

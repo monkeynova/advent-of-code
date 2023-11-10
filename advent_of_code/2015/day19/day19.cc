@@ -77,17 +77,17 @@ int FindMinPath(const absl::flat_hash_map<std::string_view,
   return -1;
 }
 
-absl::optional<int> FindMinPathReverseImpl(
+std::optional<int> FindMinPathReverseImpl(
     const std::map<std::string_view, std::string_view>& map,
     const std::vector<std::string_view>& map_by_len,
-    absl::flat_hash_map<std::string, absl::optional<int>>* memo,
+    absl::flat_hash_map<std::string, std::optional<int>>* memo,
     std::string_view src, std::string_view dest) {
   if (auto it = memo->find(dest); it != memo->end()) {
     return it->second;
   }
   VLOG(2) << "FindMinPathReverse: " << src << "; " << dest;
   if (src == dest) return 0;
-  absl::optional<int> min;
+  std::optional<int> min;
   // If we find a cycle, bomb out as impossible.
   memo->emplace(dest, min);
   int found_len;
@@ -103,7 +103,7 @@ absl::optional<int> FindMinPathReverseImpl(
       if (dest.substr(i, find.size()) == find) {
         std::string sub_dest = absl::StrCat(dest.substr(0, i), it->second,
                                             dest.substr(i + find.size()));
-        absl::optional<int> sub_min =
+        std::optional<int> sub_min =
             FindMinPathReverseImpl(map, map_by_len, memo, src, sub_dest);
         if (sub_min) {
           if (!min || *min > *sub_min + 1) {
@@ -118,7 +118,7 @@ absl::optional<int> FindMinPathReverseImpl(
   return min;
 }
 
-absl::optional<int> FindMinPathReverse(
+std::optional<int> FindMinPathReverse(
     const std::map<std::string_view, std::string_view>& map,
     std::string_view src, std::string_view dest) {
   std::vector<std::string_view> map_by_len;
@@ -128,7 +128,7 @@ absl::optional<int> FindMinPathReverse(
               if (a.size() != b.size()) return a.size() > b.size();
               return a < b;
             });
-  absl::flat_hash_map<std::string, absl::optional<int>> memo;
+  absl::flat_hash_map<std::string, std::optional<int>> memo;
   return FindMinPathReverseImpl(map, map_by_len, &memo, src, dest);
 }
 
@@ -140,12 +140,12 @@ std::string_view FirstElement(std::string_view str) {
   return str.substr(0, 1);
 }
 
-absl::optional<int> MatchFromFront(
+std::optional<int> MatchFromFront(
     const std::map<std::string_view, std::string_view>& map,
     std::string_view src, std::string_view dest) {
   std::string_view first_elem = FirstElement(dest);
   VLOG(1) << "Looking how to produce " << first_elem << " for " << dest;
-  absl::optional<int> min;
+  std::optional<int> min;
   for (auto it = map.lower_bound(first_elem); it != map.end(); ++it) {
     std::string_view rule_dest = it->first;
     std::string_view rule_src = it->second;
@@ -159,7 +159,7 @@ absl::optional<int> MatchFromFront(
     if (dest.substr(0, rule_dest.size()) == rule_dest) {
       std::string sub_dest =
           absl::StrCat(rule_src, dest.substr(rule_dest.size()));
-      absl::optional<int> sub_min = MatchFromFront(map, src, sub_dest);
+      std::optional<int> sub_min = MatchFromFront(map, src, sub_dest);
       if (sub_min) {
         if (!min || *min > *sub_min) {
           min = *sub_min;

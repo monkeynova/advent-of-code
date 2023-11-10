@@ -93,9 +93,9 @@ absl::StatusOr<std::string> Day_2019_12::Part2(
   // align.
   std::vector<Moon> start = moons;
   int64_t steps = 0;
-  absl::optional<int> x_cycle_size;
-  absl::optional<int> y_cycle_size;
-  absl::optional<int> z_cycle_size;
+  std::optional<int> x_cycle_size;
+  std::optional<int> y_cycle_size;
+  std::optional<int> z_cycle_size;
 
   bool done = false;
   while (!done) {

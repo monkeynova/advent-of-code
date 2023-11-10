@@ -2,12 +2,12 @@
 #define ADVENT_OF_CODE_MOD_H
 
 #include <numeric>
+#include <optional>
 #include <vector>
 
 #include "absl/functional/function_ref.h"
 #include "absl/log/check.h"
 #include "absl/log/log.h"
-#include "absl/types/optional.h"
 
 namespace advent_of_code {
 
@@ -34,16 +34,15 @@ T InverseMod(T n, T mod) {
   return PowerMod<T>(n, mod - 2, mod);
 }
 
-using OnExtendedEuclidean = absl::FunctionRef<absl::optional<int64_t>(
+using OnExtendedEuclidean = absl::FunctionRef<std::optional<int64_t>(
     int64_t, int64_t, int64_t, int64_t, int64_t, int64_t)>;
-absl::optional<int64_t> ExtendedEuclideanAlgorithm(
+std::optional<int64_t> ExtendedEuclideanAlgorithm(
     int64_t a, int64_t b, OnExtendedEuclidean on_result);
 
-absl::optional<int64_t> ExtendedEuclideanAlgorithmInvert(int64_t n,
-                                                         int64_t mod);
-absl::optional<int64_t> ChineseRemainder(int64_t mod_a, int64_t a,
-                                         int64_t mod_b, int64_t b);
-absl::optional<int64_t> ChineseRemainder(
+std::optional<int64_t> ExtendedEuclideanAlgorithmInvert(int64_t n, int64_t mod);
+std::optional<int64_t> ChineseRemainder(int64_t mod_a, int64_t a, int64_t mod_b,
+                                        int64_t b);
+std::optional<int64_t> ChineseRemainder(
     std::vector<std::pair<int64_t, int64_t>> list);
 
 }  // namespace advent_of_code

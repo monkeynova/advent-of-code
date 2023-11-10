@@ -46,8 +46,8 @@ struct State {
     return absl::StrCat(tmp);
   }
 
-  absl::StatusOr<absl::optional<Point>> RunStep() {
-    absl::optional<Point> ret;
+  absl::StatusOr<std::optional<Point>> RunStep() {
+    std::optional<Point> ret;
     absl::flat_hash_set<Point> cart_locations;
     std::sort(carts.begin(), carts.end());
     for (const Cart& c : carts) cart_locations.insert(c.pos);
@@ -190,7 +190,7 @@ absl::StatusOr<std::string> Day_2018_13::Part1(
 
   while (true) {
     VLOG(1) << "State:\n" << state->DebugString();
-    absl::StatusOr<absl::optional<Point>> collision = state->RunStep();
+    absl::StatusOr<std::optional<Point>> collision = state->RunStep();
     if (!collision.ok()) return collision.status();
     if (*collision) return AdventReturn(*collision);
   }
@@ -209,7 +209,7 @@ absl::StatusOr<std::string> Day_2018_13::Part2(
 
   while (state->carts.size() > 1) {
     VLOG(1) << "State:\n" << state->DebugString();
-    absl::StatusOr<absl::optional<Point>> collision = state->RunStep();
+    absl::StatusOr<std::optional<Point>> collision = state->RunStep();
     if (!collision.ok()) return collision.status();
   }
 

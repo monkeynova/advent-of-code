@@ -137,7 +137,7 @@ class Board {
     return ret;
   };
 
-  absl::optional<int> MinStepsToAllKeys() {
+  std::optional<int> MinStepsToAllKeys() {
     std::vector<KeyPath> all_paths = AllKeyPaths();
     absl::flat_hash_map<char, std::vector<KeyPath>> all_paths_idx_by_key;
     for (KeyPath& path : all_paths) {
@@ -151,11 +151,11 @@ class Board {
     return MinStepsRobotDP(all_paths_idx_by_key);
   }
 
-  absl::optional<int> MinStepsRobotDP(
+  std::optional<int> MinStepsRobotDP(
       const absl::flat_hash_map<char, std::vector<KeyPath>>& all_paths_idx) {
     absl::flat_hash_map<NKeyState, int> states =
         AllMinStatesForRobotsNKeys(all_paths_idx, keys_.size());
-    absl::optional<int> min;
+    std::optional<int> min;
     for (const auto& pair : states) {
       min = opt_min(min, pair.second);
     }

@@ -64,9 +64,9 @@ bool CanWin(Character boss, Character me) {
   }
 }
 
-absl::optional<int> MinCostToWinRings(Character boss, Character me, Item weapon,
-                                      absl::optional<Item> armor,
-                                      std::vector<Item> rings) {
+std::optional<int> MinCostToWinRings(Character boss, Character me, Item weapon,
+                                     std::optional<Item> armor,
+                                     std::vector<Item> rings) {
   for (Item r : rings) {
     me.armor += r.armor;
     me.damage += r.damage;
@@ -84,12 +84,12 @@ absl::optional<int> MinCostToWinRings(Character boss, Character me, Item weapon,
   return cost;
 }
 
-absl::optional<int> MinCostToWinArmor(Character boss, Character me, Item weapon,
-                                      absl::optional<Item> armor) {
+std::optional<int> MinCostToWinArmor(Character boss, Character me, Item weapon,
+                                     std::optional<Item> armor) {
   if (armor) {
     me.armor += armor->armor;
   }
-  absl::optional<int> min;
+  std::optional<int> min;
   min = opt_min(min, MinCostToWinRings(boss, me, weapon, armor, {}));
   for (int ring_id = 0; ring_id < rings.size(); ++ring_id) {
     min = opt_min(min,
@@ -104,10 +104,10 @@ absl::optional<int> MinCostToWinArmor(Character boss, Character me, Item weapon,
   return min;
 }
 
-absl::optional<int> MinCostToWinWeapon(Character boss, Character me,
-                                       Item weapon) {
+std::optional<int> MinCostToWinWeapon(Character boss, Character me,
+                                      Item weapon) {
   me.damage += weapon.damage;
-  absl::optional<int> min;
+  std::optional<int> min;
   min = opt_min(min, MinCostToWinArmor(boss, me, weapon, absl::nullopt));
   for (int armor_id = 0; armor_id < armors.size(); ++armor_id) {
     min = opt_min(min, MinCostToWinArmor(boss, me, weapon, armors[armor_id]));
@@ -115,18 +115,18 @@ absl::optional<int> MinCostToWinWeapon(Character boss, Character me,
   return min;
 }
 
-absl::optional<int> MinCostToWin(Character boss) {
+std::optional<int> MinCostToWin(Character boss) {
   Character me{100, 0, 0};
-  absl::optional<int> min;
+  std::optional<int> min;
   for (int weapon_id = 0; weapon_id < weapons.size(); ++weapon_id) {
     min = opt_min(min, MinCostToWinWeapon(boss, me, weapons[weapon_id]));
   }
   return min;
 }
 
-absl::optional<int> MaxCostToLoseRings(Character boss, Character me,
-                                       Item weapon, absl::optional<Item> armor,
-                                       std::vector<Item> rings) {
+std::optional<int> MaxCostToLoseRings(Character boss, Character me, Item weapon,
+                                      std::optional<Item> armor,
+                                      std::vector<Item> rings) {
   for (Item r : rings) {
     me.armor += r.armor;
     me.damage += r.damage;
@@ -144,13 +144,12 @@ absl::optional<int> MaxCostToLoseRings(Character boss, Character me,
   return cost;
 }
 
-absl::optional<int> MaxCostToLoseArmor(Character boss, Character me,
-                                       Item weapon,
-                                       absl::optional<Item> armor) {
+std::optional<int> MaxCostToLoseArmor(Character boss, Character me, Item weapon,
+                                      std::optional<Item> armor) {
   if (armor) {
     me.armor += armor->armor;
   }
-  absl::optional<int> max;
+  std::optional<int> max;
   max = opt_max(max, MaxCostToLoseRings(boss, me, weapon, armor, {}));
   for (int ring_id = 0; ring_id < rings.size(); ++ring_id) {
     max = opt_max(
@@ -166,10 +165,10 @@ absl::optional<int> MaxCostToLoseArmor(Character boss, Character me,
   return max;
 }
 
-absl::optional<int> MaxCostToLoseWeapon(Character boss, Character me,
-                                        Item weapon) {
+std::optional<int> MaxCostToLoseWeapon(Character boss, Character me,
+                                       Item weapon) {
   me.damage += weapon.damage;
-  absl::optional<int> max;
+  std::optional<int> max;
   max = opt_max(max, MaxCostToLoseArmor(boss, me, weapon, absl::nullopt));
   for (int armor_id = 0; armor_id < armors.size(); ++armor_id) {
     max = opt_max(max, MaxCostToLoseArmor(boss, me, weapon, armors[armor_id]));
@@ -177,9 +176,9 @@ absl::optional<int> MaxCostToLoseWeapon(Character boss, Character me,
   return max;
 }
 
-absl::optional<int> MaxCostToLose(Character boss) {
+std::optional<int> MaxCostToLose(Character boss) {
   Character me{100, 0, 0};
-  absl::optional<int> max;
+  std::optional<int> max;
   for (int weapon_id = 0; weapon_id < weapons.size(); ++weapon_id) {
     max = opt_max(max, MaxCostToLoseWeapon(boss, me, weapons[weapon_id]));
   }

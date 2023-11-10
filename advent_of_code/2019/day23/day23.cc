@@ -142,7 +142,7 @@ class Network {
   }
 
   absl::StatusOr<int> RunUntilDuplicateNat() {
-    absl::optional<int> last_y;
+    std::optional<int> last_y;
     while (true) {
       bool all_idle = true;
       for (Computer& c : computers_) {

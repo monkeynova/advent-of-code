@@ -1,7 +1,9 @@
 #ifndef ADVENT_OF_CODE_ADVENT_DAY_H
 #define ADVENT_OF_CODE_ADVENT_DAY_H
 
+#include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "absl/flags/flag.h"

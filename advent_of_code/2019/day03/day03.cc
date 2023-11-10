@@ -84,7 +84,7 @@ bool Overlap(int bound11, int bound12, int bound21, int bound22, int* out) {
   return false;
 }
 
-absl::StatusOr<absl::optional<Point>> Intersect(Line l1, Line l2) {
+absl::StatusOr<std::optional<Point>> Intersect(Line l1, Line l2) {
   if (l1.from.x == l1.to.x) {
     if (l2.from.x == l2.to.x) {
       if (l1.from.x == l2.from.x) {
@@ -134,7 +134,7 @@ absl::StatusOr<std::vector<Point>> Intersect(std::vector<Line> wire1,
   std::vector<Point> ret;
   for (const auto& l1 : wire1) {
     for (const auto& l2 : wire2) {
-      absl::StatusOr<absl::optional<Point>> intersect = Intersect(l1, l2);
+      absl::StatusOr<std::optional<Point>> intersect = Intersect(l1, l2);
       if (!intersect.ok()) return intersect.status();
       if (*intersect) {
         ret.push_back(**intersect);
@@ -159,7 +159,7 @@ absl::StatusOr<std::string> Day_2019_03::Part1(
 
   absl::StatusOr<std::vector<Point>> overlap = Intersect(*wire1, *wire2);
   if (!overlap.ok()) return overlap.status();
-  absl::optional<Point> min;
+  std::optional<Point> min;
   for (const auto& point : *overlap) {
     if (point.dist() > 0 && (!min || min->dist() > point.dist())) {
       min = point;
@@ -211,7 +211,7 @@ absl::StatusOr<std::string> Day_2019_03::Part2(
 
   absl::StatusOr<std::vector<Point>> overlap = Intersect(*wire1, *wire2);
   if (!overlap.ok()) return overlap.status();
-  absl::optional<Point> min;
+  std::optional<Point> min;
   int min_score = std::numeric_limits<int>::max();
   for (const auto& point : *overlap) {
     if (point.dist() > 0) {

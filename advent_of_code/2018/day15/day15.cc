@@ -154,7 +154,7 @@ class GameBoard {
     for (Point dir : kOrderedDirs) {
       Point check = p + dir;
       if (!board_.OnBoard(check) || board_[check] != '.') continue;
-      absl::optional<int> dist =
+      std::optional<int> dist =
           PointWalk(
               {.start = check,
                .is_good =

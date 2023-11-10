@@ -110,8 +110,8 @@ struct Actor {
     LOG(FATAL) << "No destination found: " << *this << "\n" << b;
   }
 
-  absl::optional<int> CanMove(Point dest, const CharBoard& b,
-                              const AllPathsMap& all_paths) const {
+  std::optional<int> CanMove(Point dest, const CharBoard& b,
+                             const AllPathsMap& all_paths) const {
     auto it = all_paths.find(std::make_pair(cur, dest));
     if (it == all_paths.end()) {
       VLOG(1) << cur;
@@ -188,7 +188,7 @@ struct State {
   }
 };
 
-absl::optional<int> FindMinCost(
+std::optional<int> FindMinCost(
     State initial_state, const std::vector<Point>& empty,
     const absl::flat_hash_map<char, std::vector<Point>>& destinations,
     const AllPathsMap& all_paths) {
@@ -196,7 +196,7 @@ absl::optional<int> FindMinCost(
   // We use a `node_hash_set` so that `history` can be the owning storage
   // for the queue and use pointers to not 2x storage and copies.
   absl::node_hash_set<State> history = {initial_state};
-  absl::optional<int> best;
+  std::optional<int> best;
   for (std::deque<const State*> queue = {&initial_state}; !queue.empty();
        history.erase(*queue.front()), queue.pop_front()) {
     const State& cur = *queue.front();
@@ -213,7 +213,7 @@ absl::optional<int> FindMinCost(
       if (cur.actors[i].done) continue;
       // Can we go to the final location?
       Point p = cur.actors[i].Destination(destinations, cur.board);
-      absl::optional<int> cost = cur.actors[i].CanMove(p, cur.board, all_paths);
+      std::optional<int> cost = cur.actors[i].CanMove(p, cur.board, all_paths);
       if (cost) {
         if (best && cur.cost + *cost >= *best) continue;
         // We can reach the final destination. Go there and stop.
@@ -230,7 +230,7 @@ absl::optional<int> FindMinCost(
       // If we haven't moved, and we can't get to the final destionation,
       // fork off test paths for each candidate temporary location.
       for (Point p : empty) {
-        absl::optional<int> cost =
+        std::optional<int> cost =
             cur.actors[i].CanMove(p, cur.board, all_paths);
         if (cost) {
           if (best && cur.cost + *cost >= *best) continue;

@@ -39,7 +39,7 @@ absl::StatusOr<std::string> Day_2016_13::Part1(
     absl::Span<std::string_view> input) const {
   if (run_audit()) {
     SparseBoard test_board(10);
-    absl::optional<int> test_dist =
+    std::optional<int> test_dist =
         PointWalk({
                       .start = {1, 1},
                       .is_good =

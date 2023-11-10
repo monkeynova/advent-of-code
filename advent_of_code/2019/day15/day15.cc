@@ -89,7 +89,7 @@ class Droid : public IntCode::IOModule {
       std::deque<InputDirection>* out_directions_;
     };
 
-    absl::optional<int> dist =
+    std::optional<int> dist =
         PathWalk(board_, pos_, &current_path_).FindMinSteps();
     if (!dist) {
       // Fully explored the map.
@@ -99,7 +99,7 @@ class Droid : public IntCode::IOModule {
     return absl::OkStatus();
   }
 
-  absl::optional<int> DistanceToO2() {
+  std::optional<int> DistanceToO2() {
     return PointWalk(
                {.start = Cardinal::kOrigin,
                 .is_good =

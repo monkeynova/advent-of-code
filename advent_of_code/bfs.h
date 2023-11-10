@@ -58,7 +58,7 @@ class BFSInterface {
   // BFSImpl such that IsFinal returns true and returns the number of steps
   // required to go from `this` to the final state (or absl::nullopt if such a
   // state is unreachable).
-  absl::optional<int> FindMinSteps() {
+  std::optional<int> FindMinSteps() {
     DequeState state;
     return FindMinStepsImpl(state);
   }
@@ -88,7 +88,7 @@ class BFSInterface {
   // if min_steps_to_final where to return (Point{end} - Point{start}).dist()
   // the search space would prioritize more direct paths over a fully breadth
   // first search space.
-  absl::optional<int> FindMinStepsAStar() {
+  std::optional<int> FindMinStepsAStar() {
     static_assert(std::is_copy_assignable_v<BFSImpl>,
                   "BFSImpl must be copy-assignable for AStar");
     VLOG(3) << "New AStar: " << identifier();
@@ -110,7 +110,7 @@ class BFSInterface {
 
  private:
   template <typename QueueType>
-  absl::optional<int> FindMinStepsImpl(QueueType& state) {
+  std::optional<int> FindMinStepsImpl(QueueType& state) {
     static_assert(std::is_base_of<BFSInterface<BFSImpl, HistType>, BFSImpl>(),
                   "BFSInterface must be templated with a subclass");
     if (IsFinal()) return 0;
@@ -152,7 +152,7 @@ class BFSInterface<BFSImpl, HistType>::State {
     AddToFrontier(std::move(next));
   }
 
-  absl::optional<int> ret() const { return ret_; }
+  std::optional<int> ret() const { return ret_; }
 
   absl::flat_hash_map<std::remove_reference_t<HistType>, int> ConsumeHist() {
     return std::move(hist_);
@@ -165,7 +165,7 @@ class BFSInterface<BFSImpl, HistType>::State {
 
  private:
   absl::flat_hash_map<std::remove_reference_t<HistType>, int> hist_;
-  absl::optional<int> ret_;
+  std::optional<int> ret_;
 };
 
 // Uses a std::deque to process work, so all states are processed in a FIFO

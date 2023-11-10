@@ -115,7 +115,7 @@ struct GameStateGt {
   }
 };
 
-absl::optional<int> MinManaSpendForWin(Character me, Character boss) {
+std::optional<int> MinManaSpendForWin(Character me, Character boss) {
   std::priority_queue<GameState, std::vector<GameState>, GameStateGt> states;
   states.push({.mana_cost = 0, .me = me, .boss = boss});
   bool run_boss_turn = false;
@@ -143,7 +143,7 @@ absl::optional<int> MinManaSpendForWin(Character me, Character boss) {
   return absl::nullopt;
 }
 
-absl::optional<int> MinManaSpendForWinHard(Character me, Character boss) {
+std::optional<int> MinManaSpendForWinHard(Character me, Character boss) {
   std::priority_queue<GameState, std::vector<GameState>, GameStateGt> states;
   states.push({.mana_cost = 0, .me = me, .boss = boss});
   bool run_boss_turn = false;

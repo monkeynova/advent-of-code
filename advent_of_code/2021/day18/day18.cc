@@ -319,14 +319,14 @@ class SnailFishTree {
   }
 
  private:
-  absl::optional<int> value;
+  std::optional<int> value;
   std::unique_ptr<SnailFishTree> left;
   std::unique_ptr<SnailFishTree> right;
   SnailFishTree* parent = nullptr;
 };
 
 absl::Status Audit(absl::Span<std::string_view> input) {
-  absl::optional<SnailFishStack> total_stack;
+  std::optional<SnailFishStack> total_stack;
   std::unique_ptr<SnailFishTree> total_tree;
 
   for (std::string_view in_str : input) {
@@ -363,7 +363,7 @@ absl::StatusOr<std::string> Day_2021_18::Part1(
     VLOG(1) << "Audit: OK";
   }
 
-  absl::optional<SnailFishStack> total;
+  std::optional<SnailFishStack> total;
   for (std::string_view in_str : input) {
     absl::StatusOr<SnailFishStack> in = SnailFishStack::Parse(in_str);
     if (!in.ok()) return in.status();
