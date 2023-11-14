@@ -8,8 +8,10 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/char_board.h"
+#include "advent_of_code/conway.h"
 #include "advent_of_code/opt_cmp.h"
 #include "advent_of_code/point.h"
+#include "advent_of_code/point3.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
@@ -27,236 +29,125 @@ absl::StatusOr<CharBoard> ParseBoard(absl::Span<std::string_view> input) {
   return board;
 }
 
-CharBoard StepGameOfLine(const CharBoard& input) {
-  CharBoard output = input;
-  for (Point p : input.range()) {
-    int neighbors = 0;
-    for (Point dir : Cardinal::kFourDirs) {
-      Point n = dir + p;
-      if (!input.OnBoard(n)) continue;
-      if (input[n] == '#') ++neighbors;
-    }
-    if (input[p] == '#') {
-      if (neighbors != 1) output[p] = '.';
-    } else {
-      if (neighbors == 1) output[p] = '#';
-      if (neighbors == 2) output[p] = '#';
-    }
-  }
-  return output;
-}
+class Part1Conway : public ConwaySet<Point> {
+ public:
+  Part1Conway(const CharBoard& board)
+   : ConwaySet(ToSet(board)), bounds_(board.range()) {}
 
-int64_t BioDiversity(const CharBoard& input) {
-  int64_t ret = 0;
-  for (Point p : input.range()) {
-    if (input[p] == '#') {
-      ret |= (1ll << (p.y * input.width() + p.x));
-    }
+  std::vector<Point> Neighbors(const Point& p) const override {
+    std::vector<Point> ret(Cardinal::kFourDirs.begin(), Cardinal::kFourDirs.end());
+    for (Point& r : ret) r += p;
+    ret.erase(
+      std::remove_if(
+        ret.begin(), ret.end(), [&](Point p) { return !bounds_.Contains(p); }),
+      ret.end());
+    return ret;
   }
-  return ret;
-}
 
-std::optional<CharBoard> NewBoardPlusOneLevel(const CharBoard& in_board) {
-  CharBoard new_board(in_board.width(), in_board.height());
-  bool added = false;
-  if (in_board[{2, 1}] == '#') {
-    for (int sub_x = 0; sub_x < new_board.width(); ++sub_x) {
-      new_board[{sub_x, 0}] = '#';
-      added = true;
-    }
+  bool IsLive(bool is_live, int neighbors) const override {
+    if (is_live) return neighbors == 1;
+    return neighbors == 1 || neighbors == 2;
   }
-  if (in_board[{2, 3}] == '#') {
-    for (int sub_x = 0; sub_x < new_board.width(); ++sub_x) {
-      new_board[{sub_x, 4}] = '#';
-      added = true;
-    }
-  }
-  if (in_board[{1, 2}] == '#') {
-    for (int sub_y = 0; sub_y < new_board.width(); ++sub_y) {
-      new_board[{0, sub_y}] = '#';
-      added = true;
-    }
-  }
-  if (in_board[{3, 2}] == '#') {
-    for (int sub_y = 0; sub_y < new_board.width(); ++sub_y) {
-      new_board[{4, sub_y}] = '#';
-      added = true;
-    }
-  }
-  if (!added) return absl::nullopt;
-  return new_board;
-}
 
-std::optional<CharBoard> NewBoardMinusOneLevel(const CharBoard& in_board) {
-  CharBoard new_board(in_board.width(), in_board.height());
-  bool added = false;
-  int count = 0;
-  for (int x = 0; x < new_board.width(); ++x) {
-    if (in_board[{x, 0}] == '#') ++count;
+  std::vector<Point> Identifier() const {
+    std::vector<Point> ret(set().begin(), set().end());
+    absl::c_sort(ret, PointYThenXLT());
+    return ret;
   }
-  if (count == 1 || count == 2) {
-    new_board[{2, 1}] = '#';
-    added = true;
-  }
-  count = 0;
-  for (int x = 0; x < new_board.width(); ++x) {
-    if (in_board[{x, 4}] == '#') ++count;
-  }
-  if (count == 1 || count == 2) {
-    new_board[{2, 3}] = '#';
-    added = true;
-  }
-  count = 0;
-  for (int y = 0; y < new_board.height(); ++y) {
-    if (in_board[{0, y}] == '#') ++count;
-  }
-  if (count == 1 || count == 2) {
-    new_board[{1, 2}] = '#';
-    added = true;
-  }
-  count = 0;
-  for (int y = 0; y < new_board.height(); ++y) {
-    if (in_board[{4, y}] == '#') ++count;
-  }
-  if (count == 1 || count == 2) {
-    new_board[{3, 2}] = '#';
-    added = true;
-  }
-  if (!added) return absl::nullopt;
-  return new_board;
-}
 
-int CountNeighborsRecursive(const CharBoard& in_board, Point p,
-                            std::optional<CharBoard> board_minus_one,
-                            std::optional<CharBoard> board_plus_one) {
-  int neighbors = 0;
-  for (Point dir : Cardinal::kFourDirs) {
-    Point n = dir + p;
-    if (n.x < 0) {
-      if (board_minus_one) {
-        if ((*board_minus_one)[{1, 2}] == '#') ++neighbors;
-      }
-    } else if (n.x >= in_board.width()) {
-      if (board_minus_one) {
-        if ((*board_minus_one)[{3, 2}] == '#') ++neighbors;
-      }
-    } else if (n.y < 0) {
-      if (board_minus_one) {
-        if ((*board_minus_one)[{2, 1}] == '#') ++neighbors;
-      }
-    } else if (n.y >= in_board.height()) {
-      if (board_minus_one) {
-        if ((*board_minus_one)[{2, 3}] == '#') ++neighbors;
-      }
-    } else if (n == Point{2, 2}) {
-      if (board_plus_one) {
-        if (p == Point{1, 2}) {
-          for (int sub_y = 0; sub_y < board_plus_one->height(); ++sub_y) {
-            if ((*board_plus_one)[{0, sub_y}] == '#') ++neighbors;
+  int64_t BioDiversity() {
+    int64_t ret = 0;
+    for (Point p : set()) {
+      ret |= (1ll << (p.y * (bounds_.max.x + 1) + p.x));
+    }
+    return ret;
+  }
+
+ private:
+  static absl::flat_hash_set<Point> ToSet(const CharBoard& board) {
+    return board.Find('#');
+  }
+
+  PointRectangle bounds_;
+};
+
+class Part2Conway : public ConwaySet<Point3> {
+ public:
+  Part2Conway(const CharBoard& board)
+   : ConwaySet(ToSet(board)), bounds_(board.range()) {}
+
+  std::vector<Point3> Neighbors(const Point3& p) const override {
+    std::vector<Point3> ret;
+    for (Point dir2 : Cardinal::kFourDirs) {
+      Point3 dir3 = Point3{dir2.x, dir2.y, 0};
+      Point3 n = dir3 + p;
+      if (n.x == 2 && n.y == 2) {
+        // In the center, reach down a level.
+        if (dir2 == Cardinal::kNorth) { 
+          for (int i = 0; i <= bounds_.max.x; ++i) {
+            ret.push_back(Point3{i, bounds_.max.y, p.z + 1});
           }
-        } else if (p == Point{3, 2}) {
-          for (int sub_y = 0; sub_y < board_plus_one->height(); ++sub_y) {
-            if ((*board_plus_one)[{4, sub_y}] == '#') ++neighbors;
+        } else if (dir2 == Cardinal::kSouth) { 
+          for (int i = 0; i <= bounds_.max.x; ++i) {
+            ret.push_back(Point3{i, bounds_.min.y, p.z + 1});
           }
-        } else if (p == Point{2, 1}) {
-          for (int sub_x = 0; sub_x < board_plus_one->width(); ++sub_x) {
-            if ((*board_plus_one)[{sub_x, 0}] == '#') ++neighbors;
+        } else if (dir2 == Cardinal::kWest) { 
+          for (int i = 0; i <= bounds_.max.y; ++i) {
+            ret.push_back(Point3{bounds_.max.x, i, p.z + 1});
           }
-        } else if (p == Point{2, 3}) {
-          for (int sub_x = 0; sub_x < board_plus_one->width(); ++sub_x) {
-            if ((*board_plus_one)[{sub_x, 4}] == '#') ++neighbors;
+        } else if (dir2 == Cardinal::kEast) { 
+          for (int i = 0; i <= bounds_.max.y; ++i) {
+            ret.push_back(Point3{bounds_.min.x, i, p.z + 1});
           }
         } else {
-          DLOG(FATAL) << "Can't get here";
+          LOG(FATAL) << "Impossible dir";
         }
-      }
-    } else if (in_board[n] == '#') {
-      ++neighbors;
-    }
-  }
-  return neighbors;
-}
-
-absl::flat_hash_map<int, CharBoard> StepGameOfLineRecursive(
-    absl::flat_hash_map<int, CharBoard> depth_to_board) {
-  absl::flat_hash_map<int, CharBoard> out;
-  for (const auto& depth_and_board : depth_to_board) {
-    int depth = depth_and_board.first;
-    const CharBoard& in_board = depth_and_board.second;
-    CharBoard out_board = in_board;
-    std::optional<CharBoard> board_minus_one =
-        opt_find(depth_to_board, depth - 1);
-    std::optional<CharBoard> board_plus_one =
-        opt_find(depth_to_board, depth + 1);
-    for (Point p : in_board.range()) {
-      if (p == Point{2, 2}) {
-        if (!board_plus_one) {
-          std::optional<CharBoard> new_board = NewBoardPlusOneLevel(in_board);
-          if (new_board) {
-            out.emplace(depth + 1, std::move(*new_board));
-          }
-        }
-        out_board[p] = '?';
+        
+      } else if (!bounds_.Contains({n.x, n.y})) {
+        // Out of edge, reach up a level.
+        ret.push_back(Point3{2, 2, p.z - 1} + dir3);
       } else {
-        int neighbors = CountNeighborsRecursive(in_board, p, board_minus_one,
-                                                board_plus_one);
-        if (in_board[p] == '#') {
-          if (neighbors != 1) out_board[p] = '.';
-        } else {
-          if (neighbors == 1) out_board[p] = '#';
-          if (neighbors == 2) out_board[p] = '#';
-        }
-      }
-      if (!board_minus_one) {
-        std::optional<CharBoard> new_board = NewBoardMinusOneLevel(in_board);
-        if (new_board) {
-          out.emplace(depth - 1, std::move(*new_board));
-        }
+        ret.push_back(n);
       }
     }
-    out.emplace(depth, std::move(out_board));
+    return ret;
   }
-  return out;
-}
 
-std::string DebugBoards(absl::flat_hash_map<int, CharBoard> depth_to_board) {
-  int min = std::numeric_limits<int>::max();
-  int max = std::numeric_limits<int>::min();
-  for (const auto& pair : depth_to_board) {
-    min = std::min(min, pair.first);
-    max = std::max(max, pair.first);
+  bool IsLive(bool is_live, int neighbors) const override {
+    if (is_live) return neighbors == 1;
+    return neighbors == 1 || neighbors == 2;
   }
-  std::string out;
-  for (int depth = min; depth <= max; ++depth) {
-    std::string hdr = absl::StrCat("D:", depth);
-    hdr.resize(6, ' ');
-    absl::StrAppend(&out, hdr);
-  }
-  absl::StrAppend(&out, "\n");
-  for (int y = 0; y < 5; ++y) {
-    for (int depth = min; depth <= max; ++depth) {
-      auto it = depth_to_board.find(depth);
-      if (it == depth_to_board.end()) {
-        absl::StrAppend(&out, "       ");
-      } else {
-        for (int x = 0; x < 5; ++x) {
-          out.append(1, it->second[{x, y}]);
-        }
-        out.append(1, ' ');
+
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const Part2Conway& c) {
+    std::map<int, CharBoard> boards;
+    for (Point3 p : c.set()) {
+      if (boards.find(p.z) == boards.end()) {
+        CharBoard tmp(5, 5);
+        tmp[{2, 2}] = '?';
+        boards.emplace(p.z, std::move(tmp));
       }
+      CHECK(c.bounds_.Contains({p.x, p.y})) << p;
+      boards[p.z][{p.x, p.y}] = '#';
     }
-    absl::StrAppend(&out, "\n");
+    for (const auto& [z, b] : boards) {
+      absl::Format(&sink, "%d\n%v\n", z, b);
+    }
   }
-  return out;
-}
 
-int64_t CountBugs(absl::flat_hash_map<int, CharBoard> depth_to_board) {
-  int64_t bugs = 0;
-  for (const auto& pair : depth_to_board) {
-    bugs += pair.second.CountOn();
+ private:
+  static absl::flat_hash_set<Point3> ToSet(const CharBoard& board) {
+    CHECK_EQ(board.height(), 5);
+    CHECK_EQ(board.width(), 5);
+    absl::flat_hash_set<Point3> ret;
+    for (Point p : board.Find('#')) {
+      ret.insert({p.x, p.y, 0});
+    }
+    return ret;
   }
-  return bugs;
-}
+
+  PointRectangle bounds_;
+};
 
 }  // namespace
 
@@ -265,15 +156,12 @@ absl::StatusOr<std::string> Day_2019_24::Part1(
   absl::StatusOr<CharBoard> board = ParseBoard(input);
   if (!board.ok()) return board.status();
 
-  CharBoard cur = *board;
-  absl::flat_hash_set<CharBoard> hist;
-  while (!hist.contains(cur)) {
-    hist.insert(cur);
-    VLOG(2) << "Cur Board:\n" << cur;
-    cur = StepGameOfLine(cur);
+  Part1Conway p1c(*board);
+  absl::flat_hash_set<std::vector<Point>> hist;
+  while (hist.insert(p1c.Identifier()).second) {
+    p1c.Advance();
   }
-  VLOG(1) << "Dupe Board:\n" << cur;
-  return AdventReturn(BioDiversity(cur));
+  return AdventReturn(p1c.BioDiversity());
 }
 
 absl::StatusOr<std::string> Day_2019_24::Part2(
@@ -281,16 +169,9 @@ absl::StatusOr<std::string> Day_2019_24::Part2(
   absl::StatusOr<CharBoard> cur = ParseBoard(input);
   if (!cur.ok()) return cur.status();
 
-  absl::flat_hash_map<int, CharBoard> level_to_board;
-  level_to_board.emplace(0, *cur);
-
-  for (int i = 0; i < 200; ++i) {
-    VLOG(2) << "Boards[" << i << "]:\n" << DebugBoards(level_to_board);
-    absl::flat_hash_map<int, CharBoard> next =
-        StepGameOfLineRecursive(level_to_board);
-    level_to_board = std::move(next);
-  }
-  return AdventReturn(CountBugs(level_to_board));
+  Part2Conway p2c(*cur);
+  p2c.AdvanceN(200);
+  return AdventReturn(p2c.CountLive());
 }
 
 }  // namespace advent_of_code

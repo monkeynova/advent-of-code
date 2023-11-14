@@ -1,6 +1,8 @@
 #ifndef ADVENT_OF_CODE_CONWAY_H
 #define ADVENT_OF_CODE_CONWAY_H
 
+#include "absl/container/flat_hash_map.h"
+#include "absl/container/flat_hash_set.h"
 #include "absl/status/status.h"
 #include "advent_of_code/char_board.h"
 #include "advent_of_code/point.h"
@@ -58,6 +60,46 @@ class Conway {
   std::string lookup_;
   bool infinite_ = false;
   char fill_ = '.';
+};
+
+template <typename Storage>
+class ConwaySet {
+ public:
+  explicit ConwaySet(absl::flat_hash_set<Storage> set)
+   : set_(std::move(set)) {}
+
+  virtual ~ConwaySet() = default;
+
+  int64_t CountLive() const { return set_.size(); }
+
+  virtual std::vector<Storage> Neighbors(const Storage& s) const = 0;
+  virtual bool IsLive(bool is_live, int neighbors) const = 0;
+
+  void Advance() {
+    absl::flat_hash_map<Storage, int> neighbor_map;
+    for (const Storage& s : set_) {
+      for (Storage n : Neighbors(s)) {
+        ++neighbor_map[n];
+      }
+    }
+    absl::flat_hash_set<Storage> next;
+    for (const auto& [s, n] : neighbor_map) {
+      if (IsLive(set_.contains(s), n)) next.insert(s);
+    }
+    set_ = std::move(next);
+  }
+
+  void AdvanceN(int64_t n) {
+    for (int i = 0; i < n; ++i) {
+      Advance();
+    }
+  }
+
+ protected:
+  const absl::flat_hash_set<Storage>& set() const { return set_; }
+
+ private:
+  absl::flat_hash_set<Storage> set_;
 };
 
 }  // namespace advent_of_code

@@ -14,6 +14,8 @@
 namespace advent_of_code {
 namespace {
 
+// TODO(@monkeynova): Use a shared Conway interface?
+
 CharBoard Update(CharBoard in) {
   CharBoard out(in);
   for (Point c : in.range()) {

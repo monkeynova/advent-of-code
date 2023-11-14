@@ -7,18 +7,9 @@ namespace advent_of_code {
 // static
 std::string Conway::DefaultLookup() {
   std::string ret(512, '.');
-  for (int i = 0; i < 512; ++i) {
-    bool alive = false;
-    int neighbors = 0;
-    for (int bit = 0; bit < 9; ++bit) {
-      if (i & (1 << bit)) {
-        if (bit == 4) {
-          alive = true;
-        } else {
-          ++neighbors;
-        }
-      }
-    }
+  for (uint i = 0; i < 512; ++i) {
+    bool alive = i & (1 << 4);
+    int neighbors = absl::popcount(i & ~(1 << 4));
     if (neighbors == 3) {
       ret[i] = '#';
     } else if (alive && neighbors == 2) {

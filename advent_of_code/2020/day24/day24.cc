@@ -7,6 +7,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/conway.h"
 #include "advent_of_code/point.h"
 #include "re2/re2.h"
 
@@ -14,11 +15,27 @@ namespace advent_of_code {
 
 namespace {
 
-// Helper methods go here.
+class ConwayHex : public ConwaySet<Point> {
+ public:
+  ConwayHex(absl::flat_hash_set<Point> p) : ConwaySet(p) {}
 
-absl::StatusOr<absl::flat_hash_map<Point, bool>> ParseGrid(
-    absl::Span<std::string_view> input) {
-  absl::flat_hash_map<Point, bool> grid;
+  std::vector<Point> Neighbors(const Point& p) const override {
+    static const std::vector<Point> kDirs = {
+      2 * Cardinal::kWest,  2 * Cardinal::kEast, Cardinal::kSouthWest,
+      Cardinal::kSouthEast, Cardinal::kNorthWest, Cardinal::kNorthEast};
+    std::vector<Point> ret = kDirs;
+    for (Point& r : ret) r += p;
+    return ret;
+  }
+
+  bool IsLive(bool is_live, int neighbors) const override {
+    if (is_live) return neighbors == 1 || neighbors == 2;
+    return neighbors == 2;
+  }
+};
+
+absl::StatusOr<ConwayHex> ParseGrid(absl::Span<std::string_view> input) {
+  absl::flat_hash_set<Point> grid;
   for (std::string_view str : input) {
     Point p = {0, 0};
     for (int i = 0; i < str.size(); ++i) {
@@ -50,68 +67,32 @@ absl::StatusOr<absl::flat_hash_map<Point, bool>> ParseGrid(
         return Error("Bad sequence (@", i, "): ", str);
       }
     }
-    grid[p] = !grid[p];
+    auto [it, inserted] = grid.insert(p);
+    if (!inserted) grid.erase(p);
   }
-  return grid;
-}
-
-absl::StatusOr<absl::flat_hash_map<Point, bool>> RunStep(
-    const absl::flat_hash_map<Point, bool>& grid) {
-  const std::vector<Point> kDirs = {2 * Cardinal::kWest,  2 * Cardinal::kEast,
-                                    Cardinal::kSouthWest, Cardinal::kSouthEast,
-                                    Cardinal::kNorthWest, Cardinal::kNorthEast};
-
-  absl::flat_hash_map<Point, int> neighbors;
-  for (const auto& [p, is_black] : grid) {
-    if (!is_black) continue;
-    for (Point d : kDirs) {
-      ++neighbors[p + d];
-    }
-  }
-
-  absl::flat_hash_map<Point, bool> ret;
-  for (const auto& [p, count] : neighbors) {
-    bool is_black = false;
-    if (auto it = grid.find(p); it != grid.end()) is_black = it->second;
-    if (is_black) {
-      if (count == 1 || count == 2) {
-        ret[p] = true;
-      }
-    } else if (count == 2) {
-      ret[p] = true;
-    }
-  }
-  return ret;
+  return ConwayHex(std::move(grid));
 }
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2020_24::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<absl::flat_hash_map<Point, bool>> grid = ParseGrid(input);
+  absl::StatusOr<ConwayHex> grid = ParseGrid(input);
   if (!grid.ok()) return grid.status();
-  int black_count = 0;
-  for (const auto& [_, is_black] : *grid) {
-    if (is_black) ++black_count;
-  }
-  return AdventReturn(black_count);
+
+  return AdventReturn(grid->CountLive());
 }
 
 absl::StatusOr<std::string> Day_2020_24::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<absl::flat_hash_map<Point, bool>> grid = ParseGrid(input);
+  absl::StatusOr<ConwayHex> grid = ParseGrid(input);
   if (!grid.ok()) return grid.status();
 
   for (int i = 0; i < 100; ++i) {
-    grid = RunStep(*grid);
-    if (!grid.ok()) return grid.status();
+    grid->Advance();
   }
 
-  int black_count = 0;
-  for (const auto& [_, is_black] : *grid) {
-    if (is_black) ++black_count;
-  }
-  return AdventReturn(black_count);
+  return AdventReturn(grid->CountLive());
 }
 
 }  // namespace advent_of_code

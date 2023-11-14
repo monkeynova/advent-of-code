@@ -8,6 +8,7 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/char_board.h"
+#include "advent_of_code/conway.h"
 #include "advent_of_code/point3.h"
 #include "advent_of_code/point4.h"
 #include "re2/re2.h"
@@ -15,76 +16,64 @@
 namespace advent_of_code {
 namespace {
 
-class Grid3 {
+// Conway?
+
+class Part1Conway : public ConwaySet<Point3> {
  public:
-  Grid3() = default;
+  Part1Conway(const CharBoard& char_board)
+   : ConwaySet(ToSet(char_board)) {}
 
-  Grid3(const CharBoard& char_board) {
-    for (Point p : char_board.range()) {
-      if (char_board[p] == '#') {
-        grid_.insert(Point3{p.x, p.y, 0});
-      }
-    }
-  }
-
-  Grid3 Step() const {
-    Grid3 ret;
-    absl::flat_hash_map<Point3, int> neighbors;
-    for (Point3 p : grid_) {
-      for (Point3 dir : Cardinal3::kNeighborDirs) {
-        ++neighbors[p + dir];
-      }
-    }
-    for (const auto& [point, count] : neighbors) {
-      if (count == 3)
-        ret.grid_.insert(point);
-      else if (grid_.contains(point) && count == 2)
-        ret.grid_.insert(point);
-    }
-
+  std::vector<Point3> Neighbors(const Point3& p) const override {
+    std::vector<Point3> ret(Cardinal3::kNeighborDirs.begin(),
+                            Cardinal3::kNeighborDirs.end()); 
+    for (Point3& r : ret) r += p;
     return ret;
   }
 
-  int CountTiles() const { return grid_.size(); }
+  bool IsLive(bool is_alive, int neighbors) const override {
+    if (neighbors == 3) return true;
+    if (is_alive && neighbors == 2) return true;
+    return false;
+  }
 
  private:
-  absl::flat_hash_set<Point3> grid_;
+  static absl::flat_hash_set<Point3> ToSet(
+      const CharBoard& char_board) {
+    absl::flat_hash_set<Point3> set;
+    for (Point p : char_board.Find('#')) {
+      set.insert(Point3{p.x, p.y, 0});
+    }
+    return set;
+  }
 };
 
-class Grid4 {
+class Part2Conway : public ConwaySet<Point4> {
  public:
-  Grid4() = default;
+  Part2Conway(const CharBoard& char_board)
+   : ConwaySet(ToSet(char_board)) {}
 
-  Grid4(const CharBoard& char_board) {
-    for (Point p : char_board.range()) {
-      if (char_board[p] == '#') {
-        grid_.insert(Point4{p.x, p.y, 0, 0});
-      }
-    }
-  }
-
-  Grid4 Step() const {
-    Grid4 ret;
-    absl::flat_hash_map<Point4, int> neighbors;
-    for (Point4 p : grid_) {
-      for (Point4 dir : Cardinal4::kNeighborDirs) {
-        ++neighbors[p + dir];
-      }
-    }
-    for (const auto& [point, count] : neighbors) {
-      if (count == 3)
-        ret.grid_.insert(point);
-      else if (grid_.contains(point) && count == 2)
-        ret.grid_.insert(point);
-    }
-
+  std::vector<Point4> Neighbors(const Point4& p) const override {
+    std::vector<Point4> ret(Cardinal4::kNeighborDirs.begin(),
+                            Cardinal4::kNeighborDirs.end()); 
+    for (Point4& r : ret) r += p;
     return ret;
   }
 
-  int CountTiles() const { return grid_.size(); }
+  bool IsLive(bool is_alive, int neighbors) const override {
+    if (neighbors == 3) return true;
+    if (is_alive && neighbors == 2) return true;
+    return false;
+  }
 
  private:
-  absl::flat_hash_set<Point4> grid_;
+  static absl::flat_hash_set<Point4> ToSet(
+      const CharBoard& char_board) {
+    absl::flat_hash_set<Point4> set;
+    for (Point p : char_board.Find('#')) {
+      set.insert(Point4{p.x, p.y, 0, 0});
+    }
+    return set;
+  }
 };
 
 }  // namespace
@@ -93,22 +82,20 @@ absl::StatusOr<std::string> Day_2020_17::Part1(
     absl::Span<std::string_view> input) const {
   absl::StatusOr<CharBoard> initial = CharBoard::Parse(input);
   if (!initial.ok()) return initial.status();
-  Grid3 grid(*initial);
-  for (int i = 0; i < 6; ++i) {
-    grid = grid.Step();
-  }
-  return AdventReturn(grid.CountTiles());
+
+  Part1Conway conway(*initial);
+  for (int i = 0; i < 6; ++i) conway.Advance();
+  return AdventReturn(conway.CountLive());
 }
 
 absl::StatusOr<std::string> Day_2020_17::Part2(
     absl::Span<std::string_view> input) const {
   absl::StatusOr<CharBoard> initial = CharBoard::Parse(input);
   if (!initial.ok()) return initial.status();
-  Grid4 grid(*initial);
-  for (int i = 0; i < 6; ++i) {
-    grid = grid.Step();
-  }
-  return AdventReturn(grid.CountTiles());
+
+  Part2Conway conway(*initial);
+  for (int i = 0; i < 6; ++i) conway.Advance();
+  return AdventReturn(conway.CountLive());
 }
 
 }  // namespace advent_of_code
