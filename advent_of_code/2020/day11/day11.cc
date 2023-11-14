@@ -18,7 +18,9 @@ namespace {
 class SeatConway : public ConwaySet<Point> {
  public:
   SeatConway(const CharBoard& board)
-   : ConwaySet(ToSet(board)), bounds_(board.range()), allowed_(FindAllowed(board)) {}
+      : ConwaySet(ToSet(board)),
+        bounds_(board.range()),
+        allowed_(FindAllowed(board)) {}
 
   const absl::flat_hash_set<Point>& EmptyAllowed() const override {
     return allowed_;
@@ -71,8 +73,8 @@ class SeatConway : public ConwaySet<Point> {
 class SeatConwayVismap : public SeatConway {
  public:
   SeatConwayVismap(const CharBoard& b)
-   : SeatConway(b), vismap_(ComputeVismap(b)) {}
-  
+      : SeatConway(b), vismap_(ComputeVismap(b)) {}
+
   std::vector<Point> Neighbors(const Point& p) const override {
     auto it = vismap_.find(p);
     if (it == vismap_.end()) return {};

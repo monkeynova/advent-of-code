@@ -126,11 +126,9 @@ class ConwaySet {
 class ConwayBoard : public ConwaySet<Point> {
  public:
   explicit ConwayBoard(const CharBoard& b)
-   : ConwaySet(b.Find('#')), bounds_(b.range()) {}
+      : ConwaySet(b.Find('#')), bounds_(b.range()) {}
 
-  CharBoard Draw() const {
-    return CharBoard::Draw(set());
-  }
+  CharBoard Draw() const { return CharBoard::Draw(set()); }
 
   std::vector<Point> Neighbors(const Point& p) const override {
     std::vector<Point> ret;
