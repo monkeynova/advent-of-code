@@ -1,7 +1,7 @@
 #include "advent_of_code/2018/day18/day18.h"
 
 #include "absl/container/flat_hash_map.h"
-#include "absl/container/flat_hash_set.h"
+#include "absl/container/node_hash_map.h"
 #include "absl/log/log.h"
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
@@ -51,7 +51,32 @@ CharBoard Update(const CharBoard& in) {
   }
   return ret;
 }
-// Helper methods go here.
+
+template <typename Storage>
+class LoopHistory {
+ public:
+  bool AddMaybeNew(Storage s) {
+    auto [it, inserted] = hist_.emplace(std::move(s), idx_.size());
+    if (inserted) {
+      idx_.push_back(&it->first);
+      return false;
+    }
+    loop_size_ = idx_.size() - it->second;
+    loop_offset_ = it->second;
+    return true;
+  }
+
+  const Storage& FindInLoop(int64_t offset) {
+    int64_t loop_idx_ = (offset - loop_offset_) % loop_size_ + loop_offset_;
+    return *idx_[loop_idx_];
+  }
+
+ private:
+  absl::node_hash_map<Storage, int> hist_;
+  std::vector<const Storage*> idx_;
+  int loop_size_ = -1;
+  int loop_offset_ = -1;
+};
 
 }  // namespace
 
@@ -75,25 +100,12 @@ absl::StatusOr<std::string> Day_2018_18::Part2(
   if (!in.ok()) return in.status();
   CharBoard step = *in;
   constexpr int kNumSteps = 1'000'000'000;
-  absl::flat_hash_map<CharBoard, int> hist;
+  LoopHistory<CharBoard> hist;
   for (int i = 0; i < kNumSteps; ++i) {
-    if (hist.contains(step)) {
-      int loop_size = i - hist[step];
-      int loop_offset = hist[step];
-      LOG(INFO) << "Found loop at " << loop_offset << " of size " << loop_size;
-      int final_idx = (kNumSteps - loop_offset) % loop_size + loop_offset;
-      bool found = false;
-      for (const auto& [board, idx] : hist) {
-        if (idx == final_idx) {
-          step = board;
-          found = true;
-          break;
-        }
-      }
-      if (!found) return Error("Could not find loop value!");
+    if (hist.AddMaybeNew(step)) {
+      step = hist.FindInLoop(kNumSteps);
       break;
     }
-    hist[step] = i;
     VLOG(1) << "Step [" << i << "]:\n" << step;
     step = Update(step);
   }

@@ -106,10 +106,11 @@ class ConwaySet {
     return true;
   }
 
-  void AdvanceN(int64_t n) {
+  bool AdvanceN(int64_t n) {
     for (int i = 0; i < n; ++i) {
-      Advance();
+      if (!Advance()) return false;
     }
+    return true;
   }
 
  protected:

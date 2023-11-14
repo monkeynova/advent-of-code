@@ -193,6 +193,7 @@ absl::StatusOr<std::string> Day_2022_17::Part2(
   DropState ds;
   if (absl::Status st = ds.ParseWind(input[0]); !st.ok()) return st;
 
+  // TODO(@monkeynova): Re-use LoopHistory in 2018/18?
   absl::flat_hash_map<DropState::SummaryState, int> state_to_idx;
   std::vector<int> heights;
   for (int64_t i = 0; i < 1000000000000; ++i) {
