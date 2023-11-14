@@ -12,15 +12,42 @@
 
 namespace advent_of_code {
 
+namespace {
+
+class ForceCorners : public ConwayBoard {
+ public:
+  explicit ForceCorners(const CharBoard& b)
+   : ConwayBoard(b) {
+    corners_[0] = bounds().min;
+    corners_[1] = bounds().max;
+    corners_[2].x = bounds().min.x;
+    corners_[2].y = bounds().max.y;
+    corners_[3].x = bounds().max.x;
+    corners_[3].y = bounds().min.y;
+    for (Point p : corners_) Force(p);    
+  };
+
+  bool Advance() override {
+    bool ret = ConwayBoard::Advance();
+    for (Point p : corners_) Force(p);    
+    return ret;
+  }
+
+ private:
+  std::array<Point, 4> corners_;
+};
+
+}  // namespace
+
 absl::StatusOr<std::string> Day_2015_18::Part1(
     absl::Span<std::string_view> input) const {
   absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
 
-  Conway conway(*board);
-  if (auto st = conway.AdvanceN(100); !st.ok()) return st;
+  ConwayBoard conway(*board);
+  conway.AdvanceN(100);
 
-  return AdventReturn(conway.board().CountOn());
+  return AdventReturn(conway.CountLive());
 }
 
 absl::StatusOr<std::string> Day_2015_18::Part2(
@@ -28,20 +55,9 @@ absl::StatusOr<std::string> Day_2015_18::Part2(
   absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
   if (!board.ok()) return board.status();
 
-  Conway conway(*board);
-  const std::array<Point, 4> kCorners = {
-      board->range().min,
-      board->range().max,
-      {board->range().min.x, board->range().max.y},
-      {board->range().max.x, board->range().min.y},
-  };
-  for (int i = 0; i < 100; ++i) {
-    if (auto st = conway.Advance(); !st.ok()) return st;
-    for (Point p : kCorners) {
-      conway.board()[p] = '#';
-    }
-  }
-  return AdventReturn(conway.board().CountOn());
+  ForceCorners conway(*board);
+  conway.AdvanceN(100);
+  return AdventReturn(conway.CountLive());
 }
 
 }  // namespace advent_of_code

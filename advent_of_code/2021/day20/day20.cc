@@ -23,14 +23,14 @@ absl::StatusOr<std::string> Day_2021_20::Part1(
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input.subspan(2));
   if (!b.ok()) return b.status();
 
-  Conway conway(*b, std::string(lookup));
+  InfiniteConway conway(*b, std::string(lookup));
   conway.set_infinite();
   if (auto st = conway.AdvanceN(2); !st.ok()) return st;
   if (conway.fill() != '.') {
     return absl::UnimplementedError("Can't return a board with non-'.' fill");
   }
 
-  return AdventReturn(conway.board().CountOn());
+  return AdventReturn(conway.CountLive());
 }
 
 absl::StatusOr<std::string> Day_2021_20::Part2(
@@ -43,14 +43,14 @@ absl::StatusOr<std::string> Day_2021_20::Part2(
   absl::StatusOr<CharBoard> b = CharBoard::Parse(input.subspan(2));
   if (!b.ok()) return b.status();
 
-  Conway conway(*b, std::string(lookup));
+  InfiniteConway conway(*b, std::string(lookup));
   conway.set_infinite();
   if (auto st = conway.AdvanceN(50); !st.ok()) return st;
   if (conway.fill() != '.') {
     return absl::UnimplementedError("Can't return a board with non-'.' fill");
   }
 
-  return AdventReturn(conway.board().CountOn());
+  return AdventReturn(conway.CountLive());
 }
 
 }  // namespace advent_of_code

@@ -10,9 +10,9 @@
 namespace advent_of_code {
 
 // https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
-// Stores the state of a current iteration of Conway's game of life on a
-// CharBoard.
-class Conway {
+// Stores the state of a current iteration of Conway's game of life on the
+// non-trivial subset of an infinite CharBoard.
+class InfiniteConway {
  public:
   // Returns the classic Conway game of life transition table which causes
   // a location to be alive if it has exactly 3 live neighbors or if it is
@@ -28,7 +28,7 @@ class Conway {
   // #.#
   // .#. -> 101'010'110 -> 344
   // ##.
-  Conway(CharBoard b, std::string lookup = DefaultLookup())
+  InfiniteConway(CharBoard b, std::string lookup = DefaultLookup())
       : b_(std::move(b)), lookup_(std::move(lookup)) {}
 
   // If called, will treat the board as the only nontrivial subset of an
@@ -38,6 +38,8 @@ class Conway {
     infinite_ = true;
     fill_ = fill;
   }
+
+  int64_t CountLive() const { return board().CountOn(); }
 
   CharBoard& board() { return b_; }
   const CharBoard& board() const { return b_; }
@@ -78,7 +80,7 @@ class ConwaySet {
   virtual std::vector<Storage> Neighbors(const Storage& s) const = 0;
   virtual bool IsLive(bool is_live, int neighbors) const = 0;
 
-  bool Advance() {
+  virtual bool Advance() {
     absl::flat_hash_map<Storage, int> neighbor_map;
     for (const Storage& s : EmptyAllowed()) {
       neighbor_map[s] = 0;
@@ -115,9 +117,40 @@ class ConwaySet {
 
  protected:
   const absl::flat_hash_set<Storage>& set() const { return set_; }
+  void Force(Storage s) { set_.insert(std::move(s)); }
 
  private:
   absl::flat_hash_set<Storage> set_;
+};
+
+class ConwayBoard : public ConwaySet<Point> {
+ public:
+  explicit ConwayBoard(const CharBoard& b)
+   : ConwaySet(b.Find('#')), bounds_(b.range()) {}
+
+  CharBoard Draw() const {
+    return CharBoard::Draw(set());
+  }
+
+  std::vector<Point> Neighbors(const Point& p) const override {
+    std::vector<Point> ret;
+    for (Point d : Cardinal::kEightDirs) {
+      Point n = p + d;
+      if (bounds_.Contains(n)) ret.push_back(n);
+    }
+    return ret;
+  }
+  bool IsLive(bool is_live, int neighbors) const override {
+    if (neighbors == 3) return true;
+    if (is_live && neighbors == 2) return true;
+    return false;
+  }
+
+ protected:
+  PointRectangle bounds() const { return bounds_; }
+
+ private:
+  PointRectangle bounds_;
 };
 
 }  // namespace advent_of_code

@@ -5,7 +5,7 @@
 namespace advent_of_code {
 
 // static
-std::string Conway::DefaultLookup() {
+std::string InfiniteConway::DefaultLookup() {
   std::string ret(512, '.');
   for (uint i = 0; i < 512; ++i) {
     bool alive = i & (1 << 4);
@@ -19,7 +19,7 @@ std::string Conway::DefaultLookup() {
   return ret;
 }
 
-absl::Status Conway::Advance() {
+absl::Status InfiniteConway::Advance() {
   if (lookup_.size() != 512) {
     return absl::InternalError(
         absl::StrCat("Bad lookup size:", lookup_.size()));
@@ -66,7 +66,7 @@ absl::Status Conway::Advance() {
   return absl::OkStatus();
 }
 
-absl::StatusOr<CharBoard> Conway::PruneFill(CharBoard new_b) {
+absl::StatusOr<CharBoard> InfiniteConway::PruneFill(CharBoard new_b) {
   PointRectangle non_fill_rect = new_b.range();
   for (bool is_fill = true;
        is_fill && non_fill_rect.min.y < non_fill_rect.max.y;) {
@@ -103,7 +103,7 @@ absl::StatusOr<CharBoard> Conway::PruneFill(CharBoard new_b) {
   return new_b.SubBoard(non_fill_rect);
 }
 
-absl::Status Conway::AdvanceN(int count) {
+absl::Status InfiniteConway::AdvanceN(int count) {
   for (int i = 0; i < count; ++i) {
     if (auto st = Advance(); !st.ok()) return st;
   }
