@@ -71,21 +71,39 @@ class ConwaySet {
 
   int64_t CountLive() const { return set_.size(); }
 
+  virtual const absl::flat_hash_set<Storage>& EmptyAllowed() const {
+    static const absl::flat_hash_set<Storage> kEmpty;
+    return kEmpty;
+  }
   virtual std::vector<Storage> Neighbors(const Storage& s) const = 0;
   virtual bool IsLive(bool is_live, int neighbors) const = 0;
 
-  void Advance() {
+  bool Advance() {
     absl::flat_hash_map<Storage, int> neighbor_map;
+    for (const Storage& s : EmptyAllowed()) {
+      neighbor_map[s] = 0;
+    }
     for (const Storage& s : set_) {
       for (Storage n : Neighbors(s)) {
         ++neighbor_map[n];
       }
     }
+
+    bool changed = false;
     absl::flat_hash_set<Storage> next;
     for (const auto& [s, n] : neighbor_map) {
-      if (IsLive(set_.contains(s), n)) next.insert(s);
+      if (IsLive(set_.contains(s), n)) {
+        if (!set_.contains(s)) {
+          changed = true;
+        }
+        next.insert(s);
+      }
+    }
+    if (!changed && next.size() == set_.size()) {
+      return false;
     }
     set_ = std::move(next);
+    return true;
   }
 
   void AdvanceN(int64_t n) {
