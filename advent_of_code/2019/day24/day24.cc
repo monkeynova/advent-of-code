@@ -32,15 +32,15 @@ absl::StatusOr<CharBoard> ParseBoard(absl::Span<std::string_view> input) {
 class Part1Conway : public ConwaySet<Point> {
  public:
   Part1Conway(const CharBoard& board)
-   : ConwaySet(ToSet(board)), bounds_(board.range()) {}
+      : ConwaySet(ToSet(board)), bounds_(board.range()) {}
 
   std::vector<Point> Neighbors(const Point& p) const override {
-    std::vector<Point> ret(Cardinal::kFourDirs.begin(), Cardinal::kFourDirs.end());
+    std::vector<Point> ret(Cardinal::kFourDirs.begin(),
+                           Cardinal::kFourDirs.end());
     for (Point& r : ret) r += p;
-    ret.erase(
-      std::remove_if(
-        ret.begin(), ret.end(), [&](Point p) { return !bounds_.Contains(p); }),
-      ret.end());
+    ret.erase(std::remove_if(ret.begin(), ret.end(),
+                             [&](Point p) { return !bounds_.Contains(p); }),
+              ret.end());
     return ret;
   }
 
@@ -74,7 +74,7 @@ class Part1Conway : public ConwaySet<Point> {
 class Part2Conway : public ConwaySet<Point3> {
  public:
   Part2Conway(const CharBoard& board)
-   : ConwaySet(ToSet(board)), bounds_(board.range()) {}
+      : ConwaySet(ToSet(board)), bounds_(board.range()) {}
 
   std::vector<Point3> Neighbors(const Point3& p) const override {
     std::vector<Point3> ret;
@@ -83,26 +83,26 @@ class Part2Conway : public ConwaySet<Point3> {
       Point3 n = dir3 + p;
       if (n.x == 2 && n.y == 2) {
         // In the center, reach down a level.
-        if (dir2 == Cardinal::kNorth) { 
+        if (dir2 == Cardinal::kNorth) {
           for (int i = 0; i <= bounds_.max.x; ++i) {
             ret.push_back(Point3{i, bounds_.max.y, p.z + 1});
           }
-        } else if (dir2 == Cardinal::kSouth) { 
+        } else if (dir2 == Cardinal::kSouth) {
           for (int i = 0; i <= bounds_.max.x; ++i) {
             ret.push_back(Point3{i, bounds_.min.y, p.z + 1});
           }
-        } else if (dir2 == Cardinal::kWest) { 
+        } else if (dir2 == Cardinal::kWest) {
           for (int i = 0; i <= bounds_.max.y; ++i) {
             ret.push_back(Point3{bounds_.max.x, i, p.z + 1});
           }
-        } else if (dir2 == Cardinal::kEast) { 
+        } else if (dir2 == Cardinal::kEast) {
           for (int i = 0; i <= bounds_.max.y; ++i) {
             ret.push_back(Point3{bounds_.min.x, i, p.z + 1});
           }
         } else {
           LOG(FATAL) << "Impossible dir";
         }
-        
+
       } else if (!bounds_.Contains({n.x, n.y})) {
         // Out of edge, reach up a level.
         ret.push_back(Point3{2, 2, p.z - 1} + dir3);

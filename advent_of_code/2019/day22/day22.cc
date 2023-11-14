@@ -63,9 +63,8 @@ Transform CutNInverse(int64_t n, int64_t deck_size) {
 }
 
 Transform IncrementNInverse(int64_t n, int64_t deck_size) {
-  return Transform{.mult = *InverseMod(n, deck_size),
-                   .add = 0,
-                   .mod = deck_size};
+  return Transform{
+      .mult = *InverseMod(n, deck_size), .add = 0, .mod = deck_size};
 }
 
 absl::StatusOr<std::pair<Transform, Transform>> CreateTransform(

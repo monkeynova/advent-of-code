@@ -21,8 +21,8 @@ class ConwayHex : public ConwaySet<Point> {
 
   std::vector<Point> Neighbors(const Point& p) const override {
     static const std::vector<Point> kDirs = {
-      2 * Cardinal::kWest,  2 * Cardinal::kEast, Cardinal::kSouthWest,
-      Cardinal::kSouthEast, Cardinal::kNorthWest, Cardinal::kNorthEast};
+        2 * Cardinal::kWest,  2 * Cardinal::kEast,  Cardinal::kSouthWest,
+        Cardinal::kSouthEast, Cardinal::kNorthWest, Cardinal::kNorthEast};
     std::vector<Point> ret = kDirs;
     for (Point& r : ret) r += p;
     return ret;

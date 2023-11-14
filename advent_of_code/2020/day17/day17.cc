@@ -20,12 +20,11 @@ namespace {
 
 class Part1Conway : public ConwaySet<Point3> {
  public:
-  Part1Conway(const CharBoard& char_board)
-   : ConwaySet(ToSet(char_board)) {}
+  Part1Conway(const CharBoard& char_board) : ConwaySet(ToSet(char_board)) {}
 
   std::vector<Point3> Neighbors(const Point3& p) const override {
     std::vector<Point3> ret(Cardinal3::kNeighborDirs.begin(),
-                            Cardinal3::kNeighborDirs.end()); 
+                            Cardinal3::kNeighborDirs.end());
     for (Point3& r : ret) r += p;
     return ret;
   }
@@ -37,8 +36,7 @@ class Part1Conway : public ConwaySet<Point3> {
   }
 
  private:
-  static absl::flat_hash_set<Point3> ToSet(
-      const CharBoard& char_board) {
+  static absl::flat_hash_set<Point3> ToSet(const CharBoard& char_board) {
     absl::flat_hash_set<Point3> set;
     for (Point p : char_board.Find('#')) {
       set.insert(Point3{p.x, p.y, 0});
@@ -49,12 +47,11 @@ class Part1Conway : public ConwaySet<Point3> {
 
 class Part2Conway : public ConwaySet<Point4> {
  public:
-  Part2Conway(const CharBoard& char_board)
-   : ConwaySet(ToSet(char_board)) {}
+  Part2Conway(const CharBoard& char_board) : ConwaySet(ToSet(char_board)) {}
 
   std::vector<Point4> Neighbors(const Point4& p) const override {
     std::vector<Point4> ret(Cardinal4::kNeighborDirs.begin(),
-                            Cardinal4::kNeighborDirs.end()); 
+                            Cardinal4::kNeighborDirs.end());
     for (Point4& r : ret) r += p;
     return ret;
   }
@@ -66,8 +63,7 @@ class Part2Conway : public ConwaySet<Point4> {
   }
 
  private:
-  static absl::flat_hash_set<Point4> ToSet(
-      const CharBoard& char_board) {
+  static absl::flat_hash_set<Point4> ToSet(const CharBoard& char_board) {
     absl::flat_hash_set<Point4> set;
     for (Point p : char_board.Find('#')) {
       set.insert(Point4{p.x, p.y, 0, 0});

@@ -148,7 +148,9 @@ struct Cube {
     Point3 operator*() const { return cur; }
   };
 
-  const_iterator begin() const { return const_iterator{.cur = min, .base = this}; }
+  const_iterator begin() const {
+    return const_iterator{.cur = min, .base = this};
+  }
   const_iterator end() const { return const_iterator{}; }
 
   int64_t Volume() const {

@@ -159,7 +159,9 @@ struct PointRectangle {
     max.y = std::max(max.y, p.y);
   }
 
-  const_iterator begin() const { return const_iterator{.cur = min, .base = this}; }
+  const_iterator begin() const {
+    return const_iterator{.cur = min, .base = this};
+  }
   const_iterator end() const { return const_iterator{}; }
 
   bool operator==(const PointRectangle& o) const {
@@ -183,14 +185,15 @@ struct Cardinal {
   static constexpr Point kSouth = kYHat;
   static constexpr Point kWest = -kXHat;
   static constexpr Point kEast = kXHat;
-  static constexpr std::array<Point, 4> kFourDirs = {kNorth, kSouth, kWest, kEast};
+  static constexpr std::array<Point, 4> kFourDirs = {kNorth, kSouth, kWest,
+                                                     kEast};
   static constexpr Point kNorthWest = kNorth + kWest;
   static constexpr Point kNorthEast = kNorth + kEast;
   static constexpr Point kSouthWest = kSouth + kWest;
   static constexpr Point kSouthEast = kSouth + kEast;
-  static constexpr std::array<Point, 8> kEightDirs = {kNorth,     kSouth,     kWest,
-                                         kEast,      kNorthWest, kNorthEast,
-                                         kSouthWest, kSouthEast};
+  static constexpr std::array<Point, 8> kEightDirs = {
+      kNorth,     kSouth,     kWest,      kEast,
+      kNorthWest, kNorthEast, kSouthWest, kSouthEast};
 };
 
 struct PointYThenXLT {

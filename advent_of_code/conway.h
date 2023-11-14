@@ -65,8 +65,7 @@ class Conway {
 template <typename Storage>
 class ConwaySet {
  public:
-  explicit ConwaySet(absl::flat_hash_set<Storage> set)
-   : set_(std::move(set)) {}
+  explicit ConwaySet(absl::flat_hash_set<Storage> set) : set_(std::move(set)) {}
 
   virtual ~ConwaySet() = default;
 
