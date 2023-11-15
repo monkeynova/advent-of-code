@@ -105,7 +105,14 @@ class ConwayMultiSet {
       }
       unchanged &= cur_state == next_state;
     }
-    if (unchanged) return false;
+    if (unchanged) {
+      for (int i = 0; i < size; ++i) {
+        unchanged &= sets_[i].size() == next[i].size();
+      }
+    }
+    if (unchanged) {
+      return false;
+    }
     sets_ = std::move(next);
     return true;
   }
