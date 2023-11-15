@@ -21,9 +21,7 @@ class SeatConway : public ConwayMultiSet<Point, 2> {
       : ConwayMultiSet({board.Find('L'), board.Find('#')}),
         bounds_(board.range()) {}
 
-  int64_t CountFilled() const {
-    return CountState(1);
-  }
+  int64_t CountFilled() const { return CountState(1); }
 
   std::vector<Point> Neighbors(const Point& p) const override {
     std::vector<Point> ret;
@@ -41,9 +39,7 @@ class SeatConway : public ConwayMultiSet<Point, 2> {
     return neighbors[1] == 0 ? 1 : 0;
   }
 
-  std::vector<Point> Identifier() const {
-    return StablePointSet(sets()[1]);
-  }
+  std::vector<Point> Identifier() const { return StablePointSet(sets()[1]); }
 
   std::string Draw() const override {
     CharBoard draw(bounds_);

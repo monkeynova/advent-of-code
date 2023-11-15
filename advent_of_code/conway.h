@@ -69,13 +69,11 @@ template <typename Storage, int64_t size>
 class ConwayMultiSet {
  public:
   explicit ConwayMultiSet(std::array<absl::flat_hash_set<Storage>, size> sets)
-   : sets_(std::move(sets)) {}
+      : sets_(std::move(sets)) {}
 
   virtual ~ConwayMultiSet() = default;
 
-  int64_t CountState(int state) const {
-    return sets_[state].size();
-  }
+  int64_t CountState(int state) const { return sets_[state].size(); }
 
   virtual std::string Draw() const { return ""; }
   virtual std::vector<Storage> Neighbors(const Storage& s) const = 0;
@@ -125,7 +123,9 @@ class ConwayMultiSet {
   }
 
  protected:
-  const std::array<absl::flat_hash_set<Storage>, size>& sets() const { return sets_; }
+  const std::array<absl::flat_hash_set<Storage>, size>& sets() const {
+    return sets_;
+  }
   void Force(Storage s, int state) { sets_[state].insert(std::move(s)); }
 
  private:
@@ -139,7 +139,7 @@ class ConwaySet : public ConwayMultiSet<Storage, 1> {
   using Base = ConwayMultiSet<Storage, 1>;
 
   explicit ConwaySet(absl::flat_hash_set<Storage> set)
-   : Base({std::move(set)}) {}
+      : Base({std::move(set)}) {}
 
   int64_t CountLive() const { return Base::CountState(0); }
 

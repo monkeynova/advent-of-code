@@ -47,9 +47,7 @@ class Part1Conway : public ConwayBoard {
     return neighbors == 1 || neighbors == 2;
   }
 
-  std::vector<Point> Identifier() const {
-    return StablePointSet(set());
-  }
+  std::vector<Point> Identifier() const { return StablePointSet(set()); }
 
   int64_t BioDiversity() {
     int64_t ret = 0;

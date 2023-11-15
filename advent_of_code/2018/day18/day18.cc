@@ -18,7 +18,8 @@ namespace {
 class Forest : public ConwayMultiSet<Point, 3> {
  public:
   Forest(const CharBoard& b)
-   : ConwayMultiSet({b.Find('.'), b.Find('|'), b.Find('#')}), bounds_(b.range()) {}
+      : ConwayMultiSet({b.Find('.'), b.Find('|'), b.Find('#')}),
+        bounds_(b.range()) {}
 
   std::string Draw() const override {
     CharBoard ret(bounds_);
@@ -43,9 +44,12 @@ class Forest : public ConwayMultiSet<Point, 3> {
   }
   int NextState(int cur_state, std::array<int, 3> neighbors) const override {
     switch (cur_state) {
-      case 0: return neighbors[1] >= 3 ? 1 : 0;
-      case 1: return neighbors[2] >= 3 ? 2 : 1;
-      case 2: return neighbors[1] == 0 || neighbors[2] == 0 ? 0 : 2;
+      case 0:
+        return neighbors[1] >= 3 ? 1 : 0;
+      case 1:
+        return neighbors[2] >= 3 ? 2 : 1;
+      case 2:
+        return neighbors[1] == 0 || neighbors[2] == 0 ? 0 : 2;
     }
     LOG(FATAL) << "Bad state: " << cur_state;
   }
@@ -64,8 +68,8 @@ class Forest : public ConwayMultiSet<Point, 3> {
 
   Summary BuildSummary() {
     return {
-      .trees = StablePointSet(sets()[1]),
-      .lumber = StablePointSet(sets()[2]),
+        .trees = StablePointSet(sets()[1]),
+        .lumber = StablePointSet(sets()[2]),
     };
   }
 
