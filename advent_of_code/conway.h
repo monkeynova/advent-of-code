@@ -65,93 +65,6 @@ class InfiniteConway {
   char fill_ = '.';
 };
 
-template <typename Storage>
-class ConwaySet {
- public:
-  explicit ConwaySet(absl::flat_hash_set<Storage> set) : set_(std::move(set)) {}
-
-  virtual ~ConwaySet() = default;
-
-  int64_t CountLive() const { return set_.size(); }
-
-  virtual const absl::flat_hash_set<Storage>& EmptyAllowed() const {
-    static const absl::flat_hash_set<Storage> kEmpty;
-    return kEmpty;
-  }
-  virtual std::vector<Storage> Neighbors(const Storage& s) const = 0;
-  virtual bool IsLive(bool is_live, int neighbors) const = 0;
-
-  virtual bool Advance() {
-    absl::flat_hash_map<Storage, int> neighbor_map;
-    for (const Storage& s : EmptyAllowed()) {
-      neighbor_map[s] = 0;
-    }
-    for (const Storage& s : set_) {
-      for (Storage n : Neighbors(s)) {
-        ++neighbor_map[n];
-      }
-    }
-
-    bool changed = false;
-    absl::flat_hash_set<Storage> next;
-    for (const auto& [s, n] : neighbor_map) {
-      if (IsLive(set_.contains(s), n)) {
-        if (!set_.contains(s)) {
-          changed = true;
-        }
-        next.insert(s);
-      }
-    }
-    if (!changed && next.size() == set_.size()) {
-      return false;
-    }
-    set_ = std::move(next);
-    return true;
-  }
-
-  bool AdvanceN(int64_t n) {
-    for (int i = 0; i < n; ++i) {
-      if (!Advance()) return false;
-    }
-    return true;
-  }
-
- protected:
-  const absl::flat_hash_set<Storage>& set() const { return set_; }
-  void Force(Storage s) { set_.insert(std::move(s)); }
-
- private:
-  absl::flat_hash_set<Storage> set_;
-};
-
-class ConwayBoard : public ConwaySet<Point> {
- public:
-  explicit ConwayBoard(const CharBoard& b)
-      : ConwaySet(b.Find('#')), bounds_(b.range()) {}
-
-  CharBoard Draw() const { return CharBoard::Draw(set()); }
-
-  std::vector<Point> Neighbors(const Point& p) const override {
-    std::vector<Point> ret;
-    for (Point d : Cardinal::kEightDirs) {
-      Point n = p + d;
-      if (bounds_.Contains(n)) ret.push_back(n);
-    }
-    return ret;
-  }
-  bool IsLive(bool is_live, int neighbors) const override {
-    if (neighbors == 3) return true;
-    if (is_live && neighbors == 2) return true;
-    return false;
-  }
-
- protected:
-  PointRectangle bounds() const { return bounds_; }
-
- private:
-  PointRectangle bounds_;
-};
-
 template <typename Storage, int64_t size>
 class ConwayMultiSet {
  public:
@@ -168,7 +81,7 @@ class ConwayMultiSet {
   virtual std::vector<Storage> Neighbors(const Storage& s) const = 0;
   virtual int NextState(int state, std::array<int, size> neighbors) const = 0;
 
-  virtual void Advance() {
+  virtual bool Advance() {
     VLOG(2) << "Board:\n" << *this;
 
     absl::flat_hash_map<Storage, int> current_map;
@@ -183,20 +96,26 @@ class ConwayMultiSet {
     }
 
     std::array<absl::flat_hash_set<Storage>, size> next;
+    bool unchanged = true;
     for (const auto& [s, n] : neighbor_map) {
       auto it = current_map.find(s);
-      int next_state = NextState(it == current_map.end() ? -1 : it->second, n);
+      int cur_state = it == current_map.end() ? -1 : it->second;
+      int next_state = NextState(cur_state, n);
       if (next_state >= 0) {
         next[next_state].insert(s);
       }
+      unchanged &= cur_state == next_state;
     }
+    if (unchanged) return false;
     sets_ = std::move(next);
+    return true;
   }
 
-  void AdvanceN(int64_t n) {
+  bool AdvanceN(int64_t n) {
     for (int i = 0; i < n; ++i) {
-      Advance();
+      if (!Advance()) return false;
     }
+    return n > 0;
   }
 
   template <typename Sink>
@@ -206,9 +125,62 @@ class ConwayMultiSet {
 
  protected:
   const std::array<absl::flat_hash_set<Storage>, size>& sets() const { return sets_; }
+  void Force(Storage s, int state) { sets_[state].insert(std::move(s)); }
 
  private:
   std::array<absl::flat_hash_set<Storage>, size> sets_;
+};
+
+template <typename Storage>
+class ConwaySet : public ConwayMultiSet<Storage, 1> {
+ public:
+  using Base = ConwayMultiSet<Storage, 1>;
+
+  explicit ConwaySet(absl::flat_hash_set<Storage> set)
+   : Base({std::move(set)}) {}
+
+  int64_t CountLive() const { return Base::CountState(0); }
+
+  virtual bool IsLive(bool is_live, int neighbors) const = 0;
+
+  virtual int NextState(int state, std::array<int, 1> neighbors) const final {
+    return IsLive(state == 0, neighbors[0]) ? 0 : -1;
+  }
+
+ protected:
+  const absl::flat_hash_set<Storage>& set() const { return Base::sets()[0]; }
+  void Force(Storage s) { Base::Force(s, 0); }
+};
+
+class ConwayBoard : public ConwaySet<Point> {
+ public:
+  explicit ConwayBoard(const CharBoard& b)
+      : ConwaySet(b.Find('#')), bounds_(b.range()) {}
+
+  std::string Draw() const override {
+    return absl::StrCat(CharBoard::Draw(set()));
+  }
+
+  std::vector<Point> Neighbors(const Point& p) const override {
+    std::vector<Point> ret;
+    for (Point d : Cardinal::kEightDirs) {
+      Point n = p + d;
+      if (bounds_.Contains(n)) ret.push_back(n);
+    }
+    return ret;
+  }
+
+  bool IsLive(bool is_live, int neighbors) const override {
+    if (neighbors == 3) return true;
+    if (is_live && neighbors == 2) return true;
+    return false;
+  }
+
+ protected:
+  PointRectangle bounds() const { return bounds_; }
+
+ private:
+  PointRectangle bounds_;
 };
 
 }  // namespace advent_of_code

@@ -15,15 +15,14 @@
 namespace advent_of_code {
 namespace {
 
-class SeatConway : public ConwaySet<Point> {
+class SeatConway : public ConwayMultiSet<Point, 2> {
  public:
   SeatConway(const CharBoard& board)
-      : ConwaySet(ToSet(board)),
-        bounds_(board.range()),
-        allowed_(FindAllowed(board)) {}
+      : ConwayMultiSet({board.Find('L'), board.Find('#')}),
+        bounds_(board.range()) {}
 
-  const absl::flat_hash_set<Point>& EmptyAllowed() const override {
-    return allowed_;
+  int64_t CountFilled() const {
+    return CountState(1);
   }
 
   std::vector<Point> Neighbors(const Point& p) const override {
@@ -31,41 +30,30 @@ class SeatConway : public ConwaySet<Point> {
     for (Point d : Cardinal::kEightDirs) {
       Point n = p + d;
       if (!bounds_.Contains(n)) continue;
-      if (!allowed_.contains(n)) continue;
       ret.push_back(n);
     }
     return ret;
   }
 
-  bool IsLive(bool is_alive, int neighbors) const override {
-    if (is_alive) return neighbors <= 3;
-    return neighbors == 0;
+  int NextState(int cur_state, std::array<int, 2> neighbors) const override {
+    if (cur_state < 0) return cur_state;
+    if (cur_state == 1) return neighbors[1] <= 3 ? 1 : 0;
+    return neighbors[1] == 0 ? 1 : 0;
   }
 
   std::vector<Point> Identifier() const {
-    return StablePointSet(set());
+    return StablePointSet(sets()[1]);
   }
 
-  template <typename Sink>
-  friend void AbslStringify(Sink& sink, const SeatConway& c) {
-    CharBoard draw(c.bounds_);
-    for (Point p : c.allowed_) draw[p] = 'L';
-    for (Point p : c.set()) draw[p] = '#';
-    AbslStringify(sink, draw);
+  std::string Draw() const override {
+    CharBoard draw(bounds_);
+    draw.DrawOn(sets()[0], 'L');
+    draw.DrawOn(sets()[1], '#');
+    return absl::StrCat(draw);
   }
 
  private:
-  static absl::flat_hash_set<Point> ToSet(const CharBoard& board) {
-    return board.Find('#');
-  }
-  static absl::flat_hash_set<Point> FindAllowed(const CharBoard& board) {
-    absl::flat_hash_set<Point> ret = board.Find('#');
-    for (Point p : board.Find('L')) ret.insert(p);
-    return ret;
-  }
-
   PointRectangle bounds_;
-  absl::flat_hash_set<Point> allowed_;
 };
 
 class SeatConwayVismap : public SeatConway {
@@ -79,9 +67,10 @@ class SeatConwayVismap : public SeatConway {
     return it->second;
   }
 
-  bool IsLive(bool is_alive, int neighbors) const override {
-    if (is_alive) return neighbors <= 4;
-    return neighbors == 0;
+  int NextState(int cur_state, std::array<int, 2> neighbors) const override {
+    if (cur_state < 0) return cur_state;
+    if (cur_state == 1) return neighbors[1] <= 4 ? 1 : 0;
+    return neighbors[1] == 0 ? 1 : 0;
   }
 
  private:
@@ -119,7 +108,7 @@ absl::StatusOr<std::string> Day_2020_11::Part1(
   while (seat_conway.Advance()) {
     VLOG(2) << seat_conway;
   }
-  return AdventReturn(seat_conway.CountLive());
+  return AdventReturn(seat_conway.CountFilled());
 }
 
 absl::StatusOr<std::string> Day_2020_11::Part2(
@@ -132,7 +121,7 @@ absl::StatusOr<std::string> Day_2020_11::Part2(
   while (seat_conway.Advance()) {
     VLOG(2) << seat_conway;
   }
-  return AdventReturn(seat_conway.CountLive());
+  return AdventReturn(seat_conway.CountFilled());
 }
 
 }  // namespace advent_of_code

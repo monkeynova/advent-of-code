@@ -29,18 +29,16 @@ absl::StatusOr<CharBoard> ParseBoard(absl::Span<std::string_view> input) {
   return board;
 }
 
-class Part1Conway : public ConwaySet<Point> {
+class Part1Conway : public ConwayBoard {
  public:
-  Part1Conway(const CharBoard& board)
-      : ConwaySet(ToSet(board)), bounds_(board.range()) {}
+  Part1Conway(const CharBoard& board) : ConwayBoard(board) {}
 
   std::vector<Point> Neighbors(const Point& p) const override {
-    std::vector<Point> ret(Cardinal::kFourDirs.begin(),
-                           Cardinal::kFourDirs.end());
-    for (Point& r : ret) r += p;
-    ret.erase(std::remove_if(ret.begin(), ret.end(),
-                             [&](Point p) { return !bounds_.Contains(p); }),
-              ret.end());
+    std::vector<Point> ret;
+    for (Point d : Cardinal::kFourDirs) {
+      Point n = p + d;
+      if (bounds().Contains(n)) ret.push_back(n);
+    }
     return ret;
   }
 
@@ -56,17 +54,10 @@ class Part1Conway : public ConwaySet<Point> {
   int64_t BioDiversity() {
     int64_t ret = 0;
     for (Point p : set()) {
-      ret |= (1ll << (p.y * (bounds_.max.x + 1) + p.x));
+      ret |= (1ll << (p.y * (bounds().max.x + 1) + p.x));
     }
     return ret;
   }
-
- private:
-  static absl::flat_hash_set<Point> ToSet(const CharBoard& board) {
-    return board.Find('#');
-  }
-
-  PointRectangle bounds_;
 };
 
 class Part2Conway : public ConwaySet<Point3> {
@@ -116,21 +107,22 @@ class Part2Conway : public ConwaySet<Point3> {
     return neighbors == 1 || neighbors == 2;
   }
 
-  template <typename Sink>
-  friend void AbslStringify(Sink& sink, const Part2Conway& c) {
+  std::string Draw() const override {
     std::map<int, CharBoard> boards;
-    for (Point3 p : c.set()) {
+    for (Point3 p : set()) {
       if (boards.find(p.z) == boards.end()) {
         CharBoard tmp(5, 5);
         tmp[{2, 2}] = '?';
         boards.emplace(p.z, std::move(tmp));
       }
-      CHECK(c.bounds_.Contains({p.x, p.y})) << p;
+      CHECK(bounds_.Contains({p.x, p.y})) << p;
       boards[p.z][{p.x, p.y}] = '#';
     }
+    std::string ret;
     for (const auto& [z, b] : boards) {
-      absl::Format(&sink, "%d\n%v\n", z, b);
+      absl::StrAppendFormat(&ret, "%d\n%v\n", z, b);
     }
+    return ret;
   }
 
  private:
