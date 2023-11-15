@@ -47,8 +47,8 @@ class SeatConway : public ConwayMultiSet<Point, 2> {
 
   std::string Draw() const override {
     CharBoard draw(bounds_);
-    draw.DrawOn(sets()[0], 'L');
-    draw.DrawOn(sets()[1], '#');
+    draw.Draw(sets()[0], 'L');
+    draw.Draw(sets()[1], '#');
     return absl::StrCat(draw);
   }
 

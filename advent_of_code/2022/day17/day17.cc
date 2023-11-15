@@ -144,7 +144,7 @@ CharBoard DropState::AddPiece(CharBoard b, DropState::Rock r) const {
 }
 
 CharBoard DropState::SummaryState::Draw() const {
-  return CharBoard::Draw(bounds);
+  return CharBoard::DrawNew(bounds);
 }
 
 DropState::SummaryState DropState::Summarize() const {

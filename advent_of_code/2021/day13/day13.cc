@@ -106,7 +106,7 @@ absl::StatusOr<std::string> Day_2021_13::Part2(
       points.insert(p);
     }
   }
-  return OCRExtract(CharBoard::Draw(points));
+  return OCRExtract(CharBoard::DrawNew(points));
 }
 
 }  // namespace advent_of_code

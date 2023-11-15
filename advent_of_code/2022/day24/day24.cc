@@ -35,10 +35,10 @@ struct BlizzardSet {
 
   CharBoard Draw(const CharBoard& board) const {
     CharBoard draw = board;
-    for (Point p : up) draw[p] = '^';
-    for (Point p : down) draw[p] = 'v';
-    for (Point p : left) draw[p] = '<';
-    for (Point p : right) draw[p] = '>';
+    draw.Draw(up, '^');
+    draw.Draw(down, 'v');
+    draw.Draw(left, '<');
+    draw.Draw(right, '>');
     return draw;
   }
 

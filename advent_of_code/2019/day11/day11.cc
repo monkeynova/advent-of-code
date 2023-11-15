@@ -51,7 +51,7 @@ class Painter : public IntCode::IOModule {
       if (color != 1) continue;
       white_points.push_back(point);
     }
-    return CharBoard::Draw(white_points);
+    return CharBoard::DrawNew(white_points);
   }
 
  private:

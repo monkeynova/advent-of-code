@@ -22,9 +22,9 @@ class Forest : public ConwayMultiSet<Point, 3> {
 
   std::string Draw() const override {
     CharBoard ret(bounds_);
-    ret.DrawOn(sets()[0], '.');
-    ret.DrawOn(sets()[1], '|');
-    ret.DrawOn(sets()[2], '#');
+    ret.Draw(sets()[0], '.');
+    ret.Draw(sets()[1], '|');
+    ret.Draw(sets()[2], '#');
     return absl::StrCat(ret);
   }
 

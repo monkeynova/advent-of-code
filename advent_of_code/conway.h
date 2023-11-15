@@ -82,7 +82,8 @@ class ConwayMultiSet {
   virtual int NextState(int state, std::array<int, size> neighbors) const = 0;
 
   virtual bool Advance() {
-    VLOG(2) << "Board:\n" << *this;
+    VLOG(2) << "Board[" << step_ << "]\n" << *this;
+    ++step_;
 
     absl::flat_hash_map<Storage, int> current_map;
     absl::flat_hash_map<Storage, std::array<int, size>> neighbor_map;
@@ -129,6 +130,7 @@ class ConwayMultiSet {
 
  private:
   std::array<absl::flat_hash_set<Storage>, size> sets_;
+  int step_ = 0;
 };
 
 template <typename Storage>
@@ -158,7 +160,7 @@ class ConwayBoard : public ConwaySet<Point> {
       : ConwaySet(b.Find('#')), bounds_(b.range()) {}
 
   std::string Draw() const override {
-    return absl::StrCat(CharBoard::Draw(set()));
+    return absl::StrCat(CharBoard::DrawNew(set()));
   }
 
   std::vector<Point> Neighbors(const Point& p) const override {

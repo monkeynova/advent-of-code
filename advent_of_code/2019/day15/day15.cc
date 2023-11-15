@@ -168,7 +168,7 @@ class Droid : public IntCode::IOModule {
       if (v == 0) wall.push_back(p);
     }
     PointRectangle bounds;
-    CharBoard draw = CharBoard::Draw(wall, &bounds);
+    CharBoard draw = CharBoard::DrawNew(wall, &bounds);
     draw[o2_pos_ - bounds.min] = '*';
     draw[pos_ - bounds.min] = 'R';
     draw[Cardinal::kOrigin - bounds.min] = '+';

@@ -72,7 +72,7 @@ absl::StatusOr<std::string> Day_2022_23::Part1(
   absl::flat_hash_set<Point> elves = board->Find('#');
 
   for (int i = 0; i < 10; ++i) {
-    VLOG(2) << "Board:\n" << CharBoard::Draw(elves);
+    VLOG(2) << "Board:\n" << CharBoard::DrawNew(elves);
     Move(elves, i);
   }
 
@@ -87,7 +87,7 @@ absl::StatusOr<std::string> Day_2022_23::Part2(
   absl::flat_hash_set<Point> elves = board->Find('#');
 
   for (int i = 0; true; ++i) {
-    VLOG(2) << "Board:\n" << CharBoard::Draw(elves);
+    VLOG(2) << "Board:\n" << CharBoard::DrawNew(elves);
     if (!Move(elves, i)) {
       return AdventReturn(i + 1);
     }

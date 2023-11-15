@@ -71,8 +71,8 @@ class CharBoard {
   // nullptr, it contains the (inclusive) axis aligned bounding box for those
   // points.
   template <typename Container>
-  static CharBoard Draw(const Container& points,
-                        PointRectangle* bound_ret = nullptr) {
+  static CharBoard DrawNew(const Container& points,
+                           PointRectangle* bound_ret = nullptr) {
     PointRectangle bounds = PointRectangle::Bounding(points);
     CharBoard ret(bounds);
     for (Point p : points) ret[p - bounds.min] = '#';
@@ -100,7 +100,7 @@ class CharBoard {
   // nullptr, it contains the (inclusive) axis aligned bounding box for those
   // points.
   template <typename Container>
-  void  DrawOn(const Container& points, char c = '#') {
+  void Draw(const Container& points, char c = '#') {
     for (Point p : points) (*this)[p] = c;
   }
 
