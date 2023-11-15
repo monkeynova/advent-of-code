@@ -6,6 +6,7 @@
 #include "absl/status/status.h"
 #include "advent_of_code/char_board.h"
 #include "advent_of_code/point.h"
+#include "advent_of_code/vlog.h"
 
 namespace advent_of_code {
 
@@ -149,6 +150,65 @@ class ConwayBoard : public ConwaySet<Point> {
 
  private:
   PointRectangle bounds_;
+};
+
+template <typename Storage, int64_t size>
+class ConwayMultiSet {
+ public:
+  explicit ConwayMultiSet(std::array<absl::flat_hash_set<Storage>, size> sets)
+   : sets_(std::move(sets)) {}
+
+  virtual ~ConwayMultiSet() = default;
+
+  int64_t CountState(int state) const {
+    return sets_[state].size();
+  }
+
+  virtual std::string Draw() const { return ""; }
+  virtual std::vector<Storage> Neighbors(const Storage& s) const = 0;
+  virtual int NextState(int state, std::array<int, size> neighbors) const = 0;
+
+  virtual void Advance() {
+    VLOG(2) << "Board:\n" << *this;
+
+    absl::flat_hash_map<Storage, int> current_map;
+    absl::flat_hash_map<Storage, std::array<int, size>> neighbor_map;
+    for (int set_idx = 0; set_idx < size; ++set_idx) {
+      for (const Storage& s : sets_[set_idx]) {
+        current_map[s] = set_idx;
+        for (Storage n : Neighbors(s)) {
+          ++neighbor_map[n][set_idx];
+        }
+      }
+    }
+
+    std::array<absl::flat_hash_set<Storage>, size> next;
+    for (const auto& [s, n] : neighbor_map) {
+      auto it = current_map.find(s);
+      int next_state = NextState(it == current_map.end() ? -1 : it->second, n);
+      if (next_state >= 0) {
+        next[next_state].insert(s);
+      }
+    }
+    sets_ = std::move(next);
+  }
+
+  void AdvanceN(int64_t n) {
+    for (int i = 0; i < n; ++i) {
+      Advance();
+    }
+  }
+
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const ConwayMultiSet& c) {
+    sink.Append(c.Draw());
+  }
+
+ protected:
+  const std::array<absl::flat_hash_set<Storage>, size>& sets() const { return sets_; }
+
+ private:
+  std::array<absl::flat_hash_set<Storage>, size> sets_;
 };
 
 }  // namespace advent_of_code

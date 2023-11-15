@@ -116,6 +116,7 @@ cc_library(
     deps = [
         ":char_board",
         ":point",
+        ":vlog",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/log",

@@ -203,6 +203,13 @@ struct PointYThenXLT {
   }
 };
 
+inline std::vector<Point> StablePointSet(
+    const absl::flat_hash_set<Point>& unordered) {
+  std::vector<Point> ordered(unordered.begin(), unordered.end());
+  absl::c_sort(ordered, PointYThenXLT());
+  return ordered;
+}
+
 }  // namespace advent_of_code
 
 #endif  // ADVENT_OF_CODE_POINT_H

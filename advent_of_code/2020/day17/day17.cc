@@ -80,7 +80,7 @@ absl::StatusOr<std::string> Day_2020_17::Part1(
   if (!initial.ok()) return initial.status();
 
   Part1Conway conway(*initial);
-  for (int i = 0; i < 6; ++i) conway.Advance();
+  conway.AdvanceN(6);
   return AdventReturn(conway.CountLive());
 }
 
@@ -90,7 +90,7 @@ absl::StatusOr<std::string> Day_2020_17::Part2(
   if (!initial.ok()) return initial.status();
 
   Part2Conway conway(*initial);
-  for (int i = 0; i < 6; ++i) conway.Advance();
+  conway.AdvanceN(6);
   return AdventReturn(conway.CountLive());
 }
 

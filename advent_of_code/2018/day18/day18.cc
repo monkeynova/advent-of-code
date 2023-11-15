@@ -8,49 +8,70 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/char_board.h"
+#include "advent_of_code/conway.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
 
 namespace {
 
-// TODO(@monkeynova): Use a shared Conway interface?
+class Forest : public ConwayMultiSet<Point, 3> {
+ public:
+  Forest(const CharBoard& b)
+   : ConwayMultiSet({b.Find('.'), b.Find('|'), b.Find('#')}), bounds_(b.range()) {}
 
-CharBoard Update(const CharBoard& in) {
-  CharBoard ret = in;
-  for (Point p : in.range()) {
-    absl::flat_hash_map<char, int> neighbors;
+  std::string Draw() const override {
+    CharBoard ret(bounds_);
+    ret.DrawOn(sets()[0], '.');
+    ret.DrawOn(sets()[1], '|');
+    ret.DrawOn(sets()[2], '#');
+    return absl::StrCat(ret);
+  }
+
+  int64_t Trees() const { return sets()[1].size(); }
+  int64_t Lumber() const { return sets()[2].size(); }
+
+  std::vector<Point> Neighbors(const Point& p) const override {
+    std::vector<Point> ret;
     for (Point dir : Cardinal::kEightDirs) {
       Point test = p + dir;
-      if (in.OnBoard(test)) {
-        ++neighbors[in[test]];
+      if (bounds_.Contains(test)) {
+        ret.push_back(test);
       }
     }
-    switch (in[p]) {
-      case '.': {
-        if (neighbors['|'] >= 3) {
-          ret[p] = '|';
-        }
-        break;
-      }
-      case '|': {
-        if (neighbors['#'] >= 3) {
-          ret[p] = '#';
-        }
-        break;
-      }
-      case '#': {
-        if (neighbors['#'] < 1 || neighbors['|'] < 1) {
-          ret[p] = '.';
-        }
-        break;
-      }
-      default:
-        LOG(FATAL) << "Bad board char @" << p << ": " << in[p];
-    }
+    return ret;
   }
-  return ret;
-}
+  int NextState(int cur_state, std::array<int, 3> neighbors) const override {
+    switch (cur_state) {
+      case 0: return neighbors[1] >= 3 ? 1 : 0;
+      case 1: return neighbors[2] >= 3 ? 2 : 1;
+      case 2: return neighbors[1] == 0 || neighbors[2] == 0 ? 0 : 2;
+    }
+    LOG(FATAL) << "Bad state: " << cur_state;
+  }
+
+  struct Summary {
+    std::vector<Point> trees;
+    std::vector<Point> lumber;
+    bool operator==(const Summary& o) const {
+      return trees == o.trees && lumber == o.lumber;
+    }
+    template <typename H>
+    friend H AbslHashValue(H h, const Summary& s) {
+      return H::combine(std::move(h), s.trees, s.lumber);
+    }
+  };
+
+  Summary BuildSummary() {
+    return {
+      .trees = StablePointSet(sets()[1]),
+      .lumber = StablePointSet(sets()[2]),
+    };
+  }
+
+ private:
+  PointRectangle bounds_;
+};
 
 template <typename Storage>
 class LoopHistory {
@@ -84,34 +105,28 @@ absl::StatusOr<std::string> Day_2018_18::Part1(
     absl::Span<std::string_view> input) const {
   absl::StatusOr<CharBoard> in = CharBoard::Parse(input);
   if (!in.ok()) return in.status();
-  CharBoard step = *in;
-  for (int i = 0; i < 10; ++i) {
-    VLOG(1) << "Step [" << i << "]:\n" << step;
-    step = Update(step);
-  }
-  int trees = step.CountChar('|');
-  int lumber = step.CountChar('#');
-  return AdventReturn(trees * lumber);
+
+  Forest f(*in);
+  f.AdvanceN(10);
+  return AdventReturn(f.Trees() * f.Lumber());
 }
 
 absl::StatusOr<std::string> Day_2018_18::Part2(
     absl::Span<std::string_view> input) const {
   absl::StatusOr<CharBoard> in = CharBoard::Parse(input);
   if (!in.ok()) return in.status();
-  CharBoard step = *in;
   constexpr int kNumSteps = 1'000'000'000;
-  LoopHistory<CharBoard> hist;
+
+  Forest f(*in);
+  LoopHistory<Forest::Summary> hist;
   for (int i = 0; i < kNumSteps; ++i) {
-    if (hist.AddMaybeNew(step)) {
-      step = hist.FindInLoop(kNumSteps);
-      break;
+    if (hist.AddMaybeNew(f.BuildSummary())) {
+      Forest::Summary summary = hist.FindInLoop(kNumSteps);
+      return AdventReturn(summary.trees.size() * summary.lumber.size());
     }
-    VLOG(1) << "Step [" << i << "]:\n" << step;
-    step = Update(step);
+    f.Advance();
   }
-  int trees = step.CountChar('|');
-  int lumber = step.CountChar('#');
-  return AdventReturn(trees * lumber);
+  return AdventReturn(f.Trees() * f.Lumber());
 }
 
 }  // namespace advent_of_code

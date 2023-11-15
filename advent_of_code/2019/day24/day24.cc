@@ -50,9 +50,7 @@ class Part1Conway : public ConwaySet<Point> {
   }
 
   std::vector<Point> Identifier() const {
-    std::vector<Point> ret(set().begin(), set().end());
-    absl::c_sort(ret, PointYThenXLT());
-    return ret;
+    return StablePointSet(set());
   }
 
   int64_t BioDiversity() {

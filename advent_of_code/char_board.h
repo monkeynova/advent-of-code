@@ -96,6 +96,14 @@ class CharBoard {
   CharBoard(const CharBoard&) = default;
   CharBoard& operator=(const CharBoard&) = default;
 
+  // Sets each point in `points` in the board to '#'. If `bounds_ret` is not
+  // nullptr, it contains the (inclusive) axis aligned bounding box for those
+  // points.
+  template <typename Container>
+  void  DrawOn(const Container& points, char c = '#') {
+    for (Point p : points) (*this)[p] = c;
+  }
+
   int height() const { return stride_ == 1 ? 0 : buf_.size() / stride_; }
   int width() const { return stride_ - 1; }
 
