@@ -120,7 +120,16 @@ class Part2Conway : public ConwaySet<Point3> {
     }
     std::string ret;
     for (const auto& [z, b] : boards) {
-      absl::StrAppendFormat(&ret, "%d\n%v\n", z, b);
+      absl::StrAppendFormat(&ret, "Z:%3d ", z);
+    }
+    for (int i = 0; i < 5; ++i) {
+      absl::StrAppend(&ret, "\n");
+      for (const auto& [z, b] : boards) {
+        for (int j = 0; j < 5; ++j) {
+          absl::StrAppendFormat(&ret, "%c", b[{i, j}]);
+        }
+        absl::StrAppend(&ret, " ");
+      }
     }
     return ret;
   }
