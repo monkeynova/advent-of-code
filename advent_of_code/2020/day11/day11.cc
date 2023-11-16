@@ -23,6 +23,8 @@ class SeatConway : public ConwayMultiSet<Point, 2> {
 
   int64_t CountFilled() const { return CountState(1); }
 
+  bool SetsAreComplete() const override { return true; }
+
   std::vector<Point> Neighbors(const Point& p) const override {
     std::vector<Point> ret;
     for (Point d : Cardinal::kEightDirs) {

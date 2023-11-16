@@ -32,6 +32,8 @@ class Forest : public ConwayMultiSet<Point, 3> {
   int64_t Trees() const { return sets()[1].size(); }
   int64_t Lumber() const { return sets()[2].size(); }
 
+  bool SetsAreComplete() const override { return true; }
+
   std::vector<Point> Neighbors(const Point& p) const override {
     std::vector<Point> ret;
     for (Point dir : Cardinal::kEightDirs) {
@@ -44,12 +46,15 @@ class Forest : public ConwayMultiSet<Point, 3> {
   }
   int NextState(int cur_state, std::array<int, 3> neighbors) const override {
     switch (cur_state) {
-      case 0:
+      case 0: {
         return neighbors[1] >= 3 ? 1 : 0;
-      case 1:
+      }
+      case 1: {
         return neighbors[2] >= 3 ? 2 : 1;
-      case 2:
+      }
+      case 2: {
         return neighbors[1] == 0 || neighbors[2] == 0 ? 0 : 2;
+      }
     }
     LOG(FATAL) << "Bad state: " << cur_state;
   }

@@ -79,26 +79,30 @@ class ConwayMultiSet {
   virtual std::vector<Storage> Neighbors(const Storage& s) const = 0;
   virtual int NextState(int state, std::array<int, size> neighbors) const = 0;
 
+  virtual bool SetsAreComplete() const { return false; }
+
   virtual bool Advance() {
+    if (step_ == 0) AuditNextState();
     VLOG(2) << "Board[" << step_ << "]\n" << *this;
     ++step_;
 
-    absl::flat_hash_map<Storage, int> current_map;
     absl::flat_hash_map<Storage, std::array<int, size>> neighbor_map;
     for (int set_idx = 0; set_idx < size; ++set_idx) {
       for (const Storage& s : sets_[set_idx]) {
-        current_map[s] = set_idx;
         for (Storage n : Neighbors(s)) {
           ++neighbor_map[n][set_idx];
         }
       }
     }
 
+    auto add_set_size = [](int a, const absl::flat_hash_set<Storage>& s) {
+      return a + s.size();
+    };
+    int pre_total = absl::c_accumulate(sets_, 0, add_set_size);
     std::array<absl::flat_hash_set<Storage>, size> next;
     bool unchanged = true;
     for (const auto& [s, n] : neighbor_map) {
-      auto it = current_map.find(s);
-      int cur_state = it == current_map.end() ? -1 : it->second;
+      int cur_state = CurState(s);
       int next_state = NextState(cur_state, n);
       if (next_state >= 0) {
         next[next_state].insert(s);
@@ -109,6 +113,10 @@ class ConwayMultiSet {
       for (int i = 0; i < size; ++i) {
         unchanged &= sets_[i].size() == next[i].size();
       }
+    }
+    int post_total = absl::c_accumulate(sets_, 0, add_set_size);
+    if (SetsAreComplete()) {
+      CHECK_EQ(pre_total, post_total);
     }
     if (unchanged) {
       return false;
@@ -136,6 +144,26 @@ class ConwayMultiSet {
   void Force(Storage s, int state) { sets_[state].insert(std::move(s)); }
 
  private:
+  void AuditNextState() const {
+    if (SetsAreComplete()) return;
+    std::array<int, size> empty_neighbors;
+    for (int& n : empty_neighbors) n = 0;
+    for (int start_state = -1; start_state < size; ++start_state) {
+      CHECK_EQ(-1, NextState(start_state, empty_neighbors)) << start_state;
+    }
+  }
+
+  int CurState(const Storage& s) const {
+    int ret = -1;
+    for (int set_idx = 0; set_idx < sets_.size(); ++set_idx) {
+      if (sets_[set_idx].contains(s)) {
+        ret = set_idx;
+        break;
+      }
+    }
+    return ret;
+  }
+
   std::array<absl::flat_hash_set<Storage>, size> sets_;
   int step_ = 0;
 };
