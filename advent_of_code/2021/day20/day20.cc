@@ -24,12 +24,7 @@ absl::StatusOr<std::string> Day_2021_20::Part1(
   if (!b.ok()) return b.status();
 
   InfiniteConway conway(*b, std::string(lookup));
-  conway.set_infinite();
   if (auto st = conway.AdvanceN(2); !st.ok()) return st;
-  if (conway.fill() != '.') {
-    return absl::UnimplementedError("Can't return a board with non-'.' fill");
-  }
-
   return AdventReturn(conway.CountLive());
 }
 
@@ -44,12 +39,7 @@ absl::StatusOr<std::string> Day_2021_20::Part2(
   if (!b.ok()) return b.status();
 
   InfiniteConway conway(*b, std::string(lookup));
-  conway.set_infinite();
   if (auto st = conway.AdvanceN(50); !st.ok()) return st;
-  if (conway.fill() != '.') {
-    return absl::UnimplementedError("Can't return a board with non-'.' fill");
-  }
-
   return AdventReturn(conway.CountLive());
 }
 

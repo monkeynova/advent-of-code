@@ -32,19 +32,15 @@ class InfiniteConway {
   InfiniteConway(CharBoard b, std::string lookup = DefaultLookup())
       : b_(std::move(b)), lookup_(std::move(lookup)) {}
 
-  // If called, will treat the board as the only nontrivial subset of an
-  // infinitely large game of life. All surrounding locations will be
-  // considered to have the value `fill`.
-  void set_infinite(char fill = '.') {
-    infinite_ = true;
-    fill_ = fill;
+  absl::StatusOr<int64_t> CountLive() const {
+    if (fill_ != '.') {
+      return absl::FailedPreconditionError("Live count is infinite");
+    }
+    return board().CountOn();
   }
-
-  int64_t CountLive() const { return board().CountOn(); }
 
   CharBoard& board() { return b_; }
   const CharBoard& board() const { return b_; }
-  char fill() const { return fill_; }
 
   // Move forward one iteration of the board (returns an error if lookup isn't
   // well formed, or if the board contains chars other than '.' or '#').
@@ -61,7 +57,6 @@ class InfiniteConway {
 
   CharBoard b_;
   std::string lookup_;
-  bool infinite_ = false;
   char fill_ = '.';
 };
 

@@ -24,16 +24,16 @@ absl::Status InfiniteConway::Advance() {
     return absl::InternalError(
         absl::StrCat("Bad lookup size:", lookup_.size()));
   }
-  Point dst_to_src = infinite_ ? Cardinal::kNorthWest : Cardinal::kOrigin;
-  int buffer = infinite_ ? 2 : 0;
-  CharBoard new_b(b_.width() + buffer, b_.height() + buffer);
+  static const std::array<Point, 9> kDirs = {
+    Cardinal::kNorthWest, Cardinal::kNorth, Cardinal::kNorthEast,
+    Cardinal::kWest, Cardinal::kOrigin, Cardinal::kEast,
+    Cardinal::kSouthWest, Cardinal::kSouth, Cardinal::kSouthEast};
+  
+  CharBoard new_b(b_.width() + 2, b_.height() + 2);
   for (Point p : new_b.range()) {
     int bv = 0;
-    for (Point d :
-         {Cardinal::kNorthWest, Cardinal::kNorth, Cardinal::kNorthEast,
-          Cardinal::kWest, Cardinal::kOrigin, Cardinal::kEast,
-          Cardinal::kSouthWest, Cardinal::kSouth, Cardinal::kSouthEast}) {
-      Point src = p + d + dst_to_src;
+    for (Point d : kDirs) {
+      Point src = p + d + Cardinal::kNorthWest;
       bv <<= 1;
       switch (char test = b_.OnBoard(src) ? b_[src] : fill_) {
         case '#':
@@ -48,10 +48,6 @@ absl::Status InfiniteConway::Advance() {
       }
     }
     new_b[p] = lookup_[bv];
-  }
-  if (!infinite_) {
-    b_ = std::move(new_b);
-    return absl::OkStatus();
   }
 
   if (fill_ == '.') {
