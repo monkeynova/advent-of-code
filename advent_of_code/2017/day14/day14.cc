@@ -44,28 +44,26 @@ absl::StatusOr<CharBoard> BuildBoard(std::string_view input) {
 absl::StatusOr<std::string> Day_2017_14::Part1(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
-  absl::StatusOr<CharBoard> board = BuildBoard(input[0]);
-  if (!board.ok()) return board.status();
-  VLOG(1) << "Board:\n" << *board;
-  return AdventReturn(board->CountChar('.'));
+  ASSIGN_OR_RETURN(CharBoard board, BuildBoard(input[0]));
+  VLOG(1) << "Board:\n" << board;
+  return AdventReturn(board.CountChar('.'));
 }
 
 absl::StatusOr<std::string> Day_2017_14::Part2(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
-  absl::StatusOr<CharBoard> board = BuildBoard(input[0]);
-  if (!board.ok()) return board.status();
+  ASSIGN_OR_RETURN(CharBoard board, BuildBoard(input[0]));
 
   absl::flat_hash_map<Point, std::string> storage;
-  for (Point p : board->range()) {
-    if ((*board)[p] == '.') storage[p] = absl::StrCat(p);
+  for (auto [p, c] : board) {
+    if (c == '.') storage[p] = absl::StrCat(p);
   }
   DirectedGraph<bool> dg;
-  for (Point p : board->range()) {
-    if ((*board)[p] != '.') continue;
+  for (auto [p, c] : board) {
+    if (c != '.') continue;
     dg.AddNode(storage[p], true);
     for (Point d : Cardinal::kFourDirs) {
-      if ((*board)[p + d] == '.') {
+      if (board[p + d] == '.') {
         dg.AddEdge(storage[p], storage[p + d]);
       }
     }

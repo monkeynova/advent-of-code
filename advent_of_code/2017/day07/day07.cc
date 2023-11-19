@@ -87,11 +87,10 @@ absl::StatusOr<DirectedGraph<int>> Parse(absl::Span<std::string_view> input) {
 
 absl::StatusOr<std::string> Day_2017_07::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<DirectedGraph<int>> dag = Parse(input);
-  if (!dag.ok()) return dag.status();
+  ASSIGN_OR_RETURN(DirectedGraph<int> dag, Parse(input));
   std::string_view root;
-  for (std::string_view node : dag->nodes()) {
-    const std::vector<std::string_view>* incoming = dag->Incoming(node);
+  for (std::string_view node : dag.nodes()) {
+    const std::vector<std::string_view>* incoming = dag.Incoming(node);
     if (incoming == nullptr) {
       if (root != "") return Error("Dupe roots");
       root = node;
@@ -102,17 +101,16 @@ absl::StatusOr<std::string> Day_2017_07::Part1(
 
 absl::StatusOr<std::string> Day_2017_07::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<DirectedGraph<int>> dag = Parse(input);
-  if (!dag.ok()) return dag.status();
+  ASSIGN_OR_RETURN(DirectedGraph<int> dag, Parse(input));
   std::string_view root;
-  for (std::string_view node : dag->nodes()) {
-    const std::vector<std::string_view>* incoming = dag->Incoming(node);
+  for (std::string_view node : dag.nodes()) {
+    const std::vector<std::string_view>* incoming = dag.Incoming(node);
     if (incoming == nullptr) {
       if (root != "") return Error("Dupe roots");
       root = node;
     }
   }
-  return AdventReturn(FindBadWeight(root, *dag));
+  return AdventReturn(FindBadWeight(root, dag));
 }
 
 }  // namespace advent_of_code

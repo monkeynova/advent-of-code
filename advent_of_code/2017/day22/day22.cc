@@ -21,16 +21,16 @@ struct Nav {
 
 absl::StatusOr<absl::flat_hash_set<Point>> Parse(
     absl::Span<std::string_view> input) {
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
-  if (!b.ok()) return b.status();
-  if (b->width() % 2 != 1) return Error("Bad width");
-  if (b->height() % 2 != 1) return Error("Bad width");
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  if (b.width() % 2 != 1) return Error("Bad width");
+  if (b.height() % 2 != 1) return Error("Bad width");
 
-  Point center = {b->width() / 2, b->height() / 2};
+  Point center = {b.width() / 2, b.height() / 2};
 
   absl::flat_hash_set<Point> sparse_board;
-  for (Point p : b->range())
-    if (b->at(p) == '#') sparse_board.insert(p - center);
+  for (auto [p, c] : b) {
+    if (c == '#') sparse_board.insert(p - center);
+  }
   return sparse_board;
 }
 
@@ -60,16 +60,16 @@ enum State {
 
 absl::StatusOr<absl::flat_hash_map<Point, State>> Parse2(
     absl::Span<std::string_view> input) {
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
-  if (!b.ok()) return b.status();
-  if (b->width() % 2 != 1) return Error("Bad width");
-  if (b->height() % 2 != 1) return Error("Bad width");
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  if (b.width() % 2 != 1) return Error("Bad width");
+  if (b.height() % 2 != 1) return Error("Bad width");
 
-  Point center = {b->width() / 2, b->height() / 2};
+  Point center = {b.width() / 2, b.height() / 2};
 
   absl::flat_hash_map<Point, State> sparse_board;
-  for (Point p : b->range())
-    if (b->at(p) == '#') sparse_board.emplace(p - center, kInfected);
+  for (auto [p, c] : b) {
+    if (c == '#') sparse_board.emplace(p - center, kInfected);
+  }
   return sparse_board;
 }
 

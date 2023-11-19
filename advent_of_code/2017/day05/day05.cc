@@ -19,26 +19,24 @@ namespace {
 
 absl::StatusOr<std::string> Day_2017_05::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> jumps = ParseAsInts(input);
-  if (!jumps.ok()) return jumps.status();
+  ASSIGN_OR_RETURN(std::vector<int64_t> jumps, ParseAsInts(input));
   int steps = 0;
-  for (int ip = 0; ip >= 0 && ip < jumps->size(); ++steps) {
-    ip += (*jumps)[ip]++;
+  for (int ip = 0; ip >= 0 && ip < jumps.size(); ++steps) {
+    ip += jumps[ip]++;
   }
   return AdventReturn(steps);
 }
 
 absl::StatusOr<std::string> Day_2017_05::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> jumps = ParseAsInts(input);
-  if (!jumps.ok()) return jumps.status();
+  ASSIGN_OR_RETURN(std::vector<int64_t> jumps, ParseAsInts(input));
   int steps = 0;
-  for (int ip = 0; ip >= 0 && ip < jumps->size(); ++steps) {
-    int delta = (*jumps)[ip];
+  for (int ip = 0; ip >= 0 && ip < jumps.size(); ++steps) {
+    int delta = jumps[ip];
     if (delta >= 3) {
-      --(*jumps)[ip];
+      --jumps[ip];
     } else {
-      ++(*jumps)[ip];
+      ++jumps[ip];
     }
     ip += delta;
   }

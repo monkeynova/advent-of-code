@@ -43,10 +43,9 @@ class OutputWatch : public AssemBunny::OutputInterface,
 
 absl::StatusOr<std::string> Day_2016_25::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<AssemBunny> vm = AssemBunny::Parse(input);
-  if (!vm.ok()) return vm.status();
+  ASSIGN_OR_RETURN(AssemBunny vm, AssemBunny::Parse(input));
   for (int a = 0; true; ++a) {
-    AssemBunny copy = vm->Clone();
+    AssemBunny copy = vm.Clone();
     VLOG(1) << "Trying: " << a;
     copy.registers().a = a;
     OutputWatch watch;

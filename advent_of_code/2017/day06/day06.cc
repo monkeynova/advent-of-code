@@ -41,14 +41,12 @@ absl::StatusOr<std::string> Day_2017_06::Part1(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   std::vector<std::string_view> split = absl::StrSplit(input[0], "\t");
-  absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(split);
-  if (!list.ok()) return list.status();
-  std::vector<int64_t> tmp = *list;
+  ASSIGN_OR_RETURN(std::vector<int64_t> list, ParseAsInts(split));
   absl::flat_hash_set<std::vector<int64_t>> hist;
-  while (!hist.contains(tmp)) {
-    VLOG(2) << absl::StrJoin(tmp, ",");
-    hist.insert(tmp);
-    tmp = RunStep(std::move(tmp));
+  while (!hist.contains(list)) {
+    VLOG(2) << absl::StrJoin(list, ",");
+    hist.insert(list);
+    list = RunStep(std::move(list));
   }
   return AdventReturn(hist.size());
 }
@@ -57,16 +55,14 @@ absl::StatusOr<std::string> Day_2017_06::Part2(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   std::vector<std::string_view> split = absl::StrSplit(input[0], "\t");
-  absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(split);
-  if (!list.ok()) return list.status();
-  std::vector<int64_t> tmp = *list;
+  ASSIGN_OR_RETURN(std::vector<int64_t> list, ParseAsInts(split));
   absl::flat_hash_map<std::vector<int64_t>, int> hist;
-  for (int i = 0; !hist.contains(tmp); ++i) {
-    VLOG(2) << absl::StrJoin(tmp, ",");
-    hist[tmp] = i;
-    tmp = RunStep(std::move(tmp));
+  for (int i = 0; !hist.contains(list); ++i) {
+    VLOG(2) << absl::StrJoin(list, ",");
+    hist[list] = i;
+    list = RunStep(std::move(list));
   }
-  return AdventReturn(hist.size() - hist[tmp]);
+  return AdventReturn(hist.size() - hist[list]);
 }
 
 }  // namespace advent_of_code

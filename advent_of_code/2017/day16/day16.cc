@@ -82,18 +82,16 @@ void RunDance(const std::vector<DanceMove>& moves, Line* line) {
 absl::StatusOr<std::string> Day_2017_16::Part1(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
-  absl::StatusOr<std::vector<DanceMove>> moves = Parse(input[0]);
-  if (!moves.ok()) return moves.status();
+  ASSIGN_OR_RETURN(std::vector<DanceMove> moves, Parse(input[0]));
   Line line;
-  RunDance(*moves, &line);
+  RunDance(moves, &line);
   return line.vals;
 }
 
 absl::StatusOr<std::string> Day_2017_16::Part2(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
-  absl::StatusOr<std::vector<DanceMove>> moves = Parse(input[0]);
-  if (!moves.ok()) return moves.status();
+  ASSIGN_OR_RETURN(std::vector<DanceMove> moves, Parse(input[0]));
   Line line;
   absl::flat_hash_map<std::string, int> history;
   int loop_size = -1;
@@ -107,15 +105,16 @@ absl::StatusOr<std::string> Day_2017_16::Part2(
     }
     history[line.vals] = i;
     VLOG_IF(1, i % 77'777 == 0) << i;
-    RunDance(*moves, &line);
+    RunDance(moves, &line);
   }
   if (loop_size != -1) {
+    // TODO(@monkeynova): use LoopHistory from 2018/18?
     VLOG(1) << "Found loop: size=" << loop_size << "; offset=" << loop_offset;
     int need_offset = (1'000'000'000 - loop_offset) % loop_size + loop_offset;
     VLOG(1) << "  need_offset=" << need_offset;
     Line new_line;
     for (int i = 0; i < need_offset; ++i) {
-      RunDance(*moves, &new_line);
+      RunDance(moves, &new_line);
     }
     line = new_line;
   }

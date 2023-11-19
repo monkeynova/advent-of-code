@@ -40,11 +40,10 @@ absl::StatusOr<std::string> Day_2017_02::Part2(
   int checksum = 0;
   for (std::string_view row : input) {
     std::vector<std::string_view> num_strs = absl::StrSplit(row, "\t");
-    absl::StatusOr<std::vector<int64_t>> nums = ParseAsInts(num_strs);
-    if (!nums.ok()) return nums.status();
+    ASSIGN_OR_RETURN(std::vector<int64_t> nums, ParseAsInts(num_strs));
     bool found = false;
-    for (int64_t a : *nums) {
-      for (int64_t b : *nums) {
+    for (int64_t a : nums) {
+      for (int64_t b : nums) {
         if (a <= b) continue;
         if (a % b == 0) {
           if (found) return Error("Dual divisible: ", row);

@@ -30,18 +30,16 @@ absl::StatusOr<DirectedGraph<bool>> Parse(absl::Span<std::string_view> input) {
 
 absl::StatusOr<std::string> Day_2017_12::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<DirectedGraph<bool>> graph = Parse(input);
-  if (!graph.ok()) return graph.status();
+  ASSIGN_OR_RETURN(DirectedGraph<bool> graph, Parse(input));
 
-  return AdventReturn(graph->Reachable("0").size());
+  return AdventReturn(graph.Reachable("0").size());
 }
 
 absl::StatusOr<std::string> Day_2017_12::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<DirectedGraph<bool>> graph = Parse(input);
-  if (!graph.ok()) return graph.status();
+  ASSIGN_OR_RETURN(DirectedGraph<bool> graph, Parse(input));
 
-  return AdventReturn(graph->Forest().size());
+  return AdventReturn(graph.Forest().size());
 }
 
 }  // namespace advent_of_code

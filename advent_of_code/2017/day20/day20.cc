@@ -191,14 +191,13 @@ int IntersectSimulation(const std::vector<Particle>& particles) {
 
 absl::StatusOr<std::string> Day_2017_20::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<Particle>> particles = Parse(input);
-  if (!particles.ok()) return particles.status();
+  ASSIGN_OR_RETURN(std::vector<Particle> particles, Parse(input));
 
   int min_acc = std::numeric_limits<int>::max();
   int min_vec = std::numeric_limits<int>::max();
   int min_idx = -1;
-  for (int i = 0; i < particles->size(); ++i) {
-    const Particle& p = particles->at(i);
+  for (int i = 0; i < particles.size(); ++i) {
+    const Particle& p = particles[i];
     if (p.a.dist() < min_acc) {
       min_acc = p.a.dist();
       min_vec = (p.a - p.v).dist();
@@ -215,30 +214,29 @@ absl::StatusOr<std::string> Day_2017_20::Part1(
 
 absl::StatusOr<std::string> Day_2017_20::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<Particle>> particles = Parse(input);
-  if (!particles.ok()) return particles.status();
+  ASSIGN_OR_RETURN(std::vector<Particle> particles, Parse(input));
 
   if (run_audit()) {
-    std::vector<Particle> progress = *particles;
+    std::vector<Particle> progress = particles;
     for (int step = 0; step < 100; ++step) {
-      for (int i = 0; i < particles->size(); ++i) {
-        if (progress[i].p != (*particles)[i].AtTime(step)) {
-          return Error(progress[i].p, " != ", (*particles)[i].AtTime(step));
+      for (int i = 0; i < particles.size(); ++i) {
+        if (progress[i].p != particles[i].AtTime(step)) {
+          return Error(progress[i].p, " != ", particles[i].AtTime(step));
         }
         progress[i].v += progress[i].a;
         progress[i].p += progress[i].v;
       }
     }
 
-    int paths_val = IntersectPaths(*particles);
-    int simulation_val = IntersectSimulation(*particles);
+    int paths_val = IntersectPaths(particles);
+    int simulation_val = IntersectSimulation(particles);
     VLOG(1) << "paths = " << paths_val << "; simulation=" << simulation_val;
     if (paths_val != simulation_val) {
       return Error(paths_val, " != ", simulation_val);
     }
   }
 
-  return AdventReturn(IntersectPaths(*particles));
+  return AdventReturn(IntersectPaths(particles));
 }
 
 }  // namespace advent_of_code

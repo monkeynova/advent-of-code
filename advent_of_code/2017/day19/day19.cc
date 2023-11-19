@@ -69,21 +69,17 @@ absl::StatusOr<WalkRet> WalkBoard(const CharBoard& b) {
 absl::StatusOr<std::string> Day_2017_19::Part1(
     absl::Span<std::string_view> input) const {
   if (input.empty()) return Error("Bad input");
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
-  if (!b.ok()) return b.status();
-  absl::StatusOr<WalkRet> walk_ret = WalkBoard(*b);
-  if (!walk_ret.ok()) return walk_ret.status();
-  return walk_ret->sequence;
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(WalkRet walk_ret, WalkBoard(b));
+  return walk_ret.sequence;
 }
 
 absl::StatusOr<std::string> Day_2017_19::Part2(
     absl::Span<std::string_view> input) const {
   if (input.empty()) return Error("Bad input");
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
-  if (!b.ok()) return b.status();
-  absl::StatusOr<WalkRet> walk_ret = WalkBoard(*b);
-  if (!walk_ret.ok()) return walk_ret.status();
-  return AdventReturn(walk_ret->num_steps);
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(WalkRet walk_ret, WalkBoard(b));
+  return AdventReturn(walk_ret.num_steps);
 }
 
 }  // namespace advent_of_code

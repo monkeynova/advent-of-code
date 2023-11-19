@@ -59,9 +59,8 @@ class VM {
   static absl::StatusOr<VM> Parse(absl::Span<std::string_view> input) {
     VM ret;
     for (std::string_view ins : input) {
-      absl::StatusOr<Instruction> next = Instruction::Parse(ins);
-      if (!next.ok()) return next.status();
-      ret.instructions_.push_back(*next);
+      ASSIGN_OR_RETURN(Instruction next, Instruction::Parse(ins));
+      ret.instructions_.push_back(next);
     }
     return ret;
   }
@@ -164,21 +163,19 @@ class VM {
 
 absl::StatusOr<std::string> Day_2017_18::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<VM> vm = VM::Parse(input);
-  if (!vm.ok()) return vm.status();
-  vm->set_part1();
-  vm->ExecuteToRecv();
-  std::vector<int> send_queue = vm->ConsumeSendQueue();
+  ASSIGN_OR_RETURN(VM vm, VM::Parse(input));
+  vm.set_part1();
+  vm.ExecuteToRecv();
+  std::vector<int> send_queue = vm.ConsumeSendQueue();
   return AdventReturn(send_queue.back());
 }
 
 absl::StatusOr<std::string> Day_2017_18::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<VM> vm = VM::Parse(input);
-  if (!vm.ok()) return vm.status();
-  VM p0 = *vm;
+  ASSIGN_OR_RETURN(VM vm, VM::Parse(input));
+  VM p0 = vm;
   p0.set_program_id(0);
-  VM p1 = *vm;
+  VM p1 = vm;
   p1.set_program_id(1);
   bool saw_send = true;
   int p1_sends = 0;
