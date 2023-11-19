@@ -44,9 +44,8 @@ absl::StatusOr<VM> VM::Parse(absl::Span<std::string_view> input) {
             absl::StrCat("Bad register: ", vm.ip_register_));
       }
     } else {
-      absl::StatusOr<Op> op = Op::Parse(row);
-      if (!op.ok()) return op.status();
-      vm.ops_.push_back(*op);
+      ASSIGN_OR_RETURN(Op op, Op::Parse(row));
+      vm.ops_.push_back(op);
     }
   }
   return vm;

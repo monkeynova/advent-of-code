@@ -20,9 +20,8 @@ absl::StatusOr<int> SumMetadata(absl::Span<int64_t>& range) {
   range = range.subspan(2);
   int metadata = 0;
   for (int i = 0; i < num_children; ++i) {
-    absl::StatusOr<int> sub_metadata = SumMetadata(range);
-    if (!sub_metadata.ok()) return sub_metadata.status();
-    metadata += *sub_metadata;
+    ASSIGN_OR_RETURN(int sub_metadata, SumMetadata(range));
+    metadata += sub_metadata;
   }
   for (int m : range.subspan(0, num_metadata)) {
     metadata += m;
@@ -38,9 +37,8 @@ absl::StatusOr<int> NodeValue(absl::Span<int64_t>& range) {
   range = range.subspan(2);
   std::vector<int> sub_values(num_children, 0);
   for (int i = 0; i < num_children; ++i) {
-    absl::StatusOr<int> this_sub_value = NodeValue(range);
-    if (!this_sub_value.ok()) return this_sub_value.status();
-    sub_values[i] = *this_sub_value;
+    ASSIGN_OR_RETURN(int this_sub_value, NodeValue(range));
+    sub_values[i] = this_sub_value;
   }
   int value = 0;
   if (num_children == 0) {
@@ -67,26 +65,22 @@ absl::StatusOr<std::string> Day_2018_08::Part1(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   std::vector<std::string_view> int_strs = absl::StrSplit(input[0], " ");
-  absl::StatusOr<std::vector<int64_t>> ints = ParseAsInts(int_strs);
-  if (!ints.ok()) return ints.status();
-  absl::Span<int64_t> int_span = absl::MakeSpan(*ints);
-  absl::StatusOr<int> ret = SumMetadata(int_span);
-  if (!ret.ok()) return ret.status();
+  ASSIGN_OR_RETURN(std::vector<int64_t> ints, ParseAsInts(int_strs));
+  absl::Span<int64_t> int_span = absl::MakeSpan(ints);
+  ASSIGN_OR_RETURN(int ret, SumMetadata(int_span));
   if (!int_span.empty()) return Error("Bad parse");
-  return AdventReturn(*ret);
+  return AdventReturn(ret);
 }
 
 absl::StatusOr<std::string> Day_2018_08::Part2(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad size");
   std::vector<std::string_view> int_strs = absl::StrSplit(input[0], " ");
-  absl::StatusOr<std::vector<int64_t>> ints = ParseAsInts(int_strs);
-  if (!ints.ok()) return ints.status();
-  absl::Span<int64_t> int_span = absl::MakeSpan(*ints);
-  absl::StatusOr<int> ret = NodeValue(int_span);
-  if (!ret.ok()) return ret.status();
+  ASSIGN_OR_RETURN(std::vector<int64_t> ints, ParseAsInts(int_strs));
+  absl::Span<int64_t> int_span = absl::MakeSpan(ints);
+  ASSIGN_OR_RETURN(int ret, NodeValue(int_span));
   if (!int_span.empty()) return Error("Bad parse");
-  return AdventReturn(*ret);
+  return AdventReturn(ret);
 }
 
 }  // namespace advent_of_code

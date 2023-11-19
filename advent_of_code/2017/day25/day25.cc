@@ -113,12 +113,9 @@ class TuringMachine {
 
 absl::StatusOr<std::string> Day_2017_25::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<TuringMachine> tm = TuringMachine::Parse(input);
-  if (!tm.ok()) return tm.status();
-
-  RETURN_IF_ERROR(tm->Run());
-
-  return AdventReturn(tm->Checksum());
+  ASSIGN_OR_RETURN(TuringMachine tm, TuringMachine::Parse(input));
+  RETURN_IF_ERROR(tm.Run());
+  return AdventReturn(tm.Checksum());
 }
 
 absl::StatusOr<std::string> Day_2017_25::Part2(

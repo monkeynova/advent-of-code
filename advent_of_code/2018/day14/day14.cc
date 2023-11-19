@@ -19,10 +19,9 @@ namespace {
 
 absl::StatusOr<std::string> Day_2018_14::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> ints = ParseAsInts(input);
-  if (!ints.ok()) return ints.status();
-  if (ints->size() != 1) return Error("Bad size");
-  int rounds = ints->back();
+  ASSIGN_OR_RETURN(std::vector<int64_t> ints, ParseAsInts(input));
+  if (ints.size() != 1) return Error("Bad size");
+  int rounds = ints[0];
 
   std::string tmp = "37";
   int elf1_pos = 0;
@@ -43,10 +42,9 @@ absl::StatusOr<std::string> Day_2018_14::Part1(
 
 absl::StatusOr<std::string> Day_2018_14::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> ints = ParseAsInts(input);
-  if (!ints.ok()) return ints.status();
-  if (ints->size() != 1) return Error("Bad size");
-  int rounds = ints->back();
+  ASSIGN_OR_RETURN(std::vector<int64_t> ints, ParseAsInts(input));
+  if (ints.size() != 1) return Error("Bad size");
+  int rounds = ints[0];
 
   std::string needle = absl::StrCat(rounds);
 

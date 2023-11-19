@@ -182,17 +182,13 @@ absl::StatusOr<State> FindKarts(const CharBoard& b) {
 absl::StatusOr<std::string> Day_2018_13::Part1(
     absl::Span<std::string_view> input) const {
   if (input.empty()) return Error("bad input");
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
-  if (!b.ok()) return b.status();
-
-  absl::StatusOr<State> state = FindKarts(*b);
-  if (!state.ok()) return state.status();
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(State state, FindKarts(b));
 
   while (true) {
-    VLOG(1) << "State:\n" << state->DebugString();
-    absl::StatusOr<std::optional<Point>> collision = state->RunStep();
-    if (!collision.ok()) return collision.status();
-    if (*collision) return AdventReturn(*collision);
+    VLOG(1) << "State:\n" << state.DebugString();
+    ASSIGN_OR_RETURN(std::optional<Point> collision, state.RunStep());
+    if (collision) return AdventReturn(collision);
   }
 
   return Error("Left infinite loop");
@@ -201,19 +197,16 @@ absl::StatusOr<std::string> Day_2018_13::Part1(
 absl::StatusOr<std::string> Day_2018_13::Part2(
     absl::Span<std::string_view> input) const {
   if (input.empty()) return Error("bad input");
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
-  if (!b.ok()) return b.status();
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(State state, FindKarts(b));
 
-  absl::StatusOr<State> state = FindKarts(*b);
-  if (!state.ok()) return state.status();
-
-  while (state->carts.size() > 1) {
-    VLOG(1) << "State:\n" << state->DebugString();
-    absl::StatusOr<std::optional<Point>> collision = state->RunStep();
-    if (!collision.ok()) return collision.status();
+  while (state.carts.size() > 1) {
+    VLOG(1) << "State:\n" << state.DebugString();
+    ASSIGN_OR_RETURN(std::optional<Point> collision, state.RunStep());
+    (void)collision;
   }
 
-  return AdventReturn(state->carts[0].pos);
+  return AdventReturn(state.carts[0].pos);
 }
 
 }  // namespace advent_of_code

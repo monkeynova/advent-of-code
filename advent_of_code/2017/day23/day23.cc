@@ -136,9 +136,8 @@ class VM {
   static absl::StatusOr<VM> Parse(absl::Span<std::string_view> input) {
     VM ret;
     for (std::string_view ins : input) {
-      absl::StatusOr<Instruction> next = Instruction::Parse(ins);
-      if (!next.ok()) return next.status();
-      ret.instructions_.push_back(*next);
+      ASSIGN_OR_RETURN(Instruction next, Instruction::Parse(ins));
+      ret.instructions_.push_back(next);
     }
     return ret;
   }
@@ -255,12 +254,9 @@ class VM {
 
 absl::StatusOr<std::string> Day_2017_23::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<VM> vm = VM::Parse(input);
-  if (!vm.ok()) return vm.status();
-
-  vm->ExecuteToRecv();
-
-  return AdventReturn(vm->mul_count());
+  ASSIGN_OR_RETURN(VM vm, VM::Parse(input));
+  vm.ExecuteToRecv();
+  return AdventReturn(vm.mul_count());
 }
 
 absl::StatusOr<std::string> Day_2017_23::Part2(

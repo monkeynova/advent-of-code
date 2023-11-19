@@ -81,18 +81,18 @@ absl::StatusOr<CharBoard> RunIteration(
     for (int x = 0; x < in.width() / stride.x; ++x) {
       Point slice_at = {x * stride.x, y * stride.y};
       VLOG(2) << "Slice @" << slice_at;
-      absl::StatusOr<CharBoard> slice = in.SubBoard(
-          PointRectangle{slice_at, slice_at + stride - Point{1, 1}});
-      if (!slice.ok()) return slice.status();
-      VLOG(2) << "Slice:\n" << *slice;
-      absl::StatusOr<CharBoard> new_slice = FindPattern(*slice, patterns);
-      if (!new_slice.ok()) return new_slice.status();
-      if (new_slice->width() != stride.x + 1) return Error("Bad pattern: x");
-      if (new_slice->height() != stride.y + 1) return Error("Bad pattern: y");
+      ASSIGN_OR_RETURN(
+          CharBoard slice,
+          in.SubBoard(
+              PointRectangle{slice_at, slice_at + stride - Point{1, 1}}));
+      VLOG(2) << "Slice:\n" << slice;
+      ASSIGN_OR_RETURN(CharBoard new_slice, FindPattern(slice, patterns));
+      if (new_slice.width() != stride.x + 1) return Error("Bad pattern: x");
+      if (new_slice.height() != stride.y + 1) return Error("Bad pattern: y");
 
       Point splice_at = {x * (stride.x + 1), y * (stride.y + 1)};
       VLOG(2) << "Splice @" << splice_at;
-      SpliceBoard(&out, *new_slice, splice_at);
+      SpliceBoard(&out, new_slice, splice_at);
     }
   }
   return out;
@@ -104,64 +104,56 @@ absl::StatusOr<absl::flat_hash_map<CharBoard, CharBoard>> Parse(
   for (std::string_view rule : input) {
     const auto [in, out] = PairSplit(rule, " => ");
 
-    absl::StatusOr<CharBoard> board_in =
-        CharBoard::Parse(absl::StrSplit(in, "/"));
-    if (!board_in.ok()) return board_in.status();
+    ASSIGN_OR_RETURN(
+        CharBoard board_in,
+        CharBoard::Parse(absl::StrSplit(in, "/")));
 
-    absl::StatusOr<CharBoard> board_out =
-        CharBoard::Parse(absl::StrSplit(out, "/"));
-    if (!board_out.ok()) return board_out.status();
+    ASSIGN_OR_RETURN(
+        CharBoard board_out,
+        CharBoard::Parse(absl::StrSplit(out, "/")));
 
-    if (ret.contains(*board_in)) return Error("Duplicate pattern");
+    if (ret.contains(board_in)) return Error("Duplicate pattern");
     // TODO(@monkeynova): Verify no rotations.
 
-    ret.emplace(*board_in, *board_out);
+    ret.emplace(board_in, board_out);
   }
   return ret;
 }
+
+using BoardToBoard = absl::flat_hash_map<CharBoard, CharBoard>;
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_21::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<absl::flat_hash_map<CharBoard, CharBoard>> patterns =
-      Parse(input);
-  if (!patterns.ok()) return patterns.status();
+  ASSIGN_OR_RETURN(BoardToBoard patterns,  Parse(input));
 
   std::vector<std::string_view> init = {".#.", "..#", "###"};
-  absl::StatusOr<CharBoard> tmp = CharBoard::Parse(absl::MakeSpan(init));
-  if (!tmp.ok()) return tmp.status();
+  ASSIGN_OR_RETURN(CharBoard tmp, CharBoard::Parse(absl::MakeSpan(init)));
 
-  VLOG(1) << "tmp=\n" << *tmp;
+  VLOG(1) << "tmp=\n" << tmp;
   for (int i = 0; i < 5; ++i) {
-    absl::StatusOr<CharBoard> next = RunIteration(*tmp, *patterns);
-    if (!next.ok()) return next.status();
-    tmp = std::move(next);
-    VLOG(1) << "tmp=\n" << *tmp;
+    ASSIGN_OR_RETURN(tmp, RunIteration(tmp, patterns));
+    VLOG(1) << "tmp=\n" << tmp;
   }
 
-  return AdventReturn(tmp->CountOn());
+  return AdventReturn(tmp.CountOn());
 }
 
 absl::StatusOr<std::string> Day_2017_21::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<absl::flat_hash_map<CharBoard, CharBoard>> patterns =
-      Parse(input);
-  if (!patterns.ok()) return patterns.status();
+  ASSIGN_OR_RETURN(BoardToBoard patterns,  Parse(input));
 
   std::vector<std::string_view> init = {".#.", "..#", "###"};
-  absl::StatusOr<CharBoard> tmp = CharBoard::Parse(absl::MakeSpan(init));
-  if (!tmp.ok()) return tmp.status();
+  ASSIGN_OR_RETURN(CharBoard tmp, CharBoard::Parse(absl::MakeSpan(init)));
 
-  VLOG(1) << "tmp=\n" << *tmp;
+  VLOG(1) << "tmp=\n" << tmp;
   for (int i = 0; i < 18; ++i) {
-    absl::StatusOr<CharBoard> next = RunIteration(*tmp, *patterns);
-    if (!next.ok()) return next.status();
-    tmp = std::move(next);
-    VLOG(1) << "tmp=\n" << *tmp;
+    ASSIGN_OR_RETURN(tmp, RunIteration(tmp, patterns));
+    VLOG(1) << "tmp=\n" << tmp;
   }
 
-  return AdventReturn(tmp->CountOn());
+  return AdventReturn(tmp.CountOn());
 }
 
 }  // namespace advent_of_code

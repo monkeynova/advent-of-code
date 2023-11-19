@@ -199,12 +199,10 @@ class GameBoard {
         done = true;
         break;
       }
-      absl::StatusOr<Point> moved = TryMove(p);
-      if (!moved.ok()) return moved.status();
-      absl::StatusOr<Point> died_at = TryAttack(*moved);
-      if (!died_at.ok()) return died_at.status();
-      if (*died_at != Point{-1, -1}) {
-        dead.insert(*died_at);
+      ASSIGN_OR_RETURN(Point moved, TryMove(p));
+      ASSIGN_OR_RETURN(Point died_at, TryAttack(moved));
+      if (died_at != Point{-1, -1}) {
+        dead.insert(died_at);
       }
     }
 
@@ -241,10 +239,9 @@ class GameBoard {
 
 absl::StatusOr<std::string> Day_2018_15::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
-  if (!b.ok()) return b.status();
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
 
-  GameBoard game(std::move(*b));
+  GameBoard game(std::move(b));
   bool done = false;
   while (!done) {
     VLOG(1) << "State: [" << game.rounds() << "]";
@@ -261,12 +258,11 @@ absl::StatusOr<std::string> Day_2018_15::Part1(
 
 absl::StatusOr<std::string> Day_2018_15::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
-  if (!b.ok()) return b.status();
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
 
   for (int elf_attack = 3; true; ++elf_attack) {
     // TODO(@monkeynova): Binary search.
-    GameBoard game(std::move(*b), elf_attack);
+    GameBoard game(std::move(b), elf_attack);
     int start_elves = game.CountElves();
     bool done = false;
     while (!done) {

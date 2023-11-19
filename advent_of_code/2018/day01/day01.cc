@@ -19,21 +19,17 @@ namespace {
 
 absl::StatusOr<std::string> Day_2018_01::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
-  if (!list.ok()) return list.status();
-  int sum = 0;
-  for (int64_t i : *list) sum += i;
-  return AdventReturn(sum);
+  ASSIGN_OR_RETURN(std::vector<int64_t> list, ParseAsInts(input));
+  return AdventReturn(absl::c_accumulate(list, 0));
 }
 
 absl::StatusOr<std::string> Day_2018_01::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
-  if (!list.ok()) return list.status();
+  ASSIGN_OR_RETURN(std::vector<int64_t> list, ParseAsInts(input));
   absl::flat_hash_set<int> hist;
   int sum = 0;
   while (true) {
-    for (int64_t i : *list) {
+    for (int64_t i : list) {
       if (hist.contains(sum)) return AdventReturn(sum);
       hist.insert(sum);
       sum += i;
