@@ -1,7 +1,5 @@
 #include "advent_of_code/2018/day18/day18.h"
 
-#include "absl/container/flat_hash_map.h"
-#include "absl/container/node_hash_map.h"
 #include "absl/log/log.h"
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
@@ -9,6 +7,7 @@
 #include "absl/strings/str_split.h"
 #include "advent_of_code/char_board.h"
 #include "advent_of_code/conway.h"
+#include "advent_of_code/loop_history.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
@@ -80,32 +79,6 @@ class Forest : public ConwayMultiSet<Point, 3> {
 
  private:
   PointRectangle bounds_;
-};
-
-template <typename Storage>
-class LoopHistory {
- public:
-  bool AddMaybeNew(Storage s) {
-    auto [it, inserted] = hist_.emplace(std::move(s), idx_.size());
-    if (inserted) {
-      idx_.push_back(&it->first);
-      return false;
-    }
-    loop_size_ = idx_.size() - it->second;
-    loop_offset_ = it->second;
-    return true;
-  }
-
-  const Storage& FindInLoop(int64_t offset) {
-    int64_t loop_idx_ = (offset - loop_offset_) % loop_size_ + loop_offset_;
-    return *idx_[loop_idx_];
-  }
-
- private:
-  absl::node_hash_map<Storage, int> hist_;
-  std::vector<const Storage*> idx_;
-  int loop_size_ = -1;
-  int loop_offset_ = -1;
 };
 
 }  // namespace

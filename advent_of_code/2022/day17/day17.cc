@@ -11,6 +11,7 @@
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/char_board.h"
+#include "advent_of_code/loop_history.h"
 #include "advent_of_code/point.h"
 #include "advent_of_code/point_walk.h"
 #include "re2/re2.h"
@@ -29,6 +30,7 @@ class DropState {
   struct SummaryState {
     int w_idx;
     int r_idx;
+    int height;
     std::vector<Point> bounds;
 
     CharBoard Draw() const;
@@ -168,7 +170,26 @@ DropState::SummaryState DropState::Summarize() const {
     ret.bounds.push_back(point - start);
   }
   absl::c_sort(ret.bounds, PointYThenXLT());
+  ret.height = height_;
   return ret;
+}
+
+absl::StatusOr<int64_t> HeightAtDrop(DropState& ds, int64_t drops) {
+  LoopHistory<DropState::SummaryState> hist;
+  for (int64_t i = 0; i < drops; ++i) {
+    RETURN_IF_ERROR(ds.DropNextRock(i));
+
+    if (hist.AddMaybeNew(ds.Summarize())) {
+      const DropState::SummaryState& start = hist.FindInLoop(i);
+      int64_t last_drop = drops - 1;
+      int64_t cycles = hist.CyclesTo(last_drop);
+      const DropState::SummaryState& last = hist.FindInLoop(last_drop);
+      int64_t ret_height = (ds.height() - start.height) * cycles + last.height;
+      VLOG(1) << "Return " << ret_height;
+      return ret_height;      
+    }
+  }
+  return ds.height();
 }
 
 }  // namespace
@@ -180,10 +201,7 @@ absl::StatusOr<std::string> Day_2022_17::Part1(
   DropState ds;
   RETURN_IF_ERROR(ds.ParseWind(input[0]));
 
-  for (int i = 0; i < 2022; ++i) {
-    RETURN_IF_ERROR(ds.DropNextRock(i));
-  }
-  return AdventReturn(ds.height());
+  return AdventReturn(HeightAtDrop(ds, 2022));
 }
 
 absl::StatusOr<std::string> Day_2022_17::Part2(
@@ -193,31 +211,7 @@ absl::StatusOr<std::string> Day_2022_17::Part2(
   DropState ds;
   RETURN_IF_ERROR(ds.ParseWind(input[0]));
 
-  // TODO(@monkeynova): Re-use LoopHistory in 2018/18?
-  absl::flat_hash_map<DropState::SummaryState, int> state_to_idx;
-  std::vector<int> heights;
-  for (int64_t i = 0; i < 1000000000000; ++i) {
-    RETURN_IF_ERROR(ds.DropNextRock(i));
-
-    heights.push_back(ds.height());
-    auto [it, inserted] = state_to_idx.emplace(ds.Summarize(), i);
-    VLOG(2) << "Summary:\n" << it->first.Draw();
-    if (!inserted) {
-      VLOG(1) << "Repeat @" << i << " == " << it->second;
-      int prev_i = it->second;
-
-      int64_t cycles = (999'999'999'999 - prev_i) / (i - prev_i);
-      int64_t offset = (999'999'999'999 - prev_i) % (i - prev_i);
-
-      int64_t ret_height =
-          (heights[i] - heights[prev_i]) * cycles + heights[offset + prev_i];
-
-      VLOG(1) << "Return " << ret_height;
-
-      return AdventReturn(ret_height);
-    }
-  }
-  return AdventReturn(ds.height());
+  return AdventReturn(HeightAtDrop(ds, 1'000'000'000'000));
 }
 
 }  // namespace advent_of_code

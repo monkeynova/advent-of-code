@@ -181,6 +181,14 @@ cc_library(
 )
 
 cc_library(
+    name = "loop_history",
+    hdrs = ["loop_history.h"],
+    deps = [
+        "@com_google_absl//absl/container:node_hash_map",
+    ],
+)
+
+cc_library(
     name = "vlog",
     srcs = ["vlog.cc"],
     hdrs = ["vlog.h"],

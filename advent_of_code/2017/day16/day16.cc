@@ -1,12 +1,11 @@
 #include "advent_of_code/2017/day16/day16.h"
 
-#include "absl/container/flat_hash_map.h"
-#include "absl/container/flat_hash_set.h"
 #include "absl/log/log.h"
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/loop_history.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
@@ -75,8 +74,6 @@ void RunDance(const std::vector<DanceMove>& moves, Line* line) {
   }
 }
 
-// Helper methods go here.
-
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_16::Part1(
@@ -93,30 +90,14 @@ absl::StatusOr<std::string> Day_2017_16::Part2(
   if (input.size() != 1) return Error("Bad size");
   ASSIGN_OR_RETURN(std::vector<DanceMove> moves, Parse(input[0]));
   Line line;
-  absl::flat_hash_map<std::string, int> history;
-  int loop_size = -1;
-  int loop_offset;
+  LoopHistory<std::string> hist;
   for (int i = 0; i < 1'000'000'000; ++i) {
-    auto it = history.find(line.vals);
-    if (it != history.end()) {
-      loop_size = i - history[line.vals];
-      loop_offset = history[line.vals];
-      break;
+    if (hist.AddMaybeNew(line.vals)) {
+      std::string_view vals = hist.FindInLoop(1'000'000'000);
+      return AdventReturn(vals);
     }
-    history[line.vals] = i;
     VLOG_IF(1, i % 77'777 == 0) << i;
     RunDance(moves, &line);
-  }
-  if (loop_size != -1) {
-    // TODO(@monkeynova): use LoopHistory from 2018/18?
-    VLOG(1) << "Found loop: size=" << loop_size << "; offset=" << loop_offset;
-    int need_offset = (1'000'000'000 - loop_offset) % loop_size + loop_offset;
-    VLOG(1) << "  need_offset=" << need_offset;
-    Line new_line;
-    for (int i = 0; i < need_offset; ++i) {
-      RunDance(moves, &new_line);
-    }
-    line = new_line;
   }
   return line.vals;
 }
