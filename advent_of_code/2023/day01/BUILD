@@ -11,6 +11,7 @@ cc_library(
         "//advent_of_code:conway",
         "//advent_of_code:directed_graph",
         "//advent_of_code:interval",
+        "//advent_of_code:loop_history",
         "//advent_of_code:point",
         "//advent_of_code:point3",
         "//advent_of_code:point_walk",
