@@ -149,10 +149,7 @@ absl::StatusOr<std::string> Day_2018_16::Part2(
       if (!map.empty()) return Error("'Empty' line after building map");
       ++empty_count;
       if (empty_count == 3) {
-        absl::StatusOr<absl::flat_hash_map<int, VM::OpCode>> computed_map =
-            ComputeMap(possible);
-        if (!computed_map.ok()) return computed_map.status();
-        map = std::move(*computed_map);
+        ASSIGN_OR_RETURN(map, ComputeMap(possible));
         if (map.size() != 16) return Error("Missing opcodes");
         register_in = {0, 0, 0, 0};
       }

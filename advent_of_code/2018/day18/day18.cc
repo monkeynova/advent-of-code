@@ -112,21 +112,19 @@ class LoopHistory {
 
 absl::StatusOr<std::string> Day_2018_18::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> in = CharBoard::Parse(input);
-  if (!in.ok()) return in.status();
+  ASSIGN_OR_RETURN(CharBoard in, CharBoard::Parse(input));
 
-  Forest f(*in);
+  Forest f(in);
   f.AdvanceN(10);
   return AdventReturn(f.Trees() * f.Lumber());
 }
 
 absl::StatusOr<std::string> Day_2018_18::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> in = CharBoard::Parse(input);
-  if (!in.ok()) return in.status();
+  ASSIGN_OR_RETURN(CharBoard in, CharBoard::Parse(input));
   constexpr int kNumSteps = 1'000'000'000;
 
-  Forest f(*in);
+  Forest f(in);
   LoopHistory<Forest::Summary> hist;
   for (int i = 0; i < kNumSteps; ++i) {
     if (hist.AddMaybeNew(f.BuildSummary())) {

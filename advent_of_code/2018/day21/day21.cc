@@ -84,13 +84,12 @@ bool RunDecompiled(absl::Span<std::string_view> input,
 
 absl::StatusOr<std::string> Day_2018_21::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<VM> vm = VM::Parse(input);
-  if (!vm.ok()) return vm.status();
+  ASSIGN_OR_RETURN(VM vm, VM::Parse(input));
 
   int watch_register = -1;
   int watch_ip = -1;
-  for (int i = 0; i < vm->ops().size(); ++i) {
-    const VM::Op& op = vm->ops()[i];
+  for (int i = 0; i < vm.ops().size(); ++i) {
+    const VM::Op& op = vm.ops()[i];
     if (op.op_code == VM::OpCode::kEqrr && (op.arg1 == 0 || op.arg2 == 0)) {
       watch_ip = i;
       watch_register = op.arg1 == 0 ? op.arg2 : op.arg1;
@@ -99,22 +98,20 @@ absl::StatusOr<std::string> Day_2018_21::Part1(
   if (watch_ip == -1) return Error("Could not find equality test");
 
   int first_test = -1;
-  absl::Status st = vm->Execute([&](int ip) {
+  RETURN_IF_ERROR(vm.Execute([&](int ip) {
     if (ip == watch_ip) {
-      first_test = vm->register_value(watch_register);
+      first_test = vm.register_value(watch_register);
       return true;
     }
     return false;
-  });
-  if (!st.ok()) return st;
+  }));
 
   return AdventReturn(first_test);
 }
 
 absl::StatusOr<std::string> Day_2018_21::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<VM> vm = VM::Parse(input);
-  if (!vm.ok()) return vm.status();
+  ASSIGN_OR_RETURN(VM vm, VM::Parse(input));
 
   int last_new = -1;
   absl::flat_hash_set<int> hist;
@@ -132,8 +129,8 @@ absl::StatusOr<std::string> Day_2018_21::Part2(
 
   int watch_register = -1;
   int watch_ip = -1;
-  for (int i = 0; i < vm->ops().size(); ++i) {
-    const VM::Op& op = vm->ops()[i];
+  for (int i = 0; i < vm.ops().size(); ++i) {
+    const VM::Op& op = vm.ops()[i];
     if (op.op_code == VM::OpCode::kEqrr && (op.arg1 == 0 || op.arg2 == 0)) {
       watch_ip = i;
       watch_register = op.arg1 == 0 ? op.arg2 : op.arg1;
@@ -141,17 +138,16 @@ absl::StatusOr<std::string> Day_2018_21::Part2(
   }
   if (watch_ip == -1) return Error("Could not find equality test");
 
-  absl::Status st = vm->Execute([&](int ip) {
+  RETURN_IF_ERROR(vm.Execute([&](int ip) {
     if (ip == watch_ip) {
-      int watch_value = vm->register_value(watch_register);
+      int watch_value = vm.register_value(watch_register);
       if (hist.contains(watch_value)) return true;
       VLOG(2) << "Value: " << watch_value << " of " << hist.size();
       hist.insert(watch_value);
       last_new = watch_value;
     }
     return false;
-  });
-  if (!st.ok()) return st;
+  }));
 
   return AdventReturn(last_new);
 }

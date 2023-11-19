@@ -183,16 +183,15 @@ absl::StatusOr<Point3> FindBest(std::vector<NanoBot> bots_in) {
 
 absl::StatusOr<std::string> Day_2018_23::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<NanoBot>> bots = Parse(input);
-  if (!bots.ok()) return bots.status();
-  if (bots->empty()) return Error("No bots");
+  ASSIGN_OR_RETURN(std::vector<NanoBot> bots, Parse(input));
+  if (bots.empty()) return Error("No bots");
 
-  NanoBot strongest = *bots->begin();
-  for (const NanoBot& nb : *bots) {
+  NanoBot strongest = *bots.begin();
+  for (const NanoBot& nb : bots) {
     if (nb.r > strongest.r) strongest = nb;
   }
   int in_range = 0;
-  for (const NanoBot& nb : *bots) {
+  for (const NanoBot& nb : bots) {
     if ((nb.p - strongest.p).dist() <= strongest.r) {
       ++in_range;
     }
@@ -203,14 +202,12 @@ absl::StatusOr<std::string> Day_2018_23::Part1(
 
 absl::StatusOr<std::string> Day_2018_23::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<NanoBot>> bots = Parse(input);
-  if (!bots.ok()) return bots.status();
-  if (bots->empty()) return Error("No bots");
+  ASSIGN_OR_RETURN(std::vector<NanoBot> bots, Parse(input));
+  if (bots.empty()) return Error("No bots");
 
-  absl::StatusOr<Point3> best = FindBest(*bots);
-  if (!best.ok()) return best.status();
+  ASSIGN_OR_RETURN(Point3 best, FindBest(bots));
 
-  return AdventReturn(best->dist());
+  return AdventReturn(best.dist());
 }
 
 }  // namespace advent_of_code

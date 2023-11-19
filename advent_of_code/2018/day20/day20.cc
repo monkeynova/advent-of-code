@@ -24,6 +24,7 @@ struct ParsedRE {
   std::string_view val;
   std::vector<std::unique_ptr<ParsedRE>> children;
 
+  // TODO(@monkeynova): AbslStringify?
   std::string DebugString(std::string prefix = "") {
     if (type == kLiteral) return prefix.append(std::string(val));
     std::string sub_prefix = prefix;
@@ -143,10 +144,9 @@ absl::StatusOr<absl::flat_hash_set<Point>> WalkAllPaths(
       for (const auto& child : re.children) {
         absl::flat_hash_set<Point> next;
         for (Point p : ret) {
-          absl::StatusOr<absl::flat_hash_set<Point>> this_next =
-              WalkAllPaths(*child, p, sparse_board);
-          if (!this_next.ok()) return this_next.status();
-          for (Point p : *this_next) next.insert(p);
+          absl::flat_hash_set<Point> this_next;
+          ASSIGN_OR_RETURN(this_next, WalkAllPaths(*child, p, sparse_board));
+          for (Point p : this_next) next.insert(p);
         }
         ret = std::move(next);
       }
@@ -158,10 +158,9 @@ absl::StatusOr<absl::flat_hash_set<Point>> WalkAllPaths(
       }
       ret = {};
       for (const auto& child : re.children) {
-        absl::StatusOr<absl::flat_hash_set<Point>> this_next =
-            WalkAllPaths(*child, cur, sparse_board);
-        if (!this_next.ok()) return this_next.status();
-        for (Point p : *this_next) ret.insert(p);
+        absl::flat_hash_set<Point> this_next;
+        ASSIGN_OR_RETURN(this_next, WalkAllPaths(*child, cur, sparse_board));
+        for (Point p : this_next) ret.insert(p);
       }
       break;
     }
@@ -174,15 +173,13 @@ absl::StatusOr<absl::flat_hash_set<Point>> WalkAllPaths(
 absl::StatusOr<CharBoard> ConstructRoom(std::string_view re, Point* start_ret) {
   Point start = {0, 0};
 
-  absl::StatusOr<ParsedRE> parsed_re = Parse(re);
-  if (!parsed_re.ok()) return parsed_re.status();
+  ASSIGN_OR_RETURN(ParsedRE parsed_re, Parse(re));
 
-  VLOG(1) << parsed_re->DebugString();
+  VLOG(1) << parsed_re.DebugString();
 
   absl::flat_hash_set<Point> sparse_board = {start};
-  absl::StatusOr<absl::flat_hash_set<Point>> final_points =
-      WalkAllPaths(*parsed_re, start, &sparse_board);
-  if (!final_points.ok()) return final_points.status();
+  absl::flat_hash_set<Point> final_points;
+  ASSIGN_OR_RETURN(final_points, WalkAllPaths(parsed_re, start, &sparse_board));
 
   PointRectangle grid = PointRectangle::Bounding(sparse_board);
 
@@ -280,14 +277,13 @@ absl::StatusOr<std::string> Day_2018_20::Part1(
   re = re.substr(0, re.size() - 1);
 
   Point start;
-  absl::StatusOr<CharBoard> room = ConstructRoom(re, &start);
-  if (!room.ok()) return room.status();
+  ASSIGN_OR_RETURN(CharBoard room, ConstructRoom(re, &start));
 
-  VLOG(1) << "Start @" << start << " in Room:\n" << *room;
+  VLOG(1) << "Start @" << start << " in Room:\n" << room;
 
   int max_path = -1;
   std::optional<int> null_dist =
-      RoomWalk(*room, start, &max_path).FindMinSteps();
+      RoomWalk(room, start, &max_path).FindMinSteps();
   if (null_dist) return Error("Path walk terminated?!?");
 
   return AdventReturn(max_path);
@@ -303,14 +299,13 @@ absl::StatusOr<std::string> Day_2018_20::Part2(
   re = re.substr(0, re.size() - 1);
 
   Point start;
-  absl::StatusOr<CharBoard> room = ConstructRoom(re, &start);
-  if (!room.ok()) return room.status();
+  ASSIGN_OR_RETURN(CharBoard room, ConstructRoom(re, &start));
 
-  VLOG(1) << "Start @" << start << " in Room:\n" << *room;
+  VLOG(1) << "Start @" << start << " in Room:\n" << room;
 
   int count = -1;
   std::optional<int> null_dist =
-      RoomWalkPast(*room, start, 1000, &count).FindMinSteps();
+      RoomWalkPast(room, start, 1000, &count).FindMinSteps();
   if (null_dist) return Error("Path walk terminated?!?");
 
   return AdventReturn(count);

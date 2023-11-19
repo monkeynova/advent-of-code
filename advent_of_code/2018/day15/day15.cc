@@ -246,9 +246,7 @@ absl::StatusOr<std::string> Day_2018_15::Part1(
   while (!done) {
     VLOG(1) << "State: [" << game.rounds() << "]";
     VLOG(2) << "\n" << game.DebugString();
-    absl::StatusOr<bool> game_ended = game.RunStep();
-    if (!game_ended.ok()) return game_ended.status();
-    done = *game_ended;
+    ASSIGN_OR_RETURN(done, game.RunStep());
   }
 
   VLOG(1) << "State: [" << game.rounds() << "]\n" << game.DebugString();
@@ -268,9 +266,7 @@ absl::StatusOr<std::string> Day_2018_15::Part2(
     while (!done) {
       VLOG(1) << "State: [" << game.rounds() << "]";
       VLOG(2) << "\n" << game.DebugString();
-      absl::StatusOr<bool> game_ended = game.RunStep();
-      if (!game_ended.ok()) return game_ended.status();
-      done = *game_ended;
+      ASSIGN_OR_RETURN(done, game.RunStep());
     }
     int end_elves = game.CountElves();
     VLOG(1) << "elf_attack: " << elf_attack << ": " << start_elves << " => "

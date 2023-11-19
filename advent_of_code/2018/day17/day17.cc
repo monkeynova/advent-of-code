@@ -151,21 +151,20 @@ absl::StatusOr<CharBoard> Parse(absl::Span<std::string_view> input,
 absl::StatusOr<std::string> Day_2018_17::Part1(
     absl::Span<std::string_view> input) const {
   int min_y;
-  absl::StatusOr<CharBoard> b = Parse(input, &min_y);
-  if (!b.ok()) return b.status();
-  VLOG_IF(1, b->height() < 100) << "Init:\n" << *b;
-  if (VLOG_IS_ON(2) && b->height() >= 100) {
-    VLOG(2) << "Init:" << *b;
+  ASSIGN_OR_RETURN(CharBoard b, Parse(input, &min_y));
+  VLOG_IF(1, b.height() < 100) << "Init:\n" << b;
+  if (VLOG_IS_ON(2) && b.height() >= 100) {
+    VLOG(2) << "Init:" << b;
   }
-  RETURN_IF_ERROR(FillWithWater(*b));
-  VLOG_IF(1, b->height() < 100) << "Final:\n" << *b;
-  if (VLOG_IS_ON(2) && b->height() >= 100) {
-    VLOG(2) << "Final:" << *b;
+  RETURN_IF_ERROR(FillWithWater(b));
+  VLOG_IF(1, b.height() < 100) << "Final:\n" << b;
+  if (VLOG_IS_ON(2) && b.height() >= 100) {
+    VLOG(2) << "Final:" << b;
   }
   int count = 0;
-  for (Point p : b->range()) {
+  for (auto [p, c] : b) {
     if (p.y < min_y) continue;
-    if ((*b)[p] == '~' || (*b)[p] == '|') ++count;
+    if (c == '~' || c == '|') ++count;
   }
   return AdventReturn(count);
 }
@@ -173,14 +172,13 @@ absl::StatusOr<std::string> Day_2018_17::Part1(
 absl::StatusOr<std::string> Day_2018_17::Part2(
     absl::Span<std::string_view> input) const {
   int min_y;
-  absl::StatusOr<CharBoard> b = Parse(input, &min_y);
-  if (!b.ok()) return b.status();
+  ASSIGN_OR_RETURN(CharBoard b, Parse(input, &min_y));
 
-  RETURN_IF_ERROR(FillWithWater(*b));
+  RETURN_IF_ERROR(FillWithWater(b));
   int count = 0;
-  for (Point p : b->range()) {
+  for (auto [p, c] : b) {
     if (p.y < min_y) continue;
-    if ((*b)[p] == '~') ++count;
+    if (c == '~') ++count;
   }
   return AdventReturn(count);
 }

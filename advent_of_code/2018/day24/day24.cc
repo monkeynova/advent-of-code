@@ -271,10 +271,9 @@ int ImmuneLeftAfterFightWithBoost(const std::vector<Group>& start, int boost) {
 
 absl::StatusOr<std::string> Day_2018_24::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<Group>> groups = Parse(input);
-  if (!groups.ok()) return groups.status();
+  ASSIGN_OR_RETURN(std::vector<Group> groups, Parse(input));
 
-  std::vector<Group> final = Fight(*groups);
+  std::vector<Group> final = Fight(groups);
 
   int units = 0;
   for (const Group& g : final) {
@@ -286,17 +285,17 @@ absl::StatusOr<std::string> Day_2018_24::Part1(
 
 absl::StatusOr<std::string> Day_2018_24::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<Group>> groups = Parse(input);
-  if (!groups.ok()) return groups.status();
+  ASSIGN_OR_RETURN(std::vector<Group> groups, Parse(input));
 
   int min = 1;
   int max = 0;
   int immunity_units_left;
+  // TODO(@monkeynova): Remove redundancy between branches.
   while (min != max) {
     if (max == 0) {
       int boost = 2 * min;
       VLOG(1) << "Trying boost: " << boost;
-      int this_units_left = ImmuneLeftAfterFightWithBoost(*groups, boost);
+      int this_units_left = ImmuneLeftAfterFightWithBoost(groups, boost);
       if (this_units_left > 0) {
         VLOG(1) << "  Immunity won";
         immunity_units_left = this_units_left;
@@ -308,7 +307,7 @@ absl::StatusOr<std::string> Day_2018_24::Part2(
     } else {
       int boost = (max + min) / 2;
       VLOG(1) << "Trying boost: " << boost;
-      int this_units_left = ImmuneLeftAfterFightWithBoost(*groups, boost);
+      int this_units_left = ImmuneLeftAfterFightWithBoost(groups, boost);
       if (this_units_left > 0) {
         VLOG(1) << "  Immunity won";
         immunity_units_left = this_units_left;

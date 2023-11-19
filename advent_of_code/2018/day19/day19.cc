@@ -80,10 +80,9 @@ Scratch analysis of input.
 
 absl::StatusOr<std::string> Day_2018_19::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<VM> vm = VM::Parse(input);
-  if (!vm.ok()) return vm.status();
-  RETURN_IF_ERROR(vm->Execute());
-  return AdventReturn(vm->register_value(0));
+  ASSIGN_OR_RETURN(VM vm, VM::Parse(input));
+  RETURN_IF_ERROR(vm.Execute());
+  return AdventReturn(vm.register_value(0));
 }
 
 absl::StatusOr<std::string> Day_2018_19::Part2(
