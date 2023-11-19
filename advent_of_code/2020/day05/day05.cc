@@ -47,9 +47,8 @@ absl::StatusOr<std::string> Day_2020_05::Part1(
     absl::Span<std::string_view> input) const {
   int maxid = 0;
   for (std::string_view rec : input) {
-    absl::StatusOr<Seat> seat = ParseSeat(rec);
-    if (!seat.ok()) return seat.status();
-    maxid = std::max(maxid, seat->id());
+    ASSIGN_OR_RETURN(Seat seat, ParseSeat(rec));
+    maxid = std::max(maxid, seat.id());
   }
   return AdventReturn(maxid);
 }
@@ -59,9 +58,8 @@ absl::StatusOr<std::string> Day_2020_05::Part2(
   std::vector<bool> present;
   present.resize(1 << 10);
   for (std::string_view rec : input) {
-    absl::StatusOr<Seat> seat = ParseSeat(rec);
-    if (!seat.ok()) return seat.status();
-    present[seat->id()] = true;
+    ASSIGN_OR_RETURN(Seat seat, ParseSeat(rec));
+    present[seat.id()] = true;
   }
   int missingid = -1;
   for (int id = 1; id < present.size() - 1; ++id) {

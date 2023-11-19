@@ -98,22 +98,21 @@ absl::StatusOr<std::pair<Transform, Transform>> CreateTransform(
 
 absl::StatusOr<std::string> Day_2019_22::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::pair<Transform, Transform>> pair =
-      CreateTransform(input, /*deck_size=*/10'007);
-  if (!pair.ok()) return pair.status();
+  std::pair<Transform, Transform> pair;
+  ASSIGN_OR_RETURN(pair, CreateTransform(input, /*deck_size=*/10'007));
 
-  auto [t, _] = *pair;
+  auto [t, _] = pair;
   return AdventReturn(t.Apply(2019));
 }
 
 absl::StatusOr<std::string> Day_2019_22::Part2(
     absl::Span<std::string_view> input) const {
   int64_t run_count = 101'741'582'076'661;
-  absl::StatusOr<std::pair<Transform, Transform>> pair =
-      CreateTransform(input, /*deck_size=*/119'315'717'514'047);
-  if (!pair.ok()) return pair.status();
+  std::pair<Transform, Transform> pair;
+  ASSIGN_OR_RETURN(
+      pair, CreateTransform(input, /*deck_size=*/119'315'717'514'047));
 
-  auto [_, inv_t] = *pair;
+  auto [_, inv_t] = pair;
   Transform full_reverse_transform{.mult = 1, .add = 0, .mod = inv_t.mod};
   Transform power_reverse_transform = inv_t;
   for (int64_t bit = 1; bit <= run_count; bit <<= 1) {

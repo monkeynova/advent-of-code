@@ -76,20 +76,18 @@ class Part2Conway : public ConwaySet<Point4> {
 
 absl::StatusOr<std::string> Day_2020_17::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> initial = CharBoard::Parse(input);
-  if (!initial.ok()) return initial.status();
+  ASSIGN_OR_RETURN(CharBoard initial, CharBoard::Parse(input));
 
-  Part1Conway conway(*initial);
+  Part1Conway conway(initial);
   conway.AdvanceN(6);
   return AdventReturn(conway.CountLive());
 }
 
 absl::StatusOr<std::string> Day_2020_17::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> initial = CharBoard::Parse(input);
-  if (!initial.ok()) return initial.status();
+  ASSIGN_OR_RETURN(CharBoard initial, CharBoard::Parse(input));
 
-  Part2Conway conway(*initial);
+  Part2Conway conway(initial);
   conway.AdvanceN(6);
   return AdventReturn(conway.CountLive());
 }

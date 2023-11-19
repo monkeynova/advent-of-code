@@ -184,10 +184,9 @@ Start ParseAndClearBoard(CharBoard& board) {
 
 absl::StatusOr<std::string> Day_2022_24::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
-  if (!board.ok()) return board.status();
+  ASSIGN_OR_RETURN(CharBoard board, CharBoard::Parse(input));
 
-  Start start = ParseAndClearBoard(*board);
+  Start start = ParseAndClearBoard(board);
   if (!start.start) return Error("No start");
   if (!start.end) return Error("No end");
   VLOG(1) << "Route: " << *start.start << " -> " << *start.end;
@@ -196,15 +195,14 @@ absl::StatusOr<std::string> Day_2022_24::Part1(
   hist.sets.push_back(std::move(start.blizzards));
 
   return AdventReturn(
-      BFSWalk(*start.start, *start.end, *board, hist).FindMinSteps());
+      BFSWalk(*start.start, *start.end, board, hist).FindMinSteps());
 }
 
 absl::StatusOr<std::string> Day_2022_24::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
-  if (!board.ok()) return board.status();
+  ASSIGN_OR_RETURN(CharBoard board, CharBoard::Parse(input));
 
-  Start start = ParseAndClearBoard(*board);
+  Start start = ParseAndClearBoard(board);
   if (!start.start) return Error("No start");
   if (!start.end) return Error("No end");
   VLOG(1) << "Route: " << *start.start << " -> " << *start.end;
@@ -214,7 +212,7 @@ absl::StatusOr<std::string> Day_2022_24::Part2(
     BlizzardHistory hist;
     hist.sets.push_back(std::move(start.blizzards));
     std::optional<int> dist =
-        BFSWalk(*start.start, *start.end, *board, hist).FindMinSteps();
+        BFSWalk(*start.start, *start.end, board, hist).FindMinSteps();
     if (!dist) return Error("stage ", i, " not found");
     total_dist += *dist;
     std::swap(*start.start, *start.end);

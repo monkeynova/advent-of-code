@@ -10,22 +10,7 @@
 
 namespace advent_of_code {
 
-absl::StatusOr<std::string> Day_2020_10::Part1(
-    absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> jolts = ParseAsInts(input);
-  if (!jolts.ok()) return jolts.status();
-  std::sort(jolts->begin(), jolts->end());
-  int cur_j = 0;
-  absl::flat_hash_map<int, int> deltas;
-  for (int j : *jolts) {
-    if (j - cur_j > 3) return absl::InvalidArgumentError("Can't chain");
-    ++deltas[j - cur_j];
-    cur_j = j;
-  }
-  // Final adapter.
-  ++deltas[3];
-  return AdventReturn(deltas[1] * deltas[3]);
-}
+namespace {
 
 absl::StatusOr<int64_t> CountValidArrangements(
     const std::vector<int64_t>& jolts,
@@ -41,10 +26,10 @@ absl::StatusOr<int64_t> CountValidArrangements(
   int64_t count = 0;
   for (int delta = offset; delta < jolts.size(); ++delta) {
     if (jolts[delta] > cur_val + 3) break;
-    absl::StatusOr<int64_t> next =
-        CountValidArrangements(jolts, memo, jolts[delta], delta + 1);
-    if (!next.ok()) return next.status();
-    count += *next;
+   ASSIGN_OR_RETURN(
+        int64_t next,
+        CountValidArrangements(jolts, memo, jolts[delta], delta + 1));
+    count += next;
   }
 
   VLOG(2) << "  = " << count;
@@ -52,15 +37,32 @@ absl::StatusOr<int64_t> CountValidArrangements(
   return count;
 }
 
+}  // namespace
+
+absl::StatusOr<std::string> Day_2020_10::Part1(
+    absl::Span<std::string_view> input) const {
+  ASSIGN_OR_RETURN(std::vector<int64_t> jolts, ParseAsInts(input));
+  absl::c_sort(jolts);
+  int cur_j = 0;
+  absl::flat_hash_map<int, int> deltas;
+  for (int j : jolts) {
+    if (j - cur_j > 3) return absl::InvalidArgumentError("Can't chain");
+    ++deltas[j - cur_j];
+    cur_j = j;
+  }
+  // Final adapter.
+  ++deltas[3];
+  return AdventReturn(deltas[1] * deltas[3]);
+}
+
 absl::StatusOr<std::string> Day_2020_10::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> jolts = ParseAsInts(input);
-  if (!jolts.ok()) return jolts.status();
-  std::sort(jolts->begin(), jolts->end());
+  ASSIGN_OR_RETURN(std::vector<int64_t> jolts, ParseAsInts(input));
+  absl::c_sort(jolts);
 
   absl::flat_hash_map<std::pair<int, int>, int64_t> memo;
   // TODO(@monkeynova): Maybe handle if max is not unique.
-  return AdventReturn(CountValidArrangements(*jolts, &memo, 0, 0));
+  return AdventReturn(CountValidArrangements(jolts, &memo, 0, 0));
 }
 
 }  // namespace advent_of_code

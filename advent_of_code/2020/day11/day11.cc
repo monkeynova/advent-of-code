@@ -98,10 +98,9 @@ class SeatConwayVismap : public SeatConway {
 
 absl::StatusOr<std::string> Day_2020_11::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> parsed = CharBoard::Parse(input);
-  if (!parsed.ok()) return parsed.status();
+  ASSIGN_OR_RETURN(CharBoard parsed, CharBoard::Parse(input));
 
-  SeatConway seat_conway(*parsed);
+  SeatConway seat_conway(parsed);
   VLOG(2) << seat_conway;
   while (seat_conway.Advance()) {
     VLOG(2) << seat_conway;
@@ -111,10 +110,9 @@ absl::StatusOr<std::string> Day_2020_11::Part1(
 
 absl::StatusOr<std::string> Day_2020_11::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> parsed = CharBoard::Parse(input);
-  if (!parsed.ok()) return parsed.status();
+  ASSIGN_OR_RETURN(CharBoard parsed, CharBoard::Parse(input));
 
-  SeatConwayVismap seat_conway(*parsed);
+  SeatConwayVismap seat_conway(parsed);
   VLOG(2) << seat_conway;
   while (seat_conway.Advance()) {
     VLOG(2) << seat_conway;

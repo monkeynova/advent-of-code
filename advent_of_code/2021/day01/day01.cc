@@ -19,12 +19,11 @@ namespace {
 
 absl::StatusOr<std::string> Day_2021_01::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
-  if (!list.ok()) return list.status();
+  ASSIGN_OR_RETURN(std::vector<int64_t> list, ParseAsInts(input));
 
   int64_t count = 0;
-  for (int i = 0; i < list->size() - 1; ++i) {
-    if ((*list)[i] < (*list)[i + 1]) ++count;
+  for (int i = 0; i + 1 < list.size(); ++i) {
+    if (list[i] < list[i + 1]) ++count;
   }
 
   return AdventReturn(count);
@@ -32,12 +31,11 @@ absl::StatusOr<std::string> Day_2021_01::Part1(
 
 absl::StatusOr<std::string> Day_2021_01::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
-  if (!list.ok()) return list.status();
+  ASSIGN_OR_RETURN(std::vector<int64_t> list, ParseAsInts(input));
 
   int64_t count = 0;
-  for (int i = 0; i < list->size() - 3; ++i) {
-    if ((*list)[i] < (*list)[i + 3]) ++count;
+  for (int i = 0; i + 3 < list.size(); ++i) {
+    if (list[i] < list[i + 3]) ++count;
   }
 
   return AdventReturn(count);

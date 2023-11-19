@@ -33,10 +33,9 @@ class Droid : public IntCode::IOModule {
   bool PauseIntCode() override { return done_; }
 
   absl::StatusOr<int64_t> Fetch() override {
-    absl::StatusOr<InputDirection> direction = PickDirection();
-    if (!direction.ok()) return direction.status();
-    dir_ = kInputDirectionMap[static_cast<int>(*direction)];
-    return static_cast<int64_t>(*direction);
+    ASSIGN_OR_RETURN(InputDirection direction, PickDirection());
+    dir_ = kInputDirectionMap[static_cast<int>(direction)];
+    return static_cast<int64_t>(direction);
   }
 
   absl::StatusOr<InputDirection> PickDirection() {
@@ -194,11 +193,10 @@ class Droid : public IntCode::IOModule {
 
 absl::StatusOr<std::string> Day_2019_15::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
-  if (!codes.ok()) return codes.status();
+  ASSIGN_OR_RETURN(IntCode codes, IntCode::Parse(input));
 
   Droid droid;
-  RETURN_IF_ERROR(codes->Run(&droid));
+  RETURN_IF_ERROR(codes.Run(&droid));
   VLOG(1) << "Droid:\n" << droid.DebugBoard();
 
   return AdventReturn(droid.DistanceToO2());
@@ -206,11 +204,10 @@ absl::StatusOr<std::string> Day_2019_15::Part1(
 
 absl::StatusOr<std::string> Day_2019_15::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
-  if (!codes.ok()) return codes.status();
+  ASSIGN_OR_RETURN(IntCode codes, IntCode::Parse(input));
 
   Droid droid;
-  RETURN_IF_ERROR(codes->Run(&droid));
+  RETURN_IF_ERROR(codes.Run(&droid));
   VLOG(1) << "Droid:\n" << droid.DebugBoard();
 
   return AdventReturn(droid.GreatestDistanceFromO2());

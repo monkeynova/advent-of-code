@@ -10,12 +10,11 @@ namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2020_01::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
-  if (!list.ok()) return list.status();
+  ASSIGN_OR_RETURN(std::vector<int64_t> list, ParseAsInts(input));
 
   int res = -1;
   absl::flat_hash_set<int> hist;
-  for (int a : *list) {
+  for (int a : list) {
     if (hist.contains(2020 - a)) {
       res = a * (2020 - a);
       break;
@@ -28,15 +27,14 @@ absl::StatusOr<std::string> Day_2020_01::Part1(
 
 absl::StatusOr<std::string> Day_2020_01::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> list = ParseAsInts(input);
-  if (!list.ok()) return list.status();
+  ASSIGN_OR_RETURN(std::vector<int64_t> list, ParseAsInts(input));
 
   int res = -1;
   absl::flat_hash_set<int> hist;
-  for (int i = 0; i < list->size(); ++i) {
-    int a = (*list)[i];
-    for (int j = 0; j < list->size(); ++j) {
-      int b = (*list)[j];
+  for (int i = 0; i < list.size(); ++i) {
+    int a = list[i];
+    for (int j = 0; j < list.size(); ++j) {
+      int b = list[j];
       if (hist.contains(2020 - a - b)) {
         res = a * b * (2020 - a - b);
         break;

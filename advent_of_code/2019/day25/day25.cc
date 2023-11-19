@@ -51,8 +51,7 @@ class Terminal : public IntCode::IOModule {
 
 absl::StatusOr<std::string> Day_2019_25::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
-  if (!codes.ok()) return codes.status();
+  ASSIGN_OR_RETURN(IntCode codes, IntCode::Parse(input));
 
   std::string collect_and_go_to_security =
       "north\n"
@@ -91,7 +90,7 @@ absl::StatusOr<std::string> Day_2019_25::Part1(
       "coin", "mutex",       "candy cane",    "mouse"};
   for (int i = 0; i < (1 << inventory.size()); ++i) {
     // TODO(@monkeynova): We don't have to re-run from scratch.
-    IntCode tmp_codes = codes->Clone();
+    IntCode tmp_codes = codes.Clone();
     std::string command = collect_and_go_to_security;
     for (int j = 0; j < inventory.size(); ++j) {
       if (i & (1 << j)) {

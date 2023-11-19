@@ -48,28 +48,23 @@ class VM {
         ++input_it;
       } else if (op[0] == "add") {
         if (op.size() != 3) return Error("Bad inp");
-        absl::StatusOr<int64_t> src = RegisterOrLiteral(op[2]);
-        if (!src.ok()) return src.status();
-        *dest += *src;
+        ASSIGN_OR_RETURN(int64_t src, RegisterOrLiteral(op[2]));
+        *dest += src;
       } else if (op[0] == "mul") {
         if (op.size() != 3) return Error("Bad inp");
-        absl::StatusOr<int64_t> src = RegisterOrLiteral(op[2]);
-        if (!src.ok()) return src.status();
-        *dest *= *src;
+        ASSIGN_OR_RETURN(int64_t src, RegisterOrLiteral(op[2]));
+        *dest *= src;
       } else if (op[0] == "div") {
         if (op.size() != 3) return Error("Bad inp");
-        absl::StatusOr<int64_t> src = RegisterOrLiteral(op[2]);
-        if (!src.ok()) return src.status();
-        *dest /= *src;
+        ASSIGN_OR_RETURN(int64_t src, RegisterOrLiteral(op[2]));
+        *dest /= src;
       } else if (op[0] == "mod") {
         if (op.size() != 3) return Error("Bad inp");
-        absl::StatusOr<int64_t> src = RegisterOrLiteral(op[2]);
-        if (!src.ok()) return src.status();
-        *dest %= *src;
+        ASSIGN_OR_RETURN(int64_t src, RegisterOrLiteral(op[2]));
+        *dest %= src;
       } else if (op[0] == "eql") {
-        absl::StatusOr<int64_t> src = RegisterOrLiteral(op[2]);
-        if (!src.ok()) return src.status();
-        *dest = (*dest == *src);
+        ASSIGN_OR_RETURN(int64_t src, RegisterOrLiteral(op[2]));
+        *dest = (*dest == src);
       } else {
         return Error("Unsupported op: ", op[0]);
       }
@@ -330,22 +325,20 @@ std::string FindBestInputMiddle(const DecompiledConstants& dc,
 
 absl::StatusOr<std::string> Day_2021_24::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<DecompiledConstants> dc = ExtractConstants(input);
-  if (!dc.ok()) return dc.status();
-  std::string ret = FindBestInputMiddle(*dc, BetterInputMax);
+  ASSIGN_OR_RETURN(DecompiledConstants dc, ExtractConstants(input));
+  std::string ret = FindBestInputMiddle(dc, BetterInputMax);
   VM vm = VM::Parse(input);
-  if (auto st = vm.Execute(ret); !st.ok()) return st;
+  RETURN_IF_ERROR(vm.Execute(ret));
   if (vm.RegisterValue("z") != 0) return Error("VM Check failure");
   return ret;
 }
 
 absl::StatusOr<std::string> Day_2021_24::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<DecompiledConstants> dc = ExtractConstants(input);
-  if (!dc.ok()) return dc.status();
-  std::string ret = FindBestInputMiddle(*dc, BetterInputMin);
+  ASSIGN_OR_RETURN(DecompiledConstants dc, ExtractConstants(input));
+  std::string ret = FindBestInputMiddle(dc, BetterInputMin);
   VM vm = VM::Parse(input);
-  if (auto st = vm.Execute(ret); !st.ok()) return st;
+  RETURN_IF_ERROR(vm.Execute(ret));
   if (vm.RegisterValue("z") != 0) return Error("VM Check failure");
   return ret;
 }

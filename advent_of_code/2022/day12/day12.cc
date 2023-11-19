@@ -59,23 +59,21 @@ class HeightBfs : public BFSInterface<HeightBfs<run_reverse>, Point> {
 
 absl::StatusOr<std::string> Day_2022_12::Part1(
     absl::Span<std::string_view> input) const {
-  auto board = CharBoard::Parse(input);
-  if (!board.ok()) return board.status();
-  absl::flat_hash_set<Point> starts = board->Find('S');
+  ASSIGN_OR_RETURN(CharBoard board, CharBoard::Parse(input));
+  absl::flat_hash_set<Point> starts = board.Find('S');
   if (starts.size() != 1) return Error("Bad start");
 
-  HeightBfs</*reverse=*/false> search(*board, *starts.begin());
+  HeightBfs</*reverse=*/false> search(board, *starts.begin());
   return AdventReturn(search.FindMinSteps());
 }
 
 absl::StatusOr<std::string> Day_2022_12::Part2(
     absl::Span<std::string_view> input) const {
-  auto board = CharBoard::Parse(input);
-  if (!board.ok()) return board.status();
-  absl::flat_hash_set<Point> starts = board->Find('E');
+  ASSIGN_OR_RETURN(CharBoard board, CharBoard::Parse(input));
+  absl::flat_hash_set<Point> starts = board.Find('E');
   if (starts.size() != 1) return Error("Bad start");
 
-  HeightBfs</*reverse=*/true> search(*board, *starts.begin());
+  HeightBfs</*reverse=*/true> search(board, *starts.begin());
   return AdventReturn(search.FindMinSteps());
 }
 

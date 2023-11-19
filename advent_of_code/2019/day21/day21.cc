@@ -55,8 +55,7 @@ class SpringBot : public IntCode::IOModule {
 
 absl::StatusOr<std::string> Day_2019_21::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
-  if (!codes.ok()) return codes.status();
+  ASSIGN_OR_RETURN(IntCode codes, IntCode::Parse(input));
 
   // JUMP goes 4 spaces forward.
   // Jump = D & (!A | !B | !C)
@@ -69,15 +68,14 @@ absl::StatusOr<std::string> Day_2019_21::Part1(
       "OR T J\n"
       "AND D J\n"
       "WALK\n");
-  RETURN_IF_ERROR(codes->Run(&spring_bot));
+  RETURN_IF_ERROR(codes.Run(&spring_bot));
 
   return AdventReturn(spring_bot.damage());
 }
 
 absl::StatusOr<std::string> Day_2019_21::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
-  if (!codes.ok()) return codes.status();
+  ASSIGN_OR_RETURN(IntCode codes, IntCode::Parse(input));
 
   // JUMP goes 4 spaces forward.
   // Jump = D & (!A | !B | !C) & !(!E & !H)
@@ -96,7 +94,7 @@ absl::StatusOr<std::string> Day_2019_21::Part2(
       "AND T J\n"
       "AND D J\n"
       "RUN\n");
-  RETURN_IF_ERROR(codes->Run(&spring_bot));
+  RETURN_IF_ERROR(codes.Run(&spring_bot));
 
   return AdventReturn(spring_bot.damage());
 }

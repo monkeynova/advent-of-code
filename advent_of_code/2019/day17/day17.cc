@@ -280,9 +280,7 @@ class ViewPort : public IntCode::IOModule {
       } else {
         if (!current_input_.empty()) {
           board_build_.push_back(std::move(current_input_));
-          absl::StatusOr<CharBoard> next_board = CharBoard::Parse(board_build_);
-          if (!next_board.ok()) return next_board.status();
-          board_ = std::move(*next_board);
+          ASSIGN_OR_RETURN(board_, CharBoard::Parse(board_build_));
         }
       }
       current_input_ = "";
@@ -307,24 +305,22 @@ class ViewPort : public IntCode::IOModule {
 
 absl::StatusOr<std::string> Day_2019_17::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
-  if (!codes.ok()) return codes.status();
+  ASSIGN_OR_RETURN(IntCode codes, IntCode::Parse(input));
 
   ViewPort view_port;
-  RETURN_IF_ERROR(codes->Run(&view_port));
+  RETURN_IF_ERROR(codes.Run(&view_port));
 
   return AdventReturn(view_port.ComputeAlignment());
 }
 
 absl::StatusOr<std::string> Day_2019_17::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
-  if (!codes.ok()) return codes.status();
+  ASSIGN_OR_RETURN(IntCode codes, IntCode::Parse(input));
 
-  RETURN_IF_ERROR(codes->Poke(0, 2));
+  RETURN_IF_ERROR(codes.Poke(0, 2));
 
   ViewPort view_port;
-  RETURN_IF_ERROR(codes->Run(&view_port));
+  RETURN_IF_ERROR(codes.Run(&view_port));
 
   return AdventReturn(view_port.dust_collected());
 }

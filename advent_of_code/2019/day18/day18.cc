@@ -221,24 +221,22 @@ class Board {
 
 absl::StatusOr<std::string> Day_2019_18::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> char_board = CharBoard::Parse(input);
-  if (!char_board.ok()) return char_board.status();
-  Board b(*char_board);
+  ASSIGN_OR_RETURN(CharBoard char_board, CharBoard::Parse(input));
+  Board b(char_board);
   RETURN_IF_ERROR(b.InitializeBoard());
   return AdventReturn(b.MinStepsToAllKeys());
 }
 
 absl::StatusOr<std::string> Day_2019_18::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> char_board = CharBoard::Parse(input);
-  if (!char_board.ok()) return char_board.status();
+  ASSIGN_OR_RETURN(CharBoard char_board, CharBoard::Parse(input));
 
   bool found = false;
   Point robot;
-  for (Point p : char_board->range()) {
-    if (!char_board->OnBoard(p + Cardinal::kNorthWest)) continue;
-    if (!char_board->OnBoard(p + Cardinal::kSouthEast)) continue;
-    if ((*char_board)[p] == '@') {
+  for (Point p : char_board.range()) {
+    if (!char_board.OnBoard(p + Cardinal::kNorthWest)) continue;
+    if (!char_board.OnBoard(p + Cardinal::kSouthEast)) continue;
+    if (char_board[p] == '@') {
       if (found) return Error("Multiple starting robots");
       found = true;
       robot = p;
@@ -246,19 +244,19 @@ absl::StatusOr<std::string> Day_2019_18::Part2(
   }
   if (!found) return absl::InvalidArgumentError("Could not edit board");
 
-  (*char_board)[robot] = '#';
-  (*char_board)[robot + Cardinal::kNorth] = '#';
-  (*char_board)[robot + Cardinal::kSouth] = '#';
-  (*char_board)[robot + Cardinal::kWest] = '#';
-  (*char_board)[robot + Cardinal::kEast] = '#';
-  (*char_board)[robot + Cardinal::kNorthEast] = '@';
-  (*char_board)[robot + Cardinal::kNorthWest] = '@';
-  (*char_board)[robot + Cardinal::kSouthEast] = '@';
-  (*char_board)[robot + Cardinal::kSouthWest] = '@';
+  char_board[robot] = '#';
+  char_board[robot + Cardinal::kNorth] = '#';
+  char_board[robot + Cardinal::kSouth] = '#';
+  char_board[robot + Cardinal::kWest] = '#';
+  char_board[robot + Cardinal::kEast] = '#';
+  char_board[robot + Cardinal::kNorthEast] = '@';
+  char_board[robot + Cardinal::kNorthWest] = '@';
+  char_board[robot + Cardinal::kSouthEast] = '@';
+  char_board[robot + Cardinal::kSouthWest] = '@';
 
-  VLOG(1) << "\n" << *char_board;
+  VLOG(1) << "\n" << char_board;
 
-  Board b(*char_board);
+  Board b(char_board);
   RETURN_IF_ERROR(b.InitializeBoard());
 
   return AdventReturn(b.MinStepsToAllKeys());

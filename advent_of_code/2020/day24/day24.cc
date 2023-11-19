@@ -77,22 +77,20 @@ absl::StatusOr<ConwayHex> ParseGrid(absl::Span<std::string_view> input) {
 
 absl::StatusOr<std::string> Day_2020_24::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<ConwayHex> grid = ParseGrid(input);
-  if (!grid.ok()) return grid.status();
+  ASSIGN_OR_RETURN(ConwayHex grid, ParseGrid(input));
 
-  return AdventReturn(grid->CountLive());
+  return AdventReturn(grid.CountLive());
 }
 
 absl::StatusOr<std::string> Day_2020_24::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<ConwayHex> grid = ParseGrid(input);
-  if (!grid.ok()) return grid.status();
+  ASSIGN_OR_RETURN(ConwayHex grid, ParseGrid(input));
 
   for (int i = 0; i < 100; ++i) {
-    grid->Advance();
+    grid.Advance();
   }
 
-  return AdventReturn(grid->CountLive());
+  return AdventReturn(grid.CountLive());
 }
 
 }  // namespace advent_of_code

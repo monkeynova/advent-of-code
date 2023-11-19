@@ -58,18 +58,15 @@ absl::StatusOr<int> FindContiguousRangeMinMaxSum(
 
 absl::StatusOr<std::string> Day_2020_09::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> vals = ParseAsInts(input);
-  if (!vals.ok()) return vals.status();
-  return AdventReturn(FindMissingXMASPair(*vals));
+  ASSIGN_OR_RETURN(std::vector<int64_t> vals, ParseAsInts(input));
+  return AdventReturn(FindMissingXMASPair(vals));
 }
 
 absl::StatusOr<std::string> Day_2020_09::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> vals = ParseAsInts(input);
-  if (!vals.ok()) return vals.status();
-  absl::StatusOr<int> missing = FindMissingXMASPair(*vals);
-  if (!missing.ok()) return missing.status();
-  return AdventReturn(FindContiguousRangeMinMaxSum(*vals, *missing));
+  ASSIGN_OR_RETURN(std::vector<int64_t> vals, ParseAsInts(input));
+  ASSIGN_OR_RETURN(int missing, FindMissingXMASPair(vals));
+  return AdventReturn(FindContiguousRangeMinMaxSum(vals, missing));
 }
 
 }  // namespace advent_of_code

@@ -86,43 +86,43 @@ int64_t CountPopulationAfter(std::vector<int64_t> fish, int64_t steps) {
 absl::StatusOr<std::string> Day_2021_06::Part1(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  absl::StatusOr<std::vector<int64_t>> nums =
-      ParseAsInts(absl::StrSplit(input[0], ","));
-  if (!nums.ok()) return nums.status();
+  ASSIGN_OR_RETURN(
+      std::vector<int64_t> nums,
+      ParseAsInts(absl::StrSplit(input[0], ",")));
 
   constexpr int64_t kDays = 80;
 
   if (run_audit()) {
-    if (CountPopulationAfter(*nums, kDays) !=
-        CountPopulationAfterBrute(*nums, kDays)) {
+    if (CountPopulationAfter(nums, kDays) !=
+        CountPopulationAfterBrute(nums, kDays)) {
       return Error("Bad Brute");
     }
-    if (CountPopulationAfter(*nums, kDays) !=
-        CountPopulationAfterUniquePop(*nums, kDays)) {
+    if (CountPopulationAfter(nums, kDays) !=
+        CountPopulationAfterUniquePop(nums, kDays)) {
       return Error("Bad UniquePop");
     }
   }
 
-  return AdventReturn(CountPopulationAfter(*nums, kDays));
+  return AdventReturn(CountPopulationAfter(nums, kDays));
 }
 
 absl::StatusOr<std::string> Day_2021_06::Part2(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  absl::StatusOr<std::vector<int64_t>> nums =
-      ParseAsInts(absl::StrSplit(input[0], ","));
-  if (!nums.ok()) return nums.status();
+  ASSIGN_OR_RETURN(
+      std::vector<int64_t> nums,
+      ParseAsInts(absl::StrSplit(input[0], ",")));
 
   constexpr int64_t kDays = 256;
 
   if (run_audit()) {
-    if (CountPopulationAfter(*nums, kDays) !=
-        CountPopulationAfterUniquePop(*nums, kDays)) {
+    if (CountPopulationAfter(nums, kDays) !=
+        CountPopulationAfterUniquePop(nums, kDays)) {
       return Error("Bad UniquePop");
     }
   }
 
-  return AdventReturn(CountPopulationAfter(*nums, kDays));
+  return AdventReturn(CountPopulationAfter(nums, kDays));
 }
 
 }  // namespace advent_of_code

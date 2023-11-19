@@ -53,13 +53,12 @@ int64_t BasinSize(const CharBoard& board, Point p) {
 
 absl::StatusOr<std::string> Day_2021_09::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
-  if (!board.ok()) return board.status();
+  ASSIGN_OR_RETURN(CharBoard board, CharBoard::Parse(input));
 
-  std::vector<Point> basins = FindLow(*board);
+  std::vector<Point> basins = FindLow(board);
   int64_t sum_risk = 0;
   for (Point p : basins) {
-    sum_risk += (*board)[p] + 1 - '0';
+    sum_risk += board[p] + 1 - '0';
   }
 
   return AdventReturn(sum_risk);
@@ -67,15 +66,14 @@ absl::StatusOr<std::string> Day_2021_09::Part1(
 
 absl::StatusOr<std::string> Day_2021_09::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
-  if (!board.ok()) return board.status();
+  ASSIGN_OR_RETURN(CharBoard board, CharBoard::Parse(input));
 
-  std::vector<Point> basins = FindLow(*board);
+  std::vector<Point> basins = FindLow(board);
   if (basins.size() < 3) return Error("Not enough basins");
 
   std::vector<int64_t> sizes;
   for (Point start : basins) {
-    sizes.push_back(BasinSize(*board, start));
+    sizes.push_back(BasinSize(board, start));
   }
   absl::c_sort(sizes, [](int64_t a, int64_t b) { return b < a; });
 

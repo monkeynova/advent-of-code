@@ -188,22 +188,16 @@ absl::Status Computer::SendCurrentPacket() {
 
 absl::StatusOr<std::string> Day_2019_23::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<IntCode> code = IntCode::Parse(input);
-  if (!code.ok()) return code.status();
+  ASSIGN_OR_RETURN(IntCode codes, IntCode::Parse(input));
 
-  Network network(*code);
-
-  return AdventReturn(network.RunUntilAddress255ReturnY());
+  return AdventReturn(Network(codes).RunUntilAddress255ReturnY());
 }
 
 absl::StatusOr<std::string> Day_2019_23::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<IntCode> code = IntCode::Parse(input);
-  if (!code.ok()) return code.status();
+  ASSIGN_OR_RETURN(IntCode codes, IntCode::Parse(input));
 
-  Network network(*code);
-
-  return AdventReturn(network.RunUntilDuplicateNat());
+  return AdventReturn(Network(codes).RunUntilDuplicateNat());
 }
 
 }  // namespace advent_of_code

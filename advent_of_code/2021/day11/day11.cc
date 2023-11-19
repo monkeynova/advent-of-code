@@ -46,12 +46,11 @@ int64_t RunStep(CharBoard& b) {
 
 absl::StatusOr<std::string> Day_2021_11::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
-  if (!board.ok()) return board.status();
+  ASSIGN_OR_RETURN(CharBoard board, CharBoard::Parse(input));
 
   int64_t flashes = 0;
   for (int i = 0; i < 100; ++i) {
-    flashes += RunStep(*board);
+    flashes += RunStep(board);
   }
 
   return AdventReturn(flashes);
@@ -59,12 +58,11 @@ absl::StatusOr<std::string> Day_2021_11::Part1(
 
 absl::StatusOr<std::string> Day_2021_11::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
-  if (!board.ok()) return board.status();
+  ASSIGN_OR_RETURN(CharBoard board, CharBoard::Parse(input));
 
-  int64_t all_flash = board->width() * board->height();
+  int64_t all_flash = board.range().Area();
   for (int i = 1; true; ++i) {
-    int64_t flash_count = RunStep(*board);
+    int64_t flash_count = RunStep(board);
     if (flash_count == all_flash) {
       return AdventReturn(i);
     }
