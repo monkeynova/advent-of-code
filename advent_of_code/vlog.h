@@ -26,4 +26,6 @@ extern int verbosity_level;
 #define DVLOG_EVERY_N(s, n) DLOG_IF_EVERY_N(INFO, VLOG_IS_ON(s), n)
 #define DVLOG_IF_EVERY_N(s, cond, n) DLOG_IF(INFO, VLOG_IS_ON(s) && (cond), n)
 
+#define RETURN_IF_ERROR(arg) {absl::Status st = arg; if (!st.ok()) return st;}
+
 #endif  // ADVENT_OF_CODE_VLOG_H

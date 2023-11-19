@@ -10,7 +10,8 @@ namespace advent_of_code {
 
 absl::Status GetContents(std::string_view filename, std::string* file_contents);
 
-absl::Status HandleTestIncludes(std::string* test_case);
+absl::Status HandleTestIncludes(
+    std::string* test_case, std::vector<std::string>* includes_out = nullptr);
 
 }  // namespace advent_of_code
 

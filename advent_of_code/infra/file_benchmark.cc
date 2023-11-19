@@ -9,20 +9,23 @@
 #include "file_based_test_driver/test_case_options.h"
 #include "re2/re2.h"
 
+ABSL_FLAG(std::string, bechmark_file_include_filter_re, "",
+          "If non-empty, specifies an RE such that benchmarks are filtered "
+          "to only run if they have an include that mathes the RE");
+
 namespace advent_of_code {
 
 struct DirtyTestParseResult {
   int part;
   std::string test;
   file_based_test_driver::TestCaseOptions options;
+  std::vector<std::string> includes;
 };
 
 absl::Status FinishTest(DirtyTestParseResult* result) {
   SetupTestCaseOptions(&result->options);
-  if (absl::Status st = result->options.ParseTestCaseOptions(&result->test);
-      !st.ok())
-    return st;
-  if (absl::Status st = HandleTestIncludes(&result->test); !st.ok()) return st;
+  RETURN_IF_ERROR(result->options.ParseTestCaseOptions(&result->test));
+  RETURN_IF_ERROR(HandleTestIncludes(&result->test, &result->includes));
   return absl::OkStatus();
 }
 
@@ -52,7 +55,7 @@ DirtyTestParse(std::string_view contents) {
     }
     absl::StrAppend(&next->test, line, "\n");
   }
-  if (absl::Status st = FinishTest(next.get()); !st.ok()) return st;
+  RETURN_IF_ERROR(FinishTest(next.get()));
   ret.push_back(std::move(next));
   return ret;
 }
@@ -60,9 +63,7 @@ DirtyTestParse(std::string_view contents) {
 absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>>
 FileBenchmarkTests(std::string_view test_file) {
   std::string file_contents;
-  if (absl::Status st = GetContents(test_file, &file_contents); !st.ok()) {
-    return st;
-  }
+  RETURN_IF_ERROR(GetContents(test_file, &file_contents));
   return DirtyTestParse(file_contents);
 }
 
@@ -109,8 +110,8 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
     }
   }
   if (skip.empty()) {
-    if (std::string long_option = test->options.GetString(kLongOption);
-        !long_option.empty()) {
+    std::string long_option = test->options.GetString(kLongOption);
+    if (!long_option.empty()) {
       absl::StatusOr<absl::Duration> long_duration =
           ParseLongTestDuration(long_option);
       if (!long_duration.ok()) {
@@ -121,11 +122,21 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
       }
     }
   }
-  if (!skip.empty()) {
-    state.SetLabel(
-        absl::StrCat("Part: ", part, "; *** SKIPPED ", skip, " ****"));
-    for (auto _ : state) {
+  if (skip.empty()) {
+    std::string include_filter_re =
+        absl::GetFlag(FLAGS_bechmark_file_include_filter_re);
+    if (!include_filter_re.empty()) {
+      auto match_re = [&](const std::string& test) {
+        return RE2::PartialMatch(test, include_filter_re);
+      };
+      if (!absl::c_any_of(test->includes, match_re)) {
+        skip = absl::StrCat("(no include =~ m/", include_filter_re, "/)");
+      }
     }
+  }
+  if (!skip.empty()) {
+    state.SkipWithMessage(
+        absl::StrCat("Part: ", part, "; *** SKIPPED ", skip, " ****"));
     return;
   }
 

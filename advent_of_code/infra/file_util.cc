@@ -56,10 +56,14 @@ absl::Status GetContents(std::string_view filename,
   return absl::OkStatus();
 }
 
-absl::Status HandleTestIncludes(std::string* test_case) {
+absl::Status HandleTestIncludes(std::string* test_case,
+                                std::vector<std::string>* includes_out) {
   std::string_view include_fname;
   RE2 include_pattern{"@include{([^}]*)}"};
   while (RE2::PartialMatch(*test_case, include_pattern, &include_fname)) {
+    if (includes_out != nullptr) {
+      includes_out->emplace_back(include_fname);
+    }
     std::string contents;
     if (absl::Status st = GetContents(absl::StrCat(include_fname), &contents);
         !st.ok()) {
