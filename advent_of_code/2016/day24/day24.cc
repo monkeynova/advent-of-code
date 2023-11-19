@@ -15,15 +15,14 @@ namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2016_24::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
-  if (!b.ok()) return b.status();
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
 
-  absl::flat_hash_set<Point> start_set = b->Find('0');
+  absl::flat_hash_set<Point> start_set = b.Find('0');
   if (start_set.size() != 1) return Error("No unique start");
   Point start = *start_set.begin();
 
   int need = 0;
-  for (const auto [_, c] : *b) {
+  for (const auto [_, c] : b) {
     if (c > '0' && c <= '9') {
       need |= 1 << (c - '1');
     }
@@ -34,8 +33,8 @@ absl::StatusOr<std::string> Day_2016_24::Part1(
                              .start = {.p = start, .d = need},
                              .is_good =
                                  [&](PointAndData<int>& cur, int) {
-                                   if (!b->OnBoard(cur.p)) return false;
-                                   char board_char = (*b)[cur.p];
+                                   if (!b.OnBoard(cur.p)) return false;
+                                   char board_char = b[cur.p];
                                    if (board_char == '#') return false;
                                    if (board_char > '0' && board_char <= '9') {
                                      cur.d &= ~(1 << (board_char - '1'));
@@ -50,15 +49,14 @@ absl::StatusOr<std::string> Day_2016_24::Part1(
 
 absl::StatusOr<std::string> Day_2016_24::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
-  if (!b.ok()) return b.status();
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
 
-  absl::flat_hash_set<Point> start_set = b->Find('0');
+  absl::flat_hash_set<Point> start_set = b.Find('0');
   if (start_set.size() != 1) return Error("No unique start");
   Point start = *start_set.begin();
 
   int need = 0;
-  for (const auto [_, c] : *b) {
+  for (const auto [_, c] : b) {
     if (c > '0' && c <= '9') {
       need |= 1 << (c - '1');
     }
@@ -70,8 +68,8 @@ absl::StatusOr<std::string> Day_2016_24::Part2(
               .start = {.p = start, .d = need},
               .is_good =
                   [&](PointAndData<int>& cur, int) {
-                    if (!b->OnBoard(cur.p)) return false;
-                    char board_char = (*b)[cur.p];
+                    if (!b.OnBoard(cur.p)) return false;
+                    char board_char = b[cur.p];
                     if (board_char == '#') return false;
                     if (board_char > '0' && board_char <= '9') {
                       cur.d &= ~(1 << (board_char - '1'));

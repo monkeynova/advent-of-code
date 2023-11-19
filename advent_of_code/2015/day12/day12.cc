@@ -42,9 +42,8 @@ absl::StatusOr<int> ParseAndCountNonRed(std::string_view* json,
     int ret = 0;
     *json = json->substr(1);
     while (!json->empty() && (*json)[0] != ']') {
-      absl::StatusOr<int> next = ParseAndCountNonRed(json);
-      if (!next.ok()) return next.status();
-      ret += *next;
+      ASSIGN_OR_RETURN(int next, ParseAndCountNonRed(json));
+      ret += next;
       if ((*json)[0] == ',') {
         *json = json->substr(1);
       } else if ((*json)[0] != ']') {
@@ -60,15 +59,13 @@ absl::StatusOr<int> ParseAndCountNonRed(std::string_view* json,
     int ret = 0;
     *json = json->substr(1);
     while (!json->empty() && (*json)[0] != '}') {
-      absl::StatusOr<int> next = ParseAndCountNonRed(json);
-      if (!next.ok()) return next.status();
-      ret += *next;
+      ASSIGN_OR_RETURN(int next, ParseAndCountNonRed(json));
+      ret += next;
       if ((*json)[0] != ':') return Error("Missing k/v break: ", *json);
       *json = json->substr(1);
       bool is_red;
-      next = ParseAndCountNonRed(json, &is_red);
-      if (!next.ok()) return next.status();
-      ret += *next;
+      ASSIGN_OR_RETURN(next, ParseAndCountNonRed(json, &is_red));
+      ret += next;
       if (is_red) has_red = true;
       if ((*json)[0] == ',') {
         *json = json->substr(1);
@@ -101,11 +98,10 @@ absl::StatusOr<std::string> Day_2015_12::Part2(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   std::string_view json = input[0];
-  absl::StatusOr<int> ret = ParseAndCountNonRed(&json);
-  if (!ret.ok()) return ret.status();
+  ASSIGN_OR_RETURN(int ret, ParseAndCountNonRed(&json));
   if (!json.empty()) return Error("Json not fully consumed: ", json);
 
-  return AdventReturn(*ret);
+  return AdventReturn(ret);
 }
 
 }  // namespace advent_of_code

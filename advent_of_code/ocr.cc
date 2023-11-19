@@ -311,14 +311,12 @@ absl::StatusOr<std::string> OCRExtract(const CharBoard& board) {
   std::string ret;
   for (int char_start = 0, char_end; char_start < board.width();
        char_start = char_end + 1) {
-    absl::StatusOr<CharBoard> single_char =
-        ExtractNextChar(char_start, board, &char_end);
-    if (!single_char.ok()) return single_char.status();
+    ASSIGN_OR_RETURN(CharBoard single_char,
+                      ExtractNextChar(char_start, board, &char_end));
 
-    absl::StatusOr<char> next_char = OCRChar(*single_char, exemplars);
-    if (!next_char.ok()) return next_char.status();
+    ASSIGN_OR_RETURN(char next_char, OCRChar(single_char, exemplars));
 
-    ret.append(1, *next_char);
+    ret.append(1, next_char);
   }
   if (absl::GetFlag(FLAGS_ocr_mode) == kOutput) {
     return ret;

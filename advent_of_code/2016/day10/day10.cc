@@ -38,15 +38,13 @@ absl::StatusOr<int> Eval(absl::flat_hash_map<int, Bot>* bots, int bot_num,
   if (it == bots->end()) return Error("No bot: ", in->bot_num);
   Bot& in_bot = it->second;
 
-  absl::StatusOr<int> v1 = Eval(bots, in->bot_num, &in_bot.inputs[0]);
-  if (!v1.ok()) return v1.status();
-  absl::StatusOr<int> v2 = Eval(bots, in->bot_num, &in_bot.inputs[1]);
-  if (!v2.ok()) return v2.status();
+  ASSIGN_OR_RETURN(int v1, Eval(bots, in->bot_num, &in_bot.inputs[0]));
+  ASSIGN_OR_RETURN(int v2, Eval(bots, in->bot_num, &in_bot.inputs[1]));
 
   if (in_bot.low_bot_num == bot_num) {
-    in->value = std::min(*v1, *v2);
+    in->value = std::min(v1, v2);
   } else if (in_bot.high_bot_num == bot_num) {
-    in->value = std::max(*v1, *v2);
+    in->value = std::max(v1, v2);
   } else {
     return Error("Bot is neither high nor low");
   }
@@ -65,15 +63,13 @@ absl::StatusOr<int> EvalOutput(absl::flat_hash_map<int, Bot>* bots,
   if (it == bots->end()) return Error("No bot: ", in->bot_num);
   Bot& in_bot = it->second;
 
-  absl::StatusOr<int> v1 = Eval(bots, in->bot_num, &in_bot.inputs[0]);
-  if (!v1.ok()) return v1.status();
-  absl::StatusOr<int> v2 = Eval(bots, in->bot_num, &in_bot.inputs[1]);
-  if (!v2.ok()) return v2.status();
+  ASSIGN_OR_RETURN(int v1, Eval(bots, in->bot_num, &in_bot.inputs[0]));
+  ASSIGN_OR_RETURN(int v2, Eval(bots, in->bot_num, &in_bot.inputs[1]));
 
   if (in_bot.low_output_num == output_num) {
-    in->value = std::min(*v1, *v2);
+    in->value = std::min(v1, v2);
   } else if (in_bot.high_output_num == output_num) {
-    in->value = std::max(*v1, *v2);
+    in->value = std::max(v1, v2);
   } else {
     return Error("Bot is neither high nor low");
   }
@@ -88,12 +84,10 @@ absl::StatusOr<int> FindCmp(absl::flat_hash_map<int, Bot>* bots, int test_v1,
     if (bot.inputs.size() != 2) {
       return Error("Bad input: ", bot_num, ": ", bot.inputs.size());
     }
-    absl::StatusOr<int> v1 = Eval(bots, bot_num, &bot.inputs[0]);
-    if (!v1.ok()) return v1.status();
-    absl::StatusOr<int> v2 = Eval(bots, bot_num, &bot.inputs[1]);
-    if (!v2.ok()) return v2.status();
-    if (*v1 == test_v1 && *v2 == test_v2) return bot_num;
-    if (*v2 == test_v1 && *v1 == test_v2) return bot_num;
+    ASSIGN_OR_RETURN(int v1, Eval(bots, bot_num, &bot.inputs[0]));
+    ASSIGN_OR_RETURN(int v2, Eval(bots, bot_num, &bot.inputs[1]));
+    if (v1 == test_v1 && v2 == test_v2) return bot_num;
+    if (v2 == test_v1 && v1 == test_v2) return bot_num;
   }
 
   return Error("Not found");
@@ -219,14 +213,11 @@ absl::StatusOr<std::string> Day_2016_10::Part2(
     }
   }
 
-  absl::StatusOr<int> v0 = EvalOutput(&bots, 0, &outputs[0]);
-  if (!v0.ok()) return v0.status();
-  absl::StatusOr<int> v1 = EvalOutput(&bots, 1, &outputs[1]);
-  if (!v1.ok()) return v1.status();
-  absl::StatusOr<int> v2 = EvalOutput(&bots, 2, &outputs[2]);
-  if (!v2.ok()) return v2.status();
+  ASSIGN_OR_RETURN(int v0, EvalOutput(&bots, 0, &outputs[0]));
+  ASSIGN_OR_RETURN(int v1, EvalOutput(&bots, 1, &outputs[1]));
+  ASSIGN_OR_RETURN(int v2, EvalOutput(&bots, 2, &outputs[2]));
 
-  return AdventReturn(*v0 * *v1 * *v2);
+  return AdventReturn(v0 * v1 * v2);
 }
 
 }  // namespace advent_of_code

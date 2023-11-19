@@ -214,9 +214,7 @@ absl::Status RunTest() {
   VLOG(1) << "Test: " << pw;
   for (std::string_view in : instructions) {
     VLOG(1) << "Test: " << in;
-    absl::StatusOr<std::string> next = ApplyRule(in, pw);
-    if (!next.ok()) return next.status();
-    pw = std::move(*next);
+    ASSIGN_OR_RETURN(pw, ApplyRule(in, pw));
     VLOG(1) << "Test: " << pw;
   }
   if (pw != "decab") {
@@ -243,9 +241,7 @@ absl::Status RunReverseTest() {
   VLOG(1) << "Test: " << pw;
   for (std::string_view in : reverse) {
     VLOG(1) << "Test: " << in;
-    absl::StatusOr<std::string> next = ApplyRuleReverse(in, pw);
-    if (!next.ok()) return next.status();
-    pw = std::move(*next);
+    ASSIGN_OR_RETURN(pw, ApplyRuleReverse(in, pw));
     VLOG(1) << "Test: " << pw;
   }
   if (pw != "abcde") {
@@ -266,9 +262,7 @@ absl::StatusOr<std::string> Day_2016_21::Part1(
   VLOG(2) << pw;
   for (std::string_view in : input) {
     VLOG(2) << in;
-    absl::StatusOr<std::string> next = ApplyRule(in, pw);
-    if (!next.ok()) return next.status();
-    pw = std::move(*next);
+    ASSIGN_OR_RETURN(pw, ApplyRule(in, pw));
     VLOG(2) << pw;
   }
   return pw;
@@ -284,9 +278,7 @@ absl::StatusOr<std::string> Day_2016_21::Part2(
   std::reverse(reverse.begin(), reverse.end());
   for (std::string_view in : reverse) {
     VLOG(2) << in;
-    absl::StatusOr<std::string> next = ApplyRuleReverse(in, pw);
-    if (!next.ok()) return next.status();
-    pw = std::move(*next);
+    ASSIGN_OR_RETURN(pw, ApplyRuleReverse(in, pw));
     VLOG(2) << pw;
   }
   return pw;

@@ -77,10 +77,10 @@ absl::StatusOr<AssemBunny> AssemBunny ::Parse(
     absl::Span<std::string_view> input) {
   AssemBunny ret;
   for (std::string_view in : input) {
-    absl::StatusOr<Instruction> i =
-        Instruction::Parse(in, ret.registers_.get());
-    if (!i.ok()) return i.status();
-    ret.instructions_.push_back(std::move(*i));
+    ASSIGN_OR_RETURN(
+        Instruction i,
+        Instruction::Parse(in, ret.registers_.get()));
+    ret.instructions_.push_back(std::move(i));
   }
   return ret;
 }

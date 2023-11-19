@@ -64,11 +64,10 @@ std::optional<int64_t> MatchesDecompiled(absl::Span<std::string_view> input) {
 
 absl::StatusOr<std::string> Day_2016_23::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<AssemBunny> vm = AssemBunny::Parse(input);
-  if (!vm.ok()) return vm.status();
-  vm->registers().a = 7;
-  RETURN_IF_ERROR(vm->Execute());
-  return AdventReturn(vm->registers().a);
+  ASSIGN_OR_RETURN(AssemBunny vm, AssemBunny::Parse(input));
+  vm.registers().a = 7;
+  RETURN_IF_ERROR(vm.Execute());
+  return AdventReturn(vm.registers().a);
 }
 
 absl::StatusOr<std::string> Day_2016_23::Part2(
@@ -79,11 +78,10 @@ absl::StatusOr<std::string> Day_2016_23::Part2(
 
   LOG(ERROR) << "Falling back to full execution...";
 
-  absl::StatusOr<AssemBunny> vm = AssemBunny::Parse(input);
-  if (!vm.ok()) return vm.status();
-  vm->registers().a = 12;
-  RETURN_IF_ERROR(vm->Execute());
-  return AdventReturn(vm->registers().a);
+  ASSIGN_OR_RETURN(AssemBunny vm, AssemBunny::Parse(input));
+  vm.registers().a = 12;
+  RETURN_IF_ERROR(vm.Execute());
+  return AdventReturn(vm.registers().a);
 }
 
 }  // namespace advent_of_code

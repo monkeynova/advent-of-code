@@ -28,4 +28,17 @@ extern int verbosity_level;
 
 #define RETURN_IF_ERROR(arg) {absl::Status st = arg; if (!st.ok()) return st;}
 
+#define ASSIGN_OR_RETURN_CONCAT(x, y) ASSIGN_OR_RETURN_CONCAT_(x, y)
+#define ASSIGN_OR_RETURN_CONCAT_(x, y) x ## y
+
+#define ASSIGN_OR_RETURN(lhs, rhs)                      \
+  ASSIGN_OR_RETURN_IMPL(                                \
+    ASSIGN_OR_RETURN_CONCAT(_status_or_, __LINE__),     \
+    lhs, rhs)
+
+#define ASSIGN_OR_RETURN_IMPL(statusor_var, lhs, rhs)   \
+  auto statusor_var = (rhs);                            \
+  if (!statusor_var.ok()) return statusor_var.status(); \
+  lhs = *std::move(statusor_var)
+
 #endif  // ADVENT_OF_CODE_VLOG_H

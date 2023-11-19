@@ -56,9 +56,7 @@ absl::Status InfiniteConway::Advance() {
     fill_ = lookup_[511];
   }
 
-  absl::StatusOr<CharBoard> pruned = PruneFill(std::move(new_b));
-  if (!pruned.ok()) return pruned.status();
-  b_ = *std::move(pruned);
+  ASSIGN_OR_RETURN(b_, PruneFill(std::move(new_b)));
   return absl::OkStatus();
 }
 

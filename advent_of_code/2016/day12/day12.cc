@@ -14,23 +14,17 @@ namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2016_12::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<AssemBunny> vm = AssemBunny::Parse(input);
-  if (!vm.ok()) return vm.status();
-
-  RETURN_IF_ERROR(vm->Execute());
-
-  return AdventReturn(vm->registers().a);
+  ASSIGN_OR_RETURN(AssemBunny vm, AssemBunny::Parse(input));
+  RETURN_IF_ERROR(vm.Execute());
+  return AdventReturn(vm.registers().a);
 }
 
 absl::StatusOr<std::string> Day_2016_12::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<AssemBunny> vm = AssemBunny::Parse(input);
-  if (!vm.ok()) return vm.status();
-
-  vm->registers().c = 1;
-  RETURN_IF_ERROR(vm->Execute());
-
-  return AdventReturn(vm->registers().a);
+  ASSIGN_OR_RETURN(AssemBunny vm, AssemBunny::Parse(input));
+  vm.registers().c = 1;
+  RETURN_IF_ERROR(vm.Execute());
+  return AdventReturn(vm.registers().a);
 }
 
 }  // namespace advent_of_code

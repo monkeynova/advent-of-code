@@ -19,9 +19,11 @@ struct Operation {
   std::string dest;
 };
 
+using ExprMap = absl::flat_hash_map<std::string, Operation>;
+
 absl::StatusOr<int> EvaluateMemo(
     absl::flat_hash_map<std::string_view, int>* memo,
-    const absl::flat_hash_map<std::string, Operation>& ops_by_dest,
+    const ExprMap& ops_by_dest,
     std::string_view dest) {
   if (auto it = memo->find(dest); it != memo->end()) return it->second;
 
@@ -33,37 +35,27 @@ absl::StatusOr<int> EvaluateMemo(
     }
     const Operation& op = it->second;
     if (op.operation == "") {
-      absl::StatusOr<int> in = EvaluateMemo(memo, ops_by_dest, op.arg1);
-      if (!in.ok()) return in.status();
-      ret = *in;
+      ASSIGN_OR_RETURN(int in, EvaluateMemo(memo, ops_by_dest, op.arg1));
+      ret = in;
     } else if (op.operation == "NOT") {
-      absl::StatusOr<int> in = EvaluateMemo(memo, ops_by_dest, op.arg1);
-      if (!in.ok()) return in.status();
-      ret = ~*in;
+      ASSIGN_OR_RETURN(int in, EvaluateMemo(memo, ops_by_dest, op.arg1));
+      ret = ~in;
     } else if (op.operation == "AND") {
-      absl::StatusOr<int> in1 = EvaluateMemo(memo, ops_by_dest, op.arg1);
-      if (!in1.ok()) return in1.status();
-      absl::StatusOr<int> in2 = EvaluateMemo(memo, ops_by_dest, op.arg2);
-      if (!in2.ok()) return in2.status();
-      ret = *in1 & *in2;
+      ASSIGN_OR_RETURN(int in1, EvaluateMemo(memo, ops_by_dest, op.arg1));
+      ASSIGN_OR_RETURN(int in2, EvaluateMemo(memo, ops_by_dest, op.arg2));
+      ret = in1 & in2;
     } else if (op.operation == "OR") {
-      absl::StatusOr<int> in1 = EvaluateMemo(memo, ops_by_dest, op.arg1);
-      if (!in1.ok()) return in1.status();
-      absl::StatusOr<int> in2 = EvaluateMemo(memo, ops_by_dest, op.arg2);
-      if (!in2.ok()) return in2.status();
-      ret = *in1 | *in2;
+      ASSIGN_OR_RETURN(int in1, EvaluateMemo(memo, ops_by_dest, op.arg1));
+      ASSIGN_OR_RETURN(int in2, EvaluateMemo(memo, ops_by_dest, op.arg2));
+      ret = in1 | in2;
     } else if (op.operation == "LSHIFT") {
-      absl::StatusOr<int> in1 = EvaluateMemo(memo, ops_by_dest, op.arg1);
-      if (!in1.ok()) return in1.status();
-      absl::StatusOr<int> in2 = EvaluateMemo(memo, ops_by_dest, op.arg2);
-      if (!in2.ok()) return in2.status();
-      ret = *in1 << *in2;
+      ASSIGN_OR_RETURN(int in1, EvaluateMemo(memo, ops_by_dest, op.arg1));
+      ASSIGN_OR_RETURN(int in2, EvaluateMemo(memo, ops_by_dest, op.arg2));
+      ret = in1 << in2;
     } else if (op.operation == "RSHIFT") {
-      absl::StatusOr<int> in1 = EvaluateMemo(memo, ops_by_dest, op.arg1);
-      if (!in1.ok()) return in1.status();
-      absl::StatusOr<int> in2 = EvaluateMemo(memo, ops_by_dest, op.arg2);
-      if (!in2.ok()) return in2.status();
-      ret = *in1 >> *in2;
+      ASSIGN_OR_RETURN(int in1, EvaluateMemo(memo, ops_by_dest, op.arg1));
+      ASSIGN_OR_RETURN(int in2, EvaluateMemo(memo, ops_by_dest, op.arg2));
+      ret = in1 >> in2;
     }
   }
 
@@ -72,15 +64,14 @@ absl::StatusOr<int> EvaluateMemo(
 }
 
 absl::StatusOr<int> Evaluate(
-    const absl::flat_hash_map<std::string, Operation>& ops_by_dest,
+    const ExprMap& ops_by_dest,
     std::string_view dest) {
   absl::flat_hash_map<std::string_view, int> memo;
   return EvaluateMemo(&memo, ops_by_dest, dest);
 }
 
-absl::StatusOr<absl::flat_hash_map<std::string, Operation>> Parse(
-    absl::Span<std::string_view> input) {
-  absl::flat_hash_map<std::string, Operation> ops_by_dest;
+absl::StatusOr<ExprMap> Parse(absl::Span<std::string_view> input) {
+  ExprMap ops_by_dest;
 
   for (std::string_view str : input) {
     const auto [op_str, dest] = PairSplit(str, " -> ");
@@ -117,22 +108,16 @@ absl::StatusOr<absl::flat_hash_map<std::string, Operation>> Parse(
 
 absl::StatusOr<std::string> Day_2015_07::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<absl::flat_hash_map<std::string, Operation>> ops_by_dest =
-      Parse(input);
-  if (!ops_by_dest.ok()) return ops_by_dest.status();
-  return AdventReturn(Evaluate(*ops_by_dest, "a"));
+  ASSIGN_OR_RETURN(ExprMap ops_by_dest, Parse(input));
+  return AdventReturn(Evaluate(ops_by_dest, "a"));
 }
 
 absl::StatusOr<std::string> Day_2015_07::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<absl::flat_hash_map<std::string, Operation>> ops_by_dest =
-      Parse(input);
-  if (!ops_by_dest.ok()) return ops_by_dest.status();
-  absl::StatusOr<int> a_val = Evaluate(*ops_by_dest, "a");
-  if (!a_val.ok()) return a_val.status();
-
-  (*ops_by_dest)["b"] = Operation{.arg1 = absl::StrCat(*a_val)};
-  return AdventReturn(Evaluate(*ops_by_dest, "a"));
+  ASSIGN_OR_RETURN(ExprMap ops_by_dest, Parse(input));
+  ASSIGN_OR_RETURN(int a_val, Evaluate(ops_by_dest, "a"));
+  ops_by_dest["b"] = Operation{.arg1 = absl::StrCat(a_val)};
+  return AdventReturn(Evaluate(ops_by_dest, "a"));
 }
 
 }  // namespace advent_of_code

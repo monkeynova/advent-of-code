@@ -51,18 +51,16 @@ Point FromPosition(int position) {
 
 absl::StatusOr<std::string> Day_2017_03::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> nums = ParseAsInts(input);
-  if (!nums.ok()) return nums.status();
-  if (nums->size() != 1) return Error("Bad size");
-  return AdventReturn(FromPosition(nums->at(0)).dist());
+  ASSIGN_OR_RETURN(std::vector<int64_t> nums, ParseAsInts(input));
+  if (nums.size() != 1) return Error("Bad size");
+  return AdventReturn(FromPosition(nums[0]).dist());
 }
 
 absl::StatusOr<std::string> Day_2017_03::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> nums = ParseAsInts(input);
-  if (!nums.ok()) return nums.status();
-  if (nums->size() != 1) return Error("Bad size");
-  int min_val = nums->at(0);
+  ASSIGN_OR_RETURN(std::vector<int64_t> nums, ParseAsInts(input));
+  if (nums.size() != 1) return Error("Bad size");
+  int min_val = nums[0];
   absl::flat_hash_map<Point, int> sums;
   sums[{0, 0}] = 1;
   for (int i = 2;; ++i) {

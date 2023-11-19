@@ -13,15 +13,14 @@ namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2015_17::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> cap = ParseAsInts(input);
-  if (!cap.ok()) return cap.status();
+  ASSIGN_OR_RETURN(std::vector<int64_t> cap, ParseAsInts(input));
 
   int valid = 0;
-  for (int i = 0; i < (1 << cap->size()); ++i) {
+  for (int i = 0; i < (1 << cap.size()); ++i) {
     int sum = 0;
     for (int bit = 0; (1 << bit) <= i; ++bit) {
       if (i & (1 << bit)) {
-        sum += (*cap)[bit];
+        sum += cap[bit];
       }
     }
     if (sum == 150) ++valid;
@@ -32,17 +31,16 @@ absl::StatusOr<std::string> Day_2015_17::Part1(
 
 absl::StatusOr<std::string> Day_2015_17::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> cap = ParseAsInts(input);
-  if (!cap.ok()) return cap.status();
+  ASSIGN_OR_RETURN(std::vector<int64_t> cap, ParseAsInts(input));
 
   int min_valid = std::numeric_limits<int>::max();
   int valid = 0;
-  for (int i = 0; i < (1 << cap->size()); ++i) {
+  for (int i = 0; i < (1 << cap.size()); ++i) {
     int sum = 0;
     int entries = 0;
     for (int bit = 0; (1 << bit) <= i; ++bit) {
       if (i & (1 << bit)) {
-        sum += (*cap)[bit];
+        sum += cap[bit];
         ++entries;
       }
     }

@@ -40,10 +40,9 @@ class ForceCorners : public ConwayBoard {
 
 absl::StatusOr<std::string> Day_2015_18::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
-  if (!board.ok()) return board.status();
+  ASSIGN_OR_RETURN(CharBoard board, CharBoard::Parse(input));
 
-  ConwayBoard conway(*board);
+  ConwayBoard conway(board);
   conway.AdvanceN(100);
 
   return AdventReturn(conway.CountLive());
@@ -51,10 +50,9 @@ absl::StatusOr<std::string> Day_2015_18::Part1(
 
 absl::StatusOr<std::string> Day_2015_18::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
-  if (!board.ok()) return board.status();
+  ASSIGN_OR_RETURN(CharBoard board, CharBoard::Parse(input));
 
-  ForceCorners conway(*board);
+  ForceCorners conway(board);
   conway.AdvanceN(100);
   return AdventReturn(conway.CountLive());
 }

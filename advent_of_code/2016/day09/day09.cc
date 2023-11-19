@@ -46,11 +46,11 @@ absl::StatusOr<std::string> DecompressV2(std::string_view in) {
                           &count)) {
         return Error("Bad parse: ", in.substr(i));
       }
-      absl::StatusOr<std::string> tmp =
-          DecompressV2(in.substr(i + skip.size(), len));
-      if (!tmp.ok()) return tmp.status();
+      ASSIGN_OR_RETURN(
+          std::string tmp,
+          DecompressV2(in.substr(i + skip.size(), len)));
       for (int j = 0; j < count; ++j) {
-        ret.append(*tmp);
+        ret.append(std::move(tmp));
       }
       i += skip.size() + len - 1;
     } else {
@@ -71,10 +71,10 @@ absl::StatusOr<int64_t> DecompressV2NonWhitespaceLen(std::string_view in) {
                           &count)) {
         return Error("Bad parse: ", in.substr(i));
       }
-      absl::StatusOr<int64_t> sub_len =
-          DecompressV2NonWhitespaceLen(in.substr(i + skip.size(), len));
-      if (!sub_len.ok()) return sub_len.status();
-      ret += count * *sub_len;
+      ASSIGN_OR_RETURN(
+          int64_t sub_len,
+          DecompressV2NonWhitespaceLen(in.substr(i + skip.size(), len)));
+      ret += count * sub_len;
       i += skip.size() + len - 1;
     } else {
       ret += in[i] == ' ' ? 0 : 1;
@@ -97,10 +97,9 @@ int NonWhitespaceLen(std::string_view s) {
 absl::StatusOr<std::string> Day_2016_09::Part1(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  absl::StatusOr<std::string> dec = DecompressV1(input[0]);
-  if (!dec.ok()) return dec.status();
-  VLOG_IF(1, dec->size() < 100) << *dec;
-  return AdventReturn(NonWhitespaceLen(*dec));
+  ASSIGN_OR_RETURN(std::string dec, DecompressV1(input[0]));
+  VLOG_IF(1, dec.size() < 100) << dec;
+  return AdventReturn(NonWhitespaceLen(dec));
 }
 
 absl::StatusOr<std::string> Day_2016_09::Part2(

@@ -69,10 +69,9 @@ absl::StatusOr<std::string> Day_2015_20::Part1(
     }
   }
 
-  absl::StatusOr<std::vector<int64_t>> present_count_list = ParseAsInts(input);
-  if (!present_count_list.ok()) return present_count_list.status();
-  if (present_count_list->size() != 1) return Error("Bad count");
-  int present_count = (*present_count_list)[0];
+  ASSIGN_OR_RETURN(std::vector<int64_t> present_count_list, ParseAsInts(input));
+  if (present_count_list.size() != 1) return Error("Bad count");
+  int present_count = present_count_list[0];
 
   for (int house_num = 1; house_num < present_count / 10; ++house_num) {
     if (PresentCount(house_num) > present_count) return AdventReturn(house_num);
@@ -83,10 +82,9 @@ absl::StatusOr<std::string> Day_2015_20::Part1(
 
 absl::StatusOr<std::string> Day_2015_20::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> present_count_list = ParseAsInts(input);
-  if (!present_count_list.ok()) return present_count_list.status();
-  if (present_count_list->size() != 1) return Error("Bad count");
-  int present_count = (*present_count_list)[0];
+  ASSIGN_OR_RETURN(std::vector<int64_t> present_count_list, ParseAsInts(input));
+  if (present_count_list.size() != 1) return Error("Bad count");
+  int present_count = present_count_list[0];
 
   for (int house_num = 1; house_num < present_count / 11; ++house_num) {
     if (PresentCountPart2(house_num) > present_count)
