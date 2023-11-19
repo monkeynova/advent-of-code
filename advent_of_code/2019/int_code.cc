@@ -191,81 +191,66 @@ absl::Status IntCode::RunSingleOpcode(InputSource* input, OutputSink* output) {
   VLOG(4) << "@" << code_pos_ << ": " << CodeTypes()[opcode].name;
   switch (static_cast<OpCode>(opcode)) {
     case OpCode::kAdd: {
-      absl::StatusOr<int64_t> in1 = LoadParameter(parameter_modes, 1);
-      if (!in1.ok()) return in1.status();
-      absl::StatusOr<int64_t> in2 = LoadParameter(parameter_modes, 2);
-      if (!in2.ok()) return in2.status();
-      RETURN_IF_ERROR(SaveParameter(parameter_modes, 3, *in1 + *in2));
+      ASSIGN_OR_RETURN(int64_t in1, LoadParameter(parameter_modes, 1));
+      ASSIGN_OR_RETURN(int64_t in2, LoadParameter(parameter_modes, 2));
+      RETURN_IF_ERROR(SaveParameter(parameter_modes, 3, in1 + in2));
       break;
     }
     case OpCode::kMul: {
-      absl::StatusOr<int64_t> in1 = LoadParameter(parameter_modes, 1);
-      if (!in1.ok()) return in1.status();
-      absl::StatusOr<int64_t> in2 = LoadParameter(parameter_modes, 2);
-      if (!in2.ok()) return in2.status();
-      RETURN_IF_ERROR(SaveParameter(parameter_modes, 3, *in1 * *in2));
+      ASSIGN_OR_RETURN(int64_t in1, LoadParameter(parameter_modes, 1));
+      ASSIGN_OR_RETURN(int64_t in2, LoadParameter(parameter_modes, 2));
+      RETURN_IF_ERROR(SaveParameter(parameter_modes, 3, in1 * in2));
       break;
     }
     case OpCode::kInput: {
       if (input == nullptr) {
         return absl::InvalidArgumentError("No input specified");
       }
-      absl::StatusOr<int64_t> input_val = input->Fetch();
-      if (!input_val.ok()) return input_val.status();
-      RETURN_IF_ERROR(SaveParameter(parameter_modes, 1, *input_val));
+      ASSIGN_OR_RETURN(int64_t input_val, input->Fetch());
+      RETURN_IF_ERROR(SaveParameter(parameter_modes, 1, input_val));
       break;
     }
     case OpCode::kOutput: {
-      absl::StatusOr<int64_t> in = LoadParameter(parameter_modes, 1);
-      if (!in.ok()) return in.status();
+      ASSIGN_OR_RETURN(int64_t in, LoadParameter(parameter_modes, 1));
       if (output == nullptr) {
         return absl::InvalidArgumentError("No output specified");
       }
-      RETURN_IF_ERROR(output->Put(*in));
+      RETURN_IF_ERROR(output->Put(in));
       break;
     }
     case OpCode::kJNZ: {
-      absl::StatusOr<int64_t> in1 = LoadParameter(parameter_modes, 1);
-      if (!in1.ok()) return in1.status();
-      if (*in1 != 0) {
-        absl::StatusOr<int64_t> in2 = LoadParameter(parameter_modes, 2);
-        if (!in2.ok()) return in2.status();
-        code_pos_ = *in2;
+      ASSIGN_OR_RETURN(int64_t in1, LoadParameter(parameter_modes, 1));
+      if (in1 != 0) {
+        ASSIGN_OR_RETURN(int64_t in2, LoadParameter(parameter_modes, 2));
+        code_pos_ = in2;
         jumped = true;
       }
       break;
     }
     case OpCode::kJZ: {
-      absl::StatusOr<int64_t> in1 = LoadParameter(parameter_modes, 1);
-      if (!in1.ok()) return in1.status();
-      if (*in1 == 0) {
-        absl::StatusOr<int64_t> in2 = LoadParameter(parameter_modes, 2);
-        if (!in2.ok()) return in2.status();
-        code_pos_ = *in2;
+      ASSIGN_OR_RETURN(int64_t in1, LoadParameter(parameter_modes, 1));
+      if (in1 == 0) {
+        ASSIGN_OR_RETURN(int64_t in2, LoadParameter(parameter_modes, 2));
+        code_pos_ = in2;
         jumped = true;
       }
       break;
     }
     case OpCode::kLT: {
-      absl::StatusOr<int64_t> in1 = LoadParameter(parameter_modes, 1);
-      if (!in1.ok()) return in1.status();
-      absl::StatusOr<int64_t> in2 = LoadParameter(parameter_modes, 2);
-      if (!in2.ok()) return in2.status();
-      RETURN_IF_ERROR(SaveParameter(parameter_modes, 3, *in1 < *in2));
+      ASSIGN_OR_RETURN(int64_t in1, LoadParameter(parameter_modes, 1));
+      ASSIGN_OR_RETURN(int64_t in2, LoadParameter(parameter_modes, 2));
+      RETURN_IF_ERROR(SaveParameter(parameter_modes, 3, in1 < in2));
       break;
     }
     case OpCode::kEQ: {
-      absl::StatusOr<int64_t> in1 = LoadParameter(parameter_modes, 1);
-      if (!in1.ok()) return in1.status();
-      absl::StatusOr<int64_t> in2 = LoadParameter(parameter_modes, 2);
-      if (!in2.ok()) return in2.status();
-      RETURN_IF_ERROR(SaveParameter(parameter_modes, 3, *in1 == *in2));
+      ASSIGN_OR_RETURN(int64_t in1, LoadParameter(parameter_modes, 1));
+      ASSIGN_OR_RETURN(int64_t in2, LoadParameter(parameter_modes, 2));
+      RETURN_IF_ERROR(SaveParameter(parameter_modes, 3, in1 == in2));
       break;
     }
     case OpCode::kIncR: {
-      absl::StatusOr<int64_t> in = LoadParameter(parameter_modes, 1);
-      if (!in.ok()) return in.status();
-      relative_base_ += *in;
+      ASSIGN_OR_RETURN(int64_t in, LoadParameter(parameter_modes, 1));
+      relative_base_ += in;
       break;
     }
     case OpCode::kTerm: {

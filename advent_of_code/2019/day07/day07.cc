@@ -32,23 +32,13 @@ absl::StatusOr<int> FindBestThrust(const IntCode& base_codes, int input_value,
       return absl::InvalidArgumentError("Didn't return a single output");
     }
 
-    absl::StatusOr<int> sub_best_thrust =
-        FindBestThrust(base_codes, output[0], index + 1, used);
-    if (!sub_best_thrust.ok()) return sub_best_thrust.status();
-    best_thrust = std::max(best_thrust, *sub_best_thrust);
+    ASSIGN_OR_RETURN(
+        int sub_best_thrust,
+        FindBestThrust(base_codes, output[0], index + 1, used));
+    best_thrust = std::max(best_thrust, sub_best_thrust);
     used.erase(i);
   }
   return best_thrust;
-}
-
-}  // namespace
-
-absl::StatusOr<std::string> Day_2019_07::Part1(
-    absl::Span<std::string_view> input) const {
-  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
-  if (!codes.ok()) return codes.status();
-
-  return AdventReturn(FindBestThrust(*codes, 0));
 }
 
 class AssemblyIO : public IntCode::IOModule {
@@ -138,21 +128,29 @@ absl::StatusOr<int> FindBestThrustFeedback(const IntCode& base_codes,
                     [i](int p) { return i == p; }))
       continue;
     phases.push_back(i);
-    absl::StatusOr<int> sub_best_thrust =
-        FindBestThrustFeedback(base_codes, phases);
-    if (!sub_best_thrust.ok()) return sub_best_thrust.status();
-    best_thrust = std::max(best_thrust, *sub_best_thrust);
+    ASSIGN_OR_RETURN(
+        int sub_best_thrust,
+        FindBestThrustFeedback(base_codes, phases));
+    best_thrust = std::max(best_thrust, sub_best_thrust);
     phases.pop_back();
   }
   return best_thrust;
 }
 
+}  // namespace
+
+absl::StatusOr<std::string> Day_2019_07::Part1(
+    absl::Span<std::string_view> input) const {
+  ASSIGN_OR_RETURN(IntCode codes, IntCode::Parse(input));
+
+  return AdventReturn(FindBestThrust(codes, 0));
+}
+
 absl::StatusOr<std::string> Day_2019_07::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
-  if (!codes.ok()) return codes.status();
+  ASSIGN_OR_RETURN(IntCode codes, IntCode::Parse(input));
 
-  return AdventReturn(FindBestThrustFeedback(*codes));
+  return AdventReturn(FindBestThrustFeedback(codes));
 }
 
 }  // namespace advent_of_code

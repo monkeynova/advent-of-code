@@ -111,23 +111,21 @@ class DrawBoard : public IntCode::IOModule {
 
 absl::StatusOr<std::string> Day_2019_13::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
-  if (!codes.ok()) return codes.status();
+  ASSIGN_OR_RETURN(IntCode codes, IntCode::Parse(input));
 
   DrawBoard draw_board;
-  RETURN_IF_ERROR(codes->Run(&draw_board));
+  RETURN_IF_ERROR(codes.Run(&draw_board));
 
   return AdventReturn(draw_board.CountBlockTiles());
 }
 
 absl::StatusOr<std::string> Day_2019_13::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
-  if (!codes.ok()) return codes.status();
+  ASSIGN_OR_RETURN(IntCode codes, IntCode::Parse(input));
 
-  RETURN_IF_ERROR(codes->Poke(0, 2));
+  RETURN_IF_ERROR(codes.Poke(0, 2));
   DrawBoard draw_board;
-  RETURN_IF_ERROR(codes->Run(&draw_board));
+  RETURN_IF_ERROR(codes.Run(&draw_board));
 
   return AdventReturn(draw_board.score());
 }

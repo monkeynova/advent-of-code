@@ -82,21 +82,19 @@ TransferRet FindTransfer(
 
 absl::StatusOr<std::string> Day_2019_06::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<absl::flat_hash_map<std::string, std::vector<std::string>>>
-      orbits = ParseOrbits(input);
-  if (!orbits.ok()) return orbits.status();
+  absl::flat_hash_map<std::string, std::vector<std::string>> orbits;
+  ASSIGN_OR_RETURN(orbits, ParseOrbits(input));
 
-  int count_orbits = CountOrbits(*orbits, "COM", 0);
+  int count_orbits = CountOrbits(orbits, "COM", 0);
   return AdventReturn(count_orbits);
 }
 
 absl::StatusOr<std::string> Day_2019_06::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<absl::flat_hash_map<std::string, std::vector<std::string>>>
-      orbits = ParseOrbits(input);
-  if (!orbits.ok()) return orbits.status();
+  absl::flat_hash_map<std::string, std::vector<std::string>> orbits;
+  ASSIGN_OR_RETURN(orbits, ParseOrbits(input));
 
-  TransferRet transfer = FindTransfer(*orbits, "COM", "YOU", "SAN");
+  TransferRet transfer = FindTransfer(orbits, "COM", "YOU", "SAN");
   return AdventReturn(transfer.transfer_size);
 }
 

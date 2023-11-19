@@ -10,12 +10,11 @@ namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2019_05::Part1(
     absl::Span<std::string_view> input_text) const {
-  absl::StatusOr<IntCode> codes = IntCode::Parse(input_text);
-  if (!codes.ok()) return codes.status();
+  ASSIGN_OR_RETURN(IntCode codes, IntCode::Parse(input_text));
 
   std::vector<int64_t> input = {1};
   std::vector<int64_t> output;
-  RETURN_IF_ERROR(codes->Run(input, &output));
+  RETURN_IF_ERROR(codes.Run(input, &output));
 
   for (int i = 0; i < output.size() - 1; ++i) {
     if (output[i] != 0) {
@@ -28,12 +27,11 @@ absl::StatusOr<std::string> Day_2019_05::Part1(
 
 absl::StatusOr<std::string> Day_2019_05::Part2(
     absl::Span<std::string_view> input_text) const {
-  absl::StatusOr<IntCode> codes = IntCode::Parse(input_text);
-  if (!codes.ok()) return codes.status();
+  ASSIGN_OR_RETURN(IntCode codes, IntCode::Parse(input_text));
 
   std::vector<int64_t> input = {5};
   std::vector<int64_t> output;
-  RETURN_IF_ERROR(codes->Run(input, &output));
+  RETURN_IF_ERROR(codes.Run(input, &output));
 
   for (int i = 0; i < output.size() - 1; ++i) {
     if (output[i] != 0) {

@@ -58,25 +58,12 @@ MostVisible FindMostVisible(const Board& board) {
 }
 
 absl::StatusOr<Board> ParseBoard(absl::Span<std::string_view> input) {
-  absl::StatusOr<CharBoard> char_board = CharBoard::Parse(input);
-  if (!char_board.ok()) return char_board.status();
+  ASSIGN_OR_RETURN(CharBoard char_board, CharBoard::Parse(input));
 
   Board ret;
-  ret.height = char_board->height();
-  ret.width = char_board->width();
-  for (Point p : char_board->range()) {
-    switch ((*char_board)[p]) {
-      case '.': {
-        break;
-      }
-      case 'X': {
-        ret.asteroids.insert(p);
-        break;
-      }
-      default:
-        return absl::InvalidArgumentError("bad token");
-    }
-  }
+  ret.height = char_board.height();
+  ret.width = char_board.width();
+  ret.asteroids = char_board.Find('X');
   return ret;
 }
 
@@ -84,9 +71,8 @@ absl::StatusOr<Board> ParseBoard(absl::Span<std::string_view> input) {
 
 absl::StatusOr<std::string> Day_2019_10::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<Board> asteroids = ParseBoard(input);
-  if (!asteroids.ok()) return asteroids.status();
-  MostVisible most_visible = FindMostVisible(*asteroids);
+  ASSIGN_OR_RETURN(Board asteroids, ParseBoard(input));
+  MostVisible most_visible = FindMostVisible(asteroids);
 
   return AdventReturn(most_visible.seen);
 }
@@ -107,16 +93,15 @@ struct OrderedDestruct {
 
 absl::StatusOr<std::string> Day_2019_10::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<Board> board = ParseBoard(input);
-  if (!board.ok()) return board.status();
-  if (board->asteroids.size() < 201) {
+  ASSIGN_OR_RETURN(Board board, ParseBoard(input));
+  if (board.asteroids.size() < 201) {
     return absl::InvalidArgumentError("There aren't 200 asteroids to destroy");
   }
-  MostVisible most_visible = FindMostVisible(*board);
+  MostVisible most_visible = FindMostVisible(board);
 
   std::vector<OrderedDestruct> ordered_destruct;
   Point origin = most_visible.most_visible;
-  for (const Point& p : board->asteroids) {
+  for (const Point& p : board.asteroids) {
     if (p == origin) continue;
     Point delta = p - origin;
     // atan2(y,x) gives the angle from the x-axis, towards the y-axis.
@@ -128,7 +113,7 @@ absl::StatusOr<std::string> Day_2019_10::Part2(
       theta += 8 * atan2(1, 1) /* 2 * pi */;
     }
     ordered_destruct.push_back(
-        {.p = p, .theta = theta, .count = ObscureCount(*board, origin, p)});
+        {.p = p, .theta = theta, .count = ObscureCount(board, origin, p)});
   }
   std::sort(ordered_destruct.begin(), ordered_destruct.end());
   int ret = ordered_destruct[199].p.x * 100 + ordered_destruct[199].p.y;

@@ -7,12 +7,11 @@ namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2019_01::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> costs = ParseAsInts(input);
-  if (!costs.ok()) return costs.status();
+  ASSIGN_OR_RETURN(std::vector<int64_t> costs, ParseAsInts(input));
 
   int total_fuel = 0;
 
-  for (const auto& module_cost : *costs) {
+  for (const auto& module_cost : costs) {
     total_fuel += module_cost / 3 - 2;
   }
 
@@ -21,12 +20,11 @@ absl::StatusOr<std::string> Day_2019_01::Part1(
 
 absl::StatusOr<std::string> Day_2019_01::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> costs = ParseAsInts(input);
-  if (!costs.ok()) return costs.status();
+  ASSIGN_OR_RETURN(std::vector<int64_t> costs, ParseAsInts(input));
 
   int total_fuel = 0;
 
-  for (const auto& module_cost : *costs) {
+  for (const auto& module_cost : costs) {
     int module_fuel = module_cost / 3 - 2;
     int fuel_fuel = module_fuel;
     while (fuel_fuel / 3 - 2 > 0) {

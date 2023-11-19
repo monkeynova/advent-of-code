@@ -9,9 +9,9 @@
 namespace advent_of_code {
 namespace {
 
-absl::Status CorrectBoard(IntCode* codes, int noun, int verb) {
-  RETURN_IF_ERROR(codes->Poke(1, noun));
-  RETURN_IF_ERROR(codes->Poke(2, verb));
+absl::Status CorrectBoard(IntCode& codes, int noun, int verb) {
+  RETURN_IF_ERROR(codes.Poke(1, noun));
+  RETURN_IF_ERROR(codes.Poke(2, verb));
   return absl::OkStatus();
 }
 
@@ -19,28 +19,25 @@ absl::Status CorrectBoard(IntCode* codes, int noun, int verb) {
 
 absl::StatusOr<std::string> Day_2019_02::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
-  if (!codes.ok()) return codes.status();
+  ASSIGN_OR_RETURN(IntCode codes, IntCode::Parse(input));
 
-  RETURN_IF_ERROR(CorrectBoard(&*codes, 12, 2));
-  RETURN_IF_ERROR(codes->Run());
+  RETURN_IF_ERROR(CorrectBoard(codes, 12, 2));
+  RETURN_IF_ERROR(codes.Run());
 
-  return AdventReturn(codes->Peek(0));
+  return AdventReturn(codes.Peek(0));
 }
 
 absl::StatusOr<std::string> Day_2019_02::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<IntCode> start_codes = IntCode::Parse(input);
-  if (!start_codes.ok()) return start_codes.status();
+  ASSIGN_OR_RETURN(IntCode start_codes, IntCode::Parse(input));
 
   for (int noun = 0; noun < 100; ++noun) {
     for (int verb = 0; verb < 100; ++verb) {
-      IntCode codes = start_codes->Clone();
-      RETURN_IF_ERROR(CorrectBoard(&codes, noun, verb));
+      IntCode codes = start_codes.Clone();
+      RETURN_IF_ERROR(CorrectBoard(codes, noun, verb));
       if (absl::Status st = codes.Run(); !st.ok()) break;
-      absl::StatusOr<int> val = codes.Peek(0);
-      if (!val.ok()) return val.status();
-      if (*val == 19690720) {
+      ASSIGN_OR_RETURN(int val, codes.Peek(0));
+      if (val == 19690720) {
         return AdventReturn(100 * noun + verb);
       }
     }
