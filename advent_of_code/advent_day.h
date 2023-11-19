@@ -20,7 +20,7 @@ namespace advent_of_code {
 
 template <class... Args>
 inline absl::Status Error(Args... args) {
-  return absl::InternalError(absl::StrCat(args...));
+  return absl::InternalError(absl::StrCat(std::forward<Args>(args)...));
 }
 
 template <class Container>
