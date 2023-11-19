@@ -16,16 +16,15 @@ namespace advent_of_code {
 
 absl::StatusOr<std::string> Day_2022_08::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
-  if (!board.ok()) return board.status();
+  ASSIGN_OR_RETURN(CharBoard board, CharBoard::Parse(input));
 
   int count = 0;
-  for (Point p : board->range()) {
+  for (Point p : board.range()) {
     bool visible_any = false;
     for (Point d : Cardinal::kFourDirs) {
       bool visible_this = true;
-      for (Point t = p + d; board->OnBoard(t); t += d) {
-        if ((*board)[t] >= (*board)[p]) {
+      for (Point t = p + d; board.OnBoard(t); t += d) {
+        if (board[t] >= board[p]) {
           visible_this = false;
           break;
         }
@@ -42,17 +41,16 @@ absl::StatusOr<std::string> Day_2022_08::Part1(
 
 absl::StatusOr<std::string> Day_2022_08::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> board = CharBoard::Parse(input);
-  if (!board.ok()) return board.status();
+  ASSIGN_OR_RETURN(CharBoard board, CharBoard::Parse(input));
 
   int best_score = 0;
-  for (Point p : board->range()) {
+  for (Point p : board.range()) {
     int score = 1;
     for (Point d : Cardinal::kFourDirs) {
       int dist = 0;
-      for (Point t = p + d; board->OnBoard(t); t += d) {
+      for (Point t = p + d; board.OnBoard(t); t += d) {
         ++dist;
-        if ((*board)[t] >= (*board)[p]) {
+        if (board[t] >= board[p]) {
           break;
         }
       }

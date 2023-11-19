@@ -52,24 +52,22 @@ class Route : public BFSInterface<Route, Point> {
 
 absl::StatusOr<std::string> Day_2021_15::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
-  if (!b.ok()) return b.status();
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
 
-  return AdventReturn(Route(*b).FindMinStepsAStar());
+  return AdventReturn(Route(b).FindMinStepsAStar());
 }
 
 absl::StatusOr<std::string> Day_2021_15::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
-  if (!b.ok()) return b.status();
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
 
-  CharBoard big_board(b->width() * 5, b->height() * 5);
-  for (const auto [p, c] : *b) {
+  CharBoard big_board(b.width() * 5, b.height() * 5);
+  for (const auto [p, c] : b) {
     int base = c - '1';
     for (int i = 0; i < 5; i++) {
-      Point dx = i * Cardinal::kXHat * b->width();
+      Point dx = i * Cardinal::kXHat * b.width();
       for (int j = 0; j < 5; j++) {
-        Point dy = j * Cardinal::kYHat * b->height();
+        Point dy = j * Cardinal::kYHat * b.height();
         big_board[p + dx + dy] = ((base + i + j) % 9) + '1';
       }
     }

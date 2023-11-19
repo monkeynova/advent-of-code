@@ -139,44 +139,42 @@ int64_t ScoreMonkeys(const std::vector<Monkey>& monkeys) {
 
 absl::StatusOr<std::string> Day_2022_11::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<Monkey>> monkeys = ParseMonkeys(input);
-  if (!monkeys.ok()) return monkeys.status();
+  ASSIGN_OR_RETURN(std::vector<Monkey> monkeys, ParseMonkeys(input));
 
   for (int64_t round = 0; round < 20; ++round) {
-    for (Monkey& m : *monkeys) {
+    for (Monkey& m : monkeys) {
       for (Monkey::Item& i : m.items) {
         m.UpdateWorry(i);
         i.worry /= 3;
-        (*monkeys)[m.NextMonkey(i)].items.push_back(i);
+        monkeys[m.NextMonkey(i)].items.push_back(i);
       }
       m.inspections += m.items.size();
       m.items.clear();
     }
   }
-  return AdventReturn(ScoreMonkeys(*monkeys));
+  return AdventReturn(ScoreMonkeys(monkeys));
 }
 
 absl::StatusOr<std::string> Day_2022_11::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<Monkey>> monkeys = ParseMonkeys(input);
-  if (!monkeys.ok()) return monkeys.status();
+  ASSIGN_OR_RETURN(std::vector<Monkey> monkeys, ParseMonkeys(input));
 
   int full_mod = 1;
-  for (const Monkey& m : *monkeys) full_mod *= m.div_test;
+  for (const Monkey& m : monkeys) full_mod *= m.div_test;
   VLOG(1) << "full_mod = " << full_mod;
 
   for (int64_t round = 0; round < 10'000; ++round) {
-    for (Monkey& m : *monkeys) {
+    for (Monkey& m : monkeys) {
       for (Monkey::Item& i : m.items) {
         m.UpdateWorry(i);
         i.worry %= full_mod;
-        (*monkeys)[m.NextMonkey(i)].items.push_back(i);
+        monkeys[m.NextMonkey(i)].items.push_back(i);
       }
       m.inspections += m.items.size();
       m.items.clear();
     }
   }
-  return AdventReturn(ScoreMonkeys(*monkeys));
+  return AdventReturn(ScoreMonkeys(monkeys));
 }
 
 }  // namespace advent_of_code

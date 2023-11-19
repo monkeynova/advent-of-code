@@ -28,10 +28,10 @@ absl::StatusOr<Rule> ParseRule(std::string_view in) {
   }
   if (!RE2::FullMatch(dest, "\"(.)\"", &ret.token)) {
     for (std::string_view piece : absl::StrSplit(dest, " | ")) {
-      absl::StatusOr<std::vector<int64_t>> sub_rule =
-          ParseAsInts(absl::StrSplit(piece, " "));
-      if (!sub_rule.ok()) return sub_rule.status();
-      ret.sub_rules.push_back(*sub_rule);
+      ASSIGN_OR_RETURN(
+          std::vector<int64_t> sub_rule,
+          ParseAsInts(absl::StrSplit(piece, " ")));
+      ret.sub_rules.push_back(std::move(sub_rule));
     }
   }
 
@@ -161,12 +161,11 @@ absl::StatusOr<std::string> Day_2020_19::Part1(
       continue;
     }
     if (parse_rules) {
-      absl::StatusOr<Rule> rule = ParseRule(in);
-      if (!rule.ok()) return rule.status();
-      if (rule_set.contains(rule->rule_num)) {
-        return Error("Duplicate rule: ", rule->rule_num);
+      ASSIGN_OR_RETURN(Rule rule, ParseRule(in));
+      if (rule_set.contains(rule.rule_num)) {
+        return Error("Duplicate rule: ", rule.rule_num);
       }
-      rule_set.emplace(rule->rule_num, *rule);
+      rule_set.emplace(rule.rule_num, rule);
     } else {
       messages.push_back(in);
     }
@@ -193,12 +192,11 @@ absl::StatusOr<std::string> Day_2020_19::Part2(
       continue;
     }
     if (parse_rules) {
-      absl::StatusOr<Rule> rule = ParseRule(in);
-      if (!rule.ok()) return rule.status();
-      if (rule_set.contains(rule->rule_num)) {
-        return Error("Duplicate rule: ", rule->rule_num);
+      ASSIGN_OR_RETURN(Rule rule, ParseRule(in));
+      if (rule_set.contains(rule.rule_num)) {
+        return Error("Duplicate rule: ", rule.rule_num);
       }
-      rule_set.emplace(rule->rule_num, *rule);
+      rule_set.emplace(rule.rule_num, rule);
     } else {
       messages.push_back(in);
     }

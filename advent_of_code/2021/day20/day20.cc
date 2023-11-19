@@ -20,11 +20,10 @@ absl::StatusOr<std::string> Day_2021_20::Part1(
   if (lookup.size() != 512) return Error("Bad input (lookup size)");
   if (!input[1].empty()) return Error("Bad input (missing empty line)");
 
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input.subspan(2));
-  if (!b.ok()) return b.status();
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input.subspan(2)));
 
-  InfiniteConway conway(*b, std::string(lookup));
-  if (auto st = conway.AdvanceN(2); !st.ok()) return st;
+  InfiniteConway conway(b, std::string(lookup));
+  RETURN_IF_ERROR(conway.AdvanceN(2));
   return AdventReturn(conway.CountLive());
 }
 
@@ -35,11 +34,10 @@ absl::StatusOr<std::string> Day_2021_20::Part2(
   if (lookup.size() != 512) return Error("Bad input (lookup size)");
   if (!input[1].empty()) return Error("Bad input (missing empty line)");
 
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input.subspan(2));
-  if (!b.ok()) return b.status();
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input.subspan(2)));
 
-  InfiniteConway conway(*b, std::string(lookup));
-  if (auto st = conway.AdvanceN(50); !st.ok()) return st;
+  InfiniteConway conway(b, std::string(lookup));
+  RETURN_IF_ERROR(conway.AdvanceN(50));
   return AdventReturn(conway.CountLive());
 }
 

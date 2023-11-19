@@ -106,9 +106,8 @@ absl::StatusOr<std::string> Day_2021_04::Part1(
   std::vector<Board> boards;
   for (int64_t lidx = 2; lidx < input.size(); lidx += 6) {
     if (!input[lidx - 1].empty()) return Error("Bad spacer");
-    absl::StatusOr<Board> board = Board::Parse(input.subspan(lidx, 5));
-    if (!board.ok()) return board.status();
-    boards.push_back(*board);
+    ASSIGN_OR_RETURN(Board board, Board::Parse(input.subspan(lidx, 5)));
+    boards.push_back(board);
   }
 
   for (int64_t num : numbers) {
@@ -138,9 +137,8 @@ absl::StatusOr<std::string> Day_2021_04::Part2(
   std::vector<Board> boards;
   for (int64_t lidx = 2; lidx < input.size(); lidx += 6) {
     if (!input[lidx - 1].empty()) return Error("Bad spacer");
-    absl::StatusOr<Board> board = Board::Parse(input.subspan(lidx, 5));
-    if (!board.ok()) return board.status();
-    boards.push_back(*board);
+    ASSIGN_OR_RETURN(Board board, Board::Parse(input.subspan(lidx, 5)));
+    boards.push_back(board);
   }
 
   for (int64_t num : numbers) {

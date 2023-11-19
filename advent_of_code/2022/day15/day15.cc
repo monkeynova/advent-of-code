@@ -62,14 +62,13 @@ bool HasCloser(const std::vector<SAndB>& list, Point t) {
 
 absl::StatusOr<std::string> Day_2022_15::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<SAndB>> list = ParseList(input);
-  if (!list.ok()) return list.status();
+  ASSIGN_OR_RETURN(std::vector<SAndB> list, ParseList(input));
 
   int y;
   if (!absl::SimpleAtoi(param(), &y)) return Error(param(), " isn't an int");
   Interval1D no_closer;
   Interval1D beacons;
-  for (const auto& sandb : *list) {
+  for (const auto& sandb : list) {
     if (sandb.beacon.y == y) {
       beacons = beacons.Union(Interval1D(sandb.beacon.x, sandb.beacon.x + 1));
     }
@@ -81,8 +80,7 @@ absl::StatusOr<std::string> Day_2022_15::Part1(
 
 absl::StatusOr<std::string> Day_2022_15::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<SAndB>> list = ParseList(input);
-  if (!list.ok()) return list.status();
+  ASSIGN_OR_RETURN(std::vector<SAndB> list, ParseList(input));
 
   int max;
   if (!absl::SimpleAtoi(param(), &max)) return Error(param(), " isn't an int");
@@ -97,7 +95,7 @@ absl::StatusOr<std::string> Day_2022_15::Part2(
   // unique and not next to another in order to prove the answer is unique.
   absl::flat_hash_map<int, int> x_plus_y_to_count;
   absl::flat_hash_map<int, int> x_minus_y_to_count;
-  for (const auto& sandb : *list) {
+  for (const auto& sandb : list) {
     int x_plus_y = sandb.sensor.x + sandb.sensor.y;
     int x_minus_y = sandb.sensor.x - sandb.sensor.y;
     ++x_plus_y_to_count[x_plus_y + sandb.d + 1];
@@ -116,7 +114,7 @@ absl::StatusOr<std::string> Day_2022_15::Part2(
       t.y = x_plus_y - x_minus_y;
       if (t.y % 2 != 0) continue;
       t.y /= 2;
-      if (test_area.Contains(t) && !HasCloser(*list, t)) {
+      if (test_area.Contains(t) && !HasCloser(list, t)) {
         if (found && *found != t) return Error("Duplicate!");
         found = t;
         VLOG(1) << "Found @" << *found << " -> "
@@ -126,7 +124,7 @@ absl::StatusOr<std::string> Day_2022_15::Part2(
   }
   if (!found) return Error("Not found");
   for (Point d : Cardinal::kFourDirs) {
-    if (!HasCloser(*list, *found + d)) return Error("Not unique");
+    if (!HasCloser(list, *found + d)) return Error("Not unique");
   }
   return AdventReturn(found->x * 4000000ll + found->y);
 }

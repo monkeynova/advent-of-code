@@ -42,15 +42,14 @@ int64_t Coordinates(RingType::const_iterator it) {
 
 absl::StatusOr<std::string> Day_2022_20::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> input_ints = ParseAsInts(input);
-  if (!input_ints.ok()) return input_ints.status();
+  ASSIGN_OR_RETURN(std::vector<int64_t> input_ints, ParseAsInts(input));
 
-  RingType list(*input_ints);
+  RingType list(input_ints);
   RingType::const_iterator zero_it;
   RingType::const_iterator start = list.FirstAdded();
 
   std::vector<RingType::const_iterator> list_it;
-  list_it.reserve(input_ints->size());
+  list_it.reserve(input_ints.size());
 
   auto it = start;
   do {
@@ -70,19 +69,18 @@ absl::StatusOr<std::string> Day_2022_20::Part1(
 
 absl::StatusOr<std::string> Day_2022_20::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<int64_t>> input_ints = ParseAsInts(input);
-  if (!input_ints.ok()) return input_ints.status();
+  ASSIGN_OR_RETURN(std::vector<int64_t> input_ints, ParseAsInts(input));
 
-  for (auto& i : *input_ints) {
+  for (auto& i : input_ints) {
     i *= 811589153;
   }
 
-  RingType list(*input_ints);
+  RingType list(input_ints);
   RingType::const_iterator zero_it;
   RingType::const_iterator start = list.FirstAdded();
 
   std::vector<RingType::const_iterator> list_it;
-  list_it.reserve(input_ints->size());
+  list_it.reserve(input_ints.size());
 
   auto it = start;
   do {

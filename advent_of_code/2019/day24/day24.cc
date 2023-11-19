@@ -150,10 +150,9 @@ class Part2Conway : public ConwaySet<Point3> {
 
 absl::StatusOr<std::string> Day_2019_24::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> board = ParseBoard(input);
-  if (!board.ok()) return board.status();
+  ASSIGN_OR_RETURN(CharBoard board, ParseBoard(input));
 
-  Part1Conway p1c(*board);
+  Part1Conway p1c(board);
   absl::flat_hash_set<std::vector<Point>> hist;
   while (hist.insert(p1c.Identifier()).second) {
     p1c.Advance();
@@ -163,10 +162,9 @@ absl::StatusOr<std::string> Day_2019_24::Part1(
 
 absl::StatusOr<std::string> Day_2019_24::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> cur = ParseBoard(input);
-  if (!cur.ok()) return cur.status();
+  ASSIGN_OR_RETURN(CharBoard board, ParseBoard(input));
 
-  Part2Conway p2c(*cur);
+  Part2Conway p2c(board);
   p2c.AdvanceN(200);
   return AdventReturn(p2c.CountLive());
 }

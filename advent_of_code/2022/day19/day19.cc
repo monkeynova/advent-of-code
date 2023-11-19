@@ -149,11 +149,10 @@ absl::StatusOr<std::string> Day_2022_19::Part1(
     absl::Span<std::string_view> input) const {
   int cost = 0;
   for (std::string_view line : input) {
-    absl::StatusOr<Blueprint> bp = Parse(line);
-    if (!bp.ok()) return bp.status();
-    int best_geode = BestGeode(*bp, 24);
-    VLOG(1) << "id: " << bp->id << " best is " << best_geode;
-    cost += bp->id * best_geode;
+    ASSIGN_OR_RETURN(Blueprint bp, Parse(line));
+    int best_geode = BestGeode(bp, 24);
+    VLOG(1) << "id: " << bp.id << " best is " << best_geode;
+    cost += bp.id * best_geode;
   }
   return AdventReturn(cost);
 }
@@ -163,10 +162,9 @@ absl::StatusOr<std::string> Day_2022_19::Part2(
   int64_t cost = 1;
   input = input.subspan(0, 3);
   for (std::string_view line : input) {
-    absl::StatusOr<Blueprint> bp = Parse(line);
-    if (!bp.ok()) return bp.status();
-    int best_geode = BestGeode(*bp, 32);
-    VLOG(1) << "id: " << bp->id << " best is " << best_geode;
+    ASSIGN_OR_RETURN(Blueprint bp, Parse(line));
+    int best_geode = BestGeode(bp, 32);
+    VLOG(1) << "id: " << bp.id << " best is " << best_geode;
     cost *= best_geode;
   }
   return AdventReturn(cost);

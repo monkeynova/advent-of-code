@@ -250,23 +250,22 @@ std::optional<int> FindMinCost(
 
 absl::StatusOr<std::string> Day_2021_23::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
-  if (!b.ok()) return b.status();
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
 
-  State s{.board = *b};
+  State s{.board = b};
 
   // Find the initial locations of actors and the temporary places in which to
   // store them.
   std::vector<Point> empty;
   std::vector<Point> srcs;
-  for (const auto [p, c] : *b) {
+  for (const auto [p, c] : b) {
     if (c >= 'A' && c <= 'D') {
       s.actors.push_back({.c = c, .cur = p});
       srcs.push_back(p);
     }
     // p + south = '#' is the stupid test for not stopping at a hallway
     // entrance.
-    if (c == '.' && (*b)[p + Cardinal::kSouth] == '#') {
+    if (c == '.' && b[p + Cardinal::kSouth] == '#') {
       empty.push_back(p);
     }
   };
@@ -278,8 +277,7 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
   std::vector<Point> all_points;
   all_points.insert(all_points.end(), empty.begin(), empty.end());
   all_points.insert(all_points.end(), srcs.begin(), srcs.end());
-  absl::StatusOr<AllPathsMap> all_paths = ComputeAllPaths(*b, all_points);
-  if (!all_paths.ok()) return all_paths.status();
+  ASSIGN_OR_RETURN(AllPathsMap all_paths, ComputeAllPaths(b, all_points));
 
   // Identify the destination locations for each set of actors.
   if (srcs.size() % 4 != 0) return Error("Bad srcs");
@@ -300,7 +298,7 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
   // Identify which actors are already in their final destination.
   for (const auto& [c, v] : destinations) {
     for (Point test : v) {
-      if ((*b)[test] != c) break;
+      if (b[test] != c) break;
       bool found = false;
       for (auto& a : s.actors) {
         if (a.cur == test) {
@@ -314,7 +312,7 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
   }
 
   return AdventReturn(
-      FindMinCost(std::move(s), empty, destinations, *all_paths));
+      FindMinCost(std::move(s), empty, destinations, all_paths));
 }
 
 absl::StatusOr<std::string> Day_2021_23::Part2(

@@ -15,15 +15,14 @@ namespace advent_of_code {
 absl::StatusOr<std::string> Day_2020_25::Part1(
     absl::Span<std::string_view> input) const {
   if (input.size() != 2) return Error("Bad size");
-  absl::StatusOr<std::vector<int64_t>> ints = ParseAsInts(input);
-  if (!ints.ok()) return ints.status();
+  ASSIGN_OR_RETURN(std::vector<int64_t> ints, ParseAsInts(input));
 
   for (int i = 1; i <= 20201227; ++i) {
-    if (PowerMod<int64_t>(7, i, 20201227) == (*ints)[0]) {
-      return AdventReturn(PowerMod<int64_t>((*ints)[1], i, 20201227));
+    if (PowerMod<int64_t>(7, i, 20201227) == ints[0]) {
+      return AdventReturn(PowerMod<int64_t>(ints[1], i, 20201227));
     }
-    if (PowerMod<int64_t>(7, i, 20201227) == (*ints)[1]) {
-      return AdventReturn(PowerMod<int64_t>((*ints)[0], i, 20201227));
+    if (PowerMod<int64_t>(7, i, 20201227) == ints[1]) {
+      return AdventReturn(PowerMod<int64_t>(ints[0], i, 20201227));
     }
   }
 

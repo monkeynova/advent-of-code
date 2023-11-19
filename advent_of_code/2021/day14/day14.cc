@@ -66,14 +66,11 @@ absl::StatusOr<CharPairCounts> Expand(const CharPairCounts& pair_counts,
 
 absl::StatusOr<std::string> Day_2021_14::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<Problem> p = Parse(input);
-  if (!p.ok()) return p.status();
+  ASSIGN_OR_RETURN(Problem p, Parse(input));
 
-  std::string rec = std::string(p->start);
+  std::string rec = std::string(p.start);
   for (int i = 0; i < 10; ++i) {
-    absl::StatusOr<std::string> next = Expand(rec, *p);
-    if (!next.ok()) return next.status();
-    rec = std::move(*next);
+    ASSIGN_OR_RETURN(rec, Expand(rec, p));
   }
   absl::flat_hash_map<std::string_view, int64_t> counts;
   std::string_view rec_view = rec;
@@ -91,21 +88,19 @@ absl::StatusOr<std::string> Day_2021_14::Part1(
 
 absl::StatusOr<std::string> Day_2021_14::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<Problem> p = Parse(input);
-  if (!p.ok()) return p.status();
+  ASSIGN_OR_RETURN(Problem p, Parse(input));
 
   CharPairCounts pair_counts;
-  for (int i = 0; i < p->start.size() - 1; ++i) {
-    ++pair_counts[{p->start[i], p->start[i + 1]}];
+  for (int i = 0; i < p.start.size() - 1; ++i) {
+    ++pair_counts[{p.start[i], p.start[i + 1]}];
   }
   for (int i = 0; i < 40; ++i) {
-    absl::StatusOr<CharPairCounts> new_pair_counts = Expand(pair_counts, *p);
-    pair_counts = std::move(*new_pair_counts);
+    ASSIGN_OR_RETURN(pair_counts, Expand(pair_counts, p));
   }
   absl::flat_hash_map<char, int64_t> single_char_counts = {
       // End characters missed one count in pairs.
-      {p->start[0], 1},
-      {p->start.back(), 1},
+      {p.start[0], 1},
+      {p.start.back(), 1},
   };
   for (const auto& [str, count] : pair_counts) {
     single_char_counts[str[0]] += count;

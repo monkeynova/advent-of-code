@@ -76,13 +76,12 @@ absl::StatusOr<int> CountContainedBags(const DirectedGraph<BagRule>& bags,
   int bag_count = 1;
   if (outgoing != nullptr) {
     for (std::string_view sub_bag : *outgoing) {
-      absl::StatusOr<int> sub_bags = CountContainedBags(bags, sub_bag);
-      if (!sub_bags.ok()) return sub_bags.status();
+      ASSIGN_OR_RETURN(int sub_bags, CountContainedBags(bags, sub_bag));
       auto sub_bag_count_it = bag_rule->bag_to_count.find(sub_bag);
       if (sub_bag_count_it == bag_rule->bag_to_count.end()) {
         return Error("Cannot find bag count: ", sub_bag);
       }
-      bag_count += sub_bag_count_it->second * *sub_bags;
+      bag_count += sub_bag_count_it->second * sub_bags;
     }
   }
   return bag_count;
@@ -92,20 +91,17 @@ absl::StatusOr<int> CountContainedBags(const DirectedGraph<BagRule>& bags,
 
 absl::StatusOr<std::string> Day_2020_07::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<DirectedGraph<BagRule>> bags = Parse(input);
-  if (!bags.ok()) return bags.status();
-  VLOG(1) << bags->nodes().size();
-  return AdventReturn(CountContainingBags(*bags, "shiny gold"));
+  ASSIGN_OR_RETURN(DirectedGraph<BagRule> bags, Parse(input));
+  VLOG(1) << bags.nodes().size();
+  return AdventReturn(CountContainingBags(bags, "shiny gold"));
 }
 
 absl::StatusOr<std::string> Day_2020_07::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<DirectedGraph<BagRule>> bags = Parse(input);
-  if (!bags.ok()) return bags.status();
+  ASSIGN_OR_RETURN(DirectedGraph<BagRule> bags, Parse(input));
 
-  absl::StatusOr<int> contained_bags = CountContainedBags(*bags, "shiny gold");
-  if (!contained_bags.ok()) return bags.status();
-  return AdventReturn(*contained_bags - 1); /* don't include top bag */
+  ASSIGN_OR_RETURN(int contained_bags, CountContainedBags(bags, "shiny gold"));
+  return AdventReturn(contained_bags - 1); /* don't include top bag */
 }
 
 }  // namespace advent_of_code

@@ -68,10 +68,10 @@ absl::StatusOr<std::string> Day_2021_13::Part1(
     }
     if (folds) {
       absl::StatusOr<Point> axis = ParseFold(line);
-      absl::StatusOr<absl::flat_hash_set<Point>> folded =
-          Fold(std::move(points), *axis);
-      if (!folded.ok()) return folded.status();
-      return AdventReturn(folded->size());
+      ASSIGN_OR_RETURN(
+          absl::flat_hash_set<Point> folded,
+          Fold(std::move(points), *axis));
+      return AdventReturn(folded.size());
     } else {
       Point p;
       if (!RE2::FullMatch(line, "(\\d+,\\d+)", p.Capture())) {
@@ -94,10 +94,7 @@ absl::StatusOr<std::string> Day_2021_13::Part2(
     }
     if (folds) {
       absl::StatusOr<Point> axis = ParseFold(line);
-      absl::StatusOr<absl::flat_hash_set<Point>> folded =
-          Fold(std::move(points), *axis);
-      if (!folded.ok()) return folded.status();
-      points = std::move(*folded);
+      ASSIGN_OR_RETURN(points, Fold(std::move(points), *axis));
     } else {
       Point p;
       if (!RE2::FullMatch(line, "(\\d+,\\d+)", p.Capture())) {

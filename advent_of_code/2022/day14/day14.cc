@@ -82,26 +82,24 @@ absl::StatusOr<bool> AddSand(CharBoard& b, Point at) {
 
 absl::StatusOr<std::string> Day_2022_14::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<absl::flat_hash_set<Point>> points = AllPoints(input);
-  if (!points.ok()) return points.status();
+  ASSIGN_OR_RETURN(absl::flat_hash_set<Point> points, AllPoints(input));
 
   PointRectangle grid{kAddAt, kAddAt};
-  for (Point p : *points) grid.ExpandInclude(p);
+  for (Point p : points) grid.ExpandInclude(p);
 
   // Add space to fall off the end.
   --grid.min.x;
   ++grid.max.x;
   VLOG(1) << "Grid: " << grid;
 
-  CharBoard b = DrawGrid(grid, *points);
+  CharBoard b = DrawGrid(grid, points);
   VLOG(2) << "Board:\n" << b;
 
   Point add = kAddAt - grid.min;
   int add_count = 0;
   while (b[add] == '.') {
-    absl::StatusOr<bool> added = AddSand(b, add);
-    if (!added.ok()) return added.status();
-    if (!*added) break;
+    ASSIGN_OR_RETURN(bool added, AddSand(b, add));
+    if (!added) break;
     VLOG(2) << "Board:\n" << b;
     ++add_count;
   }
@@ -110,11 +108,10 @@ absl::StatusOr<std::string> Day_2022_14::Part1(
 
 absl::StatusOr<std::string> Day_2022_14::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<absl::flat_hash_set<Point>> points = AllPoints(input);
-  if (!points.ok()) return points.status();
+  ASSIGN_OR_RETURN(absl::flat_hash_set<Point> points, AllPoints(input));
 
   PointRectangle grid{kAddAt, kAddAt};
-  for (Point p : *points) grid.ExpandInclude(p);
+  for (Point p : points) grid.ExpandInclude(p);
 
   // Expand to include the bottom line.
   grid.ExpandInclude(Point{kAddAt.x, grid.max.y + 2});
@@ -123,7 +120,7 @@ absl::StatusOr<std::string> Day_2022_14::Part2(
   grid.ExpandInclude(Point{kAddAt.x + grid.max.y, grid.max.y});
   VLOG(1) << "Grid: " << grid;
 
-  CharBoard b = DrawGrid(grid, *points);
+  CharBoard b = DrawGrid(grid, points);
   // Draw the bottom line.
   for (int x = 0; x < b.width(); ++x) {
     b[Point{x, b.height() - 1}] = '#';
@@ -133,9 +130,8 @@ absl::StatusOr<std::string> Day_2022_14::Part2(
   Point add = kAddAt - grid.min;
   int add_count = 0;
   while (b[add] == '.') {
-    absl::StatusOr<bool> added = AddSand(b, add);
-    if (!added.ok()) return added.status();
-    if (!*added) break;
+    ASSIGN_OR_RETURN(bool added, AddSand(b, add));
+    if (!added) break;
     VLOG(2) << "Board:\n" << b;
     ++add_count;
   }

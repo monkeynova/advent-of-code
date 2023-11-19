@@ -37,13 +37,12 @@ int UpdateSouth(CharBoard& b) { return Update(b, 'v', Cardinal::kSouth); }
 
 absl::StatusOr<std::string> Day_2021_25::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<CharBoard> b = CharBoard::Parse(input);
-  if (!b.ok()) return b.status();
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
 
   for (int i = 1; true; ++i) {
     int moved = 0;
-    moved += UpdateEast(*b);
-    moved += UpdateSouth(*b);
+    moved += UpdateEast(b);
+    moved += UpdateSouth(b);
     if (moved == 0) {
       return AdventReturn(i);
     }
