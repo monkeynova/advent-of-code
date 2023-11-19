@@ -79,9 +79,8 @@ absl::StatusOr<std::string> Day_2022_25::Part1(
     absl::Span<std::string_view> input) const {
   int64_t total = 0;
   for (std::string_view line : input) {
-    absl::StatusOr<int64_t> decoded = DecodeSnafu(line);
-    if (!decoded.ok()) return decoded.status();
-    total += *decoded;
+    ASSIGN_OR_RETURN(int64_t decoded, DecodeSnafu(line));
+    total += decoded;
   }
   return EncodeSnafu(total);
 }

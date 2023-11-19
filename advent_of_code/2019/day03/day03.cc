@@ -134,43 +134,14 @@ absl::StatusOr<std::vector<Point>> Intersect(std::vector<Line> wire1,
   std::vector<Point> ret;
   for (const auto& l1 : wire1) {
     for (const auto& l2 : wire2) {
-      absl::StatusOr<std::optional<Point>> intersect = Intersect(l1, l2);
-      if (!intersect.ok()) return intersect.status();
-      if (*intersect) {
-        ret.push_back(**intersect);
+      ASSIGN_OR_RETURN(std::optional<Point> intersect, Intersect(l1, l2));
+      if (intersect) {
+        ret.push_back(*intersect);
       }
     }
   }
 
   return ret;
-}
-
-}  // namespace
-
-absl::StatusOr<std::string> Day_2019_03::Part1(
-    absl::Span<std::string_view> input) const {
-  if (input.size() != 2) {
-    return absl::InvalidArgumentError("input does not contain 2 lines");
-  }
-  absl::StatusOr<std::vector<Line>> wire1 = Parse(input[0]);
-  if (!wire1.ok()) return wire1.status();
-  absl::StatusOr<std::vector<Line>> wire2 = Parse(input[1]);
-  if (!wire2.ok()) return wire2.status();
-
-  absl::StatusOr<std::vector<Point>> overlap = Intersect(*wire1, *wire2);
-  if (!overlap.ok()) return overlap.status();
-  std::optional<Point> min;
-  for (const auto& point : *overlap) {
-    if (point.dist() > 0 && (!min || min->dist() > point.dist())) {
-      min = point;
-    }
-  }
-
-  if (!min) {
-    return absl::InvalidArgumentError("No intersect found");
-  }
-
-  return AdventReturn(min->dist());
 }
 
 absl::StatusOr<bool> PointOnLine(Point point, Line line) {
@@ -186,10 +157,9 @@ absl::StatusOr<int> CostToOverlap(Point intersect,
                                   const std::vector<Line>& wire) {
   std::vector<int> cost_to_start(wire.size() + 1, 0);
   for (int i = 0; i < wire.size(); ++i) {
-    absl::StatusOr<bool> on_line = PointOnLine(intersect, wire[i]);
-    if (!on_line.ok()) return on_line.status();
+    ASSIGN_OR_RETURN(bool on_line, PointOnLine(intersect, wire[i]));
 
-    if (*on_line) {
+    if (on_line) {
       return cost_to_start[i] + (wire[i].from - intersect).dist();
     }
     cost_to_start[i + 1] =
@@ -199,28 +169,48 @@ absl::StatusOr<int> CostToOverlap(Point intersect,
   return absl::InvalidArgumentError("Point not found on wire");
 }
 
+}  // namespace
+
+absl::StatusOr<std::string> Day_2019_03::Part1(
+    absl::Span<std::string_view> input) const {
+  if (input.size() != 2) {
+    return absl::InvalidArgumentError("input does not contain 2 lines");
+  }
+  ASSIGN_OR_RETURN(std::vector<Line> wire1, Parse(input[0]));
+  ASSIGN_OR_RETURN(std::vector<Line> wire2, Parse(input[1]));
+
+  ASSIGN_OR_RETURN(std::vector<Point> overlap, Intersect(wire1, wire2));
+  std::optional<Point> min;
+  for (const auto& point : overlap) {
+    if (point.dist() > 0 && (!min || min->dist() > point.dist())) {
+      min = point;
+    }
+  }
+
+  if (!min) {
+    return absl::InvalidArgumentError("No intersect found");
+  }
+
+  return AdventReturn(min->dist());
+}
+
 absl::StatusOr<std::string> Day_2019_03::Part2(
     absl::Span<std::string_view> input) const {
   if (input.size() != 2) {
     return absl::InvalidArgumentError("input does not contain 2 lines");
   }
-  absl::StatusOr<std::vector<Line>> wire1 = Parse(input[0]);
-  if (!wire1.ok()) return wire1.status();
-  absl::StatusOr<std::vector<Line>> wire2 = Parse(input[1]);
-  if (!wire2.ok()) return wire2.status();
+  ASSIGN_OR_RETURN(std::vector<Line> wire1, Parse(input[0]));
+  ASSIGN_OR_RETURN(std::vector<Line> wire2, Parse(input[1]));
 
-  absl::StatusOr<std::vector<Point>> overlap = Intersect(*wire1, *wire2);
-  if (!overlap.ok()) return overlap.status();
+  ASSIGN_OR_RETURN(std::vector<Point> overlap, Intersect(wire1, wire2));
   std::optional<Point> min;
   int min_score = std::numeric_limits<int>::max();
-  for (const auto& point : *overlap) {
+  for (const auto& point : overlap) {
     if (point.dist() > 0) {
-      absl::StatusOr<int> wire1_score = CostToOverlap(point, *wire1);
-      if (!wire1_score.ok()) return wire1_score.status();
-      absl::StatusOr<int> wire2_score = CostToOverlap(point, *wire2);
-      if (!wire2_score.ok()) return wire2_score.status();
+      ASSIGN_OR_RETURN(int wire1_score, CostToOverlap(point, wire1));
+      ASSIGN_OR_RETURN(int wire2_score, CostToOverlap(point, wire2));
 
-      int score = *wire1_score + *wire2_score;
+      int score = wire1_score + wire2_score;
       if (score < min_score) {
         min = point;
         min_score = score;

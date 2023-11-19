@@ -70,10 +70,9 @@ class TractorSearch {
     for (int y = min.y; y < max.y; ++y) {
       for (int x = min.x; x < max.x; ++x) {
         Point p{x, y};
-        absl::StatusOr<int> out = ScanPoint(p);
-        if (!out.ok()) return out.status();
-        VLOG(1) << p << "=" << *out;
-        if (*out) ++active;
+        ASSIGN_OR_RETURN(int out, ScanPoint(p));
+        VLOG(1) << p << "=" << out;
+        if (out) ++active;
       }
     }
     return active;
@@ -99,9 +98,8 @@ class TractorSearch {
     };
     std::vector<Range> ranges;
     for (Point probe{.x = size, .y = 0};; ++probe.y) {
-      absl::StatusOr<int> on = ScanPoint(probe);
-      if (!on.ok()) return on.status();
-      if (*on) {
+      ASSIGN_OR_RETURN(int on, ScanPoint(probe));
+      if (on) {
         ranges.resize(probe.y + 1);
         ranges.back().min = probe;
         ranges.back().max = probe;
@@ -111,9 +109,8 @@ class TractorSearch {
         return absl::InvalidArgumentError("Can't find start");
     }
     while (true) {
-      absl::StatusOr<int> on = ScanPoint(ranges.back().min);
-      if (!on.ok()) return on.status();
-      if (!*on) {
+      ASSIGN_OR_RETURN(int on, ScanPoint(ranges.back().min));
+      if (!on) {
         ++ranges.back().min.x;
         break;
       }
@@ -122,9 +119,8 @@ class TractorSearch {
         return absl::InvalidArgumentError("Can't find min");
     }
     while (true) {
-      absl::StatusOr<int> on = ScanPoint(ranges.back().max);
-      if (!on.ok()) return on.status();
-      if (!*on) {
+      ASSIGN_OR_RETURN(int on, ScanPoint(ranges.back().max));
+      if (!on) {
         --ranges.back().max.x;
         break;
       }
@@ -140,9 +136,8 @@ class TractorSearch {
       ++next_range.max.y;
       ++next_range.max.x;
       while (true) {
-        absl::StatusOr<int> on = ScanPoint(next_range.min);
-        if (!on.ok()) return on.status();
-        if (*on) break;
+        ASSIGN_OR_RETURN(int on, ScanPoint(next_range.min));
+        if (on) break;
         ++next_range.min.x;
       }
       if (next_range.min.x > next_range.max.x) {
@@ -150,9 +145,8 @@ class TractorSearch {
         next_range.max.x = next_range.min.x;
       }
       while (true) {
-        absl::StatusOr<int> on = ScanPoint(next_range.max);
-        if (!on.ok()) return on.status();
-        if (!*on) {
+      ASSIGN_OR_RETURN(int on, ScanPoint(next_range.max));
+        if (!on) {
           --next_range.max.x;
           break;
         }
@@ -173,6 +167,7 @@ class TractorSearch {
     return Point{0, 0};
   }
 
+  // TODO(@monkeynova): Return a bool instead?
   absl::StatusOr<int> ScanPoint(Point p) {
     Drone prober(p);
     IntCode new_codes = codes_.Clone();
@@ -190,24 +185,21 @@ class TractorSearch {
 
 absl::StatusOr<std::string> Day_2019_19::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
-  if (!codes.ok()) return codes.status();
+  ASSIGN_OR_RETURN(IntCode codes, IntCode::Parse(input));
 
-  TractorSearch search(std::move(*codes));
+  TractorSearch search(std::move(codes));
 
   return AdventReturn(search.ScanRange(Point{0, 0}, Point{50, 50}));
 }
 
 absl::StatusOr<std::string> Day_2019_19::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<IntCode> codes = IntCode::Parse(input);
-  if (!codes.ok()) return codes.status();
+  ASSIGN_OR_RETURN(IntCode codes, IntCode::Parse(input));
 
-  TractorSearch search(std::move(*codes));
-  absl::StatusOr<Point> space = search.FindSquareSpace(100);
-  if (!space.ok()) return space.status();
+  TractorSearch search(std::move(codes));
+  ASSIGN_OR_RETURN(Point space, search.FindSquareSpace(100));
 
-  return AdventReturn(space->x * 10000 + space->y);
+  return AdventReturn(space.x * 10000 + space.y);
 }
 
 }  // namespace advent_of_code

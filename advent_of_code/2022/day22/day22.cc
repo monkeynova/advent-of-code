@@ -229,20 +229,18 @@ absl::StatusOr<StitchMap> BuildStitchMap(const CharBoard& board) {
     int stitch_count = 0;
     for (int i = 0; i < 6; ++i) {
       PointAndDir s1 = s_set[i];
-      absl::StatusOr<std::optional<PointAndDir>> e1 =
-          stitch_map.SameEdge(e_set, s1);
-      if (!e1.ok()) return e1.status();
-      if (!*e1) continue;
+      ASSIGN_OR_RETURN(
+          std::optional<PointAndDir> e1,
+          stitch_map.SameEdge(e_set, s1));
+      if (!e1) continue;
       for (int j = i + 1; j < 6; ++j) {
         PointAndDir s2 = s_set[j];
-        absl::StatusOr<std::optional<PointAndDir>> e2 =
-            stitch_map.SameEdge(e_set, s2);
-        if (!e2.ok()) return e1.status();
-        if (!*e2) continue;
+        ASSIGN_OR_RETURN(
+            std::optional<PointAndDir> e2,
+            stitch_map.SameEdge(e_set, s2));
+        if (!e2) continue;
         ++stitch_count;
-        absl::Status st =
-            stitch_map.Add(s1.p, (*e1)->p, s1.d, s2.p, (*e2)->p, -s2.d);
-        if (!st.ok()) return st;
+        RETURN_IF_ERROR(stitch_map.Add(s1.p, e1->p, s1.d, s2.p, e2->p, -s2.d));
       }
     }
     if (stitch_count != 1) {
@@ -341,18 +339,14 @@ absl::StatusOr<PointAndDir> MovePath(std::string_view path, PointAndDir cur,
                                      const Mover& mover) {
   int dist = 0;
   for (char c : path) {
-    if (c >= '0' && c <= '9')
+    if (c >= '0' && c <= '9') {
       dist = dist * 10 + c - '0';
-    else if (c == 'R') {
-      absl::StatusOr<PointAndDir> next = mover.Move(cur, dist);
-      if (!next.ok()) return next.status();
-      cur = *next;
+    } else if (c == 'R') {
+      ASSIGN_OR_RETURN(cur, mover.Move(cur, dist));
       dist = 0;
       cur = cur.rotate_right();
     } else if (c == 'L') {
-      absl::StatusOr<PointAndDir> next = mover.Move(cur, dist);
-      if (!next.ok()) return next.status();
-      cur = *next;
+      ASSIGN_OR_RETURN(cur, mover.Move(cur, dist));
       dist = 0;
       cur = cur.rotate_left();
     } else {
@@ -389,15 +383,12 @@ absl::StatusOr<std::string> Day_2022_22::Part1(
   input = input.subspan(0, input.size() - 2);
 
   std::vector<std::string> storage;
-  absl::StatusOr<CharBoard> board = PadAndParseBoard(input, storage);
+  ASSIGN_OR_RETURN(CharBoard board, PadAndParseBoard(input, storage));
+  ASSIGN_OR_RETURN(PointAndDir start, FindStart(board));
 
-  absl::StatusOr<PointAndDir> start = FindStart(*board);
-  if (!start.ok()) return start.status();
-
-  Part1Mover mover(*board);
-  absl::StatusOr<PointAndDir> end = MovePath(path, *start, mover);
-  if (!end.ok()) return end.status();
-  return AdventReturn(Score(*end));
+  Part1Mover mover(board);
+  ASSIGN_OR_RETURN(PointAndDir end, MovePath(path, start, mover));
+  return AdventReturn(Score(end));
 }
 
 absl::StatusOr<std::string> Day_2022_22::Part2(
@@ -408,19 +399,13 @@ absl::StatusOr<std::string> Day_2022_22::Part2(
   input = input.subspan(0, input.size() - 2);
 
   std::vector<std::string> storage;
-  absl::StatusOr<CharBoard> board = PadAndParseBoard(input, storage);
-  if (!board.ok()) return board.status();
+  ASSIGN_OR_RETURN(CharBoard board, PadAndParseBoard(input, storage));
+  ASSIGN_OR_RETURN(PointAndDir start, FindStart(board));
+  ASSIGN_OR_RETURN(StitchMap stitch_map, BuildStitchMap(board));
 
-  absl::StatusOr<PointAndDir> start = FindStart(*board);
-  if (!start.ok()) return start.status();
-
-  absl::StatusOr<StitchMap> stitch_map = BuildStitchMap(*board);
-  if (!stitch_map.ok()) return stitch_map.status();
-
-  Part2Mover mover(*board, *stitch_map);
-  absl::StatusOr<PointAndDir> end = MovePath(path, *start, mover);
-  if (!end.ok()) return end.status();
-  return AdventReturn(Score(*end));
+  Part2Mover mover(board, stitch_map);
+  ASSIGN_OR_RETURN(PointAndDir end, MovePath(path, start, mover));
+  return AdventReturn(Score(end));
 }
 
 }  // namespace advent_of_code

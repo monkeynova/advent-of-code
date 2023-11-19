@@ -2,6 +2,7 @@
 
 #include "absl/log/log.h"
 #include "absl/strings/str_cat.h"
+#include "advent_of_code/vlog.h"
 
 namespace advent_of_code {
 
@@ -26,39 +27,31 @@ absl::StatusOr<BitsExpr> BitsExpr::Parse(std::string_view hex) {
 
 absl::StatusOr<BitsExpr> BitsExpr::Parser::ParseExpr() {
   BitsExpr ret;
-  absl::StatusOr<int64_t> ver = ReadInt(3);
-  if (!ver.ok()) return ver.status();
-  ret.version_ = *ver;
-  absl::StatusOr<int64_t> type = ReadInt(3);
-  if (!type.ok()) return type.status();
-  ret.type_ = static_cast<EvaluateType>(*type);
+  ASSIGN_OR_RETURN(ret.version_, ReadInt(3));
+  ASSIGN_OR_RETURN(int64_t type, ReadInt(3));
+  ret.type_ = static_cast<EvaluateType>(type);
 
   if (ret.type_ == EvaluateType::kLiteral) {
     ret.literal_ = 0;
-    absl::StatusOr<int64_t> more;
+    int64_t more;
     do {
-      more = ReadInt(1);
-      if (!more.ok()) return more.status();
-      absl::StatusOr<int64_t> nibble = ReadInt(4);
-      if (!nibble.ok()) return nibble.status();
-      ret.literal_ = (ret.literal_ << 4) | *nibble;
-    } while (*more);
+      ASSIGN_OR_RETURN(more, ReadInt(1));
+      ASSIGN_OR_RETURN(int64_t nibble, ReadInt(4));
+      ret.literal_ = (ret.literal_ << 4) | nibble;
+    } while (more);
     return ret;
   }
 
-  absl::StatusOr<int64_t> l_type = ReadInt(1);
-  if (!l_type.ok()) return l_type.status();
+  ASSIGN_OR_RETURN(int64_t l_type, ReadInt(1));
 
-  if (*l_type == 0) {
+  if (l_type == 0) {
     // 15-bit length in which sub-records exist.
-    absl::StatusOr<int64_t> length = ReadInt(15);
-    if (!length.ok()) return length.status();
+    ASSIGN_OR_RETURN(int64_t length, ReadInt(15));
 
-    int64_t bit_end = offset_ + *length;
+    int64_t bit_end = offset_ + length;
     while (offset_ < bit_end) {
-      absl::StatusOr<BitsExpr> sub = ParseExpr();
-      if (!sub.ok()) return sub.status();
-      ret.sub_.push_back(absl::make_unique<BitsExpr>(std::move(*sub)));
+      ASSIGN_OR_RETURN(BitsExpr sub, ParseExpr());
+      ret.sub_.push_back(absl::make_unique<BitsExpr>(std::move(sub)));
     }
     if (offset_ != bit_end) {
       return absl::InvalidArgumentError(absl::StrCat(
@@ -68,12 +61,10 @@ absl::StatusOr<BitsExpr> BitsExpr::Parser::ParseExpr() {
   }
 
   // 11-bit sub-record count.
-  absl::StatusOr<int64_t> sub_count = ReadInt(11);
-  if (!sub_count.ok()) return sub_count.status();
-  for (int i = 0; i < *sub_count; ++i) {
-    absl::StatusOr<BitsExpr> sub = ParseExpr();
-    if (!sub.ok()) return sub.status();
-    ret.sub_.push_back(absl::make_unique<BitsExpr>(std::move(*sub)));
+  ASSIGN_OR_RETURN(int64_t sub_count, ReadInt(11));
+  for (int i = 0; i < sub_count; ++i) {
+    ASSIGN_OR_RETURN(BitsExpr sub, ParseExpr());
+    ret.sub_.push_back(absl::make_unique<BitsExpr>(std::move(sub)));
   }
   return ret;
 }
@@ -102,36 +93,32 @@ absl::StatusOr<int64_t> BitsExpr::Evaluate() const {
     case EvaluateType::kSum: {
       int64_t ret = 0;
       for (const auto& sub : sub_) {
-        absl::StatusOr<int64_t> sv = sub->Evaluate();
-        if (!sv.ok()) return sv.status();
-        ret += *sv;
+        ASSIGN_OR_RETURN(int64_t sv, sub->Evaluate());
+        ret += sv;
       }
       return ret;
     }
     case EvaluateType::kProduct: {
       int64_t ret = 1;
       for (const auto& sub : sub_) {
-        absl::StatusOr<int64_t> sv = sub->Evaluate();
-        if (!sv.ok()) return sv.status();
-        ret *= *sv;
+        ASSIGN_OR_RETURN(int64_t sv, sub->Evaluate());
+        ret *= sv;
       }
       return ret;
     }
     case EvaluateType::kMin: {
       int64_t ret = std::numeric_limits<int64_t>::max();
       for (const auto& sub : sub_) {
-        absl::StatusOr<int64_t> sv = sub->Evaluate();
-        if (!sv.ok()) return sv.status();
-        ret = std::min(ret, *sv);
+        ASSIGN_OR_RETURN(int64_t sv, sub->Evaluate());
+        ret = std::min(ret, sv);
       }
       return ret;
     }
     case EvaluateType::kMax: {
       int64_t ret = std::numeric_limits<int64_t>::min();
       for (const auto& sub : sub_) {
-        absl::StatusOr<int64_t> sv = sub->Evaluate();
-        if (!sv.ok()) return sv.status();
-        ret = std::max(ret, *sv);
+        ASSIGN_OR_RETURN(int64_t sv, sub->Evaluate());
+        ret = std::max(ret, sv);
       }
       return ret;
     }
@@ -143,33 +130,27 @@ absl::StatusOr<int64_t> BitsExpr::Evaluate() const {
         return absl::InvalidArgumentError(
             absl::StrCat("Invalid argument count for Greater: ", sub_.size()));
       }
-      absl::StatusOr<int64_t> left = sub_[0]->Evaluate();
-      if (!left.ok()) return left.status();
-      absl::StatusOr<int64_t> right = sub_[1]->Evaluate();
-      if (!right.ok()) return right.status();
-      return *left > *right;
+      ASSIGN_OR_RETURN(int64_t left, sub_[0]->Evaluate());
+      ASSIGN_OR_RETURN(int64_t right, sub_[1]->Evaluate());
+      return left > right;
     }
     case EvaluateType::kLess: {
       if (sub_.size() != 2) {
         return absl::InvalidArgumentError(
             absl::StrCat("Invalid argument count for Less: ", sub_.size()));
       }
-      absl::StatusOr<int64_t> left = sub_[0]->Evaluate();
-      if (!left.ok()) return left.status();
-      absl::StatusOr<int64_t> right = sub_[1]->Evaluate();
-      if (!right.ok()) return right.status();
-      return *left < *right;
+      ASSIGN_OR_RETURN(int64_t left, sub_[0]->Evaluate());
+      ASSIGN_OR_RETURN(int64_t right, sub_[1]->Evaluate());
+      return left < right;
     }
     case EvaluateType::kEqual: {
       if (sub_.size() != 2) {
         return absl::InvalidArgumentError(
             absl::StrCat("Invalid argument count for Equal: ", sub_.size()));
       }
-      absl::StatusOr<int64_t> left = sub_[0]->Evaluate();
-      if (!left.ok()) return left.status();
-      absl::StatusOr<int64_t> right = sub_[1]->Evaluate();
-      if (!right.ok()) return right.status();
-      return *left == *right;
+      ASSIGN_OR_RETURN(int64_t left, sub_[0]->Evaluate());
+      ASSIGN_OR_RETURN(int64_t right, sub_[1]->Evaluate());
+      return left == right;
     }
     default: {
       return absl::InternalError(absl::StrCat("Bad type: ", type_));

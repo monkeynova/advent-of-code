@@ -182,8 +182,7 @@ class SnailFishTree {
 
   static absl::StatusOr<std::unique_ptr<SnailFishTree>> Parse(
       std::string_view line) {
-    absl::StatusOr<std::unique_ptr<SnailFishTree>> rec = ParseImpl(line);
-    if (!rec.ok()) return rec.status();
+    ASSIGN_OR_RETURN(std::unique_ptr<SnailFishTree> rec, ParseImpl(line));
     if (!line.empty()) return absl::InvalidArgumentError("No full parse");
     return rec;
   }
@@ -195,17 +194,15 @@ class SnailFishTree {
     if (line[0] == '[') {
       line = line.substr(1);
 
-      absl::StatusOr<std::unique_ptr<SnailFishTree>> left = ParseImpl(line);
-      if (!left.ok()) return left.status();
-      ret->left = std::move(*left);
+      ASSIGN_OR_RETURN(std::unique_ptr<SnailFishTree> left, ParseImpl(line));
+      ret->left = std::move(left);
       ret->left->parent = ret.get();
 
       if (line[0] != ',') return Error("Bad parse ','");
       line = line.substr(1);
 
-      absl::StatusOr<std::unique_ptr<SnailFishTree>> right = ParseImpl(line);
-      if (!right.ok()) return right.status();
-      ret->right = std::move(*right);
+      ASSIGN_OR_RETURN(std::unique_ptr<SnailFishTree> right, ParseImpl(line));
+      ret->right = std::move(right);
       ret->right->parent = ret.get();
 
       if (line[0] != ']') return Error("Bad parse ']'");
@@ -330,21 +327,20 @@ absl::Status Audit(absl::Span<std::string_view> input) {
   std::unique_ptr<SnailFishTree> total_tree;
 
   for (std::string_view in_str : input) {
-    absl::StatusOr<SnailFishStack> in_stack = SnailFishStack::Parse(in_str);
-    if (!in_stack.ok()) return in_stack.status();
+    ASSIGN_OR_RETURN(SnailFishStack in_stack, SnailFishStack::Parse(in_str));
     if (!total_stack) {
-      total_stack = std::move(*in_stack);
+      total_stack = std::move(in_stack);
     } else {
-      total_stack = total_stack->Add(std::move(*in_stack));
+      total_stack = total_stack->Add(std::move(in_stack));
     }
 
-    absl::StatusOr<std::unique_ptr<SnailFishTree>> in_tree =
-        SnailFishTree::Parse(in_str);
-    if (!in_tree.ok()) return in_tree.status();
+    ASSIGN_OR_RETURN(
+        std::unique_ptr<SnailFishTree> in_tree,
+        SnailFishTree::Parse(in_str));
     if (!total_tree) {
-      total_tree = std::move(*in_tree);
+      total_tree = std::move(in_tree);
     } else {
-      total_tree = total_tree->Add(std::move(*in_tree));
+      total_tree = total_tree->Add(std::move(in_tree));
     }
   }
 
@@ -365,14 +361,13 @@ absl::StatusOr<std::string> Day_2021_18::Part1(
 
   std::optional<SnailFishStack> total;
   for (std::string_view in_str : input) {
-    absl::StatusOr<SnailFishStack> in = SnailFishStack::Parse(in_str);
-    if (!in.ok()) return in.status();
+    ASSIGN_OR_RETURN(SnailFishStack in, SnailFishStack::Parse(in_str));
     VLOG(2) << in_str;
-    VLOG(2) << *in;
+    VLOG(2) << in;
     if (!total) {
-      total = std::move(*in);
+      total = std::move(in);
     } else {
-      total = total->Add(std::move(*in));
+      total = total->Add(std::move(in));
     }
     VLOG(2) << "Total: " << *total;
   }
@@ -384,9 +379,8 @@ absl::StatusOr<std::string> Day_2021_18::Part2(
     absl::Span<std::string_view> input) const {
   std::vector<SnailFishStack> values;
   for (std::string_view in_str : input) {
-    absl::StatusOr<SnailFishStack> in = SnailFishStack::Parse(in_str);
-    if (!in.ok()) return in.status();
-    values.push_back(std::move(*in));
+    ASSIGN_OR_RETURN(SnailFishStack in, SnailFishStack::Parse(in_str));
+    values.push_back(std::move(in));
   }
   int max = 0;
   for (const auto& sf1 : values) {

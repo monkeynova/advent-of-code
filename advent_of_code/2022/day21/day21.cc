@@ -66,9 +66,7 @@ absl::StatusOr<int64_t> ConstantFold(
 absl::StatusOr<int64_t> Evaluate(
     absl::flat_hash_map<std::string_view, Monkey>& monkeys,
     std::string_view name) {
-  absl::StatusOr<int64_t> val = ConstantFold(monkeys, name);
-  if (!val.ok()) return val.status();
-  return *val;
+  return ConstantFold(monkeys, name);
 }
 
 absl::StatusOr<int64_t> SolveForVal(
@@ -163,24 +161,23 @@ absl::StatusOr<absl::flat_hash_map<std::string_view, Monkey>> ParseMonkeys(
 
 absl::StatusOr<std::string> Day_2022_21::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<absl::flat_hash_map<std::string_view, Monkey>> monkeys =
-      ParseMonkeys(input);
-  if (!monkeys.ok()) return monkeys.status();
-  return AdventReturn(Evaluate(*monkeys, "root"));
+  absl::flat_hash_map<std::string_view, Monkey> monkeys;
+  ASSIGN_OR_RETURN(monkeys, ParseMonkeys(input));
+  return AdventReturn(Evaluate(monkeys, "root"));
 }
 
 absl::StatusOr<std::string> Day_2022_21::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<absl::flat_hash_map<std::string_view, Monkey>> monkeys =
-      ParseMonkeys(input);
-  if (!monkeys.ok()) return monkeys.status();
+  absl::flat_hash_map<std::string_view, Monkey> monkeys;
+  ASSIGN_OR_RETURN(monkeys, ParseMonkeys(input));
 
-  if (!monkeys->contains("humn")) return Error("No human");
-  Monkey& humn = (*monkeys)["humn"];
+  auto humn_it = monkeys.find("humn");
+  if (humn_it == monkeys.end()) return Error("No human");
+  Monkey& humn = humn_it->second;
   humn.unknown = true;
   humn.value = std::nullopt;
 
-  return AdventReturn(SolveForRootEquality(*monkeys));
+  return AdventReturn(SolveForRootEquality(monkeys));
 }
 
 }  // namespace advent_of_code
