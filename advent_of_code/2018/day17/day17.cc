@@ -47,9 +47,7 @@ absl::Status DropFrom(CharBoard& b, Point start) {
     PointRectangle fill = {cur, cur};
     while (b[fill.min - Point{1, 0}] != '#') {
       if (b[fill.min + Point{0, 1}] == '.') {
-        if (absl::Status st = DropFrom(b, fill.min + Point{0, 1}); !st.ok()) {
-          return st;
-        }
+        RETURN_IF_ERROR(DropFrom(b, fill.min + Point{0, 1}));
         if (b[fill.min + Point{0, 1}] != '~' &&
             b[fill.min + Point{0, 1}] != '#') {
           filling = false;
@@ -66,9 +64,7 @@ absl::Status DropFrom(CharBoard& b, Point start) {
     }
     while (b[fill.max + Point{1, 0}] != '#') {
       if (b[fill.max + Point{0, 1}] == '.') {
-        if (absl::Status st = DropFrom(b, fill.max + Point{0, 1}); !st.ok()) {
-          return st;
-        }
+        RETURN_IF_ERROR(DropFrom(b, fill.max + Point{0, 1}));
         if (b[fill.max + Point{0, 1}] != '~' &&
             b[fill.max + Point{0, 1}] != '#') {
           filling = false;
@@ -161,10 +157,7 @@ absl::StatusOr<std::string> Day_2018_17::Part1(
   if (VLOG_IS_ON(2) && b->height() >= 100) {
     VLOG(2) << "Init:" << *b;
   }
-  if (absl::Status st = FillWithWater(*b); !st.ok()) {
-    VLOG(2) << "Final:" << *b;
-    return st;
-  }
+  RETURN_IF_ERROR(FillWithWater(*b));
   VLOG_IF(1, b->height() < 100) << "Final:\n" << *b;
   if (VLOG_IS_ON(2) && b->height() >= 100) {
     VLOG(2) << "Final:" << *b;
@@ -183,9 +176,7 @@ absl::StatusOr<std::string> Day_2018_17::Part2(
   absl::StatusOr<CharBoard> b = Parse(input, &min_y);
   if (!b.ok()) return b.status();
 
-  if (absl::Status st = FillWithWater(*b); !st.ok()) {
-    return st;
-  }
+  RETURN_IF_ERROR(FillWithWater(*b));
   int count = 0;
   for (Point p : b->range()) {
     if (p.y < min_y) continue;

@@ -41,7 +41,7 @@ DirtyTestParse(std::string_view contents) {
     } else if (line == "==") {
       in_answer = false;
       in_test = false;
-      if (absl::Status st = FinishTest(next.get()); !st.ok()) return st;
+      RETURN_IF_ERROR(FinishTest(next.get()));
       ret.push_back(std::move(next));
       next = absl::make_unique<DirtyTestParseResult>();
       continue;

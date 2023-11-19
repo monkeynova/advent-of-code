@@ -104,9 +104,7 @@ absl::StatusOr<int> RunAssembly(const IntCode& base_codes,
     for (int i = 0; i < 5; ++i) {
       PartialState& unit = assembly[i];
       unit.io.clear_output();
-      if (absl::Status st = unit.code.Run(&unit.io); !st.ok()) {
-        return st;
-      }
+      RETURN_IF_ERROR(unit.code.Run(&unit.io));
       if (unit.io.output()) {
         assembly[(i + 1) % 5].io.add_input(*unit.io.output());
       } else {
@@ -117,7 +115,7 @@ absl::StatusOr<int> RunAssembly(const IntCode& base_codes,
 
   // Wait for termination on assembly.
   for (auto& unit : assembly) {
-    if (absl::Status st = unit.code.Run(); !st.ok()) return st;
+    RETURN_IF_ERROR(unit.code.Run());
   }
 
   if (!assembly.back().io.last_nonempty_output()) {

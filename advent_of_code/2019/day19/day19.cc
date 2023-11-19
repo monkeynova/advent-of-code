@@ -176,9 +176,7 @@ class TractorSearch {
   absl::StatusOr<int> ScanPoint(Point p) {
     Drone prober(p);
     IntCode new_codes = codes_.Clone();
-    if (absl::Status st = new_codes.Run(&prober); !st.ok()) {
-      return st;
-    }
+    RETURN_IF_ERROR(new_codes.Run(&prober));
     VLOG(2) << "ScanPoint: " << p << " = " << prober.output();
 
     return prober.output();

@@ -89,7 +89,7 @@ class Computer : public IntCode::IOModule {
       case PacketState::kSetY: {
         out_packet_.y = val;
         out_packet_state_ = PacketState::kSetAddress;
-        if (absl::Status st = SendCurrentPacket(); !st.ok()) return st;
+        RETURN_IF_ERROR(SendCurrentPacket());
         break;
       }
       default:
@@ -135,7 +135,7 @@ class Network {
   absl::StatusOr<int> RunUntilAddress255ReturnY() {
     while (nat_packet_.address != 255) {
       for (Computer& c : computers_) {
-        if (absl::Status st = c.StepExecution(); !st.ok()) return st;
+        RETURN_IF_ERROR(c.StepExecution());
       }
     }
     return nat_packet_.y;
@@ -146,7 +146,7 @@ class Network {
     while (true) {
       bool all_idle = true;
       for (Computer& c : computers_) {
-        if (absl::Status st = c.StepExecution(); !st.ok()) return st;
+        RETURN_IF_ERROR(c.StepExecution());
         all_idle &= c.idle();
       }
       if (all_idle) {
@@ -156,9 +156,7 @@ class Network {
         last_y = nat_packet_.y;
         Packet host_packet = nat_packet_;
         host_packet.address = 0;
-        if (absl::Status st = computers_[0].RecvPacket(host_packet); !st.ok()) {
-          return st;
-        }
+        RETURN_IF_ERROR(computers_[0].RecvPacket(host_packet));
       }
     }
   }
@@ -172,10 +170,7 @@ class Network {
         return absl::InvalidArgumentError(
             absl::StrCat("Bad address: ", packet.address));
       }
-      if (absl::Status st = computers_[packet.address].RecvPacket(packet);
-          !st.ok()) {
-        return st;
-      }
+      RETURN_IF_ERROR(computers_[packet.address].RecvPacket(packet));
     }
     return absl::OkStatus();
   }

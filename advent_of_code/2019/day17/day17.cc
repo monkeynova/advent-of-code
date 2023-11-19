@@ -262,7 +262,7 @@ class ViewPort : public IntCode::IOModule {
     if (val == '\n') {
       VLOG(2) << current_input_;
       if (current_input_ == "Main:") {
-        if (absl::Status st = ComputeProgram(); !st.ok()) return st;
+        RETURN_IF_ERROR(ComputeProgram());
         current_output_ = program_.main;
         current_output_pos_ = 0;
       } else if (current_input_ == "Function A:") {
@@ -311,9 +311,7 @@ absl::StatusOr<std::string> Day_2019_17::Part1(
   if (!codes.ok()) return codes.status();
 
   ViewPort view_port;
-  if (absl::Status st = codes->Run(&view_port); !st.ok()) {
-    return st;
-  }
+  RETURN_IF_ERROR(codes->Run(&view_port));
 
   return AdventReturn(view_port.ComputeAlignment());
 }
@@ -323,13 +321,10 @@ absl::StatusOr<std::string> Day_2019_17::Part2(
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
 
-  if (absl::Status st = codes->Poke(0, 2); !st.ok()) return st;
+  RETURN_IF_ERROR(codes->Poke(0, 2));
 
   ViewPort view_port;
-  if (absl::Status st = codes->Run(&view_port, &view_port, &view_port);
-      !st.ok()) {
-    return st;
-  }
+  RETURN_IF_ERROR(codes->Run(&view_port));
 
   return AdventReturn(view_port.dust_collected());
 }

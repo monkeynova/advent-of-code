@@ -15,7 +15,7 @@ absl::StatusOr<std::string> Day_2019_09::Part1(
 
   std::vector<int64_t> input = {1};
   std::vector<int64_t> output;
-  if (absl::Status st = codes->Run(input, &output); !st.ok()) return st;
+  RETURN_IF_ERROR(codes->Run(input, &output));
 
   if (output.size() != 1) {
     return absl::InvalidArgumentError(
@@ -32,7 +32,7 @@ absl::StatusOr<std::string> Day_2019_09::Part2(
 
   std::vector<int64_t> input = {2};
   std::vector<int64_t> output;
-  if (absl::Status st = codes->Run(input, &output); !st.ok()) return st;
+  RETURN_IF_ERROR(codes->Run(input, &output));
 
   if (output.size() != 1) {
     return absl::InvalidArgumentError(

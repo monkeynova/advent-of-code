@@ -116,7 +116,7 @@ absl::StatusOr<std::string> Day_2017_25::Part1(
   absl::StatusOr<TuringMachine> tm = TuringMachine::Parse(input);
   if (!tm.ok()) return tm.status();
 
-  if (absl::Status st = tm->Run(); !st.ok()) return st;
+  RETURN_IF_ERROR(tm->Run());
 
   return AdventReturn(tm->Checksum());
 }

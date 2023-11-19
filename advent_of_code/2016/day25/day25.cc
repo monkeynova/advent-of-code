@@ -50,7 +50,7 @@ absl::StatusOr<std::string> Day_2016_25::Part1(
     VLOG(1) << "Trying: " << a;
     copy.registers().a = a;
     OutputWatch watch;
-    if (absl::Status st = copy.Execute(&watch, &watch); !st.ok()) return st;
+    RETURN_IF_ERROR(copy.Execute(&watch, &watch));
     bool check = true;
     const std::vector<int64_t>& output = watch.output();
     VLOG(1) << " output: " << absl::StrJoin(output, ",");

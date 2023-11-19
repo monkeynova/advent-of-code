@@ -69,7 +69,7 @@ absl::StatusOr<std::string> Day_2019_21::Part1(
       "OR T J\n"
       "AND D J\n"
       "WALK\n");
-  if (absl::Status st = codes->Run(&spring_bot); !st.ok()) return st;
+  RETURN_IF_ERROR(codes->Run(&spring_bot));
 
   return AdventReturn(spring_bot.damage());
 }
@@ -96,7 +96,7 @@ absl::StatusOr<std::string> Day_2019_21::Part2(
       "AND T J\n"
       "AND D J\n"
       "RUN\n");
-  if (absl::Status st = codes->Run(&spring_bot); !st.ok()) return st;
+  RETURN_IF_ERROR(codes->Run(&spring_bot));
 
   return AdventReturn(spring_bot.damage());
 }

@@ -9,6 +9,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_replace.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/vlog.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
@@ -26,10 +27,7 @@ absl::Status GetContents(std::string_view filename,
                          std::string* file_contents) {
   // Because we are using a c api, check for in-string nulls.
   std::string filename_str;
-  if (absl::Status status = NullFreeString(filename, &filename_str);
-      !status.ok()) {
-    return status;
-  }
+  RETURN_IF_ERROR(NullFreeString(filename, &filename_str));
 
   struct stat status;
   if (stat(filename.data(), &status) != 0) {

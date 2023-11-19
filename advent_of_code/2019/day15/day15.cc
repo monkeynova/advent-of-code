@@ -41,7 +41,7 @@ class Droid : public IntCode::IOModule {
 
   absl::StatusOr<InputDirection> PickDirection() {
     if (current_path_.empty()) {
-      if (absl::Status st = ComputePathToNearestUnknown(); !st.ok()) return st;
+      RETURN_IF_ERROR(ComputePathToNearestUnknown());
     }
     InputDirection dir = current_path_.front();
     current_path_.pop_front();
@@ -198,9 +198,7 @@ absl::StatusOr<std::string> Day_2019_15::Part1(
   if (!codes.ok()) return codes.status();
 
   Droid droid;
-  if (absl::Status st = codes->Run(&droid); !st.ok()) {
-    return st;
-  }
+  RETURN_IF_ERROR(codes->Run(&droid));
   VLOG(1) << "Droid:\n" << droid.DebugBoard();
 
   return AdventReturn(droid.DistanceToO2());
@@ -212,9 +210,7 @@ absl::StatusOr<std::string> Day_2019_15::Part2(
   if (!codes.ok()) return codes.status();
 
   Droid droid;
-  if (absl::Status st = codes->Run(&droid); !st.ok()) {
-    return st;
-  }
+  RETURN_IF_ERROR(codes->Run(&droid));
   VLOG(1) << "Droid:\n" << droid.DebugBoard();
 
   return AdventReturn(droid.GreatestDistanceFromO2());

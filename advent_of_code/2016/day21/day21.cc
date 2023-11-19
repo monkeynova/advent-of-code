@@ -259,7 +259,7 @@ absl::Status RunReverseTest() {
 absl::StatusOr<std::string> Day_2016_21::Part1(
     absl::Span<std::string_view> input) const {
   if (run_audit()) {
-    if (absl::Status st = RunTest(); !st.ok()) return st;
+    RETURN_IF_ERROR(RunTest());
   }
 
   std::string pw = "abcdefgh";
@@ -276,7 +276,7 @@ absl::StatusOr<std::string> Day_2016_21::Part1(
 
 absl::StatusOr<std::string> Day_2016_21::Part2(
     absl::Span<std::string_view> input) const {
-  if (absl::Status st = RunReverseTest(); !st.ok()) return st;
+  RETURN_IF_ERROR(RunReverseTest());
 
   std::string pw = "fbgdceah";
   VLOG(2) << pw;

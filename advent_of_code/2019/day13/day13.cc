@@ -115,7 +115,7 @@ absl::StatusOr<std::string> Day_2019_13::Part1(
   if (!codes.ok()) return codes.status();
 
   DrawBoard draw_board;
-  if (absl::Status st = codes->Run(&draw_board); !st.ok()) return st;
+  RETURN_IF_ERROR(codes->Run(&draw_board));
 
   return AdventReturn(draw_board.CountBlockTiles());
 }
@@ -125,9 +125,9 @@ absl::StatusOr<std::string> Day_2019_13::Part2(
   absl::StatusOr<IntCode> codes = IntCode::Parse(input);
   if (!codes.ok()) return codes.status();
 
-  if (absl::Status st = codes->Poke(0, 2); !st.ok()) return st;
+  RETURN_IF_ERROR(codes->Poke(0, 2));
   DrawBoard draw_board;
-  if (absl::Status st = codes->Run(&draw_board); !st.ok()) return st;
+  RETURN_IF_ERROR(codes->Run(&draw_board));
 
   return AdventReturn(draw_board.score());
 }

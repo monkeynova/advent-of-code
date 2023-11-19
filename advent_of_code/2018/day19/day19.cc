@@ -82,7 +82,7 @@ absl::StatusOr<std::string> Day_2018_19::Part1(
     absl::Span<std::string_view> input) const {
   absl::StatusOr<VM> vm = VM::Parse(input);
   if (!vm.ok()) return vm.status();
-  if (absl::Status st = vm->Execute(); !st.ok()) return st;
+  RETURN_IF_ERROR(vm->Execute());
   return AdventReturn(vm->register_value(0));
 }
 

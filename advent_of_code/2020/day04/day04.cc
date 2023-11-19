@@ -25,7 +25,7 @@ absl::Status Valid(
 }
 
 absl::Status Valid2(absl::flat_hash_map<std::string, std::string> passport) {
-  if (absl::Status st = Valid(passport); !st.ok()) return st;
+  RETURN_IF_ERROR(Valid(passport));
   int year;
   if (!absl::SimpleAtoi(passport["byr"], &year)) {
     return absl::InvalidArgumentError("byr isn't numeric");

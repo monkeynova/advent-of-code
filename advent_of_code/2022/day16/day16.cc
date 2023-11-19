@@ -67,7 +67,7 @@ struct State {
     for (std::string_view out : *graph.Outgoing(me_str)) {
       State s = *this;
       s.MoveMe(out);
-      if (absl::Status st = on_next(s); !st.ok()) return st;
+      RETURN_IF_ERROR(on_next(s));
     }
     return absl::OkStatus();
   }
@@ -87,7 +87,7 @@ struct State {
     for (std::string_view out : *graph.Outgoing(el_str)) {
       State s = *this;
       s.MoveEl(out);
-      if (absl::Status st = on_next(s); !st.ok()) return st;
+      RETURN_IF_ERROR(on_next(s));
     }
     return absl::Status();
   }

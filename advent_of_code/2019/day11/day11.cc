@@ -69,7 +69,7 @@ absl::StatusOr<std::string> Day_2019_11::Part1(
   if (!codes.ok()) return codes.status();
 
   Painter painter;
-  if (absl::Status st = codes->Run(&painter); !st.ok()) return st;
+  RETURN_IF_ERROR(codes->Run(&painter));
 
   return AdventReturn(painter.UniquePanelsPainted());
 }
@@ -81,7 +81,7 @@ absl::StatusOr<std::string> Day_2019_11::Part2(
 
   Painter painter;
   painter.Set({.x = 0, .y = 0}, 1);
-  if (absl::Status st = codes->Run(&painter); !st.ok()) return st;
+  RETURN_IF_ERROR(codes->Run(&painter));
 
   return OCRExtract(painter.Panels());
 }

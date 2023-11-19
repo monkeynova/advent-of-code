@@ -224,7 +224,7 @@ absl::StatusOr<std::string> Day_2019_18::Part1(
   absl::StatusOr<CharBoard> char_board = CharBoard::Parse(input);
   if (!char_board.ok()) return char_board.status();
   Board b(*char_board);
-  if (absl::Status st = b.InitializeBoard(); !st.ok()) return st;
+  RETURN_IF_ERROR(b.InitializeBoard());
   return AdventReturn(b.MinStepsToAllKeys());
 }
 
@@ -259,7 +259,7 @@ absl::StatusOr<std::string> Day_2019_18::Part2(
   VLOG(1) << "\n" << *char_board;
 
   Board b(*char_board);
-  if (absl::Status st = b.InitializeBoard(); !st.ok()) return st;
+  RETURN_IF_ERROR(b.InitializeBoard());
 
   return AdventReturn(b.MinStepsToAllKeys());
 }

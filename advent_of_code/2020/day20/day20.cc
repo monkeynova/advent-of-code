@@ -111,9 +111,9 @@ class TileMerger {
       : tiles_(tiles) {}
 
   absl::StatusOr<CharBoard> Merge() {
-    if (absl::Status st = InitSideLength(); !st.ok()) return st;
-    if (absl::Status st = BuildEdgeMap(); !st.ok()) return st;
-    if (absl::Status st = ClassifyTiles(); !st.ok()) return st;
+    RETURN_IF_ERROR(InitSideLength());
+    RETURN_IF_ERROR(BuildEdgeMap());
+    RETURN_IF_ERROR(ClassifyTiles());
     int merged_side_length = tile_edge_size_ * side_tile_count_;
     CharBoard merged(merged_side_length, merged_side_length);
     for (Point p : merged.range()) {
@@ -121,9 +121,7 @@ class TileMerger {
     }
     for (int tile_y = 0; tile_y < side_tile_count_; ++tile_y) {
       for (int tile_x = 0; tile_x < side_tile_count_; ++tile_x) {
-        if (absl::Status st = FindAndInsertTile(&merged, tile_x, tile_y);
-            !st.ok())
-          return st;
+        RETURN_IF_ERROR(FindAndInsertTile(&merged, tile_x, tile_y));
         VLOG(2) << "Merging board\n" << merged;
       }
     }

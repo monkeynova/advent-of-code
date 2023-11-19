@@ -160,9 +160,7 @@ absl::Status AssemBunny::Execute(OutputInterface* output_interface,
       case OpCode::kOut: {
         int64_t* output = i.MutableArg1();
         if (output_interface == nullptr) return Error("No output sink");
-        if (absl::Status st = output_interface->OnOutput(*output, this);
-            !st.ok())
-          return st;
+        RETURN_IF_ERROR(output_interface->OnOutput(*output, this));
         break;
       }
     }

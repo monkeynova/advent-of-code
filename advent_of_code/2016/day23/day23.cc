@@ -67,7 +67,7 @@ absl::StatusOr<std::string> Day_2016_23::Part1(
   absl::StatusOr<AssemBunny> vm = AssemBunny::Parse(input);
   if (!vm.ok()) return vm.status();
   vm->registers().a = 7;
-  if (absl::Status st = vm->Execute(); !st.ok()) return st;
+  RETURN_IF_ERROR(vm->Execute());
   return AdventReturn(vm->registers().a);
 }
 
@@ -82,7 +82,7 @@ absl::StatusOr<std::string> Day_2016_23::Part2(
   absl::StatusOr<AssemBunny> vm = AssemBunny::Parse(input);
   if (!vm.ok()) return vm.status();
   vm->registers().a = 12;
-  if (absl::Status st = vm->Execute(); !st.ok()) return st;
+  RETURN_IF_ERROR(vm->Execute());
   return AdventReturn(vm->registers().a);
 }
 

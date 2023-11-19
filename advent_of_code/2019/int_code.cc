@@ -169,7 +169,7 @@ absl::Status IntCode::SaveParameter(int64_t parameter_modes, int64_t parameter,
 absl::Status IntCode::Run(InputSource* input, OutputSink* output,
                           PauseCondition* pause_condition) {
   while (!terminated_ && !pause_condition->PauseIntCode()) {
-    if (absl::Status st = RunSingleOpcode(input, output); !st.ok()) return st;
+    RETURN_IF_ERROR(RunSingleOpcode(input, output));
   }
   return absl::OkStatus();
 }
@@ -195,9 +195,7 @@ absl::Status IntCode::RunSingleOpcode(InputSource* input, OutputSink* output) {
       if (!in1.ok()) return in1.status();
       absl::StatusOr<int64_t> in2 = LoadParameter(parameter_modes, 2);
       if (!in2.ok()) return in2.status();
-      if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 + *in2);
-          !st.ok())
-        return st;
+      RETURN_IF_ERROR(SaveParameter(parameter_modes, 3, *in1 + *in2));
       break;
     }
     case OpCode::kMul: {
@@ -205,9 +203,7 @@ absl::Status IntCode::RunSingleOpcode(InputSource* input, OutputSink* output) {
       if (!in1.ok()) return in1.status();
       absl::StatusOr<int64_t> in2 = LoadParameter(parameter_modes, 2);
       if (!in2.ok()) return in2.status();
-      if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 * *in2);
-          !st.ok())
-        return st;
+      RETURN_IF_ERROR(SaveParameter(parameter_modes, 3, *in1 * *in2));
       break;
     }
     case OpCode::kInput: {
@@ -216,10 +212,7 @@ absl::Status IntCode::RunSingleOpcode(InputSource* input, OutputSink* output) {
       }
       absl::StatusOr<int64_t> input_val = input->Fetch();
       if (!input_val.ok()) return input_val.status();
-      if (absl::Status st = SaveParameter(parameter_modes, 1, *input_val);
-          !st.ok()) {
-        return st;
-      }
+      RETURN_IF_ERROR(SaveParameter(parameter_modes, 1, *input_val));
       break;
     }
     case OpCode::kOutput: {
@@ -228,7 +221,7 @@ absl::Status IntCode::RunSingleOpcode(InputSource* input, OutputSink* output) {
       if (output == nullptr) {
         return absl::InvalidArgumentError("No output specified");
       }
-      if (absl::Status st = output->Put(*in); !st.ok()) return st;
+      RETURN_IF_ERROR(output->Put(*in));
       break;
     }
     case OpCode::kJNZ: {
@@ -258,10 +251,7 @@ absl::Status IntCode::RunSingleOpcode(InputSource* input, OutputSink* output) {
       if (!in1.ok()) return in1.status();
       absl::StatusOr<int64_t> in2 = LoadParameter(parameter_modes, 2);
       if (!in2.ok()) return in2.status();
-      if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 < *in2);
-          !st.ok()) {
-        return st;
-      }
+      RETURN_IF_ERROR(SaveParameter(parameter_modes, 3, *in1 < *in2));
       break;
     }
     case OpCode::kEQ: {
@@ -269,10 +259,7 @@ absl::Status IntCode::RunSingleOpcode(InputSource* input, OutputSink* output) {
       if (!in1.ok()) return in1.status();
       absl::StatusOr<int64_t> in2 = LoadParameter(parameter_modes, 2);
       if (!in2.ok()) return in2.status();
-      if (absl::Status st = SaveParameter(parameter_modes, 3, *in1 == *in2);
-          !st.ok()) {
-        return st;
-      }
+      RETURN_IF_ERROR(SaveParameter(parameter_modes, 3, *in1 == *in2));
       break;
     }
     case OpCode::kIncR: {

@@ -125,7 +125,7 @@ absl::Status DropState::DropNextRock(int i) {
       break;
     }
   }
-  if (absl::Status st = InsertRock(drop); !st.ok()) return st;
+  RETURN_IF_ERROR(InsertRock(drop));
   VLOG(2) << "Board (" << i << "):\n" << Draw(height_);
   return absl::OkStatus();
 }
@@ -178,10 +178,10 @@ absl::StatusOr<std::string> Day_2022_17::Part1(
   if (input.size() != 1) return Error("Bad input");
 
   DropState ds;
-  if (absl::Status st = ds.ParseWind(input[0]); !st.ok()) return st;
+  RETURN_IF_ERROR(ds.ParseWind(input[0]));
 
   for (int i = 0; i < 2022; ++i) {
-    if (absl::Status st = ds.DropNextRock(i); !st.ok()) return st;
+    RETURN_IF_ERROR(ds.DropNextRock(i));
   }
   return AdventReturn(ds.height());
 }
@@ -191,13 +191,13 @@ absl::StatusOr<std::string> Day_2022_17::Part2(
   if (input.size() != 1) return Error("Bad input");
 
   DropState ds;
-  if (absl::Status st = ds.ParseWind(input[0]); !st.ok()) return st;
+  RETURN_IF_ERROR(ds.ParseWind(input[0]));
 
   // TODO(@monkeynova): Re-use LoopHistory in 2018/18?
   absl::flat_hash_map<DropState::SummaryState, int> state_to_idx;
   std::vector<int> heights;
   for (int64_t i = 0; i < 1000000000000; ++i) {
-    if (absl::Status st = ds.DropNextRock(i); !st.ok()) return st;
+    RETURN_IF_ERROR(ds.DropNextRock(i));
 
     heights.push_back(ds.height());
     auto [it, inserted] = state_to_idx.emplace(ds.Summarize(), i);
