@@ -169,9 +169,8 @@ absl::StatusOr<std::string> Day_2021_08::Part2(
     }
     int64_t decode_val = 0;
     for (std::string_view digit : absl::StrSplit(decode, " ")) {
-      absl::StatusOr<int64_t> v = Decode(digit, *map);
-      if (!v.ok()) return v.status();
-      decode_val = decode_val * 10 + *v;
+      ASSIGN_OR_RETURN(int64_t v, Decode(digit, *map));
+      decode_val = decode_val * 10 + v;
     }
     sum += decode_val;
   }

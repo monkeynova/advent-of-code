@@ -69,8 +69,7 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseValue(std::string_view* str) {
   while ((*str)[0] == ' ') *str = str->substr(1);
   if ((*str)[0] == '(') {
     *str = str->substr(1);
-    absl::StatusOr<std::unique_ptr<ExprTree>> ret = ParseOpTree(str);
-    if (!ret.ok()) return ret.status();
+    ASSIGN_OR_RETURN(std::unique_ptr<ExprTree> ret, ParseOpTree(str));
     if ((*str)[0] != ')') return Error("No matching ')'");
     *str = str->substr(1);
     while ((*str)[0] == ' ') *str = str->substr(1);
@@ -88,23 +87,21 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseValue(std::string_view* str) {
 }
 
 absl::StatusOr<std::unique_ptr<ExprTree>> ParseOpTree(std::string_view* str) {
-  absl::StatusOr<std::unique_ptr<ExprTree>> last_val = ParseValue(str);
-  if (!last_val.ok()) return last_val.status();
+  ASSIGN_OR_RETURN(std::unique_ptr<ExprTree> last_val, ParseValue(str));
   while (!str->empty()) {
     char op = (*str)[0];
     if (op == ')') break;
     *str = str->substr(1);
-    absl::StatusOr<std::unique_ptr<ExprTree>> next_val = ParseValue(str);
-    if (!next_val.ok()) return next_val.status();
+    ASSIGN_OR_RETURN(std::unique_ptr<ExprTree> next_val, ParseValue(str));
     switch (op) {
       case '+': {
         last_val =
-            absl::make_unique<Add>(std::move(*last_val), std::move(*next_val));
+            absl::make_unique<Add>(std::move(last_val), std::move(next_val));
         break;
       }
       case '*': {
         last_val =
-            absl::make_unique<Mult>(std::move(*last_val), std::move(*next_val));
+            absl::make_unique<Mult>(std::move(last_val), std::move(next_val));
         break;
       }
       default:
@@ -127,8 +124,7 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseValue2(std::string_view* str) {
   while ((*str)[0] == ' ') *str = str->substr(1);
   if ((*str)[0] == '(') {
     *str = str->substr(1);
-    absl::StatusOr<std::unique_ptr<ExprTree>> ret = ParseOpTree2(str);
-    if (!ret.ok()) return ret.status();
+    ASSIGN_OR_RETURN(std::unique_ptr<ExprTree> ret, ParseOpTree2(str));
     if ((*str)[0] != ')') return Error("No matching ')'");
     *str = str->substr(1);
     while ((*str)[0] == ' ') *str = str->substr(1);
@@ -146,31 +142,29 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseValue2(std::string_view* str) {
 }
 
 absl::StatusOr<std::unique_ptr<ExprTree>> ParseAddTree(std::string_view* str) {
-  absl::StatusOr<std::unique_ptr<ExprTree>> last_val = ParseValue2(str);
-  if (!last_val.ok()) return last_val.status();
+  ASSIGN_OR_RETURN(std::unique_ptr<ExprTree> last_val, ParseValue2(str));
   while (!str->empty()) {
     char op = (*str)[0];
     if (op == ')' || op == '*') break;
     if (op != '+') return Error("Not add: ", *str);
     *str = str->substr(1);
-    absl::StatusOr<std::unique_ptr<ExprTree>> next_val = ParseValue2(str);
+    ASSIGN_OR_RETURN(std::unique_ptr<ExprTree> next_val, ParseValue2(str));
     last_val =
-        absl::make_unique<Add>(std::move(*last_val), std::move(*next_val));
+        absl::make_unique<Add>(std::move(last_val), std::move(next_val));
   }
   return last_val;
 }
 
 absl::StatusOr<std::unique_ptr<ExprTree>> ParseMulTree(std::string_view* str) {
-  absl::StatusOr<std::unique_ptr<ExprTree>> last_val = ParseAddTree(str);
-  if (!last_val.ok()) return last_val.status();
+  ASSIGN_OR_RETURN(std::unique_ptr<ExprTree> last_val, ParseAddTree(str));
   while (!str->empty()) {
     char op = (*str)[0];
     if (op == ')') break;
     if (op != '*') return Error("Not mult: ", *str);
     *str = str->substr(1);
-    absl::StatusOr<std::unique_ptr<ExprTree>> next_val = ParseAddTree(str);
+    ASSIGN_OR_RETURN(std::unique_ptr<ExprTree> next_val, ParseAddTree(str));
     last_val =
-        absl::make_unique<Mult>(std::move(*last_val), std::move(*next_val));
+        absl::make_unique<Mult>(std::move(last_val), std::move(next_val));
   }
   return last_val;
 }
@@ -191,9 +185,8 @@ absl::StatusOr<std::string> Day_2020_18::Part1(
     absl::Span<std::string_view> input) const {
   int64_t sum = 0;
   for (std::string_view expr : input) {
-    absl::StatusOr<std::unique_ptr<ExprTree>> tree = Parse(expr);
-    if (!tree.ok()) return tree.status();
-    sum += (*tree)->Eval();
+    ASSIGN_OR_RETURN(std::unique_ptr<ExprTree> tree, Parse(expr));
+    sum += tree->Eval();
   }
   return AdventReturn(sum);
 }
@@ -202,10 +195,9 @@ absl::StatusOr<std::string> Day_2020_18::Part2(
     absl::Span<std::string_view> input) const {
   int64_t sum = 0;
   for (std::string_view expr : input) {
-    absl::StatusOr<std::unique_ptr<ExprTree>> tree = Parse2(expr);
-    if (!tree.ok()) return tree.status();
-    VLOG(1) << (*tree)->DebugString();
-    sum += (*tree)->Eval();
+    ASSIGN_OR_RETURN(std::unique_ptr<ExprTree> tree, Parse2(expr));
+    VLOG(1) << tree->DebugString();
+    sum += tree->Eval();
   }
   return AdventReturn(sum);
 }

@@ -43,10 +43,7 @@ absl::StatusOr<ParseResult> Parse(absl::Span<std::string_view> input) {
   if (input[i] != "your ticket:") return Error("Not 'your ticket' ", input[i]);
   ++i;
   std::vector<std::string_view> my_ticket_str = absl::StrSplit(input[i], ",");
-  absl::StatusOr<std::vector<int64_t>> my_ticket =
-      ParseAsInts(absl::MakeSpan(my_ticket_str));
-  if (!my_ticket.ok()) return my_ticket.status();
-  res.my_ticket = *my_ticket;
+  ASSIGN_OR_RETURN(res.my_ticket, ParseAsInts(absl::MakeSpan(my_ticket_str)));
   ++i;
 
   if (!input[i].empty()) return Error("Not empty line: ", input[i]);
@@ -57,10 +54,10 @@ absl::StatusOr<ParseResult> Parse(absl::Span<std::string_view> input) {
   for (; i < input.size(); ++i) {
     std::vector<std::string_view> other_ticket_str =
         absl::StrSplit(input[i], ",");
-    absl::StatusOr<std::vector<int64_t>> other_ticket =
-        ParseAsInts(absl::MakeSpan(other_ticket_str));
-    if (!other_ticket.ok()) return other_ticket.status();
-    res.other_tickets.push_back(*other_ticket);
+    ASSIGN_OR_RETURN(
+        std::vector<int64_t> other_ticket,
+        ParseAsInts(absl::MakeSpan(other_ticket_str)));
+    res.other_tickets.push_back(std::move(other_ticket));
   }
 
   return res;
@@ -78,32 +75,6 @@ bool CheckRange(int v, OrRange or_range) {
     return true;
   }
   return false;
-}
-
-}  // namespace
-
-absl::StatusOr<std::string> Day_2020_16::Part1(
-    absl::Span<std::string_view> input) const {
-  absl::StatusOr<ParseResult> parse = Parse(input);
-  if (!parse.ok()) return parse.status();
-  int bad_val_sum = 0;
-  for (const std::vector<int64_t>& ticket : parse->other_tickets) {
-    for (int v : ticket) {
-      VLOG(2) << "Checking: " << v;
-      bool valid_any = false;
-      for (const auto& [name, or_range] : parse->rules) {
-        if (CheckRange(v, or_range)) {
-          valid_any = true;
-          break;
-        }
-      }
-      if (!valid_any) {
-        VLOG(2) << "Invalid";
-        bad_val_sum += v;
-      }
-    }
-  }
-  return AdventReturn(bad_val_sum);
 }
 
 bool IsValid(const ParseResult& parse, std::string_view field_name, int pos) {
@@ -185,18 +156,42 @@ std::vector<std::string_view> FindFieldOrder(const ParseResult& parse) {
   return ret;
 }
 
+}  // namespace
+
+absl::StatusOr<std::string> Day_2020_16::Part1(
+    absl::Span<std::string_view> input) const {
+  ASSIGN_OR_RETURN(ParseResult parse, Parse(input));
+  int bad_val_sum = 0;
+  for (const std::vector<int64_t>& ticket : parse.other_tickets) {
+    for (int v : ticket) {
+      VLOG(2) << "Checking: " << v;
+      bool valid_any = false;
+      for (const auto& [name, or_range] : parse.rules) {
+        if (CheckRange(v, or_range)) {
+          valid_any = true;
+          break;
+        }
+      }
+      if (!valid_any) {
+        VLOG(2) << "Invalid";
+        bad_val_sum += v;
+      }
+    }
+  }
+  return AdventReturn(bad_val_sum);
+}
+
 absl::StatusOr<std::string> Day_2020_16::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<ParseResult> parse = Parse(input);
-  if (!parse.ok()) return parse.status();
+  ASSIGN_OR_RETURN(ParseResult parse, Parse(input));
 
   std::vector<std::vector<int64_t>> valid_tickets;
-  for (const std::vector<int64_t>& ticket : parse->other_tickets) {
+  for (const std::vector<int64_t>& ticket : parse.other_tickets) {
     bool valid_ticket = true;
     for (int v : ticket) {
       VLOG(2) << "Checking: " << v;
       bool valid_any_value = false;
-      for (const auto& [name, or_range] : parse->rules) {
+      for (const auto& [name, or_range] : parse.rules) {
         if (CheckRange(v, or_range)) {
           valid_any_value = true;
           break;
@@ -216,10 +211,10 @@ absl::StatusOr<std::string> Day_2020_16::Part2(
                            [](std::string* out, const std::vector<int64_t>& t) {
                              absl::StrAppend(out, absl::StrJoin(t, ","));
                            });
-  parse->other_tickets = valid_tickets;
-  std::vector<std::string_view> field_order = FindFieldOrder(*parse);
+  parse.other_tickets = valid_tickets;
+  std::vector<std::string_view> field_order = FindFieldOrder(parse);
   VLOG(1) << "found size == " << field_order.size() << " of "
-          << parse->rules.size();
+          << parse.rules.size();
   VLOG(1) << "Found order: " << absl::StrJoin(field_order, ",");
   std::string_view prefix = "departure";
   int prefix_count = 0;
@@ -228,8 +223,8 @@ absl::StatusOr<std::string> Day_2020_16::Part2(
     if (field_order[i].substr(0, prefix.size()) == prefix) {
       ++prefix_count;
       VLOG(1) << " field_order: " << field_order[i] << ": " << i;
-      VLOG(1) << " *= " << parse->my_ticket[i];
-      product *= parse->my_ticket[i];
+      VLOG(1) << " *= " << parse.my_ticket[i];
+      product *= parse.my_ticket[i];
     }
   }
   if (prefix_count != 6) return Error("Wrong number of prefix=", prefix);

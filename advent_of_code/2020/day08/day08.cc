@@ -83,22 +83,18 @@ absl::StatusOr<bool> BootCode::Execute() {
 
 absl::StatusOr<std::string> Day_2020_08::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<BootCode> boot_code = BootCode::Parse(input);
-  if (!boot_code.ok()) return boot_code.status();
-
-  absl::StatusOr<bool> terminated = boot_code->Execute();
-  if (!terminated.ok()) return terminated.status();
-
-  return AdventReturn(boot_code->accumulator());
+  ASSIGN_OR_RETURN(BootCode boot_code, BootCode::Parse(input));
+  ASSIGN_OR_RETURN(bool terminated, boot_code.Execute());
+  (void)terminated;
+  return AdventReturn(boot_code.accumulator());
 }
 
 absl::StatusOr<std::string> Day_2020_08::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<BootCode> boot_code = BootCode::Parse(input);
-  if (!boot_code.ok()) return boot_code.status();
+  ASSIGN_OR_RETURN(BootCode boot_code, BootCode::Parse(input));
 
-  for (int i = 0; i < boot_code->statements().size(); ++i) {
-    std::vector<BootCode::Statement> edit_statements = boot_code->statements();
+  for (int i = 0; i < boot_code.statements().size(); ++i) {
+    std::vector<BootCode::Statement> edit_statements = boot_code.statements();
     if (edit_statements[i].i == BootCode::Instruction::kJmp) {
       edit_statements[i].i = BootCode::Instruction::kNop;
     } else if (edit_statements[i].i == BootCode::Instruction::kNop) {
@@ -107,9 +103,8 @@ absl::StatusOr<std::string> Day_2020_08::Part2(
       continue;
     }
     BootCode tmp_code(std::move(edit_statements));
-    absl::StatusOr<bool> terminated = tmp_code.Execute();
-    if (!terminated.ok()) return terminated.status();
-    if (*terminated) {
+    ASSIGN_OR_RETURN(bool terminated, tmp_code.Execute());
+    if (terminated) {
       return AdventReturn(tmp_code.accumulator());
     }
   }

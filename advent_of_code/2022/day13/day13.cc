@@ -117,11 +117,9 @@ absl::StatusOr<std::string> Day_2022_13::Part1(
   int ret = 0;
   for (int i = 0; i < input.size(); i += 3) {
     if (!input[i + 2].empty()) return Error("Bad input: empty");
-    absl::StatusOr<Packet> left = ParseFull(input[i]);
-    if (!left.ok()) return left.status();
-    absl::StatusOr<Packet> right = ParseFull(input[i + 1]);
-    if (!right.ok()) return right.status();
-    if (!(*right < *left)) ret += (i / 3) + 1;
+    ASSIGN_OR_RETURN(Packet left, ParseFull(input[i]));
+    ASSIGN_OR_RETURN(Packet right, ParseFull(input[i + 1]));
+    if (!(right < left)) ret += (i / 3) + 1;
   }
   return AdventReturn(ret);
 }
@@ -135,12 +133,11 @@ absl::StatusOr<std::string> Day_2022_13::Part2(
   int idx2 = 2;
   for (int i = 0; i < input.size(); ++i) {
     if (input[i].empty()) continue;
-    absl::StatusOr<Packet> test = ParseFull(input[i]);
-    if (!test.ok()) return test.status();
-    if (*test < *m1) {
+    ASSIGN_OR_RETURN(Packet test, ParseFull(input[i]));
+    if (test < *m1) {
       ++idx1;
       ++idx2;
-    } else if (*test < *m2) {
+    } else if (test < *m2) {
       ++idx2;
     }
   }

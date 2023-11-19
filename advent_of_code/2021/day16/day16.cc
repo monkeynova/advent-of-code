@@ -16,17 +16,15 @@ namespace advent_of_code {
 absl::StatusOr<std::string> Day_2021_16::Part1(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  absl::StatusOr<BitsExpr> expr = BitsExpr::Parse(input[0]);
-  if (!expr.ok()) return expr.status();
-  return AdventReturn(expr->SumVersions());
+  ASSIGN_OR_RETURN(BitsExpr expr, BitsExpr::Parse(input[0]));
+  return AdventReturn(expr.SumVersions());
 }
 
 absl::StatusOr<std::string> Day_2021_16::Part2(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  absl::StatusOr<BitsExpr> expr = BitsExpr::Parse(input[0]);
-  if (!expr.ok()) return expr.status();
-  return AdventReturn(expr->Evaluate());
+  ASSIGN_OR_RETURN(BitsExpr expr, BitsExpr::Parse(input[0]));
+  return AdventReturn(expr.Evaluate());
 }
 
 }  // namespace advent_of_code

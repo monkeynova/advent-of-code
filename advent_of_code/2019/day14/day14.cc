@@ -83,55 +83,53 @@ absl::StatusOr<int64_t> ComputeOreNeedForFuel(
 
 absl::StatusOr<int64_t> ComputeOreNeedForFuel(
     const DirectedGraph<Rule>& rule_set) {
-  absl::StatusOr<std::vector<std::string_view>> ordered_ingredients =
-      rule_set.DAGSort();
-  if (!ordered_ingredients.ok()) return ordered_ingredients.status();
-  if (ordered_ingredients->at(0) != "FUEL") {
+  ASSIGN_OR_RETURN(
+      std::vector<std::string_view> ordered_ingredients,
+      rule_set.DAGSort());
+  if (ordered_ingredients[0] != "FUEL") {
     return Error("Not a DAG rooted at FUEL");
   }
-  if (ordered_ingredients->back() != "ORE") {
+  if (ordered_ingredients.back() != "ORE") {
     return Error("Not a DAG with leaf at ORE");
   }
-  return ComputeOreNeedForFuel(rule_set, *ordered_ingredients, 1);
+  return ComputeOreNeedForFuel(rule_set, ordered_ingredients, 1);
 }
 
 absl::StatusOr<int> FuelFromOre(const DirectedGraph<Rule>& rule_set,
                                 uint64_t ore_supply) {
-  absl::StatusOr<std::vector<std::string_view>> ordered_ingredients =
-      rule_set.DAGSort();
-  if (!ordered_ingredients.ok()) return ordered_ingredients.status();
-  if (ordered_ingredients->at(0) != "FUEL") {
+  ASSIGN_OR_RETURN(
+      std::vector<std::string_view> ordered_ingredients,
+      rule_set.DAGSort());
+  if (ordered_ingredients[0] != "FUEL") {
     return Error("Not a DAG rooted at FUEL");
   }
-  if (ordered_ingredients->back() != "ORE") {
+  if (ordered_ingredients.back() != "ORE") {
     return Error("Not a DAG with leaf at ORE");
   }
   int64_t guess = 1;
-  absl::StatusOr<int64_t> ore_needed = 0;
-  while (*ore_needed < ore_supply) {
-    ore_needed = ComputeOreNeedForFuel(rule_set, *ordered_ingredients, guess);
-    if (!ore_needed.ok()) return ore_needed.status();
-    VLOG(1) << guess << " => " << *ore_needed;
+  int64_t ore_needed = 0;
+  while (ore_needed < ore_supply) {
+    ASSIGN_OR_RETURN(ore_needed, ComputeOreNeedForFuel(rule_set, ordered_ingredients, guess));
+    VLOG(1) << guess << " => " << ore_needed;
     guess <<= 1;
   }
   int64_t min = guess >> 2;
   int64_t max = guess >> 1;
   while (min < max) {
     guess = (min + max) / 2;
-    ore_needed = ComputeOreNeedForFuel(rule_set, *ordered_ingredients, guess);
-    if (!ore_needed.ok()) return ore_needed.status();
-    VLOG(1) << guess << " => " << *ore_needed;
-    if (*ore_needed == ore_supply) {
+    ASSIGN_OR_RETURN(ore_needed, ComputeOreNeedForFuel(rule_set, ordered_ingredients, guess));
+    VLOG(1) << guess << " => " << ore_needed;
+    if (ore_needed == ore_supply) {
       min = max = guess;
-    } else if (*ore_needed < ore_supply) {
+    } else if (ore_needed < ore_supply) {
       if (min == guess) break;
       min = guess;
     } else {
       max = guess;
     }
   }
-  ore_needed = ComputeOreNeedForFuel(rule_set, *ordered_ingredients, guess);
-  if (*ore_needed > ore_supply) return guess - 1;
+  ASSIGN_OR_RETURN(ore_needed, ComputeOreNeedForFuel(rule_set, ordered_ingredients, guess));
+  if (ore_needed > ore_supply) return guess - 1;
   return guess;
 }
 
@@ -139,18 +137,16 @@ absl::StatusOr<int> FuelFromOre(const DirectedGraph<Rule>& rule_set,
 
 absl::StatusOr<std::string> Day_2019_14::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<DirectedGraph<Rule>> rule_set = ParseRuleSet(input);
-  if (!rule_set.ok()) return rule_set.status();
+  ASSIGN_OR_RETURN(DirectedGraph<Rule> rule_set, ParseRuleSet(input));
 
-  return AdventReturn(ComputeOreNeedForFuel(*rule_set));
+  return AdventReturn(ComputeOreNeedForFuel(rule_set));
 }
 
 absl::StatusOr<std::string> Day_2019_14::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<DirectedGraph<Rule>> rule_set = ParseRuleSet(input);
-  if (!rule_set.ok()) return rule_set.status();
+  ASSIGN_OR_RETURN(DirectedGraph<Rule> rule_set, ParseRuleSet(input));
 
-  return AdventReturn(FuelFromOre(*rule_set, 1000000000000));
+  return AdventReturn(FuelFromOre(rule_set, 1'000'000'000'000));
 }
 
 }  // namespace advent_of_code

@@ -23,39 +23,36 @@ class Maze {
     while (!input.empty() && input.back() == "") {
       input = input.subspan(0, input.size() - 1);
     }
-    absl::StatusOr<CharBoard> with_portals = CharBoard::Parse(input);
-    if (!with_portals.ok()) return with_portals.status();
+    ASSIGN_OR_RETURN(CharBoard with_portals, CharBoard::Parse(input));
 
     absl::flat_hash_map<std::string, std::vector<Point>> portals;
 
-    PointRectangle range = with_portals->range();
+    PointRectangle range = with_portals.range();
     range.min += Point{2, 2};
     range.max -= Point{2, 2};
 
-    Maze ret(with_portals->width() - 4, with_portals->height() - 4);
-    absl::StatusOr<CharBoard> sub_board = with_portals->SubBoard(range);
-    if (!sub_board.ok()) return sub_board.status();
-    ret.board_ = std::move(*sub_board);
+    Maze ret(with_portals.width() - 4, with_portals.height() - 4);
+    ASSIGN_OR_RETURN(ret.board_, with_portals.SubBoard(range));
     for (Point p : range) {
-      if (with_portals->at(p) == '.') {
-        if (IsCapAlpha(with_portals->at(p + Point{0, -1}))) {
-          char portal_name[] = {with_portals->at(p + Point{0, -2}),
-                                with_portals->at(p + Point{0, -1}), '\0'};
+      if (with_portals[p] == '.') {
+        if (IsCapAlpha(with_portals[p + Point{0, -1}])) {
+          char portal_name[] = {with_portals[p + Point{0, -2}],
+                                with_portals[p + Point{0, -1}], '\0'};
           portals[std::string(portal_name)].push_back(p - Point{2, 2});
         }
-        if (IsCapAlpha(with_portals->at(p + Point{0, 1}))) {
-          char portal_name[] = {with_portals->at(p + Point{0, 1}),
-                                with_portals->at(p + Point{0, 2}), '\0'};
+        if (IsCapAlpha(with_portals[p + Point{0, 1}])) {
+          char portal_name[] = {with_portals[p + Point{0, 1}],
+                                with_portals[p + Point{0, 2}], '\0'};
           portals[std::string(portal_name)].push_back(p - Point{2, 2});
         }
-        if (IsCapAlpha(with_portals->at(p + Point{-1, 0}))) {
-          char portal_name[] = {with_portals->at(p + Point{-2, 0}),
-                                with_portals->at(p + Point{-1, 0}), '\0'};
+        if (IsCapAlpha(with_portals[p + Point{-1, 0}])) {
+          char portal_name[] = {with_portals[p + Point{-2, 0}],
+                                with_portals[p + Point{-1, 0}], '\0'};
           portals[std::string(portal_name)].push_back(p - Point{2, 2});
         }
-        if (IsCapAlpha(with_portals->at(p + Point{1, 0}))) {
-          char portal_name[] = {with_portals->at(p + Point{1, 0}),
-                                with_portals->at(p + Point{2, 0}), '\0'};
+        if (IsCapAlpha(with_portals[p + Point{1, 0}])) {
+          char portal_name[] = {with_portals[p + Point{1, 0}],
+                                with_portals[p + Point{2, 0}], '\0'};
           portals[std::string(portal_name)].push_back(p - Point{2, 2});
         }
       }
@@ -192,18 +189,16 @@ class Maze {
 
 absl::StatusOr<std::string> Day_2019_20::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<Maze> maze = Maze::Parse(input);
-  if (!maze.ok()) return maze.status();
+  ASSIGN_OR_RETURN(Maze maze, Maze::Parse(input));
 
-  return AdventReturn(maze->FindPath());
+  return AdventReturn(maze.FindPath());
 }
 
 absl::StatusOr<std::string> Day_2019_20::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<Maze> maze = Maze::Parse(input);
-  if (!maze.ok()) return maze.status();
+  ASSIGN_OR_RETURN(Maze maze, Maze::Parse(input));
 
-  return AdventReturn(maze->FindRecursivePath());
+  return AdventReturn(maze.FindRecursivePath());
 }
 
 }  // namespace advent_of_code

@@ -93,18 +93,16 @@ absl::StatusOr<std::string> Day_2020_21::Part1(
     absl::Span<std::string_view> input) const {
   std::vector<Food> foods;
   for (std::string_view in : input) {
-    absl::StatusOr<Food> food = ParseFood(in);
-    if (!food.ok()) return food.status();
-    foods.push_back(std::move(*food));
+    ASSIGN_OR_RETURN(Food food, ParseFood(in));
+    foods.push_back(std::move(food));
   }
-  absl::StatusOr<absl::flat_hash_map<std::string_view, std::string_view>>
-      ingredient_to_allergen = FindAllergens(foods);
-  if (!ingredient_to_allergen.ok()) return ingredient_to_allergen.status();
+  absl::flat_hash_map<std::string_view, std::string_view> ingredient_to_allergen;
+  ASSIGN_OR_RETURN(ingredient_to_allergen, FindAllergens(foods));
 
   int count = 0;
   for (const Food& f : foods) {
     for (std::string_view ingredient : f.ingredients) {
-      if (!ingredient_to_allergen->contains(ingredient)) ++count;
+      if (!ingredient_to_allergen.contains(ingredient)) ++count;
     }
   }
   return AdventReturn(count);
@@ -114,13 +112,11 @@ absl::StatusOr<std::string> Day_2020_21::Part2(
     absl::Span<std::string_view> input) const {
   std::vector<Food> foods;
   for (std::string_view in : input) {
-    absl::StatusOr<Food> food = ParseFood(in);
-    if (!food.ok()) return food.status();
-    foods.push_back(std::move(*food));
+    ASSIGN_OR_RETURN(Food food, ParseFood(in));
+    foods.push_back(std::move(food));
   }
-  absl::StatusOr<absl::flat_hash_map<std::string_view, std::string_view>>
-      ingredient_to_allergen = FindAllergens(foods);
-  if (!ingredient_to_allergen.ok()) return ingredient_to_allergen.status();
+  absl::flat_hash_map<std::string_view, std::string_view> ingredient_to_allergen;
+  ASSIGN_OR_RETURN(ingredient_to_allergen, FindAllergens(foods));
 
   struct IandA {
     std::string_view i;
@@ -128,10 +124,10 @@ absl::StatusOr<std::string> Day_2020_21::Part2(
     bool operator<(const IandA& o) const { return a < o.a; }
   };
   std::vector<IandA> ingredient_and_allergen;
-  for (const auto& pair : *ingredient_to_allergen) {
+  for (const auto& pair : ingredient_to_allergen) {
     ingredient_and_allergen.push_back({.i = pair.first, .a = pair.second});
   }
-  std::sort(ingredient_and_allergen.begin(), ingredient_and_allergen.end());
+  absl::c_sort(ingredient_and_allergen);
   std::string out = absl::StrJoin(ingredient_and_allergen, ",",
                                   [](std::string* out, const IandA& ianda) {
                                     absl::StrAppend(out, ianda.i);

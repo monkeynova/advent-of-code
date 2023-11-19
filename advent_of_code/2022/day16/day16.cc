@@ -177,10 +177,9 @@ absl::StatusOr<int> BestPath(const DirectedGraph<Valve>& graph, int minutes,
 
   int best_known = 0;
   if (use_elephant) {
-    absl::StatusOr<int> just_me =
-        BestPath(graph, minutes, /*use_elephant=*/false);
-    if (!just_me.ok()) return just_me.status();
-    best_known = *just_me;
+    ASSIGN_OR_RETURN(
+        best_known,
+        BestPath(graph, minutes, /*use_elephant=*/false));
   }
 
   VLOG(1) << "Max cardinality: " << graph.nodes().size() << "*"
@@ -255,18 +254,16 @@ absl::StatusOr<int> BestPath(const DirectedGraph<Valve>& graph, int minutes,
 
 absl::StatusOr<std::string> Day_2022_16::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<DirectedGraph<Valve>> graph = ParseGraph(input);
-  if (!graph.ok()) return graph.status();
+  ASSIGN_OR_RETURN(DirectedGraph<Valve> graph, ParseGraph(input));
 
-  return AdventReturn(BestPath(*graph, 30, /*use_elephant=*/false));
+  return AdventReturn(BestPath(graph, 30, /*use_elephant=*/false));
 }
 
 absl::StatusOr<std::string> Day_2022_16::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<DirectedGraph<Valve>> graph = ParseGraph(input);
-  if (!graph.ok()) return graph.status();
+  ASSIGN_OR_RETURN(DirectedGraph<Valve> graph, ParseGraph(input));
 
-  return AdventReturn(BestPath(*graph, 26, /*use_elephant=*/true));
+  return AdventReturn(BestPath(graph, 26, /*use_elephant=*/true));
 }
 
 }  // namespace advent_of_code

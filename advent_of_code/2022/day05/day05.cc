@@ -94,23 +94,24 @@ absl::StatusOr<Day> Parse(absl::Span<std::string_view> input) {
   }
   if (!split_at) return Error("No empty line in input");
 
-  absl::StatusOr<std::vector<std::unique_ptr<CargoStack>>> stacks =
-      ParseStacks(input.subspan(0, *split_at));
-  if (!stacks.ok()) return stacks.status();
+  ASSIGN_OR_RETURN(
+      std::vector<std::unique_ptr<CargoStack>> stacks,
+      ParseStacks(input.subspan(0, *split_at)));
 
-  absl::StatusOr<std::vector<Move>> moves =
-      ParseMoves(input.subspan(*split_at + 1), *stacks);
+  ASSIGN_OR_RETURN(
+      std::vector<Move> moves,
+      ParseMoves(input.subspan(*split_at + 1), stacks));
 
-  return Day{.stacks = std::move(*stacks), .moves = std::move(*moves)};
+  return Day{.stacks = std::move(stacks), .moves = std::move(moves)};
 }
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2022_05::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<Day> day = Parse(input);
+  ASSIGN_OR_RETURN(Day day, Parse(input));
 
-  for (const Move& m : day->moves) {
+  for (const Move& m : day.moves) {
     if (m.from.size() < m.count) return Error("Bad move: empty");
     for (int i = 0; i < m.count; ++i) {
       m.to.push_back(m.from[m.from.size() - i - 1]);
@@ -118,14 +119,14 @@ absl::StatusOr<std::string> Day_2022_05::Part1(
     m.from.resize(m.from.size() - m.count);
   }
 
-  return day->Tops();
+  return day.Tops();
 }
 
 absl::StatusOr<std::string> Day_2022_05::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<Day> day = Parse(input);
+  ASSIGN_OR_RETURN(Day day, Parse(input));
 
-  for (const Move& m : day->moves) {
+  for (const Move& m : day.moves) {
     if (m.from.size() < m.count) return Error("Bad move: empty");
     for (int i = 0; i < m.count; ++i) {
       m.to.push_back(m.from[m.from.size() - m.count + i]);
@@ -133,7 +134,7 @@ absl::StatusOr<std::string> Day_2022_05::Part2(
     m.from.resize(m.from.size() - m.count);
   }
 
-  return day->Tops();
+  return day.Tops();
 }
 
 }  // namespace advent_of_code

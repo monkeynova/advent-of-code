@@ -78,10 +78,9 @@ absl::flat_hash_map<std::string, int> FileSizes2DirSizes(
 
 absl::StatusOr<absl::flat_hash_map<std::string, int>> ParseDirSizes(
     absl::Span<std::string_view> input) {
-  absl::StatusOr<absl::flat_hash_map<std::string, int>> file2size =
-      ParseFileSizes(input);
-  if (!file2size.ok()) return file2size.status();
-  return FileSizes2DirSizes(*file2size);
+  absl::flat_hash_map<std::string, int> file2size;
+  ASSIGN_OR_RETURN(file2size, ParseFileSizes(input));
+  return FileSizes2DirSizes(file2size);
 }
 
 }  // namespace
@@ -90,12 +89,11 @@ absl::StatusOr<std::string> Day_2022_07::Part1(
     absl::Span<std::string_view> input) const {
   const int kSmallSizeThreshold = 100'000;
 
-  absl::StatusOr<absl::flat_hash_map<std::string, int>> dir2size =
-      ParseDirSizes(input);
-  if (!dir2size.ok()) return dir2size.status();
+  absl::flat_hash_map<std::string, int> dir2size;
+  ASSIGN_OR_RETURN(dir2size, ParseDirSizes(input));
 
   int small_size = 0;
-  for (const auto& [dname, size] : *dir2size) {
+  for (const auto& [dname, size] : dir2size) {
     if (size > kSmallSizeThreshold) continue;
     small_size += size;
   }
@@ -107,14 +105,13 @@ absl::StatusOr<std::string> Day_2022_07::Part2(
   const int kDiskSize = 70'000'000;
   const int kFreeSize = 30'000'000;
 
-  absl::StatusOr<absl::flat_hash_map<std::string, int>> dir2size =
-      ParseDirSizes(input);
-  if (!dir2size.ok()) return dir2size.status();
+  absl::flat_hash_map<std::string, int> dir2size;
+  ASSIGN_OR_RETURN(dir2size, ParseDirSizes(input));
 
-  int total = (*dir2size)[""];
+  int total = dir2size[""];
   int min_free = total - (kDiskSize - kFreeSize);
   int best = std::numeric_limits<int>::max();
-  for (const auto& [dname, size] : *dir2size) {
+  for (const auto& [dname, size] : dir2size) {
     if (size < min_free) continue;
     best = std::min(size, best);
   }

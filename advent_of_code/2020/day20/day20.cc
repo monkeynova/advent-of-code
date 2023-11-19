@@ -402,18 +402,18 @@ absl::StatusOr<std::string> Day_2020_20::Part1(
     if (RE2::FullMatch(input[i], "Tile (\\d+):", &cur_tile_num)) {
       cur_tile_index = i + 1;
     } else if (input[i].empty()) {
-      absl::StatusOr<CharBoard> board =
-          CharBoard::Parse(input.subspan(cur_tile_index, i - cur_tile_index));
-      if (!board.ok()) return board.status();
+      ASSIGN_OR_RETURN(
+          CharBoard board,
+          CharBoard::Parse(input.subspan(cur_tile_index, i - cur_tile_index)));
       if (tiles.contains(cur_tile_num)) return Error("Dup tile:", cur_tile_num);
-      tiles.emplace(cur_tile_num, std::move(*board));
+      tiles.emplace(cur_tile_num, std::move(board));
     }
   }
-  absl::StatusOr<CharBoard> board =
-      CharBoard::Parse(input.subspan(cur_tile_index, input.size()));
-  if (!board.ok()) return board.status();
+  ASSIGN_OR_RETURN(
+      CharBoard board,
+      CharBoard::Parse(input.subspan(cur_tile_index, input.size())));
   if (tiles.contains(cur_tile_num)) return Error("Dup tile:", cur_tile_num);
-  tiles.emplace(cur_tile_num, std::move(*board));
+  tiles.emplace(cur_tile_num, std::move(board));
 
   return AdventReturn(AlignTileCorners(tiles));
 }
@@ -427,25 +427,24 @@ absl::StatusOr<std::string> Day_2020_20::Part2(
     if (RE2::FullMatch(input[i], "Tile (\\d+):", &cur_tile_num)) {
       cur_tile_index = i + 1;
     } else if (input[i].empty()) {
-      absl::StatusOr<CharBoard> board =
-          CharBoard::Parse(input.subspan(cur_tile_index, i - cur_tile_index));
-      if (!board.ok()) return board.status();
+      ASSIGN_OR_RETURN(
+          CharBoard board,
+          CharBoard::Parse(input.subspan(cur_tile_index, i - cur_tile_index)));
       if (tiles.contains(cur_tile_num)) return Error("Dup tile:", cur_tile_num);
-      tiles.emplace(cur_tile_num, std::move(*board));
+      tiles.emplace(cur_tile_num, std::move(board));
     }
   }
-  absl::StatusOr<CharBoard> board =
-      CharBoard::Parse(input.subspan(cur_tile_index, input.size()));
-  if (!board.ok()) return board.status();
+  ASSIGN_OR_RETURN(
+      CharBoard board,
+      CharBoard::Parse(input.subspan(cur_tile_index, input.size())));
   if (tiles.contains(cur_tile_num)) return Error("Dup tile:", cur_tile_num);
-  tiles.emplace(cur_tile_num, std::move(*board));
+  tiles.emplace(cur_tile_num, std::move(board));
 
-  absl::StatusOr<CharBoard> merged = TileMerger(tiles).Merge();
-  if (!merged.ok()) return merged.status();
+  ASSIGN_OR_RETURN(CharBoard merged, TileMerger(tiles).Merge());
 
-  VLOG(1) << "Merged Board:\n" << *merged;
+  VLOG(1) << "Merged Board:\n" << merged;
 
-  return AdventReturn(CountNonSeaMonster(*merged));
+  return AdventReturn(CountNonSeaMonster(merged));
 }
 
 }  // namespace advent_of_code

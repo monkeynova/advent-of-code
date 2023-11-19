@@ -84,9 +84,8 @@ absl::StatusOr<bool> TryPosition(Scanner* dest, const Scanner& src) {
     for (const auto& [p, c] : try_absolute_counts) {
       if (c < 12) continue;
       dest->absolute = p;
-      absl::StatusOr<int> overlap = CountOverlap(*dest, src);
-      if (!overlap.ok()) return overlap.status();
-      if (*overlap >= 12) {
+      ASSIGN_OR_RETURN(int overlap, CountOverlap(*dest, src));
+      if (overlap >= 12) {
         return true;
       }
     }
@@ -128,10 +127,10 @@ absl::Status PositionScanners(std::vector<Scanner>& scanners) {
         if (this_attempt.contains(p_idx)) continue;
 
         VLOG(2) << "Trying " << i << " with " << p_idx;
-        absl::StatusOr<bool> collapsed =
-            TryPosition(&scanners[i], scanners[p_idx]);
-        if (!collapsed.ok()) return collapsed.status();
-        if (*collapsed) {
+        ASSIGN_OR_RETURN(
+            bool collapsed,
+            TryPosition(&scanners[i], scanners[p_idx]));
+        if (collapsed) {
           VLOG(1) << "Collapsed " << i << " with " << p_idx;
           new_positioned.insert(i);
           break;
@@ -151,13 +150,12 @@ absl::Status PositionScanners(std::vector<Scanner>& scanners) {
 
 absl::StatusOr<std::string> Day_2021_19::Part1(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<Scanner>> scanners = Parse(input);
-  if (!scanners.ok()) return scanners.status();
+  ASSIGN_OR_RETURN(std::vector<Scanner> scanners, Parse(input));
 
-  if (auto st = PositionScanners(*scanners); !st.ok()) return st;
+  RETURN_IF_ERROR(PositionScanners(scanners));
 
   absl::flat_hash_set<Point3> absolute_becons;
-  for (const auto& s : *scanners) {
+  for (const auto& s : scanners) {
     for (const auto& b : s.relative_beacons) {
       absolute_becons.insert(s.RelativeToAbsolute(b));
     }
@@ -168,15 +166,14 @@ absl::StatusOr<std::string> Day_2021_19::Part1(
 
 absl::StatusOr<std::string> Day_2021_19::Part2(
     absl::Span<std::string_view> input) const {
-  absl::StatusOr<std::vector<Scanner>> scanners = Parse(input);
-  if (!scanners.ok()) return scanners.status();
+  ASSIGN_OR_RETURN(std::vector<Scanner> scanners, Parse(input));
 
-  if (auto st = PositionScanners(*scanners); !st.ok()) return st;
+  RETURN_IF_ERROR(PositionScanners(scanners));
 
   int max_dist = 0;
-  for (int i = 0; i < scanners->size(); ++i) {
-    for (int j = i + 1; j < scanners->size(); ++j) {
-      int dist = ((*scanners)[i].absolute - (*scanners)[j].absolute).dist();
+  for (int i = 0; i < scanners.size(); ++i) {
+    for (int j = i + 1; j < scanners.size(); ++j) {
+      int dist = (scanners[i].absolute - scanners[j].absolute).dist();
       max_dist = std::max(max_dist, dist);
     }
   }

@@ -66,9 +66,8 @@ absl::StatusOr<std::string> Day_2021_17::Part1(
   }
   PointRectangle target{{minx, miny}, {maxx, maxy}};
   int64_t max_max = 0;
-  absl::StatusOr<PointRectangle> vbound = VelocityBounds(target);
-  if (!vbound.ok()) return vbound.status();
-  for (Point v0 : *vbound) {
+  ASSIGN_OR_RETURN(PointRectangle vbound, VelocityBounds(target));
+  for (Point v0 : vbound) {
     std::optional<int64_t> max_y = Fire(v0, target);
     if (!max_y) continue;
     VLOG(2) << v0 << " => " << *max_y;
@@ -88,9 +87,8 @@ absl::StatusOr<std::string> Day_2021_17::Part2(
   }
   PointRectangle target{{minx, miny}, {maxx, maxy}};
   int64_t count = 0;
-  absl::StatusOr<PointRectangle> vbound = VelocityBounds(target);
-  if (!vbound.ok()) return vbound.status();
-  for (Point v0 : *vbound) {
+  ASSIGN_OR_RETURN(PointRectangle vbound, VelocityBounds(target));
+  for (Point v0 : vbound) {
     std::optional<int64_t> max_y = Fire(v0, target);
     if (!max_y) continue;
     VLOG(2) << v0 << " => " << *max_y;
