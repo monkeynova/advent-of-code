@@ -258,8 +258,10 @@ absl::StatusOr<std::string> Day_2018_15::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
 
+  // We cannot binary search here. The details of the game are such that the
+  // evaluation of "all elves survive" isn't monotonic with respect to the
+  // attack value.
   for (int elf_attack = 3; true; ++elf_attack) {
-    // TODO(@monkeynova): Binary search.
     GameBoard game(std::move(b), elf_attack);
     int start_elves = game.CountElves();
     bool done = false;

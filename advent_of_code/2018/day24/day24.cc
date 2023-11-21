@@ -267,6 +267,28 @@ int ImmuneLeftAfterFightWithBoost(const std::vector<Group>& start, int boost) {
   return units;
 }
 
+int InfiniteBinarySearch(absl::FunctionRef<bool(int)> cmp) {
+  int min = 1;
+  int max = 0;
+  while (max == 0) {
+    int test = 2 * min;
+    if (cmp(test)) {
+      min = test;
+    } else {
+      max = test;
+    }
+  }
+  while (min != max) {
+    int test = (max + min) / 2;
+    if (cmp(test)) {
+      min = test + 1;
+    } else {
+      max = test;
+    }
+  }
+  return min;
+}
+
 }  // namespace
 
 absl::StatusOr<std::string> Day_2018_24::Part1(
@@ -287,39 +309,17 @@ absl::StatusOr<std::string> Day_2018_24::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(std::vector<Group> groups, Parse(input));
 
-  int min = 1;
-  int max = 0;
-  int immunity_units_left;
-  // TODO(@monkeynova): Remove redundancy between branches.
-  while (min != max) {
-    if (max == 0) {
-      int boost = 2 * min;
-      VLOG(1) << "Trying boost: " << boost;
-      int this_units_left = ImmuneLeftAfterFightWithBoost(groups, boost);
-      if (this_units_left > 0) {
-        VLOG(1) << "  Immunity won";
-        immunity_units_left = this_units_left;
-        max = 2 * min;
-      } else {
-        VLOG(1) << "  Infection won";
-        min = 2 * min;
-      }
-    } else {
-      int boost = (max + min) / 2;
-      VLOG(1) << "Trying boost: " << boost;
-      int this_units_left = ImmuneLeftAfterFightWithBoost(groups, boost);
-      if (this_units_left > 0) {
-        VLOG(1) << "  Immunity won";
-        immunity_units_left = this_units_left;
-        max = boost;
-      } else {
-        VLOG(1) << "  Infection won";
-        min = boost + 1;
-      }
+  int boost = InfiniteBinarySearch([&](int test_boost) {
+    VLOG(1) << "Trying boost: " << test_boost;
+    int this_units_left = ImmuneLeftAfterFightWithBoost(groups, test_boost);
+    if (this_units_left > 0) {
+      VLOG(1) << "  Immunity won";
+      return false;
     }
-  }
-
-  return AdventReturn(immunity_units_left);
+    VLOG(1) << "  Infection won";
+    return true;
+  });
+  return AdventReturn(ImmuneLeftAfterFightWithBoost(groups, boost));
 }
 
 }  // namespace advent_of_code
