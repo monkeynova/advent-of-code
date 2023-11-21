@@ -29,6 +29,24 @@ cc_test(
     ],
 )
 
+cc_library(
+    name = "vm",
+    hdrs = ["vm.h"],
+    srcs = ["vm.cc"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "//advent_of_code:vlog",
+        "@com_google_absl//absl/container:flat_hash_map",
+        "@com_google_absl//absl/log:check",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/status:statusor",
+        "@com_googlesource_code_re2//:re2",
+    ],
+)
+
+
 cc_test(
     name = "benchmark",
     size = "small",
