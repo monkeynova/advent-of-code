@@ -64,8 +64,7 @@ absl::StatusOr<std::string> Day_2022_15::Part1(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(std::vector<SAndB> list, ParseList(input));
 
-  int y;
-  if (!absl::SimpleAtoi(param(), &y)) return Error(param(), " isn't an int");
+  ASSIGN_OR_RETURN(int y, IntParam());
   Interval1D no_closer;
   Interval1D beacons;
   for (const auto& sandb : list) {
@@ -82,8 +81,7 @@ absl::StatusOr<std::string> Day_2022_15::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(std::vector<SAndB> list, ParseList(input));
 
-  int max;
-  if (!absl::SimpleAtoi(param(), &max)) return Error(param(), " isn't an int");
+  ASSIGN_OR_RETURN(int max, IntParam());
   PointRectangle test_area;
   test_area.min = {0, 0};
   test_area.max = Point{max, max};

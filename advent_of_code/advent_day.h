@@ -48,6 +48,11 @@ class AdventDay {
 
   bool run_audit() const { return absl::GetFlag(FLAGS_advent_day_run_audit); }
   std::string_view param() const { return param_; }
+  absl::StatusOr<int64_t> IntParam() const {
+    int64_t param_val;
+    if (!absl::SimpleAtoi(param(), &param_val)) return Error("Not an int: ", param());
+    return param_val;
+  }
 
   void set_param(std::string param) { param_ = param; }
 

@@ -1,14 +1,23 @@
 # http://adventofcode.com/2016/day/16
 ==
 
+[part=1]
+[param=20]
+10000
+--
+01100
+==
+
 # 10001101110101111 (low)
 [part=1]
+[param=272]
 @include{advent_of_code/2016/day16/input.txt}
 --
 11111000111110000
 ==
 
 [part=2]
+[param=35651584]
 @include{advent_of_code/2016/day16/input.txt}
 --
 10111100110110100
