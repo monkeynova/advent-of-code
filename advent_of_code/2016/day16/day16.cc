@@ -15,29 +15,31 @@ namespace {
 
 class DragonCurve {
  public:
-  static std::string Expand(std::string_view tmp) {
-    std::string copy = std::string(tmp);
-    std::reverse(copy.begin(), copy.end());
-    for (int i = 0; i < copy.size(); ++i) {
-      copy[i] = copy[i] == '0' ? '1' : '0';
+  static void ExpandTo(std::string& str, int size) {
+    while (str.size() != size) {
+      int start_size = str.size();
+      str.resize(2 * str.size() + 1, '0');
+      for (int i = 0; i < start_size; ++i) {
+        // ^1: 0 -> 1, 1 -> 0.
+        str[str.size() - 1 - i] = str[i] ^ 1;
+      }
+      if (str.size() > size) str.resize(size);
+      VLOG(2) << str;
     }
-    std::string ret = absl::StrCat(tmp, "0", copy);
-    VLOG(2) << ret;
-    return ret;
   }
 
-  static std::string Checksum(std::string_view tmp) {
-    std::string ret;
-    ret.resize((tmp.size() + 1) / 2);
-    for (int i = 0; i < tmp.size(); i += 2) {
-      if (tmp[i] == tmp[i + 1]) {
-        ret[i / 2] = '1';
-      } else {
-        ret[i / 2] = '0';
+  static void Checksum(std::string& str) {
+    while (str.size() % 2 == 0) {
+      for (int i = 0; i + 1 < str.size(); i += 2) {
+        if (str[i] == str[i + 1]) {
+          str[i / 2] = '1';
+        } else {
+          str[i / 2] = '0';
+        }
       }
+      VLOG(2) << str;
+      str.resize(str.size() / 2);
     }
-    VLOG(2) << ret;
-    return ret;
   }
 
   explicit DragonCurve(std::string_view str) : str_(str) {}
@@ -62,16 +64,13 @@ class DragonCurve {
 
 std::string RunPart1(std::string_view input, int size) {
   std::string s = std::string(input);
+  int reserve = input.size();
+  while (reserve < size) reserve = 2 * reserve + 1;
+  s.reserve(reserve);
   VLOG(1) << "Start: " << s;
-  while (s.size() < size) {
-    s = DragonCurve::Expand(s);
-  }
+  DragonCurve::ExpandTo(s, size);
   VLOG(1) << "Expanded: " << s;
-  s = s.substr(0, size);
-  VLOG(1) << "Truncated:" << s;
-  while (s.size() % 2 == 0) {
-    s = DragonCurve::Checksum(s);
-  }
+  DragonCurve::Checksum(s);
   VLOG(1) << "Checksum: " << s;
   return s;
 }
