@@ -25,10 +25,10 @@ absl::Status InfiniteConway::Advance() {
         absl::StrCat("Bad lookup size:", lookup_.size()));
   }
   static const std::array<Point, 9> kDirs = {
-    Cardinal::kNorthWest, Cardinal::kNorth, Cardinal::kNorthEast,
-    Cardinal::kWest, Cardinal::kOrigin, Cardinal::kEast,
-    Cardinal::kSouthWest, Cardinal::kSouth, Cardinal::kSouthEast};
-  
+      Cardinal::kNorthWest, Cardinal::kNorth,  Cardinal::kNorthEast,
+      Cardinal::kWest,      Cardinal::kOrigin, Cardinal::kEast,
+      Cardinal::kSouthWest, Cardinal::kSouth,  Cardinal::kSouthEast};
+
   CharBoard new_b(b_.width() + 2, b_.height() + 2);
   for (Point p : new_b.range()) {
     int bv = 0;

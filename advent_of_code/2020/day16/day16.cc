@@ -54,9 +54,8 @@ absl::StatusOr<ParseResult> Parse(absl::Span<std::string_view> input) {
   for (; i < input.size(); ++i) {
     std::vector<std::string_view> other_ticket_str =
         absl::StrSplit(input[i], ",");
-    ASSIGN_OR_RETURN(
-        std::vector<int64_t> other_ticket,
-        ParseAsInts(absl::MakeSpan(other_ticket_str)));
+    ASSIGN_OR_RETURN(std::vector<int64_t> other_ticket,
+                     ParseAsInts(absl::MakeSpan(other_ticket_str)));
     res.other_tickets.push_back(std::move(other_ticket));
   }
 

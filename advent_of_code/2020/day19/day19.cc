@@ -28,9 +28,8 @@ absl::StatusOr<Rule> ParseRule(std::string_view in) {
   }
   if (!RE2::FullMatch(dest, "\"(.)\"", &ret.token)) {
     for (std::string_view piece : absl::StrSplit(dest, " | ")) {
-      ASSIGN_OR_RETURN(
-          std::vector<int64_t> sub_rule,
-          ParseAsInts(absl::StrSplit(piece, " ")));
+      ASSIGN_OR_RETURN(std::vector<int64_t> sub_rule,
+                       ParseAsInts(absl::StrSplit(piece, " ")));
       ret.sub_rules.push_back(std::move(sub_rule));
     }
   }

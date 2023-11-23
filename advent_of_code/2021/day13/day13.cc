@@ -68,9 +68,8 @@ absl::StatusOr<std::string> Day_2021_13::Part1(
     }
     if (folds) {
       absl::StatusOr<Point> axis = ParseFold(line);
-      ASSIGN_OR_RETURN(
-          absl::flat_hash_set<Point> folded,
-          Fold(std::move(points), *axis));
+      ASSIGN_OR_RETURN(absl::flat_hash_set<Point> folded,
+                       Fold(std::move(points), *axis));
       return AdventReturn(folded.size());
     } else {
       Point p;

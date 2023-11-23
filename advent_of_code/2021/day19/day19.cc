@@ -127,9 +127,8 @@ absl::Status PositionScanners(std::vector<Scanner>& scanners) {
         if (this_attempt.contains(p_idx)) continue;
 
         VLOG(2) << "Trying " << i << " with " << p_idx;
-        ASSIGN_OR_RETURN(
-            bool collapsed,
-            TryPosition(&scanners[i], scanners[p_idx]));
+        ASSIGN_OR_RETURN(bool collapsed,
+                         TryPosition(&scanners[i], scanners[p_idx]));
         if (collapsed) {
           VLOG(1) << "Collapsed " << i << " with " << p_idx;
           new_positioned.insert(i);

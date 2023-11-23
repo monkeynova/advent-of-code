@@ -77,7 +77,7 @@ class DragonCurve {
   std::string_view str_;
 };
 
-// abc0xyz 0 abc1xyz  0  abc0xyz 1 abc1xyz 
+// abc0xyz 0 abc1xyz  0  abc0xyz 1 abc1xyz
 // 001 0 011  0  001 1 011   0   001 0 011  1  001 1 011
 // 000 0 000  0  000 0 000   1   111 1 111  1  111 1 111
 // 000 0 000  1  111 1 111   0   000 0 000  1  111 1 111
@@ -98,7 +98,7 @@ class CheckSum {
   CheckSum(int size) {
     for (int even_size = size; even_size % 2 == 0; even_size /= 2) {
       ++stack_size_;
-    }    
+    }
     CHECK_LT(stack_size_, stack_.size());
   }
 
@@ -178,7 +178,8 @@ absl::StatusOr<std::string> Day_2016_16::Part1(
     }
     std::string streaming_ish_ret = StreamingIshChecksum(input[0], val);
     if (ret != streaming_ish_ret) {
-      return Error("Streaming Checksum failed: ", ret, " != ", streaming_ish_ret);
+      return Error("Streaming Checksum failed: ", ret,
+                   " != ", streaming_ish_ret);
     }
   }
   return AdventReturn(ret);

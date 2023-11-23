@@ -177,9 +177,8 @@ absl::StatusOr<int> BestPath(const DirectedGraph<Valve>& graph, int minutes,
 
   int best_known = 0;
   if (use_elephant) {
-    ASSIGN_OR_RETURN(
-        best_known,
-        BestPath(graph, minutes, /*use_elephant=*/false));
+    ASSIGN_OR_RETURN(best_known,
+                     BestPath(graph, minutes, /*use_elephant=*/false));
   }
 
   VLOG(1) << "Max cardinality: " << graph.nodes().size() << "*"

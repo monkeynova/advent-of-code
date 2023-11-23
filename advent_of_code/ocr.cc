@@ -312,7 +312,7 @@ absl::StatusOr<std::string> OCRExtract(const CharBoard& board) {
   for (int char_start = 0, char_end; char_start < board.width();
        char_start = char_end + 1) {
     ASSIGN_OR_RETURN(CharBoard single_char,
-                      ExtractNextChar(char_start, board, &char_end));
+                     ExtractNextChar(char_start, board, &char_end));
 
     ASSIGN_OR_RETURN(char next_char, OCRChar(single_char, exemplars));
 

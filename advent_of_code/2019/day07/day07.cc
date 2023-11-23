@@ -32,9 +32,8 @@ absl::StatusOr<int> FindBestThrust(const IntCode& base_codes, int input_value,
       return absl::InvalidArgumentError("Didn't return a single output");
     }
 
-    ASSIGN_OR_RETURN(
-        int sub_best_thrust,
-        FindBestThrust(base_codes, output[0], index + 1, used));
+    ASSIGN_OR_RETURN(int sub_best_thrust,
+                     FindBestThrust(base_codes, output[0], index + 1, used));
     best_thrust = std::max(best_thrust, sub_best_thrust);
     used.erase(i);
   }
@@ -128,9 +127,8 @@ absl::StatusOr<int> FindBestThrustFeedback(const IntCode& base_codes,
                     [i](int p) { return i == p; }))
       continue;
     phases.push_back(i);
-    ASSIGN_OR_RETURN(
-        int sub_best_thrust,
-        FindBestThrustFeedback(base_codes, phases));
+    ASSIGN_OR_RETURN(int sub_best_thrust,
+                     FindBestThrustFeedback(base_codes, phases));
     best_thrust = std::max(best_thrust, sub_best_thrust);
     phases.pop_back();
   }

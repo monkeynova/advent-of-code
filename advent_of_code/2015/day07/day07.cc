@@ -23,8 +23,7 @@ using ExprMap = absl::flat_hash_map<std::string, Operation>;
 
 absl::StatusOr<int> EvaluateMemo(
     absl::flat_hash_map<std::string_view, int>* memo,
-    const ExprMap& ops_by_dest,
-    std::string_view dest) {
+    const ExprMap& ops_by_dest, std::string_view dest) {
   if (auto it = memo->find(dest); it != memo->end()) return it->second;
 
   int ret;
@@ -63,9 +62,8 @@ absl::StatusOr<int> EvaluateMemo(
   return ret;
 }
 
-absl::StatusOr<int> Evaluate(
-    const ExprMap& ops_by_dest,
-    std::string_view dest) {
+absl::StatusOr<int> Evaluate(const ExprMap& ops_by_dest,
+                             std::string_view dest) {
   absl::flat_hash_map<std::string_view, int> memo;
   return EvaluateMemo(&memo, ops_by_dest, dest);
 }

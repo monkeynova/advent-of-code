@@ -334,9 +334,8 @@ absl::Status Audit(absl::Span<std::string_view> input) {
       total_stack = total_stack->Add(std::move(in_stack));
     }
 
-    ASSIGN_OR_RETURN(
-        std::unique_ptr<SnailFishTree> in_tree,
-        SnailFishTree::Parse(in_str));
+    ASSIGN_OR_RETURN(std::unique_ptr<SnailFishTree> in_tree,
+                     SnailFishTree::Parse(in_str));
     if (!total_tree) {
       total_tree = std::move(in_tree);
     } else {

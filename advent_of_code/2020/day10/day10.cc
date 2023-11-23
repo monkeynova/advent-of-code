@@ -26,9 +26,8 @@ absl::StatusOr<int64_t> CountValidArrangements(
   int64_t count = 0;
   for (int delta = offset; delta < jolts.size(); ++delta) {
     if (jolts[delta] > cur_val + 3) break;
-   ASSIGN_OR_RETURN(
-        int64_t next,
-        CountValidArrangements(jolts, memo, jolts[delta], delta + 1));
+    ASSIGN_OR_RETURN(int64_t next, CountValidArrangements(
+                                       jolts, memo, jolts[delta], delta + 1));
     count += next;
   }
 

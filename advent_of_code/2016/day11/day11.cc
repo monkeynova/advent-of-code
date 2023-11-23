@@ -282,14 +282,16 @@ absl::StatusOr<ElevatorState> ElevatorState::Parse(
 absl::StatusOr<std::string> Day_2016_11::Part1(
     absl::Span<std::string_view> input) const {
   std::vector<std::string_view> element_names;
-  ASSIGN_OR_RETURN(ElevatorState s, ElevatorState::Parse(input, &element_names));
+  ASSIGN_OR_RETURN(ElevatorState s,
+                   ElevatorState::Parse(input, &element_names));
   return AdventReturn(s.FindMinSteps());
 }
 
 absl::StatusOr<std::string> Day_2016_11::Part2(
     absl::Span<std::string_view> input) const {
   std::vector<std::string_view> element_names;
-  ASSIGN_OR_RETURN(ElevatorState s, ElevatorState::Parse(input, &element_names));
+  ASSIGN_OR_RETURN(ElevatorState s,
+                   ElevatorState::Parse(input, &element_names));
   s.AddElementAtFloor0("elerium");
   s.AddElementAtFloor0("dilithium");
 

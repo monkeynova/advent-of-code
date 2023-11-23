@@ -96,7 +96,8 @@ absl::StatusOr<std::string> Day_2020_21::Part1(
     ASSIGN_OR_RETURN(Food food, ParseFood(in));
     foods.push_back(std::move(food));
   }
-  absl::flat_hash_map<std::string_view, std::string_view> ingredient_to_allergen;
+  absl::flat_hash_map<std::string_view, std::string_view>
+      ingredient_to_allergen;
   ASSIGN_OR_RETURN(ingredient_to_allergen, FindAllergens(foods));
 
   int count = 0;
@@ -115,7 +116,8 @@ absl::StatusOr<std::string> Day_2020_21::Part2(
     ASSIGN_OR_RETURN(Food food, ParseFood(in));
     foods.push_back(std::move(food));
   }
-  absl::flat_hash_map<std::string_view, std::string_view> ingredient_to_allergen;
+  absl::flat_hash_map<std::string_view, std::string_view>
+      ingredient_to_allergen;
   ASSIGN_OR_RETURN(ingredient_to_allergen, FindAllergens(foods));
 
   struct IandA {

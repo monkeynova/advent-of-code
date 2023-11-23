@@ -94,13 +94,11 @@ absl::StatusOr<Day> Parse(absl::Span<std::string_view> input) {
   }
   if (!split_at) return Error("No empty line in input");
 
-  ASSIGN_OR_RETURN(
-      std::vector<std::unique_ptr<CargoStack>> stacks,
-      ParseStacks(input.subspan(0, *split_at)));
+  ASSIGN_OR_RETURN(std::vector<std::unique_ptr<CargoStack>> stacks,
+                   ParseStacks(input.subspan(0, *split_at)));
 
-  ASSIGN_OR_RETURN(
-      std::vector<Move> moves,
-      ParseMoves(input.subspan(*split_at + 1), stacks));
+  ASSIGN_OR_RETURN(std::vector<Move> moves,
+                   ParseMoves(input.subspan(*split_at + 1), stacks));
 
   return Day{.stacks = std::move(stacks), .moves = std::move(moves)};
 }

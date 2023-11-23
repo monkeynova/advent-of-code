@@ -68,9 +68,8 @@ FileBenchmarkTests(std::string_view test_file) {
 }
 
 absl::StatusOr<int> FileBenchmarkTestCount(AdventDay* day) {
-  ASSIGN_OR_RETURN(
-      std::vector<std::unique_ptr<DirtyTestParseResult>> tests,
-      FileBenchmarkTests(day->test_file()));
+  ASSIGN_OR_RETURN(std::vector<std::unique_ptr<DirtyTestParseResult>> tests,
+                   FileBenchmarkTests(day->test_file()));
   return tests.size();
 }
 

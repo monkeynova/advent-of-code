@@ -81,10 +81,9 @@ absl::StatusOr<CharBoard> RunIteration(
     for (int x = 0; x < in.width() / stride.x; ++x) {
       Point slice_at = {x * stride.x, y * stride.y};
       VLOG(2) << "Slice @" << slice_at;
-      ASSIGN_OR_RETURN(
-          CharBoard slice,
-          in.SubBoard(
-              PointRectangle{slice_at, slice_at + stride - Point{1, 1}}));
+      ASSIGN_OR_RETURN(CharBoard slice,
+                       in.SubBoard(PointRectangle{
+                           slice_at, slice_at + stride - Point{1, 1}}));
       VLOG(2) << "Slice:\n" << slice;
       ASSIGN_OR_RETURN(CharBoard new_slice, FindPattern(slice, patterns));
       if (new_slice.width() != stride.x + 1) return Error("Bad pattern: x");
@@ -104,13 +103,11 @@ absl::StatusOr<absl::flat_hash_map<CharBoard, CharBoard>> Parse(
   for (std::string_view rule : input) {
     const auto [in, out] = PairSplit(rule, " => ");
 
-    ASSIGN_OR_RETURN(
-        CharBoard board_in,
-        CharBoard::Parse(absl::StrSplit(in, "/")));
+    ASSIGN_OR_RETURN(CharBoard board_in,
+                     CharBoard::Parse(absl::StrSplit(in, "/")));
 
-    ASSIGN_OR_RETURN(
-        CharBoard board_out,
-        CharBoard::Parse(absl::StrSplit(out, "/")));
+    ASSIGN_OR_RETURN(CharBoard board_out,
+                     CharBoard::Parse(absl::StrSplit(out, "/")));
 
     if (ret.contains(board_in)) return Error("Duplicate pattern");
     // TODO(@monkeynova): Verify no rotations.
@@ -126,7 +123,7 @@ using BoardToBoard = absl::flat_hash_map<CharBoard, CharBoard>;
 
 absl::StatusOr<std::string> Day_2017_21::Part1(
     absl::Span<std::string_view> input) const {
-  ASSIGN_OR_RETURN(BoardToBoard patterns,  Parse(input));
+  ASSIGN_OR_RETURN(BoardToBoard patterns, Parse(input));
 
   std::vector<std::string_view> init = {".#.", "..#", "###"};
   ASSIGN_OR_RETURN(CharBoard tmp, CharBoard::Parse(absl::MakeSpan(init)));
@@ -142,7 +139,7 @@ absl::StatusOr<std::string> Day_2017_21::Part1(
 
 absl::StatusOr<std::string> Day_2017_21::Part2(
     absl::Span<std::string_view> input) const {
-  ASSIGN_OR_RETURN(BoardToBoard patterns,  Parse(input));
+  ASSIGN_OR_RETURN(BoardToBoard patterns, Parse(input));
 
   std::vector<std::string_view> init = {".#.", "..#", "###"};
   ASSIGN_OR_RETURN(CharBoard tmp, CharBoard::Parse(absl::MakeSpan(init)));

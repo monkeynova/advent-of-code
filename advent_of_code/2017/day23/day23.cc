@@ -85,43 +85,43 @@ jnz a 2 {
 namespace {
 
 std::optional<int64_t> TryMatchProgram(absl::Span<std::string_view> input) {
-  std::string program_re = 
-    "set b (\\d+)\n"
-    "set c b\n"
-    "jnz a 2\n"
-    "jnz 1 5\n"
-    "mul b (\\d+)\n"
-    "sub b (-?\\d+)\n"
-    "set c b\n"
-    "sub c (-?\\d+)\n"
-    "set f 1\n"
-    "set d 2\n"
-    "set e 2\n"
-    "set g d\n"
-    "mul g e\n"
-    "sub g b\n"
-    "jnz g 2\n"
-    "set f 0\n"
-    "sub e -1\n"
-    "set g e\n"
-    "sub g b\n"
-    "jnz g -8\n"
-    "sub d -1\n"
-    "set g d\n"
-    "sub g b\n"
-    "jnz g -13\n"
-    "jnz f 2\n"
-    "sub h -1\n"
-    "set g b\n"
-    "sub g c\n"
-    "jnz g 2\n"
-    "jnz 1 3\n"
-    "sub b (-?\\d+)\n"
-    "jnz 1 -23";
+  std::string program_re =
+      "set b (\\d+)\n"
+      "set c b\n"
+      "jnz a 2\n"
+      "jnz 1 5\n"
+      "mul b (\\d+)\n"
+      "sub b (-?\\d+)\n"
+      "set c b\n"
+      "sub c (-?\\d+)\n"
+      "set f 1\n"
+      "set d 2\n"
+      "set e 2\n"
+      "set g d\n"
+      "mul g e\n"
+      "sub g b\n"
+      "jnz g 2\n"
+      "set f 0\n"
+      "sub e -1\n"
+      "set g e\n"
+      "sub g b\n"
+      "jnz g -8\n"
+      "sub d -1\n"
+      "set g d\n"
+      "sub g b\n"
+      "jnz g -13\n"
+      "jnz f 2\n"
+      "sub h -1\n"
+      "set g b\n"
+      "sub g c\n"
+      "jnz g 2\n"
+      "jnz 1 3\n"
+      "sub b (-?\\d+)\n"
+      "jnz 1 -23";
 
   int b_init, b_mul, b_sub, c_sub, b_neg_delta;
-  if (!RE2::FullMatch(absl::StrJoin(input, "\n"), program_re, 
-                      &b_init, &b_mul, &b_sub, &c_sub, &b_neg_delta)) {
+  if (!RE2::FullMatch(absl::StrJoin(input, "\n"), program_re, &b_init, &b_mul,
+                      &b_sub, &c_sub, &b_neg_delta)) {
     return std::nullopt;
   }
 
@@ -141,7 +141,7 @@ std::optional<int64_t> TryMatchProgram(absl::Span<std::string_view> input) {
   }
   return h;
 }
-   
+
 }  // namespace
 
 absl::StatusOr<std::string> Day_2017_23::Part1(
@@ -153,7 +153,6 @@ absl::StatusOr<std::string> Day_2017_23::Part1(
 
 absl::StatusOr<std::string> Day_2017_23::Part2(
     absl::Span<std::string_view> input) const {
-
   std::optional<int> reimplement_val = TryMatchProgram(input);
   if (reimplement_val) return AdventReturn(reimplement_val);
 

@@ -145,7 +145,7 @@ class TractorSearch {
         next_range.max.x = next_range.min.x;
       }
       while (true) {
-      ASSIGN_OR_RETURN(bool on, ScanPoint(next_range.max));
+        ASSIGN_OR_RETURN(bool on, ScanPoint(next_range.max));
         if (!on) {
           --next_range.max.x;
           break;

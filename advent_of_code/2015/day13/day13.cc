@@ -48,9 +48,8 @@ absl::StatusOr<int> BestFillRemainingSeats(
           << "): " << delta_happiness;
 
   if (seated->size() == cost_map.size()) {
-    ASSIGN_OR_RETURN(
-        int wrap_around,
-        PairDelta(cost_map, (*seating)[0], seating->back()));
+    ASSIGN_OR_RETURN(int wrap_around,
+                     PairDelta(cost_map, (*seating)[0], seating->back()));
     return wrap_around + delta_happiness;
   }
 
@@ -61,18 +60,16 @@ absl::StatusOr<int> BestFillRemainingSeats(
 
     int this_delta = 0;
     if (!seating->empty()) {
-      ASSIGN_OR_RETURN(
-          this_delta,
-          PairDelta(cost_map, to_seat, seating->back()));
+      ASSIGN_OR_RETURN(this_delta,
+                       PairDelta(cost_map, to_seat, seating->back()));
     }
 
     seating->push_back(to_seat);
     seated->insert(to_seat);
 
-    ASSIGN_OR_RETURN(
-        int next_best,
-        BestFillRemainingSeats(
-            cost_map, delta_happiness + this_delta, seating, seated));
+    ASSIGN_OR_RETURN(int next_best, BestFillRemainingSeats(
+                                        cost_map, delta_happiness + this_delta,
+                                        seating, seated));
     max_happiness = opt_max(max_happiness, next_best);
 
     seated->erase(to_seat);

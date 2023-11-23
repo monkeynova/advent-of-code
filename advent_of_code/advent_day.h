@@ -50,7 +50,8 @@ class AdventDay {
   std::string_view param() const { return param_; }
   absl::StatusOr<int64_t> IntParam() const {
     int64_t param_val;
-    if (!absl::SimpleAtoi(param(), &param_val)) return Error("Not an int: ", param());
+    if (!absl::SimpleAtoi(param(), &param_val))
+      return Error("Not an int: ", param());
     return param_val;
   }
 

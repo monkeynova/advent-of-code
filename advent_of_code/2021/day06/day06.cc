@@ -86,9 +86,8 @@ int64_t CountPopulationAfter(std::vector<int64_t> fish, int64_t steps) {
 absl::StatusOr<std::string> Day_2021_06::Part1(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  ASSIGN_OR_RETURN(
-      std::vector<int64_t> nums,
-      ParseAsInts(absl::StrSplit(input[0], ",")));
+  ASSIGN_OR_RETURN(std::vector<int64_t> nums,
+                   ParseAsInts(absl::StrSplit(input[0], ",")));
 
   constexpr int64_t kDays = 80;
 
@@ -109,9 +108,8 @@ absl::StatusOr<std::string> Day_2021_06::Part1(
 absl::StatusOr<std::string> Day_2021_06::Part2(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  ASSIGN_OR_RETURN(
-      std::vector<int64_t> nums,
-      ParseAsInts(absl::StrSplit(input[0], ",")));
+  ASSIGN_OR_RETURN(std::vector<int64_t> nums,
+                   ParseAsInts(absl::StrSplit(input[0], ",")));
 
   constexpr int64_t kDays = 256;
 

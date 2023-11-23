@@ -28,11 +28,11 @@ absl::StatusOr<VM_2017::Instruction> VM_2017::Instruction::Parse(
     ret.op_code = Instruction::kMod;
   } else if (RE2::FullMatch(str, "rcv (-?\\d+|[a-z])", &ret.arg1)) {
     ret.op_code = Instruction::kRcv;
-  } else if (RE2::FullMatch(str, "jgz (-?\\d+|[a-z]) (-?\\d+|[a-z])",
-                            &ret.arg1, &ret.arg2)) {
+  } else if (RE2::FullMatch(str, "jgz (-?\\d+|[a-z]) (-?\\d+|[a-z])", &ret.arg1,
+                            &ret.arg2)) {
     ret.op_code = Instruction::kJgz;
-  } else if (RE2::FullMatch(str, "jnz (-?\\d+|[a-z]) (-?\\d+|[a-z])",
-                            &ret.arg1, &ret.arg2)) {
+  } else if (RE2::FullMatch(str, "jnz (-?\\d+|[a-z]) (-?\\d+|[a-z])", &ret.arg1,
+                            &ret.arg2)) {
     ret.op_code = Instruction::kJnz;
   } else {
     return absl::InvalidArgumentError(absl::StrCat("Bad instruction: ", str));

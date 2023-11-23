@@ -166,7 +166,7 @@ class ConwaySet : public ConwayMultiSet<Storage, 1> {
   void Force(Storage s) { Base::Force(s, 0); }
 
  private:
-   virtual int NextState(int state, std::array<int, 1> neighbors) const final {
+  virtual int NextState(int state, std::array<int, 1> neighbors) const final {
     return IsLive(state == 0, neighbors[0]) ? 0 : -1;
   }
 };

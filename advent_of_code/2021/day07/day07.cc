@@ -21,9 +21,8 @@ namespace {
 absl::StatusOr<std::string> Day_2021_07::Part1(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  ASSIGN_OR_RETURN(
-      std::vector<int64_t> nums,
-      ParseAsInts(absl::StrSplit(input[0], ",")));
+  ASSIGN_OR_RETURN(std::vector<int64_t> nums,
+                   ParseAsInts(absl::StrSplit(input[0], ",")));
 
   // Median minimizes cost function. And if median is between two values any
   // point between the two values is valid, so we don't need to worry about
@@ -40,9 +39,8 @@ absl::StatusOr<std::string> Day_2021_07::Part1(
 absl::StatusOr<std::string> Day_2021_07::Part2(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
-  ASSIGN_OR_RETURN(
-      std::vector<int64_t> nums,
-      ParseAsInts(absl::StrSplit(input[0], ",")));
+  ASSIGN_OR_RETURN(std::vector<int64_t> nums,
+                   ParseAsInts(absl::StrSplit(input[0], ",")));
 
   const auto& [min_it, max_it] = absl::c_minmax_element(nums);
   int64_t best_cost = std::numeric_limits<int64_t>::max();

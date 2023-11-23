@@ -186,7 +186,7 @@ absl::StatusOr<int64_t> HeightAtDrop(DropState& ds, int64_t drops) {
       const DropState::SummaryState& last = hist.FindInLoop(last_drop);
       int64_t ret_height = (ds.height() - start.height) * cycles + last.height;
       VLOG(1) << "Return " << ret_height;
-      return ret_height;      
+      return ret_height;
     }
   }
   return ds.height();

@@ -28,7 +28,7 @@ class VM_2017 {
     } op_code;
     std::string_view arg1;
     std::string_view arg2;
-  
+
     static absl::StatusOr<Instruction> Parse(std::string_view str);
   };
 

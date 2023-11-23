@@ -149,8 +149,7 @@ absl::StatusOr<std::unique_ptr<ExprTree>> ParseAddTree(std::string_view* str) {
     if (op != '+') return Error("Not add: ", *str);
     *str = str->substr(1);
     ASSIGN_OR_RETURN(std::unique_ptr<ExprTree> next_val, ParseValue2(str));
-    last_val =
-        absl::make_unique<Add>(std::move(last_val), std::move(next_val));
+    last_val = absl::make_unique<Add>(std::move(last_val), std::move(next_val));
   }
   return last_val;
 }

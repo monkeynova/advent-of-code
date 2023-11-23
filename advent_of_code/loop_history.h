@@ -31,9 +31,7 @@ class LoopHistory {
     return (offset - loop_offset_) % loop_size_ + loop_offset_;
   }
 
-  const Storage& FindInLoop(int64_t offset) {
-    return *idx_[IndexAt(offset)];
-  }
+  const Storage& FindInLoop(int64_t offset) { return *idx_[IndexAt(offset)]; }
 
  private:
   absl::node_hash_map<Storage, int> hist_;
@@ -41,7 +39,6 @@ class LoopHistory {
   int loop_size_ = -1;
   int loop_offset_ = -1;
 };
-
 
 }  // namespace advent_of_code
 

@@ -229,15 +229,13 @@ absl::StatusOr<StitchMap> BuildStitchMap(const CharBoard& board) {
     int stitch_count = 0;
     for (int i = 0; i < 6; ++i) {
       PointAndDir s1 = s_set[i];
-      ASSIGN_OR_RETURN(
-          std::optional<PointAndDir> e1,
-          stitch_map.SameEdge(e_set, s1));
+      ASSIGN_OR_RETURN(std::optional<PointAndDir> e1,
+                       stitch_map.SameEdge(e_set, s1));
       if (!e1) continue;
       for (int j = i + 1; j < 6; ++j) {
         PointAndDir s2 = s_set[j];
-        ASSIGN_OR_RETURN(
-            std::optional<PointAndDir> e2,
-            stitch_map.SameEdge(e_set, s2));
+        ASSIGN_OR_RETURN(std::optional<PointAndDir> e2,
+                         stitch_map.SameEdge(e_set, s2));
         if (!e2) continue;
         ++stitch_count;
         RETURN_IF_ERROR(stitch_map.Add(s1.p, e1->p, s1.d, s2.p, e2->p, -s2.d));

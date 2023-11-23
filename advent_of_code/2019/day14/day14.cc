@@ -83,9 +83,8 @@ absl::StatusOr<int64_t> ComputeOreNeedForFuel(
 
 absl::StatusOr<int64_t> ComputeOreNeedForFuel(
     const DirectedGraph<Rule>& rule_set) {
-  ASSIGN_OR_RETURN(
-      std::vector<std::string_view> ordered_ingredients,
-      rule_set.DAGSort());
+  ASSIGN_OR_RETURN(std::vector<std::string_view> ordered_ingredients,
+                   rule_set.DAGSort());
   if (ordered_ingredients[0] != "FUEL") {
     return Error("Not a DAG rooted at FUEL");
   }
@@ -97,9 +96,8 @@ absl::StatusOr<int64_t> ComputeOreNeedForFuel(
 
 absl::StatusOr<int> FuelFromOre(const DirectedGraph<Rule>& rule_set,
                                 uint64_t ore_supply) {
-  ASSIGN_OR_RETURN(
-      std::vector<std::string_view> ordered_ingredients,
-      rule_set.DAGSort());
+  ASSIGN_OR_RETURN(std::vector<std::string_view> ordered_ingredients,
+                   rule_set.DAGSort());
   if (ordered_ingredients[0] != "FUEL") {
     return Error("Not a DAG rooted at FUEL");
   }
@@ -109,7 +107,8 @@ absl::StatusOr<int> FuelFromOre(const DirectedGraph<Rule>& rule_set,
   int64_t guess = 1;
   int64_t ore_needed = 0;
   while (ore_needed < ore_supply) {
-    ASSIGN_OR_RETURN(ore_needed, ComputeOreNeedForFuel(rule_set, ordered_ingredients, guess));
+    ASSIGN_OR_RETURN(ore_needed, ComputeOreNeedForFuel(
+                                     rule_set, ordered_ingredients, guess));
     VLOG(1) << guess << " => " << ore_needed;
     guess <<= 1;
   }
@@ -117,7 +116,8 @@ absl::StatusOr<int> FuelFromOre(const DirectedGraph<Rule>& rule_set,
   int64_t max = guess >> 1;
   while (min < max) {
     guess = (min + max) / 2;
-    ASSIGN_OR_RETURN(ore_needed, ComputeOreNeedForFuel(rule_set, ordered_ingredients, guess));
+    ASSIGN_OR_RETURN(ore_needed, ComputeOreNeedForFuel(
+                                     rule_set, ordered_ingredients, guess));
     VLOG(1) << guess << " => " << ore_needed;
     if (ore_needed == ore_supply) {
       min = max = guess;
@@ -128,7 +128,8 @@ absl::StatusOr<int> FuelFromOre(const DirectedGraph<Rule>& rule_set,
       max = guess;
     }
   }
-  ASSIGN_OR_RETURN(ore_needed, ComputeOreNeedForFuel(rule_set, ordered_ingredients, guess));
+  ASSIGN_OR_RETURN(ore_needed,
+                   ComputeOreNeedForFuel(rule_set, ordered_ingredients, guess));
   if (ore_needed > ore_supply) return guess - 1;
   return guess;
 }

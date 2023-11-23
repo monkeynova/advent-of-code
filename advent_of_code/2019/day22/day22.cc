@@ -109,8 +109,8 @@ absl::StatusOr<std::string> Day_2019_22::Part2(
     absl::Span<std::string_view> input) const {
   int64_t run_count = 101'741'582'076'661;
   std::pair<Transform, Transform> pair;
-  ASSIGN_OR_RETURN(
-      pair, CreateTransform(input, /*deck_size=*/119'315'717'514'047));
+  ASSIGN_OR_RETURN(pair,
+                   CreateTransform(input, /*deck_size=*/119'315'717'514'047));
 
   auto [_, inv_t] = pair;
   Transform full_reverse_transform{.mult = 1, .add = 0, .mod = inv_t.mod};

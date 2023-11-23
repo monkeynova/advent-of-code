@@ -409,9 +409,8 @@ absl::StatusOr<std::string> Day_2020_20::Part1(
       tiles.emplace(cur_tile_num, std::move(board));
     }
   }
-  ASSIGN_OR_RETURN(
-      CharBoard board,
-      CharBoard::Parse(input.subspan(cur_tile_index, input.size())));
+  ASSIGN_OR_RETURN(CharBoard board, CharBoard::Parse(input.subspan(
+                                        cur_tile_index, input.size())));
   if (tiles.contains(cur_tile_num)) return Error("Dup tile:", cur_tile_num);
   tiles.emplace(cur_tile_num, std::move(board));
 
@@ -434,9 +433,8 @@ absl::StatusOr<std::string> Day_2020_20::Part2(
       tiles.emplace(cur_tile_num, std::move(board));
     }
   }
-  ASSIGN_OR_RETURN(
-      CharBoard board,
-      CharBoard::Parse(input.subspan(cur_tile_index, input.size())));
+  ASSIGN_OR_RETURN(CharBoard board, CharBoard::Parse(input.subspan(
+                                        cur_tile_index, input.size())));
   if (tiles.contains(cur_tile_num)) return Error("Dup tile:", cur_tile_num);
   tiles.emplace(cur_tile_num, std::move(board));
 
