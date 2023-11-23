@@ -32,15 +32,6 @@ absl::flat_hash_set<std::string> RunStep(
   return unique;
 }
 
-#if 0
-ParseTree BuildParseTree(
-    const std::map<std::string_view, std::string_view>& map) {
-  for (const auto& [dest, src] : map) {
-    //...
-  }
-}
-#endif
-
 int FindMinPath(const absl::flat_hash_map<std::string_view,
                                           std::vector<std::string_view>>& map,
                 std::string_view src, std::string_view dest) {
@@ -77,210 +68,12 @@ int FindMinPath(const absl::flat_hash_map<std::string_view,
   return -1;
 }
 
-std::optional<int> FindMinPathReverseImpl(
-    const std::map<std::string_view, std::string_view>& map,
-    const std::vector<std::string_view>& map_by_len,
-    absl::flat_hash_map<std::string, std::optional<int>>* memo,
-    std::string_view src, std::string_view dest) {
-  if (auto it = memo->find(dest); it != memo->end()) {
-    return it->second;
-  }
-  VLOG(2) << "FindMinPathReverse: " << src << "; " << dest;
-  if (src == dest) return 0;
-  std::optional<int> min;
-  // If we find a cycle, bomb out as impossible.
-  memo->emplace(dest, min);
-  int found_len;
-  for (std::string_view find : map_by_len) {
-    if (find.size() > dest.size()) continue;
-    auto it = map.find(find);
-    CHECK(it != map.end());
-    CHECK(it->first == find);
-    if (min && found_len > find.size()) break;
-    for (int i = 0; i <= dest.size() - find.size(); ++i) {
-      VLOG(3) << "Trying: " << dest << "@" << i << "; " << it->first << " => "
-              << it->second;
-      if (dest.substr(i, find.size()) == find) {
-        std::string sub_dest = absl::StrCat(dest.substr(0, i), it->second,
-                                            dest.substr(i + find.size()));
-        std::optional<int> sub_min =
-            FindMinPathReverseImpl(map, map_by_len, memo, src, sub_dest);
-        if (sub_min) {
-          if (!min || *min > *sub_min + 1) {
-            min = *sub_min + 1;
-            found_len = find.size();
-          }
-        }
-      }
-    }
-  }
-  memo->emplace(dest, min);
-  return min;
-}
-
-std::optional<int> FindMinPathReverse(
-    const std::map<std::string_view, std::string_view>& map,
-    std::string_view src, std::string_view dest) {
-  std::vector<std::string_view> map_by_len;
-  for (const auto& pair : map) map_by_len.push_back(pair.first);
-  std::sort(map_by_len.begin(), map_by_len.end(),
-            [](std::string_view a, std::string_view b) {
-              if (a.size() != b.size()) return a.size() > b.size();
-              return a < b;
-            });
-  absl::flat_hash_map<std::string, std::optional<int>> memo;
-  return FindMinPathReverseImpl(map, map_by_len, &memo, src, dest);
-}
-
 std::string_view FirstElement(std::string_view str) {
   if (str.size() < 2) return str;
   if (str[1] >= 'a' && str[1] <= 'z') {
     return str.substr(0, 2);
   }
   return str.substr(0, 1);
-}
-
-std::optional<int> MatchFromFront(
-    const std::map<std::string_view, std::string_view>& map,
-    std::string_view src, std::string_view dest) {
-  std::string_view first_elem = FirstElement(dest);
-  VLOG(1) << "Looking how to produce " << first_elem << " for " << dest;
-  std::optional<int> min;
-  for (auto it = map.lower_bound(first_elem); it != map.end(); ++it) {
-    std::string_view rule_dest = it->first;
-    std::string_view rule_src = it->second;
-    // No more rules that produce the first Element.
-    if (rule_dest.substr(0, first_elem.size()) != first_elem) break;
-    // This rule can't match since rules only make strings longer.
-    if (dest.size() < rule_dest.size()) continue;
-
-    VLOG(2) << "Found: " << it->first << " for " << first_elem;
-
-    if (dest.substr(0, rule_dest.size()) == rule_dest) {
-      std::string sub_dest =
-          absl::StrCat(rule_src, dest.substr(rule_dest.size()));
-      std::optional<int> sub_min = MatchFromFront(map, src, sub_dest);
-      if (sub_min) {
-        if (!min || *min > *sub_min) {
-          min = *sub_min;
-        }
-      }
-    }
-  }
-
-  return absl::nullopt;
-}
-
-absl::flat_hash_set<std::string_view> FindTerminalElements(
-    const absl::flat_hash_map<std::string_view, std::vector<std::string_view>>&
-        map) {
-  absl::flat_hash_set<std::string_view> ret;
-  for (const auto& [src, dest_list] : map) {
-    for (std::string_view dest : dest_list) {
-      while (!dest.empty()) {
-        std::string_view first_elem = FirstElement(dest);
-        if (!map.contains(first_elem)) {
-          ret.insert(first_elem);
-        }
-        dest = dest.substr(first_elem.size());
-      }
-    }
-  }
-  return ret;
-}
-
-void PruneRulesFromTerminals(
-    std::string_view str,
-    const absl::flat_hash_set<std::string_view>& terminals,
-    absl::flat_hash_map<std::string_view, std::vector<std::string_view>>* map,
-    std::map<std::string_view, std::string_view>* reverse) {
-  absl::flat_hash_set<std::string_view> unused_terminals = terminals;
-  for (int off = 0; off < str.size();) {
-    std::string_view first_elem = FirstElement(str.substr(off));
-    unused_terminals.erase(first_elem);
-    off += first_elem.size();
-  }
-  if (unused_terminals.empty()) return;
-  VLOG(1) << "Pruning terminals: " << absl::StrJoin(unused_terminals, ",");
-  for (auto& [src, dest_list] : *map) {
-    std::vector<std::string_view> new_dest_list;
-    for (std::string_view dest : dest_list) {
-      bool prune_rule = false;
-      for (int off = 0; off < dest.size();) {
-        std::string_view first_elem = FirstElement(dest.substr(off));
-        if (unused_terminals.contains(first_elem)) {
-          prune_rule = true;
-          break;
-        }
-        off += first_elem.size();
-      }
-      VLOG(2) << "Should prune: " << src << " => " << dest << " = "
-              << prune_rule;
-      if (prune_rule) {
-        VLOG(1) << "Pruning: " << src << " => " << dest;
-        reverse->erase(dest);
-      } else {
-        new_dest_list.push_back(dest);
-      }
-    }
-    dest_list = std::move(new_dest_list);
-  }
-  return;
-}
-
-std::vector<std::string_view> SplitOnTerminalElements(
-    std::string_view str,
-    const absl::flat_hash_set<std::string_view>& terminals) {
-  std::vector<std::string_view> ret;
-  int last_start = 0;
-  for (int off = 0; off < str.size();) {
-    std::string_view first_elem = FirstElement(str.substr(off));
-    off += first_elem.size();
-    if (terminals.contains(first_elem) || off == str.size()) {
-      ret.push_back(str.substr(last_start, off - last_start));
-      last_start = off;
-    }
-  }
-  return ret;
-}
-
-absl::StatusOr<int> MatchFromFrontRnAr(
-    std::string_view str,
-    const absl::flat_hash_map<std::string_view, std::vector<std::string_view>>&
-        map) {
-  std::string_view first_elem = FirstElement(str);
-  std::string_view second_elem = FirstElement(str.substr(first_elem.size()));
-  if (second_elem != "Rn") return Error("Not XRn");
-  std::string replaced_string;
-  int replace_steps = 0;
-  for (int off = first_elem.size() + second_elem.size(); off < str.size();) {
-    std::string_view next_elem = FirstElement(str.substr(off));
-    if (next_elem == "Ar") {
-      int min = std::numeric_limits<int>::max();
-      std::string_view next_start;
-      for (const auto& [start, _] : map) {
-        int next_min =
-            FindMinPath(map, start, str.substr(0, off + next_elem.size()));
-        if (next_min > 0 && next_min < min) {
-          min = next_min;
-          next_start = start;
-        }
-      }
-      VLOG(2) << "MatchFromFrontRnAr: " << str.substr(0, off + next_elem.size())
-              << " to " << next_start << " takes " << min << " steps.";
-      replace_steps += min;
-      replaced_string =
-          absl::StrCat(next_start, str.substr(off + next_elem.size()));
-      str = replaced_string;
-      off = next_start.size();
-      std::string_view check_rn = FirstElement(str.substr(off));
-      if (check_rn != "Rn") return Error("Not XRn");
-    } else {
-      off += next_elem.size();
-    }
-  }
-
-  return Error("Nothing to return");
 }
 
 }  // namespace
@@ -305,7 +98,7 @@ absl::StatusOr<std::string> Day_2015_19::Part1(
 absl::StatusOr<std::string> Day_2015_19::Part2(
     absl::Span<std::string_view> input) const {
   if (input.size() < 3) return Error("Bad input");
-  std::string_view final = input.back();
+  std::string_view target = input.back();
   if (!input[input.size() - 2].empty()) return Error("Bad input");
   absl::flat_hash_map<std::string_view, std::vector<std::string_view>> map;
   std::map<std::string_view, std::string_view> reverse;
@@ -321,43 +114,55 @@ absl::StatusOr<std::string> Day_2015_19::Part2(
     reverse[to] = from;
   }
 
-  if (final.size() < 10) {
-    // TODO(@monkeynova): This filter might be better served in a reverse
-    // model where we recognize the hack will work.
-    return AdventReturn(FindMinPath(map, "e", final));
+  bool checklist_match = true;
+  for (const auto& [from, to_list] : map) {
+    if (!checklist_match) break;
+    for (std::string_view to : to_list) {
+      // 'Ar' always terminates a rule.
+      checklist_match &= !RE2::PartialMatch(to, "Ar.");
+      VLOG_IF(1, !checklist_match) << from << " -> " << to;
+      // 'Rn' always has a matching 'Ar'.
+      checklist_match &= !RE2::PartialMatch(to, "Rn.*Rn") &&
+          (!RE2::PartialMatch(to, "Rn") || RE2::PartialMatch(to, "Rn.*Ar"));
+      // 'F' never goes to 'Rn..Ar'.
+      checklist_match &= (from != "F") || !RE2::PartialMatch(to, "Rn.*Ar");
+      VLOG_IF(1, !checklist_match) << from << " -> " << to;
+      // Initial rule sets 2 elements.
+      checklist_match &= (from != "e") || RE2::FullMatch(to, "[A-Z][a-z]?[A-Z][a-z]?");
+      VLOG_IF(1, !checklist_match) << from << " -> " << to;
+      // All rules that don't have Rn..Ar add one element.
+      checklist_match &= RE2::PartialMatch(to, "Rn.*Ar") || RE2::FullMatch(to, "[A-Z][a-z]?[A-Z][a-z]?");
+      VLOG_IF(1, !checklist_match) << from << " -> " << to;
+      // All rules that add Rn..Ar (without Y) add 3.
+      // All rules that add Rn..Y..Ar (with a single Y) add 5.
+      // All rules that add Rn..Y..Y..Ar can't further match Rn..Ar since target never has Rn..Y..Y..Ar.
+      if (RE2::FullMatch(to, "[A-Z][a-z]?RnF(YFYF)?Ar")) {
+        checklist_match &= !RE2::PartialMatch(target, "Rn[^R]*Y[^R]*Y[^R]*Ar");
+        VLOG_IF(1, !checklist_match) << from << " -> " << to;
+      } else {
+        checklist_match &= !RE2::PartialMatch(to, "Rn.*Ar") || 
+            RE2::FullMatch(to, "[A-Z][a-z]?Rn[A-Z][a-z]?(Y[A-Z][a-z]?)?Ar");
+        VLOG_IF(1, !checklist_match) << from << " -> " << to;
+      }
+      if (!checklist_match) break;
+    }
+  }
+  if (checklist_match) {
+    // steps is # of elements - 1 (start) - 2 * count('Ar' == 'Rn') - 2 * count
+    // 'Y'.
+    int steps = -1;
+    for (int off = 0; off < target.size();) {
+      std::string_view next_elem = FirstElement(target.substr(off));
+      off += next_elem.size();
+      ++steps;
+      if (next_elem == "Ar") --steps;
+      if (next_elem == "Rn") --steps;
+      if (next_elem == "Y") steps -= 2;
+    }
+    return AdventReturn(steps);
   }
 
-  // 'Ar' always terminates a rule.
-  // 'Rn' always has a matching 'Ar'.
-  // Initial rule sets 2 elemnts.
-  // All rules that don't have Rn..Ar add one element.
-  // All rules that add Rn..Ar (without Y) add 3.
-  // All ruels that add Rn..Y..Ar (with a single Y) add 5.
-  // steps is # of elements - 1 (start) - 2 * count('Ar' == 'Rn') - 2 * count
-  // 'Y'.
-  int steps = -1;
-  for (int off = 0; off < final.size();) {
-    std::string_view next_elem = FirstElement(final.substr(off));
-    off += next_elem.size();
-    ++steps;
-    if (next_elem == "Ar") --steps;
-    if (next_elem == "Rn") --steps;
-    if (next_elem == "Y") steps -= 2;
-  }
-  return AdventReturn(steps);
-
-  absl::flat_hash_set<std::string_view> terminals = FindTerminalElements(map);
-  VLOG(1) << "Terminal Elements = " << absl::StrJoin(terminals, ",");
-  std::vector<std::string_view> terminal_split =
-      SplitOnTerminalElements(final, {"Ar"});  // terminals);
-  VLOG(1) << "Terminal Split = " << absl::StrJoin(terminal_split, ", ");
-  PruneRulesFromTerminals(final, terminals, &map, &reverse);
-
-  return AdventReturn(MatchFromFrontRnAr(final, map));
-
-  // return AdventReturn(MatchFromFront(reverse, "e", final));
-
-  return AdventReturn(FindMinPath(map, "e", final));
+  return AdventReturn(FindMinPath(map, "e", target));
 }
 
 }  // namespace advent_of_code
