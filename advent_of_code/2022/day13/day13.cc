@@ -98,11 +98,6 @@ Packet Parse(std::string_view& line) {
   return ret;
 }
 
-bool ByPointerLt(const std::unique_ptr<Packet>& a,
-                 const std::unique_ptr<Packet>& b) {
-  return *a < *b;
-}
-
 absl::StatusOr<Packet> ParseFull(std::string_view line) {
   std::string_view tmp = line;
   Packet ret = Parse(tmp);

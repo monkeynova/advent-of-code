@@ -337,9 +337,9 @@ absl::StatusOr<std::string> Day_2021_24::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(DecompiledConstants dc, ExtractConstants(input));
   std::string ret = FindBestInputMiddle(dc, BetterInputMin);
-  VM vm = VM::Parse(input);
-  RETURN_IF_ERROR(vm.Execute(ret));
-  if (vm.RegisterValue("z") != 0) return Error("VM Check failure");
+  if (Decompiled(dc, ret) != 0) {
+    return Error("Decompiled Check failure");
+  }
   return ret;
 }
 

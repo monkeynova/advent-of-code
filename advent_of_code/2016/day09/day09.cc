@@ -35,30 +35,6 @@ absl::StatusOr<std::string> DecompressV1(std::string_view in) {
   return ret;
 }
 
-absl::StatusOr<std::string> DecompressV2(std::string_view in) {
-  std::string ret;
-  for (int i = 0; i < in.size(); ++i) {
-    if (in[i] == '(') {
-      int count;
-      int len;
-      std::string_view skip;
-      if (!RE2::FullMatch(in.substr(i), "(\\((\\d+)x(\\d+)\\)).*", &skip, &len,
-                          &count)) {
-        return Error("Bad parse: ", in.substr(i));
-      }
-      ASSIGN_OR_RETURN(std::string tmp,
-                       DecompressV2(in.substr(i + skip.size(), len)));
-      for (int j = 0; j < count; ++j) {
-        ret.append(std::move(tmp));
-      }
-      i += skip.size() + len - 1;
-    } else {
-      ret.append(std::string(in.substr(i, 1)));
-    }
-  }
-  return ret;
-}
-
 absl::StatusOr<int64_t> DecompressV2NonWhitespaceLen(std::string_view in) {
   int64_t ret = 0;
   for (int i = 0; i < in.size(); ++i) {

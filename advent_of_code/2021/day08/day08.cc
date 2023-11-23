@@ -14,10 +14,11 @@ namespace advent_of_code {
 
 namespace {
 
-std::string DebugSet(const absl::flat_hash_set<char>& possible) {
+template <typename Sink>
+void AbslStringify(Sink& sink, const absl::flat_hash_set<char>& possible) {
   std::string ret;
   for (char c : possible) ret.append(1, c);
-  return ret;
+  sink.Append(ret);
 }
 
 absl::flat_hash_set<char> Restrict(const absl::flat_hash_set<char>& possible,
