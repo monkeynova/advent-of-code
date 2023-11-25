@@ -12,6 +12,11 @@ int Interval1D::Size() const {
   return size;
 }
 
+bool Interval1D::HasOverlap(const Interval1D& o) const {
+  // TODO(@monkeynova): Return early when possible.
+  return !Intersect(o).empty();
+}
+
 Interval1D Interval1D::Union(const Interval1D& o) const {
   return Merge(o, [](bool left, bool right) { return left || right; });
 }

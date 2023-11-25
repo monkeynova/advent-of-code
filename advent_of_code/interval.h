@@ -12,11 +12,28 @@ namespace advent_of_code {
 
 class Interval1D {
  public:
+  static Interval1D OpenTop(int min) {
+    Interval1D ret;
+    ret.x_.push_back(min);
+    return ret;
+  } 
+
   Interval1D() = default;
-  Interval1D(int start, int end) : x_({start, end}) {}
+  Interval1D(int start, int end) {
+    if (end > start) {
+      x_.push_back(start);
+      x_.push_back(end);
+    }
+  }
 
   bool empty() const { return x_.empty(); }
   int Size() const;
+
+  bool HasOverlap(const Interval1D& o) const;
+
+  bool operator==(const Interval1D& o) const {
+    return x_ == o.x_;
+  }
 
   absl::Span<const int> x() const { return x_; }
 
@@ -35,6 +52,11 @@ class Interval1D {
     if (iv.x_.size() % 2 != 0) {
       absl::Format(&sink, "[%d,∞)", iv.x_.back());
     }
+  }
+
+  template <typename H>
+  friend H AbslHashValue(H h, const Interval1D& iv) {
+    return H::combine(std::move(h), iv.x_);
   }
 
  private:
