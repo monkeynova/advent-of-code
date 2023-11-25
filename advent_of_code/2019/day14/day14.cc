@@ -13,7 +13,6 @@ namespace advent_of_code {
 namespace {
 
 struct Rule {
-  std::string name;
   int quantity_out;
   absl::flat_hash_map<std::string_view, int> in;
 };
@@ -51,9 +50,8 @@ absl::StatusOr<int64_t> ComputeOreNeedForFuel(
     const DirectedGraph<Rule>& rule_set,
     const std::vector<std::string_view>& ordered_ingredients,
     int64_t fuel_needed) {
-  // TODO(@monkeynova): Remember this ordering...
-  absl::flat_hash_map<std::string_view, int64_t> needs;
-  needs.emplace("FUEL", fuel_needed);
+  absl::flat_hash_map<std::string_view, int64_t> needs =
+      {{"FUEL", fuel_needed}};
   for (std::string_view node : ordered_ingredients) {
     if (node == "ORE") continue;
     const Rule* rule = rule_set.GetData(node);
@@ -94,8 +92,30 @@ absl::StatusOr<int64_t> ComputeOreNeedForFuel(
   return ComputeOreNeedForFuel(rule_set, ordered_ingredients, 1);
 }
 
+int InfiniteBinarySearch(absl::FunctionRef<bool(int)> cmp) {
+  int min = 1;
+  int max = 0;
+  while (max == 0) {
+    int test = 2 * min;
+    if (cmp(test)) {
+      min = test;
+    } else {
+      max = test;
+    }
+  }
+  while (min != max) {
+    int test = (max + min) / 2;
+    if (cmp(test)) {
+      min = test + 1;
+    } else {
+      max = test;
+    }
+  }
+  return min;
+}
+
 absl::StatusOr<int> FuelFromOre(const DirectedGraph<Rule>& rule_set,
-                                uint64_t ore_supply) {
+                                int64_t ore_supply) {
   ASSIGN_OR_RETURN(std::vector<std::string_view> ordered_ingredients,
                    rule_set.DAGSort());
   if (ordered_ingredients[0] != "FUEL") {
@@ -104,34 +124,17 @@ absl::StatusOr<int> FuelFromOre(const DirectedGraph<Rule>& rule_set,
   if (ordered_ingredients.back() != "ORE") {
     return Error("Not a DAG with leaf at ORE");
   }
-  int64_t guess = 1;
-  int64_t ore_needed = 0;
-  while (ore_needed < ore_supply) {
-    ASSIGN_OR_RETURN(ore_needed, ComputeOreNeedForFuel(
-                                     rule_set, ordered_ingredients, guess));
-    VLOG(1) << guess << " => " << ore_needed;
-    guess <<= 1;
-  }
-  int64_t min = guess >> 2;
-  int64_t max = guess >> 1;
-  while (min < max) {
-    guess = (min + max) / 2;
-    ASSIGN_OR_RETURN(ore_needed, ComputeOreNeedForFuel(
-                                     rule_set, ordered_ingredients, guess));
-    VLOG(1) << guess << " => " << ore_needed;
-    if (ore_needed == ore_supply) {
-      min = max = guess;
-    } else if (ore_needed < ore_supply) {
-      if (min == guess) break;
-      min = guess;
-    } else {
-      max = guess;
+  int smallest_unmakable = InfiniteBinarySearch(
+    [&](int guess) {
+      absl::StatusOr<int64_t> ore_needed =
+          ComputeOreNeedForFuel(rule_set, ordered_ingredients, guess);
+      CHECK(ore_needed.ok());
+      VLOG(1) << guess << " => " << *ore_needed;
+      return *ore_needed < ore_supply;
+
     }
-  }
-  ASSIGN_OR_RETURN(ore_needed,
-                   ComputeOreNeedForFuel(rule_set, ordered_ingredients, guess));
-  if (ore_needed > ore_supply) return guess - 1;
-  return guess;
+  );
+  return smallest_unmakable - 1;
 }
 
 }  // namespace
