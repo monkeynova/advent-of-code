@@ -98,15 +98,19 @@ class IntervalSet {
     absl::flat_hash_set<int> ret;
     for (const auto& [i, s] : set_) {
       if (test.HasOverlap(i)) {
-        for (int i : s) ret.insert(i);
+        if (ret.empty()) {
+          ret = s;
+        } else {
+          for (int i : s) {
+            ret.insert(i);
+          }
+        }
       }
     }
     return ret.size();
   }
 
  private:
-  // TODO(@monkeynova): There's probably a better way to intersect multiple
-  // sets than distincting on the interval.
   absl::flat_hash_map<Interval1D, absl::flat_hash_set<int>> set_;
 };
 
