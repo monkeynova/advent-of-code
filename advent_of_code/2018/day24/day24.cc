@@ -7,6 +7,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/interval.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
@@ -256,28 +257,6 @@ int ImmuneLeftAfterFightWithBoost(const std::vector<Group>& start, int boost) {
 
   return absl::c_accumulate(
     combat, 0, [](int a, const Group& g) { return a + g.units; });
-}
-
-int InfiniteBinarySearch(absl::FunctionRef<bool(int)> cmp) {
-  int min = 1;
-  int max = 0;
-  while (max == 0) {
-    int test = 2 * min;
-    if (cmp(test)) {
-      min = test;
-    } else {
-      max = test;
-    }
-  }
-  while (min != max) {
-    int test = (max + min) / 2;
-    if (cmp(test)) {
-      min = test + 1;
-    } else {
-      max = test;
-    }
-  }
-  return min;
 }
 
 }  // namespace

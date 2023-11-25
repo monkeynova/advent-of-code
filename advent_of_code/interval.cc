@@ -4,6 +4,28 @@
 
 namespace advent_of_code {
 
+int InfiniteBinarySearch(absl::FunctionRef<bool(int)> cmp) {
+  int min = 1;
+  int max = 0;
+  while (max == 0) {
+    int test = 2 * min;
+    if (cmp(test)) {
+      min = test;
+    } else {
+      max = test;
+    }
+  }
+  while (min != max) {
+    int test = (max + min) / 2;
+    if (cmp(test)) {
+      min = test + 1;
+    } else {
+      max = test;
+    }
+  }
+  return min;
+}
+
 int Interval1D::Size() const {
   int size = 0;
   for (int i = 0; i < x_.size(); i += 2) {

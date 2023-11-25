@@ -10,6 +10,11 @@
 
 namespace advent_of_code {
 
+// Runs an infinite binary search on values to find the smallest value x such
+// that `cmp`(x) returns false. `cmp` must be a function that returns true or
+// false solely based on whether its input is less than some critical value.
+int InfiniteBinarySearch(absl::FunctionRef<bool(int)> cmp);
+
 class Interval1D {
  public:
   static Interval1D OpenTop(int min) {
