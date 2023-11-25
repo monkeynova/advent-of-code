@@ -226,14 +226,15 @@ std::vector<Group> RunRound(std::vector<Group> groups, bool* change = nullptr) {
 std::vector<Group> Fight(const std::vector<Group>& start) {
   std::vector<Group> combat = start;
 
-  for (int round = 0; CountTypes(combat) > 1; ++round) {
+  bool change = true;
+  for (int round = 0; change && CountTypes(combat) > 1; ++round) {
     if (VLOG_IS_ON(2)) {
       VLOG(2) << "Round: " << round;
       for (const Group& g : combat) {
         VLOG(3) << "  " << g;
       }
     }
-    combat = RunRound(std::move(combat));
+    combat = RunRound(std::move(combat), &change);
   }
   return combat;
 }
@@ -244,27 +245,17 @@ int ImmuneLeftAfterFightWithBoost(const std::vector<Group>& start, int boost) {
     if (g.type == Group::kImmune) g.attack += boost;
   }
 
-  bool change = true;
-  for (int round = 0; change && CountTypes(combat) > 1; ++round) {
-    if (VLOG_IS_ON(2)) {
-      VLOG(1) << "Round: " << round;
-      for (const Group& g : combat) {
-        VLOG(2) << "  " << g;
-      }
-    }
-    combat = RunRound(std::move(combat), &change);
+  combat = Fight(combat);
+
+  auto is_immune = [](const Group& g) { return g.type == Group::kImmune; };
+  if (!absl::c_all_of(combat, is_immune)) {
+    // If Infection exists, either it won or stalemated, which isn't a win for
+    // Immunity.
+    return 0;
   }
 
-  // Stalemate isn't a win.
-  if (!change) return 0;
-
-  if (combat[0].type != Group::kImmune) return 0;
-
-  int units = 0;
-  for (const Group& g : combat) {
-    units += g.units;
-  }
-  return units;
+  return absl::c_accumulate(
+    combat, 0, [](int a, const Group& g) { return a + g.units; });
 }
 
 int InfiniteBinarySearch(absl::FunctionRef<bool(int)> cmp) {
