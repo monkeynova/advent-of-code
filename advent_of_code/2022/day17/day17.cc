@@ -156,7 +156,7 @@ DropState::SummaryState DropState::Summarize() const {
 
   Point start = {0, height_};
   absl::flat_hash_set<Point> visited = {start};
-  absl::flat_hash_map<Point, int> reachable =
+  ret.bounds = StablePointSet(
       PointWalk({.start = start,
                  .is_good =
                      [&](Point test, int) {
@@ -164,12 +164,8 @@ DropState::SummaryState DropState::Summarize() const {
                        return !stopped_.contains(test);
                      },
                  .is_final = [](Point, int) { return false; }})
-          .FindReachable();
-  ret.bounds.reserve(reachable.size());
-  for (const auto& [point, _] : reachable) {
-    ret.bounds.push_back(point - start);
-  }
-  absl::c_sort(ret.bounds, PointYThenXLT());
+          .FindReachable());
+  for (Point& p : ret.bounds) p -= start;
   ret.height = height_;
   return ret;
 }

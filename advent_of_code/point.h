@@ -5,6 +5,7 @@
 #include <iostream>
 #include <numeric>
 
+#include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
 #include "absl/hash/hash.h"
 #include "absl/log/check.h"
@@ -206,6 +207,16 @@ struct PointYThenXLT {
 inline std::vector<Point> StablePointSet(
     const absl::flat_hash_set<Point>& unordered) {
   std::vector<Point> ordered(unordered.begin(), unordered.end());
+  absl::c_sort(ordered, PointYThenXLT());
+  return ordered;
+}
+
+template <typename ValueType>
+inline std::vector<Point> StablePointSet(
+    const absl::flat_hash_map<Point, ValueType>& unordered) {
+  std::vector<Point> ordered;
+  ordered.reserve(unordered.size());
+  for (const auto& [p, _] : unordered) ordered.push_back(p);
   absl::c_sort(ordered, PointYThenXLT());
   return ordered;
 }
