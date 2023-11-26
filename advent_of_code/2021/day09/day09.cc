@@ -72,10 +72,12 @@ absl::StatusOr<std::string> Day_2021_09::Part2(
   if (basins.size() < 3) return Error("Not enough basins");
 
   std::vector<int64_t> sizes;
+  sizes.reserve(basins.size());
   for (Point start : basins) {
     sizes.push_back(BasinSize(board, start));
   }
-  absl::c_sort(sizes, [](int64_t a, int64_t b) { return b < a; });
+  absl::c_partial_sort(sizes, sizes.begin() + 3,
+                       [](int64_t a, int64_t b) { return b < a; });
 
   return AdventReturn(sizes[0] * sizes[1] * sizes[2]);
 }
