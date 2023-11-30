@@ -42,7 +42,7 @@ std::optional<int> FindBadWeight(std::string_view root,
   CHECK(sub_weight_counts.size() < 3);
   CHECK(sub_weight_counts.size() > 0);
   if (sub_weight_counts.size() == 2) {
-    int miss_target_weight;
+    int miss_target_weight = -1;
     int miss_weight;
     int target_weight;
     for (const auto& [weight, count] : sub_weight_counts) {
@@ -53,6 +53,7 @@ std::optional<int> FindBadWeight(std::string_view root,
         target_weight = weight;
       }
     }
+    CHECK_NE(miss_target_weight, -1);
     return target_weight - miss_target_weight + miss_weight;
   }
   if (this_weight_out != nullptr) {

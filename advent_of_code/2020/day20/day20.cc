@@ -397,11 +397,12 @@ absl::StatusOr<std::string> Day_2020_20::Part1(
     absl::Span<std::string_view> input) const {
   absl::flat_hash_map<int, CharBoard> tiles;
   int cur_tile_num;
-  int cur_tile_index;
+  int cur_tile_index = -1;
   for (int i = 0; i < input.size(); ++i) {
     if (RE2::FullMatch(input[i], "Tile (\\d+):", &cur_tile_num)) {
       cur_tile_index = i + 1;
     } else if (input[i].empty()) {
+      if (cur_tile_index == -1) return Error("Missing tile specifier");
       ASSIGN_OR_RETURN(
           CharBoard board,
           CharBoard::Parse(input.subspan(cur_tile_index, i - cur_tile_index)));
@@ -409,6 +410,7 @@ absl::StatusOr<std::string> Day_2020_20::Part1(
       tiles.emplace(cur_tile_num, std::move(board));
     }
   }
+  if (cur_tile_index == -1) return Error("Missing tile specifier");
   ASSIGN_OR_RETURN(CharBoard board, CharBoard::Parse(input.subspan(
                                         cur_tile_index, input.size())));
   if (tiles.contains(cur_tile_num)) return Error("Dup tile:", cur_tile_num);

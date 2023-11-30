@@ -25,7 +25,7 @@ absl::StatusOr<std::string> Day_2019_08::Part1(
   }
 
   std::optional<int> min_zeros;
-  int min_layer;
+  int min_layer = -1;
   for (int i = 0; i < layer_count; ++i) {
     const char* layer = input[0].data() + i * kLayerSize;
     int zero_count = 0;

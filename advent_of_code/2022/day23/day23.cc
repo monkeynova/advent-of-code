@@ -38,13 +38,11 @@ bool Move(absl::flat_hash_set<Point>& elves, int turn) {
 
     if (absl::c_none_of(Cardinal::kEightDirs, has_elf)) continue;
 
-    bool proposal_added = false;
     for (int i = 0; i < 4; ++i) {
       int proposal = (i + turn) % 4;
       Point move = kDirProposeOrder[proposal];
       if (absl::c_any_of(kDirTestOrder[proposal], has_elf)) continue;
       proposals[p + move].push_back(p);
-      proposal_added = true;
       break;
     }
   }

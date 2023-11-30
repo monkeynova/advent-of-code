@@ -43,7 +43,7 @@ absl::StatusOr<std::string> Day_2020_02::Part2(
     if (!RE2::FullMatch(str, *pattern, &min, &max, &c, &password)) {
       return absl::InternalError("");
     }
-    if (password[min - 1] == c[0] ^ password[max - 1] == c[0]) {
+    if ((password[min - 1] == c[0]) ^ (password[max - 1] == c[0])) {
       ++valid;
     }
   }

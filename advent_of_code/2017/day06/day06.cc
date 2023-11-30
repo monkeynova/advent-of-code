@@ -14,7 +14,7 @@ namespace advent_of_code {
 namespace {
 
 std::vector<int64_t> RunStep(std::vector<int64_t> in) {
-  int64_t max_idx;
+  int64_t max_idx = -1;
   int64_t max_value = std::numeric_limits<int64_t>::min();
   for (int i = 0; i < in.size(); ++i) {
     if (in[i] > max_value) {
@@ -22,6 +22,7 @@ std::vector<int64_t> RunStep(std::vector<int64_t> in) {
       max_idx = i;
     }
   }
+  CHECK_NE(max_idx, -1);
   int64_t q = in[max_idx];
   in[max_idx] = 0;
   int64_t per = q / in.size();

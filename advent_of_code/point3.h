@@ -16,9 +16,9 @@
 namespace advent_of_code {
 
 struct Point3 {
-  int x;
-  int y;
-  int z;
+  int x = 0;
+  int y = 0;
+  int z = 0;
 
   static bool RE2Parse(const char* str, size_t n, void* dest) {
     std::vector<std::string_view> coord_str = absl::StrSplit(

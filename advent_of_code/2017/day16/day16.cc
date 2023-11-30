@@ -62,11 +62,14 @@ void RunDance(const std::vector<DanceMove>& moves, Line* line) {
         break;
       }
       case DanceMove::kPartner: {
-        int n1, n2;
+        int n1 = -1;
+        int n2 = -1;
         for (int i = 0; i < line->vals.length(); ++i) {
           if (m.c1 == line->vals[i]) n1 = i;
           if (m.c2 == line->vals[i]) n2 = i;
         }
+        CHECK_NE(n1, -1);
+        CHECK_NE(n2, -1);
         std::swap(line->vals[n1], line->vals[n2]);
         break;
       }
