@@ -6,6 +6,8 @@
 
 namespace advent_of_code {
 
+namespace {
+
 std::optional<int> TryParse(char c) {
   if (c >= '0' && c <= '9') {
     return c - '0';
@@ -29,6 +31,8 @@ std::optional<int> TryParse(std::string_view prefix) {
   }
   return std::nullopt;
 }
+
+}  // namespace
 
 absl::StatusOr<std::string> Day_2023_01::Part1(
     absl::Span<std::string_view> input) const {
