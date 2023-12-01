@@ -8,6 +8,9 @@ my ($year, $day) = @ARGV;
 die "Bad year: $year" unless $year >= 2015;
 die "Bad day: $day" unless $day > 0 && $day <= 25;
 
+$day = sprintf "%02d", $day;
+my $url_day = sprintf "%d", $day;
+
 mkdir "advent_of_code/$year" if ! -d "advent_of_code/$year";
 die "advent_of_code/$year/day$day already exists" if -d "advent_of_code/$year/day$day";
 system("cp", "-r", "advent_of_code/new_day_path", "advent_of_code/$year/day$day")
@@ -32,7 +35,7 @@ while (my ($src, $dest) = each %renames) {
 system("perl", "-spi", "-e",
        join(" ", ("s{^// clang-format.*\n}{}g;",
                   "s{new_day_path}{$year/day$day}g;",
-                  "s{new_day_url}{$year/day/$day}g;",
+                  "s{new_day_url}{$year/day/$url_day}g;",
                   "s{new_day}{day$day}g;",
                   "s{NEW_DAY}{${year}_DAY$day}g;",
                   "s{NewDay}{Day_${year}_${day}}g")),
@@ -85,7 +88,7 @@ EOF
   $build_contents =~ s{
     (cc_library\([^\)]+
      name\s*=\s*"benchmark_lib"[^\)]+)
-    ("\@com_monkeynova_gunit_main//:test_main",[^\)]+\))
+    ("//advent_of_code/\d+/day\d+:day\d+_benchmark_lib",[^\)]+\))
   }{$1
     "//advent_of_code/${year}/day${day}:day${day}_benchmark_lib",
     $2
