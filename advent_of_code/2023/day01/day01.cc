@@ -14,54 +14,62 @@
 
 namespace advent_of_code {
 
-namespace {
+std::optional<int> TryParse(char c) {
+  if (c >= '0' && c <= '9') {
+    return c - '0';
+  }
+  return std::nullopt;
+}
 
-// Helper methods go here.
-
-}  // namespace
+std::optional<int> TryParse(std::string_view prefix) {
+  static constexpr std::array<std::string_view, 10> words = {
+    "zero", "one", "two", "three", "four", "five", "six", "seven",
+    "eight", "nine",
+  };
+  if (prefix[0] >= '0' && prefix[0] <= '9') {
+    return prefix[0] - '0';
+  }
+  for (int d = 0; d < 10; ++d) {
+    std::string_view digit_word = words[d];
+    if (prefix.substr(0, digit_word.size()) == digit_word) {
+      return d;
+    }
+  }
+  return std::nullopt;
+}
 
 absl::StatusOr<std::string> Day_2023_01::Part1(
     absl::Span<std::string_view> input) const {
   int sum = 0;
   for (std::string_view line : input) {
-    int first = -1;
-    int last = -1;
+    std::optional<int> first;
+    std::optional<int> last;
     for (char c : line) {
-      if (c >= '0' && c <= '9') {
-        if (first == -1) first = c - '0';
-        last = c - '0';
+      std::optional<int> d = TryParse(c);
+      if (d) {
+        if (!first) first = d;
+        last = d;
       }
     }
-    sum += first * 10 + last;
+    sum += *first * 10 + *last;
   }
   return AdventReturn(sum);
 }
 
 absl::StatusOr<std::string> Day_2023_01::Part2(
     absl::Span<std::string_view> input) const {
-  std::array<std::string_view, 10> words = {
-    "zero", "one", "two", "three", "four", "five", "six", "seven",
-    "eight", "nine",
-  };
   int sum = 0;
   for (std::string_view line : input) {
-    int first = -1;
-    int last = -1;
+    std::optional<int> first;
+    std::optional<int> last;
     for (int i = 0; i < line.size(); ++i) {
-      for (int d = 0; d < 10; ++d) {
-        std::string_view digit_word = words[d];
-        if (line.substr(i, digit_word.size()) == digit_word) {
-          if (first == -1) first = d;
-          last = d;
-        }
-      }
-      if (line[i] >= '0' && line[i] <= '9') {
-        if (first == -1) first = line[i] - '0';
-        last = line[i] - '0';
+      std::optional<int> d = TryParse(line.substr(i));
+      if (d) {
+        if (!first) first = d;
+        last = d;
       }
     }
-    VLOG(1) << line << ": " << first << "-" << last;
-    sum += first * 10 + last;
+    sum += *first * 10 + *last;
   }
   return AdventReturn(sum);
 }
