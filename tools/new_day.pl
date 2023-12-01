@@ -45,10 +45,36 @@ if (! -f $year_build_fname) {
   $build_contents = <<EOF;
 cc_test(
     name = "benchmark",
+    size = "small",
     tags = ["benchmark"],
     deps = [
-        "//advent_of_code/${year}/day${day}:day${day}_benchmark_lib",
+        ":benchmark_lib",
         "\@com_monkeynova_gunit_main//:test_main",
+    ],
+)
+
+cc_binary(
+    name = "whole_year",
+    testonly = 1,
+    args = [
+        "--benchmark",
+        "--bechmark_file_include_filter_re=input",
+        "--benchmark_flags=--benchmark_min_time=0ns",
+    ],
+    deps = [
+        ":benchmark_lib",
+        "\@com_monkeynova_gunit_main//:test_main",
+    ],
+)
+
+cc_library(
+    name = "benchmark_lib",
+    testonly = 1,
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "//advent_of_code/${year}/day${day}:day${day}_benchmark_lib",
     ],
 )
 EOF
@@ -57,8 +83,8 @@ EOF
   $build_contents = join '', <$fh>;
   close $fh;
   $build_contents =~ s{
-    (cc_test\([^\)]+
-     name\s*=\s*"benchmark"[^\)]+)
+    (cc_library\([^\)]+
+     name\s*=\s*"benchmark_lib"[^\)]+)
     ("\@com_monkeynova_gunit_main//:test_main",[^\)]+\))
   }{$1
     "//advent_of_code/${year}/day${day}:day${day}_benchmark_lib",
