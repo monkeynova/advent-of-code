@@ -36,6 +36,16 @@ collect all solutions for a given year at ```advent_of_code/YYYY:benchmark```
 and a benchmark that collects all solutions across all years
 ```advent_of_code:benchmark```.
 
+There is also a "run every day exactly once" benchmark in
+```advent_of_code/YYYY:whole_year```. Rather than a cc_test it is a cc_binary
+and it will run all of the benchmarks in ```advent_of_code/YYYY:benchmark```
+with options to a) Only run each benchmark once and b) One run a benchmark for
+the competetion input. This allows one to run
+```time bazel-bin/advent_of_code/YYYY/whole_year``` in order to get a measure
+of how long to solve an entire year. This was inspired by blog posts like
+https://www.forrestthewoods.com/blog/solving-advent-of-code-in-under-a-second/
+which attempt to run an entire years worth of solutions in <1 second.
+
 ### Solve Process ###
 
  The process for solving a new day is as follows
