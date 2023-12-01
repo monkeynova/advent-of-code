@@ -1,5 +1,4 @@
-// http://adventofcode.com/2023/day/1
-// http://adventofcode.com/2023/day/1
+// http://adventofcode.com/2023/day/01
 
 #include "advent_of_code/2023/day01/day01.h"
 
