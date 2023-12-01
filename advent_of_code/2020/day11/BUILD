@@ -49,7 +49,7 @@ cc_library(
     deps = [
         ":day11_input",
         "//advent_of_code/infra:file_benchmark",
-        "@com_monkeynova_gunit_main//:test_main",
+        "@com_google_googletest//:gtest",
     ],
     alwayslink = 1,
 )
