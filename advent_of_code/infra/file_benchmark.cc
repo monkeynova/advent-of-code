@@ -109,19 +109,6 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
     }
   }
   if (skip.empty()) {
-    std::string long_option = test->options.GetString(kLongOption);
-    if (!long_option.empty()) {
-      absl::StatusOr<absl::Duration> long_duration =
-          ParseLongTestDuration(long_option);
-      if (!long_duration.ok()) {
-        return BM_Day_SetError(state, long_duration.status().ToString());
-      }
-      if (absl::GetFlag(FLAGS_run_long_tests) < *long_duration) {
-        skip = absl::StrCat("(long=", long_option, ")");
-      }
-    }
-  }
-  if (skip.empty()) {
     std::string include_filter_re =
         absl::GetFlag(FLAGS_bechmark_file_include_filter_re);
     if (!include_filter_re.empty()) {

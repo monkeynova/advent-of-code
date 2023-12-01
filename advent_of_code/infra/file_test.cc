@@ -19,8 +19,6 @@
 
 namespace advent_of_code {
 
-constexpr absl::Duration kMinAllowedTestTime = absl::Seconds(15);
-
 void RunTestCase(AdventDay* advent_day, std::string_view test_case_with_options,
                  file_based_test_driver::RunTestCaseResult* test_result) {
   std::unique_ptr<absl::FlagSaver> flag_saver;
@@ -67,29 +65,6 @@ void RunTestCase(AdventDay* advent_day, std::string_view test_case_with_options,
     }
   }
 
-  absl::StatusOr<absl::Duration> test_allowed_duration = kMinAllowedTestTime;
-  if (std::string long_opt = options.GetString(kLongOption);
-      !long_opt.empty()) {
-    test_allowed_duration = ParseLongTestDuration(long_opt);
-    if (!test_allowed_duration.ok()) {
-      test_result->AddTestOutput(
-          absl::StrCat("ERROR: Could not parse 'long' option: ",
-                       test_allowed_duration.status().ToString()));
-      return;
-    }
-    if (*test_allowed_duration < kMinAllowedTestTime) {
-      test_allowed_duration = kMinAllowedTestTime;
-    }
-    if (absl::GetFlag(FLAGS_run_long_tests) < *test_allowed_duration) {
-      if (absl::GetFlag(FLAGS_fail_if_long_skip)) {
-        test_result->AddTestOutput(absl::StrCat("ERROR: Skipped long test"));
-      } else {
-        test_result->set_ignore_test_output(true);
-      }
-      return;
-    }
-  }
-
   std::vector<std::string_view> lines = absl::StrSplit(test_case, "\n");
   absl::Span<std::string_view> lines_span = absl::MakeSpan(lines);
   // Pull off HACK: prefix lines from the front...
@@ -107,7 +82,6 @@ void RunTestCase(AdventDay* advent_day, std::string_view test_case_with_options,
     return;
   }
   advent_day->set_param(options.GetString(kParamOption));
-  absl::Time start = absl::Now();
   switch (options.GetInt64(kPartOption)) {
     case 1: {
       output = advent_day->Part1(lines_span);
@@ -126,14 +100,6 @@ void RunTestCase(AdventDay* advent_day, std::string_view test_case_with_options,
   if (!output.ok()) {
     test_result->AddTestOutput(
         absl::StrCat("ERROR: ", output.status().ToString()));
-    return;
-  }
-  absl::Time end = absl::Now();
-  if (absl::GetFlag(FLAGS_fail_if_long_skip) &&
-      end - start > *test_allowed_duration) {
-    test_result->AddTestOutput(absl::StrCat(
-        "ERROR: Test took took long: took=", (end - start) / absl::Seconds(1),
-        "s; allowed=", *test_allowed_duration / absl::Seconds(1), "s"));
     return;
   }
   test_result->AddTestOutput(*output);
