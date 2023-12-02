@@ -33,12 +33,59 @@ namespace {
 
 absl::StatusOr<std::string> Day_2023_02::Part1(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  int game_total = 0;
+  for (std::string_view line : input) {
+    auto [game_str, view_set] = PairSplit(line, ": ");
+    int game_num;
+    if (!RE2::FullMatch(game_str, "Game (\\d+)", &game_num)) {
+      return Error("Bad game: ", game_str);
+    }
+    bool bad = false;
+    for (std::string_view view : absl::StrSplit(view_set, "; ")) {
+      absl::flat_hash_map<std::string_view, int> totals;
+      for (std::string_view ball_res : absl::StrSplit(view, ", ")) {
+        int count;
+        std::string_view color;
+        if (!RE2::FullMatch(ball_res, "(\\d+) (blue|red|green)", &count, &color)) {
+          return Error("Bad ball_res: ", ball_res);
+        }
+        if (totals.contains(color)) return Error("Dupe color in view:", color);
+        totals[color] += count;
+      }
+      bad |= totals["blue"] > 14;
+      bad |= totals["green"] > 13;
+      bad |= totals["red"] > 12;
+    }
+    if (!bad) {
+      game_total += game_num;
+    }
+  }
+  return AdventReturn(game_total);
 }
 
 absl::StatusOr<std::string> Day_2023_02::Part2(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  int total_power = 0;
+  for (std::string_view line : input) {
+    auto [game_str, view_set] = PairSplit(line, ": ");
+    int game_num;
+    if (!RE2::FullMatch(game_str, "Game (\\d+)", &game_num)) {
+      return Error("Bad game: ", game_str);
+    }
+    absl::flat_hash_map<std::string_view, int> totals;
+    for (std::string_view view : absl::StrSplit(view_set, "; ")) {
+      for (std::string_view ball_res : absl::StrSplit(view, ", ")) {
+        int count;
+        std::string_view color;
+        if (!RE2::FullMatch(ball_res, "(\\d+) (blue|red|green)", &count, &color)) {
+          return Error("Bad ball_res: ", ball_res);
+        }
+        totals[color] = std::max(totals[color], count);
+      }
+    }
+    total_power += totals["red"] * totals["blue"] * totals["green"];
+  }
+  return AdventReturn(total_power);
 }
 
 }  // namespace advent_of_code
