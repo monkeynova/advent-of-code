@@ -27,7 +27,42 @@ namespace advent_of_code {
 
 namespace {
 
-// Helper methods go here.
+struct Game {
+  struct View {
+    int red = 0;
+    int green = 0;
+    int blue = 0;
+  };
+
+  int num;
+  std::vector<View> views;
+};
+
+absl::StatusOr<Game> Parse(std::string_view line) {
+  Game ret;
+  auto [game_str, view_set] = PairSplit(line, ": ");
+  static LazyRE2 game_re{"Game (\\d+)"};
+  if (!RE2::FullMatch(game_str, *game_re, &ret.num)) {
+    return Error("Bad game: ", game_str);
+  }
+  for (std::string_view view_str : absl::StrSplit(view_set, "; ")) {
+    Game::View view;
+    for (std::string_view ball_res : absl::StrSplit(view_str, ", ")) {
+      int count;
+      std::string_view color;
+      static LazyRE2 ball_re{"(\\d+) (blue|red|green)"};
+      if (!RE2::FullMatch(ball_res, *ball_re, &count, &color)) {
+        return Error("Bad ball_res: ", ball_res);
+      }
+      if (color == "red") view.red = count;
+      else if (color == "blue") view.blue = count;
+      else if (color == "green") view.green = count;
+      else return Error("Bad color: ", color);
+    }
+    ret.views.push_back(view);
+  }
+  return ret;
+}
 
 }  // namespace
 
@@ -35,29 +70,12 @@ absl::StatusOr<std::string> Day_2023_02::Part1(
     absl::Span<std::string_view> input) const {
   int game_total = 0;
   for (std::string_view line : input) {
-    auto [game_str, view_set] = PairSplit(line, ": ");
-    int game_num;
-    if (!RE2::FullMatch(game_str, "Game (\\d+)", &game_num)) {
-      return Error("Bad game: ", game_str);
-    }
-    bool bad = false;
-    for (std::string_view view : absl::StrSplit(view_set, "; ")) {
-      absl::flat_hash_map<std::string_view, int> totals;
-      for (std::string_view ball_res : absl::StrSplit(view, ", ")) {
-        int count;
-        std::string_view color;
-        if (!RE2::FullMatch(ball_res, "(\\d+) (blue|red|green)", &count, &color)) {
-          return Error("Bad ball_res: ", ball_res);
-        }
-        if (totals.contains(color)) return Error("Dupe color in view:", color);
-        totals[color] += count;
-      }
-      bad |= totals["blue"] > 14;
-      bad |= totals["green"] > 13;
-      bad |= totals["red"] > 12;
-    }
-    if (!bad) {
-      game_total += game_num;
+    ASSIGN_OR_RETURN(Game game, Parse(line));
+    auto is_possible = [](const Game::View& v) {
+      return v.red <= 12 && v.green <= 13 && v.blue <= 14;
+    };
+    if (absl::c_all_of(game.views, is_possible)) {
+      game_total += game.num;
     }
   }
   return AdventReturn(game_total);
@@ -67,23 +85,16 @@ absl::StatusOr<std::string> Day_2023_02::Part2(
     absl::Span<std::string_view> input) const {
   int total_power = 0;
   for (std::string_view line : input) {
-    auto [game_str, view_set] = PairSplit(line, ": ");
-    int game_num;
-    if (!RE2::FullMatch(game_str, "Game (\\d+)", &game_num)) {
-      return Error("Bad game: ", game_str);
-    }
-    absl::flat_hash_map<std::string_view, int> totals;
-    for (std::string_view view : absl::StrSplit(view_set, "; ")) {
-      for (std::string_view ball_res : absl::StrSplit(view, ", ")) {
-        int count;
-        std::string_view color;
-        if (!RE2::FullMatch(ball_res, "(\\d+) (blue|red|green)", &count, &color)) {
-          return Error("Bad ball_res: ", ball_res);
-        }
-        totals[color] = std::max(totals[color], count);
-      }
-    }
-    total_power += totals["red"] * totals["blue"] * totals["green"];
+    ASSIGN_OR_RETURN(Game game, Parse(line));
+    Game::View min = absl::c_accumulate(
+      game.views, Game::View{},
+      [](Game::View a, Game::View b) {
+        a.red = std::max(a.red, b.red);
+        a.green = std::max(a.green, b.green);
+        a.blue = std::max(a.blue, b.blue);
+        return a;
+      });
+    total_power += min.red * min.blue * min.green;
   }
   return AdventReturn(total_power);
 }
