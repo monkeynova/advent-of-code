@@ -31,5 +31,6 @@ cc_library(
     deps = [
         "//advent_of_code/2023/day01:day01_benchmark_lib",
         "//advent_of_code/2023/day02:day02_benchmark_lib",
+        "//advent_of_code/2023/day03:day03_benchmark_lib",
     ],
 )
