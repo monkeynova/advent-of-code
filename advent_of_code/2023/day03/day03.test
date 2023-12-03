@@ -2,24 +2,42 @@
 ==
 
 [part=1]
-Example input
+467..114..
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598..
 --
-ERROR: UNIMPLEMENTED: Problem not known
+4361
 ==
 
 [part=1]
 @include{advent_of_code/2023/day03/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+549908
 ==
 
 [part=2]
-Example input
+467..114..
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598..
 --
-ERROR: UNIMPLEMENTED: Problem not known
+467835
 ==
 
 [part=2]
 @include{advent_of_code/2023/day03/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+81166799
