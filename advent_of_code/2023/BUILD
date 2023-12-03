@@ -12,8 +12,8 @@ sh_binary(
     name = "whole_year",
     testonly = 1,
     srcs = ["//tools:whole_year.sh"],
-    data = [":benchmark"],
     args = ["$(location :benchmark)"],
+    data = [":benchmark"],
 )
 
 cc_library(
@@ -26,5 +26,6 @@ cc_library(
         "//advent_of_code/2023/day01:day01_benchmark_lib",
         "//advent_of_code/2023/day02:day02_benchmark_lib",
         "//advent_of_code/2023/day03:day03_benchmark_lib",
+        "//advent_of_code/2023/day04:day04_benchmark_lib",
     ],
 )
