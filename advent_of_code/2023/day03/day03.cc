@@ -37,22 +37,32 @@ absl::StatusOr<std::string> Day_2023_03::Part1(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
   int sum = 0;
-  absl::flat_hash_set<Point> used;
-  for (Point p : b.range()) {
-    bool has_symbol = false;
-    int cur_num = 0;
-    for (Point p2 = p; !used.contains(p2) && b.OnBoard(p2) && IsDigit(b[p2]); ++p2.x) {
-      used.insert(p2);
-      cur_num = cur_num * 10 + b[p2] - '0';
-      for (Point d : Cardinal::kEightDirs) {
-        Point t = p2 + d;
-        if (b.OnBoard(t) && b[t] != '.' && !IsDigit(b[t])) {
-          has_symbol = true;
-        }
+  std::vector<bool> used(b.range().Area(), false);
+  auto point_idx = [&](Point p) {
+    return p.y * b.width() + p.x;
+  };
+  auto valid_digit = [&](Point p) {
+    return b.OnBoard(p) && IsDigit(b[p]) && !used[point_idx(p)];
+  };
+  for (auto [p, c] : b) {
+    if (c == '.' || IsDigit(c)) continue;
+    for (Point dir : Cardinal::kEightDirs) {
+      Point t = p + dir;
+      if (!valid_digit(t)) continue;
+      Point min = t;
+      for (; valid_digit(min); min += Cardinal::kWest) {
+        used[point_idx(min)] = true;
       }
-    }
-    if (has_symbol) {
-      sum += cur_num;
+      min += Cardinal::kEast;
+      Point max = t;
+      for (max += Cardinal::kEast; valid_digit(max); max += Cardinal::kEast) {
+        used[point_idx(max)] = true;
+      }
+      int num = 0;
+      for (Point d = min; d != max; ++d.x) {
+        num = num * 10 + b[d] - '0';
+      }
+      sum += num;
     }
   }
   return AdventReturn(sum);
@@ -62,23 +72,27 @@ absl::StatusOr<std::string> Day_2023_03::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
   int64_t sum = 0;
-  absl::flat_hash_set<Point> used;
-  for (Point p : b.range()) {
-    if (b[p] != '*') continue;
+  std::vector<bool> used(b.range().Area(), false);
+  auto point_idx = [&](Point p) {
+    return p.y * b.width() + p.x;
+  };
+  auto valid_digit = [&](Point p) {
+    return b.OnBoard(p) && IsDigit(b[p]) && !used[point_idx(p)];
+  };
+  for (auto [p, c] : b) {
+    if (c != '*') continue;
     std::vector<int64_t> adjacent;
     for (Point dir : Cardinal::kEightDirs) {
       Point t = p + dir;
-      if (used.contains(t) || !IsDigit(b[t])) continue;
+      if (!valid_digit(t)) continue;
       Point min = t;
-      while (!used.contains(min) && b.OnBoard(min) && IsDigit(b[min])) {
-        used.insert(min);
-        --min.x;
+      for (; valid_digit(min); min += Cardinal::kWest) {
+        used[point_idx(min)] = true;
       }
-      ++min.x;
-      Point max = {t.x + 1, t.y};
-      while (!used.contains(max) && b.OnBoard(max) && IsDigit(b[max])) {
-        used.insert(max);
-        ++max.x;
+      min += Cardinal::kEast;
+      Point max = t;
+      for (max += Cardinal::kEast; valid_digit(max); max += Cardinal::kEast) {
+        used[point_idx(max)] = true;
       }
       int num = 0;
       for (Point d = min; d != max; ++d.x) {
