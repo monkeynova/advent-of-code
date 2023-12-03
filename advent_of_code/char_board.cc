@@ -31,8 +31,23 @@ Point CharBoard::TorusPoint(Point p) const {
 
 absl::flat_hash_set<Point> CharBoard::Find(char c) const {
   absl::flat_hash_set<Point> ret;
-  for (Point p : range())
-    if (at(p) == c) ret.insert(p);
+  CHECK_NE(c, '\n');
+  for (int i = 0; i < buf_.size(); ++i) {
+    if (buf_[i] == c) {
+      ret.insert({.x = i % stride_, .y = i / stride_});
+    }
+  }
+  return ret;
+}
+
+absl::flat_hash_set<Point> CharBoard::Find(std::bitset<256> charset) const {
+  absl::flat_hash_set<Point> ret;
+  CHECK(!charset['\n']);
+  for (int i = 0; i < buf_.size(); ++i) {
+    if (charset[buf_[i]]) {
+      ret.insert({.x = i % stride_, .y = i / stride_});
+    }
+  }
   return ret;
 }
 

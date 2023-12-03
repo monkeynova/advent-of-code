@@ -10,10 +10,6 @@ namespace advent_of_code {
 
 namespace {
 
-bool IsDigit(char c) {
-  return c >= '0' && c <= '9';
-}
-
 // Returns a pair of points, {min, max}, with the same y value as `start` and
 // such that all points with x values in [min.x, max.x) are on `b` and have a
 // digit stored in the correspondng board location.
@@ -21,12 +17,12 @@ bool IsDigit(char c) {
 // model directly off of b.stride().
 std::pair<Point, Point> DigitRange(const CharBoard& b, Point start) {
   Point min = start;
-  while (b.OnBoard(min) && IsDigit(b[min])) {
+  while (b.OnBoard(min) && isdigit(b[min])) {
     min += Cardinal::kWest;
   }
   min += Cardinal::kEast;
   Point max = start + Cardinal::kEast;
-  while (b.OnBoard(max) && IsDigit(b[max])) {
+  while (b.OnBoard(max) && isdigit(b[max])) {
     max += Cardinal::kEast;
   }
   return {min, max};
@@ -42,12 +38,15 @@ absl::StatusOr<std::string> Day_2023_03::Part1(
   auto point_idx = [&](Point p) {
     return p.y * b.width() + p.x;
   };
-  for (auto [p, c] : b) {
-    if (c == '.' || IsDigit(c)) continue;
+  std::bitset<256> find = ~std::bitset<256>();
+  find['.'] = false;
+  find['\n'] = false;
+  for (char c = '0'; c <= '9'; ++c) find[c] = false;
+  for (Point p : b.Find(find)) {
     for (Point dir : Cardinal::kEightDirs) {
       Point t = p + dir;
       if (!b.OnBoard(t)) continue;
-      if (!IsDigit(b[t])) continue;
+      if (!isdigit(b[t])) continue;
       if (used[point_idx(t)]) continue;
 
       auto [min, max] = DigitRange(b, t);
@@ -70,13 +69,12 @@ absl::StatusOr<std::string> Day_2023_03::Part2(
   auto point_idx = [&](Point p) {
     return p.y * b.width() + p.x;
   };
-  for (auto [p, c] : b) {
-    if (c != '*') continue;
+  for (Point p : b.Find('*')) {
     std::vector<int64_t> adjacent;
     for (Point dir : Cardinal::kEightDirs) {
       Point t = p + dir;
       if (!b.OnBoard(t)) continue;
-      if (!IsDigit(b[t])) continue;
+      if (!isdigit(b[t])) continue;
       if (used[point_idx(t)]) continue;
 
       auto [min, max] = DigitRange(b, t);

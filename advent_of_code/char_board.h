@@ -137,6 +137,8 @@ class CharBoard {
 
   // Retuns the set of points p such that at(p) == c.
   absl::flat_hash_set<Point> Find(char c) const;
+  // Returns the set of points p such that charset[at(p)] is true.
+  absl::flat_hash_set<Point> Find(std::bitset<256> charset) const;
 
   // Returns Find(test).size(), though doesn't use the temporary space.
   int CountChar(char test) const;
