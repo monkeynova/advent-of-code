@@ -31,6 +31,24 @@ bool IsDigit(char c) {
   return c >= '0' && c <= '9';
 }
 
+// Returns a pair of points, {min, max}, with the same y value as `start` and
+// such that all points with x values in [min.x, max.x) are on `b` and have a
+// digit stored in the correspondng board location.
+// TODO(@monkeynova): whole_year<1sec challenge: Consider a std::string_view
+// model directly off of b.stride().
+std::pair<Point, Point> DigitRange(const CharBoard& b, Point start) {
+  Point min = start;
+  while (b.OnBoard(min) && IsDigit(b[min])) {
+    min += Cardinal::kWest;
+  }
+  min += Cardinal::kEast;
+  Point max = start + Cardinal::kEast;
+  while (b.OnBoard(max) && IsDigit(b[max])) {
+    max += Cardinal::kEast;
+  }
+  return {min, max};
+}
+
 }  // namespace
 
 absl::StatusOr<std::string> Day_2023_03::Part1(
@@ -41,25 +59,18 @@ absl::StatusOr<std::string> Day_2023_03::Part1(
   auto point_idx = [&](Point p) {
     return p.y * b.width() + p.x;
   };
-  auto valid_digit = [&](Point p) {
-    return b.OnBoard(p) && IsDigit(b[p]) && !used[point_idx(p)];
-  };
   for (auto [p, c] : b) {
     if (c == '.' || IsDigit(c)) continue;
     for (Point dir : Cardinal::kEightDirs) {
       Point t = p + dir;
-      if (!valid_digit(t)) continue;
-      Point min = t;
-      for (; valid_digit(min); min += Cardinal::kWest) {
-        used[point_idx(min)] = true;
-      }
-      min += Cardinal::kEast;
-      Point max = t;
-      for (max += Cardinal::kEast; valid_digit(max); max += Cardinal::kEast) {
-        used[point_idx(max)] = true;
-      }
+      if (!b.OnBoard(t)) continue;
+      if (!IsDigit(b[t])) continue;
+      if (used[point_idx(t)]) continue;
+
+      auto [min, max] = DigitRange(b, t);
       int num = 0;
-      for (Point d = min; d != max; ++d.x) {
+      for (Point d = min; d != max; d += Cardinal::kEast) {
+        used[point_idx(d)] = true;
         num = num * 10 + b[d] - '0';
       }
       sum += num;
@@ -76,26 +87,19 @@ absl::StatusOr<std::string> Day_2023_03::Part2(
   auto point_idx = [&](Point p) {
     return p.y * b.width() + p.x;
   };
-  auto valid_digit = [&](Point p) {
-    return b.OnBoard(p) && IsDigit(b[p]) && !used[point_idx(p)];
-  };
   for (auto [p, c] : b) {
     if (c != '*') continue;
     std::vector<int64_t> adjacent;
     for (Point dir : Cardinal::kEightDirs) {
       Point t = p + dir;
-      if (!valid_digit(t)) continue;
-      Point min = t;
-      for (; valid_digit(min); min += Cardinal::kWest) {
-        used[point_idx(min)] = true;
-      }
-      min += Cardinal::kEast;
-      Point max = t;
-      for (max += Cardinal::kEast; valid_digit(max); max += Cardinal::kEast) {
-        used[point_idx(max)] = true;
-      }
+      if (!b.OnBoard(t)) continue;
+      if (!IsDigit(b[t])) continue;
+      if (used[point_idx(t)]) continue;
+
+      auto [min, max] = DigitRange(b, t);
       int num = 0;
-      for (Point d = min; d != max; ++d.x) {
+      for (Point d = min; d != max; d += Cardinal::kEast) {
+        used[point_idx(d)] = true;
         num = num * 10 + b[d] - '0';
       }
       adjacent.push_back(num);
