@@ -29,18 +29,12 @@ cc_test(
     ],
 )
 
-cc_binary(
+sh_binary(
     name = "whole_year",
     testonly = 1,
-    args = [
-        "--benchmark",
-        "--bechmark_file_include_filter_re=input",
-        "--benchmark_flags=--benchmark_min_time=0ns",
-    ],
-    deps = [
-        ":benchmark_lib",
-        "@com_monkeynova_gunit_main//:test_main",
-    ],
+    srcs = ["//tools:whole_year.sh"],
+    data = [":benchmark"],
+    args = ["$(location :benchmark)"],
 )
 
 cc_library(
