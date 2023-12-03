@@ -7,11 +7,11 @@
 #include "advent_of_code/infra/file_flags.h"
 #include "advent_of_code/infra/file_test_options.h"
 #include "file_based_test_driver/test_case_options.h"
-#include "re2/re2.h"
 
-ABSL_FLAG(std::string, bechmark_file_include_filter_re, "",
-          "If non-empty, specifies an RE such that benchmarks are filtered "
-          "to only run if they have an include that mathes the RE");
+ABSL_FLAG(std::string, bechmark_file_include_filter, "",
+          "If non-empty, specifies a string such that benchmarks are filtered "
+          "to only run if they (a) have an include and (b) that include "
+          "contains the filter as a substring.");
 
 namespace advent_of_code {
 
@@ -109,14 +109,14 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
     }
   }
   if (skip.empty()) {
-    std::string include_filter_re =
-        absl::GetFlag(FLAGS_bechmark_file_include_filter_re);
-    if (!include_filter_re.empty()) {
-      auto match_re = [&](const std::string& test) {
-        return RE2::PartialMatch(test, include_filter_re);
+    static std::string include_filter = 
+        absl::GetFlag(FLAGS_bechmark_file_include_filter);
+    if (!include_filter.empty()) {
+      auto matches = [&](const std::string& test) {
+        return test.find(include_filter) != std::string::npos;
       };
-      if (!absl::c_any_of(test->includes, match_re)) {
-        skip = absl::StrCat("(no include =~ m/", include_filter_re, "/)");
+      if (!absl::c_any_of(test->includes, matches)) {
+        skip = absl::StrCat("(no include contains '", include_filter, "'");
       }
     }
   }
