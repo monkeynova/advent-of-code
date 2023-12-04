@@ -14,44 +14,28 @@
 
 namespace advent_of_code {
 
-static absl::Status NullFreeString(std::string_view str, std::string* out_str) {
-  if (str.find('\0') != std::string_view::npos) {
-    return absl::InvalidArgumentError(
-        absl::StrCat("filename contains null characters: ", str));
-  }
-  *out_str = std::string(str);
-  return absl::OkStatus();
-}
-
-absl::Status GetContents(std::string_view filename,
-                         std::string* file_contents) {
-  // Because we are using a c api, check for in-string nulls.
-  std::string filename_str;
-  RETURN_IF_ERROR(NullFreeString(filename, &filename_str));
-
+absl::StatusOr<std::string> GetContents(std::string_view filename) {
   struct stat status;
   if (stat(filename.data(), &status) != 0) {
-    return absl::Status(absl::StatusCode::kNotFound,
-                        absl::StrCat("Could not find", filename));
+    return absl::NotFoundError(absl::StrCat("Could not find", filename));
   } else if (S_ISREG(status.st_mode) == 0) {
-    return absl::Status(absl::StatusCode::kFailedPrecondition,
-                        absl::StrCat("File is not regular", filename));
+    return absl::FailedPreconditionError(
+      absl::StrCat("File is not regular", filename));
   }
 
-  std::ifstream stream(std::string(filename), std::ifstream::in);
+  std::ifstream stream(filename, std::ifstream::in);
   if (!stream) {
     // Could be a wider range of reasons.
-    return absl::Status(absl::StatusCode::kNotFound,
-                        absl::StrCat("Unable to open: ", filename));
+    return absl::NotFoundError(absl::StrCat("Unable to open: ", filename));
   }
   stream.seekg(0, stream.end);
   int length = stream.tellg();
   stream.seekg(0, stream.beg);
-  file_contents->clear();
-  file_contents->resize(length);
-  stream.read(&(*file_contents)[0], length);
+  std::string file_contents;
+  file_contents.resize(length);
+  stream.read(&file_contents[0], length);
   stream.close();
-  return absl::OkStatus();
+  return file_contents;
 }
 
 absl::Status HandleTestIncludes(std::string* test_case,
@@ -62,13 +46,10 @@ absl::Status HandleTestIncludes(std::string* test_case,
     if (includes_out != nullptr) {
       includes_out->emplace_back(include_fname);
     }
-    std::string contents;
-    if (absl::Status st = GetContents(absl::StrCat(include_fname), &contents);
-        !st.ok()) {
-      return absl::InvalidArgumentError(absl::StrCat(
-          "Unable to include file \"", include_fname, "\": ", st.ToString()));
-      return st;
-    }
+    // absl::StrCat(include_fname) ensures that the string_view has a '\0'
+    // after it.
+    ASSIGN_OR_RETURN(std::string contents,
+                     GetContents(absl::StrCat(include_fname)));
     *test_case = absl::StrReplaceAll(
         *test_case,
         {{absl::StrCat("@include{", include_fname, "}"), contents}});

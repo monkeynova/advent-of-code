@@ -33,6 +33,7 @@ cc_binary(
         "@com_google_absl//absl/log:flags",
         "@com_google_absl//absl/log:initialize",
         "@com_google_absl//absl/strings",
+        "@com_monkeynova_gunit_main//:main_lib",
     ],
 )
 

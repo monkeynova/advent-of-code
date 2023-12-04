@@ -62,8 +62,7 @@ DirtyTestParse(std::string_view contents) {
 
 absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>>
 FileBenchmarkTests(std::string_view test_file) {
-  std::string file_contents;
-  RETURN_IF_ERROR(GetContents(test_file, &file_contents));
+  ASSIGN_OR_RETURN(std::string file_contents, GetContents(test_file));
   return DirtyTestParse(file_contents);
 }
 
