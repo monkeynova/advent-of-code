@@ -26,45 +26,74 @@ class Game {
 
  private:
   Game() = default;
+  
+  static std::string_view NextToken(std::string_view& line);
 
   int num_;
   std::vector<View> views_;
 };
 
+std::string_view Game::NextToken(std::string_view& line) {
+  int start = 0;
+  while (start < line.size() && isspace(line[start])) {
+    ++start;
+  }
+  if (start == line.size()) {
+    line = "";
+    return "";
+  }
+  int end = start + 1;
+  if (line[end] == '-' || isdigit(line[end])) {
+    ++end;
+    while (end < line.size() && isdigit(line[end])) {
+      ++end;
+    }
+  } else if (isalpha(line[end])) {
+    while (end < line.size() && isalpha(line[end])) {
+      ++end;
+    }
+  }
+  std::string_view ret = line.substr(start, end - start);
+  line = line.substr(end);
+  return ret;
+}
+
 absl::StatusOr<Game> Game::Parse(std::string_view line) {
   Game ret;
-  auto [game_str, view_set] = PairSplit(line, ": ");
-  static LazyRE2 game_re{"Game (\\d+)"};
-  if (!RE2::FullMatch(game_str, *game_re, &ret.num_)) {
-    return Error("Bad game: ", game_str, "; ", line);
+
+  // line = 'Game \d+: $view(; $view)*'
+  // view = '$ball(, $ball)*'
+  // ball = '\d+ (red|green|blue)'
+  if (NextToken(line) != "Game") return Error("Bad game");
+  if (!absl::SimpleAtoi(NextToken(line), &ret.num_)) {
+    return Error("Not game_num");
   }
-  for (std::string_view view_str : absl::StrSplit(view_set, "; ")) {
-    Game::View view;
-    Game::View dupe_check;
-    for (std::string_view ball_res : absl::StrSplit(view_str, ", ")) {
-      int count;
-      std::string_view color;
-      static LazyRE2 ball_re{"(\\d+) (blue|red|green)"};
-      if (!RE2::FullMatch(ball_res, *ball_re, &count, &color)) {
-        return Error("Bad ball_res: ", ball_res, "; ", line);
+  if (NextToken(line) != ":") return Error("Bad game");
+
+  while (!line.empty()) {
+    ret.views_.push_back({});
+    View& cur = ret.views_.back();
+    while (!line.empty()) {
+      int count = 0;
+      if (!absl::SimpleAtoi(NextToken(line), &count)) {
+        return Error("Not number");
       }
+      std::string_view color = NextToken(line);
       if (color == "red") {
-        if (dupe_check.red) return Error("Dupe red: ", line);
-        dupe_check.red = 1;
-        view.red = count;
+        cur.red = count;
       } else if (color == "blue") {
-        if (dupe_check.blue) return Error("Dupe red: ", line);
-        dupe_check.blue = 1;
-        view.blue = count;
+        cur.blue = count;
       } else if (color == "green") {
-        if (dupe_check.green) return Error("Dupe red: ", line);
-        dupe_check.green = 1;
-        view.green = count;
+        cur.green = count;
       } else {
-        return Error("Bad color: ", color, "; ", line);
+        return Error("Bad color: ", color);
       }
+      if (line.empty()) break;
+      std::string_view delim = NextToken(line);
+      if (delim == ",") continue;
+      if (delim == ";") break;
+      return Error("Bad game");
     }
-    ret.views_.push_back(view);
   }
   return ret;
 }
