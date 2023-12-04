@@ -9,24 +9,63 @@ namespace advent_of_code {
 namespace {
 
 std::optional<int> TryParse(char c) {
-  if (c >= '0' && c <= '9') {
-    return c - '0';
+  switch (c) {
+    case '0': return 0;
+    case '1': return 1;
+    case '2': return 2;
+    case '3': return 3;
+    case '4': return 4;
+    case '5': return 5;
+    case '6': return 6;
+    case '7': return 7;
+    case '8': return 8;
+    case '9': return 9;
   }
   return std::nullopt;
 }
 
 std::optional<int> TryParse(std::string_view prefix) {
-  static constexpr std::array<std::string_view, 10> words = {
-    "zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
-    "nine",
-  };
-  if (prefix[0] >= '0' && prefix[0] <= '9') {
-    return prefix[0] - '0';
-  }
-  for (int d = 0; d < 10; ++d) {
-    std::string_view digit_word = words[d];
-    if (prefix.substr(0, digit_word.size()) == digit_word) {
-      return d;
+  switch (prefix[0]) {
+    case '0': return 0;
+    case '1': return 1;
+    case '2': return 2;
+    case '3': return 3;
+    case '4': return 4;
+    case '5': return 5;
+    case '6': return 6;
+    case '7': return 7;
+    case '8': return 8;
+    case '9': return 9;
+    case 'z': {
+      if (prefix.substr(0, 4) == "zero") return 0;
+      break;
+    }
+    case 'o': {
+      if (prefix.substr(0, 3) == "one") return 1;
+      break;
+    }
+    case 't': {
+      if (prefix.substr(0, 3) == "two") return 2;
+      if (prefix.substr(0, 5) == "three") return 3;
+      break;
+    }
+    case 'f': {
+      if (prefix.substr(0, 4) == "four") return 4;
+      if (prefix.substr(0, 4) == "five") return 5;
+      break;
+    }
+    case 's': {
+      if (prefix.substr(0, 3) == "six") return 6;
+      if (prefix.substr(0, 5) == "seven") return 7;
+      break;
+    }
+    case 'e': {
+      if (prefix.substr(0, 5) == "eight") return 8;
+      break;
+    }
+    case 'n': {
+      if (prefix.substr(0, 4) == "nine") return 9;
+      break;
     }
   }
   return std::nullopt;
