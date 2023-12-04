@@ -16,6 +16,7 @@ cc_library(
         "//advent_of_code:point3",
         "//advent_of_code:point_walk",
         "//advent_of_code:splice_ring",
+        "//advent_of_code:tokenizer",
         "@com_google_absl//absl/algorithm:container",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",

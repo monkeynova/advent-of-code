@@ -6,10 +6,9 @@ cc_library(
     hdrs = ["day02.h"],
     deps = [
         "//advent_of_code:advent_day",
+        "//advent_of_code:tokenizer",
         "@com_google_absl//absl/algorithm:container",
         "@com_google_absl//absl/log",
-        "@com_google_absl//absl/strings",
-        "@com_googlesource_code_re2//:re2",
     ],
 )
 

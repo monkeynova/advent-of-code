@@ -191,6 +191,15 @@ cc_library(
 )
 
 cc_library(
+    name = "tokenizer",
+    srcs = ["tokenizer.cc"],
+    hdrs = ["tokenizer.h"],
+    deps = [
+        ":vlog",
+    ],
+)
+
+cc_library(
     name = "vlog",
     srcs = ["vlog.cc"],
     hdrs = ["vlog.h"],

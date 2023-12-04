@@ -4,8 +4,7 @@
 
 #include "absl/algorithm/container.h"
 #include "absl/log/log.h"
-#include "absl/strings/str_split.h"
-#include "re2/re2.h"
+#include "advent_of_code/tokenizer.h"
 
 namespace advent_of_code {
 
@@ -33,52 +32,28 @@ class Game {
   std::vector<View> views_;
 };
 
-std::string_view Game::NextToken(std::string_view& line) {
-  int start = 0;
-  while (start < line.size() && isspace(line[start])) {
-    ++start;
-  }
-  if (start == line.size()) {
-    line = "";
-    return "";
-  }
-  int end = start + 1;
-  if (line[end] == '-' || isdigit(line[end])) {
-    ++end;
-    while (end < line.size() && isdigit(line[end])) {
-      ++end;
-    }
-  } else if (isalpha(line[end])) {
-    while (end < line.size() && isalpha(line[end])) {
-      ++end;
-    }
-  }
-  std::string_view ret = line.substr(start, end - start);
-  line = line.substr(end);
-  return ret;
-}
-
 absl::StatusOr<Game> Game::Parse(std::string_view line) {
   Game ret;
 
   // line = 'Game \d+: $view(; $view)*'
   // view = '$ball(, $ball)*'
   // ball = '\d+ (red|green|blue)'
-  if (NextToken(line) != "Game") return Error("Bad game");
-  if (!absl::SimpleAtoi(NextToken(line), &ret.num_)) {
+  Tokenizer tok(line);
+  if (tok.Next() != "Game") return Error("Bad game");
+  if (!absl::SimpleAtoi(tok.Next(), &ret.num_)) {
     return Error("Not game_num");
   }
-  if (NextToken(line) != ":") return Error("Bad game");
+  if (tok.Next() != ":") return Error("Bad game");
 
-  while (!line.empty()) {
+  while (!tok.Done()) {
     ret.views_.push_back({});
     View& cur = ret.views_.back();
-    while (!line.empty()) {
+    while (!tok.Done()) {
       int count = 0;
-      if (!absl::SimpleAtoi(NextToken(line), &count)) {
+      if (!absl::SimpleAtoi(tok.Next(), &count)) {
         return Error("Not number");
       }
-      std::string_view color = NextToken(line);
+      std::string_view color =tok.Next();
       if (color == "red") {
         cur.red = count;
       } else if (color == "blue") {
@@ -88,8 +63,8 @@ absl::StatusOr<Game> Game::Parse(std::string_view line) {
       } else {
         return Error("Bad color: ", color);
       }
-      if (line.empty()) break;
-      std::string_view delim = NextToken(line);
+      if (tok.Done()) break;
+      std::string_view delim = tok.Next();
       if (delim == ",") continue;
       if (delim == ";") break;
       return Error("Bad game");
