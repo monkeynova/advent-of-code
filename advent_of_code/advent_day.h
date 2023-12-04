@@ -27,6 +27,7 @@ template <class Container>
 inline absl::StatusOr<std::vector<int64_t>> ParseAsInts(Container input) {
   std::vector<int64_t> vals;
   for (std::string_view in : input) {
+    if (in.empty()) continue;
     int64_t v;
     if (!absl::SimpleAtoi(in, &v)) {
       return absl::InvalidArgumentError(absl::StrCat("parse as int: ", in));

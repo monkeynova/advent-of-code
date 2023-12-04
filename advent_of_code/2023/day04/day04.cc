@@ -26,19 +26,53 @@
 namespace advent_of_code {
 
 namespace {
-
-// Helper methods go here.
-
 }  // namespace
 
 absl::StatusOr<std::string> Day_2023_04::Part1(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  int64_t total = 0;
+  for (std::string_view line : input) {
+    auto [card, rest] = PairSplit(line, ": ");
+    auto [win_nums, my_nums] = PairSplit(rest, " | ");
+    ASSIGN_OR_RETURN(
+      std::vector<int64_t> wins, ParseAsInts(absl::StrSplit(win_nums, " ")));
+    absl::flat_hash_set<int64_t> win_set(wins.begin(), wins.end());
+    ASSIGN_OR_RETURN(
+      std::vector<int64_t> mine, ParseAsInts(absl::StrSplit(my_nums, " ")));
+    int64_t win_count = absl::c_accumulate(mine, int64_t{0}, [&](int64_t a, int64_t n) {
+      return a + (win_set.contains(n) ? 1 : 0);
+    });
+    if (win_count > 0) {
+      total += 1 << (win_count - 1);
+    }
+  }
+  return AdventReturn(total);
 }
 
 absl::StatusOr<std::string> Day_2023_04::Part2(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  std::vector<int64_t> counts(input.size(), 1);
+
+  int card_idx = 0;
+  for (std::string_view line : input) {
+    auto [card, rest] = PairSplit(line, ": ");
+    auto [win_nums, my_nums] = PairSplit(rest, " | ");
+    ASSIGN_OR_RETURN(
+      std::vector<int64_t> wins, ParseAsInts(absl::StrSplit(win_nums, " ")));
+    absl::flat_hash_set<int64_t> win_set(wins.begin(), wins.end());
+    ASSIGN_OR_RETURN(
+      std::vector<int64_t> mine, ParseAsInts(absl::StrSplit(my_nums, " ")));
+    int64_t win_count = absl::c_accumulate(mine, int64_t{0}, [&](int64_t a, int64_t n) {
+      return a + (win_set.contains(n) ? 1 : 0);
+    });
+    if (win_count > 0) {
+      for (int i = 0; card_idx + 1 + i < counts.size() && i < win_count; ++i) {
+        counts[card_idx + 1 + i] += counts[card_idx];
+      }
+    }
+    ++card_idx;
+  }
+  return AdventReturn(absl::c_accumulate(counts, int64_t{0}));
 }
 
 }  // namespace advent_of_code
