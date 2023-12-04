@@ -54,12 +54,12 @@ std::string_view NextToken(std::string_view& line) {
 
 struct Card {
   int num;
-  absl::flat_hash_set<int> wins;
+  std::bitset<100> wins;
   std::vector<int> my_nums;
 
   int Score() const {
     return absl::c_accumulate(my_nums, 0, [&](int a, int n) {
-      return a + (wins.contains(n) ? 1 : 0);
+      return a + (wins[n] ? 1 : 0);
     });
   }
 };
@@ -74,7 +74,8 @@ absl::StatusOr<Card> ParseCard(std::string_view input) {
     if (token == "|") break;
     int win;
     if (!absl::SimpleAtoi(token, &win)) return Error("Bad card");
-    card.wins.insert(win);
+    if (win >= 100) return Error("Win too big");
+    card.wins[win] = true;
   }
   while (!input.empty()) {
     int my_num;
