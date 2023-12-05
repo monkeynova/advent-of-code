@@ -39,6 +39,14 @@ bool Interval1D::HasOverlap(const Interval1D& o) const {
   return !Intersect(o).empty();
 }
 
+Interval1D Interval1D::Translate(int64_t delta) const {
+  Interval1D ret = *this;
+  for (int64_t& x : ret.x_) {
+    x += delta;
+  }
+  return ret;
+}
+
 Interval1D Interval1D::Union(const Interval1D& o) const {
   return Merge(o, [](bool left, bool right) { return left || right; });
 }

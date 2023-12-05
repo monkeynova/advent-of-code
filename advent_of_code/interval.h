@@ -42,6 +42,8 @@ class Interval1D {
 
   absl::Span<const int64_t> x() const { return x_; }
 
+  Interval1D Translate(int64_t delta) const;
+
   Interval1D Union(const Interval1D& o) const;
   Interval1D Intersect(const Interval1D& o) const;
   Interval1D Minus(const Interval1D& o) const;
