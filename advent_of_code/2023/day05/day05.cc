@@ -40,9 +40,22 @@ struct Range {
   int64_t len;
 };
 
-void ApplyMap(const std::vector<Range>& ranges, std::vector<int64_t>& vals) {
+class Map {
+ public:
+  Map() = default;
+  void Clear() { ranges_.clear(); }
+  void AddRange(Range range) { ranges_.push_back(range); }
+
+  void Apply(std::vector<int64_t>& vals) const;
+  Interval1D Apply(Interval1D i_int) const;
+
+ private:
+  std::vector<Range> ranges_;
+};
+
+void Map::Apply(std::vector<int64_t>& vals) const {
   for (int64_t& val : vals) {
-    for (const Range& r : ranges) {
+    for (const Range& r : ranges_) {
       if (val >= r.src_start && val < r.src_start + r.len) {
         val += r.dest_start - r.src_start;
         break;
@@ -51,10 +64,11 @@ void ApplyMap(const std::vector<Range>& ranges, std::vector<int64_t>& vals) {
   }
 }
 
-Interval1D ApplyMap(const std::vector<Range>& ranges, Interval1D i_int) {
+Interval1D Map::Apply(Interval1D i_int) const {
   Interval1D ret;
 
-  for (const Range& r : ranges) {
+  // TODO(@monkeynova): Sort ranges, stream intersects.
+  for (const Range& r : ranges_) {
     Interval1D overlap =
         i_int.Intersect(Interval1D(r.src_start, r.src_start + r.len));
     if (!overlap.empty()) {
@@ -71,13 +85,13 @@ Interval1D ApplyMap(const std::vector<Range>& ranges, Interval1D i_int) {
 absl::StatusOr<std::string> Day_2023_05::Part1(
     absl::Span<std::string_view> input) const {
   auto [type, val_str] = PairSplit(input[0], ": ");
-  type = absl::StripSuffix(type, "s"); // seeds -> seed
+  type = absl::StripSuffix(type, "s"); // seeds -> seed.
 
   ASSIGN_OR_RETURN(std::vector<int64_t> vals, ParseAsInts(absl::StrSplit(val_str, " ")));
   if (!input[1].empty()) return Error("No empty line");
 
   bool was_empty = true;
-  std::vector<Range> map;
+  Map map;
   for (int i = 2; i < input.size(); ++i) {
     std::string_view line = input[i];
     if (was_empty) {
@@ -89,25 +103,26 @@ absl::StatusOr<std::string> Day_2023_05::Part1(
       was_empty = false;
     } else if (line.empty()) {
       was_empty = true;
-      ApplyMap(map, vals);
-      map = {};
+      map.Apply(vals);
+      map.Clear();
     } else {
       ASSIGN_OR_RETURN(Range range, Range::Parse(line));
-      map.push_back(range);
+      map.AddRange(range);
     }
   }
-  ApplyMap(map, vals);
+  map.Apply(vals);
 
-  int64_t min = absl::c_accumulate(vals, std::numeric_limits<int64_t>::max(), [](int64_t a, int64_t b) {
-    return std::min(a, b);
-  });
-  return AdventReturn(min);
+  return AdventReturn(absl::c_accumulate(
+    vals, vals[0],
+    [](int64_t a, int64_t b) {
+      return std::min(a, b);
+    }));
 }
 
 absl::StatusOr<std::string> Day_2023_05::Part2(
     absl::Span<std::string_view> input) const {
   auto [type, val_str] = PairSplit(input[0], ": ");
-  type = absl::StripSuffix(type, "s"); // seeds -> seed
+  type = absl::StripSuffix(type, "s"); // seeds -> seed.
 
   ASSIGN_OR_RETURN(std::vector<int64_t> pre_vals, ParseAsInts(absl::StrSplit(val_str, " ")));
   if (pre_vals.size() % 2 != 0) return Error("Not even");
@@ -118,7 +133,7 @@ absl::StatusOr<std::string> Day_2023_05::Part2(
 
   if (!input[1].empty()) return Error("No empty line");
   bool was_empty = true;
-  std::vector<Range> map;
+  Map map;
   for (int i = 2; i < input.size(); ++i) {
     std::string_view line = input[i];
     if (was_empty) {
@@ -130,19 +145,16 @@ absl::StatusOr<std::string> Day_2023_05::Part2(
       was_empty = false;
     } else if (line.empty()) {
       was_empty = true;
-      vals = ApplyMap(map, vals);
-      map = {};
+      vals = map.Apply(vals);
+      map.Clear();
     } else {
       ASSIGN_OR_RETURN(Range range, Range::Parse(line));
-      map.push_back(range);
+      map.AddRange(range);
     }
   }
-  vals = ApplyMap(map, vals);
+  vals = map.Apply(vals);
 
-  int64_t min = absl::c_accumulate(vals.x(), std::numeric_limits<int64_t>::max(), [](int64_t a, int64_t b) {
-    return std::min(a, b);
-  });
-  return AdventReturn(min);
+  return AdventReturn(vals.x()[0]);
 }
 
 }  // namespace advent_of_code
