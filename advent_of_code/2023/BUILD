@@ -23,16 +23,15 @@ cc_binary(
     args = [
         "--benchmark",
         "--benchmark_flags=" +
-            "--benchmark_min_time=0ns," +
-            "--benchmark_filter=WholeYear," +
-            "--benchmark_time_unit=us",
+        "--benchmark_min_time=0ns," +
+        "--benchmark_filter=WholeYear," +
+        "--benchmark_time_unit=us",
     ],
     deps = [
         ":benchmark_lib",
         "@com_monkeynova_gunit_main//:test_main",
-    ]
+    ],
 )
-
 
 cc_library(
     name = "benchmark_lib",
@@ -46,5 +45,6 @@ cc_library(
         "//advent_of_code/2023/day03:day03_benchmark_lib",
         "//advent_of_code/2023/day04:day04_benchmark_lib",
         "//advent_of_code/2023/day05:day05_benchmark_lib",
+        "//advent_of_code/2023/day06:day06_benchmark_lib",
     ],
 )
