@@ -24,7 +24,7 @@ class Interval1D {
   } 
 
   Interval1D() = default;
-  Interval1D(int start, int end) {
+  Interval1D(int64_t start, int64_t end) {
     if (end > start) {
       x_.push_back(start);
       x_.push_back(end);
@@ -32,7 +32,7 @@ class Interval1D {
   }
 
   bool empty() const { return x_.empty(); }
-  int Size() const;
+  int64_t Size() const;
 
   bool HasOverlap(const Interval1D& o) const;
 
@@ -40,7 +40,7 @@ class Interval1D {
     return x_ == o.x_;
   }
 
-  absl::Span<const int> x() const { return x_; }
+  absl::Span<const int64_t> x() const { return x_; }
 
   Interval1D Union(const Interval1D& o) const;
   Interval1D Intersect(const Interval1D& o) const;
@@ -68,7 +68,7 @@ class Interval1D {
   Interval1D Merge(const Interval1D& o,
                    absl::FunctionRef<bool(bool, bool)> merge_fn) const;
 
-  std::vector<int> x_;
+  std::vector<int64_t> x_;
 };
 
 class RectangleSet {

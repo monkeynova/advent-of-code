@@ -26,8 +26,8 @@ int InfiniteBinarySearch(absl::FunctionRef<bool(int)> cmp) {
   return min;
 }
 
-int Interval1D::Size() const {
-  int size = 0;
+int64_t Interval1D::Size() const {
+  int64_t size = 0;
   for (int i = 0; i < x_.size(); i += 2) {
     size += x_[i + 1] - x_[i];
   }
@@ -60,9 +60,9 @@ Interval1D Interval1D::Merge(
   bool ret_on = false;
   Interval1D ret;
   while (left_it != x_.end() && right_it != o.x_.end()) {
-    int lval = *left_it;
-    int rval = *right_it;
-    int t;
+    int64_t lval = *left_it;
+    int64_t rval = *right_it;
+    int64_t t;
     if (lval <= rval) {
       t = lval;
       left_on = !left_on;
@@ -79,7 +79,7 @@ Interval1D Interval1D::Merge(
     }
   }
   while (left_it != x_.end()) {
-    int t = *left_it;
+    int64_t t = *left_it;
     left_on = !left_on;
     ++left_it;
     if (ret_on != merge_fn(left_on, right_on)) {
@@ -88,7 +88,7 @@ Interval1D Interval1D::Merge(
     }
   }
   while (right_it != o.x_.end()) {
-    int t = *right_it;
+    int64_t t = *right_it;
     right_on = !right_on;
     ++right_it;
     if (ret_on != merge_fn(left_on, right_on)) {
