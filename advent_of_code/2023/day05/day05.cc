@@ -16,6 +16,15 @@ struct Range {
     if (vals.size() != 3) return Error("Bad range size");
     return Range{vals[0], vals[1], vals[2]};
   }
+  struct BySrcStart {
+    bool operator()(Range a, Range b) const {
+      return a.src_start < b.src_start;
+    }
+  };
+
+  int64_t Delta() const { return dest_start - src_start; }
+
+  int64_t src_end() const { return src_start + len; }
 
   int64_t dest_start;
   int64_t src_start;
@@ -29,7 +38,8 @@ class Map {
   void AddRange(Range range) { ranges_.push_back(range); }
 
   void Apply(std::vector<int64_t>& vals) const;
-  Interval1D Apply(Interval1D i_int) const;
+  Interval1D Apply(Interval1D i_int);
+  Interval1D ApplyOld(Interval1D i_int) const;
 
  private:
   std::vector<Range> ranges_;
@@ -39,27 +49,73 @@ void Map::Apply(std::vector<int64_t>& vals) const {
   for (int64_t& val : vals) {
     for (const Range& r : ranges_) {
       if (val >= r.src_start && val < r.src_start + r.len) {
-        val += r.dest_start - r.src_start;
+        val += r.Delta();
         break;
       }
     }
   }
 }
 
-Interval1D Map::Apply(Interval1D i_int) const {
+Interval1D Map::Apply(Interval1D i_int) {
   Interval1D ret;
 
-  // TODO(@monkeynova): Sort ranges, stream intersects.
-  for (const Range& r : ranges_) {
-    Interval1D overlap =
-        i_int.Intersect(Interval1D(r.src_start, r.src_start + r.len));
-    if (!overlap.empty()) {
-      ret = ret.Union(overlap.Translate(r.dest_start - r.src_start));
-      i_int = i_int.Minus(overlap);
+  absl::c_sort(ranges_, Range::BySrcStart{});
+  absl::Span<const int64_t> i_span = i_int.x();
+
+  auto i_it = i_span.begin();
+  auto range_it = ranges_.begin();
+
+  std::optional<int64_t> i_start;
+  while (i_it != i_span.end() && range_it != ranges_.end()) {
+    if (*i_it < range_it->src_start) {
+      if (i_start) {
+        ret = ret.Union(Interval1D(*i_start, *i_it));
+        i_start = std::nullopt;
+      } else {
+        i_start = *i_it;
+      }
+
+      ++i_it;
+      continue;
     }
-    if (i_int.empty()) break;
+    if (range_it->src_end() <= *i_it) {
+      if (i_start) {
+        if (*i_start < range_it->src_start) {
+          ret = ret.Union(Interval1D(*i_start, range_it->src_start));
+          i_start = range_it->src_start;
+        }
+        ret = ret.Union(Interval1D(*i_start, range_it->src_end())
+                            .Translate(range_it->Delta()));
+        i_start = range_it->src_end();        
+      }
+      ++range_it;
+      continue;
+    }
+    // range_it->src_start <= *i_it < range_it->src_end()
+    if (i_start) {
+      if (*i_start < range_it->src_start) {
+        ret = ret.Union(Interval1D(*i_start, range_it->src_start));
+        i_start = range_it->src_start;
+      }
+      ret = ret.Union(Interval1D(*i_start, *i_it)
+                          .Translate(range_it->Delta()));
+      i_start = std::nullopt;
+    } else {
+      i_start = *i_it;
+    }
+    ++i_it;
   }
-  return ret.Union(i_int);
+  while (i_it != i_span.end()) {
+    if (i_start) {
+      ret = ret.Union(Interval1D(*i_start, *i_it));
+      i_start = std::nullopt;
+    } else {
+      i_start = *i_it;
+    }
+    ++i_it;
+  }
+  CHECK(!i_start);
+  return ret;
 }
 
 }  // namespace
