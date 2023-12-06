@@ -167,6 +167,10 @@ class CharBoard {
     absl::Format(&sink, "%s", b.buf_);
   }
 
+  std::string_view row(int y) const {
+    return std::string_view(stride(y), stride_);
+  }
+
  private:
   char* stride(int y) { return buf_.data() + stride_ * y; }
   const char* stride(int y) const { return buf_.data() + stride_ * y; }

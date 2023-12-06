@@ -10,22 +10,27 @@ namespace advent_of_code {
 
 namespace {
 
-// Returns a pair of points, {min, max}, with the same y value as `start` and
-// such that all points with x values in [min.x, max.x) are on `b` and have a
-// digit stored in the correspondng board location.
-// TODO(@monkeynova): whole_year<1sec challenge: Consider a std::string_view
-// model directly off of b.stride().
-std::pair<Point, Point> DigitRange(const CharBoard& b, Point start) {
-  Point min = start;
-  while (b.OnBoard(min) && isdigit(b[min])) {
-    min += Cardinal::kWest;
+// Returns a tuple, {min_x, max_x, num}, such that all points with y values
+// equal to start.y and x values in [min_x, max_x) are on `b` and have a
+// digit stored in the correspondng board location. num is the value of the
+// integer contained within that range of digits.
+std::tuple<int, int, int> DigitRange(const CharBoard& b, Point start) {
+  std::string_view row = b.row(start.y);
+  int num = 0;
+  int min = start.x;
+  int pow10 = 1;
+  while (min >= 0 && isdigit(row[min])) {
+    num += (row[min] - '0') * pow10;
+    pow10 *= 10;
+    --min;
   }
-  min += Cardinal::kEast;
-  Point max = start + Cardinal::kEast;
-  while (b.OnBoard(max) && isdigit(b[max])) {
-    max += Cardinal::kEast;
+  ++min;
+  int max = start.x + 1;
+  while (max < row.size() && isdigit(row[max])) {
+    num = num * 10 + (row[max] - '0');
+    ++max;
   }
-  return {min, max};
+  return {min, max, num};
 }
 
 }  // namespace
@@ -49,11 +54,10 @@ absl::StatusOr<std::string> Day_2023_03::Part1(
       if (!isdigit(b[t])) continue;
       if (used[point_idx(t)]) continue;
 
-      auto [min, max] = DigitRange(b, t);
-      int num = 0;
-      for (Point d = min; d != max; d += Cardinal::kEast) {
-        used[point_idx(d)] = true;
-        num = num * 10 + b[d] - '0';
+      auto [min, max, num] = DigitRange(b, t);
+      int used_idx = point_idx({min, t.y});
+      for (int x = min; x != max; ++x, ++used_idx) {
+        used[used_idx] = true;
       }
       sum += num;
     }
@@ -70,22 +74,23 @@ absl::StatusOr<std::string> Day_2023_03::Part2(
     return p.y * b.width() + p.x;
   };
   for (Point p : b.Find('*')) {
-    std::vector<int64_t> adjacent;
+    std::array<int64_t, 3> adjacent;
+    int adj_idx = 0;
     for (Point dir : Cardinal::kEightDirs) {
       Point t = p + dir;
       if (!b.OnBoard(t)) continue;
       if (!isdigit(b[t])) continue;
       if (used[point_idx(t)]) continue;
 
-      auto [min, max] = DigitRange(b, t);
-      int num = 0;
-      for (Point d = min; d != max; d += Cardinal::kEast) {
-        used[point_idx(d)] = true;
-        num = num * 10 + b[d] - '0';
+      auto [min, max, num] = DigitRange(b, t);
+      int used_idx = point_idx({min, t.y});
+      for (int x = min; x != max; ++x, ++used_idx) {
+        used[used_idx] = true;
       }
-      adjacent.push_back(num);
+      adjacent[adj_idx] = num;
+      if (++adj_idx == 3) break;
     }
-    if (adjacent.size() == 2) {
+    if (adj_idx == 2) {
       sum += adjacent[0] * adjacent[1];
     }
   }
