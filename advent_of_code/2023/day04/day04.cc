@@ -16,16 +16,12 @@ class Card {
   static absl::StatusOr<Card> Parse(std::string_view input);
 
   int num() const { return num_; }
-  int Score() const {
-    return absl::c_accumulate(my_nums_, 0, [&](int a, int n) {
-      return a + (wins_[n] ? 1 : 0);
-    });
-  }
+  int Score() const { return score_; }
 
  private:
   int num_;
   std::bitset<100> wins_;
-  std::vector<int> my_nums_;
+  int score_ = 0;
 };
 
 absl::StatusOr<Card> Card::Parse(std::string_view input) {
@@ -45,7 +41,7 @@ absl::StatusOr<Card> Card::Parse(std::string_view input) {
   while (!tok.Done()) {
     int my_num;
     if (!absl::SimpleAtoi(tok.Next(), &my_num)) return Error("Bad card");
-    card.my_nums_.push_back(my_num);
+    if (card.wins_[my_num]) ++card.score_;
   }
   return card;
 }
