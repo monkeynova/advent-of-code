@@ -2,24 +2,27 @@
 ==
 
 [part=1]
-Example input
+Time:      7  15   30
+Distance:  9  40  200
 --
-ERROR: UNIMPLEMENTED: Problem not known
+288
 ==
 
 [part=1]
 @include{advent_of_code/2023/day06/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+1710720
 ==
 
 [part=2]
-Example input
+Time:      7  15   30
+Distance:  9  40  200
 --
-ERROR: UNIMPLEMENTED: Problem not known
+71503
 ==
 
+# 31402962 (low - needed an int64)
 [part=2]
 @include{advent_of_code/2023/day06/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+35349468
