@@ -14,7 +14,7 @@
 namespace advent_of_code {
 
 template <typename Day>
-static void BM_WholeYear(benchmark::State& state) {
+static void BM_WholeYear_ByDay(benchmark::State& state) {
   for (auto _ : state) {
     Day day;
     std::string filename(day.test_file());
@@ -39,12 +39,48 @@ static void BM_WholeYear(benchmark::State& state) {
   }
 }
 
-BENCHMARK_TEMPLATE(BM_WholeYear, Day_2023_01);
-BENCHMARK_TEMPLATE(BM_WholeYear, Day_2023_02);
-BENCHMARK_TEMPLATE(BM_WholeYear, Day_2023_03);
-BENCHMARK_TEMPLATE(BM_WholeYear, Day_2023_04);
-BENCHMARK_TEMPLATE(BM_WholeYear, Day_2023_05);
-BENCHMARK_TEMPLATE(BM_WholeYear, Day_2023_06);
-BENCHMARK_TEMPLATE(BM_WholeYear, Day_2023_07);
+BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_01);
+BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_02);
+BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_03);
+BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_04);
+BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_05);
+BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_06);
+BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_07);
+
+static void BM_WholeYear(benchmark::State& state) {
+  std::vector<std::unique_ptr<AdventDay>> days;
+  days.emplace_back(new Day_2023_01());
+  days.emplace_back(new Day_2023_02());
+  days.emplace_back(new Day_2023_03());
+  days.emplace_back(new Day_2023_04());
+  days.emplace_back(new Day_2023_05());
+  days.emplace_back(new Day_2023_06());
+
+  for (auto _ : state) {
+    for (const std::unique_ptr<AdventDay>& day : days) {
+      std::string filename(day->test_file());
+      filename.erase(filename.rfind('/'));
+      filename.append("/input.txt");
+      absl::StatusOr<std::string> file = GetContents(filename);
+      CHECK_OK(file);
+      std::vector<std::string_view> input_own = absl::StrSplit(*file, '\n');
+      while (!input_own.empty() && input_own.back().empty()) {
+        input_own.pop_back();
+      }
+      absl::Span<std::string_view> input(input_own);
+      absl::StatusOr<std::string> ret;
+      if (ret = day->Part1(input); !ret.ok()) {
+        state.SkipWithError(ret.status().message().data());
+        return;
+      }
+      if (ret = day->Part2(input); !ret.ok()) {
+        state.SkipWithError(ret.status().message().data());
+        return;
+      }
+    }
+  }
+}
+
+BENCHMARK(BM_WholeYear);
 
 }  // namespace advent_of_code
