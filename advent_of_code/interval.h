@@ -24,6 +24,7 @@ class Interval1D {
   } 
 
   Interval1D() = default;
+  explicit Interval1D(std::vector<int64_t> x) : x_(std::move(x)) {}
   Interval1D(int64_t start, int64_t end) {
     if (end > start) {
       x_.push_back(start);

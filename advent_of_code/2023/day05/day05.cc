@@ -4,6 +4,7 @@
 
 #include "absl/algorithm/container.h"
 #include "absl/log/log.h"
+#include "absl/strings/str_join.h"
 #include "advent_of_code/interval.h"
 
 namespace advent_of_code {
@@ -57,8 +58,12 @@ void Map::Apply(std::vector<int64_t>& vals) const {
 }
 
 Interval1D Map::Apply(Interval1D i_int) {
-  Interval1D ret;
+  std::vector<int64_t> ret_x;
 
+  // Merge ranges with the interval to create a new set of intervals in ret_x.
+  // This list won't be sorted because of the range movement, but will describe
+  // disjoint (though potentially mergable) segements which, since we have raw
+  // starts and ends can be sorted as raw ints.
   absl::c_sort(ranges_, Range::BySrcStart{});
   absl::Span<const int64_t> i_span = i_int.x();
 
@@ -69,7 +74,8 @@ Interval1D Map::Apply(Interval1D i_int) {
   while (i_it != i_span.end() && range_it != ranges_.end()) {
     if (*i_it < range_it->src_start) {
       if (i_start) {
-        ret = ret.Union(Interval1D(*i_start, *i_it));
+        ret_x.push_back(*i_start);
+        ret_x.push_back(*i_it);
         i_start = std::nullopt;
       } else {
         i_start = *i_it;
@@ -81,11 +87,12 @@ Interval1D Map::Apply(Interval1D i_int) {
     if (range_it->src_end() <= *i_it) {
       if (i_start) {
         if (*i_start < range_it->src_start) {
-          ret = ret.Union(Interval1D(*i_start, range_it->src_start));
+          ret_x.push_back(*i_start);
+          ret_x.push_back(range_it->src_start);
           i_start = range_it->src_start;
         }
-        ret = ret.Union(Interval1D(*i_start, range_it->src_end())
-                            .Translate(range_it->Delta()));
+        ret_x.push_back(*i_start + range_it->Delta());
+        ret_x.push_back(range_it->src_end() + range_it->Delta());
         i_start = range_it->src_end();        
       }
       ++range_it;
@@ -94,11 +101,12 @@ Interval1D Map::Apply(Interval1D i_int) {
     // range_it->src_start <= *i_it < range_it->src_end()
     if (i_start) {
       if (*i_start < range_it->src_start) {
-        ret = ret.Union(Interval1D(*i_start, range_it->src_start));
+        ret_x.push_back(*i_start);
+        ret_x.push_back(range_it->src_start);
         i_start = range_it->src_start;
       }
-      ret = ret.Union(Interval1D(*i_start, *i_it)
-                          .Translate(range_it->Delta()));
+      ret_x.push_back(*i_start + range_it->Delta());
+      ret_x.push_back(*i_it + range_it->Delta());
       i_start = std::nullopt;
     } else {
       i_start = *i_it;
@@ -107,15 +115,38 @@ Interval1D Map::Apply(Interval1D i_int) {
   }
   while (i_it != i_span.end()) {
     if (i_start) {
-      ret = ret.Union(Interval1D(*i_start, *i_it));
+      ret_x.push_back(*i_start);
+      ret_x.push_back(*i_it);
       i_start = std::nullopt;
     } else {
       i_start = *i_it;
     }
     ++i_it;
   }
-  CHECK(!i_start);
-  return ret;
+  CHECK(!i_start) << "Check that we're not still in the interval";
+
+  // Now take the segments in `ret_x` and sorted them, and merge ranges.
+  // Range merging occurs by dropping the two values of x2 when we see
+  // a range like [x1, x2),[x2, x3).
+  CHECK_EQ(ret_x.size() % 2, 0) << "Parity check on range creation";
+  absl::c_sort(ret_x);
+  int out = 0;
+  for (int i = 0; i < ret_x.size(); ++i) {
+    if (i + 1 == ret_x.size()) {
+      ret_x[out] = ret_x[i];
+      ++out;
+      continue;
+    }
+    if (ret_x[i] == ret_x[i + 1]) {
+      ++i;
+      continue;
+    }
+    ret_x[out] = ret_x[i];
+    ++out;
+  }
+  ret_x.resize(out);
+  CHECK_EQ(ret_x.size() % 2, 0) << "Parity check on range unioning";
+  return Interval1D(std::move(ret_x));
 }
 
 }  // namespace
