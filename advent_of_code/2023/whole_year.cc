@@ -5,6 +5,7 @@
 #include "advent_of_code/2023/day03/day03.h"
 #include "advent_of_code/2023/day04/day04.h"
 #include "advent_of_code/2023/day05/day05.h"
+#include "advent_of_code/2023/day06/day06.h"
 #include "advent_of_code/infra/file_util.h"
 #include "advent_of_code/vlog.h"
 #include "benchmark/benchmark.h"
@@ -42,5 +43,6 @@ BENCHMARK_TEMPLATE(BM_WholeYear, Day_2023_02);
 BENCHMARK_TEMPLATE(BM_WholeYear, Day_2023_03);
 BENCHMARK_TEMPLATE(BM_WholeYear, Day_2023_04);
 BENCHMARK_TEMPLATE(BM_WholeYear, Day_2023_05);
+BENCHMARK_TEMPLATE(BM_WholeYear, Day_2023_06);
 
 }  // namespace advent_of_code
