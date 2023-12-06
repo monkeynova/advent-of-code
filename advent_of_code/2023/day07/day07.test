@@ -1,0 +1,25 @@
+# http://adventofcode.com/2023/day/7
+==
+
+[part=1]
+Example input
+--
+ERROR: UNIMPLEMENTED: Problem not known
+==
+
+[part=1]
+@include{advent_of_code/2023/day07/input.txt}
+--
+ERROR: UNIMPLEMENTED: Problem not known
+==
+
+[part=2]
+Example input
+--
+ERROR: UNIMPLEMENTED: Problem not known
+==
+
+[part=2]
+@include{advent_of_code/2023/day07/input.txt}
+--
+ERROR: UNIMPLEMENTED: Problem not known
