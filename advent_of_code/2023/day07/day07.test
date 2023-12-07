@@ -2,24 +2,33 @@
 ==
 
 [part=1]
-Example input
+32T3K 765
+T55J5 684
+KK677 28
+KTJJT 220
+QQQJA 483
 --
-ERROR: UNIMPLEMENTED: Problem not known
+6440
 ==
 
+# 247382155 (high - broken comparator)
 [part=1]
 @include{advent_of_code/2023/day07/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+246912307
 ==
 
 [part=2]
-Example input
+32T3K 765
+T55J5 684
+KK677 28
+KTJJT 220
+QQQJA 483
 --
-ERROR: UNIMPLEMENTED: Problem not known
+5905
 ==
 
 [part=2]
 @include{advent_of_code/2023/day07/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+246894760
