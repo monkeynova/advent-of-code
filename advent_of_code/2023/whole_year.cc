@@ -7,6 +7,7 @@
 #include "advent_of_code/2023/day05/day05.h"
 #include "advent_of_code/2023/day06/day06.h"
 #include "advent_of_code/2023/day07/day07.h"
+#include "advent_of_code/2023/day08/day08.h"
 #include "advent_of_code/infra/file_util.h"
 #include "advent_of_code/vlog.h"
 #include "benchmark/benchmark.h"
@@ -46,6 +47,7 @@ BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_04);
 BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_05);
 BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_06);
 BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_07);
+BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_08);
 
 static void BM_WholeYear(benchmark::State& state) {
   std::vector<std::unique_ptr<AdventDay>> days;
