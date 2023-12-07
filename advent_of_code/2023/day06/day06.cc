@@ -30,19 +30,17 @@ absl::StatusOr<std::string> Day_2023_06::Part1(
     absl::Span<std::string_view> input) const {
   if (input.size() != 2) return Error("Bad input");
   Tokenizer time_tok(input[0]);
+  RETURN_IF_ERROR(time_tok.NextIs("Time"));
+  RETURN_IF_ERROR(time_tok.NextIs(":"));
   Tokenizer dist_tok(input[1]);
-  if (time_tok.Next() != "Time") return Error("Bad time");
-  if (time_tok.Next() != ":") return Error("Bad time");
-  if (dist_tok.Next() != "Distance") return Error("Bad distance");
-  if (dist_tok.Next() != ":") return Error("Bad distance");
+  RETURN_IF_ERROR(dist_tok.NextIs("Distance"));
+  RETURN_IF_ERROR(dist_tok.NextIs(":"));
 
   int64_t product = 1;
   while (!time_tok.Done()) {
-    int time;
-    if (!absl::SimpleAtoi(time_tok.Next(), &time)) return Error("Bad time");
+    ASSIGN_OR_RETURN(int time, time_tok.NextInt());
     if (dist_tok.Done()) return Error("Bad lengths");
-    int distance;
-    if (!absl::SimpleAtoi(dist_tok.Next(), &distance)) return Error("Bad distance");
+    ASSIGN_OR_RETURN(int distance, dist_tok.NextInt());
     product *= ValidRangeSize(time, distance);
   }
   if (!dist_tok.Done()) return Error("Bad lengths");

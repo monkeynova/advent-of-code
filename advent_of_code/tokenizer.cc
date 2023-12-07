@@ -1,6 +1,24 @@
 #include "advent_of_code/tokenizer.h"
 
+#include "absl/strings/str_cat.h"
+
 namespace advent_of_code {
+
+absl::Status Tokenizer::NextIs(std::string_view expect) {
+  std::string_view next = Next();
+  if (next == expect) return absl::OkStatus();
+  return absl::InvalidArgumentError(absl::StrCat(
+      "Unexpected token: '", next, "' != '", expect, "'; remaining is '",
+      in_, "'"));
+}
+
+absl::StatusOr<int64_t> Tokenizer::NextInt() {
+  std::string_view next = Next();
+  int64_t ret;
+  if (absl::SimpleAtoi(next, &ret)) return ret;
+  return absl::InvalidArgumentError(absl::StrCat(
+      "Not an int: '", next, "'; remaining is '", in_, "'"));
+}
 
 std::string_view Tokenizer::Next() {
   int start = 0;

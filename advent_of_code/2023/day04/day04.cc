@@ -26,10 +26,10 @@ class Card {
 
 absl::StatusOr<Card> Card::Parse(std::string_view input) {
   Tokenizer tok(input);
-  if (tok.Next() != "Card") return Error("Bad card");
+  RETURN_IF_ERROR(tok.NextIs("Card"));
   Card card;
   if (!absl::SimpleAtoi(tok.Next(), &card.num_)) return Error("Bad card");
-  if (tok.Next() != ":") return Error("Bad card");
+  RETURN_IF_ERROR(tok.NextIs(":"));
   while (!tok.Done()) {
     std::string_view token = tok.Next();
     if (token == "|") break;
@@ -39,8 +39,7 @@ absl::StatusOr<Card> Card::Parse(std::string_view input) {
     card.wins_[win] = true;
   }
   while (!tok.Done()) {
-    int my_num;
-    if (!absl::SimpleAtoi(tok.Next(), &my_num)) return Error("Bad card");
+    ASSIGN_OR_RETURN(int my_num, tok.NextInt());
     if (card.wins_[my_num]) ++card.score_;
   }
   return card;

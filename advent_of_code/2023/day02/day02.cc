@@ -39,21 +39,16 @@ absl::StatusOr<Game> Game::Parse(std::string_view line) {
   // view = '$ball(, $ball)*'
   // ball = '\d+ (red|green|blue)'
   Tokenizer tok(line);
-  if (tok.Next() != "Game") return Error("Bad game");
-  if (!absl::SimpleAtoi(tok.Next(), &ret.num_)) {
-    return Error("Not game_num");
-  }
-  if (tok.Next() != ":") return Error("Bad game");
+  RETURN_IF_ERROR(tok.NextIs("Game"));
+  ASSIGN_OR_RETURN(ret.num_, tok.NextInt());
+  RETURN_IF_ERROR(tok.NextIs(":"));
 
   while (!tok.Done()) {
     ret.views_.push_back({});
     View& cur = ret.views_.back();
     while (!tok.Done()) {
-      int count = 0;
-      if (!absl::SimpleAtoi(tok.Next(), &count)) {
-        return Error("Not number");
-      }
-      std::string_view color =tok.Next();
+      ASSIGN_OR_RETURN(int count, tok.NextInt());
+      std::string_view color = tok.Next();
       if (color == "red") {
         cur.red = count;
       } else if (color == "blue") {
