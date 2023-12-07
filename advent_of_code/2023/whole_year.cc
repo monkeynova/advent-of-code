@@ -14,53 +14,77 @@
 
 namespace advent_of_code {
 
-template <typename Day>
-static void BM_WholeYear_ByDay(benchmark::State& state) {
+absl::Span<const std::unique_ptr<AdventDay>> AllDays() {
+  static std::vector<std::unique_ptr<AdventDay>> days = []() {
+    std::vector<std::unique_ptr<AdventDay>> days;
+    days.emplace_back(new Day_2023_01());
+    days.emplace_back(new Day_2023_02());
+    days.emplace_back(new Day_2023_03());
+    days.emplace_back(new Day_2023_04());
+    days.emplace_back(new Day_2023_05());
+    days.emplace_back(new Day_2023_06());
+    days.emplace_back(new Day_2023_07());
+    return days;
+  }();
+  return days;
+}
+
+static void BM_WholeYear_2023(benchmark::State& state) {
+  int bytes_processed = 0;
   for (auto _ : state) {
-    Day day;
-    std::string filename(day.test_file());
+    AdventDay* day = AllDays()[state.range(0) - 1].get();
+    std::string filename(day->test_file());
     filename.erase(filename.rfind('/'));
     filename.append("/input.txt");
     absl::StatusOr<std::string> file = GetContents(filename);
     CHECK_OK(file);
+    bytes_processed += file->size();
     std::vector<std::string_view> input_own = absl::StrSplit(*file, '\n');
     while (!input_own.empty() && input_own.back().empty()) {
       input_own.pop_back();
     }
     absl::Span<std::string_view> input(input_own);
     absl::StatusOr<std::string> ret;
-    if (ret = day.Part1(input); !ret.ok()) {
+    if (ret = day->Part1(input); !ret.ok()) {
       state.SkipWithError(ret.status().message().data());
       return;
     }
-    if (ret = day.Part2(input); !ret.ok()) {
+    if (ret = day->Part2(input); !ret.ok()) {
       state.SkipWithError(ret.status().message().data());
       return;
     }
   }
+  state.SetBytesProcessed(bytes_processed);
 }
 
-BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_01);
-BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_02);
-BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_03);
-BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_04);
-BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_05);
-BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_06);
-BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_07);
-BENCHMARK_TEMPLATE(BM_WholeYear_ByDay, Day_2023_08);
+BENCHMARK(BM_WholeYear_2023)->DenseRange(1, AllDays().size());
+
+static void BM_WholeYear_ParseOnly(benchmark::State& state) {
+  int bytes_processed = 0;
+  for (auto _ : state) {
+    for (const std::unique_ptr<AdventDay>& day : AllDays()) {
+      std::string filename(day->test_file());
+      filename.erase(filename.rfind('/'));
+      filename.append("/input.txt");
+      absl::StatusOr<std::string> file = GetContents(filename);
+      CHECK_OK(file);
+      bytes_processed += file->size();
+      std::vector<std::string_view> input_own = absl::StrSplit(*file, '\n');
+      while (!input_own.empty() && input_own.back().empty()) {
+        input_own.pop_back();
+      }
+      absl::Span<std::string_view> input(input_own);
+      absl::StatusOr<std::string> ret;
+    }
+  }
+  state.SetBytesProcessed(bytes_processed);
+}
+
+BENCHMARK(BM_WholeYear_ParseOnly);
 
 static void BM_WholeYear(benchmark::State& state) {
-  std::vector<std::unique_ptr<AdventDay>> days;
-  days.emplace_back(new Day_2023_01());
-  days.emplace_back(new Day_2023_02());
-  days.emplace_back(new Day_2023_03());
-  days.emplace_back(new Day_2023_04());
-  days.emplace_back(new Day_2023_05());
-  days.emplace_back(new Day_2023_06());
-  days.emplace_back(new Day_2023_07());
-
   for (auto _ : state) {
-    for (const std::unique_ptr<AdventDay>& day : days) {
+    for (const std::unique_ptr<AdventDay>& day : AllDays()) {
       std::string filename(day->test_file());
       filename.erase(filename.rfind('/'));
       filename.append("/input.txt");
