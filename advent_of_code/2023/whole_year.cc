@@ -55,6 +55,7 @@ static void BM_WholeYear(benchmark::State& state) {
   days.emplace_back(new Day_2023_04());
   days.emplace_back(new Day_2023_05());
   days.emplace_back(new Day_2023_06());
+  days.emplace_back(new Day_2023_07());
 
   for (auto _ : state) {
     for (const std::unique_ptr<AdventDay>& day : days) {
