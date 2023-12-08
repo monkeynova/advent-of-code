@@ -2,24 +2,37 @@
 ==
 
 [part=1]
-Example input
+LLR
+
+AAA = (BBB, BBB)
+BBB = (AAA, ZZZ)
+ZZZ = (ZZZ, ZZZ)
 --
-ERROR: UNIMPLEMENTED: Problem not known
+6
 ==
 
 [part=1]
 @include{advent_of_code/2023/day08/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+17621
 ==
 
 [part=2]
-Example input
+LR
+
+11A = (11B, XXX)
+11B = (XXX, 11Z)
+11Z = (11B, XXX)
+22A = (22B, XXX)
+22B = (22C, 22C)
+22C = (22Z, 22Z)
+22Z = (22B, 22B)
+XXX = (XXX, XXX)
 --
-ERROR: UNIMPLEMENTED: Problem not known
+6
 ==
 
 [part=2]
 @include{advent_of_code/2023/day08/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+20685524831999
