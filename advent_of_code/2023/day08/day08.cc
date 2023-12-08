@@ -31,45 +31,56 @@ namespace {
 
 class Map {
  public:
-  using LocType = std::string_view;
-  static LocType MakeLoc(std::string_view loc) {
-    return loc;
-  }
-
   Map() = default;
 
-  absl::Status SetDirs(std::string_view lr_in) {
-    lr = lr_in;
+  absl::Status SetDirs(std::string_view lr) {
+    dir_.clear();
+    dir_.reserve(lr.size());
+    for (char c : lr) {
+      switch (c) {
+        case 'L': dir_.push_back(true); break;
+        case 'R': dir_.push_back(false); break;
+        default: return Error("Bad dir");
+      }
+    }
     return absl::OkStatus();
   }
-  absl::Status AddLine(std::string_view line);
 
-  std::pair<int, LocType> HistKey(int steps, LocType loc) const {
-    return {steps % lr.size(), loc};
+  std::optional<int> FindLoc(std::string_view loc) {
+    auto it = name_to_id_.find(loc);
+    if (it == name_to_id_.end()) return std::nullopt;
+    return it->second;
   }
 
-  std::vector<LocType> GhostStarts() const;
-  absl::flat_hash_set<LocType> GhostEnds() const;
+  absl::Status AddLine(std::string_view line);
 
-  absl::StatusOr<LocType> Advance(int num_step, LocType loc) const;
+  std::pair<int, int> HistKey(int steps, int loc) const {
+    return {steps % dir_.size(), loc};
+  }
+
+  std::vector<int> GhostStarts() const;
+  std::vector<bool> GhostEnds() const;
+
+  int Advance(int num_step, int loc) const;
 
  private:
-  std::string_view lr;
-  absl::flat_hash_map<LocType, std::pair<LocType, LocType>> map;
+  std::vector<bool> dir_;
+  absl::flat_hash_map<std::string_view, int> name_to_id_;
+  std::vector<std::pair<int, int>> map_;
 };
 
-std::vector<Map::LocType> Map::GhostStarts() const {
-  std::vector<LocType> ret;
-  for (const auto& [from, _] : map) {
-    if (from.back() == 'A') ret.push_back(from);
+std::vector<int> Map::GhostStarts() const {
+  std::vector<int> ret;
+  for (const auto& [name, id] : name_to_id_) {
+    if (name.back() == 'A') ret.push_back(id);
   }
   return ret;
 }
 
-absl::flat_hash_set<Map::LocType> Map::GhostEnds() const {
-  absl::flat_hash_set<LocType> ret;
-  for (const auto& [from, _] : map) {
-    if (from.back() == 'Z') ret.insert(from);
+std::vector<bool> Map::GhostEnds() const {
+  std::vector<bool> ret(map_.size(), false);
+  for (const auto& [name, id] : name_to_id_) {
+    if (name.back() == 'Z') ret[id] = true;
   }
   return ret;
 }
@@ -77,26 +88,45 @@ absl::flat_hash_set<Map::LocType> Map::GhostEnds() const {
 absl::Status Map::AddLine(std::string_view line) {
   if (line.size() != 16) return Error("Bad line");
   std::string_view from = line.substr(0, 3);
-  if (line.substr(3, 4) != " = (") return Error("Bad line");
-  std::string_view l = line.substr(7, 3);
-  if (line.substr(10, 2) != ", ") return Error("Bad line");
-  std::string_view r = line.substr(12, 3);
-  if (line.substr(15, 1) != ")") return Error("Bad line");
-  if (!map.emplace(from, std::make_pair(l, r)).second) {
-    return Error("Dup from: ", from);
+  auto [from_it, from_inserted] = name_to_id_.emplace(from, name_to_id_.size());
+  if (from_inserted) {
+    map_.push_back({-1, -1});
   }
+  int from_id = from_it->second;
+
+  if (line.substr(3, 4) != " = (") return Error("Bad line");
+
+  std::string_view l = line.substr(7, 3);
+  auto [l_it, l_inserted] = name_to_id_.emplace(l, name_to_id_.size());
+  if (l_inserted) {
+    map_.push_back({-1, -1});
+  }
+  int l_id = l_it->second;
+
+  if (line.substr(10, 2) != ", ") return Error("Bad line");
+
+  std::string_view r = line.substr(12, 3);
+  auto [r_it, r_inserted] = name_to_id_.emplace(r, name_to_id_.size());
+  if (r_inserted) {
+    map_.push_back({-1, -1});
+  }
+  int r_id = r_it->second;
+
+  if (line.substr(15, 1) != ")") return Error("Bad line");
+
+  map_[from_id].first = l_id;
+  map_[from_id].second = r_id;
+
+  CHECK_EQ(name_to_id_.size(), map_.size());
+
   return absl::OkStatus();
 }
 
-absl::StatusOr<Map::LocType> Map::Advance(int num_step, LocType loc) const {
-  char dir = lr[num_step % lr.size()];
-  auto it = map.find(loc);
-  if (it == map.end()) return Error("Bad loc: ", loc);
-  switch (dir) {
-    case 'L': return it->second.first;
-    case 'R': return it->second.second;
+int Map::Advance(int num_step, int loc) const {
+  if (dir_[num_step % dir_.size()]) {
+    return map_[loc].first;
   }
-  return Error("Bad dir: ", std::string_view(&dir, 1));
+  return map_[loc].second;
 }
 
 struct Loop {
@@ -130,11 +160,14 @@ absl::StatusOr<std::string> Day_2023_08::Part1(
     RETURN_IF_ERROR(map.AddLine(input[i]));
   }
   
-  Map::LocType loc = Map::MakeLoc("AAA");
-  Map::LocType end = Map::MakeLoc("ZZZ");
+  std::optional<int> loc = map.FindLoc("AAA");
+  if (!loc) return Error("No start");
+  std::optional<int> end = map.FindLoc("ZZZ");
+  if (!end) return Error("No end");
+
   for (int steps = 0; true; ++steps) {
-    ASSIGN_OR_RETURN(loc, map.Advance(steps, loc));
-    if (loc == end) return AdventReturn(steps + 1);
+    loc = map.Advance(steps, *loc);
+    if (loc == *end) return AdventReturn(steps + 1);
   }
   return Error("Left infinite loop");
 }
@@ -151,11 +184,11 @@ absl::StatusOr<std::string> Day_2023_08::Part2(
   }
   
   std::vector<Loop> loops;
-  absl::flat_hash_set<Map::LocType> ghost_ends(map.GhostEnds());
-  for (Map::LocType from : map.GhostStarts()) {
+  std::vector<bool> ghost_ends = map.GhostEnds();
+  for (int from : map.GhostStarts()) {
     Loop loop;
-    Map::LocType loc = from;
-    absl::flat_hash_map<std::pair<int, Map::LocType>, int> hist;
+    int loc = from;
+    absl::flat_hash_map<std::pair<int, int>, int> hist;
     for (int steps = 0; true; ++steps) {
       auto [it, inserted] = hist.emplace(map.HistKey(steps, loc), steps);
       if (!inserted) {
@@ -163,8 +196,8 @@ absl::StatusOr<std::string> Day_2023_08::Part2(
         loop.to = it->second;
         break;
       }
-      ASSIGN_OR_RETURN(loc, map.Advance(steps, loc));
-      if (ghost_ends.contains(loc)) loop.end_z.push_back(steps + 1);
+      loc = map.Advance(steps, loc);
+      if (ghost_ends[loc]) loop.end_z.push_back(steps + 1);
     }
     if (loop.end_z.empty()) return Error("Impossible");
     loops.push_back(loop);
