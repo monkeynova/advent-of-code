@@ -29,27 +29,38 @@ absl::Span<const std::unique_ptr<AdventDay>> AllDays() {
   return days;
 }
 
+struct Input {
+  std::string file;
+  std::vector<std::string_view> lines;
+};
+
+absl::StatusOr<Input> ReadInput(AdventDay* day) {
+  Input ret;
+  std::string filename(day->test_file());
+  filename.erase(filename.rfind('/'));
+  filename.append("/input.txt");
+  ASSIGN_OR_RETURN(ret.file, GetContents(filename));
+  ret.lines = absl::StrSplit(ret.file, '\n');
+  while (!ret.lines.empty() && ret.lines.back().empty()) {
+    ret.lines.pop_back();
+  }
+  return ret;  
+}
+
 static void BM_WholeYear_2023(benchmark::State& state) {
   int bytes_processed = 0;
   for (auto _ : state) {
     AdventDay* day = AllDays()[state.range(0) - 1].get();
-    std::string filename(day->test_file());
-    filename.erase(filename.rfind('/'));
-    filename.append("/input.txt");
-    absl::StatusOr<std::string> file = GetContents(filename);
-    CHECK_OK(file);
-    bytes_processed += file->size();
-    std::vector<std::string_view> input_own = absl::StrSplit(*file, '\n');
-    while (!input_own.empty() && input_own.back().empty()) {
-      input_own.pop_back();
-    }
-    absl::Span<std::string_view> input(input_own);
+    absl::StatusOr<Input> input = ReadInput(day);
+    CHECK(input.ok());
+    bytes_processed += input->file.size();
+    absl::Span<std::string_view> in_span(input->lines);
     absl::StatusOr<std::string> ret;
-    if (ret = day->Part1(input); !ret.ok()) {
+    if (ret = day->Part1(in_span); !ret.ok()) {
       state.SkipWithError(ret.status().message().data());
       return;
     }
-    if (ret = day->Part2(input); !ret.ok()) {
+    if (ret = day->Part2(in_span); !ret.ok()) {
       state.SkipWithError(ret.status().message().data());
       return;
     }
@@ -63,18 +74,11 @@ static void BM_WholeYear_ParseOnly(benchmark::State& state) {
   int bytes_processed = 0;
   for (auto _ : state) {
     for (const std::unique_ptr<AdventDay>& day : AllDays()) {
-      std::string filename(day->test_file());
-      filename.erase(filename.rfind('/'));
-      filename.append("/input.txt");
-      absl::StatusOr<std::string> file = GetContents(filename);
-      CHECK_OK(file);
-      bytes_processed += file->size();
-      std::vector<std::string_view> input_own = absl::StrSplit(*file, '\n');
-      while (!input_own.empty() && input_own.back().empty()) {
-        input_own.pop_back();
-      }
-      absl::Span<std::string_view> input(input_own);
-      absl::StatusOr<std::string> ret;
+      absl::StatusOr<Input> input = ReadInput(day.get());
+      CHECK(input.ok());
+      bytes_processed += input->file.size();
+      absl::Span<std::string_view> in_span(input->lines);
+      benchmark::DoNotOptimize(in_span);
     }
   }
   state.SetBytesProcessed(bytes_processed);
@@ -85,22 +89,15 @@ BENCHMARK(BM_WholeYear_ParseOnly);
 static void BM_WholeYear(benchmark::State& state) {
   for (auto _ : state) {
     for (const std::unique_ptr<AdventDay>& day : AllDays()) {
-      std::string filename(day->test_file());
-      filename.erase(filename.rfind('/'));
-      filename.append("/input.txt");
-      absl::StatusOr<std::string> file = GetContents(filename);
-      CHECK_OK(file);
-      std::vector<std::string_view> input_own = absl::StrSplit(*file, '\n');
-      while (!input_own.empty() && input_own.back().empty()) {
-        input_own.pop_back();
-      }
-      absl::Span<std::string_view> input(input_own);
+      absl::StatusOr<Input> input = ReadInput(day.get());
+      CHECK(input.ok());
+      absl::Span<std::string_view> in_span(input->lines);
       absl::StatusOr<std::string> ret;
-      if (ret = day->Part1(input); !ret.ok()) {
+      if (ret = day->Part1(in_span); !ret.ok()) {
         state.SkipWithError(ret.status().message().data());
         return;
       }
-      if (ret = day->Part2(input); !ret.ok()) {
+      if (ret = day->Part2(in_span); !ret.ok()) {
         state.SkipWithError(ret.status().message().data());
         return;
       }
