@@ -24,6 +24,7 @@ absl::Span<const std::unique_ptr<AdventDay>> AllDays() {
     days.emplace_back(new Day_2023_05());
     days.emplace_back(new Day_2023_06());
     days.emplace_back(new Day_2023_07());
+    days.emplace_back(new Day_2023_08());
     return days;
   }();
   return days;
