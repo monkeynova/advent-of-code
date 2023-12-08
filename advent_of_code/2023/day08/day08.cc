@@ -34,6 +34,11 @@ struct Map {
   absl::flat_hash_map<std::string_view, std::pair<std::string_view, std::string_view>> map;
 
   explicit Map(std::string_view lr_in) : lr(lr_in) {}
+
+  std::pair<int, std::string_view> HistKey(int steps, std::string_view loc) {
+    return {steps % lr.size(), loc};
+  }
+
   absl::Status AddLine(std::string_view line);
   absl::StatusOr<std::string_view> Advance(int num_step, std::string_view loc) const;
 };
@@ -68,7 +73,18 @@ struct Loop {
   std::vector<int64_t> end_z;
   int64_t from;
   int64_t to;
+
   int64_t mod() const { return from - to; }
+  bool ZeroAt(int64_t steps) const {
+    return absl::c_any_of(
+      end_z, [&](int64_t z) { return z % mod() == steps % mod(); });
+  }
+
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const Loop& loop) {
+    absl::Format(&sink, "%d-%d: %s", loop.to, loop.from,
+                 absl::StrJoin(loop.end_z, ","));
+  }
 };
 
 }  // namespace
@@ -103,55 +119,51 @@ absl::StatusOr<std::string> Day_2023_08::Part2(
   
   std::vector<Loop> loops;
   for (const auto& [from, _] : map.map) {
-    if (from.back() == 'A') {
-      Loop loop;
-      std::string_view loc = from;
-      absl::flat_hash_map<std::pair<int, std::string_view>, int> hist;
-      for (int steps = 0; true; ++steps) {
-        auto [it, inserted] = hist.emplace(std::make_pair(steps % map.lr.size(), loc), steps);
-        if (!inserted) {
-          loop.from = steps;
-          loop.to = it->second;
-          break;
-        }
-        ASSIGN_OR_RETURN(loc, map.Advance(steps, loc));
-        if (loc.back() == 'Z') loop.end_z.push_back(steps + 1);
+    if (from.back() != 'A') continue;
+
+    Loop loop;
+    std::string_view loc = from;
+    absl::flat_hash_map<std::pair<int, std::string_view>, int> hist;
+    for (int steps = 0; true; ++steps) {
+      auto [it, inserted] = hist.emplace(map.HistKey(steps, loc), steps);
+      if (!inserted) {
+        loop.from = steps;
+        loop.to = it->second;
+        break;
       }
-      if (loop.end_z.empty()) return Error("Impossible");
-      loops.push_back(loop);
-      VLOG(1) << loop.to << "-" << loop.from << ": " << absl::StrJoin(loop.end_z, ",");
+      ASSIGN_OR_RETURN(loc, map.Advance(steps, loc));
+      if (loc.back() == 'Z') loop.end_z.push_back(steps + 1);
     }
+    if (loop.end_z.empty()) return Error("Impossible");
+    loops.push_back(loop);
+    VLOG(1) << loop;
   }
 
   std::optional<int64_t> zero_mod_ok = 1;
   for (const auto& loop : loops) {
-    if (loop.end_z.size() != 1) { zero_mod_ok = std::nullopt; break; }
-    if (loop.end_z[0] % loop.mod() != 0) { zero_mod_ok = std::nullopt; break; }
-    zero_mod_ok = *zero_mod_ok * loop.mod() / std::gcd(*zero_mod_ok, loop.mod());
+    if (loop.end_z.size() != 1 || loop.end_z[0] % loop.mod() != 0) {
+      zero_mod_ok = std::nullopt;
+      break;
+    }
+
+    int64_t gcd = std::gcd(*zero_mod_ok, loop.mod());
+    zero_mod_ok = *zero_mod_ok * loop.mod() / gcd;
   }
   if (zero_mod_ok) return AdventReturn(zero_mod_ok);
 
   std::optional<Loop> probe;
   for (const Loop& loop : loops) {
     if (loop.end_z.size() == 1) {
-      probe = loop;
-      break;
+      if (!probe || probe->mod() < loop.mod()) {
+        probe = loop;
+      }
     }
   }
   if (!probe) return Error("No probe");
-  for (int step_test = probe->end_z[0]; true; step_test += probe->mod()) {
-    bool all_match = true;
-    for (const Loop& loop : loops) {
-      bool any_match = false;
-      for (int64_t z : loop.end_z) {
-        if (step_test < z) continue;
-        if (z % loop.mod() == step_test % (loop.mod())) {
-          any_match = true;
-        }
-      }
-      if (!any_match) all_match = false;
-    }
-    if (all_match) {
+  VLOG(1) << "Probe = " << *probe;
+  for (int64_t step_test = probe->end_z[0]; true; step_test += probe->mod()) {
+    if (absl::c_all_of(loops,
+                       [&](const Loop& l) { return l.ZeroAt(step_test); })) {
       return AdventReturn(step_test);
     }
   }
