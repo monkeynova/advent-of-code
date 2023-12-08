@@ -46,7 +46,7 @@ class Map {
     return absl::OkStatus();
   }
 
-  std::optional<int> FindLoc(std::string_view loc) {
+  std::optional<int> FindLoc(std::array<char, 3> loc) {
     auto it = name_to_id_.find(loc);
     if (it == name_to_id_.end()) return std::nullopt;
     return it->second;
@@ -61,11 +61,16 @@ class Map {
   std::vector<int> GhostStarts() const;
   std::vector<bool> GhostEnds() const;
 
-  int Advance(int num_step, int loc) const;
+  int Advance(int step_idx, int loc) const {
+    if (dir_[step_idx]) {
+      return map_[loc].first;
+    }
+    return map_[loc].second;
+  }
 
  private:
   std::vector<bool> dir_;
-  absl::flat_hash_map<std::string_view, int> name_to_id_;
+  absl::flat_hash_map<std::array<char, 3>, int> name_to_id_;
   std::vector<std::pair<int, int>> map_;
 };
 
@@ -87,7 +92,7 @@ std::vector<bool> Map::GhostEnds() const {
 
 absl::Status Map::AddLine(std::string_view line) {
   if (line.size() != 16) return Error("Bad line");
-  std::string_view from = line.substr(0, 3);
+  std::array<char, 3> from = {line[0], line[1], line[2]};
   auto [from_it, from_inserted] = name_to_id_.emplace(from, name_to_id_.size());
   if (from_inserted) {
     map_.push_back({-1, -1});
@@ -96,7 +101,7 @@ absl::Status Map::AddLine(std::string_view line) {
 
   if (line.substr(3, 4) != " = (") return Error("Bad line");
 
-  std::string_view l = line.substr(7, 3);
+  std::array<char, 3> l = {line[7], line[8], line[9]};
   auto [l_it, l_inserted] = name_to_id_.emplace(l, name_to_id_.size());
   if (l_inserted) {
     map_.push_back({-1, -1});
@@ -105,7 +110,7 @@ absl::Status Map::AddLine(std::string_view line) {
 
   if (line.substr(10, 2) != ", ") return Error("Bad line");
 
-  std::string_view r = line.substr(12, 3);
+  std::array<char, 3> r = {line[12], line[13], line[14]};
   auto [r_it, r_inserted] = name_to_id_.emplace(r, name_to_id_.size());
   if (r_inserted) {
     map_.push_back({-1, -1});
@@ -120,13 +125,6 @@ absl::Status Map::AddLine(std::string_view line) {
   CHECK_EQ(name_to_id_.size(), map_.size());
 
   return absl::OkStatus();
-}
-
-int Map::Advance(int num_step, int loc) const {
-  if (dir_[num_step % dir_.size()]) {
-    return map_[loc].first;
-  }
-  return map_[loc].second;
 }
 
 struct Loop {
@@ -154,20 +152,28 @@ absl::StatusOr<std::string> Day_2023_08::Part1(
   if (input.size() < 3) return Error("Bad size");
   if (!input[1].empty()) return Error("Bad input");
 
+  VLOG(1) << "Pre";
   Map map;
   RETURN_IF_ERROR(map.SetDirs(input[0]));
   for (int i = 2; i < input.size(); ++i) {
     RETURN_IF_ERROR(map.AddLine(input[i]));
   }
-  
-  std::optional<int> loc = map.FindLoc("AAA");
+
+  VLOG(1) << "Mid";
+
+  std::optional<int> loc = map.FindLoc({'A','A','A'});
   if (!loc) return Error("No start");
-  std::optional<int> end = map.FindLoc("ZZZ");
+  std::optional<int> end = map.FindLoc({'Z','Z','Z'});
   if (!end) return Error("No end");
 
-  for (int steps = 0; true; ++steps) {
-    loc = map.Advance(steps, *loc);
-    if (loc == *end) return AdventReturn(steps + 1);
+  int dir_size = input[0].size();
+  for (int steps = 0, step_idx = 0; true; ++steps) {
+    loc = map.Advance(step_idx, *loc);
+    if (++step_idx == dir_size) step_idx = 0;
+    if (loc == *end) {
+      VLOG(1) << "Post";
+      return AdventReturn(steps + 1);
+    }
   }
   return Error("Left infinite loop");
 }
@@ -183,20 +189,23 @@ absl::StatusOr<std::string> Day_2023_08::Part2(
     RETURN_IF_ERROR(map.AddLine(input[i]));
   }
   
+  int dir_size = input[0].size();
   std::vector<Loop> loops;
   std::vector<bool> ghost_ends = map.GhostEnds();
   for (int from : map.GhostStarts()) {
     Loop loop;
     int loc = from;
-    absl::flat_hash_map<std::pair<int, int>, int> hist;
-    for (int steps = 0; true; ++steps) {
-      auto [it, inserted] = hist.emplace(map.HistKey(steps, loc), steps);
-      if (!inserted) {
+    std::vector<int> hist(dir_size * ghost_ends.size(), -1);
+    for (int steps = 0, step_idx = 0; true; ++steps) {
+      int key = step_idx * ghost_ends.size() + loc;
+      if (hist[key] != -1) {
         loop.from = steps;
-        loop.to = it->second;
+        loop.to = hist[key];
         break;
       }
-      loc = map.Advance(steps, loc);
+      hist[key] = steps;
+      loc = map.Advance(step_idx, loc);
+      if (++step_idx == dir_size) step_idx = 0;
       if (ghost_ends[loc]) loop.end_z.push_back(steps + 1);
     }
     if (loop.end_z.empty()) return Error("Impossible");
