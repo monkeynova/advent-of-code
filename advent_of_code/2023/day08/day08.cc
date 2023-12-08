@@ -29,19 +29,50 @@ namespace advent_of_code {
 
 namespace {
 
-struct Map {
-  std::string_view lr;
-  absl::flat_hash_map<std::string_view, std::pair<std::string_view, std::string_view>> map;
+class Map {
+ public:
+  using LocType = std::string_view;
+  static LocType MakeLoc(std::string_view loc) {
+    return loc;
+  }
 
-  explicit Map(std::string_view lr_in) : lr(lr_in) {}
+  Map() = default;
 
-  std::pair<int, std::string_view> HistKey(int steps, std::string_view loc) {
+  absl::Status SetDirs(std::string_view lr_in) {
+    lr = lr_in;
+    return absl::OkStatus();
+  }
+  absl::Status AddLine(std::string_view line);
+
+  std::pair<int, LocType> HistKey(int steps, LocType loc) const {
     return {steps % lr.size(), loc};
   }
 
-  absl::Status AddLine(std::string_view line);
-  absl::StatusOr<std::string_view> Advance(int num_step, std::string_view loc) const;
+  std::vector<LocType> GhostStarts() const;
+  absl::flat_hash_set<LocType> GhostEnds() const;
+
+  absl::StatusOr<LocType> Advance(int num_step, LocType loc) const;
+
+ private:
+  std::string_view lr;
+  absl::flat_hash_map<LocType, std::pair<LocType, LocType>> map;
 };
+
+std::vector<Map::LocType> Map::GhostStarts() const {
+  std::vector<LocType> ret;
+  for (const auto& [from, _] : map) {
+    if (from.back() == 'A') ret.push_back(from);
+  }
+  return ret;
+}
+
+absl::flat_hash_set<Map::LocType> Map::GhostEnds() const {
+  absl::flat_hash_set<LocType> ret;
+  for (const auto& [from, _] : map) {
+    if (from.back() == 'Z') ret.insert(from);
+  }
+  return ret;
+}
 
 absl::Status Map::AddLine(std::string_view line) {
   if (line.size() != 16) return Error("Bad line");
@@ -57,8 +88,7 @@ absl::Status Map::AddLine(std::string_view line) {
   return absl::OkStatus();
 }
 
-absl::StatusOr<std::string_view> Map::Advance(
-    int num_step, std::string_view loc) const {
+absl::StatusOr<Map::LocType> Map::Advance(int num_step, LocType loc) const {
   char dir = lr[num_step % lr.size()];
   auto it = map.find(loc);
   if (it == map.end()) return Error("Bad loc: ", loc);
@@ -94,15 +124,17 @@ absl::StatusOr<std::string> Day_2023_08::Part1(
   if (input.size() < 3) return Error("Bad size");
   if (!input[1].empty()) return Error("Bad input");
 
-  Map map(input[0]);
+  Map map;
+  RETURN_IF_ERROR(map.SetDirs(input[0]));
   for (int i = 2; i < input.size(); ++i) {
     RETURN_IF_ERROR(map.AddLine(input[i]));
   }
   
-  std::string_view loc = "AAA";
+  Map::LocType loc = Map::MakeLoc("AAA");
+  Map::LocType end = Map::MakeLoc("ZZZ");
   for (int steps = 0; true; ++steps) {
     ASSIGN_OR_RETURN(loc, map.Advance(steps, loc));
-    if (loc == "ZZZ") return AdventReturn(steps + 1);
+    if (loc == end) return AdventReturn(steps + 1);
   }
   return Error("Left infinite loop");
 }
@@ -112,18 +144,18 @@ absl::StatusOr<std::string> Day_2023_08::Part2(
   if (input.size() < 3) return Error("Bad size");
   if (!input[1].empty()) return Error("Bad input");
 
-  Map map(input[0]);
+  Map map;
+  RETURN_IF_ERROR(map.SetDirs(input[0]));
   for (int i = 2; i < input.size(); ++i) {
     RETURN_IF_ERROR(map.AddLine(input[i]));
   }
   
   std::vector<Loop> loops;
-  for (const auto& [from, _] : map.map) {
-    if (from.back() != 'A') continue;
-
+  absl::flat_hash_set<Map::LocType> ghost_ends(map.GhostEnds());
+  for (Map::LocType from : map.GhostStarts()) {
     Loop loop;
-    std::string_view loc = from;
-    absl::flat_hash_map<std::pair<int, std::string_view>, int> hist;
+    Map::LocType loc = from;
+    absl::flat_hash_map<std::pair<int, Map::LocType>, int> hist;
     for (int steps = 0; true; ++steps) {
       auto [it, inserted] = hist.emplace(map.HistKey(steps, loc), steps);
       if (!inserted) {
@@ -132,7 +164,7 @@ absl::StatusOr<std::string> Day_2023_08::Part2(
         break;
       }
       ASSIGN_OR_RETURN(loc, map.Advance(steps, loc));
-      if (loc.back() == 'Z') loop.end_z.push_back(steps + 1);
+      if (ghost_ends.contains(loc)) loop.end_z.push_back(steps + 1);
     }
     if (loop.end_z.empty()) return Error("Impossible");
     loops.push_back(loop);
