@@ -5,6 +5,7 @@ use warnings;
 
 my ($year, $day) = @ARGV;
 
+die "USAGE:\n$0 <year> <day>\n" unless $year;
 die "Bad year: $year" unless $year >= 2015;
 die "Bad day: $day" unless $day > 0 && $day <= 25;
 
