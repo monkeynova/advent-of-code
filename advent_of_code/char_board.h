@@ -1,6 +1,7 @@
 #ifndef ADVENT_OF_CODE_CHAR_BOARD_H
 #define ADVENT_OF_CODE_CHAR_BOARD_H
 
+#include <bitset>
 #include <vector>
 
 #include "absl/container/flat_hash_set.h"
