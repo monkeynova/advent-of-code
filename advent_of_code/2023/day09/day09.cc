@@ -10,7 +10,7 @@ absl::StatusOr<std::string> Day_2023_09::Part1(
     absl::Span<std::string_view> input) const {
   int64_t total = 0;
   for (std::string_view line : input) {
-    ASSIGN_OR_RETURN(std::vector<int64_t> vals, ParseAsInts(line));
+    ASSIGN_OR_RETURN(std::vector<int> vals, ParseAsInts<int>(line));
     int64_t predict = 0;
     for (bool done = false; !done; vals.pop_back()) {
       predict += vals.back();
@@ -29,7 +29,7 @@ absl::StatusOr<std::string> Day_2023_09::Part2(
     absl::Span<std::string_view> input) const {
   int64_t total = 0;
   for (std::string_view line : input) {
-    ASSIGN_OR_RETURN(std::vector<int64_t> vals, ParseAsInts(line));
+    ASSIGN_OR_RETURN(std::vector<int> vals, ParseAsInts<int>(line));
     int64_t predict = 0;
     bool negate = true;
     for (bool done = false; !done; vals.pop_back()) {

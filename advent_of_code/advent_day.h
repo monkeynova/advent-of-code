@@ -37,8 +37,9 @@ inline absl::StatusOr<std::vector<int64_t>> ParseAsInts(Container input) {
   return vals;
 }
 
-inline absl::StatusOr<std::vector<int64_t>> ParseAsInts(std::string_view input) {
-  std::vector<int64_t> vals;
+template <typename IntType=int64_t>
+inline absl::StatusOr<std::vector<IntType>> ParseAsInts(std::string_view input) {
+  std::vector<IntType> vals;
   Tokenizer tok(input);
   while (!tok.Done()) {
     vals.push_back(0);
