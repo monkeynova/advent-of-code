@@ -17,7 +17,7 @@ absl::StatusOr<std::string> Day_2023_09::Part1(
       done = true;
       for (int i = 0; i + 1 < vals.size(); ++i) {
         vals[i] = vals[i + 1] - vals[i];
-        if (vals[i] != 0) done = false;
+        done &= vals[i] != 0;
       }
     }
     total += predict;
@@ -38,7 +38,7 @@ absl::StatusOr<std::string> Day_2023_09::Part2(
       done = true;
       for (int i = 0; i + 1 < vals.size(); ++i) {
         vals[i] = vals[i + 1] - vals[i];
-        if (vals[i] != 0) done = false;
+        done &= vals[i] != 0;
       }
     }
     if (negate) {
