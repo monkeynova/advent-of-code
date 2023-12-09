@@ -2,6 +2,8 @@
 
 #include "advent_of_code/2023/day04/day04.h"
 
+#include <bitset>
+
 #include "absl/algorithm/container.h"
 #include "absl/log/log.h"
 #include "absl/strings/numbers.h"
