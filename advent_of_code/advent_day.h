@@ -12,6 +12,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
 #include "absl/types/span.h"
+#include "advent_of_code/tokenizer.h"
 #include "advent_of_code/vlog.h"
 
 extern absl::Flag<bool> FLAGS_advent_day_run_audit;
@@ -32,6 +33,16 @@ inline absl::StatusOr<std::vector<int64_t>> ParseAsInts(Container input) {
       return absl::InvalidArgumentError(absl::StrCat("parse as int: ", in));
     }
     vals.push_back(v);
+  }
+  return vals;
+}
+
+inline absl::StatusOr<std::vector<int64_t>> ParseAsInts(std::string_view input) {
+  std::vector<int64_t> vals;
+  Tokenizer tok(input);
+  while (!tok.Done()) {
+    vals.push_back(0);
+    ASSIGN_OR_RETURN(vals.back(), tok.NextInt());
   }
   return vals;
 }
