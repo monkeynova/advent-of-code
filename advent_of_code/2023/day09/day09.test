@@ -2,24 +2,28 @@
 ==
 
 [part=1]
-Example input
+0 3 6 9 12 15
+1 3 6 10 15 21
+10 13 16 21 30 45
 --
-ERROR: UNIMPLEMENTED: Problem not known
+114
 ==
 
 [part=1]
 @include{advent_of_code/2023/day09/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+2175229206
 ==
 
 [part=2]
-Example input
+0 3 6 9 12 15
+1 3 6 10 15 21
+10 13 16 21 30 45
 --
-ERROR: UNIMPLEMENTED: Problem not known
+2
 ==
 
 [part=2]
 @include{advent_of_code/2023/day09/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+942

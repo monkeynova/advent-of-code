@@ -34,12 +34,56 @@ namespace {
 
 absl::StatusOr<std::string> Day_2023_09::Part1(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  int64_t total = 0;
+  for (std::string_view line : input) {
+    ASSIGN_OR_RETURN(
+      std::vector<int64_t> vals,
+      ParseAsInts(absl::StrSplit(line, " ")));
+    std::vector<int64_t> end_vals;
+    for (bool done = false; !done;) {
+      end_vals.push_back(vals.back());
+      done = true;
+      for (int i = 0; i + 1 < vals.size(); ++i) {
+        vals[i] = vals[i + 1] - vals[i];
+        if (vals[i] != 0) done = false;
+      }
+      vals.pop_back();
+    }
+    int64_t predict = 0;
+    while (!end_vals.empty()) {
+      predict += end_vals.back();
+      end_vals.pop_back();
+    }
+    total += predict;
+  }
+  return AdventReturn(total);
 }
 
 absl::StatusOr<std::string> Day_2023_09::Part2(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  int64_t total = 0;
+  for (std::string_view line : input) {
+    ASSIGN_OR_RETURN(
+      std::vector<int64_t> vals,
+      ParseAsInts(absl::StrSplit(line, " ")));
+    std::vector<int64_t> begin_vals;
+    for (bool done = false; !done;) {
+      begin_vals.push_back(vals[0]);
+      done = true;
+      for (int i = 0; i + 1 < vals.size(); ++i) {
+        vals[i] = vals[i + 1] - vals[i];
+        if (vals[i] != 0) done = false;
+      }
+      vals.pop_back();
+    }
+    int64_t predict = 0;
+    while (!begin_vals.empty()) {
+      predict = begin_vals.back() - predict;
+      begin_vals.pop_back();
+    }
+    total += predict;
+  }
+  return AdventReturn(total);
 }
 
 }  // namespace advent_of_code
