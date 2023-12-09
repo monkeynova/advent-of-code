@@ -53,30 +53,12 @@ absl::StatusOr<int64_t> Decode(std::string_view digit,
   return it->second;
 }
 
-bool TryMap(absl::flat_hash_map<char, char>& map, char next,
-            const std::vector<std::string_view>& digits) {
-  if (next == 'h') {
-    for (std::string_view d : digits) {
-      absl::StatusOr<int64_t> v = Decode(d, map);
-      if (!v.ok()) return false;
-    }
-    return true;
-  }
-
-  for (char c : {'a', 'b', 'c', 'd', 'e', 'f', 'g'}) {
-    if (map.contains(c)) continue;
-    map[c] = next;
-    if (TryMap(map, next + 1, digits)) return true;
-    map.erase(c);
-  }
-  return false;
-}
-
 absl::StatusOr<absl::flat_hash_map<char, char>> FindMap(
     const std::vector<std::string_view>& left) {
   if (left.size() != 10) return Error("Bad exemplars");
 
-  absl::flat_hash_map<int64_t, absl::flat_hash_set<char>> countToSegments = {
+  static const absl::flat_hash_map<int64_t, absl::flat_hash_set<char>>
+  countToSegments = {
       {8, {'a', 'c'}}, {6, {'b'}}, {7, {'d', 'g'}}, {4, {'e'}}, {9, {'f'}},
   };
 
