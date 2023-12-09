@@ -70,8 +70,8 @@ class Map {
 
  private:
   std::vector<bool> dir_;
-  absl::flat_hash_map<std::array<char, 3>, int> name_to_id_;
-  std::vector<std::pair<int, int>> map_;
+  absl::flat_hash_map<std::array<char, 3>, int16_t> name_to_id_;
+  std::vector<std::pair<int16_t, int16_t>> map_;
 };
 
 std::vector<int> Map::GhostStarts() const {
@@ -152,14 +152,12 @@ absl::StatusOr<std::string> Day_2023_08::Part1(
   if (input.size() < 3) return Error("Bad size");
   if (!input[1].empty()) return Error("Bad input");
 
-  VLOG(1) << "Pre";
   Map map;
   RETURN_IF_ERROR(map.SetDirs(input[0]));
   for (int i = 2; i < input.size(); ++i) {
     RETURN_IF_ERROR(map.AddLine(input[i]));
   }
 
-  VLOG(1) << "Mid";
 
   std::optional<int> loc = map.FindLoc({'A','A','A'});
   if (!loc) return Error("No start");
@@ -171,7 +169,6 @@ absl::StatusOr<std::string> Day_2023_08::Part1(
     loc = map.Advance(step_idx, *loc);
     if (++step_idx == dir_size) step_idx = 0;
     if (loc == *end) {
-      VLOG(1) << "Post";
       return AdventReturn(steps + 1);
     }
   }
