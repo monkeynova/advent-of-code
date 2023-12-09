@@ -90,10 +90,12 @@ static void BM_WholeYear_ParseOnly(benchmark::State& state) {
 BENCHMARK(BM_WholeYear_ParseOnly);
 
 static void BM_WholeYear(benchmark::State& state) {
+  int bytes_processed = 0;
   for (auto _ : state) {
     for (const std::unique_ptr<AdventDay>& day : AllDays()) {
       absl::StatusOr<Input> input = ReadInput(day.get());
       CHECK(input.ok());
+      bytes_processed += input->file.size();
       absl::Span<std::string_view> in_span(input->lines);
       absl::StatusOr<std::string> ret;
       if (ret = day->Part1(in_span); !ret.ok()) {
@@ -106,6 +108,7 @@ static void BM_WholeYear(benchmark::State& state) {
       }
     }
   }
+  state.SetBytesProcessed(bytes_processed);
 }
 
 BENCHMARK(BM_WholeYear);
