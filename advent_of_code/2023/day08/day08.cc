@@ -192,12 +192,13 @@ absl::StatusOr<std::string> Day_2023_08::Part2(
   int dir_size = input[0].size();
   std::vector<Loop> loops;
   std::vector<bool> ghost_ends = map.GhostEnds();
+  int num_locs = ghost_ends.size();
   for (int from : map.GhostStarts()) {
     Loop loop;
     int loc = from;
-    std::vector<int> hist(dir_size * ghost_ends.size(), -1);
+    std::vector<int> hist(dir_size * num_locs, -1);
     for (int steps = 0, step_idx = 0; true; ++steps) {
-      int key = step_idx * ghost_ends.size() + loc;
+      int key = step_idx * num_locs + loc;
       if (hist[key] != -1) {
         loop.from = steps;
         loop.to = hist[key];
