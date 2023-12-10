@@ -37,19 +37,23 @@ inline Point AdjustDir(Point dir, char c) {
         Cardinal::kOrigin, Cardinal::kOrigin, Cardinal::kOrigin,
         Cardinal::kOrigin, Cardinal::kOrigin, Cardinal::kOrigin};
     }
-    // {NW, N, NE, W, O, E, SW, S, SE};
-    ret['|'][1] = Cardinal::kNorth;
-    ret['|'][7] = Cardinal::kSouth;
-    ret['-'][3] = Cardinal::kWest;
-    ret['-'][5] = Cardinal::kEast;
-    ret['F'][1] = Cardinal::kEast;
-    ret['F'][3] = Cardinal::kSouth;
-    ret['7'][1] = Cardinal::kWest;
-    ret['7'][5] = Cardinal::kSouth;
-    ret['J'][7] = Cardinal::kWest;
-    ret['J'][5] = Cardinal::kNorth;
-    ret['L'][7] = Cardinal::kEast;
-    ret['L'][3] = Cardinal::kNorth;
+    constexpr int kNorthIdx = 1;
+    constexpr int kWestIdx = 3;
+    constexpr int kEastIdx = 5;
+    constexpr int kSouthIdx = 7;
+
+    ret['|'][kNorthIdx] = Cardinal::kNorth;
+    ret['|'][kSouthIdx] = Cardinal::kSouth;
+    ret['-'][kWestIdx] = Cardinal::kWest;
+    ret['-'][kEastIdx] = Cardinal::kEast;
+    ret['F'][kNorthIdx] = Cardinal::kEast;
+    ret['F'][kWestIdx] = Cardinal::kSouth;
+    ret['7'][kNorthIdx] = Cardinal::kWest;
+    ret['7'][kEastIdx] = Cardinal::kSouth;
+    ret['J'][kSouthIdx] = Cardinal::kWest;
+    ret['J'][kEastIdx] = Cardinal::kNorth;
+    ret['L'][kSouthIdx] = Cardinal::kEast;
+    ret['L'][kWestIdx] = Cardinal::kNorth;
     return ret;
   }();
   return kTransitionTable[c][point_idx];
