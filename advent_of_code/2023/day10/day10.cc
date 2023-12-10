@@ -93,7 +93,8 @@ struct XAndC {
   }
 };
 
-std::vector<std::vector<XAndC>> FindLoop(const ImmutableCharBoard& b, Point start) {
+std::vector<std::vector<XAndC>> FindLoop(const ImmutableCharBoard& b,
+                                         Point start) {
   CHECK_LT(b.width(), std::numeric_limits<int16_t>::max());
   for (Point dir : Cardinal::kFourDirs) {
     Point orig_dir = dir;
@@ -114,51 +115,38 @@ std::vector<std::vector<XAndC>> FindLoop(const ImmutableCharBoard& b, Point star
   return {};
 }
 
-absl::StatusOr<int> InsideSpace(const ImmutableCharBoard& b, std::vector<std::vector<XAndC>> loop) {
+absl::StatusOr<int> InsideSpace(const ImmutableCharBoard& b,
+                                std::vector<std::vector<XAndC>> loop) {
   int count_inside = 0;
+  // Maps from one inside_state which is two bits of 'inside' for the upper and
+  // lower halves of the cell to another.
+  // That is insde_state = (upper_inside << 1) | lower_inside and
+  // kInsideTransition describes how that changed with a given char on the
+  // board.
+  static const std::array<std::array<char, 4>, 128> kInsideTransition = []() {
+    std::array<std::array<char, 4>, 128> ret;
+    for (int i = 0; i < ret.size(); ++i) {
+      ret[i] = std::array<char, 4>{-1, -1, -1, -1};
+    }
+    ret['|'] = std::array<char, 4>{3, -1, -1, 0};
+    ret['-'] = std::array<char, 4>{0, 1, 2, 3};
+    ret['J'] = std::array<char, 4>{0, 3, 0, 3};
+    ret['7'] = std::array<char, 4>{0, 0, 3, 3};
+    ret['L'] = std::array<char, 4>{2, -1, -1, 1};
+    ret['F'] = std::array<char, 4>{1, -1, -1, 2};
+    return ret;
+  }();
+
   for (int y = 0; y < loop.size(); ++y) {
+    if (loop[y].empty()) continue;
     absl::c_sort(loop[y]);
-    bool upper_inside = false;
-    bool lower_inside = false;
+    int inside_state = 0;
     bool prev_inside = false;
     for (int i = 0; i < loop[y].size(); ++i) {
       auto [x, c] = loop[y][i];
-      switch (c) {
-        case '|': {
-          if (upper_inside != lower_inside) return Error("Bad |");
-          upper_inside = !upper_inside;
-          lower_inside = !lower_inside;
-          break;
-        }
-        case 'J': {
-          if (upper_inside == lower_inside) return Error("Bad J");
-          upper_inside = lower_inside;
-          break;
-        }
-        case '7': {
-          if (upper_inside == lower_inside) return Error("Bad 7");
-          lower_inside = upper_inside;
-          break;
-        }
-        case 'L': {
-          if (upper_inside != lower_inside) return Error("Bad L");
-          upper_inside = !upper_inside;
-          break;
-        }
-        case 'F': {
-          if (upper_inside != lower_inside) return Error("Bad F");
-          lower_inside = !lower_inside;
-          break;
-        }
-        case '-': {
-          if (upper_inside == lower_inside) return Error("Bad - ");
-          break;
-        }
-        default: {
-          return Error("Unknown pipe");
-        }
-      }
-      if (!upper_inside || !lower_inside) {
+      inside_state = kInsideTransition[c][inside_state];
+      if (inside_state == -1) return Error("Bad transition");
+      if (inside_state != 3) {
         if (prev_inside) {
           count_inside += x - loop[y][i - 1].x - 1;
         }
