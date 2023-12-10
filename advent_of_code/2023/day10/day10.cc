@@ -28,45 +28,31 @@ char StartType(Point orig_dir, Point dir) {
 }
 
 inline Point AdjustDir(Point dir, char c) {
-  switch (c) {
-    case '|': {
-      if (dir != Cardinal::kNorth && dir != Cardinal::kSouth) {
-        return Cardinal::kOrigin;
-      }
-      return dir;
+  int point_idx = (dir.y + 1) * 3 + (dir.x + 1);
+  static const std::array<std::array<Point, 9>, 128> kTransitionTable = []() {
+    std::array<std::array<Point, 9>, 128> ret;
+    for (int c = 0; c < 128; ++c) {
+      ret[c] = {
+        Cardinal::kOrigin, Cardinal::kOrigin, Cardinal::kOrigin,
+        Cardinal::kOrigin, Cardinal::kOrigin, Cardinal::kOrigin,
+        Cardinal::kOrigin, Cardinal::kOrigin, Cardinal::kOrigin};
     }
-    case '-': {
-      if (dir != Cardinal::kEast && dir != Cardinal::kWest) {
-        return Cardinal::kOrigin;
-      }
-      return dir;
-    }
-    case 'F': {
-      if (dir == Cardinal::kNorth) return Cardinal::kEast;
-      else if (dir == Cardinal::kWest) return Cardinal::kSouth;
-      else return Cardinal::kOrigin;
-      break;
-    }
-    case '7': {
-      if (dir == Cardinal::kNorth) return Cardinal::kWest;
-      else if (dir == Cardinal::kEast) return Cardinal::kSouth;
-      else return Cardinal::kOrigin;
-      break;
-    }
-    case 'J': {
-      if (dir == Cardinal::kSouth) return Cardinal::kWest;
-      else if (dir == Cardinal::kEast) return Cardinal::kNorth;
-      else return Cardinal::kOrigin;
-      break;
-    }
-    case 'L': {
-      if (dir == Cardinal::kSouth) return Cardinal::kEast;
-      else if (dir == Cardinal::kWest) return Cardinal::kNorth;
-      else return Cardinal::kOrigin;
-      break;
-    }
-  }
-  return Cardinal::kOrigin;
+    // {NW, N, NE, W, O, E, SW, S, SE};
+    ret['|'][1] = Cardinal::kNorth;
+    ret['|'][7] = Cardinal::kSouth;
+    ret['-'][3] = Cardinal::kWest;
+    ret['-'][5] = Cardinal::kEast;
+    ret['F'][1] = Cardinal::kEast;
+    ret['F'][3] = Cardinal::kSouth;
+    ret['7'][1] = Cardinal::kWest;
+    ret['7'][5] = Cardinal::kSouth;
+    ret['J'][7] = Cardinal::kWest;
+    ret['J'][5] = Cardinal::kNorth;
+    ret['L'][7] = Cardinal::kEast;
+    ret['L'][3] = Cardinal::kNorth;
+    return ret;
+  }();
+  return kTransitionTable[c][point_idx];
 }
 
 std::optional<int> FindLoopSize(const ImmutableCharBoard& b, Point start) {
