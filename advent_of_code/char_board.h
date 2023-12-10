@@ -230,9 +230,6 @@ absl::StatusOr<CharBoard> CharBoard::Parse(const Container& in) {
 template <>
 template <typename Container>
 absl::StatusOr<ImmutableCharBoard> ImmutableCharBoard::Parse(const Container& in) {
-  // We do a 2-pass read of 'in' to allow Container to not support
-  // empty()/operator[] calls. This is necessary to allow the value returned
-  // by absl::StrSplit to be passed directly in.
   static_assert(
       std::is_same_v<std::string_view, decltype(std::string_view(*in.begin()))>,
       "Container must iterate over std::string_view");
@@ -246,17 +243,18 @@ absl::StatusOr<ImmutableCharBoard> ImmutableCharBoard::Parse(const Container& in
     } else if (width != line.size()) {
       return absl::InvalidArgumentError("Inconsistent width");
     }
+    if (line[line.size()] != '\n') {
+      return absl::InvalidArgumentError("Not terminated correctly");
+    }
     if (buf.empty()) {
-      buf = line;
-    } else if (buf.data() + buf.size() + 1 != line.data()) {
+      buf = std::string_view(line.data(), line.size() + 1);
+    } else if (buf.data() + buf.size() != line.data()) {
       return absl::InvalidArgumentError("Not contiguous");
-    } else if (line.data()[-1] != '\n') {
-      return absl::InvalidArgumentError("Not broken correctly");
     } else {
-      buf = std::string_view(buf.data(), buf.size() + 1 + line.size());
+      buf = std::string_view(buf.data(), buf.size() + line.size() + 1);
     }
   }
-  return ImmutableCharBoard(width, buf);
+  return ImmutableCharBoard(/*stride=*/width + 1, buf);
 }
 
 }  // namespace advent_of_code

@@ -86,7 +86,7 @@ inline Point AdjustDir(Point dir, char c) {
   return Cardinal::kOrigin;
 }
 
-std::optional<int> FindLoopSize(const CharBoard& b, Point start) {
+std::optional<int> FindLoopSize(const ImmutableCharBoard& b, Point start) {
   for (Point dir : Cardinal::kFourDirs) {
     int loop_size = 0;
     for (Point test = dir + start; b.OnBoard(test); test += dir) {
@@ -110,7 +110,7 @@ struct XAndC {
   }
 };
 
-std::vector<std::vector<XAndC>> FindLoop(const CharBoard& b, Point start) {
+std::vector<std::vector<XAndC>> FindLoop(const ImmutableCharBoard& b, Point start) {
   CHECK_LT(b.width(), std::numeric_limits<int16_t>::max());
   for (Point dir : Cardinal::kFourDirs) {
     Point orig_dir = dir;
@@ -131,7 +131,7 @@ std::vector<std::vector<XAndC>> FindLoop(const CharBoard& b, Point start) {
   return {};
 }
 
-absl::StatusOr<int> InsideSpace(const CharBoard& b, std::vector<std::vector<XAndC>> loop) {
+absl::StatusOr<int> InsideSpace(const ImmutableCharBoard& b, std::vector<std::vector<XAndC>> loop) {
   int count_inside = 0;
   for (int y = 0; y < loop.size(); ++y) {
     absl::c_sort(loop[y]);
@@ -192,7 +192,7 @@ absl::StatusOr<int> InsideSpace(const CharBoard& b, std::vector<std::vector<XAnd
 
 absl::StatusOr<std::string> Day_2023_10::Part1(
     absl::Span<std::string_view> input) const {
-  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
   absl::flat_hash_set<Point> start_set = b.Find('S');
   if (start_set.size() != 1) return Error("Bad start");
   Point start = *start_set.begin();
@@ -203,7 +203,7 @@ absl::StatusOr<std::string> Day_2023_10::Part1(
 
 absl::StatusOr<std::string> Day_2023_10::Part2(
     absl::Span<std::string_view> input) const {
-  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
   absl::flat_hash_set<Point> start_set = b.Find('S');
   if (start_set.size() != 1) return Error("Bad start");
   Point start = *start_set.begin();

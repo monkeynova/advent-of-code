@@ -14,7 +14,7 @@ namespace {
 // equal to start.y and x values in [min_x, max_x) are on `b` and have a
 // digit stored in the correspondng board location. num is the value of the
 // integer contained within that range of digits.
-std::tuple<int, int, int> DigitRange(const CharBoard& b, Point start) {
+std::tuple<int, int, int> DigitRange(const ImmutableCharBoard& b, Point start) {
   std::string_view row = b.row(start.y);
   int num = 0;
   int min = start.x;
@@ -37,7 +37,7 @@ std::tuple<int, int, int> DigitRange(const CharBoard& b, Point start) {
 
 absl::StatusOr<std::string> Day_2023_03::Part1(
     absl::Span<std::string_view> input) const {
-  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
   int sum = 0;
   std::vector<bool> used(b.range().Area(), false);
   auto point_idx = [&](Point p) {
@@ -67,7 +67,7 @@ absl::StatusOr<std::string> Day_2023_03::Part1(
 
 absl::StatusOr<std::string> Day_2023_03::Part2(
     absl::Span<std::string_view> input) const {
-  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
   int64_t sum = 0;
   std::vector<bool> used(b.range().Area(), false);
   auto point_idx = [&](Point p) {
