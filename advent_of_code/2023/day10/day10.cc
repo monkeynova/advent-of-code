@@ -44,17 +44,13 @@ char StartType(Point orig_dir, Point dir) {
   return '?';
 }
 
-std::vector<Point> FindLoop(const CharBoard& b, Point start, char* start_pipe_dest = nullptr) {
+std::optional<int> FindLoopSize(const CharBoard& b, Point start) {
   for (Point dir : Cardinal::kFourDirs) {
-    Point orig_dir = dir;
-    std::vector<Point> ret; 
+    int loop_size = 0;
     for (Point test = dir + start; b.OnBoard(test); test += dir) {
-      ret.push_back(test);
+      ++loop_size;
       if (test == start) {
-        if (start_pipe_dest != nullptr) {
-          *start_pipe_dest = StartType(orig_dir, dir);
-        }
-        return ret;
+        return loop_size;
       }
       bool off_loop = false;
       switch (b[test]) {
@@ -105,61 +101,130 @@ std::vector<Point> FindLoop(const CharBoard& b, Point start, char* start_pipe_de
   return {};
 }
 
-absl::StatusOr<int> InsideSpace(const CharBoard& b, std::vector<Point> loop, char start_pipe) {
-  Point start = loop.back();
-  absl::c_sort(loop, PointYThenXLT{});
+struct XAndC {
+  int16_t x;
+  char c;
 
-  int count_inside = 0;
-  bool upper_inside = false;
-  bool lower_inside = false;
-  bool prev_inside = false;
-  for (int i = 0; i < loop.size(); ++i) {
-    Point p = loop[i];
-    char c = p == start ? start_pipe : b[p];
-    switch (c) {
-      case '|': {
-        if (upper_inside != lower_inside) return Error("Bad |");
-        upper_inside = !upper_inside;
-        lower_inside = !lower_inside;
-        break;
+  bool operator<(const XAndC& o) const {
+    return x < o.x;
+  }
+};
+
+std::vector<std::vector<XAndC>> FindLoop(const CharBoard& b, Point start) {
+  CHECK_LT(b.width(), std::numeric_limits<int16_t>::max());
+  for (Point dir : Cardinal::kFourDirs) {
+    Point orig_dir = dir;
+    std::vector<std::vector<XAndC>> ret(b.height());
+    for (Point test = dir + start; b.OnBoard(test); test += dir) {
+      if (test == start) {
+        ret[test.y].push_back({
+          .x = static_cast<int16_t>(test.x),
+          .c = StartType(orig_dir, dir)});
+        return ret;
       }
-      case 'J': {
-        if (upper_inside == lower_inside) return Error("Bad J");
-        upper_inside = lower_inside;
-        break;
+      char c = b[test];
+      ret[test.y].push_back({.x = static_cast<int16_t>(test.x), .c = c});
+      bool off_loop = false;
+      switch (c) {
+        case '|': {
+          if (dir != Cardinal::kNorth && dir != Cardinal::kSouth) {
+            off_loop = true;
+          }
+          break;
+        }
+        case '-': {
+          if (dir != Cardinal::kEast && dir != Cardinal::kWest) {
+            off_loop = true;
+          }
+          break;
+        }
+        case 'F': {
+          if (dir == Cardinal::kNorth) dir = Cardinal::kEast;
+          else if (dir == Cardinal::kWest) dir = Cardinal::kSouth;
+          else off_loop = true;
+          break;
+        }
+        case '7': {
+          if (dir == Cardinal::kNorth) dir = Cardinal::kWest;
+          else if (dir == Cardinal::kEast) dir = Cardinal::kSouth;
+          else off_loop = true;
+          break;
+        }
+        case 'J': {
+          if (dir == Cardinal::kSouth) dir = Cardinal::kWest;
+          else if (dir == Cardinal::kEast) dir = Cardinal::kNorth;
+          else off_loop = true;
+          break;
+        }
+        case 'L': {
+          if (dir == Cardinal::kSouth) dir = Cardinal::kEast;
+          else if (dir == Cardinal::kWest) dir = Cardinal::kNorth;
+          else off_loop = true;
+          break;
+        }
+        default: {
+          off_loop = true;
+          break;
+        }
       }
-      case '7': {
-        if (upper_inside == lower_inside) return Error("Bad 7");
-        lower_inside = upper_inside;
-        break;
-      }
-      case 'L': {
-        if (upper_inside != lower_inside) return Error("Bad L");
-        upper_inside = !upper_inside;
-        break;
-      }
-      case 'F': {
-        if (upper_inside != lower_inside) return Error("Bad F");
-        lower_inside = !lower_inside;
-        break;
-      }
-      case '-': {
-        if (upper_inside == lower_inside) return Error("Bad - ");
-        break;
-      }
-      default: {
-        return Error("Unknown pipe");
-      }
+      if (off_loop) break;
     }
-    if (!upper_inside || !lower_inside) {
-      if (prev_inside) {
-        Point prev = loop[i - 1];
-        if (prev.y != p.y) return Error("Bad line");
-        count_inside += p.x - prev.x - 1;
+  }
+  return {};
+}
+
+absl::StatusOr<int> InsideSpace(const CharBoard& b, std::vector<std::vector<XAndC>> loop) {
+  int count_inside = 0;
+  for (int y = 0; y < loop.size(); ++y) {
+    absl::c_sort(loop[y]);
+    bool upper_inside = false;
+    bool lower_inside = false;
+    bool prev_inside = false;
+    for (int i = 0; i < loop[y].size(); ++i) {
+      auto [x, c] = loop[y][i];
+      switch (c) {
+        case '|': {
+          if (upper_inside != lower_inside) return Error("Bad |");
+          upper_inside = !upper_inside;
+          lower_inside = !lower_inside;
+          break;
+        }
+        case 'J': {
+          if (upper_inside == lower_inside) return Error("Bad J");
+          upper_inside = lower_inside;
+          break;
+        }
+        case '7': {
+          if (upper_inside == lower_inside) return Error("Bad 7");
+          lower_inside = upper_inside;
+          break;
+        }
+        case 'L': {
+          if (upper_inside != lower_inside) return Error("Bad L");
+          upper_inside = !upper_inside;
+          break;
+        }
+        case 'F': {
+          if (upper_inside != lower_inside) return Error("Bad F");
+          lower_inside = !lower_inside;
+          break;
+        }
+        case '-': {
+          if (upper_inside == lower_inside) return Error("Bad - ");
+          break;
+        }
+        default: {
+          return Error("Unknown pipe");
+        }
       }
-      prev_inside = false;
-    } else {
-      prev_inside = true;
+      if (!upper_inside || !lower_inside) {
+        if (prev_inside) {
+          count_inside += x - loop[y][i - 1].x - 1;
+        }
+        prev_inside = false;
+      } else {
+        prev_inside = true;
+      }
     }
   }
   return count_inside;
@@ -173,9 +238,9 @@ absl::StatusOr<std::string> Day_2023_10::Part1(
   absl::flat_hash_set<Point> start_set = b.Find('S');
   if (start_set.size() != 1) return Error("Bad start");
   Point start = *start_set.begin();
-  std::vector<Point> loop = FindLoop(b, start);
-  if (loop.empty()) return Error("No loop found");
-  return AdventReturn((loop.size() + 1) / 2);
+  std::optional<int> loop_size = FindLoopSize(b, start);
+  if (!loop_size) return AdventReturn(loop_size);
+  return AdventReturn((*loop_size + 1) / 2);
 }
 
 absl::StatusOr<std::string> Day_2023_10::Part2(
@@ -184,11 +249,9 @@ absl::StatusOr<std::string> Day_2023_10::Part2(
   absl::flat_hash_set<Point> start_set = b.Find('S');
   if (start_set.size() != 1) return Error("Bad start");
   Point start = *start_set.begin();
-  char start_pipe = '?';
-  std::vector<Point> loop = FindLoop(b, start, &start_pipe);
+  std::vector<std::vector<XAndC>> loop = FindLoop(b, start);
   if (loop.empty()) return Error("No loop found");
-  if (start_pipe == '?') return Error("Bad start pipe");
-  return AdventReturn(InsideSpace(b, std::move(loop), start_pipe));
+  return AdventReturn(InsideSpace(b, std::move(loop)));
 }
 
 }  // namespace advent_of_code
