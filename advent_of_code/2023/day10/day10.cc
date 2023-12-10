@@ -28,53 +28,75 @@ namespace advent_of_code {
 
 namespace {
 
-// Helper methods go here.
+std::vector<Point> FindLoop(const CharBoard& b) {
+  absl::flat_hash_set<Point> start_set = b.Find('S');
+  if (start_set.size() != 1) return {};
+
+  Point start = *start_set.begin();
+  for (Point dir : Cardinal::kFourDirs) {
+    std::vector<Point> ret; 
+    for (Point test = dir + start; b.OnBoard(test); test += dir) {
+      ret.push_back(test);
+      if (test == start) {
+        return ret;
+      }
+      bool off_loop = false;
+      switch (b[test]) {
+        case '|': {
+          if (dir != Cardinal::kNorth && dir != Cardinal::kSouth) {
+            off_loop = true;
+          }
+          break;
+        }
+        case '-': {
+          if (dir != Cardinal::kEast && dir != Cardinal::kWest) {
+            off_loop = true;
+          }
+          break;
+        }
+        case 'F': {
+          if (dir == Cardinal::kNorth) dir = Cardinal::kEast;
+          else if (dir == Cardinal::kWest) dir = Cardinal::kSouth;
+          else off_loop = true;
+          break;
+        }
+        case '7': {
+          if (dir == Cardinal::kNorth) dir = Cardinal::kWest;
+          else if (dir == Cardinal::kEast) dir = Cardinal::kSouth;
+          else off_loop = true;
+          break;
+        }
+        case 'J': {
+          if (dir == Cardinal::kSouth) dir = Cardinal::kWest;
+          else if (dir == Cardinal::kEast) dir = Cardinal::kNorth;
+          else off_loop = true;
+          break;
+        }
+        case 'L': {
+          if (dir == Cardinal::kSouth) dir = Cardinal::kEast;
+          else if (dir == Cardinal::kWest) dir = Cardinal::kNorth;
+          else off_loop = true;
+          break;
+        }
+        default: {
+          off_loop = true;
+          break;
+        }
+      }
+      if (off_loop) break;
+    }
+  }
+  return {};
+}
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2023_10::Part1(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
-  absl::flat_hash_set<Point> start_set = b.Find('S');
-  if (start_set.size() != 1) return Error("Bad start");
-  Point start = *start_set.begin();
-  for (Point dir : Cardinal::kFourDirs) {
-    int loop_size = 0;
-    for (Point test = dir + start; b.OnBoard(test); test += dir) {
-      if (test == start) {
-        return AdventReturn((loop_size + 1) / 2);
-      }
-      ++loop_size;
-      if (b[test] == '.') break;
-      if (b[test] == '|')  {
-        if (dir != Cardinal::kNorth && dir != Cardinal::kSouth) break;
-      }
-      if (b[test] == '-')  {
-        if (dir != Cardinal::kEast && dir != Cardinal::kWest) break;
-      }
-      if (b[test] == 'F')  {
-        if (dir == Cardinal::kNorth) dir = Cardinal::kEast;
-        else if (dir == Cardinal::kWest) dir = Cardinal::kSouth;
-        else break;
-      }
-      if (b[test] == '7')  {
-        if (dir == Cardinal::kNorth) dir = Cardinal::kWest;
-        else if (dir == Cardinal::kEast) dir = Cardinal::kSouth;
-        else break;
-      }
-      if (b[test] == 'J')  {
-        if (dir == Cardinal::kSouth) dir = Cardinal::kWest;
-        else if (dir == Cardinal::kEast) dir = Cardinal::kNorth;
-        else break;
-      }
-      if (b[test] == 'L')  {
-        if (dir == Cardinal::kSouth) dir = Cardinal::kEast;
-        else if (dir == Cardinal::kWest) dir = Cardinal::kNorth;
-        else break;
-      }
-    }
-  }
-  return Error("No loop found");
+  std::vector<Point> loop = FindLoop(b);
+  if (loop.empty()) return Error("No loop found");
+  return AdventReturn((loop.size() + 1) / 2);
 }
 
 absl::StatusOr<std::string> Day_2023_10::Part2(
@@ -112,7 +134,7 @@ absl::StatusOr<std::string> Day_2023_10::Part2(
         int count_inside = 0;
         VLOG(1) << CharBoard::DrawNew(loop);
         CharBoard inside_draw = b;
-        for (const auto& [p, c] : b) {
+        for (const auto [p, c] : b) {
           if (p.x == 0 && upper_inside) return Error("Parity failure (upper)");
           if (p.x == 0 && lower_inside) return Error("Parity failure (lower)");
           VLOG(1) << p << "; " << upper_inside << "/" << lower_inside;
