@@ -44,6 +44,22 @@ absl::flat_hash_set<Point> CharBoardBase<is_mutable>::Find(char c) const {
 }
 
 template <bool is_mutable>
+absl::StatusOr<Point> CharBoardBase<is_mutable>::FindUnique(char c) const {
+  CHECK_NE(c, '\n');
+  bool found = false;
+  Point ret;
+  for (int i = 0; i < buf_.size(); ++i) {
+    if (buf_[i] == c) {
+      if (found) return absl::InvalidArgumentError("Not unique");
+      ret = {.x = i % stride_, .y = i / stride_};
+      found = true;
+    }
+  }
+  if (!found) return absl::NotFoundError("Not found");
+  return ret;
+}
+
+template <bool is_mutable>
 absl::flat_hash_set<Point> CharBoardBase<is_mutable>::Find(std::bitset<256> charset) const {
   absl::flat_hash_set<Point> ret;
   CHECK(!charset['\n']);

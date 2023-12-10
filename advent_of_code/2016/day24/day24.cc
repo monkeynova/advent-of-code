@@ -17,9 +17,7 @@ absl::StatusOr<std::string> Day_2016_24::Part1(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
 
-  absl::flat_hash_set<Point> start_set = b.Find('0');
-  if (start_set.size() != 1) return Error("No unique start");
-  Point start = *start_set.begin();
+  ASSIGN_OR_RETURN(Point start, b.FindUnique('0'));
 
   int need = 0;
   for (const auto [_, c] : b) {
@@ -51,9 +49,7 @@ absl::StatusOr<std::string> Day_2016_24::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
 
-  absl::flat_hash_set<Point> start_set = b.Find('0');
-  if (start_set.size() != 1) return Error("No unique start");
-  Point start = *start_set.begin();
+  ASSIGN_OR_RETURN(Point start, b.FindUnique('0'));
 
   int need = 0;
   for (const auto [_, c] : b) {

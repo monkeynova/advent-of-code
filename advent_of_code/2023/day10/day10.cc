@@ -176,9 +176,7 @@ absl::StatusOr<int> InsideSpace(const ImmutableCharBoard& b, std::vector<std::ve
 absl::StatusOr<std::string> Day_2023_10::Part1(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
-  absl::flat_hash_set<Point> start_set = b.Find('S');
-  if (start_set.size() != 1) return Error("Bad start");
-  Point start = *start_set.begin();
+  ASSIGN_OR_RETURN(Point start, b.FindUnique('S'));
   std::optional<int> loop_size = FindLoopSize(b, start);
   if (!loop_size) return AdventReturn(loop_size);
   return AdventReturn((*loop_size + 1) / 2);
@@ -187,9 +185,7 @@ absl::StatusOr<std::string> Day_2023_10::Part1(
 absl::StatusOr<std::string> Day_2023_10::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
-  absl::flat_hash_set<Point> start_set = b.Find('S');
-  if (start_set.size() != 1) return Error("Bad start");
-  Point start = *start_set.begin();
+  ASSIGN_OR_RETURN(Point start, b.FindUnique('S'));
   std::vector<std::vector<XAndC>> loop = FindLoop(b, start);
   if (loop.empty()) return Error("No loop found");
   return AdventReturn(InsideSpace(b, std::move(loop)));

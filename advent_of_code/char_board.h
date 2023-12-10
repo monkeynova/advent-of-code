@@ -66,6 +66,11 @@ class CharBoardBase {
   // fails (for example if not all lines have the same size).
   // `in` must allow multiple iterations and the iteration value must be
   // implicitly castable to std::string_view.
+  // If `is_mutable` is false (that is, this function is
+  // ImmutableCharBoard::Parse), `in` must be a collection of string_views
+  // which are the lines from the equivalent of absl::StrSplit(buf, "\n").
+  // That is they must be terminated with a '\n' off the string_view and
+  // the views must be contiguous in memory (around the 'n'). 
   template <typename Container>
   static absl::StatusOr<CharBoardBase> Parse(const Container& in);
 
@@ -134,15 +139,20 @@ class CharBoardBase {
   // individual cells on the board. It is undefined behavior to call with a
   // point outside of range().
   char at(Point p) const { return buf_[p.y * stride_ + p.x]; }
-  template <bool is_mutable_test = is_mutable, typename = std::enable_if_t<is_mutable_test>>
+  template <bool is_mutable_test = is_mutable,
+            typename = std::enable_if_t<is_mutable_test>>
   void set(Point p, char c) { buf_[p.y * stride_ + p.x] = c; }
 
   char operator[](Point p) const { return buf_[p.y * stride_ + p.x]; }
-  template <bool is_mutable_test = is_mutable, typename = std::enable_if_t<is_mutable_test>>
+  template <bool is_mutable_test = is_mutable,
+            typename = std::enable_if_t<is_mutable_test>>
   char& operator[](Point p) { return buf_[p.y * stride_ + p.x]; }
 
   // Retuns the set of points p such that at(p) == c.
   absl::flat_hash_set<Point> Find(char c) const;
+  // Returns the unique point such that at(p) == c. If 0 or more than 1 such
+  // points exists an error is returned.
+  absl::StatusOr<Point> FindUnique(char c) const;
   // Returns the set of points p such that charset[at(p)] is true.
   absl::flat_hash_set<Point> Find(std::bitset<256> charset) const;
 
@@ -157,7 +167,8 @@ class CharBoardBase {
   // Returns a CharBoard which represent the subset of `this` defined in
   // `sub_range`. If any part of `sub_range` is off of the board, returns an
   // error.
-  absl::StatusOr<CharBoardBase</*mutable=*/true>> SubBoard(PointRectangle sub_range) const;
+  absl::StatusOr<CharBoardBase</*mutable=*/true>> SubBoard(
+      PointRectangle sub_range) const;
 
   // A board is hashable, so implements AbslHashValue and operator==.
   template <typename H>
@@ -166,8 +177,12 @@ class CharBoardBase {
   }
   bool operator==(const CharBoardBase& o) const { return buf_ == o.buf_; }
   bool operator!=(const CharBoardBase& o) const { return !operator==(o); }
-  bool operator==(const CharBoardBase<!is_mutable>& o) const { return buf_ == o.buf_; }
-  bool operator!=(const CharBoardBase<!is_mutable>& o) const { return !operator==(o); }
+  bool operator==(const CharBoardBase<!is_mutable>& o) const {
+    return buf_ == o.buf_;
+  }
+  bool operator!=(const CharBoardBase<!is_mutable>& o) const {
+    return !operator==(o);
+  }
 
   // For debugging purposes, implements stringification.
   template <typename Sink>
@@ -183,7 +198,8 @@ class CharBoardBase {
   friend class CharBoardBase<!is_mutable>;
   CharBoardBase(int stride, std::string_view buf) : stride_(stride), buf_(buf) {}
 
-  template <bool is_mutable_test = is_mutable, typename = std::enable_if_t<is_mutable_test>>
+  template <bool is_mutable_test = is_mutable,
+            typename = std::enable_if_t<is_mutable_test>>
   char* stride(int y) { return buf_.data() + stride_ * y; }
   const char* stride(int y) const { return buf_.data() + stride_ * y; }
 
