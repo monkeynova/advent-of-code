@@ -4,7 +4,8 @@
 
 namespace advent_of_code {
 
-absl::StatusOr<CharBoard> CharBoard::SubBoard(PointRectangle sub_range) const {
+template <bool is_mutable>
+absl::StatusOr<CharBoard> CharBoardBase<is_mutable>::SubBoard(PointRectangle sub_range) const {
   if (!OnBoard(sub_range.min)) {
     return absl::InvalidArgumentError(
         absl::StrCat("SubBoard: min not on board: ", sub_range));
@@ -22,14 +23,16 @@ absl::StatusOr<CharBoard> CharBoard::SubBoard(PointRectangle sub_range) const {
   return out;
 }
 
-Point CharBoard::TorusPoint(Point p) const {
+template <bool is_mutable>
+Point CharBoardBase<is_mutable>::TorusPoint(Point p) const {
   Point ret = {p.x % width(), p.y % height()};
   if (ret.x < 0) ret.x += width();
   if (ret.y < 0) ret.y += height();
   return ret;
 }
 
-absl::flat_hash_set<Point> CharBoard::Find(char c) const {
+template <bool is_mutable>
+absl::flat_hash_set<Point> CharBoardBase<is_mutable>::Find(char c) const {
   absl::flat_hash_set<Point> ret;
   CHECK_NE(c, '\n');
   for (int i = 0; i < buf_.size(); ++i) {
@@ -40,7 +43,8 @@ absl::flat_hash_set<Point> CharBoard::Find(char c) const {
   return ret;
 }
 
-absl::flat_hash_set<Point> CharBoard::Find(std::bitset<256> charset) const {
+template <bool is_mutable>
+absl::flat_hash_set<Point> CharBoardBase<is_mutable>::Find(std::bitset<256> charset) const {
   absl::flat_hash_set<Point> ret;
   CHECK(!charset['\n']);
   for (int i = 0; i < buf_.size(); ++i) {
@@ -51,7 +55,8 @@ absl::flat_hash_set<Point> CharBoard::Find(std::bitset<256> charset) const {
   return ret;
 }
 
-int CharBoard::CountChar(char test) const {
+template <bool is_mutable>
+int CharBoardBase<is_mutable>::CountChar(char test) const {
   int count = 0;
   for (int i = 0; i < buf_.size(); ++i) {
     if (i % stride_ == stride_ - 1) continue;
@@ -59,5 +64,8 @@ int CharBoard::CountChar(char test) const {
   }
   return count;
 }
+
+template class CharBoardBase<false>;
+template class CharBoardBase<true>;
 
 }  // namespace advent_of_code

@@ -24,14 +24,15 @@ namespace advent_of_code {
 // #..#..#
 // ## ..##
 // #######
-class CharBoard {
+template <bool is_mutable = true>
+class CharBoardBase {
  public:
   class const_iterator {
    public:
-    static const_iterator begin(const CharBoard& board) {
+    static const_iterator begin(const CharBoardBase& board) {
       return const_iterator(board);
     }
-    static const_iterator end(const CharBoard& board) {
+    static const_iterator end(const CharBoardBase& board) {
       const_iterator ret(board);
       ret.it_ = ret.range_.end();
       return ret;
@@ -52,10 +53,10 @@ class CharBoard {
     }
 
    private:
-    const_iterator(const CharBoard& board)
+    const_iterator(const CharBoardBase& board)
         : board_(board), range_(board.range()), it_(range_.begin()) {}
 
-    const CharBoard& board_;
+    const CharBoardBase& board_;
     PointRectangle range_;
     PointRectangle::const_iterator it_;
   };
@@ -66,36 +67,38 @@ class CharBoard {
   // `in` must allow multiple iterations and the iteration value must be
   // implicitly castable to std::string_view.
   template <typename Container>
-  static absl::StatusOr<CharBoard> Parse(const Container& in);
+  static absl::StatusOr<CharBoardBase> Parse(const Container& in);
 
   // Sets each point in `points` in the board to '#'. If `bounds_ret` is not
   // nullptr, it contains the (inclusive) axis aligned bounding box for those
   // points.
   template <typename Container>
-  static CharBoard DrawNew(const Container& points,
-                           PointRectangle* bound_ret = nullptr) {
+  static CharBoardBase DrawNew(const Container& points,
+                               PointRectangle* bound_ret = nullptr) {
     PointRectangle bounds = PointRectangle::Bounding(points);
-    CharBoard ret(bounds);
+    CharBoardBase ret(bounds);
     for (Point p : points) ret[p - bounds.min] = '#';
     if (bound_ret != nullptr) *bound_ret = bounds;
     return ret;
   }
 
-  CharBoard() : CharBoard(0, 0) {}
+  CharBoardBase() : CharBoardBase(0, 0) {}
 
-  CharBoard(int width, int height)
+  template <bool is_mutable_test = is_mutable, typename = std::enable_if_t<is_mutable_test>>
+  CharBoardBase(int width, int height)
       : stride_(width + 1), buf_(stride_ * height, '.') {
     for (int i = stride_ - 1; i < buf_.size(); i += stride_) {
       buf_[i] = '\n';
     }
   }
 
-  explicit CharBoard(PointRectangle r)
-      : CharBoard(r.max.x >= r.min.x ? r.max.x - r.min.x + 1 : 0,
-                  r.max.y >= r.min.y ? r.max.y - r.min.y + 1 : 0) {}
+  template <bool is_mutable_test = is_mutable, typename = std::enable_if_t<is_mutable_test>>
+  explicit CharBoardBase(PointRectangle r)
+      : CharBoardBase(r.max.x >= r.min.x ? r.max.x - r.min.x + 1 : 0,
+                      r.max.y >= r.min.y ? r.max.y - r.min.y + 1 : 0) {}
 
-  CharBoard(const CharBoard&) = default;
-  CharBoard& operator=(const CharBoard&) = default;
+  CharBoardBase(const CharBoardBase&) = default;
+  CharBoardBase& operator=(const CharBoardBase&) = default;
 
   // Sets each point in `points` in the board to '#'. If `bounds_ret` is not
   // nullptr, it contains the (inclusive) axis aligned bounding box for those
@@ -131,9 +134,11 @@ class CharBoard {
   // individual cells on the board. It is undefined behavior to call with a
   // point outside of range().
   char at(Point p) const { return buf_[p.y * stride_ + p.x]; }
+  template <bool is_mutable_test = is_mutable, typename = std::enable_if_t<is_mutable_test>>
   void set(Point p, char c) { buf_[p.y * stride_ + p.x] = c; }
 
   char operator[](Point p) const { return buf_[p.y * stride_ + p.x]; }
+  template <bool is_mutable_test = is_mutable, typename = std::enable_if_t<is_mutable_test>>
   char& operator[](Point p) { return buf_[p.y * stride_ + p.x]; }
 
   // Retuns the set of points p such that at(p) == c.
@@ -152,19 +157,21 @@ class CharBoard {
   // Returns a CharBoard which represent the subset of `this` defined in
   // `sub_range`. If any part of `sub_range` is off of the board, returns an
   // error.
-  absl::StatusOr<CharBoard> SubBoard(PointRectangle sub_range) const;
+  absl::StatusOr<CharBoardBase</*mutable=*/true>> SubBoard(PointRectangle sub_range) const;
 
   // A board is hashable, so implements AbslHashValue and operator==.
   template <typename H>
-  friend H AbslHashValue(H h, const CharBoard& b) {
+  friend H AbslHashValue(H h, const CharBoardBase& b) {
     return H::combine(std::move(h), b.buf_);
   }
-  bool operator==(const CharBoard& o) const { return buf_ == o.buf_; }
-  bool operator!=(const CharBoard& o) const { return !operator==(o); }
+  bool operator==(const CharBoardBase& o) const { return buf_ == o.buf_; }
+  bool operator!=(const CharBoardBase& o) const { return !operator==(o); }
+  bool operator==(const CharBoardBase<!is_mutable>& o) const { return buf_ == o.buf_; }
+  bool operator!=(const CharBoardBase<!is_mutable>& o) const { return !operator==(o); }
 
   // For debugging purposes, implements stringification.
   template <typename Sink>
-  friend void AbslStringify(Sink& sink, const CharBoard& b) {
+  friend void AbslStringify(Sink& sink, const CharBoardBase& b) {
     absl::Format(&sink, "%s", b.buf_);
   }
 
@@ -173,6 +180,10 @@ class CharBoard {
   }
 
  private:
+  friend class CharBoardBase<!is_mutable>;
+  CharBoardBase(int stride, std::string_view buf) : stride_(stride), buf_(buf) {}
+
+  template <bool is_mutable_test = is_mutable, typename = std::enable_if_t<is_mutable_test>>
   char* stride(int y) { return buf_.data() + stride_ * y; }
   const char* stride(int y) const { return buf_.data() + stride_ * y; }
 
@@ -180,9 +191,13 @@ class CharBoard {
   // `stride_` bytes further in. `stride_` is width() + 1 so that we can
   // include '\n' on each line and make stringification trivial.
   int stride_;
-  std::string buf_;
+  std::conditional_t<is_mutable, std::string, std::string_view> buf_;
 };
 
+using CharBoard = CharBoardBase</*is_mutable=*/true>;
+using ImmutableCharBoard = CharBoardBase</*is_mutable=*/false>;
+
+template <>
 template <typename Container>
 absl::StatusOr<CharBoard> CharBoard::Parse(const Container& in) {
   // We do a 2-pass read of 'in' to allow Container to not support
@@ -210,6 +225,38 @@ absl::StatusOr<CharBoard> CharBoard::Parse(const Container& in) {
     dst += ret.stride_;
   }
   return ret;
+}
+
+template <>
+template <typename Container>
+absl::StatusOr<ImmutableCharBoard> ImmutableCharBoard::Parse(const Container& in) {
+  // We do a 2-pass read of 'in' to allow Container to not support
+  // empty()/operator[] calls. This is necessary to allow the value returned
+  // by absl::StrSplit to be passed directly in.
+  static_assert(
+      std::is_same_v<std::string_view, decltype(std::string_view(*in.begin()))>,
+      "Container must iterate over std::string_view");
+  int width = -1;
+  int height = 0;
+  std::string_view buf = "";
+  for (std::string_view line : in) {
+    ++height;
+    if (width == -1) {
+      width = line.size();
+    } else if (width != line.size()) {
+      return absl::InvalidArgumentError("Inconsistent width");
+    }
+    if (buf.empty()) {
+      buf = line;
+    } else if (buf.data() + buf.size() + 1 != line.data()) {
+      return absl::InvalidArgumentError("Not contiguous");
+    } else if (line.data()[-1] != '\n') {
+      return absl::InvalidArgumentError("Not broken correctly");
+    } else {
+      buf = std::string_view(buf.data(), buf.size() + 1 + line.size());
+    }
+  }
+  return ImmutableCharBoard(width, buf);
 }
 
 }  // namespace advent_of_code
