@@ -44,6 +44,48 @@ char StartType(Point orig_dir, Point dir) {
   return '?';
 }
 
+inline Point AdjustDir(Point dir, char c) {
+  switch (c) {
+    case '|': {
+      if (dir != Cardinal::kNorth && dir != Cardinal::kSouth) {
+        return Cardinal::kOrigin;
+      }
+      return dir;
+    }
+    case '-': {
+      if (dir != Cardinal::kEast && dir != Cardinal::kWest) {
+        return Cardinal::kOrigin;
+      }
+      return dir;
+    }
+    case 'F': {
+      if (dir == Cardinal::kNorth) return Cardinal::kEast;
+      else if (dir == Cardinal::kWest) return Cardinal::kSouth;
+      else return Cardinal::kOrigin;
+      break;
+    }
+    case '7': {
+      if (dir == Cardinal::kNorth) return Cardinal::kWest;
+      else if (dir == Cardinal::kEast) return Cardinal::kSouth;
+      else return Cardinal::kOrigin;
+      break;
+    }
+    case 'J': {
+      if (dir == Cardinal::kSouth) return Cardinal::kWest;
+      else if (dir == Cardinal::kEast) return Cardinal::kNorth;
+      else return Cardinal::kOrigin;
+      break;
+    }
+    case 'L': {
+      if (dir == Cardinal::kSouth) return Cardinal::kEast;
+      else if (dir == Cardinal::kWest) return Cardinal::kNorth;
+      else return Cardinal::kOrigin;
+      break;
+    }
+  }
+  return Cardinal::kOrigin;
+}
+
 std::optional<int> FindLoopSize(const CharBoard& b, Point start) {
   for (Point dir : Cardinal::kFourDirs) {
     int loop_size = 0;
@@ -52,50 +94,8 @@ std::optional<int> FindLoopSize(const CharBoard& b, Point start) {
       if (test == start) {
         return loop_size;
       }
-      bool off_loop = false;
-      switch (b[test]) {
-        case '|': {
-          if (dir != Cardinal::kNorth && dir != Cardinal::kSouth) {
-            off_loop = true;
-          }
-          break;
-        }
-        case '-': {
-          if (dir != Cardinal::kEast && dir != Cardinal::kWest) {
-            off_loop = true;
-          }
-          break;
-        }
-        case 'F': {
-          if (dir == Cardinal::kNorth) dir = Cardinal::kEast;
-          else if (dir == Cardinal::kWest) dir = Cardinal::kSouth;
-          else off_loop = true;
-          break;
-        }
-        case '7': {
-          if (dir == Cardinal::kNorth) dir = Cardinal::kWest;
-          else if (dir == Cardinal::kEast) dir = Cardinal::kSouth;
-          else off_loop = true;
-          break;
-        }
-        case 'J': {
-          if (dir == Cardinal::kSouth) dir = Cardinal::kWest;
-          else if (dir == Cardinal::kEast) dir = Cardinal::kNorth;
-          else off_loop = true;
-          break;
-        }
-        case 'L': {
-          if (dir == Cardinal::kSouth) dir = Cardinal::kEast;
-          else if (dir == Cardinal::kWest) dir = Cardinal::kNorth;
-          else off_loop = true;
-          break;
-        }
-        default: {
-          off_loop = true;
-          break;
-        }
-      }
-      if (off_loop) break;
+      dir = AdjustDir(dir, b[test]);
+      if (dir == Cardinal::kOrigin) break;
     }
   }
   return {};
@@ -124,50 +124,8 @@ std::vector<std::vector<XAndC>> FindLoop(const CharBoard& b, Point start) {
       }
       char c = b[test];
       ret[test.y].push_back({.x = static_cast<int16_t>(test.x), .c = c});
-      bool off_loop = false;
-      switch (c) {
-        case '|': {
-          if (dir != Cardinal::kNorth && dir != Cardinal::kSouth) {
-            off_loop = true;
-          }
-          break;
-        }
-        case '-': {
-          if (dir != Cardinal::kEast && dir != Cardinal::kWest) {
-            off_loop = true;
-          }
-          break;
-        }
-        case 'F': {
-          if (dir == Cardinal::kNorth) dir = Cardinal::kEast;
-          else if (dir == Cardinal::kWest) dir = Cardinal::kSouth;
-          else off_loop = true;
-          break;
-        }
-        case '7': {
-          if (dir == Cardinal::kNorth) dir = Cardinal::kWest;
-          else if (dir == Cardinal::kEast) dir = Cardinal::kSouth;
-          else off_loop = true;
-          break;
-        }
-        case 'J': {
-          if (dir == Cardinal::kSouth) dir = Cardinal::kWest;
-          else if (dir == Cardinal::kEast) dir = Cardinal::kNorth;
-          else off_loop = true;
-          break;
-        }
-        case 'L': {
-          if (dir == Cardinal::kSouth) dir = Cardinal::kEast;
-          else if (dir == Cardinal::kWest) dir = Cardinal::kNorth;
-          else off_loop = true;
-          break;
-        }
-        default: {
-          off_loop = true;
-          break;
-        }
-      }
-      if (off_loop) break;
+      dir = AdjustDir(dir, c);
+      if (dir == Cardinal::kOrigin) break;
     }
   }
   return {};
