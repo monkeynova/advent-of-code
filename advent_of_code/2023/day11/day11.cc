@@ -28,18 +28,100 @@ namespace advent_of_code {
 
 namespace {
 
+
 // Helper methods go here.
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2023_11::Part1(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  absl::flat_hash_set<Point> galaxies_set = b.Find('#');
+  std::vector<Point> galaxies(galaxies_set.begin(), galaxies_set.end());
+  {
+    std::vector<bool> x_hit(b.width(), false);
+    for (Point p : galaxies) x_hit[p.x] = true;
+    VLOG(1) << absl::StrJoin(x_hit, ",");
+    for (Point& p : galaxies) {
+      int delta_x = 0;
+      for (int x = 0; x < p.x; ++x) {
+        if (!x_hit[x]) ++delta_x;
+      }
+      VLOG(2) << p << " += {" << delta_x << ",0}";
+      p.x += delta_x;
+    }
+  }
+  {
+    std::vector<bool> y_hit(b.height(), false);
+    for (Point p : galaxies) y_hit[p.y] = true;
+    VLOG(1) << absl::StrJoin(y_hit, ",");
+    for (Point& p : galaxies) {
+      int delta_y = 0;
+      for (int y = 0; y < p.y; ++y) {
+        if (!y_hit[y]) ++delta_y;
+      }
+      VLOG(2) << p << " += {0," << delta_y << "}";
+      p.y += delta_y;
+    }
+  }
+  int total_dist = 0;
+  for (int i = 0; i < galaxies.size(); ++i) {
+    Point p1 = galaxies[i];
+    for (int j = i + 1; j < galaxies.size(); ++j) {
+      Point p2 = galaxies[j];
+      VLOG(2) << p1 << "-" << p2 << " = " << (p1 - p2).dist();
+      total_dist += (p1 - p2).dist();
+    }
+  }
+  return AdventReturn(total_dist);
 }
 
 absl::StatusOr<std::string> Day_2023_11::Part2(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  ASSIGN_OR_RETURN(int64_t expand, IntParam());
+  VLOG(1) << expand;
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  absl::flat_hash_set<Point> galaxies_set = b.Find('#');
+  std::vector<Point> galaxies(galaxies_set.begin(), galaxies_set.end());
+  int64_t test = b.width();
+  test *= expand;
+  CHECK_LT(test, std::numeric_limits<int>::max());
+  {
+    std::vector<bool> x_hit(b.width(), false);
+    for (Point p : galaxies) x_hit[p.x] = true;
+    VLOG(1) << absl::StrJoin(x_hit, ",");
+    for (Point& p : galaxies) {
+      int delta_x = 0;
+      for (int x = 0; x < p.x; ++x) {
+        if (!x_hit[x]) delta_x += expand - 1;
+      }
+      VLOG(2) << p << " += {" << delta_x << ",0}";
+      p.x += delta_x;
+    }
+  }
+  {
+    std::vector<bool> y_hit(b.height(), false);
+    for (Point p : galaxies) y_hit[p.y] = true;
+    VLOG(1) << absl::StrJoin(y_hit, ",");
+    for (Point& p : galaxies) {
+      int delta_y = 0;
+      for (int y = 0; y < p.y; ++y) {
+        if (!y_hit[y]) delta_y += expand - 1;
+      }
+      VLOG(2) << p << " += {0," << delta_y << "}";
+      p.y += delta_y;
+    }
+  }
+  int64_t total_dist = 0;
+  for (int i = 0; i < galaxies.size(); ++i) {
+    Point p1 = galaxies[i];
+    for (int j = i + 1; j < galaxies.size(); ++j) {
+      Point p2 = galaxies[j];
+      VLOG(2) << p1 << "-" << p2 << " = " << (p1 - p2).dist();
+      total_dist += (p1 - p2).dist();
+    }
+  }
+  return AdventReturn(total_dist);
 }
 
 }  // namespace advent_of_code
