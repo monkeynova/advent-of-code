@@ -13,9 +13,13 @@ namespace {
 
 struct Range {
   static absl::StatusOr<Range> Parse(std::string_view line) {
-    ASSIGN_OR_RETURN(std::vector<int64_t> vals, ParseAsInts(absl::StrSplit(line, " ")));
-    if (vals.size() != 3) return Error("Bad range size");
-    return Range{vals[0], vals[1], vals[2]};
+    Tokenizer tok(line);
+    Range ret;
+    ASSIGN_OR_RETURN(ret.dest_start, tok.NextInt());
+    ASSIGN_OR_RETURN(ret.src_start, tok.NextInt());
+    ASSIGN_OR_RETURN(ret.len, tok.NextInt());
+    if (!tok.Done()) return Error("Bad range size");
+    return ret;
   }
   struct BySrcStart {
     bool operator()(Range a, Range b) const {
@@ -153,12 +157,18 @@ Interval1D Map::Apply(Interval1D i_int) {
 
 absl::StatusOr<std::string> Day_2023_05::Part1(
     absl::Span<std::string_view> input) const {
-  auto [type, val_str] = PairSplit(input[0], ": ");
-  type = absl::StripSuffix(type, "s"); // seeds -> seed.
+  Tokenizer tok(input[0]);
+  RETURN_IF_ERROR(tok.NextIs("seeds"));
+  RETURN_IF_ERROR(tok.NextIs(":"));
+  std::string_view type = "seed";
 
-  ASSIGN_OR_RETURN(std::vector<int64_t> vals, ParseAsInts(absl::StrSplit(val_str, " ")));
+  std::vector<int64_t> vals;
+  while (!tok.Done()) {
+    vals.emplace_back();
+    ASSIGN_OR_RETURN(vals.back(), tok.NextInt());
+  }
+
   if (!input[1].empty()) return Error("No empty line");
-
   bool was_empty = true;
   Map map;
   for (int i = 2; i < input.size(); ++i) {
@@ -190,14 +200,16 @@ absl::StatusOr<std::string> Day_2023_05::Part1(
 
 absl::StatusOr<std::string> Day_2023_05::Part2(
     absl::Span<std::string_view> input) const {
-  auto [type, val_str] = PairSplit(input[0], ": ");
-  type = absl::StripSuffix(type, "s"); // seeds -> seed.
+  Tokenizer tok(input[0]);
+  RETURN_IF_ERROR(tok.NextIs("seeds"));
+  RETURN_IF_ERROR(tok.NextIs(":"));
+  std::string_view type = "seed";
 
-  ASSIGN_OR_RETURN(std::vector<int64_t> pre_vals, ParseAsInts(absl::StrSplit(val_str, " ")));
-  if (pre_vals.size() % 2 != 0) return Error("Not even");
   Interval1D vals;
-  for (int i = 0; i < pre_vals.size(); i += 2) {
-    vals = vals.Union(Interval1D(pre_vals[i], pre_vals[i] + pre_vals[i+1]));
+  while (!tok.Done()) {
+    ASSIGN_OR_RETURN(int64_t pos, tok.NextInt());
+    ASSIGN_OR_RETURN(int64_t len, tok.NextInt());
+    vals = vals.Union(Interval1D(pos, pos + len));
   }
 
   if (!input[1].empty()) return Error("No empty line");
