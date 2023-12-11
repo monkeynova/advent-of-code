@@ -87,6 +87,7 @@ class CharBoardBase {
     return ret;
   }
 
+  template <bool is_mutable_test = is_mutable, typename = std::enable_if<is_mutable_test>>
   CharBoardBase() : CharBoardBase(0, 0) {}
 
   template <bool is_mutable_test = is_mutable, typename = std::enable_if_t<is_mutable_test>>

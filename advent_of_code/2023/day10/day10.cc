@@ -114,16 +114,17 @@ absl::StatusOr<int> InsideSpace(const ImmutableCharBoard& b,
   // kInsideTransition describes how that changed with a given char on the
   // board.
   static const std::array<std::array<char, 4>, 128> kInsideTransition = []() {
+    constexpr char kBad = static_cast<char>(-1);
     std::array<std::array<char, 4>, 128> ret;
     for (int i = 0; i < ret.size(); ++i) {
-      ret[i] = std::array<char, 4>{-1, -1, -1, -1};
+      ret[i] = std::array<char, 4>{kBad, kBad, kBad, kBad};
     }
-    ret['|'] = std::array<char, 4>{3, -1, -1, 0};
+    ret['|'] = std::array<char, 4>{3, kBad, kBad, 0};
     ret['-'] = std::array<char, 4>{0, 1, 2, 3};
     ret['J'] = std::array<char, 4>{0, 3, 0, 3};
     ret['7'] = std::array<char, 4>{0, 0, 3, 3};
-    ret['L'] = std::array<char, 4>{2, -1, -1, 1};
-    ret['F'] = std::array<char, 4>{1, -1, -1, 2};
+    ret['L'] = std::array<char, 4>{2, kBad, kBad, 1};
+    ret['F'] = std::array<char, 4>{1, kBad, kBad, 2};
     return ret;
   }();
 
