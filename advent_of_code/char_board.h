@@ -150,6 +150,7 @@ class CharBoardBase {
 
   // Retuns the set of points p such that at(p) == c.
   absl::flat_hash_set<Point> Find(char c) const;
+  std::vector<Point> FindVec(char c) const;
   // Returns the unique point such that at(p) == c. If 0 or more than 1 such
   // points exists an error is returned.
   absl::StatusOr<Point> FindUnique(char c) const;

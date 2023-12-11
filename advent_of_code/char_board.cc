@@ -44,6 +44,18 @@ absl::flat_hash_set<Point> CharBoardBase<is_mutable>::Find(char c) const {
 }
 
 template <bool is_mutable>
+std::vector<Point> CharBoardBase<is_mutable>::FindVec(char c) const {
+  std::vector<Point> ret;
+  CHECK_NE(c, '\n');
+  for (int i = 0; i < buf_.size(); ++i) {
+    if (buf_[i] == c) {
+      ret.push_back({.x = i % stride_, .y = i / stride_});
+    }
+  }
+  return ret;
+}
+
+template <bool is_mutable>
 absl::StatusOr<Point> CharBoardBase<is_mutable>::FindUnique(char c) const {
   CHECK_NE(c, '\n');
   bool found = false;

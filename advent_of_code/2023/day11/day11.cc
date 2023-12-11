@@ -29,31 +29,29 @@ namespace advent_of_code {
 namespace {
 
 void Expand(std::vector<Point>& galaxies, int width, int height, int size) {
+  std::vector<int> x_expand(width, false);
+  std::vector<int> y_expand(height, false);
+  for (Point p : galaxies) {
+    x_expand[p.x] = 1;
+    y_expand[p.y] = 1;
+  }
   {
-    std::vector<bool> x_hit(width, false);
-    for (Point p : galaxies) x_hit[p.x] = true;
-    VLOG(1) << absl::StrJoin(x_hit, ",");
-    for (Point& p : galaxies) {
-      int delta_x = 0;
-      for (int x = 0; x < p.x; ++x) {
-        if (!x_hit[x]) delta_x += size - 1;
-      }
-      VLOG(2) << p << " += {" << delta_x << ",0}";
-      p.x += delta_x;
+    int total = 0;
+    for (int& i : x_expand) {
+      if (i == 0) total += size - 1;
+      i = total;
     }
   }
   {
-    std::vector<bool> y_hit(height, false);
-    for (Point p : galaxies) y_hit[p.y] = true;
-    VLOG(1) << absl::StrJoin(y_hit, ",");
-    for (Point& p : galaxies) {
-      int delta_y = 0;
-      for (int y = 0; y < p.y; ++y) {
-        if (!y_hit[y]) delta_y += size - 1;
-      }
-      VLOG(2) << p << " += {0," << delta_y << "}";
-      p.y += delta_y;
+    int total = 0;
+    for (int& i : y_expand) {
+      if (i == 0) total += size - 1;
+      i = total;
     }
+  }
+  for (Point& p : galaxies) {
+    p.x += x_expand[p.x];
+    p.y += y_expand[p.y];
   }
 }
 
@@ -74,9 +72,8 @@ int64_t TotalPairDist(const std::vector<Point>& galaxies) {
 
 absl::StatusOr<std::string> Day_2023_11::Part1(
     absl::Span<std::string_view> input) const {
-  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
-  absl::flat_hash_set<Point> galaxies_set = b.Find('#');
-  std::vector<Point> galaxies(galaxies_set.begin(), galaxies_set.end());
+  ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
+  std::vector<Point> galaxies = b.FindVec('#');
   Expand(galaxies, b.width(), b.height(), 2);
   return AdventReturn(TotalPairDist(galaxies));
 }
@@ -84,9 +81,8 @@ absl::StatusOr<std::string> Day_2023_11::Part1(
 absl::StatusOr<std::string> Day_2023_11::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(int64_t expand, IntParam());
-  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
-  absl::flat_hash_set<Point> galaxies_set = b.Find('#');
-  std::vector<Point> galaxies(galaxies_set.begin(), galaxies_set.end());
+  ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
+  std::vector<Point> galaxies = b.FindVec('#');
   Expand(galaxies, b.width(), b.height(), expand);
   return AdventReturn(TotalPairDist(galaxies));
 }
