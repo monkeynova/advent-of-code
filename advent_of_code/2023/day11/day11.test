@@ -54,7 +54,7 @@
 8410
 ==
 
-# 21366708 (low --)
+# 21366708 (low -- blew out an int32 on total, but not points)
 [part=2]
 [param=1000000]
 @include{advent_of_code/2023/day11/input.txt}
