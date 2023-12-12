@@ -20,13 +20,13 @@ ZZZ = (ZZZ, ZZZ)
 [part=2]
 LR
 
-11A = (11B, XXX)
-11B = (XXX, 11Z)
-11Z = (11B, XXX)
-22A = (22B, XXX)
-22B = (22C, 22C)
-22C = (22Z, 22Z)
-22Z = (22B, 22B)
+DDA = (DDB, XXX)
+DDB = (XXX, DDZ)
+DDZ = (DDB, XXX)
+EEA = (EEB, XXX)
+EEB = (EEC, EEC)
+EEC = (EEZ, EEZ)
+EEZ = (EEB, EEB)
 XXX = (XXX, XXX)
 --
 6

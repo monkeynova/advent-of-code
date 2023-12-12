@@ -31,7 +31,7 @@ namespace {
 
 class Map {
  public:
-  Map() = default;
+  Map() : name_to_id_(26 * 26 * 26, -1) {}
 
   absl::Status SetDirs(std::string_view lr) {
     dir_.clear();
@@ -46,10 +46,8 @@ class Map {
     return absl::OkStatus();
   }
 
-  std::optional<int> FindLoc(std::array<char, 3> loc) {
-    auto it = name_to_id_.find(loc);
-    if (it == name_to_id_.end()) return std::nullopt;
-    return it->second;
+  int FindLoc(std::array<char, 3> loc) {
+    return name_to_id_[Encode(loc)];
   }
 
   absl::Status AddLine(std::string_view line);
@@ -58,8 +56,8 @@ class Map {
     return {steps % dir_.size(), loc};
   }
 
-  std::vector<int> GhostStarts() const;
-  std::vector<bool> GhostEnds() const;
+  const std::vector<int>& GhostStarts() const { return ghost_starts_; }
+  const std::vector<bool>& GhostEnds() const { return ghost_ends_; }
 
   int Advance(int step_idx, int loc) const {
     if (dir_[step_idx]) {
@@ -69,60 +67,55 @@ class Map {
   }
 
  private:
+  int Encode(std::array<char, 3> loc) {
+    return (loc[0] - 'A') * 26 * 26 + (loc[1] - 'A') * 26 + (loc[2] - 'A');
+  }
+
   std::vector<bool> dir_;
-  absl::flat_hash_map<std::array<char, 3>, int16_t> name_to_id_;
+  std::vector<int16_t> name_to_id_;
+  std::vector<int> ghost_starts_;
+  std::vector<bool> ghost_ends_;
   std::vector<std::pair<int16_t, int16_t>> map_;
 };
 
-std::vector<int> Map::GhostStarts() const {
-  std::vector<int> ret;
-  for (const auto& [name, id] : name_to_id_) {
-    if (name.back() == 'A') ret.push_back(id);
-  }
-  return ret;
-}
-
-std::vector<bool> Map::GhostEnds() const {
-  std::vector<bool> ret(map_.size(), false);
-  for (const auto& [name, id] : name_to_id_) {
-    if (name.back() == 'Z') ret[id] = true;
-  }
-  return ret;
-}
-
 absl::Status Map::AddLine(std::string_view line) {
   if (line.size() != 16) return Error("Bad line");
-  std::array<char, 3> from = {line[0], line[1], line[2]};
-  auto [from_it, from_inserted] = name_to_id_.emplace(from, name_to_id_.size());
-  if (from_inserted) {
+  int from_loc = Encode({line[0], line[1], line[2]});
+  if (name_to_id_[from_loc] == -1) {
+    name_to_id_[from_loc] = map_.size();
     map_.push_back({-1, -1});
+    ghost_ends_.push_back(false);
   }
-  int from_id = from_it->second;
+  int from_id = name_to_id_[from_loc];
+  if (line[2] == 'A') ghost_starts_.push_back(from_id);
+  else if (line[2] == 'Z') ghost_ends_[from_id] = true;
 
   if (line.substr(3, 4) != " = (") return Error("Bad line");
 
-  std::array<char, 3> l = {line[7], line[8], line[9]};
-  auto [l_it, l_inserted] = name_to_id_.emplace(l, name_to_id_.size());
-  if (l_inserted) {
+  int l_loc = Encode({line[7], line[8], line[9]});
+  if (name_to_id_[l_loc] == -1) {
+    name_to_id_[l_loc] = map_.size();
     map_.push_back({-1, -1});
+    ghost_ends_.push_back(false);
   }
-  int l_id = l_it->second;
+  int l_id = name_to_id_[l_loc];
 
   if (line.substr(10, 2) != ", ") return Error("Bad line");
 
-  std::array<char, 3> r = {line[12], line[13], line[14]};
-  auto [r_it, r_inserted] = name_to_id_.emplace(r, name_to_id_.size());
-  if (r_inserted) {
+  int r_loc = Encode({line[12], line[13], line[14]});
+  if (name_to_id_[r_loc] == -1) {
+    name_to_id_[r_loc] = map_.size();
     map_.push_back({-1, -1});
+    ghost_ends_.push_back(false);
   }
-  int r_id = r_it->second;
+  int r_id = name_to_id_[r_loc];
 
   if (line.substr(15, 1) != ")") return Error("Bad line");
 
   map_[from_id].first = l_id;
   map_[from_id].second = r_id;
 
-  CHECK_EQ(name_to_id_.size(), map_.size());
+  CHECK_EQ(ghost_ends_.size(), map_.size());
 
   return absl::OkStatus();
 }
