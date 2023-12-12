@@ -28,39 +28,10 @@ namespace advent_of_code {
 
 namespace {
 
-int CountAllPossibleSave(std::string_view pre, absl::Span<const int64_t> range) {
-  std::vector<int> to_try;
-  for (int i = 0; i < pre.size(); ++i) {
-    if (pre[i] == '?') to_try.push_back(i);
-  }
-  int possible = 0;
-  for (int bv = 0; bv < (1 << to_try.size()); ++bv) {
-    std::string filled(pre);
-    for (int i = 0; i < to_try.size(); ++i) {
-      filled[to_try[i]] = (bv & (1 << i)) ? '.' : '#';
-    }
-    std::vector<int64_t> found_range;
-    std::optional<int> cur_range;
-    for (int i = 0; i < filled.size(); ++i) {
-      if (cur_range) {
-        if (filled[i] == '#') ++*cur_range;
-        else {
-          found_range.push_back(*cur_range);
-          cur_range = std::nullopt;
-        }
-      } else if (filled[i] == '#') {
-        cur_range = 1;
-      }
-    }
-    if (cur_range) found_range.push_back(*cur_range);
-    VLOG(1) << filled << " -> " << absl::StrJoin(found_range, ",");
-    if (range == found_range) ++possible;
-  }
-  return possible;
-}
-
-struct Memo {
-  struct Key {
+class Memo {
+ public:
+  class Key {
+   public:
     Key(std::string_view pre, absl::Span<const int64_t> range, int cur_range)
      : pre_size_(pre.size()), range_size_(range.size()), cur_range_(cur_range) {}
   
@@ -72,33 +43,40 @@ struct Memo {
       return H::combine(std::move(h), m.pre_size_, m.range_size_, m.cur_range_);
     }
    private:
+    friend class Memo;
+
     int pre_size_;
     int range_size_;
     int cur_range_;  
   };
 
   Memo(std::string_view max_pre, absl::Span<const int64_t> max_range)
-   : max_pre_(max_pre.size()), max_range_(max_range.size()) {
-    max_cur_range_ = absl::c_accumulate(
+   : max_pre_(max_pre.size() + 1), max_range_(max_range.size() + 1) {
+    max_cur_range_ = 1 + absl::c_accumulate(
       max_range, static_cast<int64_t>(0),
       [](int64_t a, int64_t b) { return std::max(a, b); });
+    map_.resize(max_pre_ * max_range_ * max_cur_range_, -1);
   }
 
-  std::optional<int64_t> Find(const Key& key) {
-    auto it = map_.find(key);
-    if (it == map_.end()) return std::nullopt;
-    return it->second;
+  int64_t Find(const Key& key) {
+    return map_[KeyIdx(key)];
   }
 
   int64_t Set(const Key& key, int64_t val) {
-    return map_[key] = val;
+    return map_[KeyIdx(key)] = val;
   }
 
  private:
+  int KeyIdx(const Key& key) {
+    return key.pre_size_ * max_range_ * max_cur_range_ +
+      key.range_size_ * max_cur_range_ +
+      key.cur_range_;
+  }
+
   int max_pre_;
   int max_range_;
   int max_cur_range_;
-  absl::flat_hash_map<Key, int64_t> map_;
+  std::vector<int64_t> map_;
 };
 
 int64_t CountAllPossible(Memo* memo, std::string_view pre, absl::Span<const int64_t> range, int cur_range) {
@@ -112,8 +90,8 @@ int64_t CountAllPossible(Memo* memo, std::string_view pre, absl::Span<const int6
   if (!range.empty() && cur_range > range[0]) return 0;
 
   Memo::Key key(pre, range, cur_range);
-  std::optional<int64_t> from_memo = memo->Find(key);
-  if (from_memo) return *from_memo;
+  int64_t from_memo = memo->Find(key);
+  if (from_memo != -1) return from_memo;
 
   int64_t total = 0;
   if (pre[0] == '#' || pre[0] == '?') {
