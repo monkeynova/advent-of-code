@@ -77,6 +77,13 @@ struct Memo {
     int cur_range_;  
   };
 
+  Memo(std::string_view max_pre, absl::Span<const int64_t> max_range)
+   : max_pre_(max_pre.size()), max_range_(max_range.size()) {
+    max_cur_range_ = absl::c_accumulate(
+      max_range, static_cast<int64_t>(0),
+      [](int64_t a, int64_t b) { return std::max(a, b); });
+  }
+
   std::optional<int64_t> Find(const Key& key) {
     auto it = map_.find(key);
     if (it == map_.end()) return std::nullopt;
@@ -88,13 +95,13 @@ struct Memo {
   }
 
  private:
+  int max_pre_;
+  int max_range_;
+  int max_cur_range_;
   absl::flat_hash_map<Key, int64_t> map_;
 };
 
 int64_t CountAllPossible(Memo* memo, std::string_view pre, absl::Span<const int64_t> range, int cur_range) {
-  Memo::Key key(pre, range, cur_range);
-  std::optional<int64_t> from_memo = memo->Find(key);
-  if (from_memo) return *from_memo;
   VLOG(3) << "CountAllPossible(" << pre << ",{" << absl::StrJoin(range, ",") << "}, " << cur_range << ")";
   if (pre.empty()) {
     if (cur_range == 0 && range.empty()) return 1;
@@ -103,6 +110,10 @@ int64_t CountAllPossible(Memo* memo, std::string_view pre, absl::Span<const int6
   }
   if (range.empty() && cur_range > 0) return 0;
   if (!range.empty() && cur_range > range[0]) return 0;
+
+  Memo::Key key(pre, range, cur_range);
+  std::optional<int64_t> from_memo = memo->Find(key);
+  if (from_memo) return *from_memo;
 
   int64_t total = 0;
   if (pre[0] == '#' || pre[0] == '?') {
@@ -123,7 +134,7 @@ int64_t CountAllPossible(Memo* memo, std::string_view pre, absl::Span<const int6
 }
 
 int64_t CountAllPossible(std::string_view pre, absl::Span<const int64_t> range) {
-  Memo memo;
+  Memo memo(pre, range);
   return CountAllPossible(&memo, pre, range, 0);
 }
 
