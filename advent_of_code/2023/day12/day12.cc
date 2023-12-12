@@ -61,20 +61,20 @@ int CountAllPossibleSave(std::string_view pre, absl::Span<const int64_t> range) 
 
 struct Memo {
   struct Key {
-    Key(std::string_view pre_, absl::Span<const int64_t> range_, int cur_range_)
-     : pre(pre_), range(range_.begin(), range_.end()), cur_range(cur_range_) {}
-  
-    std::string pre;
-    std::vector<int64_t> range;
-    int cur_range;
+    Key(std::string_view pre, absl::Span<const int64_t> range, int cur_range)
+     : pre_size_(pre.size()), range_size_(range.size()), cur_range_(cur_range) {}
   
     bool operator==(const Key& o) const {
-      return pre == o.pre && range == o.range && cur_range == o.cur_range;
+      return pre_size_ == o.pre_size_ && range_size_ == o.range_size_ && cur_range_ == o.cur_range_;
     }
     template <typename H>
     friend H AbslHashValue(H h, const Key& m) {
-      return H::combine(std::move(h), m.pre, m.range, m.cur_range);
+      return H::combine(std::move(h), m.pre_size_, m.range_size_, m.cur_range_);
     }
+   private:
+    int pre_size_;
+    int range_size_;
+    int cur_range_;  
   };
 
   std::optional<int64_t> Find(const Key& key) {
