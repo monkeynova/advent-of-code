@@ -13,51 +13,49 @@ namespace {
 class Memo {
  public:
   Memo(std::string_view max_pre, absl::Span<const int64_t> max_range)
-   : max_pre_(max_pre.size() + 1), max_range_(max_range.size() + 1) {
+   : pre_(max_pre), range_(max_range), max_pre_(max_pre.size() + 1), max_range_(max_range.size() + 1) {
     map_.resize(max_pre_ * max_range_ * 2, -1);
   }
 
-  int Key(std::string_view pre, absl::Span<const int64_t> range) {
-    return pre.size() * max_range_ +
-      range.size();
-  }
+  int64_t CountAllPossible();
 
-  int64_t Find(int key) {
-    return map_[key];
-  }
+ private:
+  int64_t CountAllPossible(std::string_view pre, absl::Span<const int64_t> range, absl::Span<const int> needed);
 
   int64_t Set(int key, int64_t val) {
     return map_[key] = val;
   }
 
- private:
+  std::string_view pre_;
+  absl::Span<const int64_t> range_;
+  std::vector<int> needed_;
   int max_pre_;
   int max_range_;
   std::vector<int64_t> map_;
 };
 
-int64_t CountAllPossible(
-    Memo* memo, std::string_view pre, absl::Span<const int64_t> range,
+int64_t Memo::CountAllPossible(
+    std::string_view pre, absl::Span<const int64_t> range,
     absl::Span<const int> needed) {
-  int key = memo->Key(pre, range);
-  int64_t from_memo = memo->Find(key);
+  int key = pre.size() * max_range_ + range.size();
+  int64_t from_memo = map_[key];
   if (from_memo != -1) return from_memo;
 
   CHECK_EQ(range.size(), needed.size());
 
   if (pre.empty()) {
-    if (range.empty()) return memo->Set(key, 1);
-    return memo->Set(key, 0);
+    if (range.empty()) return map_[key] = 1;
+    return map_[key] = 0;
   }
   if (range.empty()) {
     if (absl::c_all_of(pre, [](char c) { return c != '#'; })) {
-      return memo->Set(key, 1);
+      return map_[key] = 1;
     }
-    return memo->Set(key, 0);
+    return map_[key] = 0;
   }
 
   if (needed[0] > pre.size()) {
-    return memo->Set(key, 0);
+    return map_[key] = 0;
   }
 
   int64_t total = 0;
@@ -76,28 +74,31 @@ int64_t CountAllPossible(
     } else if (pre[check_size] == '#') { 
       // Can't match ('####', 3).
     } else {
-      total += CountAllPossible(memo, pre.substr(check_size + 1),
+      total += CountAllPossible(pre.substr(check_size + 1),
                                 range.subspan(1), needed.subspan(1));
     }
   }
   if (pre[0] == '.' || pre[0] == '?') {
-    total += CountAllPossible(memo, pre.substr(1), range, needed);
+    total += CountAllPossible(pre.substr(1), range, needed);
   }
 
-  return memo->Set(key, total);
+  return map_[key] = total;
+}
+
+int64_t Memo::CountAllPossible() {
+  needed_ = std::vector<int>(range_.size(), 0);
+  needed_.back() = range_.back();
+  for (int i = range_.size() - 2; i >= 0; --i) {
+    needed_[i] = needed_[i + 1] + range_[i] + 1;
+  }
+  VLOG(2) << "... - " << absl::StrJoin(needed_, ",");
+  return CountAllPossible(pre_, range_, needed_);
 }
 
 int64_t CountAllPossible(
     std::string_view pre, absl::Span<const int64_t> range) {
-  Memo memo(pre, range);
-  std::vector<int> needed(range.size(), 0);
-  needed[range.size() - 1] = range[range.size() - 1];
-  for (int i = range.size() - 2; i >= 0; --i) {
-    needed[i] = needed[i + 1] + range[i] + 1;
-  }
   VLOG(2) << pre << " - " << absl::StrJoin(range, ",");
-  VLOG(2) << "... - " << absl::StrJoin(needed, ",");
-  return CountAllPossible(&memo, pre, range, needed);
+  return Memo(pre, range).CountAllPossible();
 }
 
 }  // namespace
