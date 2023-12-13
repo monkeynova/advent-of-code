@@ -13,14 +13,15 @@ namespace {
 class Memo {
  public:
   Memo(std::string_view max_pre, absl::Span<const int64_t> max_range)
-   : pre_(max_pre), range_(max_range), max_pre_(max_pre.size() + 1), max_range_(max_range.size() + 1) {
-    map_.resize(max_pre_ * max_range_ * 2, -1);
+   : pre_(max_pre), range_(max_range), pre_size_(max_pre.size()),
+     range_size_(max_range.size()) {
+    map_.resize((pre_size_ + 1) * (range_size_ + 1), -1);
   }
 
   int64_t CountAllPossible();
 
  private:
-  int64_t CountAllPossible(std::string_view pre, absl::Span<const int64_t> range, absl::Span<const int> needed);
+  int64_t CountAllPossible(int pre_off, int range_off);
 
   int64_t Set(int key, int64_t val) {
     return map_[key] = val;
@@ -29,57 +30,56 @@ class Memo {
   std::string_view pre_;
   absl::Span<const int64_t> range_;
   std::vector<int> needed_;
-  int max_pre_;
-  int max_range_;
+  int pre_size_;
+  int range_size_;
   std::vector<int64_t> map_;
 };
 
-int64_t Memo::CountAllPossible(
-    std::string_view pre, absl::Span<const int64_t> range,
-    absl::Span<const int> needed) {
-  int key = pre.size() * max_range_ + range.size();
+int64_t Memo::CountAllPossible(int pre_off, int range_off) {
+  int key = pre_off * (range_size_ + 1) + range_off;
   int64_t from_memo = map_[key];
   if (from_memo != -1) return from_memo;
 
-  CHECK_EQ(range.size(), needed.size());
-
-  if (pre.empty()) {
-    if (range.empty()) return map_[key] = 1;
+  if (pre_size_ == pre_off) {
+    if (range_.size() == range_off) return map_[key] = 1;
     return map_[key] = 0;
   }
-  if (range.empty()) {
-    if (absl::c_all_of(pre, [](char c) { return c != '#'; })) {
+  if (range_size_ == range_off) {
+    bool no_pound = true;
+    for (int i = pre_off; i < pre_size_; ++i) {
+      if (pre_[i] == '#') no_pound = false;
+    }
+    if (no_pound) {
       return map_[key] = 1;
     }
     return map_[key] = 0;
   }
 
-  if (needed[0] > pre.size()) {
+  if (needed_[range_off] > pre_size_ - pre_off) {
     return map_[key] = 0;
   }
 
   int64_t total = 0;
-  if (pre[0] == '#' || pre[0] == '?') {
-    int check_size = range[0];
+  if (pre_[pre_off] == '#' || pre_[pre_off] == '?') {
+    int check_size = range_[range_off];
     bool has_space = false;
-    for (int i = 1; i < check_size; ++i) {
-      if (pre[i] == '.') has_space = true;
+    for (int i = pre_off + 1; i < pre_off + check_size; ++i) {
+      if (pre_[i] == '.') has_space = true;
     }
     if (has_space) {
       // Can't match ('#.#', 3).
-    } else if (pre.size() == check_size) {
-      if (range.size() == 1) {
+    } else if (pre_size_ - pre_off == check_size) {
+      if (range_size_ == range_off + 1) {
         ++total;
       }
-    } else if (pre[check_size] == '#') { 
+    } else if (pre_[pre_off + check_size] == '#') { 
       // Can't match ('####', 3).
     } else {
-      total += CountAllPossible(pre.substr(check_size + 1),
-                                range.subspan(1), needed.subspan(1));
+      total += CountAllPossible(pre_off + check_size + 1, range_off + 1);
     }
   }
-  if (pre[0] == '.' || pre[0] == '?') {
-    total += CountAllPossible(pre.substr(1), range, needed);
+  if (pre_[pre_off] == '.' || pre_[pre_off] == '?') {
+    total += CountAllPossible(pre_off + 1, range_off);
   }
 
   return map_[key] = total;
@@ -92,7 +92,7 @@ int64_t Memo::CountAllPossible() {
     needed_[i] = needed_[i + 1] + range_[i] + 1;
   }
   VLOG(2) << "... - " << absl::StrJoin(needed_, ",");
-  return CountAllPossible(pre_, range_, needed_);
+  return CountAllPossible(0, 0);
 }
 
 int64_t CountAllPossible(
