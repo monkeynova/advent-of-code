@@ -122,7 +122,9 @@ absl::StatusOr<std::string> Day_2023_12::Part1(
   int total = 0;
   for (std::string_view line : input) {
     auto [pre, range_str] = PairSplit(line, " ");
-    ASSIGN_OR_RETURN(std::vector<int64_t> range, ParseAsInts(absl::StrSplit(range_str, ",")));
+    ASSIGN_OR_RETURN(
+        std::vector<int64_t> range,
+        ParseAsInts(absl::StrSplit(range_str, ",")));
     int all_possible = CountAllPossible(pre, range);
     VLOG(2) << line << " -> " << all_possible;
     total += all_possible;
@@ -140,7 +142,9 @@ absl::StatusOr<std::string> Day_2023_12::Part2(
       if (i > 0) pre_duped.append("?");
       pre_duped.append(pre);
     }
-    ASSIGN_OR_RETURN(std::vector<int64_t> range, ParseAsInts(absl::StrSplit(range_str, ",")));
+    ASSIGN_OR_RETURN(
+        std::vector<int64_t> range,
+        ParseAsInts(absl::StrSplit(range_str, ",")));
     std::vector<int64_t> range_duped;
     for (int i = 0; i < 5; ++i) {
       range_duped.insert(range_duped.end(), range.begin(), range.end());
