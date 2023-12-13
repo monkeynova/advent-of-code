@@ -2,24 +2,55 @@
 ==
 
 [part=1]
-Example input
+\#.##..##.
+..#.##.#.
+\##......#
+\##......#
+..#.##.#.
+..##..##.
+\#.#.##.#.
+
+\#...##..#
+\#....#..#
+..##..###
+\#####.##.
+\#####.##.
+..##..###
+\#....#..#
 --
-ERROR: UNIMPLEMENTED: Problem not known
+405
 ==
 
+# 22024 (low; Could be both; Could be neither; Got height/width backwards)
+# 42148 (high; p.x <-> p.y)
+# 31448 (low; didn't allow first col/row)
 [part=1]
 @include{advent_of_code/2023/day13/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+31956
 ==
 
 [part=2]
-Example input
+\#.##..##.
+..#.##.#.
+\##......#
+\##......#
+..#.##.#.
+..##..##.
+\#.#.##.#.
+
+\#...##..#
+\#....#..#
+..##..###
+\#####.##.
+\#####.##.
+..##..###
+\#....#..#
 --
-ERROR: UNIMPLEMENTED: Problem not known
+400
 ==
 
 [part=2]
 @include{advent_of_code/2023/day13/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+37617

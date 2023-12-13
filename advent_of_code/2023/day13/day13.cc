@@ -28,18 +28,126 @@ namespace advent_of_code {
 
 namespace {
 
-// Helper methods go here.
+int ScoreReflection(const CharBoard& b) {
+  int64_t ret = 0;
+  for (int v_test = 0; v_test + 1 < b.width(); ++v_test) {
+    bool is_symmetric = true;
+    for (Point p : b.range()) {
+      if (p.x > v_test) continue;
+      Point r = {(v_test - p.x) + v_test + 1, p.y};
+      if (!b.OnBoard(r)) continue;
+      if (b[p] != b[r]) {
+        is_symmetric = false;
+        break;
+      }
+    }
+    if (is_symmetric) {
+      VLOG(1) << "v_test = " << v_test;
+      ret += v_test + 1;
+    }
+  }
+  for (int h_test = 0; h_test + 1 < b.height(); ++h_test) {
+    bool is_symmetric = true;
+    for (Point p : b.range()) {
+      if (p.y > h_test) continue;
+      Point r = {p.x, (h_test - p.y) + h_test + 1 };
+      if (!b.OnBoard(r)) continue;
+      if (b[p] != b[r]) {
+        is_symmetric = false;
+        break;
+      }
+    }
+    if (is_symmetric) {
+      VLOG(1) << "h_test = " << h_test;
+      ret += 100 * (h_test + 1);
+    }
+  }
+  VLOG(1) << "score = " << ret;
+  if (ret == 0) {
+    VLOG(1) << "No Score\n" << b;
+  }
+  return ret;
+}
+
+int ScoreReflectionSmudge(const CharBoard& b) {
+  int64_t ret = 0;
+  for (int v_test = 0; v_test + 1 < b.width(); ++v_test) {
+    std::optional<Point> smudge;
+    for (Point p : b.range()) {
+      if (p.x > v_test) continue;
+      Point r = {(v_test - p.x) + v_test + 1, p.y};
+      if (!b.OnBoard(r)) continue;
+      if (b[p] != b[r]) {
+        if (smudge) {
+          smudge = std::nullopt;
+          break;
+        }
+        smudge = p;
+      }
+    }
+    if (smudge) {
+      VLOG(1) << "v_test = " << v_test;
+      ret += v_test + 1;
+    }
+  }
+  for (int h_test = 0; h_test + 1 < b.height(); ++h_test) {
+    std::optional<Point> smudge;
+    for (Point p : b.range()) {
+      if (p.y > h_test) continue;
+      Point r = {p.x, (h_test - p.y) + h_test + 1 };
+      if (!b.OnBoard(r)) continue;
+      if (b[p] != b[r]) {
+        if (smudge) {
+          smudge = std::nullopt;
+          break;
+        }
+        smudge = p;
+      }
+    }
+    if (smudge) {
+      VLOG(1) << "h_test = " << h_test;
+      ret += 100 * (h_test + 1);
+    }
+  }
+  VLOG(1) << "score = " << ret;
+  if (ret == 0) {
+    VLOG(1) << "No Score\n" << b;
+  }
+  return ret;
+}
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2023_13::Part1(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  int last_empty = -1;
+  int total = 0;
+  for (int i = 0; i < input.size(); ++i) {
+    if (input[i].empty()) {
+      ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input.subspan(last_empty + 1, i - last_empty - 1)));
+      total += ScoreReflection(b);
+      last_empty = i;
+    }
+  }
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input.subspan(last_empty + 1, input.size() - last_empty - 1)));
+  total += ScoreReflection(b);
+  return AdventReturn(total);
 }
 
 absl::StatusOr<std::string> Day_2023_13::Part2(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  int last_empty = -1;
+  int total = 0;
+  for (int i = 0; i < input.size(); ++i) {
+    if (input[i].empty()) {
+      ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input.subspan(last_empty + 1, i - last_empty - 1)));
+      total += ScoreReflectionSmudge(b);
+      last_empty = i;
+    }
+  }
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input.subspan(last_empty + 1, input.size() - last_empty - 1)));
+  total += ScoreReflectionSmudge(b);
+  return AdventReturn(total);
 }
 
 }  // namespace advent_of_code
