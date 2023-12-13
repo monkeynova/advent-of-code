@@ -30,90 +30,89 @@ namespace {
 
 class Memo {
  public:
-  class Key {
-   public:
-    Key(std::string_view pre, absl::Span<const int64_t> range, int cur_range)
-     : pre_size_(pre.size()), range_size_(range.size()), cur_range_(cur_range) {}
-  
-    bool operator==(const Key& o) const {
-      return pre_size_ == o.pre_size_ && range_size_ == o.range_size_ && cur_range_ == o.cur_range_;
-    }
-    template <typename H>
-    friend H AbslHashValue(H h, const Key& m) {
-      return H::combine(std::move(h), m.pre_size_, m.range_size_, m.cur_range_);
-    }
-   private:
-    friend class Memo;
-
-    int pre_size_;
-    int range_size_;
-    int cur_range_;  
-  };
-
   Memo(std::string_view max_pre, absl::Span<const int64_t> max_range)
    : max_pre_(max_pre.size() + 1), max_range_(max_range.size() + 1) {
-    max_cur_range_ = 1 + absl::c_accumulate(
+    max_cur_range_ = 2 + absl::c_accumulate(
       max_range, static_cast<int64_t>(0),
       [](int64_t a, int64_t b) { return std::max(a, b); });
     map_.resize(max_pre_ * max_range_ * max_cur_range_, -1);
   }
 
-  int64_t Find(const Key& key) {
-    return map_[KeyIdx(key)];
+  int Key(std::string_view pre, absl::Span<const int64_t> range,
+          int cur_range) {
+    return pre.size() * max_range_ * max_cur_range_ +
+      range.size() * max_cur_range_ +
+      cur_range;
   }
 
-  int64_t Set(const Key& key, int64_t val) {
-    return map_[KeyIdx(key)] = val;
+  int64_t Find(int key) {
+    return map_[key];
+  }
+
+  int64_t Set(int key, int64_t val) {
+    return map_[key] = val;
   }
 
  private:
-  int KeyIdx(const Key& key) {
-    return key.pre_size_ * max_range_ * max_cur_range_ +
-      key.range_size_ * max_cur_range_ +
-      key.cur_range_;
-  }
-
   int max_pre_;
   int max_range_;
   int max_cur_range_;
   std::vector<int64_t> map_;
 };
 
-int64_t CountAllPossible(Memo* memo, std::string_view pre, absl::Span<const int64_t> range, int cur_range) {
-  VLOG(3) << "CountAllPossible(" << pre << ",{" << absl::StrJoin(range, ",") << "}, " << cur_range << ")";
-  if (pre.empty()) {
-    if (cur_range == 0 && range.empty()) return 1;
-    if (range.size() == 1 && cur_range == range[0]) return 1;
-    return 0;
-  }
-  if (range.empty() && cur_range > 0) return 0;
-  if (!range.empty() && cur_range > range[0]) return 0;
+int64_t CountAllPossible(
+    Memo* memo, std::string_view pre, absl::Span<const int64_t> range,
+    absl::Span<const int> needed, int cur_range) {
 
-  Memo::Key key(pre, range, cur_range);
+  int key = memo->Key(pre, range, cur_range);
   int64_t from_memo = memo->Find(key);
   if (from_memo != -1) return from_memo;
 
+  CHECK_EQ(range.size(), needed.size());
+
+  if (pre.empty()) {
+    if (cur_range == 0 && range.empty()) return memo->Set(key, 1);
+    if (range.size() == 1 && cur_range == range[0]) return memo->Set(key, 1);
+    return memo->Set(key, 0);
+  }
+  if (range.empty() && cur_range > 0) return memo->Set(key, 0);
+  if (!range.empty() && cur_range > range[0]) return memo->Set(key, 0);
+
+  if (!needed.empty() && needed[0] > cur_range + pre.size()) {
+    return memo->Set(key, 0);
+  }
+
   int64_t total = 0;
   if (pre[0] == '#' || pre[0] == '?') {
-    total += CountAllPossible(memo, pre.substr(1), range, cur_range + 1);
+    total +=
+        CountAllPossible(memo, pre.substr(1), range, needed, cur_range + 1);
   }
   if (pre[0] == '.' || pre[0] == '?') {
     if (range.empty()) {
       if (cur_range == 0) {
-        total += CountAllPossible(memo, pre.substr(1), range, 0);
+        total += CountAllPossible(memo, pre.substr(1), range, needed, 0);
       }
     } else if (cur_range == 0) {
-      total += CountAllPossible(memo, pre.substr(1), range, 0);
+      total += CountAllPossible(memo, pre.substr(1), range, needed, 0);
     } else if (range[0] == cur_range) {
-      total += CountAllPossible(memo, pre.substr(1), range.subspan(1), 0);
+      total += CountAllPossible(memo, pre.substr(1), range.subspan(1),
+                                needed.subspan(1), 0);
     }  
   }
+
   return memo->Set(key, total);
 }
 
 int64_t CountAllPossible(std::string_view pre, absl::Span<const int64_t> range) {
   Memo memo(pre, range);
-  return CountAllPossible(&memo, pre, range, 0);
+  std::vector<int> needed(range.size(), 0);
+  needed[range.size() - 1] = range[range.size() - 1];
+  for (int i = range.size() - 2; i >= 0; --i) {
+    needed[i] = needed[i + 1] + range[i] + 1;
+  }
+  VLOG(2) << pre << " - " << absl::StrJoin(range, ",");
+  VLOG(2) << "... - " << absl::StrJoin(needed, ",");
+  return CountAllPossible(&memo, pre, range, needed, 0);
 }
 
 }  // namespace
