@@ -12,6 +12,7 @@
 #include "advent_of_code/2023/day10/day10.h"
 #include "advent_of_code/2023/day11/day11.h"
 #include "advent_of_code/2023/day12/day12.h"
+#include "advent_of_code/2023/day13/day13.h"
 #include "advent_of_code/infra/file_util.h"
 #include "advent_of_code/vlog.h"
 #include "benchmark/benchmark.h"
@@ -34,6 +35,7 @@ absl::Span<const std::unique_ptr<AdventDay>> AllDays() {
     days.emplace_back(new Day_2023_11());
     days.back()->set_param("1000000");
     days.emplace_back(new Day_2023_12());
+    days.emplace_back(new Day_2023_13());
     return days;
   }();
   return days;
