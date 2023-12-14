@@ -28,30 +28,102 @@ namespace advent_of_code {
 
 namespace {
 
-void Roll(CharBoard& b, Point dir) {
-  std::vector<Point> rocks = b.FindVec('O');
-  absl::c_sort(
-     rocks,
-     [dir](Point a, Point b) {
-       if (dir == Cardinal::kNorth) {
-         return a.y < b.y;
-       } else if (dir == Cardinal::kSouth) {
-         return a.y > b.y;
-       } else if (dir == Cardinal::kWest) {
-         return a.x < b.x;
-       } else if (dir == Cardinal::kEast) {
-         return a.x > b.x;
-       } else {
-         LOG(FATAL) << "dir: " << dir;
-       }
-     });
+void RollNorth(CharBoard& b) {
+  for (int x = 0; x < b.width(); ++x) {
+    int dest = 0;
+    for (int y = 0; y < b.height(); ++y) {
+      switch (b[{x,y}]) {
+        case 'O': {
+          if (dest != y) {        
+            b[{x, dest}] = 'O';
+            b[{x, y}] = '.';
+          }
+          ++dest;
+          break;
+        }
+        case '#': {
+          dest = y + 1;
+          break;
+        }
+        case '.': {
+          break;
+        }
+      }
+    }
+  }
+}
 
-  for (Point p : rocks) {
-    for (Point move = p + dir; 
-         b.OnBoard(move) && b[move] == '.';
-         move += dir, p += dir) {
-      b[move] = 'O';
-      b[p] = '.';
+void RollSouth(CharBoard& b) {
+  for (int x = 0; x < b.width(); ++x) {
+    int dest = b.height() - 1;
+    for (int y = b.height() - 1; y >= 0; --y) {
+      switch (b[{x,y}]) {
+        case 'O': {
+          if (dest != y) {        
+            b[{x, dest}] = 'O';
+            b[{x, y}] = '.';
+          }
+          --dest;
+          break;
+        }
+        case '#': {
+          dest = y - 1;
+          break;
+        }
+        case '.': {
+          break;
+        }
+      }
+    }
+  }
+}
+
+void RollWest(CharBoard& b) {
+  for (int y = 0; y < b.height(); ++y) {
+    int dest = 0;
+    for (int x = 0; x < b.width(); ++x) {
+      switch (b[{x,y}]) {
+        case 'O': {
+          if (dest != x) {        
+            b[{dest, y}] = 'O';
+            b[{x, y}] = '.';
+          }
+          ++dest;
+          break;
+        }
+        case '#': {
+          dest = x + 1;
+          break;
+        }
+        case '.': {
+          break;
+        }
+      }
+    }
+  }
+}
+
+void RollEast(CharBoard& b) {
+  for (int y = 0; y < b.height(); ++y) {
+    int dest = b.width() - 1;
+    for (int x = b.width() - 1; x >= 0; --x) {
+      switch (b[{x,y}]) {
+        case 'O': {
+          if (dest != x) {        
+            b[{dest, y}] = 'O';
+            b[{x, y}] = '.';
+          }
+          --dest;
+          break;
+        }
+        case '#': {
+          dest = x - 1;
+          break;
+        }
+        case '.': {
+          break;
+        }
+      }
     }
   }
 }
@@ -70,7 +142,7 @@ int CountLoad(const CharBoard& b) {
 absl::StatusOr<std::string> Day_2023_14::Part1(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
-  Roll(b, Cardinal::kNorth);
+  RollNorth(b);
   VLOG(2) << "Moved:\n" << b;
   return AdventReturn(CountLoad(b));
 }
@@ -81,12 +153,13 @@ absl::StatusOr<std::string> Day_2023_14::Part2(
   LoopHistory<CharBoard> hist;
   for (int i = 0; i < 1000000000; ++i) {
     if (hist.AddMaybeNew(b)) {
-      VLOG(1) << "Loop at " << i;
+      VLOG(1) << hist;
       return AdventReturn(CountLoad(hist.FindInLoop(1000000000)));
     }
-    for (Point dir : {Cardinal::kNorth, Cardinal::kWest, Cardinal::kSouth, Cardinal::kEast}) {
-      Roll(b, dir);
-    }
+    RollNorth(b);
+    RollWest(b);
+    RollSouth(b);
+    RollEast(b);
   }
   return AdventReturn(CountLoad(b));
 }

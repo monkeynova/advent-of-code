@@ -33,6 +33,12 @@ class LoopHistory {
 
   const Storage& FindInLoop(int64_t offset) { return *idx_[IndexAt(offset)]; }
 
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const LoopHistory& l) {
+    absl::Format(&sink, "Loop [%d->%d)", l.loop_offset_,
+                 l.loop_offset_ + l.loop_size_);
+  }
+
  private:
   absl::node_hash_map<Storage, int> hist_;
   std::vector<const Storage*> idx_;
