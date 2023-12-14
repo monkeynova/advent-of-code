@@ -111,7 +111,7 @@ class CharBoardBase {
   // points.
   template <typename Container>
   void Draw(const Container& points, char c = '#') {
-    for (Point p : points) (*this)[p] = c;
+    for (Point p : points) if (OnBoard(p)) (*this)[p] = c;
   }
 
   int height() const { return stride_ == 1 ? 0 : buf_.size() / stride_; }
