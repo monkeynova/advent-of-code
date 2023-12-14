@@ -195,6 +195,11 @@ class CharBoardBase {
   std::string_view row(int y) const {
     return std::string_view(stride(y), stride_);
   }
+  template <bool is_mutable_test = is_mutable,
+            typename = std::enable_if_t<is_mutable_test>>
+  char* mutable_row(int y) {
+    return stride(y);
+  }
 
  private:
   friend class CharBoardBase<!is_mutable>;

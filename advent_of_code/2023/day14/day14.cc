@@ -29,20 +29,24 @@ namespace advent_of_code {
 namespace {
 
 void RollNorth(CharBoard& b) {
+  char* raw_access = b.mutable_row(0);
+  int stride = b.width() + 1;
+
   for (int x = 0; x < b.width(); ++x) {
-    int dest = 0;
-    for (int y = 0; y < b.height(); ++y) {
-      switch (b[{x,y}]) {
+    int dest_idx = x;
+    int src_idx = x;
+    for (int y = 0; y < b.height(); ++y, src_idx += stride) {
+      switch (raw_access[src_idx]) {
         case 'O': {
-          if (dest != y) {        
-            b[{x, dest}] = 'O';
-            b[{x, y}] = '.';
+          if (src_idx != dest_idx) {        
+            raw_access[dest_idx] = 'O';
+            raw_access[src_idx] = '.';
           }
-          ++dest;
+          dest_idx += stride;
           break;
         }
         case '#': {
-          dest = y + 1;
+          dest_idx = src_idx + stride;
           break;
         }
         case '.': {
@@ -54,20 +58,24 @@ void RollNorth(CharBoard& b) {
 }
 
 void RollSouth(CharBoard& b) {
+  char* raw_access = b.mutable_row(0);
+  int stride = b.width() + 1;
+
   for (int x = 0; x < b.width(); ++x) {
-    int dest = b.height() - 1;
-    for (int y = b.height() - 1; y >= 0; --y) {
-      switch (b[{x,y}]) {
+    int dest_idx = (b.height() - 1) * stride + x;
+    int src_idx = dest_idx;
+    for (int y = b.height() - 1; y >= 0; --y, src_idx -= stride) {
+      switch (raw_access[src_idx]) {
         case 'O': {
-          if (dest != y) {        
-            b[{x, dest}] = 'O';
-            b[{x, y}] = '.';
+          if (src_idx != dest_idx) {        
+            raw_access[dest_idx] = 'O';
+            raw_access[src_idx] = '.';
           }
-          --dest;
+          dest_idx -= stride;
           break;
         }
         case '#': {
-          dest = y - 1;
+          dest_idx = src_idx - stride;
           break;
         }
         case '.': {
@@ -80,13 +88,14 @@ void RollSouth(CharBoard& b) {
 
 void RollWest(CharBoard& b) {
   for (int y = 0; y < b.height(); ++y) {
+    char* row = b.mutable_row(y);
     int dest = 0;
     for (int x = 0; x < b.width(); ++x) {
-      switch (b[{x,y}]) {
+      switch (row[x]) {
         case 'O': {
           if (dest != x) {        
-            b[{dest, y}] = 'O';
-            b[{x, y}] = '.';
+            row[dest] = 'O';
+            row[x] = '.';
           }
           ++dest;
           break;
@@ -105,13 +114,14 @@ void RollWest(CharBoard& b) {
 
 void RollEast(CharBoard& b) {
   for (int y = 0; y < b.height(); ++y) {
+    char* row = b.mutable_row(y);
     int dest = b.width() - 1;
     for (int x = b.width() - 1; x >= 0; --x) {
-      switch (b[{x,y}]) {
+      switch (row[x]) {
         case 'O': {
           if (dest != x) {        
-            b[{dest, y}] = 'O';
-            b[{x, y}] = '.';
+            row[dest] = 'O';
+            row[x] = '.';
           }
           --dest;
           break;
@@ -150,6 +160,10 @@ absl::StatusOr<std::string> Day_2023_14::Part1(
 absl::StatusOr<std::string> Day_2023_14::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  VLOG(1) << b.range();
+  VLOG(1) << b.Find('O').size() << " rollers";
+  VLOG(1) << b.Find('#').size() << " stationary";
+  
   LoopHistory<CharBoard> hist;
   for (int i = 0; i < 1000000000; ++i) {
     if (hist.AddMaybeNew(b)) {
