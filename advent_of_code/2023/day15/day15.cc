@@ -33,9 +33,9 @@ class HashTable {
 
   void Delete(std::string_view label) {
     int hash = Hash(label);
-    for (int i = 0; i < table_[hash].size(); ++i) {
-      if (table_[hash][i].label == label) {
-        table_[hash].erase(table_[hash].begin() + i);
+    for (auto it = table_[hash].begin(); it != table_[hash].end(); ++it) {
+      if (it->label == label) {
+        table_[hash].erase(it);
         break;
       }
     }
