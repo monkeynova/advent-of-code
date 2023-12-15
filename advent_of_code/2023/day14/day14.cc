@@ -43,23 +43,22 @@ class Dish {
   }
 
   int NorthLoadPart1() const;
-  int NorthLoad(const std::vector<std::vector<int>>& rollers_by_x) const;
+  int NorthLoad(const std::vector<int>& summary) const;
 
-  void RollFirstNorth() {
-    RollNorth();
-  }
+  void RollFirstNorth();
   void RollCycle();
 
-  std::vector<std::vector<int>> Summary() const {
-    return rollers_by_x_;
+  std::vector<int> Summary() const {
+    std::vector<int> ret;
+    for (const std::vector<int>& add : rollers_by_x_) {
+      ret.insert(ret.end(), add.begin(), add.end());
+      // Add a 0-load marker between vectors in summary.
+      ret.push_back(height_);
+    }
+    return ret;
   }
 
  private:
-  void RollNorth();
-  void RollSouth();
-  void RollWest();
-  void RollEast();
-
   std::vector<std::vector<int>> rollers_by_x_;
   std::vector<std::vector<int>> rollers_by_y_;
   std::vector<std::vector<int>> stops_by_x_;
@@ -79,21 +78,12 @@ int Dish::NorthLoadPart1() const {
 }
 
 
-int Dish::NorthLoad(const std::vector<std::vector<int>>& rollers_by_x) const {
-  int load = 0;
-  for (int x = 0; x < width_; ++x) {
-    for (int y : rollers_by_x[x]) {
-      load += height_ - y;
-    }
-  }
-  return load;
+int Dish::NorthLoad(const std::vector<int>& summary) const {
+  return absl::c_accumulate(summary, 0, [&](int a, int y) { return a + height_ - y; });
 }
 
-void Dish::RollCycle() {
-  RollNorth();
-  RollWest();
-  RollSouth();
-  RollEast();
+inline void ClearAll(std::vector<std::vector<int>>& v) {
+  for (auto& sub_v : v) sub_v.clear();
 }
 
 template <int out_dir,
@@ -106,8 +96,11 @@ template <int out_dir,
                   std::vector<int>::const_reverse_iterator,
                   void>>>
 inline void RollSlice(
-    const std::vector<int>& rollers, StopItType stop_it,
+    const std::vector<int>& rollers, const std::vector<int>& stops,
     std::vector<std::vector<int>>& out, int out_val) {
+  StopItType stop_it;
+  if constexpr (out_dir == 1) stop_it = stops.begin();
+  if constexpr (out_dir == -1) stop_it = stops.rbegin();
   auto roller_it = rollers.begin();
   int stop = *stop_it;
   while (roller_it != rollers.end()) {
@@ -130,40 +123,46 @@ inline void RollSlice(
   }
 }
 
-inline void ClearAll(std::vector<std::vector<int>>& v) {
-  for (auto& sub_v : v) sub_v.clear();
-}
-
-void Dish::RollNorth() {
-  ClearAll(rollers_by_y_);
+template <int out_dir, int next_dir,
+          typename RollerItType =
+              std::conditional_t<
+                next_dir == 1,
+                std::vector<int>::const_iterator,
+                std::conditional_t<
+                  next_dir == -1,
+                  std::vector<int>::const_reverse_iterator,
+                  void>>>
+inline void RollDir(
+    const std::vector<std::vector<int>>& rollers,
+    const std::vector<std::vector<int>>& stops,
+    std::vector<std::vector<int>>& out) {
+  ClearAll(out);
   // Next is West, sort by x ASC.
-  for (int x = 0; x < width_; ++x) {
-    RollSlice<1>(rollers_by_x_[x], stops_by_x_[x].begin(), rollers_by_y_, x);
+  if constexpr (next_dir == 1) {
+    for (int i = 0; i < rollers.size(); ++i) {
+      RollSlice<out_dir>(rollers[i], stops[i], out, i);
+    }
+  }
+  if constexpr (next_dir == -1) {
+    for (int i = rollers.size() - 1; i >= 0; --i) {
+      RollSlice<out_dir>(rollers[i], stops[i], out, i);
+    }
   }
 }
 
-void Dish::RollWest() {
-  ClearAll(rollers_by_x_);
-  // Next is South, sort by y DESC.
-  for (int y = height_ - 1; y >= 0; --y) {
-    RollSlice<1>(rollers_by_y_[y], stops_by_y_[y].begin(), rollers_by_x_, y);
-  }
+void Dish::RollFirstNorth() {
+  RollDir<1, 1>(rollers_by_x_, stops_by_x_, rollers_by_y_);
 }
 
-void Dish::RollSouth() {
-  ClearAll(rollers_by_y_);
-  // Next is East, sort by x DESC.
-  for (int x = width_ - 1; x >= 0; --x) {
-    RollSlice<-1>(rollers_by_x_[x], stops_by_x_[x].rbegin(), rollers_by_y_, x);
-  }
-}
-
-void Dish::RollEast() {
-  ClearAll(rollers_by_x_);
-  // Next is North, sort by y ASC.
-  for (int y = 0; y < height_; ++y) {
-    RollSlice<-1>(rollers_by_y_[y], stops_by_y_[y].rbegin(), rollers_by_x_, y);
-  }
+void Dish::RollCycle() {
+  // North; Next is West, sort by x ASC.
+  RollDir<1, 1>(rollers_by_x_, stops_by_x_, rollers_by_y_);
+  // West; Next is South, sort by y DESC.
+  RollDir<1, -1>(rollers_by_y_, stops_by_y_, rollers_by_x_);
+  // South; Next is East, sort by x DESC.
+  RollDir<-1, -1>(rollers_by_x_, stops_by_x_, rollers_by_y_);
+  // East; Next is North, sort by y ASC.
+  RollDir<-1, 1>(rollers_by_y_, stops_by_y_, rollers_by_x_);
 }
 
 }  // namespace
