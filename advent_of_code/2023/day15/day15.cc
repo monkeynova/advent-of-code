@@ -36,7 +36,7 @@ int Hash(std::string_view str) {
   return hash;
 }
 
-struct HashTable {
+class HashTable {
  public:
   HashTable() = default;
 
@@ -59,6 +59,7 @@ struct HashTable {
       }
     }
   }
+
   void Set(std::string_view label, int val) {
     int hash = Hash(label);
     bool found = false;
@@ -79,6 +80,7 @@ struct HashTable {
     std::string_view label;
     int val;
   };
+
   std::array<std::vector<Entry>, 256> table_;
 };
 
