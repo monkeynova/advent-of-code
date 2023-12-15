@@ -96,87 +96,73 @@ void Dish::RollCycle() {
   RollEast();
 }
 
-void Dish::RollNorth() {
-  for (int y = 0; y < height_; ++y) {
-    rollers_by_y_[y].clear();
-  }
-  // Next is West, sort by x ASC.
-  for (int x = 0; x < width_; ++x) {
-    auto roller_it = rollers_by_x_[x].begin();
-    auto stop_it = stops_by_x_[x].begin();
-    int stop_y = *stop_it;
-    while (roller_it != rollers_by_x_[x].end()) {
+template <int out_dir,
+          typename StopItType =
+              std::conditional_t<
+                out_dir == 1,
+                std::vector<int>::const_iterator,
+                std::conditional_t<
+                  out_dir == -1,
+                  std::vector<int>::const_reverse_iterator,
+                  void>>>
+inline void RollSlice(
+    const std::vector<int>& rollers, StopItType stop_it,
+    std::vector<std::vector<int>>& out, int out_val) {
+  auto roller_it = rollers.begin();
+  int stop = *stop_it;
+  while (roller_it != rollers.end()) {
+    if constexpr (out_dir == 1) {
       if (*stop_it < *roller_it) {
-        stop_y = *stop_it;
+        stop = *stop_it;
         ++stop_it;
         continue;
       }
-      rollers_by_y_[++stop_y].push_back(x);
-      ++roller_it;
     }
+    if constexpr (out_dir == -1) {
+      if (*stop_it > *roller_it) {
+        stop = *stop_it;
+        ++stop_it;
+        continue;
+      }
+    }
+    out[stop += out_dir].push_back(out_val);
+    ++roller_it;
+  }
+}
+
+inline void ClearAll(std::vector<std::vector<int>>& v) {
+  for (auto& sub_v : v) sub_v.clear();
+}
+
+void Dish::RollNorth() {
+  ClearAll(rollers_by_y_);
+  // Next is West, sort by x ASC.
+  for (int x = 0; x < width_; ++x) {
+    RollSlice<1>(rollers_by_x_[x], stops_by_x_[x].begin(), rollers_by_y_, x);
   }
 }
 
 void Dish::RollWest() {
-  for (int x = 0; x < width_; ++x) {
-    rollers_by_x_[x].clear();
-  }
+  ClearAll(rollers_by_x_);
   // Next is South, sort by y DESC.
   for (int y = height_ - 1; y >= 0; --y) {
-    auto roller_it = rollers_by_y_[y].begin();
-    auto stop_it = stops_by_y_[y].begin();
-    int stop_x = *stop_it;
-    while (roller_it != rollers_by_y_[y].end()) {
-      if (*stop_it < *roller_it) {
-        stop_x = *stop_it;
-        ++stop_it;
-        continue;
-      }
-      rollers_by_x_[++stop_x].push_back(y);
-      ++roller_it;
-    }
+    RollSlice<1>(rollers_by_y_[y], stops_by_y_[y].begin(), rollers_by_x_, y);
   }
 }
 
 void Dish::RollSouth() {
-  for (int y = 0; y < height_; ++y) {
-    rollers_by_y_[y].clear();
-  }
+  ClearAll(rollers_by_y_);
   // Next is East, sort by x DESC.
   for (int x = width_ - 1; x >= 0; --x) {
-    auto roller_it = rollers_by_x_[x].begin();
-    auto stop_it = stops_by_x_[x].rbegin();
-    int stop_y = *stop_it;
-    while (roller_it != rollers_by_x_[x].end()) {
-      if (*stop_it > *roller_it) {
-        stop_y = *stop_it;
-        ++stop_it;
-        continue;
-      }
-      rollers_by_y_[--stop_y].push_back(x);
-      ++roller_it;
-    }
+    RollSlice<-1>(rollers_by_x_[x], stops_by_x_[x].rbegin(), rollers_by_y_, x);
   }
 }
 
 void Dish::RollEast() {
-  for (int x = 0; x < width_; ++x) {
-    rollers_by_x_[x].clear();
-  }
+  ClearAll(rollers_by_x_);
   // Next is North, sort by y ASC.
   for (int y = 0; y < height_; ++y) {
-    auto roller_it = rollers_by_y_[y].begin();
-    auto stop_it = stops_by_y_[y].rbegin();
-    int stop_x = *stop_it;
-    while (roller_it != rollers_by_y_[y].end()) {
-      if (*stop_it > *roller_it) {
-        stop_x = *stop_it;
-        ++stop_it;
-        continue;
-      }
-      rollers_by_x_[--stop_x].push_back(y);
-      ++roller_it;
-    }
+    RollSlice<-1>(rollers_by_y_[y], stops_by_y_[y].rbegin(), rollers_by_x_, y);
   }
 }
 
