@@ -28,141 +28,47 @@ namespace advent_of_code {
 
 namespace {
 
-void RollNorth(CharBoard& b) {
-  char* raw_access = b.mutable_row(0);
-  int stride = b.width() + 1;
-
-  for (int x = 0; x < b.width(); ++x) {
-    int dest_idx = x;
-    int src_idx = x;
-    for (int y = 0; y < b.height(); ++y, src_idx += stride) {
-      switch (raw_access[src_idx]) {
-        case 'O': {
-          if (src_idx != dest_idx) {        
-            raw_access[dest_idx] = 'O';
-            raw_access[src_idx] = '.';
-          }
-          dest_idx += stride;
-          break;
-        }
-        case '#': {
-          dest_idx = src_idx + stride;
-          break;
-        }
-        case '.': {
-          break;
-        }
-      }
-    }
-  }
-}
-
-void RollSouth(CharBoard& b) {
-  char* raw_access = b.mutable_row(0);
-  int stride = b.width() + 1;
-
-  for (int x = 0; x < b.width(); ++x) {
-    int dest_idx = (b.height() - 1) * stride + x;
-    int src_idx = dest_idx;
-    for (int y = b.height() - 1; y >= 0; --y, src_idx -= stride) {
-      switch (raw_access[src_idx]) {
-        case 'O': {
-          if (src_idx != dest_idx) {        
-            raw_access[dest_idx] = 'O';
-            raw_access[src_idx] = '.';
-          }
-          dest_idx -= stride;
-          break;
-        }
-        case '#': {
-          dest_idx = src_idx - stride;
-          break;
-        }
-        case '.': {
-          break;
-        }
-      }
-    }
-  }
-}
-
-void RollWest(CharBoard& b) {
-  for (int y = 0; y < b.height(); ++y) {
-    char* row = b.mutable_row(y);
-    int dest = 0;
-    for (int x = 0; x < b.width(); ++x) {
-      switch (row[x]) {
-        case 'O': {
-          if (dest != x) {        
-            row[dest] = 'O';
-            row[x] = '.';
-          }
-          ++dest;
-          break;
-        }
-        case '#': {
-          dest = x + 1;
-          break;
-        }
-        case '.': {
-          break;
-        }
-      }
-    }
-  }
-}
-
-void RollEast(CharBoard& b) {
-  for (int y = 0; y < b.height(); ++y) {
-    char* row = b.mutable_row(y);
-    int dest = b.width() - 1;
-    for (int x = b.width() - 1; x >= 0; --x) {
-      switch (row[x]) {
-        case 'O': {
-          if (dest != x) {        
-            row[dest] = 'O';
-            row[x] = '.';
-          }
-          --dest;
-          break;
-        }
-        case '#': {
-          dest = x - 1;
-          break;
-        }
-        case '.': {
-          break;
-        }
-      }
-    }
-  }
-}
-
 class Dish {
  public:
-  explicit Dish(const CharBoard& b)
-   : rollers_(b.FindVec('O')), stops_(b.FindVec('#')),
-     width_(b.width()), height_(b.height()) {
+  explicit Dish(const ImmutableCharBoard& b)
+   : rollers_by_x_(b.width()),
+     rollers_by_y_(b.height()),
+     stops_by_x_(b.width()),
+     stops_by_y_(b.height()),
+     width_(b.width()),
+     height_(b.height()) { 
+    for (Point r : b.FindVec('O')) {
+      rollers_by_x_[r.x].push_back(r.y);
+    }
     for (int x = 0; x < width_; ++x) {
-      stops_.push_back({x, -1});
-      stops_.push_back({x, height_});
-    }  
+      stops_by_x_[x].push_back(-1);
+    }
     for (int y = 0; y < height_; ++y) {
-      stops_.push_back({-1, y});
-      stops_.push_back({width_, y});
-    }  
+      stops_by_y_[y].push_back(-1);
+    }
+    for (Point s : b.FindVec('#')) {
+      stops_by_x_[s.x].push_back(s.y);
+      stops_by_y_[s.y].push_back(s.x);
+    }
+    for (int x = 0; x < width_; ++x) {
+      stops_by_x_[x].push_back(height_);
+    }
+    for (int y = 0; y < height_; ++y) {
+      stops_by_y_[y].push_back(width_);
+    }
+    rollers_by_x_valid_ = true;
   }
 
-  int NorthLoad() const { return NorthLoad(rollers_); }
-  int NorthLoad(const std::vector<Point>& rollers) const;
+  int NorthLoadPart1() const;
+  int NorthLoad(const std::vector<std::vector<int>>& rollers_by_x) const;
 
   void RollFirstNorth() {
     RollNorth();
   }
   void RollCycle();
 
-  const std::vector<Point>& Summary() const {
-    return rollers_;
+  std::vector<std::vector<int>> Summary() const {
+    return rollers_by_x_;
   }
 
  private:
@@ -171,37 +77,31 @@ class Dish {
   void RollWest();
   void RollEast();
 
-  static bool NorthCmp(Point a, Point b) {
-    if (a.x != b.x) return a.x < b.x;
-    return a.y < b.y;
-  }
-  static bool SouthCmp(Point a, Point b) {
-    if (a.x != b.x) return a.x < b.x;
-    return a.y > b.y;
-  }
-  static bool WestCmp(Point a, Point b) {
-    if (a.y != b.y) return a.y < b.y;
-    return a.x < b.x;
-  };
-  static bool EastCmp(Point a, Point b) {
-    if (a.y != b.y) return a.y < b.y;
-    return a.x > b.x;
-  };
+  std::vector<std::vector<int>> rollers_by_x_;
+  std::vector<std::vector<int>> rollers_by_y_;
+  std::vector<std::vector<int>> stops_by_x_;
+  std::vector<std::vector<int>> stops_by_y_;
 
-  std::vector<Point> rollers_;
-  std::vector<Point> stops_;
-  std::vector<Point> stops_for_north_;
-  std::vector<Point> stops_for_south_;
-  std::vector<Point> stops_for_west_;
-  std::vector<Point> stops_for_east_;
   int width_;
   int height_;
+  bool rollers_by_x_valid_;
 };
 
-int Dish::NorthLoad(const std::vector<Point>& rollers) const {
+int Dish::NorthLoadPart1() const {
   int load = 0;
-  for (Point p : rollers) {
-    load += height_ - p.y;
+  for (int y = 0; y < height_; ++y) {
+    load += rollers_by_y_[y].size() * (height_ - y);
+  }
+  return load;
+}
+
+
+int Dish::NorthLoad(const std::vector<std::vector<int>>& rollers_by_x) const {
+  int load = 0;
+  for (int x = 0; x < width_; ++x) {
+    for (int y : rollers_by_x[x]) {
+      load += height_ - y;
+    }
   }
   return load;
 }
@@ -214,165 +114,116 @@ void Dish::RollCycle() {
 }
 
 void Dish::RollNorth() {
-  absl::c_sort(rollers_, NorthCmp);
-  if (stops_for_north_.empty()) {
-    stops_for_north_ = stops_;
-    absl::c_sort(stops_for_north_, NorthCmp);
+  for (int y = 0; y < height_; ++y) {
+    rollers_by_y_[y].clear();
   }
-  auto roller_it = rollers_.begin();
-  auto stops_it = stops_for_north_.begin();
-  Point stop;
-  while (roller_it != rollers_.end()) {
-    if (stops_it->x < roller_it->x) {
-      ++stops_it;
-      continue;
+  // Next is West, sort by x ASC.
+  for (int x = 0; x < width_; ++x) {
+    auto roller_it = rollers_by_x_[x].begin();
+    auto stop_it = stops_by_x_[x].begin();
+    int stop_y = *stop_it;
+    while (roller_it != rollers_by_x_[x].end()) {
+      if (*stop_it < *roller_it) {
+        stop_y = *stop_it;
+        ++stop_it;
+        continue;
+      }
+      rollers_by_y_[++stop_y].push_back(x);
+      ++roller_it;
     }
-    CHECK_EQ(stops_it->x, roller_it->x);
-    if (stops_it->y < roller_it->y) {
-      stop = *stops_it;
-      ++stops_it;
-      continue;
-    }
-    ++stop.y;
-    *roller_it = stop;
-    ++roller_it;
   }
 }
 
 void Dish::RollWest() {
-  absl::c_sort(rollers_, WestCmp);
-  if (stops_for_west_.empty()) {
-    stops_for_west_ = stops_;
-    absl::c_sort(stops_for_west_, WestCmp);
+  for (int x = 0; x < width_; ++x) {
+    rollers_by_x_[x].clear();
   }
-  auto roller_it = rollers_.begin();
-  auto stops_it = stops_for_west_.begin();
-  Point stop;
-  while (roller_it != rollers_.end()) {
-    if (stops_it->y < roller_it->y) {
-      ++stops_it;
-      continue;
+  // Next is South, sort by y DESC.
+  for (int y = height_ - 1; y >= 0; --y) {
+    auto roller_it = rollers_by_y_[y].begin();
+    auto stop_it = stops_by_y_[y].begin();
+    int stop_x = *stop_it;
+    while (roller_it != rollers_by_y_[y].end()) {
+      if (*stop_it < *roller_it) {
+        stop_x = *stop_it;
+        ++stop_it;
+        continue;
+      }
+      rollers_by_x_[++stop_x].push_back(y);
+      ++roller_it;
     }
-    CHECK_EQ(stops_it->y, roller_it->y);
-    if (stops_it->x < roller_it->x) {
-      stop = *stops_it;
-      ++stops_it;
-      continue;
-    }
-    ++stop.x;
-    *roller_it = stop;
-    ++roller_it;
   }
 }
 
 void Dish::RollSouth() {
-  absl::c_sort(rollers_, SouthCmp);
-  if (stops_for_south_.empty()) {
-    stops_for_south_ = stops_;
-    absl::c_sort(stops_for_south_, SouthCmp);
+  for (int y = 0; y < height_; ++y) {
+    rollers_by_y_[y].clear();
   }
-  auto roller_it = rollers_.begin();
-  auto stops_it = stops_for_south_.begin();
-  Point stop;
-  while (roller_it != rollers_.end()) {
-    if (stops_it->x < roller_it->x) {
-      ++stops_it;
-      continue;
+  // Next is East, sort by x DESC.
+  for (int x = width_ - 1; x >= 0; --x) {
+    auto roller_it = rollers_by_x_[x].begin();
+    auto stop_it = stops_by_x_[x].rbegin();
+    int stop_y = *stop_it;
+    while (roller_it != rollers_by_x_[x].end()) {
+      if (*stop_it > *roller_it) {
+        stop_y = *stop_it;
+        ++stop_it;
+        continue;
+      }
+      rollers_by_y_[--stop_y].push_back(x);
+      ++roller_it;
     }
-    CHECK_EQ(stops_it->x, roller_it->x);
-    if (stops_it->y > roller_it->y) {
-      stop = *stops_it;
-      ++stops_it;
-      continue;
-    }
-    --stop.y;
-    *roller_it = stop;
-    ++roller_it;
   }
 }
 
 void Dish::RollEast() {
-  absl::c_sort(rollers_, EastCmp);
-  if (stops_for_east_.empty()) {
-    stops_for_east_ = stops_;
-    absl::c_sort(stops_for_east_, EastCmp);
+  for (int x = 0; x < width_; ++x) {
+    rollers_by_x_[x].clear();
   }
-  auto roller_it = rollers_.begin();
-  auto stops_it = stops_for_east_.begin();
-  Point stop;
-  while (roller_it != rollers_.end()) {
-    if (stops_it->y < roller_it->y) {
-      ++stops_it;
-      continue;
+  // Next is North, sort by y ASC.
+  for (int y = 0; y < height_; ++y) {
+    auto roller_it = rollers_by_y_[y].begin();
+    auto stop_it = stops_by_y_[y].rbegin();
+    int stop_x = *stop_it;
+    while (roller_it != rollers_by_y_[y].end()) {
+      if (*stop_it > *roller_it) {
+        stop_x = *stop_it;
+        ++stop_it;
+        continue;
+      }
+      rollers_by_x_[--stop_x].push_back(y);
+      ++roller_it;
     }
-    CHECK_EQ(stops_it->y, roller_it->y);
-    if (stops_it->x > roller_it->x) {
-      stop = *stops_it;
-      ++stops_it;
-      continue;
-    }
-    --stop.x;
-    *roller_it = stop;
-    ++roller_it;
   }
-}
-
-
-int CountLoad(const CharBoard& b) {
-  std::vector<Point> rocks = b.FindVec('O');
-  int load = 0;
-  for (Point p : rocks) {
-    load += b.height() - p.y;
-  }
-  return load;
 }
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2023_14::Part1(
     absl::Span<std::string_view> input) const {
-  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
   Dish dish(b);
   dish.RollFirstNorth();
-  return AdventReturn(dish.NorthLoad());
-
-  RollNorth(b);
-  VLOG(2) << "Moved:\n" << b;
-  return AdventReturn(CountLoad(b));
+  return AdventReturn(dish.NorthLoadPart1());
 }
 
 absl::StatusOr<std::string> Day_2023_14::Part2(
     absl::Span<std::string_view> input) const {
-  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
   VLOG(1) << b.range();
   VLOG(1) << b.Find('O').size() << " rollers";
   VLOG(1) << b.Find('#').size() << " stationary";
   
-  if (false) {
-    Dish dish(b);
-    LoopHistory<std::vector<Point>> hist;
-    for (int i = 0; i < 1000000000; ++i) {
-       if (hist.AddMaybeNew(dish.Summary())) {
-        VLOG(1) << hist;
-        return AdventReturn(dish.NorthLoad(hist.FindInLoop(1000000000)));
-      }
-      dish.RollCycle();
-    }
-    return AdventReturn(dish.NorthLoad());
-  }
-
-  LoopHistory<CharBoard> hist;
+  Dish dish(b);
+  LoopHistory<decltype(dish.Summary())> hist;
   for (int i = 0; i < 1000000000; ++i) {
-    if (hist.AddMaybeNew(b)) {
+     if (hist.AddMaybeNew(dish.Summary())) {
       VLOG(1) << hist;
-      return AdventReturn(CountLoad(hist.FindInLoop(1000000000)));
+      return AdventReturn(dish.NorthLoad(hist.FindInLoop(1000000000)));
     }
-    RollNorth(b);
-    RollWest(b);
-    RollSouth(b);
-    RollEast(b);
+    dish.RollCycle();
   }
-  return AdventReturn(CountLoad(b));
+  return AdventReturn(dish.NorthLoad(dish.Summary()));
 }
 
 }  // namespace advent_of_code
