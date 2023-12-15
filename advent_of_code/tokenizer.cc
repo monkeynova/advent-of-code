@@ -30,12 +30,11 @@ std::string_view Tokenizer::Next() {
     return "";
   }
   int end = start + 1;
-  if (in_[end] == '-' || isdigit(in_[end])) {
-    ++end;
+  if (in_[start] == '-' || isdigit(in_[start])) {
     while (end < in_.size() && isdigit(in_[end])) {
       ++end;
     }
-  } else if (isalpha(in_[end])) {
+  } else if (isalpha(in_[start])) {
     while (end < in_.size() && isalpha(in_[end])) {
       ++end;
     }
