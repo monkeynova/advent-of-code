@@ -7,6 +7,7 @@ cc_library(
     deps = [
         "//advent_of_code:advent_day",
         "//advent_of_code:tokenizer",
+        "@com_google_absl//absl/algorithm:container",
         "@com_google_absl//absl/log",
     ],
 )

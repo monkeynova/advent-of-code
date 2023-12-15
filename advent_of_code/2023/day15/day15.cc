@@ -2,6 +2,7 @@
 
 #include "advent_of_code/2023/day15/day15.h"
 
+#include "absl/algorithm/container.h"
 #include "absl/log/log.h"
 #include "advent_of_code/tokenizer.h"
 
@@ -33,25 +34,18 @@ class HashTable {
 
   void Delete(std::string_view label) {
     int hash = Hash(label);
-    for (auto it = table_[hash].begin(); it != table_[hash].end(); ++it) {
-      if (it->label == label) {
-        table_[hash].erase(it);
-        break;
-      }
-    }
+    auto match_label = [&](const Entry& e) { return e.label == label; };
+    auto it = absl::c_find_if(table_[hash], match_label);
+    if (it != table_[hash].end()) table_[hash].erase(it);
   }
 
   void Set(std::string_view label, int val) {
     int hash = Hash(label);
-    bool found = false;
-    for (int i = 0; i < table_[hash].size(); ++i) {
-      if (table_[hash][i].label == label) {
-        table_[hash][i].val = val;
-        found = true;
-        break;
-      }
-    }
-    if (!found) {
+    auto match_label = [&](const Entry& e) { return e.label == label; };
+    auto it = absl::c_find_if(table_[hash], match_label);
+    if (it != table_[hash].end()) {
+      it->val = val;
+    } else {
       table_[hash].push_back({.label = label, .val = val});
     }
   }
