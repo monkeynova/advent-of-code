@@ -2,24 +2,42 @@
 ==
 
 [part=1]
-Example input
+.|...\....
+|.-.\.....
+.....|-...
+........|.
+..........
+.........\
+..../.\\..
+.-.-/..|..
+.|....-|.\
+..//.|....
 --
-ERROR: UNIMPLEMENTED: Problem not known
+46
 ==
 
 [part=1]
 @include{advent_of_code/2023/day16/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+7236
 ==
 
 [part=2]
-Example input
+.|...\....
+|.-.\.....
+.....|-...
+........|.
+..........
+.........\
+..../.\\..
+.-.-/..|..
+.|....-|.\
+..//.|....
 --
-ERROR: UNIMPLEMENTED: Problem not known
+51
 ==
 
 [part=2]
 @include{advent_of_code/2023/day16/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+7521
