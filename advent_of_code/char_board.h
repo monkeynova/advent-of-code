@@ -202,8 +202,11 @@ class CharBoardBase {
   }
 
  private:
+  friend class BoardPoint;
   friend class CharBoardBase<!is_mutable>;
   CharBoardBase(int stride, std::string_view buf) : stride_(stride), buf_(buf) {}
+
+  int stride_len() const { return stride_; }
 
   template <bool is_mutable_test = is_mutable,
             typename = std::enable_if_t<is_mutable_test>>

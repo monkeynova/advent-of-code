@@ -28,101 +28,120 @@ namespace advent_of_code {
 
 namespace {
 
-void FindEnergized(
-    const CharBoard& b, Point p, Point d,
-    absl::flat_hash_set<std::pair<Point, Point>>* hist,
-    absl::flat_hash_set<Point> *energized) {
-  for (p += d; b.OnBoard(p); p += d) {
-    if (!hist->insert({p, d}).second) break;
-    energized->insert(p);
-    char c = b[p];
-    switch (c) {
-      case '.': break;
-      case '/': {
-        if (d == Cardinal::kNorth) d = Cardinal::kEast;
-        else if (d == Cardinal::kSouth) d = Cardinal::kWest;
-        else if (d == Cardinal::kEast) d = Cardinal::kNorth;
-        else if (d == Cardinal::kWest) d = Cardinal::kSouth;
-        else LOG(FATAL) << "Bad dir";
-        break;
+enum Dir {
+  kNorth = 0,
+  kSouth = 1,
+  kWest = 2,
+  kEast = 3,
+};
+
+Point operator+(Point p, Dir d) {
+  switch (d) {
+    case kNorth: return Point{p.x, p.y - 1};
+    case kSouth: return Point{p.x, p.y + 1};
+    case kWest: return Point{p.x - 1, p.y};
+    case kEast: return Point{p.x + 1, p.y};
+  }
+}
+
+Point& operator+=(Point& p, Dir d) {
+  switch (d) {
+    case kNorth: --p.y; break;
+    case kSouth: ++p.y; break;
+    case kWest: --p.x; break;
+    case kEast: ++p.x; break;
+  }
+  return p;
+}
+
+int FindEnergized(const ImmutableCharBoard& b, Point p, Dir d) {
+  static const std::array<Dir, 4> kSlashLookup = {kEast, kWest, kSouth, kNorth};
+  static const std::array<Dir, 4> kBackLookup = {kWest, kEast, kNorth, kSouth};
+
+  const char* base = b.row(0).data();
+  int stride = b.row(1).data() - base;
+
+  int max_idx = b.width() * stride;
+
+  std::vector<bool> hist(max_idx * 4, false);
+  std::vector<bool> energized(max_idx, false);
+  int count_energized = 0;
+
+  auto on_board = [&](int idx) {
+    if (idx < 0) return false;
+    if (idx >= max_idx) return false;
+    if (idx % stride == stride - 1) return false;
+    return true;
+  };
+
+  int p_idx = p.y * stride + p.x;
+
+  std::vector<std::pair<int, Dir>> queue = {{p_idx, d}};
+  for (int i = 0; i < queue.size(); ++i) {
+    auto [idx, d] = queue[i];
+    while (on_board(idx)) {
+      if (hist[idx * 4 + d]) break;
+      hist[idx * 4 + d] = true;
+      if (!energized[idx]) {
+        energized[idx] = true;
+        ++count_energized;
       }
-      case '\\': {
-        if (d == Cardinal::kNorth) d = Cardinal::kWest;
-        else if (d == Cardinal::kSouth) d = Cardinal::kEast;
-        else if (d == Cardinal::kEast) d = Cardinal::kSouth;
-        else if (d == Cardinal::kWest) d = Cardinal::kNorth;
-        else LOG(FATAL) << "Bad dir";
-        break;
-      }
-      case '-': {
-        if (d == Cardinal::kNorth || d == Cardinal::kSouth) {
-          FindEnergized(b, p, Cardinal::kEast, hist, energized);
-          d = Cardinal::kWest;
-        } else if (d == Cardinal::kEast || d == Cardinal::kWest) {
-          // Pass trhough.
-        } else {
-          LOG(FATAL) << "Bad dir";
+      switch (base[idx]) {
+        case '.': break;
+        case '/': {
+          d = kSlashLookup[d];
+          break;
         }
-        break;
-      }
-      case '|': {
-        if (d == Cardinal::kEast || d == Cardinal::kWest) {
-          FindEnergized(b, p, Cardinal::kNorth, hist, energized);
-          d = Cardinal::kSouth;
-        } else if (d == Cardinal::kNorth || d == Cardinal::kSouth) {
-          // Pass trhough.
-        } else {
-          LOG(FATAL) << "Bad dir";
+        case '\\': {
+          d = kBackLookup[d];
+          break;
         }
-        break;
+        case '-': {
+          if (d == kNorth || d == kSouth) {
+            queue.push_back({idx + 1, kEast});
+            d = kWest;
+          }
+          break;
+        }
+        case '|': {
+          if (d == kEast || d == kWest) {
+            queue.push_back({idx - stride, kNorth});
+            d = kSouth;
+          }
+          break;
+        }
+        default: LOG(FATAL) << "Bad board: " << absl::string_view(&base[idx], 1);
       }
-      default: LOG(FATAL) << "Bad board: " << absl::string_view(&c, 1);
+      switch (d) {
+        case kNorth: idx -= stride; break;
+        case kSouth: idx += stride; break;
+        case kWest: --idx; break;
+        case kEast: ++idx; break;
+      }
     }
   }
+  return count_energized;
 }
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2023_16::Part1(
     absl::Span<std::string_view> input) const {
-  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
-  absl::flat_hash_set<Point> energized;
-  absl::flat_hash_set<std::pair<Point, Point>> hist;
-  FindEnergized(b, {-1, 0}, Cardinal::kEast, &hist, &energized);
-  return AdventReturn(energized.size());
+  ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
+  return AdventReturn(FindEnergized(b, {0, 0}, kEast));
 }
 
 absl::StatusOr<std::string> Day_2023_16::Part2(
     absl::Span<std::string_view> input) const {
-  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
   int max = 0;
   for (int x = 0; x < b.width(); ++x) {
-    {
-      absl::flat_hash_set<Point> energized;
-      absl::flat_hash_set<std::pair<Point, Point>> hist;
-      FindEnergized(b, {x, -1}, Cardinal::kSouth, &hist, &energized);
-      max = std::max<int>(max, energized.size());
-    }
-    {
-      absl::flat_hash_set<Point> energized;
-      absl::flat_hash_set<std::pair<Point, Point>> hist;
-      FindEnergized(b, {x, b.height()}, Cardinal::kNorth, &hist, &energized);
-      max = std::max<int>(max, energized.size());
-    }
+    max = std::max<int>(max, FindEnergized(b, {x, 0}, kSouth));
+    max = std::max<int>(max, FindEnergized(b, {x, b.height() - 1}, kNorth));
   }
   for (int y = 0; y < b.height(); ++y) {
-    {
-      absl::flat_hash_set<Point> energized;
-      absl::flat_hash_set<std::pair<Point, Point>> hist;
-      FindEnergized(b, {-1, y}, Cardinal::kEast, &hist, &energized);
-      max = std::max<int>(max, energized.size());
-    }
-    {
-      absl::flat_hash_set<Point> energized;
-      absl::flat_hash_set<std::pair<Point, Point>> hist;
-      FindEnergized(b, {b.width(), y}, Cardinal::kWest, &hist, &energized);
-      max = std::max<int>(max, energized.size());
-    }
+    max = std::max<int>(max, FindEnergized(b, {0, y}, kEast));
+    max = std::max<int>(max, FindEnergized(b, {b.width() - 1, y}, kWest));
   }
   return AdventReturn(max);
 }
