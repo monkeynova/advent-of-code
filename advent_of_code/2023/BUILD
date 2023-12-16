@@ -56,5 +56,6 @@ cc_library(
         "//advent_of_code/2023/day14:day14_benchmark_lib",
         "//advent_of_code/2023/day15:day15_benchmark_lib",
         "//advent_of_code/2023/day16:day16_benchmark_lib",
+        "//advent_of_code/2023/day17:day17_benchmark_lib",
     ],
 )
