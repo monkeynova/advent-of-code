@@ -49,6 +49,7 @@ class Dish {
   void RollCycle();
 
   std::vector<int> Summary() const {
+    CHECK(rollers_by_x_valid_);
     std::vector<int> ret;
     for (const std::vector<int>& add : rollers_by_x_) {
       ret.insert(ret.end(), add.begin(), add.end());
@@ -70,6 +71,7 @@ class Dish {
 };
 
 int Dish::NorthLoadPart1() const {
+  CHECK(!rollers_by_x_valid_);
   int load = 0;
   for (int y = 0; y < height_; ++y) {
     load += rollers_by_y_[y].size() * (height_ - y);
@@ -79,7 +81,8 @@ int Dish::NorthLoadPart1() const {
 
 
 int Dish::NorthLoad(const std::vector<int>& summary) const {
-  return absl::c_accumulate(summary, 0, [&](int a, int y) { return a + height_ - y; });
+  return absl::c_accumulate(
+    summary, 0, [&](int a, int y) { return a + height_ - y; });
 }
 
 inline void ClearAll(std::vector<std::vector<int>>& v) {
@@ -152,9 +155,11 @@ inline void RollDir(
 
 void Dish::RollFirstNorth() {
   RollDir<1, 1>(rollers_by_x_, stops_by_x_, rollers_by_y_);
+  rollers_by_x_valid_ = false;
 }
 
 void Dish::RollCycle() {
+  CHECK(rollers_by_x_valid_);
   // North; Next is West, sort by x ASC.
   RollDir<1, 1>(rollers_by_x_, stops_by_x_, rollers_by_y_);
   // West; Next is South, sort by y DESC.
