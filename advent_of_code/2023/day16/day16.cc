@@ -17,53 +17,74 @@ enum Dir {
   kEast = 3,
 };
 
-using SegmentMap = std::vector<int>;
+class SegmentMap {
+ public:
+  SegmentMap(const ImmutableCharBoard& b) {
+    stride_ = b.row(1).data() - b.row(0).data();
+    map_ = std::vector<int>((b.height() + 2) * stride_ * 4, -1);
+  }
+
+  int Get(int from_idx, Dir d) const {
+    return map_[from_idx * 4 + d + stride_];
+  }
+
+  void Set(int from_idx, Dir d, int to_idx) {
+    map_[from_idx * 4 + d + stride_] = to_idx;
+  }
+
+ private:
+  int stride_;
+  std::vector<int> map_;
+};
+
 SegmentMap FindSegments(const ImmutableCharBoard& b) {
   const char* base = b.row(0).data();
   int stride = b.row(1).data() - base;
   CHECK_EQ(stride, b.width() + 1);
   
-  SegmentMap ret((b.height() + 2) * stride * 4, -1);
-  int segment_off = stride;
+  SegmentMap ret(b);
 
   for (int y = 0; y < b.height(); ++y) {
     int left_idx = y * stride + -1;
     int right_idx = left_idx + 1;
     for (int x = 0; x < b.width(); ++x, ++right_idx) {
       if (base[right_idx] != '.') {
-        ret[left_idx * 4 + kEast + stride] = right_idx;
-        ret[right_idx * 4 + kWest + stride] = left_idx;
+        ret.Set(left_idx, kEast, right_idx);
+        ret.Set(right_idx, kWest, left_idx);
         left_idx = right_idx;
       }
     }
-    ret[left_idx * 4 + kEast + stride] = right_idx;
-    ret[right_idx * 4 + kWest + stride] = left_idx;
+    ret.Set(left_idx, kEast, right_idx);
+    ret.Set(right_idx, kWest, left_idx);
   }
   for (int x = 0; x < b.width(); ++x) {
     int top_idx = -1 * stride + x;
     int bottom_idx = top_idx + stride;
     for (int y = 0; y < b.height(); ++y, bottom_idx += stride) {
       if (base[bottom_idx] != '.') {
-        ret[top_idx * 4 + kSouth + stride] = bottom_idx;
-        ret[bottom_idx * 4 + kNorth + stride] = top_idx;
+        ret.Set(top_idx, kSouth, bottom_idx);
+        ret.Set(bottom_idx, kNorth, top_idx);
         top_idx = bottom_idx;
       }
     }
-    ret[top_idx * 4 + kSouth + stride] = bottom_idx;
-    ret[bottom_idx * 4 + kNorth + stride] = top_idx;
+    ret.Set(top_idx, kSouth, bottom_idx);
+    ret.Set(bottom_idx, kNorth, top_idx);
   }
   return ret;
 }
 
 // TODO(@monkeynova): A 'BoardPoint' API might make this a more re-usable way
 // to improve CharBoard performance.
-int FindEnergized(const ImmutableCharBoard& b, const SegmentMap& segments, Point p, Dir d) {
+int FindEnergized(const ImmutableCharBoard& b, const SegmentMap& segments,
+                  Point p, Dir d) {
   static const std::array<Dir, 4> kSlashLookup = {kEast, kWest, kSouth,
                                                   kNorth};
   static const std::array<Dir, 4> kBackLookup = {kWest, kEast, kNorth, kSouth};
 
   const char* base = b.row(0).data();
   int stride = b.row(1).data() - base;
+
+  const std::array<int, 4> kDeltaLookup = {-stride, stride, -1, +1};
 
   int max_idx = b.width() * stride;
 
@@ -91,9 +112,9 @@ int FindEnergized(const ImmutableCharBoard& b, const SegmentMap& segments, Point
         if (hist[idx_and_d.first * 4 + idx_and_d.second]) break;
         hist[idx_and_d.first * 4 + idx_and_d.second] = true;
       }
-      int end_idx = segments[idx_and_d.first * 4 + idx_and_d.second + stride];
+      int end_idx = segments.Get(idx_and_d.first, idx_and_d.second);
       CHECK_NE(end_idx, -1);
-      int delta = std::array<int, 4>{-stride, stride, -1, +1}[idx_and_d.second];
+      int delta = kDeltaLookup[idx_and_d.second];
       for (int idx2 = idx_and_d.first; idx2 != end_idx; idx2 += delta) {
         if (idx2 != idx) {
           if (!energized[idx2]) {
@@ -145,6 +166,9 @@ absl::StatusOr<std::string> Day_2023_16::Part1(
 absl::StatusOr<std::string> Day_2023_16::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
+  // TODO(@monkeynova): There might be a way, rather than casting every ray, to
+  // build up a map of "point+dir -> subsequent activation" that could be
+  // constructed with Memo/Dynamic programming.
   SegmentMap segments = FindSegments(b);
   int max = 0;
   for (int x = 0; x < b.width(); ++x) {
