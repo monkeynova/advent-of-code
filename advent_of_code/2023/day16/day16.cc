@@ -17,10 +17,11 @@ enum Dir {
   kEast = 3,
 };
 
-// TODO(@monkeynova): A 'BoardPoint' API might make this a more re-usable
-// way to improve CharBoard performance.
+// TODO(@monkeynova): A 'BoardPoint' API might make this a more re-usable way
+// to improve CharBoard performance.
 int FindEnergized(const ImmutableCharBoard& b, Point p, Dir d) {
-  static const std::array<Dir, 4> kSlashLookup = {kEast, kWest, kSouth, kNorth};
+  static const std::array<Dir, 4> kSlashLookup = {kEast, kWest, kSouth,
+                                                  kNorth};
   static const std::array<Dir, 4> kBackLookup = {kWest, kEast, kNorth, kSouth};
 
   const char* base = b.row(0).data();
@@ -32,11 +33,14 @@ int FindEnergized(const ImmutableCharBoard& b, Point p, Dir d) {
   std::vector<bool> energized(max_idx, false);
   int count_energized = 0;
 
-  auto on_board = [&](int idx) {
+  std::vector<bool> on_board_lookup(max_idx, true);
+  for (int i = stride - 1; i < max_idx; i += stride) {
+    on_board_lookup[i] = false;
+  }
+  auto on_board = [&](int idx) -> bool {
     if (idx < 0) return false;
     if (idx >= max_idx) return false;
-    if (idx % stride == stride - 1) return false;
-    return true;
+    return on_board_lookup[idx];
   };
 
   int p_idx = p.y * stride + p.x;
@@ -75,7 +79,6 @@ int FindEnergized(const ImmutableCharBoard& b, Point p, Dir d) {
           }
           break;
         }
-        default: LOG(FATAL) << "Bad board: " << absl::string_view(&base[idx], 1);
       }
       switch (d) {
         case kNorth: idx -= stride; break;
