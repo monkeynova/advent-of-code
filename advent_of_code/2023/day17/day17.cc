@@ -2,27 +2,8 @@
 
 #include "advent_of_code/2023/day17/day17.h"
 
-#include "absl/algorithm/container.h"
-#include "absl/container/flat_hash_map.h"
-#include "absl/container/flat_hash_set.h"
 #include "absl/log/log.h"
-#include "absl/strings/numbers.h"
-#include "absl/strings/str_cat.h"
-#include "absl/strings/str_join.h"
-#include "absl/strings/str_split.h"
-#include "advent_of_code/bfs.h"
 #include "advent_of_code/char_board.h"
-#include "advent_of_code/conway.h"
-#include "advent_of_code/directed_graph.h"
-#include "advent_of_code/graph_walk.h"
-#include "advent_of_code/interval.h"
-#include "advent_of_code/loop_history.h"
-#include "advent_of_code/point.h"
-#include "advent_of_code/point3.h"
-#include "advent_of_code/point_walk.h"
-#include "advent_of_code/splice_ring.h"
-#include "advent_of_code/tokenizer.h"
-#include "re2/re2.h"
 
 namespace advent_of_code {
 
@@ -41,7 +22,7 @@ constexpr std::array<Dir, 4> kRotateRight = {kEast, kWest, kNorth, kSouth};
 using State = std::pair<int, Dir>;
 
 void AddRange(
-    const CharBoard& b,
+    const ImmutableCharBoard& b,
     State s, Dir dir,
     int start, int end,
     std::vector<int>& heat_map,
@@ -77,7 +58,7 @@ void AddRange(
 
 absl::StatusOr<std::string> Day_2023_17::Part1(
     absl::Span<std::string_view> input) const {
-  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
   std::deque<State> queue;
   int stride = b.row(1).data() - b.row(0).data();
   int max_idx = stride * (b.height() - 1) + b.width() - 1;
@@ -100,7 +81,7 @@ absl::StatusOr<std::string> Day_2023_17::Part1(
 
 absl::StatusOr<std::string> Day_2023_17::Part2(
     absl::Span<std::string_view> input) const {
-  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
   std::deque<State> queue;
   int stride = b.row(1).data() - b.row(0).data();
   int max_idx = stride * (b.height() - 1) + b.width() - 1;
