@@ -28,6 +28,8 @@ class FastBoard {
     Point(const Point&) = default;
     Point& operator=(const Point&) = default;
 
+    bool operator==(const Point& o) const { return idx_ == o.idx_; }
+    bool operator!=(const Point& o) const { return idx_ != o.idx_; }
    private:
     friend class FastBoard;
 
@@ -40,9 +42,12 @@ class FastBoard {
     Point p;
     Dir d;
 
-    bool Move(const FastBoard& fb) {
+    bool MoveAndCheckBoard(const FastBoard& fb) {
       p = fb.Add(p, d);
       return fb.OnBoard(p);
+    }
+    void Move(const FastBoard& fb) {
+      p = fb.Add(p, d);
     }
   };
   
@@ -72,6 +77,21 @@ class FastBoard {
     std::vector<Storage> map_;
   };
 
+  template <typename Storage>
+  class PointDirExtraMap {
+   public:
+    PointDirExtraMap(const FastBoard& b, Storage init)
+     : stride_(b.stride_), map_(4 * (b.size_ + 2 * stride_), init) {}
+
+    Storage Get(PointDir pd) const { return map_[pd.p.idx_ * 4 + pd.d + stride_]; }
+    void Set(PointDir pd, Storage s) { map_[pd.p.idx_ * 4 + pd.d + stride_] = s; }
+
+   private:
+    friend class FastBoard;
+    int stride_;
+    std::vector<Storage> map_;
+  };
+
   explicit FastBoard(const ImmutableCharBoard& b)
    : base_(b.row(0).data()), stride_(b.row(1).data() - b.row(0).data()),
      size_(b.height() * stride_), dir_delta_({-stride_, stride_, -1, 1}),
@@ -83,6 +103,10 @@ class FastBoard {
 
   Point From(advent_of_code::Point in) const {
     return Point(in.y * stride_ + in.x);
+  }
+
+  advent_of_code::Point To(Point p) const {
+    return advent_of_code::Point{.x = p.idx_ % stride_, .y = p.idx_ / stride_};
   }
 
   bool OnBoard(Point p) const {

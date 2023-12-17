@@ -4,147 +4,146 @@
 
 #include "absl/log/log.h"
 #include "advent_of_code/char_board.h"
+#include "advent_of_code/fast_board.h"
 #include "advent_of_code/point.h"
 
 namespace advent_of_code {
 
 namespace {
 
-enum Dir {
-  kNorth = 0,
-  kSouth = 1,
-  kWest = 2,
-  kEast = 3,
-};
-
-class SegmentMap {
- public:
-  SegmentMap(const ImmutableCharBoard& b) {
-    stride_ = b.row(1).data() - b.row(0).data();
-    map_ = std::vector<int>((b.height() + 2) * stride_ * 4, -1);
-  }
-
-  int Get(int from_idx, Dir d) const {
-    return map_[from_idx * 4 + d + stride_];
-  }
-
-  void Set(int from_idx, Dir d, int to_idx) {
-    map_[from_idx * 4 + d + stride_] = to_idx;
-  }
-
- private:
-  int stride_;
-  std::vector<int> map_;
-};
+// TODO(@monkeynova): 'PointDirExtraMap' is an ugly hack. Find a better way.
+using SegmentMap = FastBoard::PointDirExtraMap<FastBoard::Point>;
 
 SegmentMap FindSegments(const ImmutableCharBoard& b) {
-  const char* base = b.row(0).data();
-  int stride = b.row(1).data() - base;
-  CHECK_EQ(stride, b.width() + 1);
-  
-  SegmentMap ret(b);
+  FastBoard fb(b);
+
+  const FastBoard::Point kBadPoint = fb.From({-1, -1});
+  SegmentMap ret(fb, kBadPoint);
 
   for (int y = 0; y < b.height(); ++y) {
-    int left_idx = y * stride + -1;
-    int right_idx = left_idx + 1;
-    for (int x = 0; x < b.width(); ++x, ++right_idx) {
-      if (base[right_idx] != '.') {
-        ret.Set(left_idx, kEast, right_idx);
-        ret.Set(right_idx, kWest, left_idx);
-        left_idx = right_idx;
+    FastBoard::Point left = fb.From({-1, y});
+    FastBoard::Point right = fb.Add(left, FastBoard::kEast);
+    for (int x = 0; x < b.width(); ++x) {
+      if (fb[right] != '.') {
+        ret.Set({left, FastBoard::kEast}, right);
+        ret.Set({right, FastBoard::kWest}, left);
+        left = right;
       }
+      right = fb.Add(right, FastBoard::kEast);
     }
-    ret.Set(left_idx, kEast, right_idx);
-    ret.Set(right_idx, kWest, left_idx);
+    ret.Set({left, FastBoard::kEast}, right);
+    ret.Set({right, FastBoard::kWest}, left);
+    left = fb.Add(left, FastBoard::kSouth);
   }
+
   for (int x = 0; x < b.width(); ++x) {
-    int top_idx = -1 * stride + x;
-    int bottom_idx = top_idx + stride;
-    for (int y = 0; y < b.height(); ++y, bottom_idx += stride) {
-      if (base[bottom_idx] != '.') {
-        ret.Set(top_idx, kSouth, bottom_idx);
-        ret.Set(bottom_idx, kNorth, top_idx);
-        top_idx = bottom_idx;
+    FastBoard::Point top = fb.From({x, -1});
+    FastBoard::Point bottom = fb.Add(top, FastBoard::kSouth);
+    for (int y = 0; y < b.height(); ++y) {
+      if (fb[bottom] != '.') {
+        ret.Set({top, FastBoard::kSouth}, bottom);
+        ret.Set({bottom, FastBoard::kNorth}, top);
+        top = bottom;
       }
+      bottom = fb.Add(bottom, FastBoard::kSouth);
     }
-    ret.Set(top_idx, kSouth, bottom_idx);
-    ret.Set(bottom_idx, kNorth, top_idx);
+    ret.Set({top, FastBoard::kSouth}, bottom);
+    ret.Set({bottom, FastBoard::kNorth}, top);
   }
   return ret;
 }
 
-// TODO(@monkeynova): A 'BoardPoint' API might make this a more re-usable way
-// to improve CharBoard performance.
 int FindEnergized(const ImmutableCharBoard& b, const SegmentMap& segments,
-                  Point p, Dir d) {
-  static const std::array<Dir, 4> kSlashLookup = {kEast, kWest, kSouth,
-                                                  kNorth};
-  static const std::array<Dir, 4> kBackLookup = {kWest, kEast, kNorth, kSouth};
+                  Point p, FastBoard::Dir d) {
+  static const std::array<FastBoard::Dir, 4> kSlashLookup = {
+      FastBoard::kEast, FastBoard::kWest, FastBoard::kSouth,
+      FastBoard::kNorth};
+  static const std::array<FastBoard::Dir, 4> kBackLookup = {
+      FastBoard::kWest, FastBoard::kEast, FastBoard::kNorth,
+      FastBoard::kSouth};
 
-  const char* base = b.row(0).data();
-  int stride = b.row(1).data() - base;
-
-  const std::array<int, 4> kDeltaLookup = {-stride, stride, -1, +1};
-
-  int max_idx = b.width() * stride;
-
-  std::vector<bool> hist(max_idx * 4, false);
-  std::vector<bool> energized(max_idx, false);
+  FastBoard fb(b);
+  FastBoard::PointDirMap<bool> hist(fb, false);
+  FastBoard::PointMap<bool> energized(fb, false);
   int count_energized = 0;
 
-  std::vector<bool> on_board_lookup(max_idx, true);
-  for (int i = stride - 1; i < max_idx; i += stride) {
-    on_board_lookup[i] = false;
-  }
-  auto on_board = [&](int idx) -> bool {
-    if (idx < 0) return false;
-    if (idx >= max_idx) return false;
-    return on_board_lookup[idx];
-  };
-
-  int idx = p.y * stride + p.x;
-  std::vector<std::pair<int, Dir>> queue = {{idx, d}};
-
-  for (int i = 0; i < queue.size(); ++i) {
-    std::pair<int, Dir> idx_and_d = queue[i];
-    while (true) {
-      if (on_board(idx_and_d.first)) {
-        if (hist[idx_and_d.first * 4 + idx_and_d.second]) break;
-        hist[idx_and_d.first * 4 + idx_and_d.second] = true;
-      }
-      int end_idx = segments.Get(idx_and_d.first, idx_and_d.second);
-      CHECK_NE(end_idx, -1);
-      int delta = kDeltaLookup[idx_and_d.second];
-      for (int idx2 = idx_and_d.first; idx2 != end_idx; idx2 += delta) {
-        if (idx2 != idx) {
-          if (!energized[idx2]) {
-            energized[idx2] = true;
-            ++count_energized;
-          }
+  FastBoard::Point start = fb.From(p);
+  std::vector<FastBoard::PointDir> queue;
+  {
+    // Unroll the first segment, and we can avoid doing a number of (admittedly
+    // very predictable) conditionals.
+    FastBoard::PointDir pd = {.p = start, .d = d};
+    FastBoard::Point end = segments.Get(pd);
+    if (pd.p != end) {
+      for (pd.Move(fb); pd.p != end; pd.Move(fb)) {
+        if (!energized.Get(pd.p)) {
+          energized.Set(pd.p, true);
+          ++count_energized;
         }
       }
-      if (!on_board(end_idx)) break;
-      idx_and_d.first = end_idx;
-      switch (base[idx_and_d.first]) {
+    }
+    if (!fb.OnBoard(pd.p)) {
+      return count_energized;
+    }
+    switch (fb[pd.p]) {
+      case '/': {
+        pd.d = kSlashLookup[pd.d];
+        break;
+      }
+      case '\\': {
+        pd.d  = kBackLookup[pd.d];
+        break;
+      }
+      case '|': {
+        if (pd.d == FastBoard::kWest || pd.d == FastBoard::kEast) {
+          pd.d = FastBoard::kNorth;
+          queue.push_back({.p = pd.p, .d = FastBoard::kSouth});
+        }
+        break;
+      }
+      case '-': {
+        if (pd.d == FastBoard::kNorth || pd.d == FastBoard::kSouth) {
+          pd.d = FastBoard::kWest;
+          queue.push_back({.p = pd.p, .d = FastBoard::kEast});
+        }
+        break;
+      }
+    }
+    queue.push_back(pd);
+  }
+
+  for (int i = 0; i < queue.size(); ++i) {
+    FastBoard::PointDir pd = queue[i];
+    while (true) {
+      if (hist.Get(pd)) break;
+      hist.Set(pd, true);
+      for (FastBoard::Point end = segments.Get(pd); pd.p != end; pd.Move(fb)) {
+        if (!energized.Get(pd.p)) {
+          energized.Set(pd.p, true);
+          ++count_energized;
+        }
+      }
+      if (!fb.OnBoard(pd.p)) break;
+      switch (fb[pd.p]) {
         case '/': {
-          idx_and_d.second = kSlashLookup[idx_and_d.second];
+          pd.d = kSlashLookup[pd.d];
           break;
         }
         case '\\': {
-          idx_and_d.second = kBackLookup[idx_and_d.second];
+          pd.d  = kBackLookup[pd.d];
           break;
         }
         case '|': {
-          if (idx_and_d.second == kWest || idx_and_d.second == kEast) {
-            idx_and_d.second = kNorth;
-            queue.push_back({idx_and_d.first, kSouth});
+          if (pd.d == FastBoard::kWest || pd.d == FastBoard::kEast) {
+            pd.d = FastBoard::kNorth;
+            queue.push_back({.p = pd.p, .d = FastBoard::kSouth});
           }
           break;
         }
         case '-': {
-          if (idx_and_d.second == kNorth || idx_and_d.second == kSouth) {
-            idx_and_d.second = kWest;
-            queue.push_back({idx_and_d.first, kEast});
+          if (pd.d == FastBoard::kNorth || pd.d == FastBoard::kSouth) {
+            pd.d = FastBoard::kWest;
+            queue.push_back({.p = pd.p, .d = FastBoard::kEast});
           }
           break;
         }
@@ -160,7 +159,7 @@ absl::StatusOr<std::string> Day_2023_16::Part1(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
   SegmentMap segments = FindSegments(b);
-  return AdventReturn(FindEnergized(b, segments, {-1, 0}, kEast));
+  return AdventReturn(FindEnergized(b, segments, {-1, 0}, FastBoard::kEast));
 }
 
 absl::StatusOr<std::string> Day_2023_16::Part2(
@@ -172,12 +171,12 @@ absl::StatusOr<std::string> Day_2023_16::Part2(
   SegmentMap segments = FindSegments(b);
   int max = 0;
   for (int x = 0; x < b.width(); ++x) {
-    max = std::max(max, FindEnergized(b, segments, {x, -1}, kSouth));
-    max = std::max(max, FindEnergized(b, segments, {x, b.height()}, kNorth));
+    max = std::max(max, FindEnergized(b, segments, {x, -1}, FastBoard::kSouth));
+    max = std::max(max, FindEnergized(b, segments, {x, b.height()}, FastBoard::kNorth));
   }
   for (int y = 0; y < b.height(); ++y) {
-    max = std::max(max, FindEnergized(b, segments, {-1, y}, kEast));
-    max = std::max(max, FindEnergized(b, segments, {b.width(), y}, kWest));
+    max = std::max(max, FindEnergized(b, segments, {-1, y}, FastBoard::kEast));
+    max = std::max(max, FindEnergized(b, segments, {b.width(), y}, FastBoard::kWest));
   }
   return AdventReturn(max);
 }

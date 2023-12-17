@@ -22,7 +22,7 @@ int MinCartPath(const ImmutableCharBoard& b, int min, int max) {
     CHECK(pd.d != dir);
     pd.d = dir;
     for (int i = 0; i < max; ++i) {
-      if (!pd.Move(fb)) break;
+      if (!pd.MoveAndCheckBoard(fb)) break;
       heat += fb[pd.p] - '0';
       if (i + 1 < min) continue;
   
