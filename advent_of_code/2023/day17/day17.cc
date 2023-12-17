@@ -41,7 +41,7 @@ class FastBoard {
    public:
     PointMap(const FastBoard& b, Storage init) : map_(b.size_, init) {}
 
-    Storage Get(Point p) { return map_[p.idx_]; }
+    Storage Get(Point p) const { return map_[p.idx_]; }
     void Set(Point p, Storage s) { map_[p.idx_] = s; }
 
    private:
@@ -54,7 +54,7 @@ class FastBoard {
    public:
     PointDirMap(const FastBoard& b, Storage init) : map_(4 * b.size_, init) {}
 
-    Storage Get(Point p, Dir d) { return map_[p.idx_ * 4 + d]; }
+    Storage Get(Point p, Dir d) const { return map_[p.idx_ * 4 + d]; }
     void Set(Point p, Dir d, Storage s) { map_[p.idx_ * 4 + d] = s; }
 
    private:
@@ -71,21 +71,21 @@ class FastBoard {
     }
   }
 
-  Point From(advent_of_code::Point in) {
+  Point From(advent_of_code::Point in) const {
     return Point(in.y * stride_ + in.x);
   }
 
-  bool OnBoard(Point p) {
+  bool OnBoard(Point p) const {
     if (p.idx_ < 0) return false;
     if (p.idx_ >= size_) return false;
     return on_board_[p.idx_];
   }
 
-  Point Add(Point p, Dir d) {
+  Point Add(Point p, Dir d) const {
     return Point(p.idx_ + dir_delta_[d]);
   }
 
-  char operator[](Point p) {
+  char operator[](Point p) const {
     return base_[p.idx_];
   }
 
