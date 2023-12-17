@@ -129,6 +129,16 @@ cc_library(
 )
 
 cc_library(
+    name = "fast_board",
+    hdrs = ["fast_board.h"],
+    deps = [
+        ":char_board",
+        ":point",
+    ],
+)
+
+
+cc_library(
     name = "md5",
     hdrs = ["md5.h"],
     deps = [

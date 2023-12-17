@@ -4,143 +4,53 @@
 
 #include "absl/log/log.h"
 #include "advent_of_code/char_board.h"
+#include "advent_of_code/fast_board.h"
 
 namespace advent_of_code {
 
 namespace {
 
-class FastBoard {
- public:
-  enum Dir {
-    kNorth = 0,
-    kSouth = 1,
-    kWest = 2,
-    kEast = 3,
-  };
-
-  static constexpr std::array<Dir, 4> kRotateLeft =
-      {kWest, kEast, kSouth, kNorth};
-  static constexpr std::array<Dir, 4> kRotateRight =
-      {kEast, kWest, kNorth, kSouth};
-
-  class Point {
-   public:
-    Point(const Point&) = default;
-    Point& operator=(const Point&) = default;
-
-   private:
-    friend class FastBoard;
-
-    explicit Point(int idx) : idx_(idx) {}
-
-    int idx_;
-  };
-  
-  template <typename Storage>
-  class PointMap {
-   public:
-    PointMap(const FastBoard& b, Storage init) : map_(b.size_, init) {}
-
-    Storage Get(Point p) const { return map_[p.idx_]; }
-    void Set(Point p, Storage s) { map_[p.idx_] = s; }
-
-   private:
-    friend class FastBoard;
-    std::vector<Storage> map_;
-  };
-
-  template <typename Storage>
-  class PointDirMap {
-   public:
-    PointDirMap(const FastBoard& b, Storage init) : map_(4 * b.size_, init) {}
-
-    Storage Get(Point p, Dir d) const { return map_[p.idx_ * 4 + d]; }
-    void Set(Point p, Dir d, Storage s) { map_[p.idx_ * 4 + d] = s; }
-
-   private:
-    friend class FastBoard;
-    std::vector<Storage> map_;
-  };
-
-  explicit FastBoard(const ImmutableCharBoard& b)
-   : base_(b.row(0).data()), stride_(b.row(1).data() - b.row(0).data()),
-     size_(b.height() * stride_), dir_delta_({-stride_, stride_, -1, 1}),
-     on_board_(size_, true) {
-    for (int i = stride_ - 1; i < size_; i += stride_) {
-      on_board_[i] = false;
-    }
-  }
-
-  Point From(advent_of_code::Point in) const {
-    return Point(in.y * stride_ + in.x);
-  }
-
-  bool OnBoard(Point p) const {
-    if (p.idx_ < 0) return false;
-    if (p.idx_ >= size_) return false;
-    return on_board_[p.idx_];
-  }
-
-  Point Add(Point p, Dir d) const {
-    return Point(p.idx_ + dir_delta_[d]);
-  }
-
-  char operator[](Point p) const {
-    return base_[p.idx_];
-  }
-
- private:
-  const char* base_;
-  int stride_;
-  int size_;
-  std::array<int, 4> dir_delta_;
-  std::vector<bool> on_board_;
-};
-
 int MinCartPath(const ImmutableCharBoard& b, int min, int max) {
-  using State = std::pair<FastBoard::Point, FastBoard::Dir>;
-
-  std::deque<State> queue;
+  std::deque<FastBoard::PointDir> queue;
   FastBoard fb(b);
   FastBoard::PointDirMap<int> heat_map(fb, std::numeric_limits<int>::max());
   FastBoard::PointDirMap<bool> in_queue(fb, false);
 
-  auto add_range = [&](State s, FastBoard::Dir dir) {
-    int heat = heat_map.Get(s.first, s.second);
+  auto add_range = [&](FastBoard::PointDir pd, FastBoard::Dir dir) {
+    int heat = heat_map.Get(pd);
     CHECK_NE(heat, std::numeric_limits<int>::max());
-    CHECK(s.second != dir);
-    s.second = dir;
+    CHECK(pd.d != dir);
+    pd.d = dir;
     for (int i = 0; i < max; ++i) {
-      s.first = fb.Add(s.first, s.second);
-      if (!fb.OnBoard(s.first)) break;
-      heat += fb[s.first] - '0';
+      if (!pd.Move(fb)) break;
+      heat += fb[pd.p] - '0';
       if (i + 1 < min) continue;
   
-      if (heat < heat_map.Get(s.first, s.second)) {
-        heat_map.Set(s.first, s.second, heat);
-        if (!in_queue.Get(s.first, s.second)) {
-          in_queue.Set(s.first, s.second, true);
-          queue.push_back(s); 
+      if (heat < heat_map.Get(pd)) {
+        heat_map.Set(pd, heat);
+        if (!in_queue.Get(pd)) {
+          in_queue.Set(pd, true);
+          queue.push_back(pd); 
         }
       }
     }
   };
 
-  FastBoard::Point start = fb.From({0, 0});
+  FastBoard::PointDir start = {.p = fb.From({0, 0}), .d = FastBoard::kNorth};
   for (FastBoard::Dir d : {FastBoard::kEast, FastBoard::kSouth}) {
-    heat_map.Set(start, FastBoard::kNorth, 0);
-    add_range({start, FastBoard::kNorth}, d);
+    heat_map.Set(start, 0);
+    add_range(start, d);
   }
   for (;!queue.empty(); queue.pop_front()) {
-    const State& cur = queue.front();
-    in_queue.Set(cur.first, cur.second, false);
-    add_range(cur, FastBoard::kRotateLeft[cur.second]);
-    add_range(cur, FastBoard::kRotateRight[cur.second]);
+    const FastBoard::PointDir& cur = queue.front();
+    in_queue.Set(cur, false);
+    add_range(cur, FastBoard::kRotateLeft[cur.d]);
+    add_range(cur, FastBoard::kRotateRight[cur.d]);
   }
   FastBoard::Point end = fb.From({b.width() - 1, b.height() - 1});
   int answer = std::numeric_limits<int>::max();
-  answer = std::min(answer, heat_map.Get(end, FastBoard::kEast));
-  answer = std::min(answer, heat_map.Get(end, FastBoard::kSouth));
+  answer = std::min(answer, heat_map.Get({.p = end, .d = FastBoard::kEast}));
+  answer = std::min(answer, heat_map.Get({.p = end, .d = FastBoard::kSouth}));
   return answer;
 }
 
