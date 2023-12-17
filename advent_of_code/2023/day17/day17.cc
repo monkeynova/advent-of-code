@@ -26,6 +26,7 @@ int MinCartPath(const ImmutableCharBoard& b, int min, int max) {
   int stride = b.row(1).data() - b.row(0).data();
   int max_idx = stride * (b.height() - 1) + b.width() - 1;
   std::vector<int> heat_map(4 * (max_idx + 1), std::numeric_limits<int>::max());
+  std::vector<bool> in_queue(4 * (max_idx + 1), false);
 
   std::vector<bool> on_board_vec(max_idx + 1, true);
   for (int i = stride - 1; i <= max_idx; i += stride) {
@@ -38,13 +39,14 @@ int MinCartPath(const ImmutableCharBoard& b, int min, int max) {
     return on_board_vec[idx];
   };
 
+  const std::array<int, 4> kIdxDelta = {-stride, stride, -1, 1};
+
   auto add_range = [&](State s, Dir dir) {
     int heat = heat_map[s.first * 4 + s.second];
     CHECK_NE(heat, std::numeric_limits<int>::max());
     CHECK(s.second != dir);
     s.second = dir;
     const char* base = b.row(0).data();
-    const std::array<int, 4> kIdxDelta = {-stride, stride, -1, 1};
     int delta = kIdxDelta[dir];
     for (int i = 0; i < max; ++i) {
       s.first += delta;
@@ -54,7 +56,10 @@ int MinCartPath(const ImmutableCharBoard& b, int min, int max) {
   
       if (heat < heat_map[s.first * 4 + s.second]) {
         heat_map[s.first * 4 + s.second] = heat;
-        queue.push_back(s); 
+        if (!in_queue[s.first * 4 + s.second]) {
+          in_queue[s.first * 4 + s.second] = true;
+          queue.push_back(s); 
+        }
       }
     }
   };
@@ -66,6 +71,7 @@ int MinCartPath(const ImmutableCharBoard& b, int min, int max) {
   }
   for (;!queue.empty(); queue.pop_front()) {
     const State& cur = queue.front();
+    in_queue[cur.first * 4 + cur.second] = false;
     add_range(cur, kRotateLeft[cur.second]);
     add_range(cur, kRotateRight[cur.second]);
   }
