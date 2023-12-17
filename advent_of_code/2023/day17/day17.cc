@@ -18,8 +18,10 @@ class FastBoard {
     kEast = 3,
   };
 
-  static constexpr std::array<Dir, 4> kRotateLeft = {kWest, kEast, kSouth, kNorth};
-  static constexpr std::array<Dir, 4> kRotateRight = {kEast, kWest, kNorth, kSouth};
+  static constexpr std::array<Dir, 4> kRotateLeft =
+      {kWest, kEast, kSouth, kNorth};
+  static constexpr std::array<Dir, 4> kRotateRight =
+      {kEast, kWest, kNorth, kSouth};
 
   class Point {
    public:
@@ -28,8 +30,6 @@ class FastBoard {
 
    private:
     friend class FastBoard;
-    template <typename Storage>
-    friend class PointMap;
 
     explicit Point(int idx) : idx_(idx) {}
 
