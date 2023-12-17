@@ -28,34 +28,43 @@ namespace advent_of_code {
 
 namespace {
 
-struct State {
-  Point p;
-  Point dir;
-
-  bool operator==(const State& o) const {
-    return p == o.p && dir == o.dir;
-  }
-  template <typename H>
-  friend H AbslHashValue(H h, const State& s) {
-    return H::combine(std::move(h), s.p, s.dir);
-  }
+enum Dir {
+  kNorth = 0,
+  kSouth = 1,
+  kWest = 2,
+  kEast = 3,
 };
+
+constexpr std::array<Dir, 4> kRotateLeft = {kWest, kEast, kSouth, kNorth};
+constexpr std::array<Dir, 4> kRotateRight = {kEast, kWest, kNorth, kSouth};
+
+using State = std::pair<int, Dir>;
 
 void AddRange(
     const CharBoard& b,
-    State s, Point dir,
+    State s, Dir dir,
     int start, int end,
     absl::flat_hash_map<State, int>& heat_map,
     std::deque<State>& queue) {
   auto it = heat_map.find(s);
   CHECK(it != heat_map.end());
   int heat = it->second;
-  CHECK(s.dir != dir);
-  s.dir = dir;
+  CHECK(s.second != dir);
+  s.second = dir;
+  const char* base = b.row(0).data();
+  int stride = b.row(1).data() - b.row(0).data();
+  const std::array<int, 4> kIdxDelta = {-stride, stride, -1, 1};
+  int delta = kIdxDelta[dir];
+  int max_idx = stride * (b.height() - 1) + b.width() - 1;
+  auto on_board = [&](int idx) {
+    if (idx < 0) return false;
+    if (idx > max_idx) return false;
+    return idx % stride != stride - 1;
+  };
   for (int i = 0; i < end; ++i) {
-    s.p += s.dir;
-    if (!b.OnBoard(s.p)) break;
-    heat += b[s.p] - '0';
+    s.first += delta;
+    if (!on_board(s.first)) break;
+    heat += base[s.first] - '0';
     if (i + 1 < start) continue;
 
     auto [it, inserted] = heat_map.emplace(s, heat);
@@ -73,20 +82,21 @@ absl::StatusOr<std::string> Day_2023_17::Part1(
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
   std::deque<State> queue;
   absl::flat_hash_map<State, int> heat;
-  for (Point d : {Cardinal::kEast, Cardinal::kSouth}) {
-    State s = {.p = {0, 0}, .dir = Cardinal::kOrigin};
+  for (Dir d : {kEast, kSouth}) {
+    State s = {0, kNorth};
     heat[s] = 0;
     AddRange(b, s, d, 1, 3, heat, queue);
   }
   for (;!queue.empty(); queue.pop_front()) {
     const State& cur = queue.front();
-    AddRange(b, cur, cur.dir.rotate_left(), 1, 3, heat, queue);
-    AddRange(b, cur, cur.dir.rotate_right(), 1, 3, heat, queue);
+    AddRange(b, cur, kRotateLeft[cur.second], 1, 3, heat, queue);
+    AddRange(b, cur, kRotateRight[cur.second], 1, 3, heat, queue);
   }
   int answer = std::numeric_limits<int>::max();
-  Point end = {b.width() - 1, b.height() - 1};
-  for (Point d : {Cardinal::kEast, Cardinal::kSouth}) {
-    auto it = heat.find({.p = end, .dir = d});
+  int stride = b.row(1).data() - b.row(0).data();
+  int end = (b.width() - 1) * stride + b.height() - 1;
+  for (Dir d : {kEast, kSouth}) {
+    auto it = heat.find({end, d});
     if (it != heat.end()) {
       answer = std::min(answer, it->second);
     }
@@ -99,20 +109,21 @@ absl::StatusOr<std::string> Day_2023_17::Part2(
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
   std::deque<State> queue;
   absl::flat_hash_map<State, int> heat;
-  for (Point d : {Cardinal::kEast, Cardinal::kSouth}) {
-    State s = {.p = {0, 0}, .dir = Cardinal::kOrigin};
+  for (Dir d : {kEast, kSouth}) {
+    State s = {0, kNorth};
     heat[s] = 0;
     AddRange(b, s, d, 4, 10, heat, queue);
   }
   for (;!queue.empty(); queue.pop_front()) {
     const State& cur = queue.front();
-    AddRange(b, cur, cur.dir.rotate_left(), 4, 10, heat, queue);
-    AddRange(b, cur, cur.dir.rotate_right(), 4, 10, heat, queue);
+    AddRange(b, cur, kRotateLeft[cur.second], 4, 10, heat, queue);
+    AddRange(b, cur, kRotateRight[cur.second], 4, 10, heat, queue);
   }
   int answer = std::numeric_limits<int>::max();
-  Point end = {b.width() - 1, b.height() - 1};
-  for (Point d : {Cardinal::kEast, Cardinal::kSouth}) {
-    auto it = heat.find({.p = end, .dir = d});
+  int stride = b.row(1).data() - b.row(0).data();
+  int end = (b.width() - 1) * stride + b.height() - 1;
+  for (Dir d : {kEast, kSouth}) {
+    auto it = heat.find({end, d});
     if (it != heat.end()) {
       answer = std::min(answer, it->second);
     }
