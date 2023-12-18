@@ -2,24 +2,51 @@
 ==
 
 [part=1]
-Example input
+R 6 (#70c710)
+D 5 (#0dc571)
+L 2 (#5713f0)
+D 2 (#d2c081)
+R 2 (#59c680)
+D 2 (#411b91)
+L 5 (#8ceee2)
+U 2 (#caa173)
+L 1 (#1b58a2)
+U 2 (#caa171)
+R 2 (#7807d2)
+U 3 (#a77fa3)
+L 2 (#015232)
+U 2 (#7a21e3)
 --
-ERROR: UNIMPLEMENTED: Problem not known
+62
 ==
 
+# 55082 (high)
 [part=1]
 @include{advent_of_code/2023/day18/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+53300
 ==
 
 [part=2]
-Example input
+R 6 (#70c710)
+D 5 (#0dc571)
+L 2 (#5713f0)
+D 2 (#d2c081)
+R 2 (#59c680)
+D 2 (#411b91)
+L 5 (#8ceee2)
+U 2 (#caa173)
+L 1 (#1b58a2)
+U 2 (#caa171)
+R 2 (#7807d2)
+U 3 (#a77fa3)
+L 2 (#015232)
+U 2 (#7a21e3)
 --
-ERROR: UNIMPLEMENTED: Problem not known
+952408144115
 ==
 
 [part=2]
 @include{advent_of_code/2023/day18/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+64294334780659
