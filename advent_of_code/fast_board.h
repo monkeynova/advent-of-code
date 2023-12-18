@@ -78,6 +78,19 @@ class FastBoard {
   };
 
   template <typename Storage>
+  class PointHalfDirMap {
+   public:
+    PointHalfDirMap(const FastBoard& b, Storage init) : map_(2 * b.size_, init) {}
+
+    Storage Get(PointDir pd) const { return map_[pd.p.idx_ * 2 + pd.d / 2]; }
+    void Set(PointDir pd, Storage s) { map_[pd.p.idx_ * 2 + pd.d / 2] = s; }
+
+   private:
+    friend class FastBoard;
+    std::vector<Storage> map_;
+  };
+
+  template <typename Storage>
   class PointDirExtraMap {
    public:
     PointDirExtraMap(const FastBoard& b, Storage init)

@@ -14,7 +14,7 @@ int MinCartPath(const ImmutableCharBoard& b, int min, int max) {
   std::deque<FastBoard::PointDir> queue;
   FastBoard fb(b);
   // TODO(@monkeynova): heat_map doesn't need to store keys for both North and South...
-  FastBoard::PointDirMap<int> heat_map(fb, std::numeric_limits<int>::max());
+  FastBoard::PointHalfDirMap<int> heat_map(fb, std::numeric_limits<int>::max());
   FastBoard::PointDirMap<bool> in_queue(fb, false);
 
   auto add_range = [&](FastBoard::PointDir pd, FastBoard::Dir dir) {
