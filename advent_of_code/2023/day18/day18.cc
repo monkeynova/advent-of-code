@@ -28,6 +28,71 @@ namespace advent_of_code {
 
 namespace {
 
+int64_t CountInterior(const std::vector<std::pair<Point, Point>>& loop) {
+  absl::flat_hash_set<int> distinct_y;
+  for (const auto& [p1, p2] : loop) {
+    distinct_y.insert(p1.y);
+    distinct_y.insert(p2.y);
+  }
+  std::vector<int> y_vals(distinct_y.begin(), distinct_y.end());
+  absl::c_sort(y_vals);
+  std::vector<std::pair<Point, Point>> verts;
+  for (const auto& pair : loop) {
+    if (pair.first.x == pair.second.x) {
+      verts.push_back(pair);
+    }
+  }
+  absl::c_sort(
+    verts,
+    [](const std::pair<Point, Point>& a, const std::pair<Point, Point>& b) {
+      return a.first.x < b.first.x;
+    });
+
+  auto count_on = [verts](int y) {
+    enum Bits {
+      kUpper = 1,
+      kLower = 2,
+    };
+    absl::flat_hash_map<int, int> x_to_type;
+    bool in_upper = false;
+    bool in_lower = false;
+    int last_x = std::numeric_limits<int>::min();
+
+    int64_t row_count = 0;
+    for (const auto& [p1, p2] : verts) {
+      bool start_inside = in_upper || in_lower;
+
+      if (p1.y == y) in_lower = !in_lower;
+      else if (p2.y == y) in_upper = !in_upper;
+      else if (p1.y < y && p2.y > y) {
+        in_lower = !in_lower;
+        in_upper = !in_upper;
+      }
+
+      int x = p1.x;
+      if (start_inside) {
+        row_count += p1.x - last_x;
+        if (!in_upper && !in_lower) {
+          ++row_count;
+        }
+      }
+      last_x = x;
+    }
+    return row_count;
+  };
+
+  int64_t total_count = 0;
+  for (int i = 0; i < y_vals.size(); ++i) {
+    if (i > 0 && y_vals[i] > y_vals[i - 1] + 1) {
+      int64_t height = y_vals[i] - y_vals[i - 1] - 1;
+      int y = y_vals[i] - 1;
+      total_count += height * count_on(y);
+    }
+    int y = y_vals[i];
+    total_count += count_on(y);
+  }
+  return total_count;
+}
 
 }  // namespace
 
@@ -202,68 +267,7 @@ absl::StatusOr<std::string> Day_2023_18::Part2(
     }
     cur = cur + dir * dist;
   }
-  absl::flat_hash_set<int> distinct_y;
-  for (const auto& [p1, p2] : loop) {
-    distinct_y.insert(p1.y);
-    distinct_y.insert(p2.y);
-  }
-  std::vector<int> y_vals(distinct_y.begin(), distinct_y.end());
-  absl::c_sort(y_vals);
-  auto count_on = [loop](int y) {
-    enum Bits {
-      kUpper = 1,
-      kLower = 2,
-    };
-    absl::flat_hash_map<int, int> x_to_type;
-    for (const auto& [p1, p2] : loop) {
-      if (p1.x == p2.x) { 
-        if (p1.y == y) x_to_type[p1.x] |= kLower;
-        else if (p2.y == y) x_to_type[p1.x] |= kUpper;
-        else if (p1.y < y && p2.y > y) {
-          x_to_type[p1.x] |= kUpper | kLower;
-        }
-      }
-    }
-    std::vector<int> x_vals;
-    for (const auto& [x, t] : x_to_type) {
-      x_vals.push_back(x);
-    }
-    absl::c_sort(x_vals);
-    bool in_upper = false;
-    bool in_lower = false;
-    int64_t row_count = 0;
-    for (int i = 0; i < x_vals.size(); ++i) {
-      bool start_inside = in_upper || in_lower;
-      int x = x_vals[i];
-      if (x_to_type[x] & kLower) in_lower = !in_lower;
-      if (x_to_type[x] & kUpper) in_upper = !in_upper;
-      VLOG(1) << x << ": " << start_inside << " -> " << in_upper << "/" << in_lower;
-      if (start_inside) {
-        row_count += x_vals[i] - x_vals[i - 1];
-        if (!in_upper && !in_lower) {
-          ++row_count;
-        }
-      }
-    }
-    VLOG(2) << y << " -> " << row_count;
-    return row_count;
-  };
-
-  VLOG(2) << absl::StrJoin(loop, ",", [](std::string* out, std::pair<Point, Point> pp) {
-    absl::StrAppendFormat(out, "%v-%v", pp.first, pp.second);
-  });
-
-  int64_t total_count = 0;
-  for (int i = 0; i < y_vals.size(); ++i) {
-    if (i > 0 && y_vals[i] > y_vals[i - 1] + 1) {
-      int64_t height = y_vals[i] - y_vals[i - 1] - 1;
-      int y = y_vals[i] - 1;
-      total_count += height * count_on(y);
-    }
-    int y = y_vals[i];
-    total_count += count_on(y);
-  }
-  return AdventReturn(total_count);
+  return AdventReturn(CountInterior(loop));
 }
 
 }  // namespace advent_of_code
