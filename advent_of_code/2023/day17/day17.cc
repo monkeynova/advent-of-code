@@ -2,6 +2,8 @@
 
 #include "advent_of_code/2023/day17/day17.h"
 
+#include <queue>
+
 #include "absl/log/log.h"
 #include "advent_of_code/char_board.h"
 #include "advent_of_code/fast_board.h"
@@ -11,11 +13,23 @@ namespace advent_of_code {
 namespace {
 
 int MinCartPath(const ImmutableCharBoard& b, int min, int max) {
-  std::deque<FastBoard::PointDir> queue;
   FastBoard fb(b);
   // TODO(@monkeynova): heat_map doesn't need to store keys for both North and South...
   FastBoard::PointHalfDirMap<int> heat_map(fb, std::numeric_limits<int>::max());
   FastBoard::PointDirMap<bool> in_queue(fb, false);
+
+  struct HeatMapCmp {
+    explicit HeatMapCmp(FastBoard::PointHalfDirMap<int>& heat_map) : heat_map_(heat_map) {}
+
+    bool operator()(FastBoard::PointDir a, FastBoard::PointDir b) {
+      return heat_map_.Get(b) < heat_map_.Get(a);
+    }
+
+    FastBoard::PointHalfDirMap<int>& heat_map_;
+  };
+  using QueueType = std::priority_queue<FastBoard::PointDir, std::vector<FastBoard::PointDir>, HeatMapCmp>;
+  HeatMapCmp cmp(heat_map);
+  QueueType queue(cmp);
 
   auto add_range = [&](FastBoard::PointDir pd, FastBoard::Dir dir) {
     int heat = heat_map.Get(pd);
@@ -31,7 +45,7 @@ int MinCartPath(const ImmutableCharBoard& b, int min, int max) {
         heat_map.Set(pd, heat);
         if (!in_queue.Get(pd)) {
           in_queue.Set(pd, true);
-          queue.push_back(pd); 
+          queue.push(pd); 
         }
       }
     }
@@ -43,9 +57,9 @@ int MinCartPath(const ImmutableCharBoard& b, int min, int max) {
     add_range(start, d);
   }
   int dequeued = 0;
-  for (;!queue.empty(); queue.pop_front()) {
+  for (;!queue.empty(); queue.pop()) {
     ++dequeued;
-    const FastBoard::PointDir& cur = queue.front();
+    FastBoard::PointDir cur = queue.top();
     in_queue.Set(cur, false);
     add_range(cur, FastBoard::kRotateLeft[cur.d]);
     add_range(cur, FastBoard::kRotateRight[cur.d]);
