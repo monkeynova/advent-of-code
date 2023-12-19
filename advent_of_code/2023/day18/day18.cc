@@ -3,6 +3,7 @@
 #include "advent_of_code/2023/day18/day18.h"
 
 #include "absl/algorithm/container.h"
+#include "absl/container/btree_set.h"
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
 #include "absl/log/log.h"
@@ -28,42 +29,50 @@ namespace advent_of_code {
 
 namespace {
 
+struct VerticalSegment {
+  int x;
+  int y1;
+  int y2;
+  bool operator<(const VerticalSegment& o) const {
+    return x < o.x;
+  }
+};
+
 int64_t CountInterior(const std::vector<std::pair<Point, Point>>& loop) {
-  absl::flat_hash_set<int> distinct_y;
-  std::vector<std::pair<Point, Point>> verts;
+  absl::flat_hash_map<int, std::vector<VerticalSegment>> y_to_start;
+  absl::flat_hash_map<int, std::vector<VerticalSegment>> y_to_end;
+  absl::flat_hash_set<int> y_distinct;
   for (const auto& pair : loop) {
     if (pair.first.x != pair.second.x) continue;
-    verts.push_back(pair);
-    distinct_y.insert(pair.first.y);
-    distinct_y.insert(pair.second.y);
+    VerticalSegment v = {.x = pair.first.x, .y1 = pair.first.y, .y2 = pair.second.y};
+    y_distinct.insert(pair.first.y);
+    y_distinct.insert(pair.second.y);
+    y_to_start[pair.first.y].push_back(v);
+    y_to_end[pair.second.y].push_back(v);
   }
-  std::vector<int> y_vals(distinct_y.begin(), distinct_y.end());
+  std::vector<int> y_vals(y_distinct.begin(), y_distinct.end());
   absl::c_sort(y_vals);
-  absl::c_sort(
-    verts,
-    [](const std::pair<Point, Point>& a, const std::pair<Point, Point>& b) {
-      return a.first.x < b.first.x;
-    });
 
-  auto count_on = [verts](int y) {
+  absl::btree_set<VerticalSegment> active;
+
+  auto count_on = [&active](int y) {
    bool in_upper = false;
     bool in_lower = false;
     int last_x = std::numeric_limits<int>::min();
 
     int64_t row_count = 0;
-    for (const auto& [p1, p2] : verts) {
+    for (const auto& [x, y1, y2] : active) {
       bool start_inside = in_upper || in_lower;
 
-      if (p1.y == y) in_lower = !in_lower;
-      else if (p2.y == y) in_upper = !in_upper;
-      else if (p1.y < y && p2.y > y) {
+      if (y1 == y) in_lower = !in_lower;
+      else if (y2 == y) in_upper = !in_upper;
+      else if (y1 < y && y2 > y) {
         in_lower = !in_lower;
         in_upper = !in_upper;
       }
 
-      int x = p1.x;
       if (start_inside) {
-        row_count += p1.x - last_x;
+        row_count += x - last_x;
         if (!in_upper && !in_lower) {
           ++row_count;
         }
@@ -81,7 +90,13 @@ int64_t CountInterior(const std::vector<std::pair<Point, Point>>& loop) {
       total_count += height * count_on(y);
     }
     int y = y_vals[i];
+    for (const VerticalSegment& add : y_to_start[y]) {
+      active.insert(add);
+    }
     total_count += count_on(y);
+    for (const VerticalSegment& add : y_to_end[y]) {
+      active.erase(add);
+    }
   }
   return total_count;
 }
@@ -120,6 +135,7 @@ absl::StatusOr<std::string> Day_2023_18::Part1(
 
 absl::StatusOr<std::string> Day_2023_18::Part2(
     absl::Span<std::string_view> input) const {
+  VLOG(1) << "Start";
   std::vector<std::pair<Point, Point>> loop;
   Point cur = Cardinal::kOrigin;
   for (std::string_view str : input) {
