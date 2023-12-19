@@ -56,7 +56,7 @@ int64_t CountInterior(const std::vector<std::pair<Point, Point>>& loop) {
   absl::btree_set<VerticalSegment> active;
 
   auto count_on = [&active](int y) {
-   bool in_upper = false;
+    bool in_upper = false;
     bool in_lower = false;
     int last_x = std::numeric_limits<int>::min();
 
