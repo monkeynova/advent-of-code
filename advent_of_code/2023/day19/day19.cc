@@ -32,11 +32,24 @@ struct Rule {
   int field;
   enum Type { kGt, kLt } cmp_type;
   int cmp;
-  absl::string_view dest;
+  int dest;
 };
 
-using Workflow = std::pair<std::string_view, std::vector<Rule>>;
-using WorkflowSet = absl::flat_hash_map<std::string_view, std::vector<Rule>>;
+using Workflow = std::pair<int, std::vector<Rule>>;
+using WorkflowSet = std::vector<std::vector<Rule>>;
+
+int WorkflowId(std::string_view name) {
+  CHECK_LE(name.size(), 3);
+  if (name.size() == 1) {
+    if (name[0] == 'R') return -1;
+    if (name[0] == 'A') return -2;
+  }
+  int id = 0;
+  for (char c : name) {
+    id = id * 26 + c - 'a';
+  }
+  return id;
+}
 
 absl::StatusOr<Workflow> ParseWorkflow(std::string_view line) {
   static const std::array<int, 128> kFieldMap = []() {
@@ -50,21 +63,22 @@ absl::StatusOr<Workflow> ParseWorkflow(std::string_view line) {
   }();
   Workflow ret;
   Tokenizer tok(line);
-  ret.first = tok.Next();
+  ret.first = WorkflowId(tok.Next());
   RETURN_IF_ERROR(tok.NextIs("{"));
   while (true) {
     if (tok.Done()) return Error("Tokenizer ended early");
     Rule r;
-    r.dest = tok.Next();
+    std::string_view next = tok.Next();
     std::string_view cmp = tok.Next();
     if (cmp == "}") {
       if (!tok.Done()) return Error("Bad }");
+      r.dest = WorkflowId(next);
       r.field = -1;
       ret.second.push_back(r);
       return ret;
     }
-    if (r.dest.size() != 1) return Error("Bad field");
-    r.field = kFieldMap[r.dest[0]];
+    if (next.size() != 1) return Error("Bad field");
+    r.field = kFieldMap[next[0]];
     if (r.field == -1) return Error("Bad field");
     
     if (cmp == ">") {
@@ -74,7 +88,7 @@ absl::StatusOr<Workflow> ParseWorkflow(std::string_view line) {
     }
     ASSIGN_OR_RETURN(r.cmp, tok.NextInt());
     RETURN_IF_ERROR(tok.NextIs(":"));
-    r.dest = tok.Next();
+    r.dest = WorkflowId(tok.Next());
     RETURN_IF_ERROR(tok.NextIs(","));
     ret.second.push_back(r);
   }
@@ -140,19 +154,19 @@ struct Possible {
 };
 
 int64_t CountAllPossible(
-    const WorkflowSet& workflow_set,
-    std::string_view state, Possible p) {
+    const WorkflowSet& workflow_set, int state, Possible p) {
+  static const int kAccept = WorkflowId("A");
+  static const int kReject = WorkflowId("R");
+
   if (p.Empty()) return 0;
   
-  if (state == "R") return 0;
-  if (state == "A") {
+  if (state == kReject) return 0;
+  if (state == kAccept) {
     return p.TotalScore();
   }
   
-  auto it = workflow_set.find(state);
-  CHECK(it != workflow_set.end());
   int64_t total = 0;
-  for (const Rule& r : it->second) {
+  for (const Rule& r : workflow_set[state]) {
     if (r.field == -1) {
       total += CountAllPossible(workflow_set, r.dest, p);
     } else {
@@ -174,7 +188,10 @@ int64_t CountAllPossible(
 
 absl::StatusOr<std::string> Day_2023_19::Part1(
     absl::Span<std::string_view> input) const {
-  WorkflowSet workflow_set;
+  static const int kAccept = WorkflowId("A");
+  static const int kReject = WorkflowId("R");
+
+  WorkflowSet workflow_set(26 * 26 * 26);
   int total_score = 0;
   bool apply = false;
   for (std::string_view line : input) {
@@ -183,30 +200,26 @@ absl::StatusOr<std::string> Day_2023_19::Part1(
       continue;
     }
     if (!apply) {
-      Workflow workflow;
-      ASSIGN_OR_RETURN(workflow, ParseWorkflow(line));
-      auto [it, inserted] = workflow_set.insert(std::move(workflow));
-      if (!inserted) return Error("Duplicate: ", workflow.first);
-
+      ASSIGN_OR_RETURN(Workflow workflow, ParseWorkflow(line));
+      workflow_set[workflow.first] = std::move(workflow.second);
     } else {
       ASSIGN_OR_RETURN(Xmas xmas, ParseXmas(line));
-      std::string_view state = "in";
+      int state = WorkflowId("in");
       while (true) {
-        if (state == "R") break;
-        if (state == "A") {
+        if (state == kReject) break;
+        if (state == kAccept) {
           total_score += xmas.Score();
           break;
         }
-        auto it = workflow_set.find(state);
-        if (it == workflow_set.end()) return Error("Bad state: ", state);
-        std::string_view output;
-        for (const Rule& r : it->second) {
+        int output = -3;
+        for (const Rule& r : workflow_set[state]) {
           if (xmas.CheckRule(r)) {
             output = r.dest;
             break;
           }
         }
-        if (output.empty()) return Error("No output");
+        VLOG(1) << state << " -> " << output;
+        if (output == -3) return Error("No output");
         state = output;
       }
     }
@@ -217,22 +230,21 @@ absl::StatusOr<std::string> Day_2023_19::Part1(
 
 absl::StatusOr<std::string> Day_2023_19::Part2(
     absl::Span<std::string_view> input) const {
-  WorkflowSet workflow_set;
+  WorkflowSet workflow_set(26 * 26 * 26);
   for (std::string_view line : input) {
     if (line.empty()) {
       break;
     }
-    Workflow workflow;
-    ASSIGN_OR_RETURN(workflow, ParseWorkflow(line));
-    auto [it, inserted] = workflow_set.insert(std::move(workflow));
-    if (!inserted) return Error("Duplicate: ", workflow.first);
+    ASSIGN_OR_RETURN(Workflow workflow, ParseWorkflow(line));
+    workflow_set[workflow.first] = std::move(workflow.second);
   }
 
+  int state = WorkflowId("in");
   Possible all = {
     std::pair<int, int>{1, 4000}, {1, 4000}, {1, 4000}, {1, 4000}
   };
   
-  return AdventReturn(CountAllPossible(workflow_set, "in", all));
+  return AdventReturn(CountAllPossible(workflow_set, state, all));
 }
 
 }  // namespace advent_of_code
