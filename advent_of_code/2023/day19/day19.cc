@@ -38,31 +38,31 @@ struct Rule {
 absl::StatusOr<std::pair<std::string_view, std::vector<Rule>>>
 ParseWorkflow(std::string_view line) {
   std::pair<std::string_view, std::vector<Rule>> ret;
-      Tokenizer tok(line);
-      ret.first = tok.Next();
-      RETURN_IF_ERROR(tok.NextIs("{"));
-      while (true) {
-        if (tok.Done()) return Error("Tokenizer ended early");
-        Rule r;
-        r.field = tok.Next();
-        std::string_view cmp = tok.Next();
-        if (cmp == "}") {
-          if (!tok.Done()) return Error("Bad }");
-          r.dest = r.field;
-          r.field = "";
-          ret.second.push_back(r);
-          return ret;
-        } else if (cmp == ">") {
-          r.cmp_type = Rule::kGt;
-        } else if (cmp == "<") {
-          r.cmp_type = Rule::kLt;
-        }
-        ASSIGN_OR_RETURN(r.cmp, tok.NextInt());
-        RETURN_IF_ERROR(tok.NextIs(":"));
-        r.dest = tok.Next();
-        RETURN_IF_ERROR(tok.NextIs(","));
-        ret.second.push_back(r);
-      }
+  Tokenizer tok(line);
+  ret.first = tok.Next();
+  RETURN_IF_ERROR(tok.NextIs("{"));
+  while (true) {
+    if (tok.Done()) return Error("Tokenizer ended early");
+    Rule r;
+    r.field = tok.Next();
+    std::string_view cmp = tok.Next();
+    if (cmp == "}") {
+      if (!tok.Done()) return Error("Bad }");
+      r.dest = r.field;
+      r.field = "";
+      ret.second.push_back(r);
+      return ret;
+    } else if (cmp == ">") {
+      r.cmp_type = Rule::kGt;
+    } else if (cmp == "<") {
+      r.cmp_type = Rule::kLt;
+    }
+    ASSIGN_OR_RETURN(r.cmp, tok.NextInt());
+    RETURN_IF_ERROR(tok.NextIs(":"));
+    r.dest = tok.Next();
+    RETURN_IF_ERROR(tok.NextIs(","));
+    ret.second.push_back(r);
+  }
   LOG(FATAL) << "Left infinite loop";
 }
 
@@ -71,31 +71,31 @@ struct Xmas {
 
   int Score() const {
     int score = 0;
-          for (const auto& [k, v] : fields) {
-            score += v;
-          }
+    for (const auto& [k, v] : fields) {
+      score += v;
+    }
     return score;
   }
 };
 
 absl::StatusOr<Xmas> ParseXmas(std::string_view line) {
   Xmas xmas;
-      Tokenizer tok(line);
-      RETURN_IF_ERROR(tok.NextIs("{"));
-      while (true) {
-        if (tok.Done()) return Error("Tokenizer ended early");
-        std::string_view field = tok.Next();
-        RETURN_IF_ERROR(tok.NextIs("="));
-        ASSIGN_OR_RETURN(int val, tok.NextInt());
-        xmas.fields[field] = val;
-        std::string_view delim = tok.Next();
-        if (delim == "}") {
-          if (!tok.Done()) return Error("Bad }");
-          return xmas;
-        } else if (delim != ",") {
-          return Error("Not ,");
-        }
-      }
+  Tokenizer tok(line);
+  RETURN_IF_ERROR(tok.NextIs("{"));
+  while (true) {
+    if (tok.Done()) return Error("Tokenizer ended early");
+    std::string_view field = tok.Next();
+    RETURN_IF_ERROR(tok.NextIs("="));
+    ASSIGN_OR_RETURN(int val, tok.NextInt());
+    xmas.fields[field] = val;
+    std::string_view delim = tok.Next();
+    if (delim == "}") {
+      if (!tok.Done()) return Error("Bad }");
+      return xmas;
+    } else if (delim != ",") {
+      return Error("Not ,");
+    }
+  }
   LOG(FATAL) << "Left infinite loop";
 }
 
