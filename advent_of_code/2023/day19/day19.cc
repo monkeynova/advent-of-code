@@ -35,6 +35,70 @@ struct Rule {
   absl::string_view dest;
 };
 
+absl::StatusOr<std::pair<std::string_view, std::vector<Rule>>>
+ParseWorkflow(std::string_view line) {
+  std::pair<std::string_view, std::vector<Rule>> ret;
+      Tokenizer tok(line);
+      ret.first = tok.Next();
+      RETURN_IF_ERROR(tok.NextIs("{"));
+      while (true) {
+        if (tok.Done()) return Error("Tokenizer ended early");
+        Rule r;
+        r.field = tok.Next();
+        std::string_view cmp = tok.Next();
+        if (cmp == "}") {
+          if (!tok.Done()) return Error("Bad }");
+          r.dest = r.field;
+          r.field = "";
+          ret.second.push_back(r);
+          return ret;
+        } else if (cmp == ">") {
+          r.cmp_type = Rule::kGt;
+        } else if (cmp == "<") {
+          r.cmp_type = Rule::kLt;
+        }
+        ASSIGN_OR_RETURN(r.cmp, tok.NextInt());
+        RETURN_IF_ERROR(tok.NextIs(":"));
+        r.dest = tok.Next();
+        RETURN_IF_ERROR(tok.NextIs(","));
+        ret.second.push_back(r);
+      }
+  LOG(FATAL) << "Left infinite loop";
+}
+
+struct Xmas {
+  absl::flat_hash_map<std::string_view, int> fields;
+
+  int Score() const {
+    int score = 0;
+          for (const auto& [k, v] : fields) {
+            score += v;
+          }
+    return score;
+  }
+};
+
+absl::StatusOr<Xmas> ParseXmas(std::string_view line) {
+  Xmas xmas;
+      Tokenizer tok(line);
+      RETURN_IF_ERROR(tok.NextIs("{"));
+      while (true) {
+        if (tok.Done()) return Error("Tokenizer ended early");
+        std::string_view field = tok.Next();
+        RETURN_IF_ERROR(tok.NextIs("="));
+        ASSIGN_OR_RETURN(int val, tok.NextInt());
+        xmas.fields[field] = val;
+        std::string_view delim = tok.Next();
+        if (delim == "}") {
+          if (!tok.Done()) return Error("Bad }");
+          return xmas;
+        } else if (delim != ",") {
+          return Error("Not ,");
+        }
+      }
+  LOG(FATAL) << "Left infinite loop";
+}
+
 struct Possible {
   int xmin, xmax;
   int mmin, mmax;
@@ -135,58 +199,18 @@ absl::StatusOr<std::string> Day_2023_19::Part1(
       continue;
     }
     if (!apply) {
-      Tokenizer tok(line);
-      std::string_view workflow = tok.Next();
-      auto [it, inserted] = rules.emplace(workflow, std::vector<Rule>{});
-      if (!inserted) return Error("Duplicate: ", workflow);
-      RETURN_IF_ERROR(tok.NextIs("{"));
-      while (true) {
-        if (tok.Done()) return Error("Tokenizer ended early");
-        Rule r;
-        r.field = tok.Next();
-        std::string_view cmp = tok.Next();
-        if (cmp == "}") {
-          if (!tok.Done()) return Error("Bad }");
-          r.dest = r.field;
-          r.field = "";
-          it->second.push_back(r);
-          break;
-        } else if (cmp == ">") {
-          r.cmp_type = Rule::kGt;
-        } else if (cmp == "<") {
-          r.cmp_type = Rule::kLt;
-        }
-        ASSIGN_OR_RETURN(r.cmp, tok.NextInt());
-        RETURN_IF_ERROR(tok.NextIs(":"));
-        r.dest = tok.Next();
-        RETURN_IF_ERROR(tok.NextIs(","));
-        it->second.push_back(r);
-      }
+      std::pair<std::string_view, std::vector<Rule>> workflow;
+      ASSIGN_OR_RETURN(workflow, ParseWorkflow(line));
+      auto [it, inserted] = rules.insert(std::move(workflow));
+      if (!inserted) return Error("Duplicate: ", workflow.first);
+
     } else {
-      absl::flat_hash_map<std::string_view, int> xmas;
-      Tokenizer tok(line);
-      RETURN_IF_ERROR(tok.NextIs("{"));
-      while (true) {
-        if (tok.Done()) return Error("Tokenizer ended early");
-        std::string_view field = tok.Next();
-        RETURN_IF_ERROR(tok.NextIs("="));
-        ASSIGN_OR_RETURN(int val, tok.NextInt());
-        xmas[field] = val;
-        std::string_view delim = tok.Next();
-        if (delim == "}") {
-          if (!tok.Done()) return Error("Bad }");
-          break;
-        } else if (delim != ",") {
-          return Error("Not ,");
-        }
-      }
+      ASSIGN_OR_RETURN(Xmas xmas, ParseXmas(line));
       std::string_view state = "in";
       while (true) {
         if (state == "R") break;
         if (state == "A") {
-          for (const auto& [k, v] : xmas) {
-            total_score += v;
-          }
+          total_score += xmas.Score();
           break;
         }
         auto it = rules.find(state);
@@ -197,11 +221,11 @@ absl::StatusOr<std::string> Day_2023_19::Part1(
             output = r.dest;
             break;
           }
-          if (r.cmp_type == Rule::kGt && xmas[r.field] > r.cmp) {
+          if (r.cmp_type == Rule::kGt && xmas.fields[r.field] > r.cmp) {
             output = r.dest;
             break;
           }
-          if (r.cmp_type == Rule::kLt && xmas[r.field] < r.cmp) {
+          if (r.cmp_type == Rule::kLt && xmas.fields[r.field] < r.cmp) {
             output = r.dest;
             break;
           }
@@ -222,33 +246,10 @@ absl::StatusOr<std::string> Day_2023_19::Part2(
     if (line.empty()) {
       break;
     }
-    Tokenizer tok(line);
-    std::string_view workflow = tok.Next();
-    auto [it, inserted] = rules.emplace(workflow, std::vector<Rule>{});
-    if (!inserted) return Error("Duplicate: ", workflow);
-    RETURN_IF_ERROR(tok.NextIs("{"));
-    while (true) {
-      if (tok.Done()) return Error("Tokenizer ended early");
-      Rule r;
-      r.field = tok.Next();
-      std::string_view cmp = tok.Next();
-      if (cmp == "}") {
-        if (!tok.Done()) return Error("Bad }");
-        r.dest = r.field;
-        r.field = "";
-        it->second.push_back(r);
-        break;
-      } else if (cmp == ">") {
-        r.cmp_type = Rule::kGt;
-      } else if (cmp == "<") {
-        r.cmp_type = Rule::kLt;
-      }
-      ASSIGN_OR_RETURN(r.cmp, tok.NextInt());
-      RETURN_IF_ERROR(tok.NextIs(":"));
-      r.dest = tok.Next();
-      RETURN_IF_ERROR(tok.NextIs(","));
-      it->second.push_back(r);
-    }
+    std::pair<std::string_view, std::vector<Rule>> workflow;
+    ASSIGN_OR_RETURN(workflow, ParseWorkflow(line));
+    auto [it, inserted] = rules.insert(std::move(workflow));
+    if (!inserted) return Error("Duplicate: ", workflow.first);
   }
 
   Possible all = {
