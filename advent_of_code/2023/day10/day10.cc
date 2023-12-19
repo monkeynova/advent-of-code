@@ -105,6 +105,8 @@ std::vector<std::vector<XAndC>> FindLoop(const ImmutableCharBoard& b,
   return {};
 }
 
+// TODO(@monkeynova): 2023/18 has a different approach here that might work
+// better.
 absl::StatusOr<int> InsideSpace(const ImmutableCharBoard& b,
                                 std::vector<std::vector<XAndC>> loop) {
   int count_inside = 0;
