@@ -29,30 +29,45 @@ namespace advent_of_code {
 namespace {
 
 struct Rule {
-  absl::string_view field;
+  int field;
   enum Type { kGt, kLt } cmp_type;
   int cmp;
   absl::string_view dest;
 };
 
-absl::StatusOr<std::pair<std::string_view, std::vector<Rule>>>
-ParseWorkflow(std::string_view line) {
-  std::pair<std::string_view, std::vector<Rule>> ret;
+using Workflow = std::pair<std::string_view, std::vector<Rule>>;
+using WorkflowSet = absl::flat_hash_map<std::string_view, std::vector<Rule>>;
+
+absl::StatusOr<Workflow> ParseWorkflow(std::string_view line) {
+  static const std::array<int, 128> kFieldMap = []() {
+    std::array<int, 128> kFieldMap;
+    for (int i = 0; i < kFieldMap.size(); ++i) kFieldMap[i] = -1;
+    kFieldMap['x'] = 0;
+    kFieldMap['m'] = 1;
+    kFieldMap['a'] = 2;
+    kFieldMap['s'] = 3;
+    return kFieldMap;
+  }();
+  Workflow ret;
   Tokenizer tok(line);
   ret.first = tok.Next();
   RETURN_IF_ERROR(tok.NextIs("{"));
   while (true) {
     if (tok.Done()) return Error("Tokenizer ended early");
     Rule r;
-    r.field = tok.Next();
+    r.dest = tok.Next();
     std::string_view cmp = tok.Next();
     if (cmp == "}") {
       if (!tok.Done()) return Error("Bad }");
-      r.dest = r.field;
-      r.field = "";
+      r.field = -1;
       ret.second.push_back(r);
       return ret;
-    } else if (cmp == ">") {
+    }
+    if (r.dest.size() != 1) return Error("Bad field");
+    r.field = kFieldMap[r.dest[0]];
+    if (r.field == -1) return Error("Bad field");
+    
+    if (cmp == ">") {
       r.cmp_type = Rule::kGt;
     } else if (cmp == "<") {
       r.cmp_type = Rule::kLt;
@@ -67,14 +82,17 @@ ParseWorkflow(std::string_view line) {
 }
 
 struct Xmas {
-  absl::flat_hash_map<std::string_view, int> fields;
+  std::array<int, 4> fields;
 
   int Score() const {
-    int score = 0;
-    for (const auto& [k, v] : fields) {
-      score += v;
-    }
-    return score;
+    return absl::c_accumulate(fields, 0);
+  }
+
+  bool CheckRule(const Rule& r) const {
+    if (r.field == -1) return true;
+    if (r.cmp_type == Rule::kGt && fields[r.field] > r.cmp) return true;
+    if (r.cmp_type == Rule::kLt && fields[r.field] < r.cmp) return true;
+    return false;
   }
 };
 
@@ -82,105 +100,71 @@ absl::StatusOr<Xmas> ParseXmas(std::string_view line) {
   Xmas xmas;
   Tokenizer tok(line);
   RETURN_IF_ERROR(tok.NextIs("{"));
-  while (true) {
-    if (tok.Done()) return Error("Tokenizer ended early");
-    std::string_view field = tok.Next();
-    RETURN_IF_ERROR(tok.NextIs("="));
-    ASSIGN_OR_RETURN(int val, tok.NextInt());
-    xmas.fields[field] = val;
-    std::string_view delim = tok.Next();
-    if (delim == "}") {
-      if (!tok.Done()) return Error("Bad }");
-      return xmas;
-    } else if (delim != ",") {
-      return Error("Not ,");
-    }
-  }
-  LOG(FATAL) << "Left infinite loop";
+  RETURN_IF_ERROR(tok.NextIs("x"));
+  RETURN_IF_ERROR(tok.NextIs("="));
+  ASSIGN_OR_RETURN(xmas.fields[0], tok.NextInt());
+  RETURN_IF_ERROR(tok.NextIs(","));
+  RETURN_IF_ERROR(tok.NextIs("m"));
+  RETURN_IF_ERROR(tok.NextIs("="));
+  ASSIGN_OR_RETURN(xmas.fields[1], tok.NextInt());
+  RETURN_IF_ERROR(tok.NextIs(","));
+  RETURN_IF_ERROR(tok.NextIs("a"));
+  RETURN_IF_ERROR(tok.NextIs("="));
+  ASSIGN_OR_RETURN(xmas.fields[2], tok.NextInt());
+  RETURN_IF_ERROR(tok.NextIs(","));
+  RETURN_IF_ERROR(tok.NextIs("s"));
+  RETURN_IF_ERROR(tok.NextIs("="));
+  ASSIGN_OR_RETURN(xmas.fields[3], tok.NextInt());
+  RETURN_IF_ERROR(tok.NextIs("}"));
+  if (!tok.Done()) return Error("Extra tokens");
+  return xmas;
 }
 
 struct Possible {
-  int xmin, xmax;
-  int mmin, mmax;
-  int amin, amax;
-  int smin, smax;
+  std::array<std::pair<int, int>, 4> ranges;
+
+  bool Empty() const {
+    return absl::c_any_of(
+      ranges, [](std::pair<int, int> r) {
+        return r.first > r.second;
+      });
+  }
+
   int64_t TotalScore() const {
-    int64_t p = 1;
-    p *= (xmax - xmin + 1);
-    p *= (mmax - mmin + 1);
-    p *= (amax - amin + 1);
-    p *= (smax - smin + 1);
-    return p;
+    return absl::c_accumulate(
+      ranges, int64_t{1},
+      [](int64_t a, std::pair<int, int> r) {
+        return a * (r.second - r.first + 1);
+      });
   }
 };
 
 int64_t CountAllPossible(
-    const absl::flat_hash_map<std::string_view, std::vector<Rule>>& rules,
+    const WorkflowSet& workflow_set,
     std::string_view state, Possible p) {
-  if (p.xmin > p.xmax) return 0;
-  if (p.mmin > p.mmax) return 0;
-  if (p.amin > p.amax) return 0;
-  if (p.smin > p.smax) return 0;
-
+  if (p.Empty()) return 0;
+  
   if (state == "R") return 0;
   if (state == "A") {
     return p.TotalScore();
   }
   
-  auto it = rules.find(state);
-  CHECK(it != rules.end());
+  auto it = workflow_set.find(state);
+  CHECK(it != workflow_set.end());
   int64_t total = 0;
   for (const Rule& r : it->second) {
-    if (r.field == "") {
-      total += CountAllPossible(rules, r.dest, p);
-    } else if (r.field == "x") {
+    if (r.field == -1) {
+      total += CountAllPossible(workflow_set, r.dest, p);
+    } else {
+      Possible sub = p;
       if (r.cmp_type == Rule::kLt) {
-        Possible sub = p;
-        p.xmin = r.cmp;
-        sub.xmax = r.cmp - 1;
-        total += CountAllPossible(rules, r.dest, sub);
+        p.ranges[r.field].first = r.cmp;
+        sub.ranges[r.field].second = r.cmp - 1;
       } else if (r.cmp_type == Rule::kGt) {
-        Possible sub = p;
-        p.xmax = r.cmp;
-        sub.xmin = r.cmp + 1;
-        total += CountAllPossible(rules, r.dest, sub);
-      }
-    } else if (r.field == "m") {
-      if (r.cmp_type == Rule::kLt) {
-        Possible sub = p;
-        p.mmin = r.cmp;
-        sub.mmax = r.cmp - 1;
-        total += CountAllPossible(rules, r.dest, sub);
-      } else if (r.cmp_type == Rule::kGt) {
-        Possible sub = p;
-        p.mmax = r.cmp;
-        sub.mmin = r.cmp + 1;
-        total += CountAllPossible(rules, r.dest, sub);
-      }
-    } else if (r.field == "a") {
-      if (r.cmp_type == Rule::kLt) {
-        Possible sub = p;
-        p.amin = r.cmp;
-        sub.amax = r.cmp - 1;
-        total += CountAllPossible(rules, r.dest, sub);
-      } else if (r.cmp_type == Rule::kGt) {
-        Possible sub = p;
-        p.amax = r.cmp;
-        sub.amin = r.cmp + 1;
-        total += CountAllPossible(rules, r.dest, sub);
-      }
-    } else if (r.field == "s") {
-      if (r.cmp_type == Rule::kLt) {
-        Possible sub = p;
-        p.smin = r.cmp;
-        sub.smax = r.cmp - 1;
-        total += CountAllPossible(rules, r.dest, sub);
-      } else if (r.cmp_type == Rule::kGt) {
-        Possible sub = p;
-        p.smax = r.cmp;
-        sub.smin = r.cmp + 1;
-        total += CountAllPossible(rules, r.dest, sub);
-      }
+        p.ranges[r.field].second = r.cmp;
+        sub.ranges[r.field].first = r.cmp + 1;
+      }      
+      total += CountAllPossible(workflow_set, r.dest, sub);
     }
   }
   return total;
@@ -190,7 +174,7 @@ int64_t CountAllPossible(
 
 absl::StatusOr<std::string> Day_2023_19::Part1(
     absl::Span<std::string_view> input) const {
-  absl::flat_hash_map<std::string_view, std::vector<Rule>> rules;
+  WorkflowSet workflow_set;
   int total_score = 0;
   bool apply = false;
   for (std::string_view line : input) {
@@ -199,9 +183,9 @@ absl::StatusOr<std::string> Day_2023_19::Part1(
       continue;
     }
     if (!apply) {
-      std::pair<std::string_view, std::vector<Rule>> workflow;
+      Workflow workflow;
       ASSIGN_OR_RETURN(workflow, ParseWorkflow(line));
-      auto [it, inserted] = rules.insert(std::move(workflow));
+      auto [it, inserted] = workflow_set.insert(std::move(workflow));
       if (!inserted) return Error("Duplicate: ", workflow.first);
 
     } else {
@@ -213,19 +197,11 @@ absl::StatusOr<std::string> Day_2023_19::Part1(
           total_score += xmas.Score();
           break;
         }
-        auto it = rules.find(state);
-        if (it == rules.end()) return Error("Bad state: ", state);
+        auto it = workflow_set.find(state);
+        if (it == workflow_set.end()) return Error("Bad state: ", state);
         std::string_view output;
         for (const Rule& r : it->second) {
-          if (r.field.empty()) {
-            output = r.dest;
-            break;
-          }
-          if (r.cmp_type == Rule::kGt && xmas.fields[r.field] > r.cmp) {
-            output = r.dest;
-            break;
-          }
-          if (r.cmp_type == Rule::kLt && xmas.fields[r.field] < r.cmp) {
+          if (xmas.CheckRule(r)) {
             output = r.dest;
             break;
           }
@@ -241,22 +217,22 @@ absl::StatusOr<std::string> Day_2023_19::Part1(
 
 absl::StatusOr<std::string> Day_2023_19::Part2(
     absl::Span<std::string_view> input) const {
-  absl::flat_hash_map<std::string_view, std::vector<Rule>> rules;
+  WorkflowSet workflow_set;
   for (std::string_view line : input) {
     if (line.empty()) {
       break;
     }
-    std::pair<std::string_view, std::vector<Rule>> workflow;
+    Workflow workflow;
     ASSIGN_OR_RETURN(workflow, ParseWorkflow(line));
-    auto [it, inserted] = rules.insert(std::move(workflow));
+    auto [it, inserted] = workflow_set.insert(std::move(workflow));
     if (!inserted) return Error("Duplicate: ", workflow.first);
   }
 
   Possible all = {
-    1, 4000, 1, 4000, 1, 4000, 1, 4000
+    std::pair<int, int>{1, 4000}, {1, 4000}, {1, 4000}, {1, 4000}
   };
   
-  return AdventReturn(CountAllPossible(rules, "in", all));
+  return AdventReturn(CountAllPossible(workflow_set, "in", all));
 }
 
 }  // namespace advent_of_code
