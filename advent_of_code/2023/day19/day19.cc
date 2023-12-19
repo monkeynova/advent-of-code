@@ -144,7 +144,7 @@ struct Possible {
       });
   }
 
-  int64_t TotalScore() const {
+  int64_t Count() const {
     return absl::c_accumulate(
       ranges, int64_t{1},
       [](int64_t a, std::pair<int, int> r) {
@@ -162,24 +162,22 @@ int64_t CountAllPossible(
   
   if (state == kReject) return 0;
   if (state == kAccept) {
-    return p.TotalScore();
+    return p.Count();
   }
   
   int64_t total = 0;
   for (const Rule& r : workflow_set[state]) {
-    if (r.field == -1) {
-      total += CountAllPossible(workflow_set, r.dest, p);
-    } else {
-      Possible sub = p;
+    Possible sub = p;
+    if (r.field != -1) {
       if (r.cmp_type == Rule::kLt) {
         p.ranges[r.field].first = r.cmp;
         sub.ranges[r.field].second = r.cmp - 1;
       } else if (r.cmp_type == Rule::kGt) {
         p.ranges[r.field].second = r.cmp;
         sub.ranges[r.field].first = r.cmp + 1;
-      }      
-      total += CountAllPossible(workflow_set, r.dest, sub);
-    }
+      }    
+    }  
+    total += CountAllPossible(workflow_set, r.dest, sub);
   }
   return total;
 }
@@ -190,6 +188,8 @@ absl::StatusOr<std::string> Day_2023_19::Part1(
     absl::Span<std::string_view> input) const {
   static const int kAccept = WorkflowId("A");
   static const int kReject = WorkflowId("R");
+  static const int kStart = WorkflowId("in");
+  static const int kInvalid = -3;
 
   WorkflowSet workflow_set(26 * 26 * 26);
   int total_score = 0;
@@ -204,22 +204,21 @@ absl::StatusOr<std::string> Day_2023_19::Part1(
       workflow_set[workflow.first] = std::move(workflow.second);
     } else {
       ASSIGN_OR_RETURN(Xmas xmas, ParseXmas(line));
-      int state = WorkflowId("in");
+      int state = kStart;
       while (true) {
         if (state == kReject) break;
         if (state == kAccept) {
           total_score += xmas.Score();
           break;
         }
-        int output = -3;
+        int output = kInvalid;
         for (const Rule& r : workflow_set[state]) {
           if (xmas.CheckRule(r)) {
             output = r.dest;
             break;
           }
         }
-        VLOG(1) << state << " -> " << output;
-        if (output == -3) return Error("No output");
+        if (output == kInvalid) return Error("No output");
         state = output;
       }
     }
