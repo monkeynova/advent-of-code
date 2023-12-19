@@ -30,18 +30,15 @@ namespace {
 
 int64_t CountInterior(const std::vector<std::pair<Point, Point>>& loop) {
   absl::flat_hash_set<int> distinct_y;
-  for (const auto& [p1, p2] : loop) {
-    distinct_y.insert(p1.y);
-    distinct_y.insert(p2.y);
+  std::vector<std::pair<Point, Point>> verts;
+  for (const auto& pair : loop) {
+    if (pair.first.x != pair.second.x) continue;
+    verts.push_back(pair);
+    distinct_y.insert(pair.first.y);
+    distinct_y.insert(pair.second.y);
   }
   std::vector<int> y_vals(distinct_y.begin(), distinct_y.end());
   absl::c_sort(y_vals);
-  std::vector<std::pair<Point, Point>> verts;
-  for (const auto& pair : loop) {
-    if (pair.first.x == pair.second.x) {
-      verts.push_back(pair);
-    }
-  }
   absl::c_sort(
     verts,
     [](const std::pair<Point, Point>& a, const std::pair<Point, Point>& b) {
@@ -49,12 +46,7 @@ int64_t CountInterior(const std::vector<std::pair<Point, Point>>& loop) {
     });
 
   auto count_on = [verts](int y) {
-    enum Bits {
-      kUpper = 1,
-      kLower = 2,
-    };
-    absl::flat_hash_map<int, int> x_to_type;
-    bool in_upper = false;
+   bool in_upper = false;
     bool in_lower = false;
     int last_x = std::numeric_limits<int>::min();
 
@@ -98,143 +90,32 @@ int64_t CountInterior(const std::vector<std::pair<Point, Point>>& loop) {
 
 absl::StatusOr<std::string> Day_2023_18::Part1(
     absl::Span<std::string_view> input) const {
-  Point cur = {0, 0};
-  absl::flat_hash_map<Point, char> draw;
-  Point prev_dir = Cardinal::kOrigin;
-  Point first_dir;
+  std::vector<std::pair<Point, Point>> loop;
+  Point cur = Cardinal::kOrigin;
   for (std::string_view line : input) {
     Tokenizer tok(line);
-    std::string_view dir = tok.Next();
+    std::string_view dir_str = tok.Next();
     ASSIGN_OR_RETURN(int dist, tok.NextInt());
-    Point d;
-    if (dir == "R") {
-      d = Cardinal::kEast;
-    } else if (dir == "U") {
-      d = Cardinal::kNorth;
-    } else if (dir == "D") {
-      d = Cardinal::kSouth;
-    } else if (dir == "L") {
-      d = Cardinal::kWest;
+    Point dir;
+    if (dir_str == "R") {
+      dir = Cardinal::kEast;
+    } else if (dir_str == "U") {
+      dir = Cardinal::kNorth;
+    } else if (dir_str == "D") {
+      dir = Cardinal::kSouth;
+    } else if (dir_str == "L") {
+      dir = Cardinal::kWest;
     } else {
       return Error("Bad dir");
     }
-    if (prev_dir == Cardinal::kOrigin) {
-      first_dir = d;
-      draw[cur] = 'S';
-    } else if (prev_dir == Cardinal::kNorth) {
-      if (d == Cardinal::kWest) {
-        draw[cur] = '7';
-      } else if (d == Cardinal::kEast) {
-        draw[cur] = 'F';
-      } else {
-        return Error("Unhandled turn");
-      }
-    } else if (prev_dir == Cardinal::kSouth) {
-      if (d == Cardinal::kWest) {
-        draw[cur] = 'J';
-      } else if (d == Cardinal::kEast) {
-        draw[cur] = 'L';
-      } else {
-        return Error("Unhandled turn");
-      }
-    } else if (prev_dir == Cardinal::kEast) {
-      if (d == Cardinal::kNorth) {
-        draw[cur] = 'J';
-      } else if (d == Cardinal::kSouth) {
-        draw[cur] = '7';
-      } else {
-        return Error("Unhandled turn");
-      }
-    } else if (prev_dir == Cardinal::kWest) {
-      if (d == Cardinal::kNorth) {
-        draw[cur] = 'L';
-      } else if (d == Cardinal::kSouth) {
-        draw[cur] = 'F';
-      } else {
-        return Error("Unhandled turn");
-      }
+    if (dir == Cardinal::kEast || dir == Cardinal::kSouth) {
+      loop.push_back({cur, cur + dir * dist});
+    } else {
+      loop.push_back({cur + dir * dist, cur});
     }
-    cur += d;
-    for (int i = 1; i < dist; ++i) {
-      if (d == Cardinal::kWest || d == Cardinal::kEast) {
-        draw[cur] = '-';
-      }
-      if (d == Cardinal::kNorth || d == Cardinal::kSouth) {
-        draw[cur] = '|';
-      }
-      cur += d;
-    }
-    prev_dir = d;
+    cur = cur + dir * dist;
   }
-    if (prev_dir == Cardinal::kNorth) {
-      if (first_dir == Cardinal::kWest) {
-        draw[cur] = '7';
-      } else if (first_dir == Cardinal::kEast) {
-        draw[cur] = 'F';
-      } else {
-        return Error("Unhandled turn");
-      }
-    } else if (prev_dir == Cardinal::kSouth) {
-      if (first_dir == Cardinal::kWest) {
-        draw[cur] = 'J';
-      } else if (first_dir == Cardinal::kEast) {
-        draw[cur] = 'L';
-      } else {
-        return Error("Unhandled turn");
-      }
-    } else if (prev_dir == Cardinal::kEast) {
-      if (first_dir == Cardinal::kNorth) {
-        draw[cur] = 'J';
-      } else if (first_dir == Cardinal::kSouth) {
-        draw[cur] = '7';
-      } else {
-        return Error("Unhandled turn");
-      }
-    } else if (prev_dir == Cardinal::kWest) {
-      if (first_dir == Cardinal::kNorth) {
-        draw[cur] = 'L';
-      } else if (first_dir == Cardinal::kSouth) {
-        draw[cur] = 'F';
-      } else {
-        return Error("Unhandled turn");
-      }
-    }
-  
-  PointRectangle bounds = PointRectangle::Null();
-  for (const auto& [p, c] : draw) bounds.ExpandInclude(p);
-  CharBoard b(bounds);
-  for (const auto& [p, c] : draw) b[p - bounds.min] = c;
-  VLOG(2) << b;
-
-  bool inside_upper = false;
-  bool inside_lower = false;
-  int count = 0;
-  for (const auto [p, c] : b) {
-    int start_inside = inside_upper || inside_lower;
-    switch (c) {
-      case '-': case '.': break;
-      case '|': {
-        inside_upper = !inside_upper;
-        inside_lower = !inside_lower;
-        break;
-      }
-      case 'F': case '7': {
-        inside_lower = !inside_lower;
-        break;
-      }
-      case 'J': case 'L': {
-        inside_upper = !inside_upper;
-        break;
-      }
-      default: {
-        return Error("Bad draw");
-      }
-    }
-    if (inside_upper || inside_lower || start_inside) {
-      ++count;
-    }
-  }
-  return AdventReturn(count);
+  return AdventReturn(CountInterior(loop));
 }
 
 absl::StatusOr<std::string> Day_2023_18::Part2(
