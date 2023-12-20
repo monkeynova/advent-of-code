@@ -29,19 +29,62 @@ namespace advent_of_code {
 
 namespace {
 
-struct Control {
-  enum { kFlipFlop, kConjunct, kBroadcast } type;
-  bool flip_flop_state = false;
-  absl::flat_hash_map<std::string_view, bool> conjuncts;
-  std::vector<std::string_view> outputs;
+class Modules {
+ public:
+  struct Control {
+    enum { kFlipFlop, kConjunct, kBroadcast } type;
+    bool flip_flop_state = false;
+    absl::flat_hash_map<std::string_view, bool> conjuncts;
+    std::vector<std::string_view> outputs;
+  };
+
+  static absl::StatusOr<Modules> Parse(absl::Span<std::string_view> input);
+
+  void InitializeConjuncts();
+  void SendPulses(int* low_pulse_count, int* high_pulse_count);
+  std::optional<std::pair<int, int>> SendPulses(std::string_view find);
+
+  std::vector<Modules> DisjointSubmodules(std::string_view* final_conj);
+
+  std::vector<bool> State();
+
+ private:
+  Modules() = default;
+
+  absl::flat_hash_map<std::string_view, Control> modules_;
+  std::vector<std::string_view> flip_flops_;
 };
 
-void InitializeConjuncts(
-    absl::flat_hash_map<std::string_view, Control>& modules) {
-  for (const auto& [name, con] : modules) {
+absl::StatusOr<Modules> Modules::Parse(absl::Span<std::string_view> input) {
+  Modules ret;
+  for (std::string_view line : input) {
+    auto [name, output_list] = PairSplit(line, " -> ");
+    Control control;
+    control.type = Control::kBroadcast;
+    if (name[0] == '%') {
+      control.type = Control::kFlipFlop;
+      name = name.substr(1);
+      control.flip_flop_state = 0;
+    } else if (name[0] == '&') {
+      control.type = Control::kConjunct;
+      name = name.substr(1);
+    }
+    if (control.type == Control::kBroadcast && name != "broadcaster") {
+      return Error("Bad name: ", name);
+    }
+    control.outputs = absl::StrSplit(output_list, ", ");
+    if (!ret.modules_.emplace(name, control).second) {
+      return Error("Duplicate name: ", name);
+    }
+  }
+  return ret;
+}
+
+void Modules::InitializeConjuncts() {
+  for (const auto& [name, con] : modules_) {
     for (std::string_view dest : con.outputs) {
-      auto it2 = modules.find(dest);
-      if (it2 == modules.end()) {
+      auto it2 = modules_.find(dest);
+      if (it2 == modules_.end()) {
         continue;
       }
       if (it2->second.type == Control::kConjunct) {
@@ -51,9 +94,7 @@ void InitializeConjuncts(
   }
 }
 
-void SendPulses(
-    absl::flat_hash_map<std::string_view, Control>& modules,
-    int* low_pulse_count, int* high_pulse_count) {
+void Modules::SendPulses(int* low_pulse_count, int* high_pulse_count) {
   struct Pulse {
     bool high;
     std::string_view dest;
@@ -67,8 +108,8 @@ void SendPulses(
     if (cur.high) ++*high_pulse_count;
     else ++*low_pulse_count;
 
-    auto it = modules.find(cur.dest);
-    if (it == modules.end()) {
+    auto it = modules_.find(cur.dest);
+    if (it == modules_.end()) {
       continue;
     }
     Control& control = it->second;
@@ -104,9 +145,7 @@ void SendPulses(
   }
 }
 
-std::optional<std::pair<int, int>> SendPulses(
-    absl::flat_hash_map<std::string_view, Control>& modules,
-    std::string_view find) {
+std::optional<std::pair<int, int>> Modules::SendPulses(std::string_view find) {
   struct Pulse {
     bool high;
     std::string_view dest;
@@ -132,8 +171,8 @@ std::optional<std::pair<int, int>> SendPulses(
       }
     }
 
-    auto it = modules.find(cur.dest);
-    if (it == modules.end()) {
+    auto it = modules_.find(cur.dest);
+    if (it == modules_.end()) {
       continue;
     }
     Control& control = it->second;
@@ -170,79 +209,29 @@ std::optional<std::pair<int, int>> SendPulses(
   return ret;
 }
 
-}  // namespace
-
-absl::StatusOr<std::string> Day_2023_20::Part1(
-    absl::Span<std::string_view> input) const {
-  absl::flat_hash_map<std::string_view, Control> modules;
-  for (std::string_view line : input) {
-    auto [name, output_list] = PairSplit(line, " -> ");
-    Control control;
-    control.type = Control::kBroadcast;
-    if (name[0] == '%') {
-      control.type = Control::kFlipFlop;
-      name = name.substr(1);
-      control.flip_flop_state = 0;
-    } else if (name[0] == '&') {
-      control.type = Control::kConjunct;
-      name = name.substr(1);
-    }
-    if (control.type == Control::kBroadcast && name != "broadcaster") {
-      return Error("Bad name: ", name);
-    }
-    control.outputs = absl::StrSplit(output_list, ", ");
-    if (!modules.emplace(name, control).second) {
-      return Error("Duplicate name: ", name);
-    }
+std::vector<bool> Modules::State() {
+  std::vector<bool> state;
+  for (std::string_view node : flip_flops_) {
+    state.push_back(modules_[node].flip_flop_state);
   }
-  int low_pulses = 0;
-  int high_pulses = 0;
-  InitializeConjuncts(modules);
-  for (int i = 0; i < 1000; ++i) {
-    SendPulses(modules, &low_pulses, &high_pulses);
-  }
-  return AdventReturn(low_pulses * high_pulses);
+  return state;
 }
 
-absl::StatusOr<std::string> Day_2023_20::Part2(
-    absl::Span<std::string_view> input) const {
-  absl::flat_hash_map<std::string_view, Control> modules;
-  for (std::string_view line : input) {
-    auto [name, output_list] = PairSplit(line, " -> ");
-    Control control;
-    control.type = Control::kBroadcast;
-    if (name[0] == '%') {
-      control.type = Control::kFlipFlop;
-      name = name.substr(1);
-      control.flip_flop_state = 0;
-    } else if (name[0] == '&') {
-      control.type = Control::kConjunct;
-      name = name.substr(1);
-    }
-    if (control.type == Control::kBroadcast && name != "broadcaster") {
-      return Error("Bad name: ", name);
-    }
-    control.outputs = absl::StrSplit(output_list, ", ");
-    if (!modules.emplace(name, control).second) {
-      return Error("Duplicate name: ", name);
-    }
-  }
-  InitializeConjuncts(modules);
-  
-  std::string_view final_conj;
-  for (const auto& [name, con] : modules) {
+std::vector<Modules> Modules::DisjointSubmodules(std::string_view* final_conj) {
+  *final_conj = "";
+  for (const auto& [name, con] : modules_) {
     for (std::string_view dest : con.outputs) {
       if (dest == "rx") {
         CHECK_EQ(con.outputs.size(), 1);
-        final_conj = name;
+        *final_conj = name;
       }
     }
   }
-  CHECK(!final_conj.empty());
+  CHECK(!final_conj->empty());
 
   DirectedGraph<Control> graph;
-  for (const auto& [name, con] : modules) {
-    if (name != "broadcaster" && name != final_conj) {
+  for (const auto& [name, con] : modules_) {
+    if (name != "broadcaster" && name != *final_conj) {
       graph.AddNode(name, con);
       for (std::string_view out : con.outputs) {
         graph.AddEdge(name, out);
@@ -252,31 +241,58 @@ absl::StatusOr<std::string> Day_2023_20::Part2(
   std::vector<std::vector<std::string_view>> forest = graph.Forest();
   VLOG(1) << forest.size();
   VLOG(1) << absl::StrJoin(
-    modules[final_conj].conjuncts, ",",
+    modules_[*final_conj].conjuncts, ",",
     [](std::string* out, std::pair<std::string_view, bool> p) {
       absl::StrAppend(out, p.first);
     });
     
-  std::vector<std::pair<int64_t, int64_t>> chinese_remainder;
-  std::optional<std::pair<int, int>> pulse_range;
+  std::vector<Modules> ret;
   for (int i = 0; i < forest.size(); ++i) {
+    ret.push_back(Modules());
     absl::flat_hash_map<std::string_view, Control> sub_modules;
-    sub_modules["broadcaster"] = modules["broadcaster"];
-    std::vector<std::string_view> flip_flops;
+    ret.back().modules_["broadcaster"] = modules_["broadcaster"];
     for (std::string_view node : forest[i]) {
-      sub_modules[node] = modules[node];
-      if (sub_modules[node].type == Control::kFlipFlop) {
-        flip_flops.push_back(node);
+      ret.back().modules_[node] = modules_[node];
+      if (ret.back().modules_[node].type == Control::kFlipFlop) {
+        ret.back().flip_flops_.push_back(node);
       }
     }
+  }
+  return ret;
+}
+
+}  // namespace
+
+absl::StatusOr<std::string> Day_2023_20::Part1(
+    absl::Span<std::string_view> input) const {
+  ASSIGN_OR_RETURN(Modules modules, Modules::Parse(input));
+  int low_pulses = 0;
+  int high_pulses = 0;
+  modules.InitializeConjuncts();
+  for (int i = 0; i < 1000; ++i) {
+    modules.SendPulses(&low_pulses, &high_pulses);
+  }
+  return AdventReturn(low_pulses * high_pulses);
+}
+
+absl::StatusOr<std::string> Day_2023_20::Part2(
+    absl::Span<std::string_view> input) const {
+  ASSIGN_OR_RETURN(Modules modules, Modules::Parse(input));
+
+  modules.InitializeConjuncts();
+  
+  std::string_view final_conj;
+  std::vector<Modules> sub_modules = modules.DisjointSubmodules(&final_conj);
+
+  std::vector<std::pair<int64_t, int64_t>> chinese_remainder;
+  std::optional<std::pair<int, int>> pulse_range;
+
+  for (Modules& sub_module : sub_modules) {
     absl::flat_hash_map<int, std::pair<int, int>> on_range;
     absl::flat_hash_map<std::vector<bool>, int> hist;
     for (int i = 0; true; ++i) {
-      std::optional<std::pair<int, int>> high_range = SendPulses(sub_modules, final_conj);
-      std::vector<bool> state;
-      for (std::string_view node : flip_flops) {
-        state.push_back(sub_modules[node].flip_flop_state);
-      }
+      std::optional<std::pair<int, int>> high_range = sub_module.SendPulses(final_conj);
+      std::vector<bool> state = sub_module.State();
       if (high_range) {
         VLOG(1) << i << ": [" << high_range->first << "," << high_range->second << ")";
         on_range[i] = *high_range;
