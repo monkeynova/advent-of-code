@@ -18,8 +18,8 @@ int MinCartPath(const ImmutableCharBoard& b, int min, int max) {
       fb, std::numeric_limits<int>::max());
   FastBoard::PointDirMap<bool> in_queue(fb, false);
 
-  struct HeatMapCmp {
-    explicit HeatMapCmp(const FastBoard::PointHalfDirMap<int>& heat_map)
+  struct HeatMapGt {
+    explicit HeatMapGt(const FastBoard::PointHalfDirMap<int>& heat_map)
     : heat_map_(heat_map) {}
 
     bool operator()(FastBoard::PointDir a, FastBoard::PointDir b) {
@@ -30,8 +30,8 @@ int MinCartPath(const ImmutableCharBoard& b, int min, int max) {
   };
   using QueueType = std::priority_queue<FastBoard::PointDir,
                                         std::vector<FastBoard::PointDir>,
-                                        HeatMapCmp>;
-  HeatMapCmp cmp(heat_map);
+                                        HeatMapGt>;
+  HeatMapGt cmp(heat_map);
   QueueType queue(cmp);
 
   auto add_range = [&](FastBoard::PointDir pd, FastBoard::Dir dir) {
