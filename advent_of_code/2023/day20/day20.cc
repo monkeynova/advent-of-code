@@ -41,6 +41,8 @@ class Modules {
   static absl::StatusOr<Modules> Parse(absl::Span<std::string_view> input);
 
   void InitializeConjuncts();
+
+  void SendPulses(absl::FunctionRef<void(std::string_view, bool, int)> on_pulse);
   void SendPulses(int* low_pulse_count, int* high_pulse_count);
   std::optional<std::pair<int, int>> SendPulses(std::string_view find);
 
@@ -94,19 +96,19 @@ void Modules::InitializeConjuncts() {
   }
 }
 
-void Modules::SendPulses(int* low_pulse_count, int* high_pulse_count) {
+void Modules::SendPulses(absl::FunctionRef<void(std::string_view, bool, int)> on_pulse) {
   struct Pulse {
     bool high;
     std::string_view dest;
     std::string_view src;
   };
 
+  int pulse_num = 0;
   for (std::deque<Pulse> queue = {{false, "broadcaster", "button"}};
-       !queue.empty(); queue.pop_front()) {
+       !queue.empty(); queue.pop_front(), ++pulse_num) {
     Pulse cur = queue.front();
     VLOG(2) << cur.src << " -" << (cur.high ? "high" : "low") << "- -> " << cur.dest;
-    if (cur.high) ++*high_pulse_count;
-    else ++*low_pulse_count;
+    on_pulse(cur.dest, cur.high, pulse_num);
 
     auto it = modules_.find(cur.dest);
     if (it == modules_.end()) {
@@ -145,67 +147,26 @@ void Modules::SendPulses(int* low_pulse_count, int* high_pulse_count) {
   }
 }
 
+void Modules::SendPulses(int* low_pulse_count, int* high_pulse_count) {
+  SendPulses([&](std::string_view dest, bool high, int pulse_num) {
+    if (high) ++*high_pulse_count;
+    else ++*low_pulse_count;
+  });
+}
+
 std::optional<std::pair<int, int>> Modules::SendPulses(std::string_view find) {
-  struct Pulse {
-    bool high;
-    std::string_view dest;
-    std::string_view src;
-  };
-
   std::optional<std::pair<int, int>> ret;
-
-  int pulse = 0;
-  for (std::deque<Pulse> queue = {{false, "broadcaster", "button"}};
-       !queue.empty(); queue.pop_front(), ++pulse) {
-    Pulse cur = queue.front();
-    VLOG(2) << cur.src << " -" << (cur.high ? "high" : "low") << "- -> " << cur.dest;
-
-    if (cur.dest == find) {
-      if (cur.high) {
-        CHECK(!ret) << "Double high";
-        ret = {pulse, pulse - 1};
-      } else {
-        if (ret && ret->second < ret->first) {
-          ret->second = pulse;
-        }
+  SendPulses([&](std::string_view dest, bool high, int pulse_num) {
+    if (dest != find) return;
+    if (high) {
+      CHECK(!ret) << "Double high";
+      ret = {pulse_num, pulse_num - 1};
+    } else {
+      if (ret && ret->second < ret->first) {
+        ret->second = pulse_num;
       }
     }
-
-    auto it = modules_.find(cur.dest);
-    if (it == modules_.end()) {
-      continue;
-    }
-    Control& control = it->second;
-    switch (control.type) {
-      case Control::kBroadcast: {
-        for (std::string_view d: control.outputs) {
-          queue.push_back({cur.high, d, cur.dest});
-        }
-        break;
-      }
-      case Control::kFlipFlop: {
-        if (!cur.high) {
-          control.flip_flop_state = !control.flip_flop_state;
-          for (std::string_view d: control.outputs) {
-            queue.push_back({control.flip_flop_state, d, cur.dest});
-          }
-        }
-        break;
-      }
-      case Control::kConjunct: {
-        auto it2 = control.conjuncts.find(cur.src);
-        CHECK(it2 != control.conjuncts.end()) << cur.src;
-        it2->second = cur.high;
-        bool out = !absl::c_all_of(
-          control.conjuncts,
-          [](std::pair<std::string_view, bool> p) { return p.second; });
-        for (std::string_view d: control.outputs) {
-          queue.push_back({out, d, cur.dest});
-        }
-        break;
-      }
-    }
-  }
+  });
   return ret;
 }
 
