@@ -229,12 +229,14 @@ std::vector<Modules> Modules::DisjointSubmodules(std::string_view* final_conj) {
   }
   CHECK(!final_conj->empty());
 
-  DirectedGraph<Control> graph;
+  Graph<Control> graph;
   for (const auto& [name, con] : modules_) {
     if (name != "broadcaster" && name != *final_conj) {
       graph.AddNode(name, con);
       for (std::string_view out : con.outputs) {
-        graph.AddEdge(name, out);
+        if (out != *final_conj) {
+          graph.AddEdge(name, out);
+        }
       }
     }
   }
@@ -248,6 +250,7 @@ std::vector<Modules> Modules::DisjointSubmodules(std::string_view* final_conj) {
     
   std::vector<Modules> ret;
   for (int i = 0; i < forest.size(); ++i) {
+    VLOG(1) << absl::StrJoin(forest[i], ",");
     ret.push_back(Modules());
     absl::flat_hash_map<std::string_view, Control> sub_modules;
     ret.back().modules_["broadcaster"] = modules_["broadcaster"];
@@ -299,6 +302,11 @@ absl::StatusOr<std::string> Day_2023_20::Part2(
       }
       auto [it, inserted] = hist.emplace(state, i);
       if (!inserted) {
+        VLOG(1) << on_range.size();
+          for (const auto& [i, p] : on_range) {
+            VLOG(1) << i << ": " << p.first << "," << p.second;
+          }
+        VLOG(1) << "Loop @" << i << " -> " << it->second;
         if (on_range.size() != 1) {
           return absl::UnimplementedError("Can't handle part2 without singular range");
         }
@@ -313,7 +321,6 @@ absl::StatusOr<std::string> Day_2023_20::Part2(
           }
         }
         chinese_remainder.push_back({on_range.begin()->first, i});
-        VLOG(1) << "Loop @" << i << " -> " << it->second;
         break;
       }
     }
