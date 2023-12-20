@@ -258,6 +258,7 @@ absl::StatusOr<std::string> Day_2023_20::Part2(
     });
     
   std::vector<std::pair<int64_t, int64_t>> chinese_remainder;
+  std::optional<std::pair<int, int>> pulse_range;
   for (int i = 0; i < forest.size(); ++i) {
     absl::flat_hash_map<std::string_view, Control> sub_modules;
     sub_modules["broadcaster"] = modules["broadcaster"];
@@ -282,8 +283,19 @@ absl::StatusOr<std::string> Day_2023_20::Part2(
       }
       auto [it, inserted] = hist.emplace(state, i);
       if (!inserted) {
-        CHECK_EQ(on_range.size(), 1);
-        // TODO: Check ranges overlap;
+        if (on_range.size() != 1) {
+          return absl::UnimplementedError("Can't handle part2 without singular range");
+        }
+        std::pair<int, int> new_pulse_range = on_range.begin()->second;
+        if (!pulse_range) {
+          pulse_range = new_pulse_range;
+        } else {
+          pulse_range->first = std::max(pulse_range->first, new_pulse_range.first);
+          pulse_range->second = std::min(pulse_range->second, new_pulse_range.second);
+          if (pulse_range->first > pulse_range->second) {
+            return absl::UnimplementedError("Can't handle part2 without overlapping range");
+          }
+        }
         chinese_remainder.push_back({on_range.begin()->first, i});
         VLOG(1) << "Loop @" << i << " -> " << it->second;
         break;
