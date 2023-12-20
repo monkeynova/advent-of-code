@@ -14,20 +14,23 @@ namespace {
 
 int MinCartPath(const ImmutableCharBoard& b, int min, int max) {
   FastBoard fb(b);
-  // TODO(@monkeynova): heat_map doesn't need to store keys for both North and South...
-  FastBoard::PointHalfDirMap<int> heat_map(fb, std::numeric_limits<int>::max());
+  FastBoard::PointHalfDirMap<int> heat_map(
+      fb, std::numeric_limits<int>::max());
   FastBoard::PointDirMap<bool> in_queue(fb, false);
 
   struct HeatMapCmp {
-    explicit HeatMapCmp(FastBoard::PointHalfDirMap<int>& heat_map) : heat_map_(heat_map) {}
+    explicit HeatMapCmp(const FastBoard::PointHalfDirMap<int>& heat_map)
+    : heat_map_(heat_map) {}
 
     bool operator()(FastBoard::PointDir a, FastBoard::PointDir b) {
       return heat_map_.Get(b) < heat_map_.Get(a);
     }
 
-    FastBoard::PointHalfDirMap<int>& heat_map_;
+    const FastBoard::PointHalfDirMap<int>& heat_map_;
   };
-  using QueueType = std::priority_queue<FastBoard::PointDir, std::vector<FastBoard::PointDir>, HeatMapCmp>;
+  using QueueType = std::priority_queue<FastBoard::PointDir,
+                                        std::vector<FastBoard::PointDir>,
+                                        HeatMapCmp>;
   HeatMapCmp cmp(heat_map);
   QueueType queue(cmp);
 
