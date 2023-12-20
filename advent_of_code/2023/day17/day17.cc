@@ -67,7 +67,8 @@ int MinCartPath(const ImmutableCharBoard& b, int min, int max) {
     add_range(cur, FastBoard::kRotateLeft[cur.d]);
     add_range(cur, FastBoard::kRotateRight[cur.d]);
   }
-  VLOG(1) << dequeued << "/" << b.width() * b.height() << " ~ " << 1.0 * dequeued / (b.width() * b.height());
+  VLOG(1) << dequeued << "/" << b.width() * b.height() << " ~ "
+          << 1.0 * dequeued / (b.width() * b.height());
   FastBoard::Point end = fb.From({b.width() - 1, b.height() - 1});
   int answer = std::numeric_limits<int>::max();
   answer = std::min(answer, heat_map.Get({.p = end, .d = FastBoard::kEast}));
