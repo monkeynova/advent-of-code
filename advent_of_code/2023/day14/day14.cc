@@ -126,15 +126,7 @@ inline void RollSlice(
   }
 }
 
-template <int out_dir, int next_dir,
-          typename RollerItType =
-              std::conditional_t<
-                next_dir == 1,
-                std::vector<int>::const_iterator,
-                std::conditional_t<
-                  next_dir == -1,
-                  std::vector<int>::const_reverse_iterator,
-                  void>>>
+template <int out_dir, int next_dir>
 inline void RollDir(
     const std::vector<std::vector<int>>& rollers,
     const std::vector<std::vector<int>>& stops,
