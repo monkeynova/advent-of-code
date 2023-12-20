@@ -2,24 +2,33 @@
 ==
 
 [part=1]
-Example input
+broadcaster -> a, b, c
+%a -> b
+%b -> c
+%c -> inv
+&inv -> a
 --
-ERROR: UNIMPLEMENTED: Problem not known
+32000000
+==
+
+[part=1]
+broadcaster -> a
+%a -> inv, con
+&inv -> b
+%b -> con
+&con -> output
+--
+11687500
 ==
 
 [part=1]
 @include{advent_of_code/2023/day20/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+821985143
 ==
 
-[part=2]
-Example input
---
-ERROR: UNIMPLEMENTED: Problem not known
-==
-
+# 240853834793346 (low; fence post on button press)
 [part=2]
 @include{advent_of_code/2023/day20/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+240853834793347
