@@ -34,8 +34,8 @@ class Modules {
   struct Control {
     enum { kFlipFlop, kConjunct, kBroadcast } type;
     bool flip_flop_state = false;
-    absl::flat_hash_map<std::string_view, bool> conjuncts;
-    std::vector<std::string_view> outputs;
+    absl::flat_hash_map<int, bool> conjuncts;
+    std::vector<int> outputs;
   };
 
   static absl::StatusOr<Modules> Parse(absl::Span<std::string_view> input);
@@ -53,12 +53,24 @@ class Modules {
  private:
   Modules() = default;
 
-  absl::flat_hash_map<std::string_view, Control> modules_;
-  std::vector<std::string_view> flip_flops_;
+  int broadcast_id_ = -1;
+  std::vector<Control> modules_;
+  std::vector<std::string_view> names_;
+  std::vector<int> flip_flops_;
 };
 
 absl::StatusOr<Modules> Modules::Parse(absl::Span<std::string_view> input) {
+  absl::flat_hash_map<std::string_view, int> name_to_id;
   Modules ret;
+  auto alloc_name = [&](std::string_view name) {
+    auto [name_it, inserted] = name_to_id.emplace(name, ret.names_.size());
+    if (inserted) {
+      ret.names_.push_back(name);
+      ret.modules_.push_back({});
+    }
+    return name_it->second;
+  };
+
   for (std::string_view line : input) {
     auto [name, output_list] = PairSplit(line, " -> ");
     Control control;
@@ -71,26 +83,26 @@ absl::StatusOr<Modules> Modules::Parse(absl::Span<std::string_view> input) {
       control.type = Control::kConjunct;
       name = name.substr(1);
     }
-    if (control.type == Control::kBroadcast && name != "broadcaster") {
-      return Error("Bad name: ", name);
+    int name_id = alloc_name(name);
+    if (control.type == Control::kBroadcast) {
+      if (name != "broadcaster") {
+        return Error("Bad name: ", name);
+      }
+      ret.broadcast_id_ = name_id;
     }
-    control.outputs = absl::StrSplit(output_list, ", ");
-    if (!ret.modules_.emplace(name, control).second) {
-      return Error("Duplicate name: ", name);
+    for (std::string_view out : absl::StrSplit(output_list, ", ")) {
+      control.outputs.push_back(alloc_name(out));
     }
+    ret.modules_[name_id] = std::move(control);
   }
   return ret;
 }
 
 void Modules::InitializeConjuncts() {
-  for (const auto& [name, con] : modules_) {
-    for (std::string_view dest : con.outputs) {
-      auto it2 = modules_.find(dest);
-      if (it2 == modules_.end()) {
-        continue;
-      }
-      if (it2->second.type == Control::kConjunct) {
-        it2->second.conjuncts.emplace(name, false);
+  for (int src = 0; src < modules_.size(); ++src) {
+    for (int dest : modules_[src].outputs) {
+      if (modules_[dest].type == Control::kConjunct) {
+        modules_[dest].conjuncts.emplace(src, false);
       }
     }
   }
@@ -99,25 +111,21 @@ void Modules::InitializeConjuncts() {
 void Modules::SendPulses(absl::FunctionRef<void(std::string_view, bool, int)> on_pulse) {
   struct Pulse {
     bool high;
-    std::string_view dest;
-    std::string_view src;
+    int dest;
+    int src;
   };
 
   int pulse_num = 0;
-  for (std::deque<Pulse> queue = {{false, "broadcaster", "button"}};
+  for (std::deque<Pulse> queue = {{false, broadcast_id_, -1}};
        !queue.empty(); queue.pop_front(), ++pulse_num) {
     Pulse cur = queue.front();
     VLOG(2) << cur.src << " -" << (cur.high ? "high" : "low") << "- -> " << cur.dest;
-    on_pulse(cur.dest, cur.high, pulse_num);
+    on_pulse(names_[cur.dest], cur.high, pulse_num);
 
-    auto it = modules_.find(cur.dest);
-    if (it == modules_.end()) {
-      continue;
-    }
-    Control& control = it->second;
+    Control& control = modules_[cur.dest];
     switch (control.type) {
       case Control::kBroadcast: {
-        for (std::string_view d: control.outputs) {
+        for (int d : control.outputs) {
           queue.push_back({cur.high, d, cur.dest});
         }
         break;
@@ -125,7 +133,7 @@ void Modules::SendPulses(absl::FunctionRef<void(std::string_view, bool, int)> on
       case Control::kFlipFlop: {
         if (!cur.high) {
           control.flip_flop_state = !control.flip_flop_state;
-          for (std::string_view d: control.outputs) {
+          for (int d : control.outputs) {
             queue.push_back({control.flip_flop_state, d, cur.dest});
           }
         }
@@ -136,9 +144,9 @@ void Modules::SendPulses(absl::FunctionRef<void(std::string_view, bool, int)> on
         CHECK(it2 != control.conjuncts.end()) << cur.src;
         it2->second = cur.high;
         bool out = !absl::c_all_of(
-          control.conjuncts,
-          [](std::pair<std::string_view, bool> p) { return p.second; });
-        for (std::string_view d: control.outputs) {
+            control.conjuncts,
+            [](std::pair<int, bool> p) { return p.second; });
+        for (int d : control.outputs) {
           queue.push_back({out, d, cur.dest});
         }
         break;
@@ -172,7 +180,7 @@ std::optional<std::pair<int, int>> Modules::SendPulses(std::string_view find) {
 
 std::vector<bool> Modules::State() {
   std::vector<bool> state;
-  for (std::string_view node : flip_flops_) {
+  for (int node : flip_flops_) {
     state.push_back(modules_[node].flip_flop_state);
   }
   return state;
@@ -180,45 +188,36 @@ std::vector<bool> Modules::State() {
 
 std::vector<Modules> Modules::DisjointSubmodules(std::string_view* final_conj) {
   *final_conj = "";
-  for (const auto& [name, con] : modules_) {
-    for (std::string_view dest : con.outputs) {
-      if (dest == "rx") {
-        CHECK_EQ(con.outputs.size(), 1);
-        *final_conj = name;
+  for (int i = 0; i < modules_.size(); ++i) {
+    for (int dest : modules_[i].outputs) {
+      if (names_[dest] == "rx") {
+        CHECK_EQ(modules_[i].outputs.size(), 1);
+        *final_conj = names_[i];
       }
     }
   }
   CHECK(!final_conj->empty());
 
-  Graph<Control> graph;
-  for (const auto& [name, con] : modules_) {
-    if (name != "broadcaster" && name != *final_conj) {
-      graph.AddNode(name, con);
-      for (std::string_view out : con.outputs) {
-        if (out != *final_conj) {
-          graph.AddEdge(name, out);
-        }
-      }
-    }
-  }
-  std::vector<std::vector<std::string_view>> forest = graph.Forest();
-  VLOG(1) << forest.size();
-  VLOG(1) << absl::StrJoin(
-    modules_[*final_conj].conjuncts, ",",
-    [](std::string* out, std::pair<std::string_view, bool> p) {
-      absl::StrAppend(out, p.first);
-    });
-    
   std::vector<Modules> ret;
-  for (int i = 0; i < forest.size(); ++i) {
-    VLOG(1) << absl::StrJoin(forest[i], ",");
+  for (int piece : modules_[broadcast_id_].outputs) {
     ret.push_back(Modules());
-    absl::flat_hash_map<std::string_view, Control> sub_modules;
-    ret.back().modules_["broadcaster"] = modules_["broadcaster"];
-    for (std::string_view node : forest[i]) {
-      ret.back().modules_[node] = modules_[node];
-      if (ret.back().modules_[node].type == Control::kFlipFlop) {
-        ret.back().flip_flops_.push_back(node);
+    Modules& build = ret.back();
+    build.modules_.resize(modules_.size());
+    build.names_ = names_;
+    build.broadcast_id_ = broadcast_id_;
+    build.modules_[broadcast_id_] = modules_[broadcast_id_];
+    std::vector<bool> used(modules_.size(), false);
+    for (std::deque<int> queue = {piece}; !queue.empty(); queue.pop_front()) {
+      int id = queue.front();
+      build.modules_[id] = modules_[id];
+      if (build.modules_[id].type == Control::kFlipFlop) {
+        build.flip_flops_.push_back(id);
+      }
+      for (int o : modules_[id].outputs) {
+        if (!used[o]) {
+          queue.push_back(o);
+          used[o] = true;
+        }
       }
     }
   }
