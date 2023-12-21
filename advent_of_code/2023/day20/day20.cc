@@ -34,7 +34,7 @@ class Modules {
   struct Control {
     enum { kFlipFlop, kConjunct, kBroadcast } type;
     bool flip_flop_state = false;
-    absl::flat_hash_map<int, bool> conjuncts;
+    std::vector<std::pair<int, bool>> conjuncts;
     std::vector<int> outputs;
   };
 
@@ -43,10 +43,9 @@ class Modules {
   void InitializeConjuncts();
 
   void SendPulses(absl::FunctionRef<void(std::string_view, bool, int)> on_pulse);
-  void SendPulses(int* low_pulse_count, int* high_pulse_count);
-  std::optional<std::pair<int, int>> SendPulses(std::string_view find);
 
-  std::vector<Modules> DisjointSubmodules(std::string_view* final_conj);
+  std::vector<Modules> DisjointSubmodules(std::string_view final,
+                                          std::string_view* final_conj);
 
   std::vector<bool> State();
 
@@ -102,7 +101,7 @@ void Modules::InitializeConjuncts() {
   for (int src = 0; src < modules_.size(); ++src) {
     for (int dest : modules_[src].outputs) {
       if (modules_[dest].type == Control::kConjunct) {
-        modules_[dest].conjuncts.emplace(src, false);
+        modules_[dest].conjuncts.emplace_back(src, false);
       }
     }
   }
@@ -140,12 +139,11 @@ void Modules::SendPulses(absl::FunctionRef<void(std::string_view, bool, int)> on
         break;
       }
       case Control::kConjunct: {
-        auto it2 = control.conjuncts.find(cur.src);
-        CHECK(it2 != control.conjuncts.end()) << cur.src;
-        it2->second = cur.high;
-        bool out = !absl::c_all_of(
-            control.conjuncts,
-            [](std::pair<int, bool> p) { return p.second; });
+        bool out = false;
+        for (auto& [id, val] : control.conjuncts) {
+          if (id == cur.src) val = cur.high;
+          out |= !val;
+        }
         for (int d : control.outputs) {
           queue.push_back({out, d, cur.dest});
         }
@@ -153,29 +151,6 @@ void Modules::SendPulses(absl::FunctionRef<void(std::string_view, bool, int)> on
       }
     }
   }
-}
-
-void Modules::SendPulses(int* low_pulse_count, int* high_pulse_count) {
-  SendPulses([&](std::string_view dest, bool high, int pulse_num) {
-    if (high) ++*high_pulse_count;
-    else ++*low_pulse_count;
-  });
-}
-
-std::optional<std::pair<int, int>> Modules::SendPulses(std::string_view find) {
-  std::optional<std::pair<int, int>> ret;
-  SendPulses([&](std::string_view dest, bool high, int pulse_num) {
-    if (dest != find) return;
-    if (high) {
-      CHECK(!ret) << "Double high";
-      ret = {pulse_num, pulse_num - 1};
-    } else {
-      if (ret && ret->second < ret->first) {
-        ret->second = pulse_num;
-      }
-    }
-  });
-  return ret;
 }
 
 std::vector<bool> Modules::State() {
@@ -186,17 +161,22 @@ std::vector<bool> Modules::State() {
   return state;
 }
 
-std::vector<Modules> Modules::DisjointSubmodules(std::string_view* final_conj) {
+std::vector<Modules> Modules::DisjointSubmodules(
+    std::string_view final, std::string_view* final_conj) {
   *final_conj = "";
   for (int i = 0; i < modules_.size(); ++i) {
     for (int dest : modules_[i].outputs) {
-      if (names_[dest] == "rx") {
-        CHECK_EQ(modules_[i].outputs.size(), 1);
+      if (names_[dest] == final) {
+        if (modules_[i].outputs.size() != 1) {
+          return {*this};
+        }
         *final_conj = names_[i];
       }
     }
   }
-  CHECK(!final_conj->empty());
+  if (final_conj->empty()) {
+    return {*this};
+  }
 
   std::vector<Modules> ret;
   for (int piece : modules_[broadcast_id_].outputs) {
@@ -233,7 +213,10 @@ absl::StatusOr<std::string> Day_2023_20::Part1(
   int high_pulses = 0;
   modules.InitializeConjuncts();
   for (int i = 0; i < 1000; ++i) {
-    modules.SendPulses(&low_pulses, &high_pulses);
+    modules.SendPulses([&](std::string_view dest, bool high, int pulse_num) {
+      if (high) ++high_pulses;
+      else ++low_pulses;
+    });
   }
   return AdventReturn(low_pulses * high_pulses);
 }
@@ -245,42 +228,57 @@ absl::StatusOr<std::string> Day_2023_20::Part2(
   modules.InitializeConjuncts();
   
   std::string_view final_conj;
-  std::vector<Modules> sub_modules = modules.DisjointSubmodules(&final_conj);
+  std::vector<Modules> sub_modules =
+      modules.DisjointSubmodules("rx", &final_conj);
+
+  // TODO(@monkeynova): Each of sub_modules is a counter with a comparison. If
+  // we could recognized the structure and order the bits, we could extract the
+  // values directly.
 
   std::vector<std::pair<int64_t, int64_t>> chinese_remainder;
   std::optional<std::pair<int, int>> pulse_range;
 
   for (Modules& sub_module : sub_modules) {
-    absl::flat_hash_map<int, std::pair<int, int>> on_range;
-    absl::flat_hash_map<std::vector<bool>, int> hist;
+    std::optional<std::pair<int, int>> on_range;
+    int on_range_at = -1;
+    std::vector<bool> start_state = sub_module.State();
     for (int i = 0; true; ++i) {
-      std::optional<std::pair<int, int>> high_range = sub_module.SendPulses(final_conj);
+      std::optional<std::pair<int, int>> high_range;
+      sub_module.SendPulses([&](std::string_view dest, bool high, int pulse) {
+        if (dest != final_conj) return;
+        if (high) {
+          CHECK(!high_range) << "Double high";
+          high_range = {pulse, pulse - 1};
+        } else {
+          if (high_range && high_range->second < high_range->first) {
+            high_range->second = pulse;
+          }
+        }
+      });
       std::vector<bool> state = sub_module.State();
       if (high_range) {
-        VLOG(1) << i << ": [" << high_range->first << "," << high_range->second << ")";
-        on_range[i] = *high_range;
+        VLOG(1) << i << ": [" << high_range->first << "," << high_range->second
+                << ")";
+        if (on_range) {
+          return absl::UnimplementedError(
+              "Can't handle part2 without singular range");
+        }
+        on_range = *high_range;
+        on_range_at = i;
       }
-      auto [it, inserted] = hist.emplace(state, i);
-      if (!inserted) {
-        VLOG(1) << on_range.size();
-          for (const auto& [i, p] : on_range) {
-            VLOG(1) << i << ": " << p.first << "," << p.second;
-          }
-        VLOG(1) << "Loop @" << i << " -> " << it->second;
-        if (on_range.size() != 1) {
-          return absl::UnimplementedError("Can't handle part2 without singular range");
-        }
-        std::pair<int, int> new_pulse_range = on_range.begin()->second;
+      if (state == start_state) {
+        VLOG(1) << "Loop @" << i + 1 << " -> 0";
         if (!pulse_range) {
-          pulse_range = new_pulse_range;
+          pulse_range = *on_range;
         } else {
-          pulse_range->first = std::max(pulse_range->first, new_pulse_range.first);
-          pulse_range->second = std::min(pulse_range->second, new_pulse_range.second);
+          pulse_range->first = std::max(pulse_range->first, on_range->first);
+          pulse_range->second = std::min(pulse_range->second, on_range->second);
           if (pulse_range->first > pulse_range->second) {
-            return absl::UnimplementedError("Can't handle part2 without overlapping range");
+            return absl::UnimplementedError(
+                "Can't handle part2 without overlapping range");
           }
         }
-        chinese_remainder.push_back({on_range.begin()->first, i});
+        chinese_remainder.push_back({on_range_at, i + 1});
         break;
       }
     }
