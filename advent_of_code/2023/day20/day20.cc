@@ -112,7 +112,6 @@ void Modules::SendPulses(absl::FunctionRef<void(std::string_view, bool, int)> on
     bool high;
     int dest;
     int src;
-    int skip = 0;
   };
 
   int pulse_num = 0;
