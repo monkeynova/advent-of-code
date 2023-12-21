@@ -112,6 +112,7 @@ void Modules::SendPulses(absl::FunctionRef<void(std::string_view, bool, int)> on
     bool high;
     int dest;
     int src;
+    int skip = 0;
   };
 
   int pulse_num = 0;
@@ -122,32 +123,31 @@ void Modules::SendPulses(absl::FunctionRef<void(std::string_view, bool, int)> on
     on_pulse(names_[cur.dest], cur.high, pulse_num);
 
     Control& control = modules_[cur.dest];
+    std::optional<bool> out;
     switch (control.type) {
       case Control::kBroadcast: {
-        for (int d : control.outputs) {
-          queue.push_back({cur.high, d, cur.dest});
-        }
+        out = cur.high;
         break;
       }
       case Control::kFlipFlop: {
         if (!cur.high) {
-          control.flip_flop_state = !control.flip_flop_state;
-          for (int d : control.outputs) {
-            queue.push_back({control.flip_flop_state, d, cur.dest});
-          }
+          // TODO(@monkeynova): Could we prune the 'high' messages earlier?
+          out = control.flip_flop_state = !control.flip_flop_state;
         }
         break;
       }
       case Control::kConjunct: {
-        bool out = false;
+        out = false;
         for (auto& [id, val] : control.conjuncts) {
           if (id == cur.src) val = cur.high;
-          out |= !val;
-        }
-        for (int d : control.outputs) {
-          queue.push_back({out, d, cur.dest});
+          *out |= !val;
         }
         break;
+      }
+    }
+    if (out) {
+      for (int d : control.outputs) {
+        queue.push_back({*out, d, cur.dest});
       }
     }
   }
