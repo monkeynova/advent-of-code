@@ -2,28 +2,9 @@
 
 #include "advent_of_code/2023/day20/day20.h"
 
-#include "absl/algorithm/container.h"
 #include "absl/container/flat_hash_map.h"
-#include "absl/container/flat_hash_set.h"
 #include "absl/log/log.h"
-#include "absl/strings/numbers.h"
-#include "absl/strings/str_cat.h"
-#include "absl/strings/str_join.h"
-#include "absl/strings/str_split.h"
-#include "advent_of_code/bfs.h"
-#include "advent_of_code/char_board.h"
-#include "advent_of_code/conway.h"
-#include "advent_of_code/directed_graph.h"
-#include "advent_of_code/graph_walk.h"
-#include "advent_of_code/interval.h"
-#include "advent_of_code/loop_history.h"
 #include "advent_of_code/mod.h"
-#include "advent_of_code/point.h"
-#include "advent_of_code/point3.h"
-#include "advent_of_code/point_walk.h"
-#include "advent_of_code/splice_ring.h"
-#include "advent_of_code/tokenizer.h"
-#include "re2/re2.h"
 
 namespace advent_of_code {
 
@@ -107,19 +88,20 @@ void Modules::InitializeConjuncts() {
   }
 }
 
-void Modules::SendPulses(absl::FunctionRef<void(std::string_view, bool, int)> on_pulse) {
+void Modules::SendPulses(
+    absl::FunctionRef<void(std::string_view, bool, int)> on_pulse) {
   struct Pulse {
     bool high;
     int dest;
     int src;
-  };
+  } start {false, broadcast_id_, -1};
 
   int pulse_num = 0;
-  for (std::deque<Pulse> queue = {{false, broadcast_id_, -1}};
-       !queue.empty(); queue.pop_front(), ++pulse_num) {
+  for (std::deque<Pulse> queue = {start}; !queue.empty(); queue.pop_front()) {
     Pulse cur = queue.front();
     VLOG(2) << cur.src << " -" << (cur.high ? "high" : "low") << "- -> " << cur.dest;
     on_pulse(names_[cur.dest], cur.high, pulse_num);
+    ++pulse_num;
 
     Control& control = modules_[cur.dest];
     std::optional<bool> out;
@@ -254,7 +236,6 @@ absl::StatusOr<std::string> Day_2023_20::Part2(
           }
         }
       });
-      std::vector<bool> state = sub_module.State();
       if (high_range) {
         VLOG(1) << i << ": [" << high_range->first << "," << high_range->second
                 << ")";
@@ -265,7 +246,7 @@ absl::StatusOr<std::string> Day_2023_20::Part2(
         on_range = *high_range;
         on_range_at = i;
       }
-      if (state == start_state) {
+      if (sub_module.State() == start_state) {
         VLOG(1) << "Loop @" << i + 1 << " -> 0";
         if (!pulse_range) {
           pulse_range = *on_range;
@@ -285,8 +266,6 @@ absl::StatusOr<std::string> Day_2023_20::Part2(
   std::optional<int64_t> found = ChineseRemainder(chinese_remainder);
   if (!found) return AdventReturn(found);
   return AdventReturn(*found + 1);
-
-  return Error("Takes too long, not implemented, yadda");
 }
 
 }  // namespace advent_of_code
