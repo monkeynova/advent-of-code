@@ -30,53 +30,6 @@ namespace advent_of_code {
 
 namespace {
 
-struct KeyType {
-  const std::vector<Point>* a;
-  const std::vector<Point>* b;
-  Point d;
-
-  bool operator==(const KeyType& o) const {
-    return a == o.a && b == o.b && d == o.d;
-  }
-  template <typename H>
-  friend H AbslHashValue(H h, const KeyType& k) {
-    return H::combine(std::move(h), k.a, k.b, k.d);
-  }
-};
-
-class NearDensePoints {
- public:
-  NearDensePoints() = default;
-
-  int64_t Size() const {
-    return remainder_.size();
-  }
-
-  void Add(const NearDensePoints& o, Point dir) {
-  }
-
-  void Compact() {
-    bool all_in;
-    do {
-      all_in = true;
-      for (int a = -dense_through_ - 1; a <= dense_through_ + 1; ++a) {
-        all_in &= remainder_.contains({a, -dense_through_ - 1});
-        all_in &= remainder_.contains({a, dense_through_ + 1});
-        all_in &= remainder_.contains({-dense_through_ - 1, a});
-        all_in &= remainder_.contains({dense_through_ + 1, a});
-        if (!all_in) break;
-      }
-      if (all_in) {
-        ++dense_through_;
-      }
-    } while (all_in);
-  }
-
- private:
-  int dense_through_ = 0;
-  const absl::flat_hash_set<Point> remainder_;
-};
-
 absl::StatusOr<int64_t> NaivePart2(
     const CharBoard& b, Point s, int steps) {
   absl::flat_hash_set<Point> set;
@@ -114,24 +67,6 @@ absl::StatusOr<int64_t> NaivePart2(
       }
     }
     frontier = std::move(next_frontier);
-#if 0 
-    for (auto it = set.begin(); it != set.end();) {
-      bool any_in_frontier = false;
-      for (Point d1 : Cardinal::kFourDirs) {
-        for (Point d2 : Cardinal::kFourDirs) {
-          if (frontier.contains(*it + d1 + d2)) {
-            any_in_frontier = true;
-          }
-        }
-      }
-      if (any_in_frontier) {
-        ++it;
-      } else {
-        ++removed;
-        set.erase(it++);
-      }
-    }
-#endif
   } 
   absl::flat_hash_map<Point, int> grid_count;
   for (Point p : set) {
@@ -314,7 +249,11 @@ std::optional<int64_t> HackPart2(
 absl::StatusOr<std::string> Day_2023_21::Part1(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
-  ASSIGN_OR_RETURN(int steps, IntParam());
+  auto [p1, p2] = PairSplit(param(), ",");
+  int steps;
+  if (!absl::SimpleAtoi(p1, &steps)) {
+    return Error("Bad int param: ", p1);
+  }
   absl::flat_hash_set<Point> s = b.Find('S');
   if (s.size() != 1) return Error("Start not unique");
   for (int i = 0; i < steps; ++i) {
@@ -336,7 +275,11 @@ absl::StatusOr<std::string> Day_2023_21::Part1(
 absl::StatusOr<std::string> Day_2023_21::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
-  ASSIGN_OR_RETURN(int steps, IntParam());
+  auto [p1, p2] = PairSplit(param(), ",");
+  int steps;
+  if (!absl::SimpleAtoi(p2.empty() ? p1 : p2, &steps)) {
+    return Error("Bad int param: ", p2.empty() ? p1 : p2);
+  }
 
   ASSIGN_OR_RETURN(Point s, b.FindUnique('S'));
   std::optional<int64_t> maybe_anser = HackPart2(b, s, steps);
