@@ -195,34 +195,19 @@ absl::StatusOr<std::string> Day_2023_22::Part2(
 
   int would_fall = 0;
   for (int i = 0; i < list.size(); ++i) {
-    std::vector<bool> supported(list.size(), false);
-    for (bool support_changed = true; support_changed;) {
-      support_changed = false;
-      for (int j = 0; j < list.size(); ++j) {
-        if (j == i) continue;
-        if (supported[j]) continue;
-        if (list[j].min.z == 1) {
-          supported[j] = true;
-          support_changed = true;
-          continue;
-        }
-        Cube drop = list[j];
-        --drop.min.z;
-        --drop.max.z;
-        for (int k = 0; k < list.size(); ++k) {
-          if (i == k) continue;
-          if (j == k) continue;
-          if (!supported[k]) continue;
-          if (drop.Overlaps(list[k])) {
-            supported[j] = true;
-            support_changed = true;
-          }
+    absl::flat_hash_set<int> this_supported;
+    for (std::deque<int> queue = {-1}; !queue.empty(); queue.pop_front()) {
+      this_supported.insert(queue.front());
+      auto it = supports.find(queue.front());
+      if (it == supports.end()) continue;
+      for (int o : it->second) {
+        if (o == i) continue;
+        if (this_supported.insert(o).second) {
+          queue.push_back(o);
         }
       }
     }
-    int this_would = list.size() - 1 - absl::c_accumulate(supported, 0, [](int a, bool b) { return a + (b?1:0); });
-    VLOG(1) << i << ": " << this_would;
-    would_fall += this_would;
+    would_fall += list.size() - this_supported.size(); // this_supported includes 'ground' for extra -1.
   }
 
   return AdventReturn(would_fall);
