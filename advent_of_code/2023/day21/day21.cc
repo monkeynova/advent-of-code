@@ -66,32 +66,48 @@ absl::StatusOr<int64_t> NaivePart2(
   return removed + set.size();
 }
 
-absl::flat_hash_map<Point, int> Paint(
-    const ImmutableCharBoard& b, Point start, int start_d) {
-  absl::flat_hash_map<Point, int> ret = {{start, start_d}};
-  for (std::deque<Point> queue = {start}; !queue.empty(); queue.pop_front()) {
-    auto it = ret.find(queue.front());
-    CHECK(it != ret.end());
-    for (Point d : Cardinal::kFourDirs) {
-      Point t = it->first + d;
-      if (!b.OnBoard(t) || b[t] == '#') continue;
-      if (ret.emplace(t, it->second + 1).second) {
-        queue.push_back(t);
+std::optional<std::pair<int, int>> PaintAndCountFirst(
+    const ImmutableCharBoard& b, Point start, int steps) {
+  std::pair<int, int> ret = {0, 0};
+
+  FastBoard fb(b);
+  FastBoard::PointMap<int> paint(fb, -1);
+  FastBoard::Point s_idx = fb.From(start);
+  paint.Set(s_idx, 0);
+  if (steps % 2 == 0) {
+    ++ret.first;
+  } else {
+    ++ret.second;
+  }
+  for (std::deque<FastBoard::Point> queue = {s_idx}; !queue.empty(); queue.pop_front()) {
+    int dist = paint.Get(queue.front());
+    CHECK_NE(dist, -1);
+    if (dist == steps) break;
+    ++dist;
+    for (FastBoard::Dir d : {FastBoard::kNorth, FastBoard::kSouth, FastBoard::kEast, FastBoard::kWest}) {
+      FastBoard::Point test = fb.Add(queue.front(), d);
+      if (!fb.OnBoard(test)) continue;
+      if (fb[test] == '#') continue;
+      if (paint.Get(test) != -1) continue;
+      paint.Set(test, dist);
+      queue.push_back(test);
+      if (dist % 2 == steps % 2) {
+        ++ret.first;
+      } else {
+        ++ret.second;
       }
     }
+  }
+  for (int i = 0; i < b.width(); ++i) {
+    int test_dist = (start - Point{0, i}).dist();
+    if (paint.Get(fb.From({0, i})) != test_dist) return std::nullopt;
+    if (paint.Get(fb.From({i, 0})) != test_dist) return std::nullopt;
+    if (paint.Get(fb.From({b.width() - 1, i})) != test_dist) return std::nullopt;
+    if (paint.Get(fb.From({i, b.height() - 1})) != test_dist) return std::nullopt;
   }
   return ret;
 }
 
-int64_t CountPainted(const absl::flat_hash_map<Point, int>& paint, int steps) {
-  int64_t count = 0;
-  for (const auto& [_, d] : paint) {
-    if (d % 2 == steps % 2 && d <= steps) {
-      ++count;
-    }
-  }
-  return count;
-}
 
 int64_t PaintAndCount(const ImmutableCharBoard& b, Point start, int start_d, int steps) {
   if (start_d > steps) return 0;
@@ -99,7 +115,7 @@ int64_t PaintAndCount(const ImmutableCharBoard& b, Point start, int start_d, int
   FastBoard::PointMap<int> paint(fb, -1);
   FastBoard::Point s_idx = fb.From(start);
   paint.Set(s_idx, start_d);
-  int count = start_d % 2 == steps % 2;
+  int count = start_d % 2 == steps % 2 ? 1 : 0;
   for (std::deque<FastBoard::Point> queue = {s_idx}; !queue.empty(); queue.pop_front()) {
     int dist = paint.Get(queue.front());
     CHECK_NE(dist, -1);
@@ -129,14 +145,13 @@ std::optional<int64_t> HackPart2(
   if (s.y != b.height() / 2) return std::nullopt;
   if (steps % b.width() == 0) return std::nullopt;
 
-  absl::flat_hash_map<Point, int> start_paint = Paint(b, s, 0);
-  for (int i = 0; i < b.width(); ++i) {
-    int test_dist = (s - Point{0, i}).dist();
-    if ((start_paint[{0, i}]) != test_dist) return std::nullopt;
-    if ((start_paint[{i, 0}]) != test_dist) return std::nullopt;
-    if ((start_paint[{b.width() - 1, i}]) != test_dist) return std::nullopt;
-    if ((start_paint[{i, b.height() - 1}]) != test_dist) return std::nullopt;
-  }
+  std::optional<std::pair<int, int>> test_first =
+      PaintAndCountFirst(b, s, steps);
+
+  if (!test_first) return std::nullopt;
+  int full_paint_count = test_first->first;
+  int full_off_paint_count = test_first->second;
+
   int64_t total = 0;
 
   int64_t max_x = s.x + steps;
@@ -146,21 +161,11 @@ std::optional<int64_t> HackPart2(
   VLOG(1) << max_x % b.width() << " >?> " << s.x;
   int64_t max_tile_x = max_x / b.width();
 
-  // steps - max_x % b.width() + s.y < steps
-
-  // s.x=s.y=66, w=h=131, steps=300
-  // s.x + steps = 366
-  // 366 % 131 = 104
-  // 
-
   bool extra_corner = false;
   if (max_x % b.width() < s.x) {
     extra_corner = true;
     --max_tile_x;
   }
-
-  int64_t full_paint_count = CountPainted(start_paint, steps);
-  VLOG(1) << "Full: " << full_paint_count;
 
   // 1, 5, 13, 25
   // 1 + SUM(4n)  
@@ -168,13 +173,13 @@ std::optional<int64_t> HackPart2(
   int64_t full_max_tile_x = (max_tile_x + 1) / 2;
   int64_t full_off_max_tile_x = max_tile_x - full_max_tile_x;
   VLOG(1) << max_tile_x << " -> " << full_max_tile_x << " + " << full_off_max_tile_x;
+  VLOG(1) << "Full: " << full_paint_count;
   int64_t full_tile_count = 1 + 4 * full_max_tile_x * (full_max_tile_x - 1);
   VLOG(1) << " x" << full_tile_count;
   total += full_tile_count * full_paint_count;
 
   // Full tiles are offset on which step mod they use.
   // SUM(4 * (2n + 1))
-  int64_t full_off_paint_count = CountPainted(start_paint, steps - 1);
   VLOG(1) << "Full (off): " << full_off_paint_count;
   int64_t full_off_tile_count = 4 * full_off_max_tile_x * (full_off_max_tile_x - 1) + 4 * full_off_max_tile_x;
   VLOG(1) << " x" << full_off_tile_count;
