@@ -49,7 +49,33 @@ absl::StatusOr<std::vector<Cube>> Parse(absl::Span<std::string_view> input) {
   return list;
 }
 
-void Drop(std::vector<Cube>& list) {
+struct SupportGraph {
+  absl::flat_hash_map<int, absl::flat_hash_set<int>> supports;
+  absl::flat_hash_map<int, absl::flat_hash_set<int>> supported_by;
+};
+
+SupportGraph BuildSupportGraph(const std::vector<Cube>& list) {
+  SupportGraph ret;
+  for (int i = 0; i < list.size(); ++i) {
+    if (list[i].min.z == 1) {
+      ret.supports[-1].insert(i);
+      ret.supported_by[i].insert(-1);
+    }
+    Cube drop = list[i];
+    --drop.min.z;
+    --drop.max.z;
+    for (int j = 0; j < list.size(); ++j) {
+      if (i == j) continue;
+      if (drop.Overlaps(list[j])) {
+        ret.supports[j].insert(i);
+        ret.supported_by[i].insert(j);
+      }
+    }
+  }
+  return ret;
+}
+
+SupportGraph Drop(std::vector<Cube>& list) {
   std::vector<bool> supported(list.size(), false);
   while (!absl::c_all_of(supported, [](bool b) { return b; })) {
     for (bool support_changed = true; support_changed;) {
@@ -79,6 +105,8 @@ void Drop(std::vector<Cube>& list) {
       --list[i].max.z;
     }
   }
+
+  return BuildSupportGraph(list);
 }
 
 }  // namespace
@@ -86,43 +114,28 @@ void Drop(std::vector<Cube>& list) {
 absl::StatusOr<std::string> Day_2023_22::Part1(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(std::vector<Cube> list, Parse(input));
-  Drop(list);
-
-  absl::flat_hash_map<int, absl::flat_hash_set<int>> supports;
-  absl::flat_hash_map<int, absl::flat_hash_set<int>> supported_by;
-  for (int i = 0; i < list.size(); ++i) {
-    Cube drop = list[i];
-    --drop.min.z;
-    --drop.max.z;
-    for (int j = 0; j < list.size(); ++j) {
-      if (i == j) continue;
-      if (drop.Overlaps(list[j])) {
-        supports[j].insert(i);
-        supported_by[i].insert(j);
-      }
-    }
-  }
+  SupportGraph support = Drop(list);
 
   int disintigrable = 0;
   for (int i = 0; i < list.size(); ++i) {
-    auto it1 = supports.find(i);
-    if (it1 == supports.end()) {
-      VLOG(1) << i << ": No supports";
-      VLOG(1) << list[i].min << "-" << list[i].max;
+    auto it1 = support.supports.find(i);
+    if (it1 == support.supports.end()) {
+      VLOG(2) << i << ": No supports";
+      VLOG(2) << list[i].min << "-" << list[i].max;
       ++disintigrable;
       continue;
     }
     bool all_multi_support = true;
     for (int s : it1->second) {
-      auto it2 = supported_by.find(s);
-      if (it2 == supported_by.end()) return Error("Integrity check");
+      auto it2 = support.supported_by.find(s);
+      if (it2 == support.supported_by.end()) return Error("Integrity check");
       if (it2->second.size() == 0) return Error("Integrity check");
       if (it2->second.size() == 1) {
         if (!it2->second.contains(i)) return Error("Integrity check");
         all_multi_support = false;
       }
     }
-    VLOG(1) << i << ": " << all_multi_support;
+    VLOG(2) << i << ": " << all_multi_support;
     if (all_multi_support) {
       ++disintigrable;
     }
@@ -134,34 +147,15 @@ absl::StatusOr<std::string> Day_2023_22::Part1(
 absl::StatusOr<std::string> Day_2023_22::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(std::vector<Cube> list, Parse(input));
-  Drop(list);
-
-  absl::flat_hash_map<int, absl::flat_hash_set<int>> supports;
-  absl::flat_hash_map<int, absl::flat_hash_set<int>> supported_by;
-  for (int i = 0; i < list.size(); ++i) {
-    if (list[i].min.z == 1) {
-      supports[-1].insert(i);
-      supported_by[i].insert(-1);
-    }
-    Cube drop = list[i];
-    --drop.min.z;
-    --drop.max.z;
-    for (int j = 0; j < list.size(); ++j) {
-      if (i == j) continue;
-      if (drop.Overlaps(list[j])) {
-        supports[j].insert(i);
-        supported_by[i].insert(j);
-      }
-    }
-  }
+  SupportGraph support = Drop(list);
 
   int would_fall = 0;
   for (int i = 0; i < list.size(); ++i) {
     absl::flat_hash_set<int> this_supported;
     for (std::deque<int> queue = {-1}; !queue.empty(); queue.pop_front()) {
       this_supported.insert(queue.front());
-      auto it = supports.find(queue.front());
-      if (it == supports.end()) continue;
+      auto it = support.supports.find(queue.front());
+      if (it == support.supports.end()) continue;
       for (int o : it->second) {
         if (o == i) continue;
         if (this_supported.insert(o).second) {
