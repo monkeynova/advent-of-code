@@ -76,8 +76,6 @@ SupportGraph BuildSupportGraph(const std::vector<Cube>& list) {
 }
 
 SupportGraph Drop(std::vector<Cube>& list) {
-if (true) {
-
   int max_support_z = 1;
   absl::c_sort(list, [](Cube a, Cube b) { return a.min.z < b.min.z; });
   for (int i = 0; i < list.size(); ++i) {
@@ -105,40 +103,6 @@ if (true) {
     max_support_z = std::max(max_support_z, list[i].max.z + 1);
   }
  
-} else {
-
-  std::vector<bool> supported(list.size(), false);
-  while (!absl::c_all_of(supported, [](bool b) { return b; })) {
-    for (bool support_changed = true; support_changed;) {
-      support_changed = false;
-      for (int i = 0; i < list.size(); ++i) {
-        if (supported[i]) continue;
-        if (list[i].min.z == 1) {
-          supported[i] = true;
-          support_changed = true;
-        }
-        Cube drop = list[i];
-        --drop.min.z;
-        --drop.max.z;
-        for (int j = 0; j < list.size(); ++j) {
-          if (i == j) continue;
-          if (!supported[j]) continue;
-          if (drop.Overlaps(list[j])) {
-            supported[i] = true;
-            support_changed = true;
-          }
-        }
-      }
-    }
-    for (int i = 0; i < list.size(); ++i) {
-      if (supported[i]) continue;
-      --list[i].min.z;
-      --list[i].max.z;
-    }
-  }
-
-}
-
   return BuildSupportGraph(list);
 }
 
