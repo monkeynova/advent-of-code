@@ -78,9 +78,7 @@ class NearDensePoints {
 };
 
 absl::StatusOr<int64_t> NaivePart2(
-    const CharBoard& b, int steps) {
-  ASSIGN_OR_RETURN(Point s, b.FindUnique('S'));
-
+    const CharBoard& b, Point s, int steps) {
   absl::flat_hash_set<Point> set;
   absl::flat_hash_set<Point> frontier = {s};
   if (steps % 2 == 0) {
@@ -176,22 +174,21 @@ int64_t CountPainted(const absl::flat_hash_map<Point, int>& paint, int steps) {
   return count;
 }
 
-absl::StatusOr<int64_t> HackPart2(
-    const CharBoard& b, int steps) {
-  ASSIGN_OR_RETURN(Point s, b.FindUnique('S'));
-  CHECK_EQ(b.width(), b.height());
-  CHECK_EQ(b.width() % 2, 1);
-  CHECK_EQ(s.x, b.width() / 2);
-  CHECK_EQ(s.y, b.height() / 2);
-  CHECK_NE(steps % b.width(), 0);
+std::optional<int64_t> HackPart2(
+    const CharBoard& b, Point s, int steps) {
+  if (b.width() != b.height()) return std::nullopt;
+  if (b.width() % 2 != 1) return std::nullopt;
+  if (s.x != b.width() / 2) return std::nullopt;
+  if (s.y != b.height() / 2) return std::nullopt;
+  if (steps % b.width() == 0) return std::nullopt;
 
   absl::flat_hash_map<Point, int> start_paint = Paint(b, s, 0);
   for (int i = 0; i < b.width(); ++i) {
     int test_dist = (s - Point{0, i}).dist();
-    CHECK_EQ((start_paint[{0, i}]), test_dist);
-    CHECK_EQ((start_paint[{i, 0}]), test_dist);
-    CHECK_EQ((start_paint[{b.width() - 1, i}]), test_dist);
-    CHECK_EQ((start_paint[{i, b.height() - 1}]), test_dist);
+    if ((start_paint[{0, i}]) != test_dist) return std::nullopt;
+    if ((start_paint[{i, 0}]) != test_dist) return std::nullopt;
+    if ((start_paint[{b.width() - 1, i}]) != test_dist) return std::nullopt;
+    if ((start_paint[{i, b.height() - 1}]) != test_dist) return std::nullopt;
   }
   int64_t total = 0;
 
@@ -340,45 +337,12 @@ absl::StatusOr<std::string> Day_2023_21::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
   ASSIGN_OR_RETURN(int steps, IntParam());
-  // Problem has a big open diamond in it connecting the mids.
-  // This means there's a way to put the grid together...
 
-  for (int steps = 150; steps < 1000; steps += 25) {
-    ASSIGN_OR_RETURN(int64_t h, HackPart2(b, steps));
-    ASSIGN_OR_RETURN(int64_t n, NaivePart2(b, steps));
-    CHECK_EQ(h, n) << steps;
-  }
+  ASSIGN_OR_RETURN(Point s, b.FindUnique('S'));
+  std::optional<int64_t> maybe_anser = HackPart2(b, s, steps);
+  if (maybe_anser) return AdventReturn(*maybe_anser);
 
-  return AdventReturn(HackPart2(b, steps));
-
-  return AdventReturn(NaivePart2(b, steps));
-#if 1
-
-#else
-
-  absl::flat_hash_map<Point, NearDensePoints> p_to_d =
-      {{s, NearDensePoints()}};
-  for (int i = 0; i < steps; ++i) {
-    absl::flat_hash_map<Point, NearDensePoints> next;
-    for (const auto& [p, set] : p_to_d) {
-      for (Point dir : Cardinal::kFourDirs) {
-        Point t = p + dir;
-        Point test = b.TorusPoint(t);
-        if (b[test] == '#') continue;
-        Point delta = b.OnBoard(t) ? Cardinal::kOrigin : dir;
-        next[test].Add(set, delta);
-      }
-    }
-    p_to_d = std::move(next);
-    for (auto& [p, d] : p_to_d) d.Compact();
-  }
-  return AdventReturn(absl::c_accumulate(
-    p_to_d, int64_t{0},
-    [](int64_t a, const std::pair<Point, NearDensePoints>& pair) {
-      return a + pair.second.Size();
-    }));
-#endif
-
+  return AdventReturn(NaivePart2(b, s, steps));
 }
 
 }  // namespace advent_of_code

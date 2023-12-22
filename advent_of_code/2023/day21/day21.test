@@ -25,21 +25,6 @@
 3748
 ==
 
-# Empirical from relatively naive implementation.
-[part=2]
-[param=5000]
-@include{advent_of_code/2023/day21/input.txt}
---
-21968755
-==
-
-[part=2]
-[param=26501365]
-@include{advent_of_code/2023/day21/input.txt}
---
-616951804315987
-==
-
 [part=2]
 [param=6]
 ...........
@@ -74,18 +59,16 @@
 1594
 ==
 
+# Empirical from relatively naive implementation.
 [part=2]
 [param=5000]
-...........
-.....###.#.
-.###.##..#.
-..#.#...#..
-....#.#....
-.##..S####.
-.##..#...#.
-.......##..
-.##.#.####.
-.##..##.##.
-...........
+@include{advent_of_code/2023/day21/input.txt}
 --
-16733044
+21968755
+==
+
+[part=2]
+[param=26501365]
+@include{advent_of_code/2023/day21/input.txt}
+--
+616951804315987
