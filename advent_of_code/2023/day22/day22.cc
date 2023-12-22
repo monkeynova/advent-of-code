@@ -72,37 +72,36 @@ SupportGraph BuildSupportGraph(const std::vector<Cube>& list) {
       }
     }
   }
+  VLOG(1) << "BuildSupportGraph Done";
   return ret;
 }
 
 SupportGraph Drop(std::vector<Cube>& list) {
-  int max_support_z = 1;
+  VLOG(1) << "Drop Start";
   absl::c_sort(list, [](Cube a, Cube b) { return a.min.z < b.min.z; });
-  for (int i = 0; i < list.size(); ++i) {
-    if (list[i].min.z > max_support_z) {
-      list[i].max.z -= list[i].min.z - max_support_z;
-      list[i].min.z = max_support_z;
-    }
-    Cube drop = list[i];
-    while (true) {
-      --drop.min.z;
-      --drop.max.z;
-      bool supported = false;
-      if (drop.min.z == 0) {
-        break;
-      }
-      for (int j = 0; j < i; ++j) {
-        if (drop.Overlaps(list[j])) {
-          supported = true;
-          break;
-        }
-      }
-      if (supported) break;
-      list[i] = drop;
-    }
-    max_support_z = std::max(max_support_z, list[i].max.z + 1);
+  PointRectangle r = PointRectangle::Null();
+  for (Cube c : list) {
+    r.ExpandInclude({c.min.x, c.min.y});
+    r.ExpandInclude({c.max.x, c.max.y});
   }
- 
+  CHECK(r.min == Cardinal::kOrigin);
+  std::vector<std::vector<int>> heights(r.max.y + 1, std::vector<int>(r.max.x + 1, 0));
+
+  for (int i = 0; i < list.size(); ++i) {
+    PointRectangle xy = {{list[i].min.x, list[i].min.y}, {list[i].max.x, list[i].max.y}};
+    int out_z = 0;
+    for (Point p : xy) {
+      out_z = std::max(out_z, heights[p.y][p.x]);
+    }
+    list[i].max.z -= list[i].min.z - (out_z + 1);
+    list[i].min.z = out_z + 1;
+    for (Point p : xy) {
+      heights[p.y][p.x] = list[i].max.z;
+    }
+  }
+
+  VLOG(1) << "BuildSupportGraph Start";
+
   return BuildSupportGraph(list);
 }
 
