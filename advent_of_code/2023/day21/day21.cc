@@ -232,28 +232,35 @@ std::optional<int64_t> HackPart2(
 
 absl::StatusOr<std::string> Day_2023_21::Part1(
     absl::Span<std::string_view> input) const {
-  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
   auto [p1, p2] = PairSplit(param(), ",");
   int steps;
   if (!absl::SimpleAtoi(p1, &steps)) {
     return Error("Bad int param: ", p1);
   }
-  absl::flat_hash_set<Point> s = b.Find('S');
-  if (s.size() != 1) return Error("Start not unique");
-  for (int i = 0; i < steps; ++i) {
-    absl::flat_hash_set<Point> n;
-    for (Point p : s) {
-      for (Point d : Cardinal::kFourDirs) {
-        Point t = p + d;
-        if (b.OnBoard(t) && b[t] != '#') {
-          n.insert(t);
-        }
+  ASSIGN_OR_RETURN(Point s, b.FindUnique('S'));
+  FastBoard fb(b);
+  FastBoard::PointMap<int> dist(fb, std::numeric_limits<int>::max());
+  FastBoard::Point s_idx = fb.From(s);
+  dist.Set(s_idx, 0);
+  int count = steps % 2 == 0 ? 1 : 0;
+  for (std::deque<FastBoard::Point> queue = {s_idx}; !queue.empty(); queue.pop_front()) {
+    int next_d = dist.Get(queue.front()) + 1;
+    if (next_d > steps) break;
+    for (FastBoard::Dir d : {FastBoard::kNorth, FastBoard::kSouth, FastBoard::kWest, FastBoard::kEast}) {
+      FastBoard::Point test = fb.Add(queue.front(), d);
+      if (!fb.OnBoard(test)) continue;
+      if (fb[test] == '#') continue;
+      if (dist.Get(test) <= next_d) continue;
+      if (next_d % 2 == steps % 2) {
+        ++count;
       }
+      dist.Set(test, next_d);
+      queue.push_back(test);
     }
-    s = std::move(n);
   }
 
-  return AdventReturn(s.size());
+  return AdventReturn(count);
 }
 
 absl::StatusOr<std::string> Day_2023_21::Part2(
