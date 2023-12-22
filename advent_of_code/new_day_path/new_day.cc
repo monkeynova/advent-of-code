@@ -15,6 +15,7 @@
 #include "advent_of_code/conway.h"
 #include "advent_of_code/directed_graph.h"
 #include "advent_of_code/graph_walk.h"
+#include "advent_of_code/fast_board.h"
 #include "advent_of_code/interval.h"
 #include "advent_of_code/loop_history.h"
 #include "advent_of_code/mod.h"

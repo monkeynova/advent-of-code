@@ -10,6 +10,7 @@ cc_library(
         "//advent_of_code:char_board",
         "//advent_of_code:conway",
         "//advent_of_code:directed_graph",
+        "//advent_of_code:fast_board",
         "//advent_of_code:interval",
         "//advent_of_code:loop_history",
         "//advent_of_code:mod",
