@@ -149,22 +149,31 @@ absl::StatusOr<std::string> Day_2023_22::Part2(
 
   int would_fall = 0;
   for (int i = 0; i < list.size(); ++i) {
-    absl::flat_hash_set<int> this_supported;
-    for (std::deque<int> queue = {-1}; !queue.empty(); queue.pop_front()) {
-      this_supported.insert(queue.front());
+    std::deque<int> queue = {i};
+    absl::flat_hash_set<int> falling = {i};
+
+    for (; !queue.empty(); queue.pop_front()) {
       auto it = support.supports.find(queue.front());
       if (it == support.supports.end()) continue;
-      for (int o : it->second) {
-        if (o == i) continue;
-        if (this_supported.insert(o).second) {
-          queue.push_back(o);
+
+      for (int s : it->second) {
+        bool supported = false;
+        auto it2 = support.supported_by.find(s);
+        CHECK(it2 != support.supported_by.end());
+        for (int os : it2->second) {
+          if (!falling.contains(os)) {
+            supported = true;
+          }
+        }
+        if (!supported) {
+          if (falling.insert(s).second) {
+            queue.push_back(s);
+          }
         }
       }
     }
-    // this_supported includes 'ground' for extra - 1 to remove i.
-    would_fall += list.size() - this_supported.size();
+    would_fall += falling.size() - 1;
   }
-
   VLOG(1) << "Part2 done";
 
   return AdventReturn(would_fall);
