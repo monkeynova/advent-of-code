@@ -168,24 +168,28 @@ absl::StatusOr<std::string> Day_2023_22::Part2(
   int would_fall = 0;
   for (int i = 0; i < list.size(); ++i) {
     std::deque<int> queue = {i};
-    absl::flat_hash_set<int> falling = {i};
+    std::vector<bool> falling(list.size() + 1, false);
+    falling[i] = true;
+    int falling_count = 1;
 
     for (; !queue.empty(); queue.pop_front()) {
       for (int s : support.Supports(queue.front())) {
         bool supported = false;
         for (int os : support.SupportedBy(s)) {
-          if (!falling.contains(os)) {
+          if (!falling[os]) {
             supported = true;
           }
         }
         if (!supported) {
-          if (falling.insert(s).second) {
+          if (!falling[s]) {
+            falling[s] = true;
+            ++falling_count;
             queue.push_back(s);
           }
         }
       }
     }
-    would_fall += falling.size() - 1;
+    would_fall += falling_count - 1;
   }
   VLOG(1) << "Part2 done";
 
