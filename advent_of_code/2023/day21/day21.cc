@@ -5,6 +5,7 @@
 #include "absl/algorithm/container.h"
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
+#include "absl/container/node_hash_set.h"
 #include "absl/log/log.h"
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
@@ -29,18 +30,355 @@ namespace advent_of_code {
 
 namespace {
 
-// Helper methods go here.
+struct KeyType {
+  const std::vector<Point>* a;
+  const std::vector<Point>* b;
+  Point d;
+
+  bool operator==(const KeyType& o) const {
+    return a == o.a && b == o.b && d == o.d;
+  }
+  template <typename H>
+  friend H AbslHashValue(H h, const KeyType& k) {
+    return H::combine(std::move(h), k.a, k.b, k.d);
+  }
+};
+
+class NearDensePoints {
+ public:
+  NearDensePoints() = default;
+
+  int64_t Size() const {
+    return remainder_.size();
+  }
+
+  void Add(const NearDensePoints& o, Point dir) {
+  }
+
+  void Compact() {
+    bool all_in;
+    do {
+      all_in = true;
+      for (int a = -dense_through_ - 1; a <= dense_through_ + 1; ++a) {
+        all_in &= remainder_.contains({a, -dense_through_ - 1});
+        all_in &= remainder_.contains({a, dense_through_ + 1});
+        all_in &= remainder_.contains({-dense_through_ - 1, a});
+        all_in &= remainder_.contains({dense_through_ + 1, a});
+        if (!all_in) break;
+      }
+      if (all_in) {
+        ++dense_through_;
+      }
+    } while (all_in);
+  }
+
+ private:
+  int dense_through_ = 0;
+  const absl::flat_hash_set<Point> remainder_;
+};
+
+absl::StatusOr<int64_t> NaivePart2(
+    const CharBoard& b, int steps) {
+  ASSIGN_OR_RETURN(Point s, b.FindUnique('S'));
+
+  absl::flat_hash_set<Point> set;
+  absl::flat_hash_set<Point> frontier = {s};
+  if (steps % 2 == 0) {
+    set.insert(s);
+  } else {
+    absl::flat_hash_set<Point> next_frontier;
+    for (Point p : frontier) {
+      for (Point d1 : Cardinal::kFourDirs) {
+        Point next = p + d1;
+        if (b[b.TorusPoint(next)] == '#') continue;
+        if (set.insert(next).second) {
+          next_frontier.insert(next);
+        }
+      }
+    }
+    frontier = std::move(next_frontier);
+  }
+  int64_t removed = 0;
+  for (int i = steps % 2; i < steps; i += 2) {
+    LOG_EVERY_N_SEC(INFO, 15) << i << ": " << removed << "/" << set.size() << "/" << frontier.size();
+    absl::flat_hash_set<Point> next_frontier;
+    for (Point p : frontier) {
+      for (Point d1 : Cardinal::kFourDirs) {
+        if (b[b.TorusPoint(p + d1)] == '#') continue;
+        for (Point d2 : Cardinal::kFourDirs) {
+          Point next = p + d1 + d2;
+          Point test = b.TorusPoint(next);
+          if (b[test] == '#') continue;
+          if (set.insert(next).second ) {
+            next_frontier.insert(next);
+          }
+        }
+      }
+    }
+    frontier = std::move(next_frontier);
+#if 0 
+    for (auto it = set.begin(); it != set.end();) {
+      bool any_in_frontier = false;
+      for (Point d1 : Cardinal::kFourDirs) {
+        for (Point d2 : Cardinal::kFourDirs) {
+          if (frontier.contains(*it + d1 + d2)) {
+            any_in_frontier = true;
+          }
+        }
+      }
+      if (any_in_frontier) {
+        ++it;
+      } else {
+        ++removed;
+        set.erase(it++);
+      }
+    }
+#endif
+  } 
+  absl::flat_hash_map<Point, int> grid_count;
+  for (Point p : set) {
+    Point g = {
+      static_cast<int>(floor(1.0 * p.x / b.width())),
+      static_cast<int>(floor(1.0 * p.y / b.height()))
+    };
+    ++grid_count[g];
+  }
+  for (const auto& [p, c] : grid_count) {
+    VLOG(1) << p << ": " << c;
+  }
+  return removed + set.size();
+}
+
+absl::flat_hash_map<Point, int> Paint(
+    const CharBoard& b, Point start, int start_d) {
+  absl::flat_hash_map<Point, int> ret = {{start, start_d}};
+  for (std::deque<Point> queue = {start}; !queue.empty(); queue.pop_front()) {
+    auto it = ret.find(queue.front());
+    CHECK(it != ret.end());
+    for (Point d : Cardinal::kFourDirs) {
+      Point t = it->first + d;
+      if (!b.OnBoard(t) || b[t] == '#') continue;
+      if (ret.emplace(t, it->second + 1).second) {
+        queue.push_back(t);
+      }
+    }
+  }
+  return ret;
+}
+
+int64_t CountPainted(const absl::flat_hash_map<Point, int>& paint, int steps) {
+  int64_t count = 0;
+  for (const auto& [_, d] : paint) {
+    if (d % 2 == steps % 2 && d <= steps) {
+      ++count;
+    }
+  }
+  return count;
+}
+
+absl::StatusOr<int64_t> HackPart2(
+    const CharBoard& b, int steps) {
+  ASSIGN_OR_RETURN(Point s, b.FindUnique('S'));
+  CHECK_EQ(b.width(), b.height());
+  CHECK_EQ(b.width() % 2, 1);
+  CHECK_EQ(s.x, b.width() / 2);
+  CHECK_EQ(s.y, b.height() / 2);
+  CHECK_NE(steps % b.width(), 0);
+
+  absl::flat_hash_map<Point, int> start_paint = Paint(b, s, 0);
+  for (int i = 0; i < b.width(); ++i) {
+    int test_dist = (s - Point{0, i}).dist();
+    CHECK_EQ((start_paint[{0, i}]), test_dist);
+    CHECK_EQ((start_paint[{i, 0}]), test_dist);
+    CHECK_EQ((start_paint[{b.width() - 1, i}]), test_dist);
+    CHECK_EQ((start_paint[{i, b.height() - 1}]), test_dist);
+  }
+  int64_t total = 0;
+
+  int64_t max_x = s.x + steps;
+  //  ./#
+  // ./##
+  // <### ...
+  VLOG(1) << max_x % b.width() << " >?> " << s.x;
+  int64_t max_tile_x = max_x / b.width();
+
+  // steps - max_x % b.width() + s.y < steps
+
+  // s.x=s.y=66, w=h=131, steps=300
+  // s.x + steps = 366
+  // 366 % 131 = 104
+  // 
+
+  bool extra_corner = false;
+  if (max_x % b.width() < s.x) {
+    extra_corner = true;
+    --max_tile_x;
+  }
+
+  int64_t full_paint_count = CountPainted(start_paint, steps);
+  VLOG(1) << "Full: " << full_paint_count;
+
+  // 1, 5, 13, 25
+  // 1 + SUM(4n)  
+  // 1 + 2n(n+1)
+  int64_t full_max_tile_x = (max_tile_x + 1) / 2;
+  int64_t full_off_max_tile_x = max_tile_x - full_max_tile_x;
+  VLOG(1) << max_tile_x << " -> " << full_max_tile_x << " + " << full_off_max_tile_x;
+  int64_t full_tile_count = 1 + 4 * full_max_tile_x * (full_max_tile_x - 1);
+  VLOG(1) << " x" << full_tile_count;
+  total += full_tile_count * full_paint_count;
+
+  // Full tiles are offset on which step mod they use.
+  // SUM(4 * (2n + 1))
+  int64_t full_off_paint_count = CountPainted(start_paint, steps - 1);
+  VLOG(1) << "Full (off): " << full_off_paint_count;
+  int64_t full_off_tile_count = 4 * full_off_max_tile_x * (full_off_max_tile_x - 1) + 4 * full_off_max_tile_x;
+  VLOG(1) << " x" << full_off_tile_count;
+  total += full_off_tile_count * full_off_paint_count;
+
+
+  {
+    int mid_edge_dist = steps - max_x % b.width();
+    std::vector<std::pair<std::string, Point>> corner_tiles = {
+      {"Right Corner", {0, s.y}},
+      {"Bottom Corner", {s.x, 0}},
+      {"Left Corner", {b.width() - 1, s.y}},
+      {"Top Corner", {s.x, b.height() - 1}},
+    };
+    for (const auto& [name, start] : corner_tiles) {
+      absl::flat_hash_map<Point, int> paint = Paint(b, start, mid_edge_dist);
+      int64_t count = CountPainted(paint, steps);
+      VLOG(1) << name << ": " << count;
+      total += count;
+    }
+  }
+  if (extra_corner) {
+    int mid_edge_dist = steps - max_x % b.width() - b.width();
+    std::vector<std::pair<std::string, Point>> corner_tiles = {
+      {"Right Corner (Extra)", {0, s.y}},
+      {"Bottom Corner (Extra)", {s.x, 0}},
+      {"Left Corner (Extra)", {b.width() - 1, s.y}},
+      {"Top Corner (Extra)", {s.x, b.height() - 1}},
+    };
+    for (const auto& [name, start] : corner_tiles) {
+      absl::flat_hash_map<Point, int> paint = Paint(b, start, mid_edge_dist);
+      int64_t count = CountPainted(paint, steps);
+      VLOG(1) << name << ": " << count;
+      total += count;
+    }
+  }
+  {
+    int corner_dist = steps - max_x % b.width() + s.y + 1;
+    if (extra_corner) {
+      corner_dist -= b.width();
+    }
+    // CHECK_LT(corner_dist, steps);
+    std::vector<std::pair<std::string, Point>> corner_tiles = {
+      {"UR Edge Small", {0, b.height() - 1}},
+      {"BR Edge Small", {0, 0}},
+      {"UL Edge Small", {b.width() - 1, b.height() - 1}},
+      {"BL Edge Small", {b.width() - 1, 0}},
+    };
+    for (const auto& [name, start] : corner_tiles) {
+      absl::flat_hash_map<Point, int> paint = Paint(b, start, corner_dist);
+      int64_t count = CountPainted(paint, steps);
+      VLOG(1) << name << ": " << count;
+      VLOG(1) << " x" << max_tile_x;
+      total += count * max_tile_x;
+    }
+  }
+
+  {
+    int corner_dist = steps - max_x % b.width() + s.y + 1 - b.width();
+    if (extra_corner) {
+      corner_dist -= b.width();
+    }
+    // CHECK_LT(corner_dist, steps);
+    std::vector<std::pair<std::string, Point>> corner_tiles = {
+      {"UR Edge Large", {0, b.height() - 1}},
+      {"BR Edge Large", {0, 0}},
+      {"UL Edge Large", {b.width() - 1, b.height() - 1}},
+      {"BL Edge Large", {b.width() - 1, 0}},
+    };
+    for (const auto& [name, start] : corner_tiles) {
+      absl::flat_hash_map<Point, int> paint = Paint(b, start, corner_dist);
+      int64_t count = CountPainted(paint, steps);
+      VLOG(1) << name << ": " << count;
+      VLOG(1) << " x" << max_tile_x - 1;
+      total += count * (max_tile_x - 1);
+    }
+  }
+
+  return total;
+}
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2023_21::Part1(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(int steps, IntParam());
+  absl::flat_hash_set<Point> s = b.Find('S');
+  if (s.size() != 1) return Error("Start not unique");
+  for (int i = 0; i < steps; ++i) {
+    absl::flat_hash_set<Point> n;
+    for (Point p : s) {
+      for (Point d : Cardinal::kFourDirs) {
+        Point t = p + d;
+        if (b.OnBoard(t) && b[t] != '#') {
+          n.insert(t);
+        }
+      }
+    }
+    s = std::move(n);
+  }
+
+  return AdventReturn(s.size());
 }
 
 absl::StatusOr<std::string> Day_2023_21::Part2(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(int steps, IntParam());
+  // Problem has a big open diamond in it connecting the mids.
+  // This means there's a way to put the grid together...
+
+  for (int steps = 150; steps < 1000; steps += 25) {
+    ASSIGN_OR_RETURN(int64_t h, HackPart2(b, steps));
+    ASSIGN_OR_RETURN(int64_t n, NaivePart2(b, steps));
+    CHECK_EQ(h, n) << steps;
+  }
+
+  return AdventReturn(HackPart2(b, steps));
+
+  return AdventReturn(NaivePart2(b, steps));
+#if 1
+
+#else
+
+  absl::flat_hash_map<Point, NearDensePoints> p_to_d =
+      {{s, NearDensePoints()}};
+  for (int i = 0; i < steps; ++i) {
+    absl::flat_hash_map<Point, NearDensePoints> next;
+    for (const auto& [p, set] : p_to_d) {
+      for (Point dir : Cardinal::kFourDirs) {
+        Point t = p + dir;
+        Point test = b.TorusPoint(t);
+        if (b[test] == '#') continue;
+        Point delta = b.OnBoard(t) ? Cardinal::kOrigin : dir;
+        next[test].Add(set, delta);
+      }
+    }
+    p_to_d = std::move(next);
+    for (auto& [p, d] : p_to_d) d.Compact();
+  }
+  return AdventReturn(absl::c_accumulate(
+    p_to_d, int64_t{0},
+    [](int64_t a, const std::pair<Point, NearDensePoints>& pair) {
+      return a + pair.second.Size();
+    }));
+#endif
+
 }
 
 }  // namespace advent_of_code
