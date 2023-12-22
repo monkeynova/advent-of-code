@@ -35,12 +35,197 @@ namespace {
 
 absl::StatusOr<std::string> Day_2023_22::Part1(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  std::vector<Cube> list;
+  for (std::string_view line : input) {
+    Cube next;
+    if (!RE2::FullMatch(line, "(\\d+,\\d+,\\d+)~(\\d+,\\d+,\\d+)", next.min.Capture(), next.max.Capture())) {
+      return Error("Bad line");
+    }
+    int same_count = 0;
+    if (next.min.x == next.max.x) ++same_count;
+    if (next.min.y == next.max.y) ++same_count;
+    if (next.min.z == next.max.z) ++same_count;
+    if (same_count < 2) return Error("Not a line: ", line);
+    if (next.min.x > next.max.x) return Error("Need swap");
+    if (next.min.y > next.max.y) return Error("Need swap");
+    if (next.min.z > next.max.z) return Error("Need swap");
+    list.push_back(next);
+  }
+
+  std::vector<bool> supported(list.size(), false);
+  while (!absl::c_all_of(supported, [](bool b) { return b; })) {
+    for (bool support_changed = true; support_changed;) {
+      support_changed = false;
+      for (int i = 0; i < list.size(); ++i) {
+        if (supported[i]) continue;
+        if (list[i].min.z == 1) {
+          supported[i] = true;
+          support_changed = true;
+        }
+        Cube drop = list[i];
+        --drop.min.z;
+        --drop.max.z;
+        for (int j = 0; j < list.size(); ++j) {
+          if (i == j) continue;
+          if (!supported[j]) continue;
+          if (drop.Overlaps(list[j])) {
+            supported[i] = true;
+            support_changed = true;
+          }
+        }
+      }
+    }
+    for (int i = 0; i < list.size(); ++i) {
+      if (supported[i]) continue;
+      --list[i].min.z;
+      --list[i].max.z;
+    }
+  }
+
+  absl::flat_hash_map<int, absl::flat_hash_set<int>> supports;
+  absl::flat_hash_map<int, absl::flat_hash_set<int>> supported_by;
+  for (int i = 0; i < list.size(); ++i) {
+    Cube drop = list[i];
+    --drop.min.z;
+    --drop.max.z;
+    for (int j = 0; j < list.size(); ++j) {
+      if (i == j) continue;
+      if (drop.Overlaps(list[j])) {
+        supports[j].insert(i);
+        supported_by[i].insert(j);
+      }
+    }
+  }
+
+  int disintigrable = 0;
+  for (int i = 0; i < list.size(); ++i) {
+    auto it1 = supports.find(i);
+    if (it1 == supports.end()) {
+      VLOG(1) << i << ": No supports";
+      VLOG(1) << list[i].min << "-" << list[i].max;
+      ++disintigrable;
+      continue;
+    }
+    bool all_multi_support = true;
+    for (int s : it1->second) {
+      auto it2 = supported_by.find(s);
+      if (it2 == supported_by.end()) return Error("Integrity check");
+      if (it2->second.size() == 0) return Error("Integrity check");
+      if (it2->second.size() == 1) {
+        if (!it2->second.contains(i)) return Error("Integrity check");
+        all_multi_support = false;
+      }
+    }
+    VLOG(1) << i << ": " << all_multi_support;
+    if (all_multi_support) {
+      ++disintigrable;
+    }
+  }
+
+  return AdventReturn(disintigrable);
 }
 
 absl::StatusOr<std::string> Day_2023_22::Part2(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  std::vector<Cube> list;
+  for (std::string_view line : input) {
+    Cube next;
+    if (!RE2::FullMatch(line, "(\\d+,\\d+,\\d+)~(\\d+,\\d+,\\d+)", next.min.Capture(), next.max.Capture())) {
+      return Error("Bad line");
+    }
+    int same_count = 0;
+    if (next.min.x == next.max.x) ++same_count;
+    if (next.min.y == next.max.y) ++same_count;
+    if (next.min.z == next.max.z) ++same_count;
+    if (same_count < 2) return Error("Not a line: ", line);
+    if (next.min.x > next.max.x) return Error("Need swap");
+    if (next.min.y > next.max.y) return Error("Need swap");
+    if (next.min.z > next.max.z) return Error("Need swap");
+    list.push_back(next);
+  }
+
+  std::vector<bool> supported(list.size(), false);
+  while (!absl::c_all_of(supported, [](bool b) { return b; })) {
+    for (bool support_changed = true; support_changed;) {
+      support_changed = false;
+      for (int i = 0; i < list.size(); ++i) {
+        if (supported[i]) continue;
+        if (list[i].min.z == 1) {
+          supported[i] = true;
+          support_changed = true;
+        }
+        Cube drop = list[i];
+        --drop.min.z;
+        --drop.max.z;
+        for (int j = 0; j < list.size(); ++j) {
+          if (i == j) continue;
+          if (!supported[j]) continue;
+          if (drop.Overlaps(list[j])) {
+            supported[i] = true;
+            support_changed = true;
+          }
+        }
+      }
+    }
+    for (int i = 0; i < list.size(); ++i) {
+      if (supported[i]) continue;
+      --list[i].min.z;
+      --list[i].max.z;
+    }
+  }
+
+  absl::flat_hash_map<int, absl::flat_hash_set<int>> supports;
+  absl::flat_hash_map<int, absl::flat_hash_set<int>> supported_by;
+  for (int i = 0; i < list.size(); ++i) {
+    if (list[i].min.z == 1) {
+      supports[-1].insert(i);
+      supported_by[i].insert(-1);
+    }
+    Cube drop = list[i];
+    --drop.min.z;
+    --drop.max.z;
+    for (int j = 0; j < list.size(); ++j) {
+      if (i == j) continue;
+      if (drop.Overlaps(list[j])) {
+        supports[j].insert(i);
+        supported_by[i].insert(j);
+      }
+    }
+  }
+
+  int would_fall = 0;
+  for (int i = 0; i < list.size(); ++i) {
+    std::vector<bool> supported(list.size(), false);
+    for (bool support_changed = true; support_changed;) {
+      support_changed = false;
+      for (int j = 0; j < list.size(); ++j) {
+        if (j == i) continue;
+        if (supported[j]) continue;
+        if (list[j].min.z == 1) {
+          supported[j] = true;
+          support_changed = true;
+          continue;
+        }
+        Cube drop = list[j];
+        --drop.min.z;
+        --drop.max.z;
+        for (int k = 0; k < list.size(); ++k) {
+          if (i == k) continue;
+          if (j == k) continue;
+          if (!supported[k]) continue;
+          if (drop.Overlaps(list[k])) {
+            supported[j] = true;
+            support_changed = true;
+          }
+        }
+      }
+    }
+    int this_would = list.size() - 1 - absl::c_accumulate(supported, 0, [](int a, bool b) { return a + (b?1:0); });
+    VLOG(1) << i << ": " << this_would;
+    would_fall += this_would;
+  }
+
+  return AdventReturn(would_fall);
 }
 
 }  // namespace advent_of_code

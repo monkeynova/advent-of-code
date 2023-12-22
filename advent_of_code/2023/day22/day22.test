@@ -2,24 +2,39 @@
 ==
 
 [part=1]
-Example input
+1,0,1~1,2,1
+0,0,2~2,0,2
+0,2,3~2,2,3
+0,0,4~0,2,4
+2,0,5~2,2,5
+0,1,6~2,1,6
+1,1,8~1,1,9
 --
-ERROR: UNIMPLEMENTED: Problem not known
+5
 ==
 
+# 837 (high; reversed supported and supported_by)
+# 556 (high; wrong multi-support check)
+# 473 (low; got streaming calculation of support/supported_by wrong)
 [part=1]
 @include{advent_of_code/2023/day22/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+480
 ==
 
 [part=2]
-Example input
+1,0,1~1,2,1
+0,0,2~2,0,2
+0,2,3~2,2,3
+0,0,4~0,2,4
+2,0,5~2,2,5
+0,1,6~2,1,6
+1,1,8~1,1,9
 --
-ERROR: UNIMPLEMENTED: Problem not known
+7
 ==
 
 [part=2]
 @include{advent_of_code/2023/day22/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+84021
