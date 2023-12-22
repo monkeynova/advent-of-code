@@ -15,7 +15,7 @@ namespace advent_of_code {
 namespace {
 
 absl::StatusOr<int64_t> NaivePart2(
-    const CharBoard& b, Point s, int steps) {
+    const ImmutableCharBoard& b, Point s, int steps) {
   absl::flat_hash_set<Point> set;
   absl::flat_hash_set<Point> frontier = {s};
   if (steps % 2 == 0) {
@@ -67,7 +67,7 @@ absl::StatusOr<int64_t> NaivePart2(
 }
 
 absl::flat_hash_map<Point, int> Paint(
-    const CharBoard& b, Point start, int start_d) {
+    const ImmutableCharBoard& b, Point start, int start_d) {
   absl::flat_hash_map<Point, int> ret = {{start, start_d}};
   for (std::deque<Point> queue = {start}; !queue.empty(); queue.pop_front()) {
     auto it = ret.find(queue.front());
@@ -93,8 +93,36 @@ int64_t CountPainted(const absl::flat_hash_map<Point, int>& paint, int steps) {
   return count;
 }
 
+int64_t PaintAndCount(const ImmutableCharBoard& b, Point start, int start_d, int steps) {
+  if (start_d > steps) return 0;
+  FastBoard fb(b);
+  FastBoard::PointMap<int> paint(fb, -1);
+  FastBoard::Point s_idx = fb.From(start);
+  paint.Set(s_idx, start_d);
+  int count = start_d % 2 == steps % 2;
+  for (std::deque<FastBoard::Point> queue = {s_idx}; !queue.empty(); queue.pop_front()) {
+    int dist = paint.Get(queue.front());
+    CHECK_NE(dist, -1);
+    if (dist == steps) break;
+    ++dist;
+    for (FastBoard::Dir d : {FastBoard::kNorth, FastBoard::kSouth, FastBoard::kEast, FastBoard::kWest}) {
+      FastBoard::Point test = fb.Add(queue.front(), d);
+      if (!fb.OnBoard(test)) continue;
+      if (fb[test] == '#') continue;
+      if (paint.Get(test) != -1) continue;
+      paint.Set(test, dist);
+      queue.push_back(test);
+      if (dist % 2 == steps % 2) {
+        CHECK_LE(dist, steps);
+        ++count;
+      }
+    }
+  }
+  return count;
+}
+
 std::optional<int64_t> HackPart2(
-    const CharBoard& b, Point s, int steps) {
+    const ImmutableCharBoard& b, Point s, int steps) {
   if (b.width() != b.height()) return std::nullopt;
   if (b.width() % 2 != 1) return std::nullopt;
   if (s.x != b.width() / 2) return std::nullopt;
@@ -162,8 +190,7 @@ std::optional<int64_t> HackPart2(
       {"Top Corner", {s.x, b.height() - 1}},
     };
     for (const auto& [name, start] : corner_tiles) {
-      absl::flat_hash_map<Point, int> paint = Paint(b, start, mid_edge_dist);
-      int64_t count = CountPainted(paint, steps);
+      int64_t count = PaintAndCount(b, start, mid_edge_dist, steps);
       VLOG(1) << name << ": " << count;
       total += count;
     }
@@ -177,8 +204,7 @@ std::optional<int64_t> HackPart2(
       {"Top Corner (Extra)", {s.x, b.height() - 1}},
     };
     for (const auto& [name, start] : corner_tiles) {
-      absl::flat_hash_map<Point, int> paint = Paint(b, start, mid_edge_dist);
-      int64_t count = CountPainted(paint, steps);
+      int64_t count = PaintAndCount(b, start, mid_edge_dist, steps);
       VLOG(1) << name << ": " << count;
       total += count;
     }
@@ -196,8 +222,7 @@ std::optional<int64_t> HackPart2(
       {"BL Edge Small", {b.width() - 1, 0}},
     };
     for (const auto& [name, start] : corner_tiles) {
-      absl::flat_hash_map<Point, int> paint = Paint(b, start, corner_dist);
-      int64_t count = CountPainted(paint, steps);
+      int64_t count = PaintAndCount(b, start, corner_dist, steps);
       VLOG(1) << name << ": " << count;
       VLOG(1) << " x" << max_tile_x;
       total += count * max_tile_x;
@@ -217,8 +242,7 @@ std::optional<int64_t> HackPart2(
       {"BL Edge Large", {b.width() - 1, 0}},
     };
     for (const auto& [name, start] : corner_tiles) {
-      absl::flat_hash_map<Point, int> paint = Paint(b, start, corner_dist);
-      int64_t count = CountPainted(paint, steps);
+      int64_t count = PaintAndCount(b, start, corner_dist, steps);
       VLOG(1) << name << ": " << count;
       VLOG(1) << " x" << max_tile_x - 1;
       total += count * (max_tile_x - 1);
@@ -265,7 +289,7 @@ absl::StatusOr<std::string> Day_2023_21::Part1(
 
 absl::StatusOr<std::string> Day_2023_21::Part2(
     absl::Span<std::string_view> input) const {
-  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
   auto [p1, p2] = PairSplit(param(), ",");
   int steps;
   if (!absl::SimpleAtoi(p2.empty() ? p1 : p2, &steps)) {
