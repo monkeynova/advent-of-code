@@ -33,9 +33,20 @@ absl::StatusOr<std::vector<Cube>> Parse(absl::Span<std::string_view> input) {
   std::vector<Cube> list;
   for (std::string_view line : input) {
     Cube next;
-    if (!RE2::FullMatch(line, "(\\d+,\\d+,\\d+)~(\\d+,\\d+,\\d+)", next.min.Capture(), next.max.Capture())) {
-      return Error("Bad line");
-    }
+    Tokenizer tok(line);
+    ASSIGN_OR_RETURN(next.min.x, tok.NextInt());
+    RETURN_IF_ERROR(tok.NextIs(","));
+    ASSIGN_OR_RETURN(next.min.y, tok.NextInt());
+    RETURN_IF_ERROR(tok.NextIs(","));
+    ASSIGN_OR_RETURN(next.min.z, tok.NextInt());
+    RETURN_IF_ERROR(tok.NextIs("~"));
+    ASSIGN_OR_RETURN(next.max.x, tok.NextInt());
+    RETURN_IF_ERROR(tok.NextIs(","));
+    ASSIGN_OR_RETURN(next.max.y, tok.NextInt());
+    RETURN_IF_ERROR(tok.NextIs(","));
+    ASSIGN_OR_RETURN(next.max.z, tok.NextInt());
+    if (!tok.Done()) return Error("Extra tokens");
+ 
     int same_count = 0;
     if (next.min.x == next.max.x) ++same_count;
     if (next.min.y == next.max.y) ++same_count;
@@ -117,6 +128,7 @@ absl::StatusOr<std::string> Day_2023_22::Part1(
       if (it2->second.size() == 1) {
         if (!it2->second.contains(i)) return Error("Integrity check");
         all_multi_support = false;
+        break;
       }
     }
     VLOG(2) << i << ": " << all_multi_support;
@@ -124,6 +136,8 @@ absl::StatusOr<std::string> Day_2023_22::Part1(
       ++disintigrable;
     }
   }
+
+  VLOG(1) << "Part1 done";
 
   return AdventReturn(disintigrable);
 }
@@ -150,6 +164,8 @@ absl::StatusOr<std::string> Day_2023_22::Part2(
     // this_supported includes 'ground' for extra - 1 to remove i.
     would_fall += list.size() - this_supported.size();
   }
+
+  VLOG(1) << "Part2 done";
 
   return AdventReturn(would_fall);
 }
