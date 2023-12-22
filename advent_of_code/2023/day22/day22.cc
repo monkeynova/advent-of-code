@@ -29,12 +29,7 @@ namespace advent_of_code {
 
 namespace {
 
-// Helper methods go here.
-
-}  // namespace
-
-absl::StatusOr<std::string> Day_2023_22::Part1(
-    absl::Span<std::string_view> input) const {
+absl::StatusOr<std::vector<Cube>> Parse(absl::Span<std::string_view> input) {
   std::vector<Cube> list;
   for (std::string_view line : input) {
     Cube next;
@@ -51,7 +46,10 @@ absl::StatusOr<std::string> Day_2023_22::Part1(
     if (next.min.z > next.max.z) return Error("Need swap");
     list.push_back(next);
   }
+  return list;
+}
 
+void Drop(std::vector<Cube>& list) {
   std::vector<bool> supported(list.size(), false);
   while (!absl::c_all_of(supported, [](bool b) { return b; })) {
     for (bool support_changed = true; support_changed;) {
@@ -81,6 +79,14 @@ absl::StatusOr<std::string> Day_2023_22::Part1(
       --list[i].max.z;
     }
   }
+}
+
+}  // namespace
+
+absl::StatusOr<std::string> Day_2023_22::Part1(
+    absl::Span<std::string_view> input) const {
+  ASSIGN_OR_RETURN(std::vector<Cube> list, Parse(input));
+  Drop(list);
 
   absl::flat_hash_map<int, absl::flat_hash_set<int>> supports;
   absl::flat_hash_map<int, absl::flat_hash_set<int>> supported_by;
@@ -127,52 +133,8 @@ absl::StatusOr<std::string> Day_2023_22::Part1(
 
 absl::StatusOr<std::string> Day_2023_22::Part2(
     absl::Span<std::string_view> input) const {
-  std::vector<Cube> list;
-  for (std::string_view line : input) {
-    Cube next;
-    if (!RE2::FullMatch(line, "(\\d+,\\d+,\\d+)~(\\d+,\\d+,\\d+)", next.min.Capture(), next.max.Capture())) {
-      return Error("Bad line");
-    }
-    int same_count = 0;
-    if (next.min.x == next.max.x) ++same_count;
-    if (next.min.y == next.max.y) ++same_count;
-    if (next.min.z == next.max.z) ++same_count;
-    if (same_count < 2) return Error("Not a line: ", line);
-    if (next.min.x > next.max.x) return Error("Need swap");
-    if (next.min.y > next.max.y) return Error("Need swap");
-    if (next.min.z > next.max.z) return Error("Need swap");
-    list.push_back(next);
-  }
-
-  std::vector<bool> supported(list.size(), false);
-  while (!absl::c_all_of(supported, [](bool b) { return b; })) {
-    for (bool support_changed = true; support_changed;) {
-      support_changed = false;
-      for (int i = 0; i < list.size(); ++i) {
-        if (supported[i]) continue;
-        if (list[i].min.z == 1) {
-          supported[i] = true;
-          support_changed = true;
-        }
-        Cube drop = list[i];
-        --drop.min.z;
-        --drop.max.z;
-        for (int j = 0; j < list.size(); ++j) {
-          if (i == j) continue;
-          if (!supported[j]) continue;
-          if (drop.Overlaps(list[j])) {
-            supported[i] = true;
-            support_changed = true;
-          }
-        }
-      }
-    }
-    for (int i = 0; i < list.size(); ++i) {
-      if (supported[i]) continue;
-      --list[i].min.z;
-      --list[i].max.z;
-    }
-  }
+  ASSIGN_OR_RETURN(std::vector<Cube> list, Parse(input));
+  Drop(list);
 
   absl::flat_hash_map<int, absl::flat_hash_set<int>> supports;
   absl::flat_hash_map<int, absl::flat_hash_set<int>> supported_by;
