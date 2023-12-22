@@ -76,6 +76,37 @@ SupportGraph BuildSupportGraph(const std::vector<Cube>& list) {
 }
 
 SupportGraph Drop(std::vector<Cube>& list) {
+if (true) {
+
+  int max_support_z = 1;
+  absl::c_sort(list, [](Cube a, Cube b) { return a.min.z < b.min.z; });
+  for (int i = 0; i < list.size(); ++i) {
+    if (list[i].min.z > max_support_z) {
+      list[i].max.z -= list[i].min.z - max_support_z;
+      list[i].min.z = max_support_z;
+    }
+    Cube drop = list[i];
+    while (true) {
+      --drop.min.z;
+      --drop.max.z;
+      bool supported = false;
+      if (drop.min.z == 0) {
+        break;
+      }
+      for (int j = 0; j < i; ++j) {
+        if (drop.Overlaps(list[j])) {
+          supported = true;
+          break;
+        }
+      }
+      if (supported) break;
+      list[i] = drop;
+    }
+    max_support_z = std::max(max_support_z, list[i].max.z + 1);
+  }
+ 
+} else {
+
   std::vector<bool> supported(list.size(), false);
   while (!absl::c_all_of(supported, [](bool b) { return b; })) {
     for (bool support_changed = true; support_changed;) {
@@ -105,6 +136,8 @@ SupportGraph Drop(std::vector<Cube>& list) {
       --list[i].max.z;
     }
   }
+
+}
 
   return BuildSupportGraph(list);
 }
@@ -163,7 +196,8 @@ absl::StatusOr<std::string> Day_2023_22::Part2(
         }
       }
     }
-    would_fall += list.size() - this_supported.size(); // this_supported includes 'ground' for extra -1.
+    // this_supported includes 'ground' for extra - 1 to remove i.
+    would_fall += list.size() - this_supported.size();
   }
 
   return AdventReturn(would_fall);
