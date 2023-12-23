@@ -40,6 +40,7 @@ class BoardGraph {
 
  private:
   std::optional<int> FindLongestPath(std::vector<bool>& hist, int start, int end);
+  std::optional<int> FindLongestPath(int64_t hist, int start, int end);
 
   absl::flat_hash_map<Point, int> point_to_idx_;
   std::vector<std::vector<std::pair<int, int>>> map_;
@@ -94,6 +95,8 @@ void BoardGraph::Build(const CharBoard& b, bool directed) {
   }
   map_.resize(point_to_idx_.size());
 
+  VLOG(1) << point_to_idx_.size();
+
   for (const auto& [p1, dset] : by_point) {
     auto it1 = point_to_idx_.find(p1);
     CHECK(it1 != point_to_idx_.end());
@@ -108,7 +111,7 @@ void BoardGraph::Build(const CharBoard& b, bool directed) {
 }
 
 std::optional<int> BoardGraph::FindLongestPath(std::vector<bool>& hist, int cur, int end) {
-  VLOG(2) << cur;
+  VLOG(3) << cur;
   if (cur == end) return 0;
 
   std::optional<int> max;
@@ -123,14 +126,38 @@ std::optional<int> BoardGraph::FindLongestPath(std::vector<bool>& hist, int cur,
     }
   }
   hist[cur] = false;
-  VLOG(2) << cur << ": " << (max ? *max : -1);
+  VLOG(3) << cur << ": " << (max ? *max : -1);
   return max;
 }
 
+std::optional<int> BoardGraph::FindLongestPath(int64_t hist, int cur, int end) {
+  VLOG(3) << cur;
+  if (cur == end) return 0;
+
+  std::optional<int> max;
+  hist |= (int64_t{1} << cur);
+  CHECK_GE(cur, 0);
+  CHECK_LT(cur, 63);
+  for (const auto& [p, d] : map_[cur]) {
+    if (hist & (int64_t{1} << p)) continue;
+    std::optional<int> sub = FindLongestPath(hist, p, end);
+    if (sub) {
+      if (!max || *max < *sub + d) max = *sub + d;
+    }
+  }
+  VLOG(3) << cur << ": " << (max ? *max : -1);
+  return max;
+}
+
+
 std::optional<int> BoardGraph::FindLongestPath(Point start, Point end) {
-  std::vector<bool> hist(point_to_idx_.size(), false);
   int start_idx = point_to_idx_[start];
   int end_idx = point_to_idx_[end];
+  if (point_to_idx_.size() < 63) {
+    int hist = 0;
+    return FindLongestPath(hist, start_idx, end_idx);
+  }
+  std::vector<bool> hist(point_to_idx_.size(), false);
   return FindLongestPath(hist, start_idx, end_idx);
 }
 
