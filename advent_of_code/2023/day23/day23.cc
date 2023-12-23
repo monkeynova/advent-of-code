@@ -36,15 +36,19 @@ class BoardGraph {
 
   void Build(const CharBoard& b, bool directed = true);
 
-  std::optional<int> FindLongestPath(Point start, Point end) const;
+  std::optional<int> FindLongestPath(Point start, Point end);
 
  private:
-  std::optional<int> FindLongestPath(absl::flat_hash_set<Point>& hist, Point start, Point end) const;
+  std::optional<int> FindLongestPath(std::vector<bool>& hist, int start, int end);
 
-  absl::flat_hash_map<Point, absl::flat_hash_map<Point, int>> map_;
+  absl::flat_hash_map<Point, int> point_to_idx_;
+  absl::flat_hash_map<int, absl::flat_hash_map<int, int>> map_;
+  absl::flat_hash_map<std::pair<int, int>, std::optional<int>> memo_;
 };
 
 void BoardGraph::Build(const CharBoard& b, bool directed) {
+  absl::flat_hash_map<Point, absl::flat_hash_map<Point, int>> by_point;
+
   for (const auto [p, c] : b) {
     if (c == '#') continue;
     for (Point d : Cardinal::kFourDirs) {
@@ -56,7 +60,7 @@ void BoardGraph::Build(const CharBoard& b, bool directed) {
       }
       Point t = p + d;
       if (b.OnBoard(t) && b[t] != '#') {
-        map_[p].emplace(t, 1);
+        by_point[p].emplace(t, 1);
       }
     }
   }
@@ -64,54 +68,70 @@ void BoardGraph::Build(const CharBoard& b, bool directed) {
   VLOG(1) << "Initial graph";
 
   for (bool work_done = true; work_done;) {
-    VLOG(1) << map_.size();
+    VLOG(1) << by_point.size();
     work_done = false;
     std::vector<Point> iter;
-    for (const auto& [p, _] : map_) iter.push_back(p);
+    for (const auto& [p, _] : by_point) iter.push_back(p);
     for (Point p : iter) {
-      if (map_[p].size() == 2) {
-        std::vector<std::pair<Point, int>> out(map_[p].begin(), map_[p].end());
-        map_[out[0].first].erase(p);
-        map_[out[0].first].emplace(out[1].first, out[0].second + out[1].second);
-        map_[out[1].first].erase(p);
-        map_[out[1].first].emplace(out[0].first, out[0].second + out[1].second);
-        map_.erase(p);
+      if (by_point[p].size() == 2) {
+        std::vector<std::pair<Point, int>> out(by_point[p].begin(), by_point[p].end());
+        by_point[out[0].first].erase(p);
+        by_point[out[0].first].emplace(out[1].first, out[0].second + out[1].second);
+        by_point[out[1].first].erase(p);
+        by_point[out[1].first].emplace(out[0].first, out[0].second + out[1].second);
+        by_point.erase(p);
         work_done = true;
       }
     }
   }
 
   VLOG(1) << "Pruned graph";
+  
+  point_to_idx_.clear();
+  map_.clear();
 
-  for (const auto& [p1, dset] : map_) {
+  for (const auto& [p, _] : by_point) {
+    point_to_idx_[p] = point_to_idx_.size();
+  }
+
+  for (const auto& [p1, dset] : by_point) {
+    auto it1 = point_to_idx_.find(p1);
+    CHECK(it1 != point_to_idx_.end());
+    absl::flat_hash_map<int, int>& map_build = map_[it1->second];
     for (const auto& [p2, dist] : dset) {
       VLOG(2) << p1 << "-" << p2 << ": " << dist;
+      auto it2 = point_to_idx_.find(p2);
+      CHECK(it2 != point_to_idx_.end());
+      map_build[it2->second] = dist;
     }
   }
 }
 
-std::optional<int> BoardGraph::FindLongestPath(absl::flat_hash_set<Point>& hist, Point cur, Point end) const {
+std::optional<int> BoardGraph::FindLongestPath(std::vector<bool>& hist, int cur, int end) {
   VLOG(2) << cur;
   if (cur == end) return 0;
+
   std::optional<int> max;
-  hist.insert(cur);
+  hist[cur] = true;
   auto it = map_.find(cur);
   CHECK(it != map_.end());
   for (const auto& [p, d] : it->second) {
-    if (hist.contains(p)) continue;
+    if (hist[p]) continue;
     std::optional<int> sub = FindLongestPath(hist, p, end);
     if (sub) {
       if (!max || *max < *sub + d) max = *sub + d;
     }
   }
-  hist.erase(cur);
+  hist[cur] = false;
   VLOG(2) << cur << ": " << (max ? *max : -1);
   return max;
 }
 
-std::optional<int> BoardGraph::FindLongestPath(Point start, Point end) const {
-  absl::flat_hash_set<Point> hist;
-  return FindLongestPath(hist, start, end);
+std::optional<int> BoardGraph::FindLongestPath(Point start, Point end) {
+  std::vector<bool> hist(point_to_idx_.size(), false);
+  int start_idx = point_to_idx_[start];
+  int end_idx = point_to_idx_[end];
+  return FindLongestPath(hist, start_idx, end_idx);
 }
 
 }  // namespace
