@@ -115,36 +115,28 @@ void BoardGraph::Build(const CharBoard& b, bool directed) {
 
 int BoardGraph::FindLongestPath(std::vector<bool>& hist, int cur, int end) {
   ++calls_;
-  VLOG(3) << cur;
   if (cur == end) return 0;
 
   int max = std::numeric_limits<int>::min();
   hist[cur] = true;
-  CHECK_GE(cur, 0);
-  CHECK_LT(cur, map_.size());
   for (const auto& [p, d] : map_[cur]) {
     if (hist[p]) continue;
     max = std::max(max, FindLongestPath(hist, p, end) + d);
   }
   hist[cur] = false;
-  VLOG(3) << cur << ": " << max;
   return max;
 }
 
 int BoardGraph::FindLongestPath(int64_t hist, int cur, int end) {
   ++calls_;
-  VLOG(3) << cur;
   if (cur == end) return 0;
 
   int max = std::numeric_limits<int>::min();
   hist |= (int64_t{1} << cur);
-  CHECK_GE(cur, 0);
-  CHECK_LT(cur, 63);
   for (const auto& [p, d] : map_[cur]) {
     if (hist & (int64_t{1} << p)) continue;
     max = std::max(max, FindLongestPath(hist, p, end) + d);
   }
-  VLOG(3) << cur << ": " << max;
   return max;
 }
 
