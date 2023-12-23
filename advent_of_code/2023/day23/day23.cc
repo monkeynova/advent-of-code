@@ -36,11 +36,11 @@ class BoardGraph {
 
   void Build(const CharBoard& b, bool directed = true);
 
-  std::optional<int> FindLongestPath(Point start, Point end);
+  int FindLongestPath(Point start, Point end);
 
  private:
-  std::optional<int> FindLongestPath(std::vector<bool>& hist, int start, int end);
-  std::optional<int> FindLongestPath(int64_t hist, int start, int end);
+  int FindLongestPath(std::vector<bool>& hist, int start, int end);
+  int FindLongestPath(int64_t hist, int start, int end);
 
   absl::flat_hash_map<Point, int> point_to_idx_;
   std::vector<std::vector<std::pair<int, int>>> map_;
@@ -113,51 +113,45 @@ void BoardGraph::Build(const CharBoard& b, bool directed) {
   }
 }
 
-std::optional<int> BoardGraph::FindLongestPath(std::vector<bool>& hist, int cur, int end) {
+int BoardGraph::FindLongestPath(std::vector<bool>& hist, int cur, int end) {
   ++calls_;
   VLOG(3) << cur;
   if (cur == end) return 0;
 
-  std::optional<int> max;
+  int max = -1;
   hist[cur] = true;
   CHECK_GE(cur, 0);
   CHECK_LT(cur, map_.size());
   for (const auto& [p, d] : map_[cur]) {
     if (hist[p]) continue;
-    std::optional<int> sub = FindLongestPath(hist, p, end);
-    if (sub) {
-      if (!max || *max < *sub + d) max = *sub + d;
-    }
+    max = std::max(max, FindLongestPath(hist, p, end));
   }
   hist[cur] = false;
-  VLOG(3) << cur << ": " << (max ? *max : -1);
+  VLOG(3) << cur << ": " << max;
   return max;
 }
 
-std::optional<int> BoardGraph::FindLongestPath(int64_t hist, int cur, int end) {
+int BoardGraph::FindLongestPath(int64_t hist, int cur, int end) {
   ++calls_;
   VLOG(3) << cur;
   if (cur == end) return 0;
 
-  std::optional<int> max;
+  int max = -1;
   hist |= (int64_t{1} << cur);
   CHECK_GE(cur, 0);
   CHECK_LT(cur, 63);
   for (const auto& [p, d] : map_[cur]) {
     if (hist & (int64_t{1} << p)) continue;
-    std::optional<int> sub = FindLongestPath(hist, p, end);
-    if (sub) {
-      if (!max || *max < *sub + d) max = *sub + d;
-    }
+    max = std::max(max, FindLongestPath(hist, p, end));
   }
-  VLOG(3) << cur << ": " << (max ? *max : -1);
+  VLOG(3) << cur << ": " << max;
   return max;
 }
 
-std::optional<int> BoardGraph::FindLongestPath(Point start, Point end) {
+int BoardGraph::FindLongestPath(Point start, Point end) {
   int start_idx = point_to_idx_[start];
   int end_idx = point_to_idx_[end];
-  std::optional<int> ret;
+  int ret = -1;
   if (point_to_idx_.size() < 63) {
     ret = FindLongestPath(0, start_idx, end_idx);
   } else {
