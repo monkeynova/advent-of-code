@@ -42,8 +42,7 @@ class BoardGraph {
   std::optional<int> FindLongestPath(std::vector<bool>& hist, int start, int end);
 
   absl::flat_hash_map<Point, int> point_to_idx_;
-  absl::flat_hash_map<int, absl::flat_hash_map<int, int>> map_;
-  absl::flat_hash_map<std::pair<int, int>, std::optional<int>> memo_;
+  std::vector<std::vector<std::pair<int, int>>> map_;
 };
 
 void BoardGraph::Build(const CharBoard& b, bool directed) {
@@ -93,16 +92,17 @@ void BoardGraph::Build(const CharBoard& b, bool directed) {
   for (const auto& [p, _] : by_point) {
     point_to_idx_[p] = point_to_idx_.size();
   }
+  map_.resize(point_to_idx_.size());
 
   for (const auto& [p1, dset] : by_point) {
     auto it1 = point_to_idx_.find(p1);
     CHECK(it1 != point_to_idx_.end());
-    absl::flat_hash_map<int, int>& map_build = map_[it1->second];
+    std::vector<std::pair<int, int>>& map_build = map_[it1->second];
     for (const auto& [p2, dist] : dset) {
       VLOG(2) << p1 << "-" << p2 << ": " << dist;
       auto it2 = point_to_idx_.find(p2);
       CHECK(it2 != point_to_idx_.end());
-      map_build[it2->second] = dist;
+      map_build.emplace_back(it2->second, dist);
     }
   }
 }
@@ -113,9 +113,9 @@ std::optional<int> BoardGraph::FindLongestPath(std::vector<bool>& hist, int cur,
 
   std::optional<int> max;
   hist[cur] = true;
-  auto it = map_.find(cur);
-  CHECK(it != map_.end());
-  for (const auto& [p, d] : it->second) {
+  CHECK_GE(cur, 0);
+  CHECK_LT(cur, map_.size());
+  for (const auto& [p, d] : map_[cur]) {
     if (hist[p]) continue;
     std::optional<int> sub = FindLongestPath(hist, p, end);
     if (sub) {
