@@ -44,6 +44,7 @@ class BoardGraph {
 
   absl::flat_hash_map<Point, int> point_to_idx_;
   std::vector<std::vector<std::pair<int, int>>> map_;
+  int calls_ = 0;
 };
 
 void BoardGraph::Build(const CharBoard& b, bool directed) {
@@ -76,9 +77,11 @@ void BoardGraph::Build(const CharBoard& b, bool directed) {
       if (by_point[p].size() == 2) {
         std::vector<std::pair<Point, int>> out(by_point[p].begin(), by_point[p].end());
         by_point[out[0].first].erase(p);
-        by_point[out[0].first].emplace(out[1].first, out[0].second + out[1].second);
+        CHECK(by_point[out[0].first].emplace(out[1].first, out[0].second + out[1].second).second)
+          << "Double path resolution not implemented";
         by_point[out[1].first].erase(p);
-        by_point[out[1].first].emplace(out[0].first, out[0].second + out[1].second);
+        CHECK(by_point[out[1].first].emplace(out[0].first, out[0].second + out[1].second).second)
+          << "Double path resolution not implemented";
         by_point.erase(p);
         work_done = true;
       }
@@ -111,6 +114,7 @@ void BoardGraph::Build(const CharBoard& b, bool directed) {
 }
 
 std::optional<int> BoardGraph::FindLongestPath(std::vector<bool>& hist, int cur, int end) {
+  ++calls_;
   VLOG(3) << cur;
   if (cur == end) return 0;
 
@@ -131,6 +135,7 @@ std::optional<int> BoardGraph::FindLongestPath(std::vector<bool>& hist, int cur,
 }
 
 std::optional<int> BoardGraph::FindLongestPath(int64_t hist, int cur, int end) {
+  ++calls_;
   VLOG(3) << cur;
   if (cur == end) return 0;
 
@@ -149,16 +154,19 @@ std::optional<int> BoardGraph::FindLongestPath(int64_t hist, int cur, int end) {
   return max;
 }
 
-
 std::optional<int> BoardGraph::FindLongestPath(Point start, Point end) {
   int start_idx = point_to_idx_[start];
   int end_idx = point_to_idx_[end];
+  std::optional<int> ret;
   if (point_to_idx_.size() < 63) {
     int hist = 0;
-    return FindLongestPath(hist, start_idx, end_idx);
+    ret = FindLongestPath(hist, start_idx, end_idx);
+  } else {
+    std::vector<bool> hist(point_to_idx_.size(), false);
+    ret= FindLongestPath(hist, start_idx, end_idx);
   }
-  std::vector<bool> hist(point_to_idx_.size(), false);
-  return FindLongestPath(hist, start_idx, end_idx);
+  VLOG(1) << calls_ << " calls to FindLongestPath";
+  return ret;
 }
 
 }  // namespace
