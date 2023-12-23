@@ -159,8 +159,7 @@ std::optional<int> BoardGraph::FindLongestPath(Point start, Point end) {
   int end_idx = point_to_idx_[end];
   std::optional<int> ret;
   if (point_to_idx_.size() < 63) {
-    int hist = 0;
-    ret = FindLongestPath(hist, start_idx, end_idx);
+    ret = FindLongestPath(0, start_idx, end_idx);
   } else {
     std::vector<bool> hist(point_to_idx_.size(), false);
     ret= FindLongestPath(hist, start_idx, end_idx);
