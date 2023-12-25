@@ -2,24 +2,35 @@
 ==
 
 [part=1]
-Example input
+[param=7,27]
+19, 13, 30 @ -2,  1, -2
+18, 19, 22 @ -1, -1, -2
+20, 25, 34 @ -2, -2, -4
+12, 31, 28 @ -1, -2, -1
+20, 19, 15 @  1, -5, -3
 --
-ERROR: UNIMPLEMENTED: Problem not known
+2
 ==
 
 [part=1]
+[param=200000000000000,400000000000000]
 @include{advent_of_code/2023/day24/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+12343
 ==
 
 [part=2]
-Example input
+19, 13, 30 @ -2,  1, -2
+18, 19, 22 @ -1, -1, -2
+20, 25, 34 @ -2, -2, -4
+12, 31, 28 @ -1, -2, -1
+20, 19, 15 @  1, -5, -3
 --
-ERROR: UNIMPLEMENTED: Problem not known
+47
 ==
 
+# 3087333632306562 (high; ...)
 [part=2]
 @include{advent_of_code/2023/day24/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+769281292688187
