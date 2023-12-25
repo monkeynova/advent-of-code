@@ -73,17 +73,21 @@ std::optional<int> FindDisjointSize(
 }
 
 std::vector<std::pair<int, int>> SpanningTree(
-    const std::vector<std::vector<int>>& graph) {
+    const std::vector<std::vector<int>>& graph,
+    int start = 0) {
   std::vector<std::pair<int, int>> ret;
   std::vector<bool> used(graph.size(), false);
-  used[0] = true;
-  for (std::deque<int> queue = {0}; !queue.empty(); queue.pop_front()) {
+  used[start] = true;
+  for (std::deque<int> queue = {start}; !queue.empty(); queue.pop_front()) {
     int i = queue.front();
     for (int o : graph[i]) {
       if (used[o]) continue;
       used[o] = true;
       queue.push_back(o);
-      ret.emplace_back(i, o);
+      if (i < o)
+        ret.emplace_back(i, o);
+      else
+        ret.emplace_back(o, i);
     }
   }  
 
@@ -144,11 +148,26 @@ absl::StatusOr<std::string> Day_2023_25::Part1(
         names.push_back(a_str);
       }
       int b = it_b->second;
-      edges.emplace_back(a, b);
+      if (a < b)
+        edges.emplace_back(a, b);
+      else
+        edges.emplace_back(b, a);
       graph[a].push_back(b);
       graph[b].push_back(a);
     }
   }
+
+  absl::flat_hash_map<std::pair<int, int>, int> edge_to_span_count;
+  for (int i = 0; i < graph.size(); ++i) {
+    std::vector<std::pair<int, int>> tree = SpanningTree(graph, i);
+    for (const auto& pair : tree) {
+      ++edge_to_span_count[pair];
+    }
+  }
+
+  absl::c_sort(edges, [&](std::pair<int, int> a, std::pair<int, int> b) {
+    return edge_to_span_count[a] > edge_to_span_count[b];
+  });
 
   VLOG(1) << "nodes=" << graph.size() << "/edges=" << edges.size();
   std::vector<std::vector<int>> edge_idx(graph.size(), std::vector(graph.size(), -1));
