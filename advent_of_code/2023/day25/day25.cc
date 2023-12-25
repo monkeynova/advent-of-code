@@ -30,25 +30,6 @@ namespace advent_of_code {
 
 namespace {
 
-std::optional<std::pair<int, int>> IsForestPair(
-    const std::vector<std::vector<int>>& graph,
-    const std::vector<std::vector<bool>>& skip) {
-  std::vector<bool> used(graph.size(), false);
-  used[0] = true;
-  int size = 1;
-  for (std::deque<int> queue = {0}; !queue.empty(); queue.pop_front()) {
-    for (int o : graph[queue.front()]) {
-      if (skip[queue.front()][o]) continue;
-      if (used[o]) continue;
-      used[o] = true;
-      ++size;
-      queue.push_back(o);
-    }
-  }
-  if (size == graph.size()) return std::nullopt;
-  return std::pair<int, int>{size, graph.size() - size};
-}
-
 std::optional<int> FindDisjointSize(
     const std::vector<std::vector<int>>& graph,
     std::vector<std::vector<bool>>& skip,
@@ -96,7 +77,7 @@ std::vector<std::pair<int, int>> SpanningTree(
 
 std::optional<std::pair<int, int>> FindThird(
     const std::vector<std::vector<int>>& graph,
-    const std::vector<std::vector<int>>& edge_idx,
+    const absl::flat_hash_map<std::pair<int, int>, int>& edge_idx,
     int max_edge_idx,
     std::vector<std::vector<bool>>& skip) {
   std::vector<bool> used(graph.size(), false);
@@ -107,7 +88,9 @@ std::optional<std::pair<int, int>> FindThird(
     for (int o : graph[i]) {
       if (skip[i][o]) continue;
       if (used[o]) continue;
-      if (edge_idx[i][o] < max_edge_idx) {
+      std::pair<int, int> edge = {i, o};
+      if (i > o) edge = {o, i};
+      if (auto it = edge_idx.find(edge); it != edge_idx.end() && it->second < max_edge_idx) {
         skip[i][o] = true;
         skip[o][i] = true;
         std::optional<int> disjoint_rest = FindDisjointSize(graph, skip, o, used);
@@ -170,10 +153,9 @@ absl::StatusOr<std::string> Day_2023_25::Part1(
   });
 
   VLOG(1) << "nodes=" << graph.size() << "/edges=" << edges.size();
-  std::vector<std::vector<int>> edge_idx(graph.size(), std::vector(graph.size(), -1));
+  absl::flat_hash_map<std::pair<int, int>, int> edge_idx;
   for (int i = 0; i < edges.size(); ++i) {
-    edge_idx[edges[i].first][edges[i].second] = i;
-    edge_idx[edges[i].second][edges[i].first] = i;
+    edge_idx[edges[i]] = i;
   }
 
   std::vector<std::vector<bool>> skip(graph.size(), std::vector<bool>(graph.size(), false));
