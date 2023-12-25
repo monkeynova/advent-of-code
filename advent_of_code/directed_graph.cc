@@ -36,8 +36,10 @@ std::vector<std::vector<std::string_view>> DirectedGraphBase::Forest() const {
                                  int) { return to_assign.contains(node); },
                   .is_final =
                       [&](std::string_view node, int) {
-                        forest.back().push_back(node);
-                        to_assign.erase(node);
+                        if (auto it = to_assign.find(node); it != to_assign.end()) {
+                          to_assign.erase(it);
+                          forest.back().push_back(node);
+                        }
                         return false;
                       },
               })
