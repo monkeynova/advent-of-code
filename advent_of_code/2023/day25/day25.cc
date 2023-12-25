@@ -4,27 +4,8 @@
 
 #include "absl/algorithm/container.h"
 #include "absl/container/flat_hash_map.h"
-#include "absl/container/flat_hash_set.h"
 #include "absl/log/log.h"
-#include "absl/strings/numbers.h"
-#include "absl/strings/str_cat.h"
-#include "absl/strings/str_join.h"
-#include "absl/strings/str_split.h"
-#include "advent_of_code/bfs.h"
-#include "advent_of_code/char_board.h"
-#include "advent_of_code/conway.h"
-#include "advent_of_code/directed_graph.h"
-#include "advent_of_code/fast_board.h"
-#include "advent_of_code/graph_walk.h"
-#include "advent_of_code/interval.h"
-#include "advent_of_code/loop_history.h"
-#include "advent_of_code/mod.h"
-#include "advent_of_code/point.h"
-#include "advent_of_code/point3.h"
-#include "advent_of_code/point_walk.h"
-#include "advent_of_code/splice_ring.h"
 #include "advent_of_code/tokenizer.h"
-#include "re2/re2.h"
 
 namespace advent_of_code {
 
@@ -117,14 +98,17 @@ absl::StatusOr<std::string> Day_2023_25::Part1(
   std::vector<std::string_view> names;
   std::vector<std::pair<int, int>> edges;
   for (std::string_view line : input) {
-    auto [a_str, list] = PairSplit(line, ": ");
+    Tokenizer tok(line);
+    std::string_view a_str = tok.Next();
     auto [it_a, a_inserted] = name_to_id.emplace(a_str, name_to_id.size());
     if (a_inserted) {
       graph.push_back({});
       names.push_back(a_str);
     }
+    RETURN_IF_ERROR(tok.NextIs(":"));
     int a = it_a->second;
-    for (std::string_view b_str : absl::StrSplit(list, " ")) {
+    while (!tok.Done()) {
+      std::string_view b_str = tok.Next();
       auto [it_b, b_inserted] = name_to_id.emplace(b_str, name_to_id.size());
       if (b_inserted) {
         graph.push_back({});
