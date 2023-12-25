@@ -46,15 +46,11 @@ struct Hail {
   }
 };
 
-std::optional<int64_t> Solve(const std::vector<Hail>& hail, double range, double last_range) {
+std::optional<int64_t> Solve(const std::vector<Hail>& hail, double range) {
   // (apx - hp1x)(avy - hv1y) = (apy - hp1y)(avx - hv1x)
 
   for (long double avx = -range; avx <= range; ++avx) {
-    bool skip = avx >= -last_range && avx <= last_range;
     for (long double avy = -range; avy <= range; ++avy) {
-      if (avy == -last_range && skip) {
-        avy = last_range + 1;
-      }
       Hail h1;
       Hail h2;
       bool set_h1 = false;
@@ -72,16 +68,13 @@ std::optional<int64_t> Solve(const std::vector<Hail>& hail, double range, double
       }
       if (!set_h2) continue;
 
-      long double apy = 
-         ((h2.p.x - h1.p.x) * (avy - h2.v.y) * (avy - h1.v.y) -
-          h2.p.y * (avx - h2.v.x) * (avy - h1.v.y) + 
-          h1.p.y * (avx - h1.v.x) * (avy - h2.v.y)) /
-          ((avx - h1.v.x)*(avy - h2.v.y) - (avx - h2.v.x) * (avy - h1.v.y));
       long double apx = 
          ((h2.p.y - h1.p.y) * (avx - h2.v.x) * (avx - h1.v.x) -
           h2.p.x * (avy - h2.v.y) * (avx - h1.v.x) + 
           h1.p.x * (avy - h1.v.y) * (avx - h2.v.x)) /
-         ((avy - h1.v.y)*(avx - h2.v.x) - (avy - h2.v.y) * (avx - h1.v.x));
+          ((avy - h1.v.y) * (avx - h2.v.x) - (avy - h2.v.y) * (avx - h1.v.x));
+
+      long double apy = h1.p.y + (apx - h1.p.x) * (avy - h1.v.y) / (avx - h1.v.x);
 
       bool all_match = true;
       for (const Hail& h : hail) {
@@ -97,29 +90,7 @@ std::optional<int64_t> Solve(const std::vector<Hail>& hail, double range, double
       VLOG(1) << "v_xy = " << avx << "," << avy;
 
       for (long double avz = -range; avz <= range; ++avz) {
-        Hail h1;
-        Hail h2;
-        bool set_h1 = false;
-        bool set_h2 = false;
-        for (const Hail& h : hail) {
-          if (h.v.x == avx) continue;
-          if (h.v.y == avy) continue;
-          if (h.v.z == avz) continue;
-          if (set_h1) {
-            h2 = h;
-            set_h2 = true;
-            break;
-          }
-          h1 = h;
-          set_h1 = true;
-        }
-        if (!set_h2) continue;
-
-        long double apz = 
-           ((h2.p.x - h1.p.x) * (avz - h2.v.z) * (avz - h1.v.z) -
-            h2.p.z * (avx - h2.v.x) * (avz - h1.v.z) + 
-            h1.p.z * (avx - h1.v.x) * (avz - h2.v.z)) /
-           ((avx - h1.v.x)*(avz - h2.v.z) - (avx - h2.v.x) * (avz - h1.v.z));
+        long double apz = h1.p.z + (apx - h1.p.x) * (avz - h1.v.z) / (avx - h1.v.x);
         
         Point64 ans_p = {
           static_cast<int64_t>(roundl(apx)),
@@ -169,7 +140,7 @@ std::optional<int64_t> Solve(const std::vector<Hail>& hail, double range, double
 std::optional<int64_t> Solve(const std::vector<Hail>& hail) {
   int last_range = -1;
   for (int range = 20; range < 100000; range *= 2) {
-    std::optional<int64_t> ret = Solve(hail, range, last_range);
+    std::optional<int64_t> ret = Solve(hail, range);
     if (ret) return ret;
     last_range = range;
   }
