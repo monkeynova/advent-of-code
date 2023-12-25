@@ -96,8 +96,8 @@ class FastBoard {
     PointDirExtraMap(const FastBoard& b, Storage init)
      : stride_(b.stride_), map_(4 * (b.size_ + 2 * stride_), init) {}
 
-    Storage Get(PointDir pd) const { return map_[pd.p.idx_ * 4 + pd.d + stride_]; }
-    void Set(PointDir pd, Storage s) { map_[pd.p.idx_ * 4 + pd.d + stride_] = s; }
+    Storage Get(PointDir pd) const { return map_[(pd.p.idx_ + stride_) * 4 + pd.d]; }
+    void Set(PointDir pd, Storage s) { map_[(pd.p.idx_ + stride_) * 4 + pd.d] = s; }
 
    private:
     friend class FastBoard;
