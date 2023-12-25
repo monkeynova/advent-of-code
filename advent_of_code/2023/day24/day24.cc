@@ -30,29 +30,17 @@ namespace advent_of_code {
 
 namespace {
 
-struct DPoint {
-  double x;
-  double y;
-};
-
 struct Point64 {
   int64_t x;
   int64_t y;
   int64_t z;
-
-  DPoint XY() const {
-    return {
-      static_cast<double>(x),
-      static_cast<double>(y)
-    };
-  }
 };
 
-struct DLine {
-  DPoint p;
-  DPoint d;
+struct Hail {
+  Point64 p;
+  Point64 v;
 
-  std::optional<DPoint> Intersect(DLine o) const {
+  bool IntersectXYInRange(Hail o, int64_t min, int64_t max) const {
     // d1.p + t1 * d1.d = d2.p + t2 * d2.d
     // t1 * d1.d - t2 * d2.d = d2.p - d1.p
     // [d1.d.x -d2.d.x] [t1]   [d2.p.x - d1.p.x]
@@ -62,26 +50,21 @@ struct DLine {
     //    {d.x, -o.d.x},
     //    {d.y, -o.d.y},
     //});
-    double det = d.x * -o.d.y - -o.d.x * d.y;
-    if (det == 0) return std::nullopt;
+    double det = v.x * -o.v.y - -o.v.x * v.y;
+    if (det == 0) return false;
 
     std::array<double, 2> t = {
-      -o.d.y / det * (o.p.x - p.x) - (-o.d.x) / det * (o.p.y - p.y),
-      -d.y / det * (o.p.x - p.x) + d.x / det * (o.p.y - p.y),
+      -o.v.y / det * (o.p.x - p.x) - (-o.v.x) / det * (o.p.y - p.y),
+      -v.y / det * (o.p.x - p.x) + v.x / det * (o.p.y - p.y),
     };
-    if (t[0] < 0) return std::nullopt;
-    if (t[1] < 0) return std::nullopt;
-    DPoint p_t1 = {p.x + t[0] * d.x, p.y + t[0] * d.y};
-    // DPoint p_t2 = {o.p.x + t[1] * o.d.x, p.y + t[1] * o.d.y};
-    //CHECK_NEAR(p_t1.x, p_t2.x, 1e-10);
-    //CHECK_NEAR(p_t1.y, p_t2.y, 1e-10);
-    return p_t1;
+    if (t[0] < 0) return false;
+    if (t[1] < 0) return false;
+    if (p.x + t[0] * v.x < min) return false;
+    if (p.x + t[0] * v.x > max) return false;
+    if (p.y + t[0] * v.y < min) return false;
+    if (p.y + t[0] * v.y > max) return false;
+    return true;
   }
-};
-
-struct Hail {
-  Point64 p;
-  Point64 v;
 };
 
 std::optional<int64_t> Solve(const std::vector<Hail>& hail, double min, double max) {
@@ -108,16 +91,20 @@ std::optional<int64_t> Solve(const std::vector<Hail>& hail, double min, double m
 
       long double apy = 
          ((h2.p.x - h1.p.x) * (avy - h2.v.y) * (avy - h1.v.y) -
-          h2.p.y * (avx - h2.v.x) * (avy - h1.v.y) + h1.p.y * (avx - h1.v.x) * (avy - h2.v.y)) /
+          h2.p.y * (avx - h2.v.x) * (avy - h1.v.y) + 
+          h1.p.y * (avx - h1.v.x) * (avy - h2.v.y)) /
           ((avx - h1.v.x)*(avy - h2.v.y) - (avx - h2.v.x) * (avy - h1.v.y));
       long double apx = 
          ((h2.p.y - h1.p.y) * (avx - h2.v.x) * (avx - h1.v.x) -
-          h2.p.x * (avy - h2.v.y) * (avx - h1.v.x) + h1.p.x * (avy - h1.v.y) * (avx - h2.v.x)) /
+          h2.p.x * (avy - h2.v.y) * (avx - h1.v.x) + 
+          h1.p.x * (avy - h1.v.y) * (avx - h2.v.x)) /
          ((avy - h1.v.y)*(avx - h2.v.x) - (avy - h2.v.y) * (avx - h1.v.x));
 
       bool all_match = true;
       for (const Hail& h : hail) {
-        if (abs((apx - h.p.x) * (avy - h.v.y) - (apy - h.p.y) * (avx - h.v.x)) > 1e-2) {
+        double xy_check =
+            (apx - h.p.x) * (avy - h.v.y) - (apy - h.p.y) * (avx - h.v.x);
+        if (abs(xy_check) > 1e-2) {
           all_match = false;
           break;
         }
@@ -147,7 +134,8 @@ std::optional<int64_t> Solve(const std::vector<Hail>& hail, double min, double m
 
         long double apz = 
            ((h2.p.x - h1.p.x) * (avz - h2.v.z) * (avz - h1.v.z) -
-            h2.p.z * (avx - h2.v.x) * (avz - h1.v.z) + h1.p.z * (avx - h1.v.x) * (avz - h2.v.z)) /
+            h2.p.z * (avx - h2.v.x) * (avz - h1.v.z) + 
+            h1.p.z * (avx - h1.v.x) * (avz - h2.v.z)) /
            ((avx - h1.v.x)*(avz - h2.v.z) - (avx - h2.v.x) * (avz - h1.v.z));
         
         Point64 ans_p = {
@@ -213,10 +201,6 @@ absl::StatusOr<std::string> Day_2023_24::Part1(
   if (!absl::SimpleAtoi(min_str, &min)) return Error("Bad min");
   if (!absl::SimpleAtoi(max_str, &max)) return Error("Bad max");
   VLOG(1) << "[" << min << "," << max << "]";
-  struct Hail {
-    Point64 p;
-    Point64 v;
-  };
   std::vector<Hail> hail;
   for (std::string_view line : input) {
     Hail h;
@@ -237,22 +221,8 @@ absl::StatusOr<std::string> Day_2023_24::Part1(
   }
   int intersections = 0;
   for (int i = 0; i < hail.size(); ++i) {
-    DPoint p1 = hail[i].p.XY();
-    DPoint v1 = hail[i].v.XY();
-    DLine l1 = {p1, v1};
-
     for (int j = 0; j < i; ++j) {
-      DPoint p2 = hail[j].p.XY();
-      DPoint v2 = hail[j].v.XY();
-      DLine l2 = {p2, v2};
-
-      std::optional<DPoint> intersect = l1.Intersect(l2);
-      if (!intersect) continue;
-      VLOG(2) << "Intersect @ " << intersect->x << "," << intersect->y;
-      if (intersect->x >= min && intersect->x <= max &&
-          intersect->y >= min && intersect->y <= max) {
-        VLOG(2) << "Add " << i;
-        VLOG(2) << "Add " << j;
+      if (hail[i].IntersectXYInRange(hail[j], min, max)) {
         ++intersections;
       }
     }
