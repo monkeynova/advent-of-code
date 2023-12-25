@@ -46,11 +46,15 @@ struct Hail {
   }
 };
 
-std::optional<int64_t> Solve(const std::vector<Hail>& hail, double min, double max) {
+std::optional<int64_t> Solve(const std::vector<Hail>& hail, double range, double last_range) {
   // (apx - hp1x)(avy - hv1y) = (apy - hp1y)(avx - hv1x)
 
-  for (long double avx = min; avx <= max; ++avx) {
-    for (long double avy = min; avy <= max; ++avy) {
+  for (long double avx = -range; avx <= range; ++avx) {
+    bool skip = avx >= -last_range && avx <= last_range;
+    for (long double avy = -range; avy <= range; ++avy) {
+      if (avy == -last_range && skip) {
+        avy = last_range + 1;
+      }
       Hail h1;
       Hail h2;
       bool set_h1 = false;
@@ -92,7 +96,7 @@ std::optional<int64_t> Solve(const std::vector<Hail>& hail, double min, double m
 
       VLOG(1) << "v_xy = " << avx << "," << avy;
 
-      for (long double avz = min; avz <= max; ++avz) {
+      for (long double avz = -range; avz <= range; ++avz) {
         Hail h1;
         Hail h2;
         bool set_h1 = false;
@@ -163,9 +167,11 @@ std::optional<int64_t> Solve(const std::vector<Hail>& hail, double min, double m
 }
 
 std::optional<int64_t> Solve(const std::vector<Hail>& hail) {
+  int last_range = -1;
   for (int range = 20; range < 100000; range *= 2) {
-    std::optional<int64_t> ret = Solve(hail, -range, range);
+    std::optional<int64_t> ret = Solve(hail, range, last_range);
     if (ret) return ret;
+    last_range = range;
   }
   return std::nullopt;
 }
