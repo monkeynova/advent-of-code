@@ -46,11 +46,11 @@ struct Hail {
   }
 };
 
-std::optional<int64_t> Solve(const std::vector<Hail>& hail, double range) {
+std::optional<int64_t> Solve(const std::vector<Hail>& hail, int64_t range) {
   // (apx - hp1x)(avy - hv1y) = (apy - hp1y)(avx - hv1x)
 
-  for (long double avx = -range; avx <= range; ++avx) {
-    for (long double avy = -range; avy <= range; ++avy) {
+  for (absl::int128 avx = -range; avx <= range; ++avx) {
+    for (absl::int128 avy = -range; avy <= range; ++avy) {
       Hail h1;
       Hail h2;
       bool set_h1 = false;
@@ -68,19 +68,19 @@ std::optional<int64_t> Solve(const std::vector<Hail>& hail, double range) {
       }
       if (!set_h2) continue;
 
-      long double apx = 
+      absl::int128 apx = 
          ((h2.p.y - h1.p.y) * (avx - h2.v.x) * (avx - h1.v.x) -
           h2.p.x * (avy - h2.v.y) * (avx - h1.v.x) + 
           h1.p.x * (avy - h1.v.y) * (avx - h2.v.x)) /
           ((avy - h1.v.y) * (avx - h2.v.x) - (avy - h2.v.y) * (avx - h1.v.x));
 
-      long double apy = h1.p.y + (apx - h1.p.x) * (avy - h1.v.y) / (avx - h1.v.x);
+      absl::int128 apy = h1.p.y + (apx - h1.p.x) * (avy - h1.v.y) / (avx - h1.v.x);
 
       bool all_match = true;
       for (const Hail& h : hail) {
-        double xy_check =
+        absl::int128 xy_check =
             (apx - h.p.x) * (avy - h.v.y) - (apy - h.p.y) * (avx - h.v.x);
-        if (abs(xy_check) > 1e-2) {
+        if (xy_check != 0) {
           all_match = false;
           break;
         }
@@ -89,18 +89,18 @@ std::optional<int64_t> Solve(const std::vector<Hail>& hail, double range) {
 
       VLOG(1) << "v_xy = " << avx << "," << avy;
 
-      for (long double avz = -range; avz <= range; ++avz) {
-        long double apz = h1.p.z + (apx - h1.p.x) * (avz - h1.v.z) / (avx - h1.v.x);
+      for (absl::int128 avz = -range; avz <= range; ++avz) {
+        absl::int128 apz = h1.p.z + (apx - h1.p.x) * (avz - h1.v.z) / (avx - h1.v.x);
         
         Point64 ans_p = {
-          static_cast<int64_t>(roundl(apx)),
-          static_cast<int64_t>(roundl(apy)),
-          static_cast<int64_t>(roundl(apz))
+          static_cast<int64_t>(absl::Int128Low64(apx)),
+          static_cast<int64_t>(absl::Int128Low64(apy)),
+          static_cast<int64_t>(absl::Int128Low64(apz))
         };
         Point64 ans_v = {
-          static_cast<int64_t>(roundl(avx)),
-          static_cast<int64_t>(roundl(avy)),
-          static_cast<int64_t>(roundl(avz))
+          static_cast<int64_t>(absl::Int128Low64(avx)),
+          static_cast<int64_t>(absl::Int128Low64(avy)),
+          static_cast<int64_t>(absl::Int128Low64(avz))
         };
 
         bool all_match = true;
@@ -138,11 +138,10 @@ std::optional<int64_t> Solve(const std::vector<Hail>& hail, double range) {
 }
 
 std::optional<int64_t> Solve(const std::vector<Hail>& hail) {
-  int last_range = -1;
   for (int range = 20; range < 100000; range *= 2) {
+    VLOG(1) << "range = " << range;
     std::optional<int64_t> ret = Solve(hail, range);
     if (ret) return ret;
-    last_range = range;
   }
   return std::nullopt;
 }
