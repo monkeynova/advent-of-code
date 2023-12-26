@@ -1,0 +1,58 @@
+      --------Part 1--------   --------Part 2--------
+Day       Time   Rank  Score       Time   Rank  Score
+ 25   15:56:36   7939      0   15:57:10   5921      0
+ 24   08:42:40   7773      0   19:24:06   5899      0
+ 23   08:26:29   8096      0   09:29:44   5033      0
+ 22   10:23:54   7768      0   10:41:57   6743      0
+ 21   07:26:54  12020      0   23:04:03   8255      0
+ 20   08:28:19   9080      0   10:33:10   6494      0
+ 19   08:19:58  13608      0   08:36:31   7440      0
+ 18   09:01:16  13175      0   10:10:14   8978      0
+ 17   08:43:22   8117      0   08:46:24   7080      0
+ 16   08:02:37  14429      0   08:05:42  13334      0
+ 15   08:03:40  22564      0   08:19:48  18351      0
+ 14   07:38:44  19126      0   07:47:46  12280      0
+ 13   07:40:50  16208      0   07:44:30  12502      0
+ 12   08:48:26  17246      0   09:22:21   7630      0
+ 11   08:30:55  24126      0   08:43:05  22077      0
+ 10   09:56:30  26527      0   10:31:42  13883      0
+  9   08:29:21  31014      0   08:31:06  29878      0
+  8   08:15:12  37271      0   09:08:01  26422      0
+  7   07:00:11  28418      0   07:05:18  22540      0
+  6   07:15:22  38434      0   07:20:07  37138      0
+  5   08:30:55  35863      0   09:04:41  17745      0
+  4   08:00:33  50193      0   08:07:09  39396      0
+  3   08:57:38  41339      0   09:08:00  32973      0
+  2   07:55:16  48958      0   07:57:50  45316      0
+  1   07:29:33  60899      0   07:38:24  37850      0
+
+---------------------------------------------------------------------------------
+Benchmark                       Time             CPU   Iterations UserCounters...
+---------------------------------------------------------------------------------
+BM_WholeYear_2023/1           178 us          179 us            1 bytes_per_second=118.692Mi/s
+BM_WholeYear_2023/2           146 us          146 us            1 bytes_per_second=66.5678Mi/s
+BM_WholeYear_2023/3           183 us          183 us            1 bytes_per_second=102.872Mi/s
+BM_WholeYear_2023/4           201 us          201 us            1 bytes_per_second=122.127Mi/s
+BM_WholeYear_2023/5           114 us          114 us            1 bytes_per_second=47.3575Mi/s
+BM_WholeYear_2023/6          34.1 us         34.0 us            1 bytes_per_second=2.07564Mi/s
+BM_WholeYear_2023/7           201 us          201 us            1 bytes_per_second=46.9388Mi/s
+BM_WholeYear_2023/8           644 us          644 us            1 bytes_per_second=20.5825Mi/s
+BM_WholeYear_2023/9           231 us          231 us            1 bytes_per_second=89.3564Mi/s
+BM_WholeYear_2023/10          406 us          406 us            1 bytes_per_second=46.3683Mi/s
+BM_WholeYear_2023/11          218 us          218 us            1 bytes_per_second=86.3556Mi/s
+BM_WholeYear_2023/12         2501 us         2501 us            1 bytes_per_second=8.62196Mi/s
+BM_WholeYear_2023/13          108 us          109 us            1 bytes_per_second=138.318Mi/s
+BM_WholeYear_2023/14         3081 us         3081 us            1 bytes_per_second=3.12629Mi/s
+BM_WholeYear_2023/15          305 us          304 us            1 bytes_per_second=72.2816Mi/s
+BM_WholeYear_2023/16         6162 us         6159 us            1 bytes_per_second=1.89063Mi/s
+BM_WholeYear_2023/17         7099 us         7099 us            1 bytes_per_second=2.68974Mi/s
+BM_WholeYear_2023/18          220 us          219 us            1 bytes_per_second=39.24Mi/s
+BM_WholeYear_2023/19          353 us          353 us            1 bytes_per_second=50.1827Mi/s
+BM_WholeYear_2023/20         5015 us         5013 us            1 bytes_per_second=154.286Ki/s
+BM_WholeYear_2023/21         1720 us         1719 us            1 bytes_per_second=9.59333Mi/s
+BM_WholeYear_2023/22         1274 us         1270 us            1 bytes_per_second=16.4332Mi/s
+BM_WholeYear_2023/23       178290 us       178290 us            1 bytes_per_second=109.668Ki/s
+BM_WholeYear_2023/24         6006 us         6007 us            1 bytes_per_second=3.12123Mi/s
+BM_WholeYear_2023/25        54502 us        54503 us            1 bytes_per_second=366.97Ki/s
+BM_WholeYear_ParseOnly        499 us          499 us            1 bytes_per_second=764.679Mi/s
+BM_WholeYear               270148 us       270142 us            1 bytes_per_second=1.4125Mi/s
