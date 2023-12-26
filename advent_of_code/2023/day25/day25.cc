@@ -63,7 +63,6 @@ std::optional<std::pair<int, int>> FindThird(
     std::vector<std::vector<bool>>& skip) {
   std::vector<bool> used(graph.size(), false);
   used[0] = true;
-  int used_count = 1;
   for (std::deque<int> queue = {0}; !queue.empty(); queue.pop_front()) {
     int i = queue.front();
     for (int o : graph[i]) {
@@ -82,7 +81,6 @@ std::optional<std::pair<int, int>> FindThird(
         skip[o][i] = false;
       }
       used[o] = true;
-      ++used_count;
       queue.push_back(o);
     }
   }

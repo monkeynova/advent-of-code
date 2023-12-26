@@ -26,7 +26,6 @@ struct Valve {
 absl::StatusOr<DirectedGraph<Valve>> ParseGraph(
     absl::Span<std::string_view> input) {
   DirectedGraph<Valve> graph;
-  int full_flow = 0;
   for (std::string_view line : input) {
     Valve v;
     std::string_view out;
@@ -37,7 +36,6 @@ absl::StatusOr<DirectedGraph<Valve>> ParseGraph(
       return Error("Bad line: ", line);
     }
     if (v.name.size() != 2) return Error("Bad valve: ", v.name);
-    full_flow += v.flow;
     graph.AddNode(v.name, v);
     for (std::string_view out_name : absl::StrSplit(out, ", ")) {
       if (out_name.size() != 2) return Error("Bad valve: ", out_name);
@@ -149,7 +147,6 @@ absl::StatusOr<int> BestPath(const DirectedGraph<Valve>& graph, int minutes,
                              bool use_elephant) {
   absl::flat_hash_map<std::string_view, int> pack;
   int64_t all_on = 0;
-  int full_flow = 0;
   std::vector<const Valve*> ordered_valves;
   for (std::string_view n : graph.nodes()) {
     ordered_valves.push_back(graph.GetData(n));
@@ -161,7 +158,6 @@ absl::StatusOr<int> BestPath(const DirectedGraph<Valve>& graph, int minutes,
   for (const Valve* v : ordered_valves) {
     if (v->flow == 0) break;
     all_on |= 1ll << pack.size();
-    full_flow += v->flow;
     pack[v->name] = pack.size();
   }
   if (pack.size() > 30) return Error("Can't fit");

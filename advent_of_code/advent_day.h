@@ -75,6 +75,10 @@ class AdventDay {
     return absl::StrCat(*t);
   }
 
+  absl::StatusOr<std::string> AdventReturn(absl::Status st) const {
+    return std::move(st);
+  }
+
   template <typename T>
   absl::StatusOr<std::string> AdventReturn(const std::optional<T>& t) const {
     if (!t) return absl::NotFoundError("Not found");

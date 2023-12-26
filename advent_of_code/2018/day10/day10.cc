@@ -38,7 +38,7 @@ absl::StatusOr<std::string> Day_2018_10::Part1(
     lights.push_back(l);
   }
   int last_dist = -1;
-  for (int i = 0; true; ++i) {
+  while (true) {
     PointRectangle r = {{lights[0].p.x, lights[0].p.y},
                         {lights[0].p.x, lights[0].p.y}};
     for (Light l : lights) r.ExpandInclude(l.p);
