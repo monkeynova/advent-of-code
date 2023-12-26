@@ -260,10 +260,8 @@ absl::StatusOr<ImmutableCharBoard> ImmutableCharBoard::Parse(const Container& in
       std::is_same_v<std::string_view, decltype(std::string_view(*in.begin()))>,
       "Container must iterate over std::string_view");
   int width = -1;
-  int height = 0;
   std::string_view buf = "";
   for (std::string_view line : in) {
-    ++height;
     if (width == -1) {
       width = line.size();
     } else if (width != line.size()) {
