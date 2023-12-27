@@ -5,16 +5,16 @@ use warnings;
 
 my ($fname) = @ARGV;
 $fname or die;
-$fname =~ m,/(\d{4})/day({\d{2})/, or die;
-my ($year, $day) = ($1, $2);
+$fname =~ m,/(\d{4})/day(\d{2})/, or die;
+my ($year, $day) = (int($1), int($2));
 
-open my $ifh, $fname, '<' or die "can't open $fname: $!";
-my $tmp_fname = $fname . '.new.' , $$;
-open my $ofh, $tmp_fname, '>' or die "can't open $tmp_fname: $!";
+open my $ifh, '<', $fname or die "can't open $fname: $!";
+my $tmp_fname = $fname . '.new.' . $$;
+open my $ofh, '>', $tmp_fname or die "can't open $tmp_fname: $!";
 my $saw_registry;
 while (<$ifh>) {
     $saw_registry ||= /RegisterAdventDay/;
-    if (m,}  // namespace advent_of_code, && !$saw_registry) {
+    if (m,\}  // namespace advent_of_code, && !$saw_registry) {
         print {$ofh} <<EOF;
 static AdventRegisterEntry registry = RegisterAdventDay(
     /*year=*/$year, /*day=*/$day, []() {

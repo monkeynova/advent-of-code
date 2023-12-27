@@ -103,4 +103,9 @@ absl::StatusOr<std::string> Day_2023_15::Part2(
   return AdventReturn(hash_table.Power());
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2023, /*day=*/15, []() {
+  return std::unique_ptr<AdventDay>(new Day_2023_15());
+});
+
 }  // namespace advent_of_code

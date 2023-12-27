@@ -39,6 +39,8 @@ system("perl", "-spi", "-e",
                   "s{new_day_url}{$year/day/$url_day}g;",
                   "s{new_day}{day$day}g;",
                   "s{NEW_DAY}{${year}_DAY$day}g;",
+                  "s{/*year=*/-1}{/*year=*/${year}}g;",
+                  "s{/*day=*/-1}{/*day=*/${day}}g;",
                   "s{NewDay}{Day_${year}_${day}}g")),
         map { "advent_of_code/$year/day$day/$_" } values %renames)
   and die $!;

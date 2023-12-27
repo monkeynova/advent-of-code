@@ -69,4 +69,11 @@ absl::StatusOr<std::string> Day_2023_11::Part2(
   return AdventReturn(TotalPairDist(galaxies));
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2023, /*day=*/11, []() {
+  auto ret = std::unique_ptr<AdventDay>(new Day_2023_11());
+  ret->set_param("1000000");
+  return ret;
+});
+
 }  // namespace advent_of_code

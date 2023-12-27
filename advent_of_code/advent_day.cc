@@ -21,7 +21,6 @@ absl::flat_hash_map<std::pair<int, int>, FactoryType>& Registry() {
 
 AdventRegisterEntry RegisterAdventDay(int year, int day, FactoryType factory) {
   CHECK(Registry().insert({{year, day}, factory}).second);
-  LOG(INFO) << "Registered " << year << "/" << day;
   return AdventRegisterEntry{};
 }
 

@@ -174,4 +174,9 @@ absl::StatusOr<std::string> Day_2023_23::Part2(
   return AdventReturn(g.FindLongestPath(start, end));
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2023, /*day=*/23, []() {
+  return std::unique_ptr<AdventDay>(new Day_2023_23());
+});
+
 }  // namespace advent_of_code
