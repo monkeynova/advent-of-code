@@ -201,4 +201,9 @@ absl::StatusOr<std::string> Day_2019_19::Part2(
   return AdventReturn(space.x * 10000 + space.y);
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2019, /*day=*/19, []() {
+  return std::unique_ptr<AdventDay>(new Day_2019_19());
+});
+
 }  // namespace advent_of_code

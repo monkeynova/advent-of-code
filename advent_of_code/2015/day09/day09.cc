@@ -125,4 +125,9 @@ absl::StatusOr<std::string> Day_2015_09::Part2(
   return AdventReturn(LongestAllVisit(src_routes));
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2015, /*day=*/9, []() {
+  return std::unique_ptr<AdventDay>(new Day_2015_09());
+});
+
 }  // namespace advent_of_code

@@ -64,4 +64,9 @@ absl::StatusOr<std::string> Day_2020_10::Part2(
   return AdventReturn(CountValidArrangements(jolts, &memo, 0, 0));
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2020, /*day=*/10, []() {
+  return std::unique_ptr<AdventDay>(new Day_2020_10());
+});
+
 }  // namespace advent_of_code

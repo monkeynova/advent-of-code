@@ -120,4 +120,9 @@ absl::StatusOr<std::string> Day_2020_11::Part2(
   return AdventReturn(seat_conway.CountFilled());
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2020, /*day=*/11, []() {
+  return std::unique_ptr<AdventDay>(new Day_2020_11());
+});
+
 }  // namespace advent_of_code

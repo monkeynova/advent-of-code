@@ -116,4 +116,9 @@ absl::StatusOr<std::string> Day_2017_07::Part2(
   return AdventReturn(FindBadWeight(root, dag));
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2017, /*day=*/7, []() {
+  return std::unique_ptr<AdventDay>(new Day_2017_07());
+});
+
 }  // namespace advent_of_code

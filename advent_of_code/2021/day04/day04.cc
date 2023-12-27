@@ -157,4 +157,9 @@ absl::StatusOr<std::string> Day_2021_04::Part2(
   return Error("No board found");
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2021, /*day=*/4, []() {
+  return std::unique_ptr<AdventDay>(new Day_2021_04());
+});
+
 }  // namespace advent_of_code

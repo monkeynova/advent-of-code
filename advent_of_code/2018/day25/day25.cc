@@ -54,4 +54,9 @@ absl::StatusOr<std::string> Day_2018_25::Part2(
   return "Merry Christmas!";
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2018, /*day=*/25, []() {
+  return std::unique_ptr<AdventDay>(new Day_2018_25());
+});
+
 }  // namespace advent_of_code

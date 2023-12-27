@@ -123,4 +123,9 @@ absl::StatusOr<std::string> Day_2021_06::Part2(
   return AdventReturn(CountPopulationAfter(nums, kDays));
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2021, /*day=*/6, []() {
+  return std::unique_ptr<AdventDay>(new Day_2021_06());
+});
+
 }  // namespace advent_of_code

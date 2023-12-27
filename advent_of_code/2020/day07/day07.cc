@@ -104,4 +104,9 @@ absl::StatusOr<std::string> Day_2020_07::Part2(
   return AdventReturn(contained_bags - 1); /* don't include top bag */
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2020, /*day=*/7, []() {
+  return std::unique_ptr<AdventDay>(new Day_2020_07());
+});
+
 }  // namespace advent_of_code

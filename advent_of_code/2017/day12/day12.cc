@@ -42,4 +42,9 @@ absl::StatusOr<std::string> Day_2017_12::Part2(
   return AdventReturn(graph.Forest().size());
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2017, /*day=*/12, []() {
+  return std::unique_ptr<AdventDay>(new Day_2017_12());
+});
+
 }  // namespace advent_of_code

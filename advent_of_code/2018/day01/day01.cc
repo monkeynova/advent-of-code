@@ -38,4 +38,9 @@ absl::StatusOr<std::string> Day_2018_01::Part2(
   return Error("Exited infinite loop");
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2018, /*day=*/1, []() {
+  return std::unique_ptr<AdventDay>(new Day_2018_01());
+});
+
 }  // namespace advent_of_code

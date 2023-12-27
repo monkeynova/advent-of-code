@@ -94,4 +94,9 @@ absl::StatusOr<std::string> Day_2018_09::Part2(
   return AdventReturn(HighScore(players, 100 * marbles));
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2018, /*day=*/9, []() {
+  return std::unique_ptr<AdventDay>(new Day_2018_09());
+});
+
 }  // namespace advent_of_code

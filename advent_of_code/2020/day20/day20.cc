@@ -449,4 +449,9 @@ absl::StatusOr<std::string> Day_2020_20::Part2(
   return AdventReturn(CountNonSeaMonster(merged));
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2020, /*day=*/20, []() {
+  return std::unique_ptr<AdventDay>(new Day_2020_20());
+});
+
 }  // namespace advent_of_code

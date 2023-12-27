@@ -169,4 +169,9 @@ absl::StatusOr<std::string> Day_2019_24::Part2(
   return AdventReturn(p2c.CountLive());
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2019, /*day=*/24, []() {
+  return std::unique_ptr<AdventDay>(new Day_2019_24());
+});
+
 }  // namespace advent_of_code

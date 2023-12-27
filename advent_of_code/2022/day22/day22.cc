@@ -406,4 +406,9 @@ absl::StatusOr<std::string> Day_2022_22::Part2(
   return AdventReturn(Score(end));
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2022, /*day=*/22, []() {
+  return std::unique_ptr<AdventDay>(new Day_2022_22());
+});
+
 }  // namespace advent_of_code

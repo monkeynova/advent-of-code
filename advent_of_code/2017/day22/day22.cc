@@ -141,4 +141,9 @@ absl::StatusOr<std::string> Day_2017_22::Part2(
   return AdventReturn(infected);
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2017, /*day=*/22, []() {
+  return std::unique_ptr<AdventDay>(new Day_2017_22());
+});
+
 }  // namespace advent_of_code

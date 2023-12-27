@@ -292,4 +292,9 @@ absl::StatusOr<std::string> Day_2018_24::Part2(
   return AdventReturn(ImmuneLeftAfterFightWithBoost(groups, boost));
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2018, /*day=*/24, []() {
+  return std::unique_ptr<AdventDay>(new Day_2018_24());
+});
+
 }  // namespace advent_of_code

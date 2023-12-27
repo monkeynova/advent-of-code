@@ -148,4 +148,9 @@ absl::StatusOr<std::string> Day_2015_13::Part2(
   return AdventReturn(FindBestSeating(cost_map));
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2015, /*day=*/13, []() {
+  return std::unique_ptr<AdventDay>(new Day_2015_13());
+});
+
 }  // namespace advent_of_code

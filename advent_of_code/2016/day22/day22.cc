@@ -259,4 +259,9 @@ absl::StatusOr<std::string> Day_2016_22::Part2(
   return AdventReturn(FindMinPath(grid));
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2016, /*day=*/22, []() {
+  return std::unique_ptr<AdventDay>(new Day_2016_22());
+});
+
 }  // namespace advent_of_code

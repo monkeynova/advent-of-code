@@ -70,4 +70,9 @@ absl::StatusOr<std::string> Day_2020_13::Part2(
   return AdventReturn(ChineseRemainder(remainders));
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2020, /*day=*/13, []() {
+  return std::unique_ptr<AdventDay>(new Day_2020_13());
+});
+
 }  // namespace advent_of_code

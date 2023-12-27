@@ -92,4 +92,9 @@ absl::StatusOr<std::string> Day_2020_17::Part2(
   return AdventReturn(conway.CountLive());
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2020, /*day=*/17, []() {
+  return std::unique_ptr<AdventDay>(new Day_2020_17());
+});
+
 }  // namespace advent_of_code

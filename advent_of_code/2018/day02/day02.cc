@@ -51,4 +51,9 @@ absl::StatusOr<std::string> Day_2018_02::Part2(
   return Error("Not found");
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2018, /*day=*/2, []() {
+  return std::unique_ptr<AdventDay>(new Day_2018_02());
+});
+
 }  // namespace advent_of_code

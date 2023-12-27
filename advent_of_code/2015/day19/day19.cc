@@ -165,4 +165,9 @@ absl::StatusOr<std::string> Day_2015_19::Part2(
   return AdventReturn(FindMinPath(map, "e", target));
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2015, /*day=*/19, []() {
+  return std::unique_ptr<AdventDay>(new Day_2015_19());
+});
+
 }  // namespace advent_of_code

@@ -200,4 +200,9 @@ absl::StatusOr<std::string> Day_2019_23::Part2(
   return AdventReturn(Network(codes).RunUntilDuplicateNat());
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2019, /*day=*/23, []() {
+  return std::unique_ptr<AdventDay>(new Day_2019_23());
+});
+
 }  // namespace advent_of_code

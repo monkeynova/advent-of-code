@@ -43,4 +43,9 @@ absl::StatusOr<std::string> Day_2017_05::Part2(
   return AdventReturn(steps);
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2017, /*day=*/5, []() {
+  return std::unique_ptr<AdventDay>(new Day_2017_05());
+});
+
 }  // namespace advent_of_code

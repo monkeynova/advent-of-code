@@ -210,4 +210,9 @@ absl::StatusOr<std::string> Day_2022_17::Part2(
   return AdventReturn(HeightAtDrop(ds, 1'000'000'000'000));
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2022, /*day=*/17, []() {
+  return std::unique_ptr<AdventDay>(new Day_2022_17());
+});
+
 }  // namespace advent_of_code

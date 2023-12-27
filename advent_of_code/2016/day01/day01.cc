@@ -63,4 +63,9 @@ absl::StatusOr<std::string> Day_2016_01::Part2(
   return Error("No duplicate location");
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2016, /*day=*/1, []() {
+  return std::unique_ptr<AdventDay>(new Day_2016_01());
+});
+
 }  // namespace advent_of_code

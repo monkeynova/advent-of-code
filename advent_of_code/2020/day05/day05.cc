@@ -70,4 +70,9 @@ absl::StatusOr<std::string> Day_2020_05::Part2(
   return AdventReturn(missingid);
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2020, /*day=*/5, []() {
+  return std::unique_ptr<AdventDay>(new Day_2020_05());
+});
+
 }  // namespace advent_of_code

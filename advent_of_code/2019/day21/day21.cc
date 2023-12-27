@@ -99,4 +99,9 @@ absl::StatusOr<std::string> Day_2019_21::Part2(
   return AdventReturn(spring_bot.damage());
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2019, /*day=*/21, []() {
+  return std::unique_ptr<AdventDay>(new Day_2019_21());
+});
+
 }  // namespace advent_of_code

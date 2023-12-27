@@ -217,4 +217,9 @@ absl::StatusOr<std::string> Day_2015_24::Part2(
   return AdventReturn(FindMinPartition4(weights_set));
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2015, /*day=*/24, []() {
+  return std::unique_ptr<AdventDay>(new Day_2015_24());
+});
+
 }  // namespace advent_of_code

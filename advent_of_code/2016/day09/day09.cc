@@ -82,4 +82,9 @@ absl::StatusOr<std::string> Day_2016_09::Part2(
   return AdventReturn(DecompressV2NonWhitespaceLen(input[0]));
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2016, /*day=*/9, []() {
+  return std::unique_ptr<AdventDay>(new Day_2016_09());
+});
+
 }  // namespace advent_of_code

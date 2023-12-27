@@ -180,4 +180,9 @@ absl::StatusOr<std::string> Day_2022_21::Part2(
   return AdventReturn(SolveForRootEquality(monkeys));
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2022, /*day=*/21, []() {
+  return std::unique_ptr<AdventDay>(new Day_2022_21());
+});
+
 }  // namespace advent_of_code

@@ -213,4 +213,9 @@ absl::StatusOr<std::string> Day_2019_15::Part2(
   return AdventReturn(droid.GreatestDistanceFromO2());
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2019, /*day=*/15, []() {
+  return std::unique_ptr<AdventDay>(new Day_2019_15());
+});
+
 }  // namespace advent_of_code

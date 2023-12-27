@@ -6,7 +6,8 @@ use warnings;
 my ($fname) = @ARGV;
 $fname or die;
 $fname =~ m,/(\d{4})/day(\d{2})/, or die;
-my ($year, $day) = (int($1), int($2));
+my ($year, $day) = ($1, $2);
+my $int_day = int($day);
 
 open my $ifh, '<', $fname or die "can't open $fname: $!";
 my $tmp_fname = $fname . '.new.' . $$;
@@ -17,7 +18,7 @@ while (<$ifh>) {
     if (m,\}  // namespace advent_of_code, && !$saw_registry) {
         print {$ofh} <<EOF;
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/$year, /*day=*/$day, []() {
+    /*year=*/$year, /*day=*/$int_day, []() {
   return std::unique_ptr<AdventDay>(new Day_${year}_${day}());
 });
 

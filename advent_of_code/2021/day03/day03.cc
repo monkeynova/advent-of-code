@@ -108,4 +108,9 @@ absl::StatusOr<std::string> Day_2021_03::Part2(
   return AdventReturn(o2_val * co2_val);
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2021, /*day=*/3, []() {
+  return std::unique_ptr<AdventDay>(new Day_2021_03());
+});
+
 }  // namespace advent_of_code

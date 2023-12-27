@@ -99,4 +99,9 @@ absl::StatusOr<std::string> Day_2015_06::Part2(
   return AdventReturn(total_brightness);
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2015, /*day=*/6, []() {
+  return std::unique_ptr<AdventDay>(new Day_2015_06());
+});
+
 }  // namespace advent_of_code

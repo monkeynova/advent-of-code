@@ -75,4 +75,9 @@ absl::StatusOr<std::string> Day_2019_04::Part2(
   return AdventReturn(valid);
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2019, /*day=*/4, []() {
+  return std::unique_ptr<AdventDay>(new Day_2019_04());
+});
+
 }  // namespace advent_of_code

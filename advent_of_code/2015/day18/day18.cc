@@ -57,4 +57,9 @@ absl::StatusOr<std::string> Day_2015_18::Part2(
   return AdventReturn(conway.CountLive());
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2015, /*day=*/18, []() {
+  return std::unique_ptr<AdventDay>(new Day_2015_18());
+});
+
 }  // namespace advent_of_code

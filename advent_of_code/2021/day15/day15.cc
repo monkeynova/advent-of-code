@@ -76,4 +76,9 @@ absl::StatusOr<std::string> Day_2021_15::Part2(
   return AdventReturn(Route(big_board).FindMinStepsAStar());
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/2021, /*day=*/15, []() {
+  return std::unique_ptr<AdventDay>(new Day_2021_15());
+});
+
 }  // namespace advent_of_code
