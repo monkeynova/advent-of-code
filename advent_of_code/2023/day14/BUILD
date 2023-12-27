@@ -4,6 +4,13 @@ cc_library(
     name = "day14",
     srcs = ["day14.cc"],
     hdrs = ["day14.h"],
+    data = [
+        "input.txt",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+    alwayslink = 1,
     deps = [
         "//advent_of_code:advent_day",
         "//advent_of_code:char_board",
@@ -13,49 +20,30 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "day14_input",
-    testonly = 1,
-    data = [
-        "day14.test",
-        "input.txt",
-    ],
-    deps = [
-        ":day14",
-    ],
-)
-
 cc_test(
     name = "day14_test",
     size = "small",
     srcs = ["day14_test.cc"],
+    data = [
+        "day14.test",
+    ],
     deps = [
-        ":day14_input",
+        ":day14",
         "//advent_of_code/infra:file_test",
     ],
 )
 
-cc_library(
-    name = "day14_benchmark_lib",
-    testonly = 1,
-    srcs = ["day14_benchmark.cc"],
-    visibility = [
-        "//visibility:public",
-    ],
-    deps = [
-        ":day14_input",
-        "//advent_of_code/infra:file_benchmark",
-        "@com_google_googletest//:gtest",
-    ],
-    alwayslink = 1,
-)
-
 cc_test(
     name = "day14_benchmark",
+    srcs = ["day14_benchmark.cc"],
     size = "small",
     tags = ["benchmark"],
+    data = [
+        "day14.test",
+    ],
     deps = [
-        ":day14_benchmark_lib",
+        ":day14",
+        "//advent_of_code/infra:file_benchmark",
         "@com_monkeynova_gunit_main//:test_main",
     ],
 )

@@ -4,6 +4,13 @@ cc_library(
     name = "day18",
     srcs = ["day18.cc"],
     hdrs = ["day18.h"],
+    data = [
+        "input.txt",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+    alwayslink = 1,
     deps = [
         "//advent_of_code:advent_day",
         "//advent_of_code:char_board",
@@ -17,49 +24,30 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "day18_input",
-    testonly = 1,
-    data = [
-        "day18.test",
-        "input.txt",
-    ],
-    deps = [
-        ":day18",
-    ],
-)
-
 cc_test(
     name = "day18_test",
     size = "small",
     srcs = ["day18_test.cc"],
+    data = [
+        "day18.test",
+    ],
     deps = [
-        ":day18_input",
+        ":day18",
         "//advent_of_code/infra:file_test",
     ],
 )
 
-cc_library(
-    name = "day18_benchmark_lib",
-    testonly = 1,
-    srcs = ["day18_benchmark.cc"],
-    visibility = [
-        "//visibility:public",
-    ],
-    deps = [
-        ":day18_input",
-        "//advent_of_code/infra:file_benchmark",
-        "@com_google_googletest//:gtest",
-    ],
-    alwayslink = 1,
-)
-
 cc_test(
     name = "day18_benchmark",
+    srcs = ["day18_benchmark.cc"],
     size = "small",
     tags = ["benchmark"],
+    data = [
+        "day18.test",
+    ],
     deps = [
-        ":day18_benchmark_lib",
+        ":day18",
+        "//advent_of_code/infra:file_benchmark",
         "@com_monkeynova_gunit_main//:test_main",
     ],
 )
