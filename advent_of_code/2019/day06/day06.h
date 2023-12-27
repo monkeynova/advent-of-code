@@ -7,6 +7,10 @@ namespace advent_of_code {
 
 class Day_2019_06 : public AdventDay {
  public:
+  virtual std::string_view title() const override {
+    return "Day 6: Universal Orbit Map";
+  }
+
   virtual std::string_view test_file() const override {
     return "advent_of_code/2019/day06/day06.test";
   }
