@@ -4,6 +4,13 @@ cc_library(
     name = "day19",
     srcs = ["day19.cc"],
     hdrs = ["day19.h"],
+    data = [
+        "input.txt",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+    alwayslink = 1,
     deps = [
         "//advent_of_code:advent_day",
         "@com_google_absl//absl/container:flat_hash_map",
@@ -14,49 +21,30 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "day19_input",
-    testonly = 1,
-    data = [
-        "day19.test",
-        "input.txt",
-    ],
-    deps = [
-        ":day19",
-    ],
-)
-
 cc_test(
     name = "day19_test",
     size = "small",
     srcs = ["day19_test.cc"],
+    data = [
+        "day19.test",
+    ],
     deps = [
-        ":day19_input",
+        ":day19",
         "//advent_of_code/infra:file_test",
     ],
 )
 
-cc_library(
-    name = "day19_benchmark_lib",
-    testonly = 1,
-    srcs = ["day19_benchmark.cc"],
-    visibility = [
-        "//visibility:public",
-    ],
-    deps = [
-        ":day19_input",
-        "//advent_of_code/infra:file_benchmark",
-        "@com_google_googletest//:gtest",
-    ],
-    alwayslink = 1,
-)
-
 cc_test(
     name = "day19_benchmark",
+    srcs = ["day19_benchmark.cc"],
     size = "small",
     tags = ["benchmark"],
+    data = [
+        "day19.test",
+    ],
     deps = [
-        ":day19_benchmark_lib",
+        ":day19",
+        "//advent_of_code/infra:file_benchmark",
         "@com_monkeynova_gunit_main//:test_main",
     ],
 )

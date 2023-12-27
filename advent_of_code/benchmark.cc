@@ -67,7 +67,7 @@ void BM_Day(benchmark::State& state) {
 }
 
 BENCHMARK(BM_Day)->ArgsProduct({
-  benchmark::CreateDenseRange(2023, 2023, /*step=*/1),
+  benchmark::CreateDenseRange(2015, 2023, /*step=*/1),
   benchmark::CreateDenseRange(1, 25, /*step=*/1)
 });
 
