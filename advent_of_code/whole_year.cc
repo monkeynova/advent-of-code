@@ -46,8 +46,12 @@ absl::StatusOr<DayRun> RunDay(advent_of_code::AdventDay* day) {
   ret.title = std::string(day->test_file());
   absl::StatusOr<Input> input = ReadInput(day);
   RETURN_IF_ERROR(input.status());
-  ASSIGN_OR_RETURN(ret.part1, day->Part1(absl::MakeSpan(input->lines)));
-  ASSIGN_OR_RETURN(ret.part2, day->Part2(absl::MakeSpan(input->lines)));
+  absl::StatusOr<std::string> part1 = day->Part1(absl::MakeSpan(input->lines));
+  if (part1.ok()) ret.part1 = *std::move(part1);
+  else ret.part1 = absl::StrCat("Error: ", part1.status().message());
+  absl::StatusOr<std::string> part2 = day->Part2(absl::MakeSpan(input->lines));
+  if (part2.ok()) ret.part2 = *std::move(part2);
+  else ret.part2 = absl::StrCat("Error: ", part2.status().message());
   ret.time = absl::Now() - start;
   return ret;
 }

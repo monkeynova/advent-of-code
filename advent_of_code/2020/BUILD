@@ -1,6 +1,5 @@
 cc_library(
     name = "2020",
-    testonly = 1,
     visibility = [
         "//visibility:public",
     ],

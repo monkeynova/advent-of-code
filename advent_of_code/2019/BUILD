@@ -37,7 +37,6 @@ cc_test(
 
 cc_library(
     name = "2019",
-    testonly = 1,
     visibility = [
         "//visibility:public",
     ],

@@ -237,7 +237,6 @@ cc_library(
 
 cc_library(
     name = "advent_of_code",
-    testonly = 1,
     visibility = [
         "//visibility:public",
     ],
@@ -256,8 +255,8 @@ cc_library(
 
 cc_binary(
     name = "whole_year",
-    testonly = 1,
     srcs = ["whole_year.cc"],
+    args = ["--ocr_mode=output"],
     deps = [
         ":advent_of_code",
         ":advent_day",
