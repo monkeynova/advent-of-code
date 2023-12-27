@@ -3,6 +3,7 @@ cc_binary(
     testonly = 1,
     srcs = ["whole_year.cc"],
     deps = [
+        ":2023",
         ":benchmark_lib",
         "//advent_of_code:advent_day",
         "//advent_of_code/infra:file_util",
@@ -22,12 +23,24 @@ cc_binary(
         "--benchmark_time_unit=us",
     ],
     deps = [
+        ":2023",
         "//advent_of_code:advent_day",
         "//advent_of_code/infra:file_util",
         "@com_monkeynova_gunit_main//:test_main",
     ],
 )
 
+cc_library(
+    name = "2023",
+    testonly = 1,
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "//advent_of_code/2023/day24",
+        "//advent_of_code/2023/day25",
+    ],
+)
 
 cc_library(
     name = "benchmark_lib",
@@ -59,7 +72,5 @@ cc_library(
         "//advent_of_code/2023/day21:day21_benchmark_lib",
         "//advent_of_code/2023/day22:day22_benchmark_lib",
         "//advent_of_code/2023/day23:day23_benchmark_lib",
-        "//advent_of_code/2023/day24:day24_benchmark_lib",
-        "//advent_of_code/2023/day25:day25_benchmark_lib",
     ],
 )
