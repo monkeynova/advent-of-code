@@ -94,6 +94,7 @@ class AdventDay {
   }
 
   virtual std::string_view test_file() const = 0;
+  virtual std::string_view title() const { return test_file(); }
 
   virtual absl::StatusOr<std::string> Part1(
       absl::Span<std::string_view> input) const = 0;

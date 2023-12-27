@@ -167,7 +167,7 @@ std::string StreamingChecksum(std::string_view input, int size) {
 absl::StatusOr<std::string> Day_2016_16::Part1(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");
-  ASSIGN_OR_RETURN(int val, IntParam());
+  ASSIGN_OR_RETURN(int val, IntParam1());
   // ExpandThenCollapse is actually more performance so we use that for
   // benchmarking etc. (2023-11-23: About 140ms vs 160ms for Part2).
   std::string ret = ExpandThenCollapse(input[0], val);
@@ -187,12 +187,30 @@ absl::StatusOr<std::string> Day_2016_16::Part1(
 
 absl::StatusOr<std::string> Day_2016_16::Part2(
     absl::Span<std::string_view> input) const {
-  return Part1(input);
+  if (input.size() != 1) return Error("Bad input size");
+  ASSIGN_OR_RETURN(int val, IntParam2());
+  // ExpandThenCollapse is actually more performance so we use that for
+  // benchmarking etc. (2023-11-23: About 140ms vs 160ms for Part2).
+  std::string ret = ExpandThenCollapse(input[0], val);
+  if (run_audit()) {
+    std::string streaming_ret = StreamingChecksum(input[0], val);
+    if (ret != streaming_ret) {
+      return Error("Streaming Checksum failed: ", ret, " != ", streaming_ret);
+    }
+    std::string streaming_ish_ret = StreamingIshChecksum(input[0], val);
+    if (ret != streaming_ish_ret) {
+      return Error("Streaming Checksum failed: ", ret,
+                   " != ", streaming_ish_ret);
+    }
+  }
+  return AdventReturn(ret);
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
     /*year=*/2016, /*day=*/16, []() {
-  return std::unique_ptr<AdventDay>(new Day_2016_16());
+  auto ret = std::unique_ptr<AdventDay>(new Day_2016_16());
+  ret->set_param("272,35651584");
+  return ret;
 });
 
 }  // namespace advent_of_code

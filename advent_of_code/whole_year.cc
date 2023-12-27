@@ -43,7 +43,7 @@ absl::StatusOr<DayRun> RunDay(advent_of_code::AdventDay* day) {
   }
   DayRun ret;
   absl::Time start = absl::Now();
-  ret.title = std::string(day->test_file());
+  ret.title = std::string(day->title());
   absl::StatusOr<Input> input = ReadInput(day);
   RETURN_IF_ERROR(input.status());
   absl::StatusOr<std::string> part1 = day->Part1(absl::MakeSpan(input->lines));

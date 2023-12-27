@@ -64,7 +64,7 @@ absl::StatusOr<std::string> Day_2022_15::Part1(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(std::vector<SAndB> list, ParseList(input));
 
-  ASSIGN_OR_RETURN(int y, IntParam());
+  ASSIGN_OR_RETURN(int y, IntParam1());
   Interval1D no_closer;
   Interval1D beacons;
   for (const auto& sandb : list) {
@@ -81,7 +81,7 @@ absl::StatusOr<std::string> Day_2022_15::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(std::vector<SAndB> list, ParseList(input));
 
-  ASSIGN_OR_RETURN(int max, IntParam());
+  ASSIGN_OR_RETURN(int max, IntParam2());
   PointRectangle test_area;
   test_area.min = {0, 0};
   test_area.max = Point{max, max};
@@ -129,7 +129,9 @@ absl::StatusOr<std::string> Day_2022_15::Part2(
 
 static AdventRegisterEntry registry = RegisterAdventDay(
     /*year=*/2022, /*day=*/15, []() {
-  return std::unique_ptr<AdventDay>(new Day_2022_15());
+  auto ret = std::unique_ptr<AdventDay>(new Day_2022_15());
+  ret->set_param("2000000,4000000");
+  return ret;
 });
 
 }  // namespace advent_of_code

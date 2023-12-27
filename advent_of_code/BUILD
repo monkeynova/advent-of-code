@@ -256,7 +256,10 @@ cc_library(
 cc_binary(
     name = "whole_year",
     srcs = ["whole_year.cc"],
-    args = ["--ocr_mode=output"],
+    args = [
+        "--ocr_mode=output",
+        "--advent_day_run_audit=false",
+    ],
     deps = [
         ":advent_of_code",
         ":advent_day",
@@ -271,6 +274,7 @@ cc_binary(
     testonly = 1,
     srcs = ["benchmark.cc"],
     args = [
+        "--advent_day_run_audit=false",
         "--benchmark",
         "--benchmark_flags=" +
         "--benchmark_min_time=0ns," +
