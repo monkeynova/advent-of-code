@@ -62,12 +62,9 @@ class SupportGraph {
   }
 
  private:
-  static const std::vector<int> kEmpty;
   std::vector<std::vector<int>> supports_;
   std::vector<std::vector<int>> supported_by_;
 };
-
-const std::vector<int> SupportGraph::kEmpty;
 
 SupportGraph Drop(std::vector<Cube>& list) {
   VLOG(1) << "Drop Start";

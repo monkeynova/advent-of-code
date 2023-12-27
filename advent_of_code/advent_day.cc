@@ -19,6 +19,31 @@ absl::flat_hash_map<std::pair<int, int>, FactoryType>& Registry() {
 
 }  // namespace
 
+absl::StatusOr<int64_t> AdventDay::IntParam() const {
+  int64_t param_val;
+  if (!absl::SimpleAtoi(param(), &param_val))
+    return Error("Not an int: ", param());
+  return param_val;
+}
+
+absl::StatusOr<int64_t> AdventDay::IntParam1() const {
+  auto [p1, p2] = PairSplit(param(), ",");
+  int64_t param;
+  if (!absl::SimpleAtoi(p1, &param)) {
+    return Error("Bad int param: ", p1);
+  }
+  return param;
+}
+
+absl::StatusOr<int64_t> AdventDay::IntParam2() const {
+  auto [p1, p2] = PairSplit(param(), ",");
+  int64_t param;
+  if (!absl::SimpleAtoi(p2.empty() ? p1 : p2, &param)) {
+    return Error("Bad int param: ", p2.empty() ? p1 : p2);
+  }
+  return param;
+}
+
 AdventRegisterEntry RegisterAdventDay(int year, int day, FactoryType factory) {
   CHECK(Registry().insert({{year, day}, factory}).second);
   return AdventRegisterEntry{};

@@ -262,11 +262,7 @@ std::optional<int64_t> HackPart2(
 absl::StatusOr<std::string> Day_2023_21::Part1(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
-  auto [p1, p2] = PairSplit(param(), ",");
-  int steps;
-  if (!absl::SimpleAtoi(p1, &steps)) {
-    return Error("Bad int param: ", p1);
-  }
+  ASSIGN_OR_RETURN(int steps, IntParam1());
   ASSIGN_OR_RETURN(Point s, b.FindUnique('S'));
   FastBoard fb(b);
   FastBoard::PointMap<int> dist(fb, std::numeric_limits<int>::max());
@@ -295,11 +291,7 @@ absl::StatusOr<std::string> Day_2023_21::Part1(
 absl::StatusOr<std::string> Day_2023_21::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
-  auto [p1, p2] = PairSplit(param(), ",");
-  int steps;
-  if (!absl::SimpleAtoi(p2.empty() ? p1 : p2, &steps)) {
-    return Error("Bad int param: ", p2.empty() ? p1 : p2);
-  }
+  ASSIGN_OR_RETURN(int steps, IntParam2());
 
   ASSIGN_OR_RETURN(Point s, b.FindUnique('S'));
   std::optional<int64_t> maybe_anser = HackPart2(b, s, steps);

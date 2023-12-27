@@ -59,15 +59,18 @@ class AdventDay {
   virtual ~AdventDay() = default;
 
   bool run_audit() const { return absl::GetFlag(FLAGS_advent_day_run_audit); }
-  std::string_view param() const { return param_; }
-  absl::StatusOr<int64_t> IntParam() const {
-    int64_t param_val;
-    if (!absl::SimpleAtoi(param(), &param_val))
-      return Error("Not an int: ", param());
-    return param_val;
-  }
 
   void set_param(std::string param) { param_ = param; }
+  std::string_view param() const { return param_; }
+
+  // Returns an integer value stored in param() or an error if parsing fails.
+  absl::StatusOr<int64_t> IntParam() const;
+  // IntParam1 and IntParam2 work by treating param() either as an integer or
+  // as a comma separated set of two integers. If there is a single integer,
+  // both functions return the same value. If there are two integers 
+  // separated by a comma IntParam1 returns the first and IntParam2 the second. 
+  absl::StatusOr<int64_t> IntParam1() const;
+  absl::StatusOr<int64_t> IntParam2() const;
 
   template <typename T>
   absl::StatusOr<std::string> AdventReturn(const absl::StatusOr<T>& t) const {
