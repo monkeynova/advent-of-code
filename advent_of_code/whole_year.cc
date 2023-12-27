@@ -152,7 +152,7 @@ int main(int argc, char** argv) {
   absl::Duration total_time = absl::Seconds(0);
   for (const auto& day : days) {
     absl::StatusOr<DayRun> run = RunDay(day.get());
-    CHECK(run.ok()) << run.status().message();
+    CHECK(run.ok()) << run.status().message() << day->test_file();
     runs.push_back(*std::move(run));
     total_time += runs.back().time;
   }
