@@ -7,6 +7,10 @@ namespace advent_of_code {
 
 class Day_2018_16 : public AdventDay {
  public:
+  virtual std::string_view title() const override {
+    return "Day 16: Chronal Classification";
+  }
+
   virtual std::string_view test_file() const override {
     return "advent_of_code/2018/day16/day16.test";
   }
