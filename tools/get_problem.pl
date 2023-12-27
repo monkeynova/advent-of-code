@@ -19,7 +19,7 @@ die "Bad year: $year" unless $year =~ /^\d+$/ && $year >= 2015;
 die "Bad day: $day" unless $day =~ /^\d+$/ && $day > 0 && $day <= 25;
 
 my $input_url = sprintf("https://adventofcode.com/%4d/day/%d", $year, $day);
-my $out_file = sprintf("advent_of_code/%4d/day%02d/README.md", $year, $day, $day);
+my $out_file = sprintf("advent_of_code/%4d/day%02d/README.md", $year, $day);
 
 print "Fetching $input_url into $out_file ...\n";
 my $cookies = HTTP::Cookies->new();
@@ -67,3 +67,5 @@ print {$ofh} $part1_md;
 print {$ofh} "\n";
 print {$ofh} $part2_md;
 close $ofh or die "Error writing to $out_file: $!";
+
+system("perl", "tools/lsc/add_title.pl", sprintf("advent_of_code/%4d/day%02d", $year, $day));
