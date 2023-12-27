@@ -92,6 +92,6 @@ void BM_WholeYear(benchmark::State& state) {
   }
 }
 
-BENCHMARK(BM_WholeYear)->DenseRange(2023, 2023);
+BENCHMARK(BM_WholeYear)->DenseRange(2015, 2023);
 
 }
