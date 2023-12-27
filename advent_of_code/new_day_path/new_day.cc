@@ -44,4 +44,9 @@ absl::StatusOr<std::string> NewDay::Part2(
   return absl::UnimplementedError("Problem not known");
 }
 
+static AdventRegisterEntry registry = RegisterAdventDay(
+    /*year=*/-1, /*day=*/-1, []() {
+  return std::unique_ptr<AdventDay>(new NewDay());
+});
+
 }  // namespace advent_of_code

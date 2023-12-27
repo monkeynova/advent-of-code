@@ -101,6 +101,13 @@ class AdventDay {
   std::string param_;
 };
 
+struct AdventRegisterEntry {};
+
+AdventRegisterEntry RegisterAdventDay(
+    int year, int day, std::function<std::unique_ptr<AdventDay>()>);
+
+std::unique_ptr<AdventDay> CreateAdventDay(int year, int day);
+
 }  // namespace advent_of_code
 
 #endif  // ADVENT_OF_CODE_ADVENT_DAY_H

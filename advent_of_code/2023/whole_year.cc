@@ -31,39 +31,53 @@
 
 namespace advent_of_code {
 
+namespace {
+
+constexpr int kValidDays = 25;
+
 absl::Span<const std::unique_ptr<AdventDay>> AllDays() {
-  static std::vector<std::unique_ptr<AdventDay>> days = []() {
-    std::vector<std::unique_ptr<AdventDay>> days;
-    days.emplace_back(new Day_2023_01());
-    days.emplace_back(new Day_2023_02());
-    days.emplace_back(new Day_2023_03());
-    days.emplace_back(new Day_2023_04());
-    days.emplace_back(new Day_2023_05());
-    days.emplace_back(new Day_2023_06());
-    days.emplace_back(new Day_2023_07());
-    days.emplace_back(new Day_2023_08());
-    days.emplace_back(new Day_2023_09());
-    days.emplace_back(new Day_2023_10());
-    days.emplace_back(new Day_2023_11());
-    days.back()->set_param("1000000");
-    days.emplace_back(new Day_2023_12());
-    days.emplace_back(new Day_2023_13());
-    days.emplace_back(new Day_2023_14());
-    days.emplace_back(new Day_2023_15());
-    days.emplace_back(new Day_2023_16());
-    days.emplace_back(new Day_2023_17());
-    days.emplace_back(new Day_2023_18());
-    days.emplace_back(new Day_2023_19());
-    days.emplace_back(new Day_2023_20());
-    days.emplace_back(new Day_2023_21());
-    days.back()->set_param("64,26501365");
-    days.emplace_back(new Day_2023_22());
-    days.emplace_back(new Day_2023_23());
-    days.emplace_back(new Day_2023_24());
-    days.back()->set_param("200000000000000,400000000000000");
-    days.emplace_back(new Day_2023_25());
-    return days;
-  }();
+  static std::vector<std::unique_ptr<AdventDay>> days;
+  static bool initialized = false;
+  if (!initialized) {
+    initialized = true;
+    days = []() {
+      LOG(INFO) << "Creating AllDays";
+      std::vector<std::unique_ptr<AdventDay>> days;
+      for (int day = 1; day <= kValidDays; ++day) {
+        days.emplace_back(CreateAdventDay(2023, day));
+      }
+
+      days.emplace_back(new Day_2023_01());
+      days.emplace_back(new Day_2023_02());
+      days.emplace_back(new Day_2023_03());
+      days.emplace_back(new Day_2023_04());
+      days.emplace_back(new Day_2023_05());
+      days.emplace_back(new Day_2023_06());
+      days.emplace_back(new Day_2023_07());
+      days.emplace_back(new Day_2023_08());
+      days.emplace_back(new Day_2023_09());
+      days.emplace_back(new Day_2023_10());
+      days.emplace_back(new Day_2023_11());
+      days.back()->set_param("1000000");
+      days.emplace_back(new Day_2023_12());
+      days.emplace_back(new Day_2023_13());
+      days.emplace_back(new Day_2023_14());
+      days.emplace_back(new Day_2023_15());
+      days.emplace_back(new Day_2023_16());
+      days.emplace_back(new Day_2023_17());
+      days.emplace_back(new Day_2023_18());
+      days.emplace_back(new Day_2023_19());
+      days.emplace_back(new Day_2023_20());
+      days.emplace_back(new Day_2023_21());
+      days.back()->set_param("64,26501365");
+      days.emplace_back(new Day_2023_22());
+      days.emplace_back(new Day_2023_23());
+      days.emplace_back(new Day_2023_24());
+      days.back()->set_param("200000000000000,400000000000000");
+      days.emplace_back(CreateAdventDay(2023, 25));
+      return days;
+    }();
+  }
   return days;
 }
 
@@ -84,6 +98,8 @@ absl::StatusOr<Input> ReadInput(AdventDay* day) {
   }
   return ret;  
 }
+
+}  // namespace
 
 static void BM_WholeYear_2023(benchmark::State& state) {
   int bytes_processed = 0;
@@ -106,7 +122,7 @@ static void BM_WholeYear_2023(benchmark::State& state) {
   state.SetBytesProcessed(bytes_processed);
 }
 
-BENCHMARK(BM_WholeYear_2023)->DenseRange(1, AllDays().size());
+BENCHMARK(BM_WholeYear_2023)->DenseRange(1, kValidDays);
 
 static void BM_WholeYear_ParseOnly(benchmark::State& state) {
   int bytes_processed = 0;
