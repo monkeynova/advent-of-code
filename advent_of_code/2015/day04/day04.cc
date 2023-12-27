@@ -16,7 +16,7 @@ absl::StatusOr<std::string> Day_2015_04::Part1(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
   for (int i = 0;; ++i) {
-    VLOG(1) << i;
+    VLOG(2) << i;
     MD5 md5;
     std::string str = absl::StrCat(input[0], i);
     if (VLOG_IS_ON(2)) {
@@ -35,7 +35,7 @@ absl::StatusOr<std::string> Day_2015_04::Part2(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return absl::InvalidArgumentError("Bad input");
   for (int i = 0;; ++i) {
-    VLOG(1) << i;
+    VLOG(2) << i;
     MD5 md5;
     std::string str = absl::StrCat(input[0], i);
     if (VLOG_IS_ON(2)) {
