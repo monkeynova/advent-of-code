@@ -173,25 +173,3 @@ int main(int argc, char** argv) {
 
   std::cout << table.Render();
 }
-
-void BM_WholeYear_Day(benchmark::State& state) {
-  std::unique_ptr<advent_of_code::AdventDay> day =
-      advent_of_code::CreateAdventDay(state.range(0), state.range(1));
-  if (day == nullptr) {
-    state.SkipWithError("No advent day");
-    return;
-  }
-  for (auto _ : state) {
-    absl::StatusOr<DayRun> run = RunDay(day.get());
-    if (!run.ok()) {
-      state.SkipWithError(std::string(run.status().message()));
-      return;
-    }
-  }
-}
-
-BENCHMARK(BM_WholeYear_Day)->ArgsProduct({
-  benchmark::CreateDenseRange(2023, 2023, /*step=*/1),
-  benchmark::CreateDenseRange(1, 25, /*step=*/1)
-});
-
