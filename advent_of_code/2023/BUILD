@@ -20,16 +20,17 @@ cc_binary(
     name = "whole_year_bin",
     testonly = 1,
     srcs = ["whole_year.cc"],
-    args = [
-        "--benchmark",
-        "--benchmark_flags=" +
-        "--benchmark_min_time=0ns," +
-        "--benchmark_filter=WholeYear," +
-        "--benchmark_time_unit=us",
-    ],
+    #args = [
+    #    "--benchmark",
+    #    "--benchmark_flags=" +
+    #    "--benchmark_min_time=0ns," +
+    #    "--benchmark_filter=WholeYear," +
+    #    "--benchmark_time_unit=us",
+    #],
     deps = [
         ":benchmark_lib",
-        "@com_monkeynova_gunit_main//:test_main",
+        "@com_google_absl//absl/flags:flag",
+        "@com_monkeynova_gunit_main//:main_lib",
     ],
 )
 

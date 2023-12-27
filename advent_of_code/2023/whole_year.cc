@@ -1,45 +1,28 @@
+#include "absl/flags/flag.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/advent_day.h"
 #include "advent_of_code/infra/file_util.h"
 #include "advent_of_code/vlog.h"
 #include "benchmark/benchmark.h"
+#include "main_lib.h"
 
-namespace advent_of_code {
+ABSL_FLAG(int, year, 2023, "Year to run");
 
 namespace {
-
-constexpr int kValidDays = 25;
-
-absl::Span<const std::unique_ptr<AdventDay>> AllDays() {
-  static std::vector<std::unique_ptr<AdventDay>> days;
-  static bool initialized = false;
-  if (!initialized) {
-    initialized = true;
-    days = []() {
-      LOG(INFO) << "Creating AllDays";
-      std::vector<std::unique_ptr<AdventDay>> days;
-      for (int day = 1; day <= kValidDays; ++day) {
-        days.emplace_back(CreateAdventDay(2023, day));
-      }
-      return days;
-    }();
-  }
-  return days;
-}
 
 struct Input {
   std::string file;
   std::vector<std::string_view> lines;
 };
 
-absl::StatusOr<Input> ReadInput(AdventDay* day) {
+absl::StatusOr<Input> ReadInput(advent_of_code::AdventDay* day) {
   if (day == nullptr) return absl::InvalidArgumentError("null day");
   Input ret;
   std::string filename(day->test_file());
   filename.erase(filename.rfind('/'));
   filename.append("/input.txt");
-  ASSIGN_OR_RETURN(ret.file, GetContents(filename));
+  ASSIGN_OR_RETURN(ret.file, advent_of_code::GetContents(filename));
   ret.lines = absl::StrSplit(ret.file, '\n');
   while (!ret.lines.empty() && ret.lines.back().empty()) {
     ret.lines.pop_back();
@@ -47,69 +30,168 @@ absl::StatusOr<Input> ReadInput(AdventDay* day) {
   return ret;  
 }
 
-}  // namespace
+struct DayRun {
+  absl::Duration time;
+  std::string title;
+  std::string part1;
+  std::string part2;
+};
 
-static void BM_WholeYear_2023(benchmark::State& state) {
-  int bytes_processed = 0;
+absl::StatusOr<DayRun> RunDay(advent_of_code::AdventDay* day) {
+  if (day == nullptr) {
+    return DayRun{.time = absl::Seconds(0), .title = "???", .part1 = "", .part2 = ""};
+  }
+  DayRun ret;
+  absl::Time start = absl::Now();
+  ret.title = std::string(day->test_file());
+  absl::StatusOr<Input> input = ReadInput(day);
+  RETURN_IF_ERROR(input.status());
+  ASSIGN_OR_RETURN(ret.part1, day->Part1(absl::MakeSpan(input->lines)));
+  ASSIGN_OR_RETURN(ret.part2, day->Part2(absl::MakeSpan(input->lines)));
+  ret.time = absl::Now() - start;
+  return ret;
+}
+
+class Table {
+ public: 
+  Table() = default;
+
+  void JustifyRight(int col) {
+    if (just_right_.size() <= col) {
+      just_right_.resize(col + 1, false);
+    }
+    just_right_[col] = true;
+  }
+
+  void AddTitle(std::string title) {
+    rows_.emplace_back(title);
+  }
+
+  void AddBreaker() {
+    rows_.emplace_back(Breaker());
+  }
+
+  void AddRow(std::vector<std::string> row) {
+    if (row.size() > col_widths_.size()) {
+      col_widths_.resize(row.size(), 0);
+      just_right_.resize(row.size(), false);
+    }
+    for (int i = 0; i < row.size(); ++i) {
+      col_widths_[i] = std::max<int>(col_widths_[i], row[i].size());
+    }
+    rows_.emplace_back(std::move(row));
+  }
+
+  std::string Render() {
+    std::string ret;
+
+    std::string breaker = "+";
+    for (int i = 0; i < col_widths_.size(); ++i) {
+      breaker.append(col_widths_[i] + 2, '-');
+      breaker.append(1, '+');
+    }
+    for (const auto& row : rows_) {
+      if (std::holds_alternative<Breaker>(row)) {
+        absl::StrAppend(&ret, breaker, "\n");
+      } else if (std::holds_alternative<std::string>(row)) {
+        std::string title = std::get<std::string>(row);
+        ret.append(1, '|');
+        int total_width = col_widths_.size() - 1;
+        for (int i = 0; i < col_widths_.size(); ++i) {
+          total_width += col_widths_[i] + 2;
+        }
+        int left = (total_width - title.size()) / 2;
+        int right = total_width - title.size() - left;
+        ret.append(left, ' ');
+        ret.append(title);
+        ret.append(right, ' ');
+        ret.append("|\n");
+      } else if (std::holds_alternative<std::vector<std::string>>(row)) {
+        ret.append(1, '|');
+        const std::vector<std::string>& cols = std::get<std::vector<std::string>>(row);
+        for (int i = 0; i < col_widths_.size(); ++i) {
+          ret.append(1, ' ');
+          if (cols.size() <= i) {
+            ret.append(col_widths_[i], ' ');
+          } else {
+            if (just_right_[i]) {
+              ret.append(col_widths_[i] - cols[i].size(), ' ');
+              ret.append(cols[i]);
+            } else {
+              ret.append(cols[i]);
+              ret.append(col_widths_[i] - cols[i].size(), ' ');
+            }
+          }
+          ret.append(" |");
+        }
+        ret.append("\n");
+      }
+    }
+
+    return ret;
+  }
+
+ private:
+  struct Breaker {};
+  using Row = std::variant<std::string, Breaker, std::vector<std::string>>;
+  std::vector<Row> rows_;
+  std::vector<int> col_widths_;
+  std::vector<bool> just_right_;
+};
+
+}
+
+int main(int argc, char** argv) {
+  InitMain(argc, argv);
+  int year = absl::GetFlag(FLAGS_year);
+  std::vector<std::unique_ptr<advent_of_code::AdventDay>> days;
+  for (int day = 1; day <= 25; ++day) {
+    days.push_back(advent_of_code::CreateAdventDay(year, day));
+  }
+  std::vector<DayRun> runs;
+  absl::Duration total_time = absl::Seconds(0);
+  for (const auto& day : days) {
+    absl::StatusOr<DayRun> run = RunDay(day.get());
+    CHECK(run.ok()) << run.status().message();
+    runs.push_back(*std::move(run));
+    total_time += runs.back().time;
+  }
+
+  Table table;
+  table.AddBreaker();
+  table.AddTitle(absl::StrCat("Advent of Code ", year));
+  table.AddBreaker();
+  table.AddRow({"Title", "Part 1", "Part 2", "Time"});
+  table.JustifyRight(3);
+  table.AddBreaker();
+  for (const DayRun& run : runs) {
+    table.AddRow({run.title, run.part1, run.part2, absl::StrCat(run.time)});
+  }
+  table.AddBreaker();
+  table.AddRow({"Total", "", "", absl::StrCat(total_time)});
+  table.AddBreaker();
+
+  std::cout << table.Render();
+}
+
+void BM_WholeYear_Day(benchmark::State& state) {
+  std::unique_ptr<advent_of_code::AdventDay> day =
+      advent_of_code::CreateAdventDay(state.range(0), state.range(1));
+  if (day == nullptr) {
+    state.SkipWithError("No advent day");
+    return;
+  }
   for (auto _ : state) {
-    AdventDay* day = AllDays()[state.range(0) - 1].get();
-    absl::StatusOr<Input> input = ReadInput(day);
-    CHECK(input.ok()) << input.status().message();
-    bytes_processed += input->file.size();
-    absl::Span<std::string_view> in_span(input->lines);
-    absl::StatusOr<std::string> ret;
-    if (ret = day->Part1(in_span); !ret.ok()) {
-      state.SkipWithError(ret.status().message().data());
+    absl::StatusOr<DayRun> run = RunDay(day.get());
+    if (!run.ok()) {
+      state.SkipWithError(std::string(run.status().message()));
       return;
     }
-    if (ret = day->Part2(in_span); !ret.ok()) {
-      state.SkipWithError(ret.status().message().data());
-      return;
-    }
   }
-  state.SetBytesProcessed(bytes_processed);
 }
 
-BENCHMARK(BM_WholeYear_2023)->DenseRange(1, kValidDays);
+BENCHMARK(BM_WholeYear_Day)->ArgsProduct({
+  benchmark::CreateDenseRange(2023, 2023, /*step=*/1),
+  benchmark::CreateDenseRange(1, 25, /*step=*/1)
+});
 
-static void BM_WholeYear_ParseOnly(benchmark::State& state) {
-  int bytes_processed = 0;
-  for (auto _ : state) {
-    for (const std::unique_ptr<AdventDay>& day : AllDays()) {
-      absl::StatusOr<Input> input = ReadInput(day.get());
-      CHECK(input.ok());
-      bytes_processed += input->file.size();
-      absl::Span<std::string_view> in_span(input->lines);
-      benchmark::DoNotOptimize(in_span);
-    }
-  }
-  state.SetBytesProcessed(bytes_processed);
-}
-
-BENCHMARK(BM_WholeYear_ParseOnly);
-
-static void BM_WholeYear(benchmark::State& state) {
-  int bytes_processed = 0;
-  for (auto _ : state) {
-    for (const std::unique_ptr<AdventDay>& day : AllDays()) {
-      absl::StatusOr<Input> input = ReadInput(day.get());
-      CHECK(input.ok());
-      bytes_processed += input->file.size();
-      absl::Span<std::string_view> in_span(input->lines);
-      absl::StatusOr<std::string> ret;
-      if (ret = day->Part1(in_span); !ret.ok()) {
-        state.SkipWithError(ret.status().message().data());
-        return;
-      }
-      if (ret = day->Part2(in_span); !ret.ok()) {
-        state.SkipWithError(ret.status().message().data());
-        return;
-      }
-    }
-  }
-  state.SetBytesProcessed(bytes_processed);
-}
-
-BENCHMARK(BM_WholeYear);
-
-}  // namespace advent_of_code

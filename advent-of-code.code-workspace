@@ -96,7 +96,9 @@
             "vector": "cpp",
             "hash_map": "cpp",
             "hash_set": "cpp",
-            "filesystem": "cpp"
+            "filesystem": "cpp",
+            "__verbose_abort": "cpp",
+            "charconv": "cpp"
         }
     }
 }
