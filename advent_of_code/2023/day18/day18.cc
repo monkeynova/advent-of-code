@@ -7,7 +7,6 @@
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
 #include "absl/log/log.h"
-#include "advent_of_code/char_board.h"
 #include "advent_of_code/point.h"
 #include "advent_of_code/tokenizer.h"
 

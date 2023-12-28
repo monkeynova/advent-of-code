@@ -13,7 +13,6 @@ cc_library(
     alwayslink = 1,
     deps = [
         "//advent_of_code:advent_day",
-        "//advent_of_code:char_board",
         "//advent_of_code:point",
         "//advent_of_code:tokenizer",
         "@com_google_absl//absl/algorithm:container",
