@@ -123,7 +123,7 @@ absl::StatusOr<std::string> Day_2023_25::Part1(
   }
 
   absl::flat_hash_map<std::pair<int, int>, int> edge_to_span_count;
-  for (int i = 0; i < graph.size(); ++i) {
+  for (int i = 0; i < graph.size(); i += 100) {
     std::vector<std::pair<int, int>> tree = SpanningTree(graph, i);
     for (const auto& pair : tree) {
       ++edge_to_span_count[pair];
