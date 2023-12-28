@@ -10,11 +10,7 @@
 ==
 
 [part=2]
+[flag=ocr_mode=output]
 @include{advent_of_code/2019/day08/input.txt}
 --
- XX    XX X   XXXXX  XX  
-X  X    X X   XX    X  X 
-X       X  X X XXX  X  X 
-X XX    X   X  X    XXXX 
-X  X X  X   X  X    X  X 
- XXX  XX    X  XXXX X  X 
+GJYEA

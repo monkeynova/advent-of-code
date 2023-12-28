@@ -5,6 +5,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_join.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/ocr.h"
 
 namespace advent_of_code {
 
@@ -62,23 +63,29 @@ absl::StatusOr<std::string> Day_2019_08::Part2(
   if (layer_count <= 0) {
     return absl::InvalidArgumentError("Image is empty");
   }
-  std::string render;
-  render.resize(kLayerSize);
-  for (int i = 0; i < kLayerSize; ++i) render[i] = '?';
+  CharBoard render(kWidth, kHeight);
+  for (int i = 0; i < kLayerSize; ++i) render[{i % kWidth, i / kWidth}] = '?';
   for (int i = 0; i < layer_count; ++i) {
     const char* layer = input[0].data() + i * kLayerSize;
     for (int j = 0; j < kLayerSize; ++j) {
-      if (render[j] == '?' && layer[j] != '2') {
-        render[j] = layer[j] == '0' ? ' ' : 'X';
+      Point p = {j % kWidth, j / kWidth};
+      if (render[p] == '?' && layer[j] != '2') {
+        render[p] = layer[j] == '0' ? '.' : '#';
       }
     }
   }
-  std::vector<std::string> ret;
-  for (int i = 0; i < kHeight; ++i) {
-    ret.push_back(std::string(render.substr(i * kWidth, kWidth)));
+  
+  // TODO(@monkeynova): OCRExtract requires empty columns to break characters,
+  // and we have a slight touch between the 'Y' and 'E' in the expected output.
+  std::string ret;
+  for (int i = 0; i < 25; i += 5) {
+    ASSIGN_OR_RETURN(CharBoard single_char,
+                     render.SubBoard({{i, 0}, {i + 4, kHeight - 1}}));
+    ASSIGN_OR_RETURN(std::string next_char, OCRExtract(single_char));
+    ret += next_char;
   }
 
-  return absl::StrJoin(ret, "\n");
+  return AdventReturn(ret);
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(

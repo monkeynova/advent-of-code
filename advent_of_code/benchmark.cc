@@ -10,22 +10,27 @@
 namespace {
 
 struct Input {
+  Input() = default;
+
+  // Neigher copyable nor movable. `lines` refers into `file`.
+  Input(const Input&) = delete;
+  Input(Input&&) = delete;
+
   std::string file;
   std::vector<std::string_view> lines;
 };
 
-absl::StatusOr<Input> ReadInput(advent_of_code::AdventDay* day) {
+absl::Status ReadInput(advent_of_code::AdventDay* day, Input* ret) {
   if (day == nullptr) return absl::InvalidArgumentError("null day");
-  Input ret;
   std::string filename(day->test_file());
   filename.erase(filename.rfind('/'));
   filename.append("/input.txt");
-  ASSIGN_OR_RETURN(ret.file, advent_of_code::GetContents(filename));
-  ret.lines = absl::StrSplit(ret.file, '\n');
-  while (!ret.lines.empty() && ret.lines.back().empty()) {
-    ret.lines.pop_back();
+  ASSIGN_OR_RETURN(ret->file, advent_of_code::GetContents(filename));
+  ret->lines = absl::StrSplit(ret->file, '\n');
+  while (!ret->lines.empty() && ret->lines.back().empty()) {
+    ret->lines.pop_back();
   }
-  return ret;  
+  return absl::OkStatus();  
 }
 
 struct DayRun {
@@ -37,15 +42,19 @@ struct DayRun {
 
 absl::StatusOr<DayRun> RunDay(advent_of_code::AdventDay* day) {
   if (day == nullptr) {
-    return DayRun{.time = absl::Seconds(0), .title = "???", .part1 = "", .part2 = ""};
+    return absl::NotFoundError("Null day");
   }
   DayRun ret;
   absl::Time start = absl::Now();
-  ret.title = std::string(day->test_file());
-  absl::StatusOr<Input> input = ReadInput(day);
-  RETURN_IF_ERROR(input.status());
-  ASSIGN_OR_RETURN(ret.part1, day->Part1(absl::MakeSpan(input->lines)));
-  ASSIGN_OR_RETURN(ret.part2, day->Part2(absl::MakeSpan(input->lines)));
+  ret.title = std::string(day->title());
+  Input input;
+  RETURN_IF_ERROR(ReadInput(day, &input));
+  absl::StatusOr<std::string> part1 = day->Part1(absl::MakeSpan(input.lines));
+  if (part1.ok()) ret.part1 = *std::move(part1);
+  else ret.part1 = absl::StrCat("Error: ", part1.status().message());
+  absl::StatusOr<std::string> part2 = day->Part2(absl::MakeSpan(input.lines));
+  if (part2.ok()) ret.part2 = *std::move(part2);
+  else ret.part2 = absl::StrCat("Error: ", part2.status().message());
   ret.time = absl::Now() - start;
   return ret;
 }

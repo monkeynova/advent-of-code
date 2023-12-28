@@ -13,6 +13,7 @@ cc_library(
     alwayslink = 1,
     deps = [
         "//advent_of_code:advent_day",
+        "//advent_of_code:ocr",
         "@com_google_absl//absl/log",
         "@com_google_absl//absl/strings",
     ],
