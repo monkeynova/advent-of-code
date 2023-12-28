@@ -252,39 +252,3 @@ cc_library(
         "//advent_of_code/2023",
     ],
 )
-
-cc_binary(
-    name = "whole_year",
-    srcs = ["whole_year.cc"],
-    args = [
-        "--ocr_mode=output",
-        "--advent_day_run_audit=false",
-    ],
-    deps = [
-        ":advent_of_code",
-        ":advent_day",
-        "//advent_of_code/infra:file_util",
-        "@com_google_absl//absl/flags:flag",
-        "@com_monkeynova_gunit_main//:main_lib",
-    ],
-)
-
-cc_binary(
-    name = "benchmark",
-    testonly = 1,
-    srcs = ["benchmark.cc"],
-    args = [
-        "--advent_day_run_audit=false",
-        "--benchmark",
-        "--benchmark_flags=" +
-        "--benchmark_min_time=0ns," +
-        "--benchmark_time_unit=us",
-    ],
-    deps = [
-        ":advent_of_code",
-        ":advent_day",
-        "//advent_of_code/infra:file_util",
-        "@com_monkeynova_gunit_main//:test_main",
-    ],
-)
-
