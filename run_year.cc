@@ -8,9 +8,77 @@
 #include "benchmark/benchmark.h"
 #include "main_lib.h"
 
+enum ColorType {
+  kAuto = 0,
+  kNone = 1,
+  kForce = 2,
+};
+
 ABSL_FLAG(int, year, 2023, "Year to run");
+ABSL_FLAG(ColorType, color, ColorType::kAuto, "Color mode");
+
+bool AbslParseFlag(absl::string_view text, ColorType* c, std::string* error) {
+  if (text == "auto") {
+    *c = kAuto;
+    return true;
+  }
+  if (text == "none") {
+    *c = kNone;
+    return true;
+  }
+  if (text == "force") {
+    *c = kForce;
+    return true;
+  }
+  *error = "Color mode must be one of 'auto', 'none', or 'force'";
+  return false;
+}
+
+std::string AbslUnparseFlag(ColorType c) {
+  switch (c) {
+    case kAuto: return "auto";
+    case kNone: return "none";
+    case kForce: return "force";
+  }
+  return "<Bad ColorType>";
+}
 
 namespace {
+
+bool IsColorTerminal() {
+  // This list of supported TERM values is copied from Google Test:
+  // <https://github.com/google/googletest/blob/v1.13.0/googletest/src/gtest.cc#L3225-L3259>.
+  const char* const SUPPORTED_TERM_VALUES[] = {
+      "xterm",
+      "xterm-color",
+      "xterm-256color",
+      "screen",
+      "screen-256color",
+      "tmux",
+      "tmux-256color",
+      "rxvt-unicode",
+      "rxvt-unicode-256color",
+      "linux",
+      "cygwin",
+      "xterm-kitty",
+      "alacritty",
+      "foot",
+      "foot-extra",
+      "wezterm",
+  };
+
+  const char* const term = getenv("TERM");
+
+  bool term_supports_color = false;
+  for (const char* candidate : SUPPORTED_TERM_VALUES) {
+    if (term && 0 == strcmp(term, candidate)) {
+      term_supports_color = true;
+      break;
+    }
+  }
+
+  return 0 != isatty(fileno(stdout)) && term_supports_color;
+}
 
 struct Input {
   Input() = default;
@@ -78,7 +146,13 @@ class Table {
     int span = 1;
   };
 
-  Table() = default;
+  Table() {
+    switch (absl::GetFlag(FLAGS_color)) {
+      case kNone: use_color_ = false; break;
+      case kForce: use_color_ = true; break;
+      case kAuto: use_color_ = IsColorTerminal(); break;
+    }
+  }
 
   void AddBreaker() {
     rows_.emplace_back(Breaker());
@@ -88,30 +162,100 @@ class Table {
     rows_.emplace_back(std::move(row));
   }
 
-  std::string Render() {
-    std::string ret;
-    
-    std::vector<int> col_widths = Layout();
+  std::string Render() const;
 
-    std::string breaker = "+";
-    for (int i = 0; i < col_widths.size(); ++i) {
-      breaker.append(col_widths[i] + 2, '-');
-      breaker.append(1, '+');
+ private:
+   std::vector<int> Layout() const;
+
+  struct Breaker {};
+  using Row = std::variant<Breaker, std::vector<Cell>>;
+  bool use_color_ = false;
+  std::vector<Row> rows_;
+};
+
+std::vector<int> Table::Layout() const {
+  absl::flat_hash_set<int> spans;
+  int max_span = 0;
+  for (const Row& row : rows_) {
+    if (!std::holds_alternative<std::vector<Cell>>(row)) {
+      continue;
     }
-    for (const auto& row : rows_) {
-      if (std::holds_alternative<Breaker>(row)) {
-        absl::StrAppend(&ret, breaker, "\n");
-      } else if (std::holds_alternative<std::vector<Cell>>(row)) {
-        ret.append(1, '|');
-        const std::vector<Cell>& cells = std::get<std::vector<Cell>>(row);
-        int col_idx = 0;
-        for (const Cell& cell : cells) {
-          int width = 0;
+    const auto& cells = std::get<std::vector<Cell>>(row);
+    int row_span = 0;
+    for (const Cell& cell : cells) {
+      spans.insert(cell.span);
+      row_span += cell.span;
+    }
+    max_span = std::max(max_span, row_span);
+  }
+  std::vector<int> col_widths(max_span, 0);
+  std::vector<int> spans_vec(spans.begin(), spans.end());
+  absl::c_sort(spans_vec);
+  for (int cur_span : spans_vec) {
+    for (const Row& row : rows_) {
+      if (!std::holds_alternative<std::vector<Cell>>(row)) {
+        continue;
+      }
+      const auto& cells = std::get<std::vector<Cell>>(row);
+      int col_idx = 0;
+      for (const Cell& cell : cells) {
+        if (cell.span == cur_span) {
+          int need = cell.entry.size();
+          int have = 0;
           for (int i = col_idx; i < col_idx + cell.span; ++i) {
-            if (i > col_idx) width += 3; // Margin.
-            width += col_widths[i];
+            if (i != col_idx) have += 3;  // Margin.
+            have += col_widths[i];
           }
-          ret.append(1, ' ');
+          if (need > have) {
+            // TODO(@monkeynova): This takes a budget and adds it to each
+            // column evenly. When we have different lengthts to start with
+            // we should prefer evening those lenghts out first.
+            int delta = need - have;
+            int add_per_col = delta / cell.span;
+            int change_at = col_idx + cell.span;
+            if (delta % cell.span != 0) {
+              change_at = col_idx + delta % cell.span;
+              ++add_per_col;
+            }
+            for (int i = col_idx; i < col_idx + cell.span; ++i) {
+              col_widths[i] += add_per_col;
+              if (i == change_at) {
+                --add_per_col;
+              }
+            }
+          }
+        }
+        col_idx += cell.span;
+      }
+    }
+  }
+  return col_widths;
+}
+
+std::string Table::Render() const {
+  std::string ret;
+  
+  std::vector<int> col_widths = Layout();
+  std::string breaker = "+";
+  for (int i = 0; i < col_widths.size(); ++i) {
+    breaker.append(col_widths[i] + 2, '-');
+    breaker.append(1, '+');
+  }
+  for (const auto& row : rows_) {
+    if (std::holds_alternative<Breaker>(row)) {
+      absl::StrAppend(&ret, breaker, "\n");
+    } else if (std::holds_alternative<std::vector<Cell>>(row)) {
+      ret.append(1, '|');
+      const std::vector<Cell>& cells = std::get<std::vector<Cell>>(row);
+      int col_idx = 0;
+      for (const Cell& cell : cells) {
+        int width = 0;
+        for (int i = col_idx; i < col_idx + cell.span; ++i) {
+          if (i > col_idx) width += 3; // Margin.
+          width += col_widths[i];
+        }
+        ret.append(1, ' ');
+        if (use_color_) {
           if (cell.bold) {
             ret.append("\u001b[1m");
           }
@@ -121,105 +265,38 @@ class Table {
             case Cell::kGreen: ret.append("\u001b[32m"); break;
             case Cell::kYellow: ; ret.append("\u001b[33m"); break;
           }
-          switch (cell.justify) {
-            case Cell::kRight: {
-              ret.append(width - cell.entry.size(), ' ');
-              ret.append(cell.entry);
-              break;
-            }
-            case Cell::kLeft: {
-              ret.append(cell.entry);
-              ret.append(width - cell.entry.size(), ' ');
-              break;
-            }
-            case Cell::kCenter: {
-              int left = (width - cell.entry.size()) / 2;
-              int right = width - cell.entry.size() - left;
-              ret.append(left, ' ');
-              ret.append(cell.entry);
-              ret.append(right, ' ');
-              break;
-            }
-          }
-          if (cell.color != Cell::kWhite || cell.bold) {
-            ret.append("\u001b[0m");
-          }
-          ret.append(" |");
-          col_idx += cell.span;
         }
-        ret.append("\n");
+        switch (cell.justify) {
+          case Cell::kRight: {
+            ret.append(width - cell.entry.size(), ' ');
+            ret.append(cell.entry);
+            break;
+          }
+          case Cell::kLeft: {
+            ret.append(cell.entry);
+            ret.append(width - cell.entry.size(), ' ');
+            break;
+          }
+          case Cell::kCenter: {
+            int left = (width - cell.entry.size()) / 2;
+            int right = width - cell.entry.size() - left;
+            ret.append(left, ' ');
+            ret.append(cell.entry);
+            ret.append(right, ' ');
+            break;
+          }
+        }
+        if (use_color_ && (cell.color != Cell::kWhite || cell.bold)) {
+          ret.append("\u001b[0m");
+        }
+        ret.append(" |");
+        col_idx += cell.span;
       }
+      ret.append("\n");
     }
-
-    return ret;
   }
-
- private:
-  std::vector<int> Layout() const {
-    absl::flat_hash_set<int> spans;
-    int max_span = 0;
-    for (const Row& row : rows_) {
-      if (!std::holds_alternative<std::vector<Cell>>(row)) {
-        continue;
-      }
-      const auto& cells = std::get<std::vector<Cell>>(row);
-      int row_span = 0;
-      for (const Cell& cell : cells) {
-        spans.insert(cell.span);
-        row_span += cell.span;
-      }
-      max_span = std::max(max_span, row_span);
-    }
-
-    std::vector<int> col_widths(max_span, 0);
-    std::vector<int> spans_vec(spans.begin(), spans.end());
-    absl::c_sort(spans_vec);
-
-    for (int cur_span : spans_vec) {
-      for (const Row& row : rows_) {
-        if (!std::holds_alternative<std::vector<Cell>>(row)) {
-          continue;
-        }
-        const auto& cells = std::get<std::vector<Cell>>(row);
-        int col_idx = 0;
-        for (const Cell& cell : cells) {
-          if (cell.span == cur_span) {
-            int need = cell.entry.size();
-            int have = 0;
-            for (int i = col_idx; i < col_idx + cell.span; ++i) {
-              if (i != col_idx) have += 3;  // Margin.
-              have += col_widths[i];
-            }
-            if (need > have) {
-              // TODO(@monkeynova): This takes a budget and adds it to each
-              // column evenly. When we have different lengthts to start with
-              // we should prefer evening those lenghts out first.
-              int delta = need - have;
-              int add_per_col = delta / cell.span;
-              int change_at = col_idx + cell.span;
-              if (delta % cell.span != 0) {
-                change_at = col_idx + delta % cell.span;
-                ++add_per_col;
-              }
-              for (int i = col_idx; i < col_idx + cell.span; ++i) {
-                col_widths[i] += add_per_col;
-                if (i == change_at) {
-                  --add_per_col;
-                }
-              }
-            }
-          }
-          col_idx += cell.span;
-        }
-      }
-    }
-    return col_widths;
-  }
-
-  struct Breaker {};
-  using Row = std::variant<Breaker, std::vector<Cell>>;
-  std::vector<Row> rows_;
-};
+  return ret;
+}
 
 }
 
