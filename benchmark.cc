@@ -38,6 +38,7 @@ struct DayRun {
   std::string title;
   std::string part1;
   std::string part2;
+  int bytes_processed;
 };
 
 absl::StatusOr<DayRun> RunDay(advent_of_code::AdventDay* day) {
@@ -49,6 +50,7 @@ absl::StatusOr<DayRun> RunDay(advent_of_code::AdventDay* day) {
   ret.title = std::string(day->title());
   Input input;
   RETURN_IF_ERROR(ReadInput(day, &input));
+  ret.bytes_processed = input.file.size();
   absl::StatusOr<std::string> part1 = day->Part1(absl::MakeSpan(input.lines));
   if (part1.ok()) ret.part1 = *std::move(part1);
   else ret.part1 = absl::StrCat("Error: ", part1.status().message());
@@ -66,13 +68,16 @@ void BM_Day(benchmark::State& state) {
     state.SkipWithError("No advent day");
     return;
   }
+  int64_t bytes_processed = 0;
   for (auto _ : state) {
     absl::StatusOr<DayRun> run = RunDay(day.get());
     if (!run.ok()) {
       state.SkipWithError(std::string(run.status().message()));
       return;
     }
+    bytes_processed += run->bytes_processed;
   }
+  state.SetBytesProcessed(bytes_processed);
 }
 
 BENCHMARK(BM_Day)->ArgsProduct({
@@ -90,6 +95,7 @@ void BM_WholeYear(benchmark::State& state) {
     state.SkipWithError("No advent day");
     return;
   }
+  int64_t bytes_processed = 0;
   for (auto _ : state) {
     for (const auto& day: days) {
       absl::StatusOr<DayRun> run = RunDay(day.get());
@@ -97,8 +103,10 @@ void BM_WholeYear(benchmark::State& state) {
         state.SkipWithError(std::string(run.status().message()));
         return;
       }
+      bytes_processed += run->bytes_processed;
     }
   }
+  state.SetBytesProcessed(bytes_processed);
 }
 
 BENCHMARK(BM_WholeYear)->DenseRange(2015, 2023);
