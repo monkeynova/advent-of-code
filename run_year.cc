@@ -167,7 +167,9 @@ class Table {
   std::string Render() const;
 
  private:
-   std::vector<int> Layout() const;
+  std::vector<int> Layout() const;
+  void RenderBreaker(std::string* out, const std::vector<int> col_widths,
+                     int row_num) const;
 
   struct Breaker {};
   using Row = std::variant<Breaker, std::vector<Cell>>;
@@ -238,17 +240,12 @@ std::string Table::Render() const {
   std::string ret;
   
   std::vector<int> col_widths = Layout();
-  std::string breaker = "+";
-  for (int i = 0; i < col_widths.size(); ++i) {
-    breaker.append(col_widths[i] + 2, '-');
-    breaker.append(1, '+');
-  }
-  for (const auto& row : rows_) {
-    if (std::holds_alternative<Breaker>(row)) {
-      absl::StrAppend(&ret, breaker, "\n");
-    } else if (std::holds_alternative<std::vector<Cell>>(row)) {
+  for (int i = 0; i < rows_.size(); ++i) {
+    if (std::holds_alternative<Breaker>(rows_[i])) {
+      RenderBreaker(&ret, col_widths, i);
+    } else if (std::holds_alternative<std::vector<Cell>>(rows_[i])) {
       ret.append(1, '|');
-      const std::vector<Cell>& cells = std::get<std::vector<Cell>>(row);
+      const std::vector<Cell>& cells = std::get<std::vector<Cell>>(rows_[i]);
       int col_idx = 0;
       for (const Cell& cell : cells) {
         int width = 0;
@@ -261,13 +258,66 @@ std::string Table::Render() const {
         ret.append(" |");
         col_idx += cell.span;
       }
-      ret.append("\n");
     }
+    ret.append("\n");
   }
   return ret;
 }
 
-void Table::Cell::Render(std::string* out, int width, bool enable_color) const {
+void Table::RenderBreaker(
+    std::string* out, const std::vector<int> col_widths, int row_num) const {
+  std::vector<int> prev;
+  if (row_num > 0 &&
+      std::holds_alternative<std::vector<Cell>>(rows_[row_num - 1])) {
+    int col_idx = 0;
+    for (const Cell& cell : std::get<std::vector<Cell>>(rows_[row_num - 1])) {
+      prev.push_back(col_idx);
+      col_idx += cell.span;
+    }
+    prev.push_back(col_idx);
+  }
+  std::vector<int> next;
+  if (row_num < rows_.size() &&
+      std::holds_alternative<std::vector<Cell>>(rows_[row_num + 1])) {
+    int col_idx = 0;
+    for (const Cell& cell : std::get<std::vector<Cell>>(rows_[row_num + 1])) {
+      next.push_back(col_idx);
+      col_idx += cell.span;
+    }
+    next.push_back(col_idx);
+  }
+
+  auto prev_it = prev.begin();
+  auto next_it = next.begin();
+  for (int i = 0; i < col_widths.size(); ++i) {
+    bool col_match = false;
+    if (prev_it != prev.end() && *prev_it == i) {
+      col_match = true;
+      ++prev_it;
+    }
+    if (next_it != next.end() && *next_it == i) {
+      col_match = true;
+      ++next_it;
+    }
+    out->append(1, col_match ? '+' : '-');
+    out->append(col_widths[i] + 2, '-');
+  }
+  bool col_match = false;
+  if (prev_it != prev.end() && *prev_it == col_widths.size()) {
+    col_match = true;
+    ++prev_it;
+  }
+  if (next_it != next.end() && *next_it == col_widths.size()) {
+    col_match = true;
+    ++next_it;
+  }
+  CHECK(prev_it == prev.end());
+  CHECK(next_it == next.end());
+  out->append(1, col_match ? '+' : '-');
+}
+
+void Table::Cell::Render(std::string* out, int width, bool enable_color)
+    const {
   bool need_reset = false;
   if (enable_color) {
     if (bold) {
@@ -343,10 +393,10 @@ int main(int argc, char** argv) {
                 .bold = true, .justify = Table::Cell::kCenter}});
   table.AddBreaker();
   table.AddRow({
-    Table::Cell{.entry = "Title"},
-    Table::Cell{.entry = "Part 1", .span = 2},
-    Table::Cell{.entry = "Part 2", .span = 2},
-    Table::Cell{.entry = "Time", .justify = Table::Cell::kRight}});
+    Table::Cell{.entry = "Title", .justify = Table::Cell::kCenter},
+    Table::Cell{.entry = "Part 1", .span = 2, .justify = Table::Cell::kCenter},
+    Table::Cell{.entry = "Part 2", .span = 2, .justify = Table::Cell::kCenter},
+    Table::Cell{.entry = "Time", .justify = Table::Cell::kCenter}});
   table.AddBreaker();
 
   auto day_time_color = [](absl::Duration d) {
