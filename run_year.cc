@@ -1,3 +1,4 @@
+#include "absl/container/flat_hash_set.h"
 #include "absl/flags/flag.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
@@ -63,75 +64,69 @@ absl::StatusOr<DayRun> RunDay(advent_of_code::AdventDay* day) {
 
 class Table {
  public: 
+  struct Cell {
+    enum Justify { kLeft = 0, kRight = 1, kCenter = 2 };
+    std::string entry;
+    Justify justify = kLeft;
+    int span = 1;
+  };
+
   Table() = default;
-
-  void JustifyRight(int col) {
-    if (just_right_.size() <= col) {
-      just_right_.resize(col + 1, false);
-    }
-    just_right_[col] = true;
-  }
-
-  void AddTitle(std::string title) {
-    rows_.emplace_back(title);
-  }
 
   void AddBreaker() {
     rows_.emplace_back(Breaker());
   }
 
-  void AddRow(std::vector<std::string> row) {
-    if (row.size() > col_widths_.size()) {
-      col_widths_.resize(row.size(), 0);
-      just_right_.resize(row.size(), false);
-    }
-    for (int i = 0; i < row.size(); ++i) {
-      col_widths_[i] = std::max<int>(col_widths_[i], row[i].size());
-    }
+  void AddRow(std::vector<Cell> row) {
     rows_.emplace_back(std::move(row));
   }
 
   std::string Render() {
     std::string ret;
+    
+    std::vector<int> col_widths = Layout();
 
     std::string breaker = "+";
-    for (int i = 0; i < col_widths_.size(); ++i) {
-      breaker.append(col_widths_[i] + 2, '-');
+    for (int i = 0; i < col_widths.size(); ++i) {
+      breaker.append(col_widths[i] + 2, '-');
       breaker.append(1, '+');
     }
     for (const auto& row : rows_) {
       if (std::holds_alternative<Breaker>(row)) {
         absl::StrAppend(&ret, breaker, "\n");
-      } else if (std::holds_alternative<std::string>(row)) {
-        std::string title = std::get<std::string>(row);
+      } else if (std::holds_alternative<std::vector<Cell>>(row)) {
         ret.append(1, '|');
-        int total_width = col_widths_.size() - 1;
-        for (int i = 0; i < col_widths_.size(); ++i) {
-          total_width += col_widths_[i] + 2;
-        }
-        int left = (total_width - title.size()) / 2;
-        int right = total_width - title.size() - left;
-        ret.append(left, ' ');
-        ret.append(title);
-        ret.append(right, ' ');
-        ret.append("|\n");
-      } else if (std::holds_alternative<std::vector<std::string>>(row)) {
-        ret.append(1, '|');
-        const std::vector<std::string>& cols = std::get<std::vector<std::string>>(row);
-        for (int i = 0; i < col_widths_.size(); ++i) {
+        const std::vector<Cell>& cells = std::get<std::vector<Cell>>(row);
+        int col_idx = 0;
+        for (const Cell& cell : cells) {
+          int width = 0;
+          for (int i = col_idx; i < col_idx + cell.span; ++i) {
+            if (i > col_idx) width += 3; // Margin.
+            width += col_widths[i];
+          }
           ret.append(1, ' ');
-          if (cols.size() <= i) {
-            ret.append(col_widths_[i], ' ');
-          } else {
-            if (just_right_[i]) {
-              ret.append(col_widths_[i] - cols[i].size(), ' ');
-              ret.append(cols[i]);
-            } else {
-              ret.append(cols[i]);
-              ret.append(col_widths_[i] - cols[i].size(), ' ');
+          switch (cell.justify) {
+            case Cell::kRight: {
+              ret.append(width - cell.entry.size(), ' ');
+              ret.append(cell.entry);
+              break;
+            }
+            case Cell::kLeft: {
+              ret.append(cell.entry);
+              ret.append(width - cell.entry.size(), ' ');
+              break;
+            }
+            case Cell::kCenter: {
+              int left = (width - cell.entry.size()) / 2;
+              int right = width - cell.entry.size() - left;
+              ret.append(left, ' ');
+              ret.append(cell.entry);
+              ret.append(right, ' ');
+              break;
             }
           }
           ret.append(" |");
+          col_idx += cell.span;
         }
         ret.append("\n");
       }
@@ -141,11 +136,67 @@ class Table {
   }
 
  private:
+  std::vector<int> Layout() const {
+    absl::flat_hash_set<int> spans;
+    int max_span = 0;
+    for (const Row& row : rows_) {
+      if (!std::holds_alternative<std::vector<Cell>>(row)) {
+        continue;
+      }
+      const auto& cells = std::get<std::vector<Cell>>(row);
+      int row_span = 0;
+      for (const Cell& cell : cells) {
+        spans.insert(cell.span);
+        row_span += cell.span;
+      }
+      max_span = std::max(max_span, row_span);
+    }
+
+    std::vector<int> col_widths(max_span, 0);
+    std::vector<int> spans_vec(spans.begin(), spans.end());
+    absl::c_sort(spans_vec);
+
+    for (int cur_span : spans) {
+      for (const Row& row : rows_) {
+        if (!std::holds_alternative<std::vector<Cell>>(row)) {
+          continue;
+        }
+        const auto& cells = std::get<std::vector<Cell>>(row);
+        int col_idx = 0;
+        for (const Cell& cell : cells) {
+          if (cell.span == cur_span) {
+            int need = cell.entry.size();
+            int have = 0;
+            for (int i = col_idx; i < col_idx + cell.span; ++i) {
+              if (i != col_idx) have += 3;  // Margin.
+              have += col_widths[i];
+            }
+            if (need > have) {
+              int delta = need - have;
+              int add_per_col = delta / cell.span;
+              int change_at = col_idx + cell.span;
+              if (delta % cell.span != 0) {
+                change_at = delta % cell.span;
+                ++add_per_col;
+              }
+              for (int i = col_idx; i < col_idx + cell.span; ++i) {
+                col_widths[i] += add_per_col;
+                if (i == change_at) {
+                  --add_per_col;
+                }
+              }
+            }
+          }
+          col_idx += cell.span;
+        }
+      }
+    }
+    return col_widths;
+  }
+
   struct Breaker {};
-  using Row = std::variant<std::string, Breaker, std::vector<std::string>>;
+  using Row = std::variant<Breaker, std::vector<Cell>>;
   std::vector<Row> rows_;
-  std::vector<int> col_widths_;
-  std::vector<bool> just_right_;
 };
 
 }
@@ -168,16 +219,29 @@ int main(int argc, char** argv) {
 
   Table table;
   table.AddBreaker();
-  table.AddTitle(absl::StrCat("Advent of Code ", year));
+  table.AddRow({
+    Table::Cell{.entry = absl::StrCat("Advent of Code ", year), .span = 4,
+                .justify = Table::Cell::kCenter}});
   table.AddBreaker();
-  table.AddRow({"Title", "Part 1", "Part 2", "Time"});
-  table.JustifyRight(3);
+  table.AddRow({
+    Table::Cell{.entry = "Title"},
+    Table::Cell{.entry = "Part 1"},
+    Table::Cell{.entry = "Part 2"},
+    Table::Cell{.entry = "Time"}});
   table.AddBreaker();
   for (const DayRun& run : runs) {
-    table.AddRow({run.title, run.part1, run.part2, absl::StrCat(run.time)});
+    table.AddRow({
+      Table::Cell{.entry = run.title},
+      Table::Cell{.entry = run.part1},
+      Table::Cell{.entry = run.part2},
+      Table::Cell{.entry = absl::StrCat(run.time),
+                  .justify = Table::Cell::kRight}});
   }
   table.AddBreaker();
-  table.AddRow({"Total", "", "", absl::StrCat(total_time)});
+  table.AddRow({
+    Table::Cell{.entry = "Total", .span = 3},
+    Table::Cell{.entry = absl::StrCat(total_time),
+                .justify = Table::Cell::kRight}});
   table.AddBreaker();
 
   std::cout << table.Render();
