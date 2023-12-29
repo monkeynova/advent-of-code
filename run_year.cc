@@ -40,12 +40,16 @@ struct DayRun {
   absl::Duration time;
   std::string title;
   std::string part1;
+  bool part1_solved;
   std::string part2;
+  bool part2_solved;
 };
 
 absl::StatusOr<DayRun> RunDay(advent_of_code::AdventDay* day) {
   if (day == nullptr) {
-    return DayRun{.time = absl::Seconds(0), .title = "???", .part1 = "", .part2 = ""};
+    return DayRun{.time = absl::Seconds(0), .title = "???",
+                  .part1 = "", .part1_solved = false,
+                  .part2 = "", .part2_solved = false};
   }
   DayRun ret;
   absl::Time start = absl::Now();
@@ -53,10 +57,10 @@ absl::StatusOr<DayRun> RunDay(advent_of_code::AdventDay* day) {
   Input input;
   RETURN_IF_ERROR(ReadInput(day, &input));
   absl::StatusOr<std::string> part1 = day->Part1(absl::MakeSpan(input.lines));
-  if (part1.ok()) ret.part1 = *std::move(part1);
+  if ((ret.part1_solved = part1.ok())) ret.part1 = *std::move(part1);
   else ret.part1 = absl::StrCat("Error: ", part1.status().message());
   absl::StatusOr<std::string> part2 = day->Part2(absl::MakeSpan(input.lines));
-  if (part2.ok()) ret.part2 = *std::move(part2);
+  if ((ret.part2_solved = part2.ok())) ret.part2 = *std::move(part2);
   else ret.part2 = absl::StrCat("Error: ", part2.status().message());
   ret.time = absl::Now() - start;
   return ret;
@@ -156,7 +160,7 @@ class Table {
     std::vector<int> spans_vec(spans.begin(), spans.end());
     absl::c_sort(spans_vec);
 
-    for (int cur_span : spans) {
+    for (int cur_span : spans_vec) {
       for (const Row& row : rows_) {
         if (!std::holds_alternative<std::vector<Cell>>(row)) {
           continue;
@@ -172,11 +176,14 @@ class Table {
               have += col_widths[i];
             }
             if (need > have) {
+              // TODO(@monkeynova): This takes a budget and adds it to each
+              // column evenly. When we have different lengthts to start with
+              // we should prefer evening those lenghts out first.
               int delta = need - have;
               int add_per_col = delta / cell.span;
               int change_at = col_idx + cell.span;
               if (delta % cell.span != 0) {
-                change_at = delta % cell.span;
+                change_at = col_idx + delta % cell.span;
                 ++add_per_col;
               }
               for (int i = col_idx; i < col_idx + cell.span; ++i) {
@@ -220,26 +227,28 @@ int main(int argc, char** argv) {
   Table table;
   table.AddBreaker();
   table.AddRow({
-    Table::Cell{.entry = absl::StrCat("Advent of Code ", year), .span = 4,
+    Table::Cell{.entry = absl::StrCat("Advent of Code ", year), .span = 6,
                 .justify = Table::Cell::kCenter}});
   table.AddBreaker();
   table.AddRow({
     Table::Cell{.entry = "Title"},
-    Table::Cell{.entry = "Part 1"},
-    Table::Cell{.entry = "Part 2"},
+    Table::Cell{.entry = "Part 1", .span = 2},
+    Table::Cell{.entry = "Part 2", .span = 2},
     Table::Cell{.entry = "Time"}});
   table.AddBreaker();
   for (const DayRun& run : runs) {
     table.AddRow({
       Table::Cell{.entry = run.title},
       Table::Cell{.entry = run.part1},
+      Table::Cell{.entry = run.part1_solved ? "*" : " "},
       Table::Cell{.entry = run.part2},
+      Table::Cell{.entry = run.part2_solved ? "*" : " "},
       Table::Cell{.entry = absl::StrCat(run.time),
                   .justify = Table::Cell::kRight}});
   }
   table.AddBreaker();
   table.AddRow({
-    Table::Cell{.entry = "Total", .span = 3},
+    Table::Cell{.entry = "Total", .span = 5},
     Table::Cell{.entry = absl::StrCat(total_time),
                 .justify = Table::Cell::kRight}});
   table.AddBreaker();
