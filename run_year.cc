@@ -144,6 +144,8 @@ class Table {
     Color color = kWhite;
     bool bold = false;
     int span = 1;
+
+    void Render(std::string* out, int width, bool enable_color) const;
   };
 
   Table() {
@@ -255,40 +257,7 @@ std::string Table::Render() const {
           width += col_widths[i];
         }
         ret.append(1, ' ');
-        if (use_color_) {
-          if (cell.bold) {
-            ret.append("\u001b[1m");
-          }
-          switch (cell.color) {
-            case Cell::kWhite: break;
-            case Cell::kRed: ret.append("\u001b[31m"); break;
-            case Cell::kGreen: ret.append("\u001b[32m"); break;
-            case Cell::kYellow: ; ret.append("\u001b[33m"); break;
-          }
-        }
-        switch (cell.justify) {
-          case Cell::kRight: {
-            ret.append(width - cell.entry.size(), ' ');
-            ret.append(cell.entry);
-            break;
-          }
-          case Cell::kLeft: {
-            ret.append(cell.entry);
-            ret.append(width - cell.entry.size(), ' ');
-            break;
-          }
-          case Cell::kCenter: {
-            int left = (width - cell.entry.size()) / 2;
-            int right = width - cell.entry.size() - left;
-            ret.append(left, ' ');
-            ret.append(cell.entry);
-            ret.append(right, ' ');
-            break;
-          }
-        }
-        if (use_color_ && (cell.color != Cell::kWhite || cell.bold)) {
-          ret.append("\u001b[0m");
-        }
+        cell.Render(&ret, width, use_color_);
         ret.append(" |");
         col_idx += cell.span;
       }
@@ -296,6 +265,57 @@ std::string Table::Render() const {
     }
   }
   return ret;
+}
+
+void Table::Cell::Render(std::string* out, int width, bool enable_color) const {
+  bool need_reset = false;
+  if (enable_color) {
+    if (bold) {
+      out->append("\u001b[1m");
+      need_reset = true;
+    }
+    switch (color) {
+      case kWhite: break;
+      case kRed: {
+        out->append("\u001b[31m");
+        need_reset = true;
+        break;
+      }
+      case kGreen: {
+        out->append("\u001b[32m");
+        need_reset = true;
+        break;
+      }
+      case kYellow: {
+        out->append("\u001b[33m");
+        need_reset = true;
+        break;
+      }
+    }
+  }
+  switch (justify) {
+    case kRight: {
+      out->append(width - entry.size(), ' ');
+      out->append(entry);
+      break;
+    }
+    case kLeft: {
+      out->append(entry);
+      out->append(width - entry.size(), ' ');
+      break;
+    }
+    case kCenter: {
+      int left = (width - entry.size()) / 2;
+      int right = width - entry.size() - left;
+      out->append(left, ' ');
+      out->append(entry);
+      out->append(right, ' ');
+      break;
+    }
+  }
+  if (need_reset) {
+    out->append("\u001b[0m");
+  }
 }
 
 }
