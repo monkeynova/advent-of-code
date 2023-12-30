@@ -99,8 +99,13 @@ close $fh;
 
 # Non-fatal if clang-format isn't present.
 system("find advent_of_code/$year/day$day -name '*.h' -o -name '*.cc' | " .
-       "xargs clang-format --style=Google -i");
+       "xargs clang-format --style=Google -i")
+  and die $!;
 
 # Non-fatal if buildifier isn't present.
-system("find advent_of_code/$year/day$day -name BUILD | xargs buildifier");
-system("buildifier advent_of_code/$year/BUILD");
+system("find advent_of_code/$year/day$day -name BUILD | xargs buildifier")
+  and die $!;
+system("buildifier advent_of_code/$year/BUILD")
+  and die $!;
+system("buildozer 'add deps //advent_of_code/$year:day$day' //advent_of_code/$year")
+  and die $!;
