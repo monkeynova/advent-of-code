@@ -5,11 +5,11 @@ use warnings;
 
 my ($year, $day) = @ARGV;
 die unless $day;
-$day = sprintf "%02d", $day;
-die unless -f "advent_of_code/${year}/day${day}";
+die unless -d "advent_of_code/${year}/day${day}";
+die unless -f "advent_of_code/${year}/day${day}/day${day}_test.cc";
 
-open $fh, '>', "advent_of_code/${year}/day${day}/day${day}_test.cc" or die $!;
-print {$ofh} << EOF;
+open my $ofh, '>', "advent_of_code/${year}/day${day}/day${day}_test.cc" or die $!;
+print {$ofh} <<EOF;
 #include "advent_of_code/${year}/day${day}/day${day}.h"
 
 #include "advent_of_code/infra/file_benchmark.h"
