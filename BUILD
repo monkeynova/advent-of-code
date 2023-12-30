@@ -37,4 +37,3 @@ cc_binary(
         "@com_monkeynova_gunit_main//:test_main",
     ],
 )
-
