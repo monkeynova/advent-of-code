@@ -4,6 +4,9 @@ cc_library(
     name = "new_day",
     srcs = ["new_day.cc"],
     hdrs = ["new_day.h"],
+    data = [
+        "input.txt",
+    ],
     deps = [
         "//advent_of_code:advent_day",
         "//advent_of_code:bfs",
@@ -28,49 +31,16 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "new_day_input",
-    testonly = 1,
-    data = [
-        "input.txt",
-        "new_day.test",
-    ],
-    deps = [
-        ":new_day",
-    ],
-)
-
 cc_test(
     name = "new_day_test",
     size = "small",
     srcs = ["new_day_test.cc"],
-    deps = [
-        ":new_day_input",
-        "//advent_of_code/infra:file_test",
-    ],
-)
-
-cc_library(
-    name = "new_day_benchmark_lib",
-    testonly = 1,
-    srcs = ["new_day_benchmark.cc"],
-    visibility = [
-        "//visibility:public",
+    data = [
+        "new_day.test",
     ],
     deps = [
-        ":new_day_input",
+        ":new_day",
         "//advent_of_code/infra:file_benchmark",
-        "@com_google_googletest//:gtest",
-    ],
-    alwayslink = 1,
-)
-
-cc_test(
-    name = "new_day_benchmark",
-    size = "small",
-    tags = ["benchmark"],
-    deps = [
-        ":new_day_benchmark_lib",
-        "@com_monkeynova_gunit_main//:test_main",
+        "//advent_of_code/infra:file_test",
     ],
 )
