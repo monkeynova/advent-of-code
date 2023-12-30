@@ -34,18 +34,3 @@ cc_test(
         "//advent_of_code/infra:file_test",
     ],
 )
-
-cc_test(
-    name = "day13_benchmark",
-    size = "small",
-    srcs = ["day13_benchmark.cc"],
-    data = [
-        "day13.test",
-    ],
-    tags = ["benchmark"],
-    deps = [
-        ":day13",
-        "//advent_of_code/infra:file_benchmark",
-        "@com_monkeynova_gunit_main//:test_main",
-    ],
-)
