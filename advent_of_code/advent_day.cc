@@ -14,7 +14,7 @@ using FactoryType = std::function<std::unique_ptr<AdventDay>()>;
 
 absl::flat_hash_map<std::pair<int, int>, FactoryType>& Registry() {
   static absl::flat_hash_map<std::pair<int, int>, FactoryType> registry;
-  return registry; 
+  return registry;
 }
 
 }  // namespace

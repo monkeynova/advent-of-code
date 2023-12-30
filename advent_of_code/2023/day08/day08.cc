@@ -19,17 +19,20 @@ class Map {
     dir_.reserve(lr.size());
     for (char c : lr) {
       switch (c) {
-        case 'L': dir_.push_back(true); break;
-        case 'R': dir_.push_back(false); break;
-        default: return Error("Bad dir");
+        case 'L':
+          dir_.push_back(true);
+          break;
+        case 'R':
+          dir_.push_back(false);
+          break;
+        default:
+          return Error("Bad dir");
       }
     }
     return absl::OkStatus();
   }
 
-  int FindLoc(std::array<char, 3> loc) {
-    return name_to_id_[Encode(loc)];
-  }
+  int FindLoc(std::array<char, 3> loc) { return name_to_id_[Encode(loc)]; }
 
   absl::Status AddLine(std::string_view line);
 
@@ -68,8 +71,10 @@ absl::Status Map::AddLine(std::string_view line) {
     ghost_ends_.push_back(false);
   }
   int from_id = name_to_id_[from_loc];
-  if (line[2] == 'A') ghost_starts_.push_back(from_id);
-  else if (line[2] == 'Z') ghost_ends_[from_id] = true;
+  if (line[2] == 'A')
+    ghost_starts_.push_back(from_id);
+  else if (line[2] == 'Z')
+    ghost_ends_[from_id] = true;
 
   if (line.substr(3, 4) != " = (") return Error("Bad line");
 
@@ -109,7 +114,7 @@ struct Loop {
   int64_t mod() const { return from - to; }
   bool ZeroAt(int64_t steps) const {
     return absl::c_any_of(
-      end_z, [&](int64_t z) { return z % mod() == steps % mod(); });
+        end_z, [&](int64_t z) { return z % mod() == steps % mod(); });
   }
 
   template <typename Sink>
@@ -132,10 +137,9 @@ absl::StatusOr<std::string> Day_2023_08::Part1(
     RETURN_IF_ERROR(map.AddLine(input[i]));
   }
 
-
-  std::optional<int> loc = map.FindLoc({'A','A','A'});
+  std::optional<int> loc = map.FindLoc({'A', 'A', 'A'});
   if (!loc) return Error("No start");
-  std::optional<int> end = map.FindLoc({'Z','Z','Z'});
+  std::optional<int> end = map.FindLoc({'Z', 'Z', 'Z'});
   if (!end) return Error("No end");
 
   int dir_size = input[0].size();
@@ -159,7 +163,7 @@ absl::StatusOr<std::string> Day_2023_08::Part2(
   for (int i = 2; i < input.size(); ++i) {
     RETURN_IF_ERROR(map.AddLine(input[i]));
   }
-  
+
   int dir_size = input[0].size();
   std::vector<Loop> loops;
   std::vector<bool> ghost_ends = map.GhostEnds();
@@ -218,8 +222,7 @@ absl::StatusOr<std::string> Day_2023_08::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2023, /*day=*/8, []() {
-  return std::unique_ptr<AdventDay>(new Day_2023_08());
-});
+    /*year=*/2023, /*day=*/8,
+    []() { return std::unique_ptr<AdventDay>(new Day_2023_08()); });
 
 }  // namespace advent_of_code

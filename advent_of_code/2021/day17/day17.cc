@@ -29,7 +29,8 @@ absl::StatusOr<PointRectangle> VelocityBounds(PointRectangle target) {
   while (min_vx * (min_vx + 1) / 2 < target.min.x) ++min_vx;
   // the y coordinate will always go back through 0, with oppositve velocity.
   // This means that if v0.y >= -miny it will skip the target.
-  return PointRectangle{{min_vx, target.min.y}, {target.max.x, -target.min.y - 1}};
+  return PointRectangle{{min_vx, target.min.y},
+                        {target.max.x, -target.min.y - 1}};
 }
 
 std::optional<int> MaxYFromFire(Point v0, PointRectangle target) {
@@ -77,7 +78,8 @@ Interval1D StepsInRange(int v0, int x_min, int x_max, bool stop_at_top) {
     stop = Interval1D::OpenTop(ceil(-(-2 * v0 + 1) / (2.0 * 1)));
   }
   min = min.Union(stop);
-  Interval1D max = SolveQuadraticInteger(1, -2 * v0 + 1, 2 * (x_max + 1) - 2 * v0);
+  Interval1D max =
+      SolveQuadraticInteger(1, -2 * v0 + 1, 2 * (x_max + 1) - 2 * v0);
   if (!max.empty()) {
     max = max.Union(stop);
   }
@@ -120,20 +122,25 @@ absl::StatusOr<std::string> Day_2021_17::Part1(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   int minx, maxx, miny, maxy;
-  if (!RE2::FullMatch(input[0], "target area: x=(-?\\d+)\\.\\.(-?\\d+), y=(-\\d+)\\.\\.(-?\\d+)",
-                      &minx, &maxx, &miny, &maxy)) {
+  if (!RE2::FullMatch(
+          input[0],
+          "target area: x=(-?\\d+)\\.\\.(-?\\d+), y=(-\\d+)\\.\\.(-?\\d+)",
+          &minx, &maxx, &miny, &maxy)) {
     return Error("Bad line");
   }
   if (miny >= 0) return Error("Postive miny not supported");
   PointRectangle target{{minx, miny}, {maxx, maxy}};
   ASSIGN_OR_RETURN(PointRectangle vbound, VelocityBounds(target));
-  if (StepsInRange(vbound.max.y, miny, maxy, /*stop_at_top=*/false).Intersect(
-        StepsInRange(vbound.min.x, minx, maxx, /*stop_at_top=*/true)).empty()) {
+  if (StepsInRange(vbound.max.y, miny, maxy, /*stop_at_top=*/false)
+          .Intersect(
+              StepsInRange(vbound.min.x, minx, maxx, /*stop_at_top=*/true))
+          .empty()) {
     return Error("maxy 'optimization' doesn't land in range");
   }
   int maxy_from_vy = vbound.max.y * (vbound.max.y + 1) / 2;
   if (run_audit()) {
-    std::optional<int> maxy = MaxYFromFire(Point{vbound.min.x, vbound.max.y}, target);
+    std::optional<int> maxy =
+        MaxYFromFire(Point{vbound.min.x, vbound.max.y}, target);
     if (!maxy) return Error("Audit: MaxYFromFire doesn't hit");
     if (*maxy != maxy_from_vy) {
       return Error("Audit: MaxYFromFire doesn't hit");
@@ -146,8 +153,10 @@ absl::StatusOr<std::string> Day_2021_17::Part2(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input");
   int minx, maxx, miny, maxy;
-  if (!RE2::FullMatch(input[0], "target area: x=(-?\\d+)\\.\\.(-?\\d+), y=(-\\d+)\\.\\.(-?\\d+)",
-                      &minx, &maxx, &miny, &maxy)) {
+  if (!RE2::FullMatch(
+          input[0],
+          "target area: x=(-?\\d+)\\.\\.(-?\\d+), y=(-\\d+)\\.\\.(-?\\d+)",
+          &minx, &maxx, &miny, &maxy)) {
     return Error("Bad line");
   }
   PointRectangle target{{minx, miny}, {maxx, maxy}};
@@ -158,14 +167,14 @@ absl::StatusOr<std::string> Day_2021_17::Part2(
   }
   int64_t count = 0;
   for (int vy = vbound.min.y; vy <= vbound.max.y; ++vy) {
-    count += x_set.CountIntersect(StepsInRange(vy, miny, maxy, /*stop_at_top=*/false));
+    count += x_set.CountIntersect(
+        StepsInRange(vy, miny, maxy, /*stop_at_top=*/false));
   }
   return AdventReturn(count);
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2021, /*day=*/17, []() {
-  return std::unique_ptr<AdventDay>(new Day_2021_17());
-});
+    /*year=*/2021, /*day=*/17,
+    []() { return std::unique_ptr<AdventDay>(new Day_2021_17()); });
 
 }  // namespace advent_of_code

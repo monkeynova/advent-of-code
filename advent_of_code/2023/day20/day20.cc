@@ -23,7 +23,8 @@ class Modules {
 
   void InitializeConjuncts();
 
-  void SendPulses(absl::FunctionRef<void(std::string_view, bool, int)> on_pulse);
+  void SendPulses(
+      absl::FunctionRef<void(std::string_view, bool, int)> on_pulse);
 
   std::vector<Modules> DisjointSubmodules(std::string_view final,
                                           std::string_view* final_conj);
@@ -94,12 +95,13 @@ void Modules::SendPulses(
     bool high;
     int dest;
     int src;
-  } start {false, broadcast_id_, -1};
+  } start{false, broadcast_id_, -1};
 
   int pulse_num = 0;
   for (std::deque<Pulse> queue = {start}; !queue.empty(); queue.pop_front()) {
     Pulse cur = queue.front();
-    VLOG(2) << cur.src << " -" << (cur.high ? "high" : "low") << "- -> " << cur.dest;
+    VLOG(2) << cur.src << " -" << (cur.high ? "high" : "low") << "- -> "
+            << cur.dest;
     on_pulse(names_[cur.dest], cur.high, pulse_num);
     ++pulse_num;
 
@@ -142,8 +144,8 @@ std::vector<bool> Modules::State() {
   return state;
 }
 
-std::vector<Modules> Modules::DisjointSubmodules(
-    std::string_view final, std::string_view* final_conj) {
+std::vector<Modules> Modules::DisjointSubmodules(std::string_view final,
+                                                 std::string_view* final_conj) {
   *final_conj = "";
   for (int i = 0; i < modules_.size(); ++i) {
     for (int dest : modules_[i].outputs) {
@@ -195,8 +197,10 @@ absl::StatusOr<std::string> Day_2023_20::Part1(
   modules.InitializeConjuncts();
   for (int i = 0; i < 1000; ++i) {
     modules.SendPulses([&](std::string_view dest, bool high, int pulse_num) {
-      if (high) ++high_pulses;
-      else ++low_pulses;
+      if (high)
+        ++high_pulses;
+      else
+        ++low_pulses;
     });
   }
   return AdventReturn(low_pulses * high_pulses);
@@ -207,7 +211,7 @@ absl::StatusOr<std::string> Day_2023_20::Part2(
   ASSIGN_OR_RETURN(Modules modules, Modules::Parse(input));
 
   modules.InitializeConjuncts();
-  
+
   std::string_view final_conj;
   std::vector<Modules> sub_modules =
       modules.DisjointSubmodules("rx", &final_conj);
@@ -269,8 +273,7 @@ absl::StatusOr<std::string> Day_2023_20::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2023, /*day=*/20, []() {
-  return std::unique_ptr<AdventDay>(new Day_2023_20());
-});
+    /*year=*/2023, /*day=*/20,
+    []() { return std::unique_ptr<AdventDay>(new Day_2023_20()); });
 
 }  // namespace advent_of_code

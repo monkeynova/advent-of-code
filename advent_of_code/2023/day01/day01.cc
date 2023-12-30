@@ -10,32 +10,52 @@ namespace {
 
 std::optional<int> TryParse(char c) {
   switch (c) {
-    case '0': return 0;
-    case '1': return 1;
-    case '2': return 2;
-    case '3': return 3;
-    case '4': return 4;
-    case '5': return 5;
-    case '6': return 6;
-    case '7': return 7;
-    case '8': return 8;
-    case '9': return 9;
+    case '0':
+      return 0;
+    case '1':
+      return 1;
+    case '2':
+      return 2;
+    case '3':
+      return 3;
+    case '4':
+      return 4;
+    case '5':
+      return 5;
+    case '6':
+      return 6;
+    case '7':
+      return 7;
+    case '8':
+      return 8;
+    case '9':
+      return 9;
   }
   return std::nullopt;
 }
 
 std::optional<int> TryParse(std::string_view prefix) {
   switch (prefix[0]) {
-    case '0': return 0;
-    case '1': return 1;
-    case '2': return 2;
-    case '3': return 3;
-    case '4': return 4;
-    case '5': return 5;
-    case '6': return 6;
-    case '7': return 7;
-    case '8': return 8;
-    case '9': return 9;
+    case '0':
+      return 0;
+    case '1':
+      return 1;
+    case '2':
+      return 2;
+    case '3':
+      return 3;
+    case '4':
+      return 4;
+    case '5':
+      return 5;
+    case '6':
+      return 6;
+    case '7':
+      return 7;
+    case '8':
+      return 8;
+    case '9':
+      return 9;
     case 'z': {
       if (prefix.substr(0, 4) == "zero") return 0;
       break;
@@ -112,8 +132,7 @@ absl::StatusOr<std::string> Day_2023_01::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2023, /*day=*/1, []() {
-  return std::unique_ptr<AdventDay>(new Day_2023_01());
-});
+    /*year=*/2023, /*day=*/1,
+    []() { return std::unique_ptr<AdventDay>(new Day_2023_01()); });
 
 }  // namespace advent_of_code

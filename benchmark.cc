@@ -1,10 +1,11 @@
+#include "benchmark/benchmark.h"
+
 #include "absl/flags/flag.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/advent_day.h"
 #include "advent_of_code/infra/file_util.h"
 #include "advent_of_code/vlog.h"
-#include "benchmark/benchmark.h"
 #include "main_lib.h"
 
 namespace {
@@ -30,7 +31,7 @@ absl::Status ReadInput(advent_of_code::AdventDay* day, Input* ret) {
   while (!ret->lines.empty() && ret->lines.back().empty()) {
     ret->lines.pop_back();
   }
-  return absl::OkStatus();  
+  return absl::OkStatus();
 }
 
 struct DayRun {
@@ -52,11 +53,15 @@ absl::StatusOr<DayRun> RunDay(advent_of_code::AdventDay* day) {
   RETURN_IF_ERROR(ReadInput(day, &input));
   ret.bytes_processed = input.file.size();
   absl::StatusOr<std::string> part1 = day->Part1(absl::MakeSpan(input.lines));
-  if (part1.ok()) ret.part1 = *std::move(part1);
-  else ret.part1 = absl::StrCat("Error: ", part1.status().message());
+  if (part1.ok())
+    ret.part1 = *std::move(part1);
+  else
+    ret.part1 = absl::StrCat("Error: ", part1.status().message());
   absl::StatusOr<std::string> part2 = day->Part2(absl::MakeSpan(input.lines));
-  if (part2.ok()) ret.part2 = *std::move(part2);
-  else ret.part2 = absl::StrCat("Error: ", part2.status().message());
+  if (part2.ok())
+    ret.part2 = *std::move(part2);
+  else
+    ret.part2 = absl::StrCat("Error: ", part2.status().message());
   ret.time = absl::Now() - start;
   return ret;
 }
@@ -80,10 +85,9 @@ void BM_Day(benchmark::State& state) {
   state.SetBytesProcessed(bytes_processed);
 }
 
-BENCHMARK(BM_Day)->ArgsProduct({
-  benchmark::CreateDenseRange(2015, 2023, /*step=*/1),
-  benchmark::CreateDenseRange(1, 25, /*step=*/1)
-});
+BENCHMARK(BM_Day)->ArgsProduct(
+    {benchmark::CreateDenseRange(2015, 2023, /*step=*/1),
+     benchmark::CreateDenseRange(1, 25, /*step=*/1)});
 
 void BM_WholeYear(benchmark::State& state) {
   std::vector<std::unique_ptr<advent_of_code::AdventDay>> days;
@@ -97,7 +101,7 @@ void BM_WholeYear(benchmark::State& state) {
   }
   int64_t bytes_processed = 0;
   for (auto _ : state) {
-    for (const auto& day: days) {
+    for (const auto& day : days) {
       absl::StatusOr<DayRun> run = RunDay(day.get());
       if (!run.ok()) {
         state.SkipWithError(std::string(run.status().message()));
@@ -111,4 +115,4 @@ void BM_WholeYear(benchmark::State& state) {
 
 BENCHMARK(BM_WholeYear)->DenseRange(2015, 2023);
 
-}
+}  // namespace

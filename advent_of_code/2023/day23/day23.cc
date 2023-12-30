@@ -58,13 +58,18 @@ void BoardGraph::Build(const CharBoard& b, bool directed) {
     for (const auto& [p, _] : by_point) iter.push_back(p);
     for (Point p : iter) {
       if (by_point[p].size() == 2) {
-        std::vector<std::pair<Point, int>> out(by_point[p].begin(), by_point[p].end());
+        std::vector<std::pair<Point, int>> out(by_point[p].begin(),
+                                               by_point[p].end());
         by_point[out[0].first].erase(p);
-        CHECK(by_point[out[0].first].emplace(out[1].first, out[0].second + out[1].second).second)
-          << "Double path resolution not implemented";
+        CHECK(by_point[out[0].first]
+                  .emplace(out[1].first, out[0].second + out[1].second)
+                  .second)
+            << "Double path resolution not implemented";
         by_point[out[1].first].erase(p);
-        CHECK(by_point[out[1].first].emplace(out[0].first, out[0].second + out[1].second).second)
-          << "Double path resolution not implemented";
+        CHECK(by_point[out[1].first]
+                  .emplace(out[0].first, out[0].second + out[1].second)
+                  .second)
+            << "Double path resolution not implemented";
         by_point.erase(p);
         work_done = true;
       }
@@ -72,7 +77,7 @@ void BoardGraph::Build(const CharBoard& b, bool directed) {
   }
 
   VLOG(1) << "Pruned graph";
-  
+
   point_to_idx_.clear();
   map_.clear();
 
@@ -132,7 +137,7 @@ int BoardGraph::FindLongestPath(Point start, Point end) {
     ret = FindLongestPath(0, start_idx, end_idx);
   } else {
     std::vector<bool> hist(point_to_idx_.size(), false);
-    ret= FindLongestPath(hist, start_idx, end_idx);
+    ret = FindLongestPath(hist, start_idx, end_idx);
   }
   VLOG(1) << calls_ << " calls to FindLongestPath";
   return ret;
@@ -144,7 +149,7 @@ absl::StatusOr<std::string> Day_2023_23::Part1(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
   Point start = {-1, -1};
-  Point end= {-1, -1};
+  Point end = {-1, -1};
   for (const auto [p, c] : b) {
     if (c == '.') {
       if (start == Point{-1, -1}) start = p;
@@ -161,7 +166,7 @@ absl::StatusOr<std::string> Day_2023_23::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
   Point start = {-1, -1};
-  Point end= {-1, -1};
+  Point end = {-1, -1};
   for (const auto [p, c] : b) {
     if (c == '.') {
       if (start == Point{-1, -1}) start = p;
@@ -175,8 +180,7 @@ absl::StatusOr<std::string> Day_2023_23::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2023, /*day=*/23, []() {
-  return std::unique_ptr<AdventDay>(new Day_2023_23());
-});
+    /*year=*/2023, /*day=*/23,
+    []() { return std::unique_ptr<AdventDay>(new Day_2023_23()); });
 
 }  // namespace advent_of_code

@@ -11,11 +11,9 @@ namespace advent_of_code {
 
 namespace {
 
-std::optional<int> FindDisjointSize(
-    const std::vector<std::vector<int>>& graph,
-    std::vector<std::vector<bool>>& skip,
-    int start,
-    const std::vector<bool>& used) {
+std::optional<int> FindDisjointSize(const std::vector<std::vector<int>>& graph,
+                                    std::vector<std::vector<bool>>& skip,
+                                    int start, const std::vector<bool>& used) {
   std::vector<bool> used2(graph.size(), false);
   used2[start] = true;
   int used2_size = 1;
@@ -29,14 +27,13 @@ std::optional<int> FindDisjointSize(
       ++used2_size;
       queue.push_back(o);
     }
-  }  
+  }
 
   return used2_size;
 }
 
 std::vector<std::pair<int, int>> SpanningTree(
-    const std::vector<std::vector<int>>& graph,
-    int start = 0) {
+    const std::vector<std::vector<int>>& graph, int start = 0) {
   std::vector<std::pair<int, int>> ret;
   std::vector<bool> used(graph.size(), false);
   used[start] = true;
@@ -51,7 +48,7 @@ std::vector<std::pair<int, int>> SpanningTree(
       else
         ret.emplace_back(o, i);
     }
-  }  
+  }
 
   return ret;
 }
@@ -59,8 +56,7 @@ std::vector<std::pair<int, int>> SpanningTree(
 std::optional<std::pair<int, int>> FindThird(
     const std::vector<std::vector<int>>& graph,
     const absl::flat_hash_map<std::pair<int, int>, int>& edge_idx,
-    int max_edge_idx,
-    std::vector<std::vector<bool>>& skip) {
+    int max_edge_idx, std::vector<std::vector<bool>>& skip) {
   std::vector<bool> used(graph.size(), false);
   used[0] = true;
   for (std::deque<int> queue = {0}; !queue.empty(); queue.pop_front()) {
@@ -70,12 +66,15 @@ std::optional<std::pair<int, int>> FindThird(
       if (used[o]) continue;
       std::pair<int, int> edge = {i, o};
       if (i > o) edge = {o, i};
-      if (auto it = edge_idx.find(edge); it != edge_idx.end() && it->second < max_edge_idx) {
+      if (auto it = edge_idx.find(edge);
+          it != edge_idx.end() && it->second < max_edge_idx) {
         skip[i][o] = true;
         skip[o][i] = true;
-        std::optional<int> disjoint_rest = FindDisjointSize(graph, skip, o, used);
+        std::optional<int> disjoint_rest =
+            FindDisjointSize(graph, skip, o, used);
         if (disjoint_rest) {
-          return std::pair<int,int>{*disjoint_rest, graph.size() - *disjoint_rest};
+          return std::pair<int, int>{*disjoint_rest,
+                                     graph.size() - *disjoint_rest};
         }
         skip[i][o] = false;
         skip[o][i] = false;
@@ -140,7 +139,8 @@ absl::StatusOr<std::string> Day_2023_25::Part1(
     edge_idx[edges[i]] = i;
   }
 
-  std::vector<std::vector<bool>> skip(graph.size(), std::vector<bool>(graph.size(), false));
+  std::vector<std::vector<bool>> skip(graph.size(),
+                                      std::vector<bool>(graph.size(), false));
   for (int i = 0; i < edges.size(); ++i) {
     LOG_EVERY_N_SEC(INFO, 15) << i << "/" << edges.size();
     skip[edges[i].first][edges[i].second] = true;
@@ -149,7 +149,8 @@ absl::StatusOr<std::string> Day_2023_25::Part1(
       skip[edges[j].first][edges[j].second] = true;
       skip[edges[j].second][edges[j].first] = true;
 
-      std::optional<std::pair<int, int>> ret = FindThird(graph, edge_idx, j, skip);
+      std::optional<std::pair<int, int>> ret =
+          FindThird(graph, edge_idx, j, skip);
       if (ret) {
         return AdventReturn(ret->first * ret->second);
       }
@@ -170,8 +171,7 @@ absl::StatusOr<std::string> Day_2023_25::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2023, /*day=*/25, []() {
-  return std::unique_ptr<AdventDay>(new Day_2023_25());
-});
+    /*year=*/2023, /*day=*/25,
+    []() { return std::unique_ptr<AdventDay>(new Day_2023_25()); });
 
 }  // namespace advent_of_code

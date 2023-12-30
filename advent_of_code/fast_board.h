@@ -18,10 +18,10 @@ class FastBoard {
     kEast = 3,
   };
 
-  static constexpr std::array<Dir, 4> kRotateLeft =
-      {kWest, kEast, kSouth, kNorth};
-  static constexpr std::array<Dir, 4> kRotateRight =
-      {kEast, kWest, kNorth, kSouth};
+  static constexpr std::array<Dir, 4> kRotateLeft = {kWest, kEast, kSouth,
+                                                     kNorth};
+  static constexpr std::array<Dir, 4> kRotateRight = {kEast, kWest, kNorth,
+                                                      kSouth};
 
   class Point {
    public:
@@ -30,6 +30,7 @@ class FastBoard {
 
     bool operator==(const Point& o) const { return idx_ == o.idx_; }
     bool operator!=(const Point& o) const { return idx_ != o.idx_; }
+
    private:
     friend class FastBoard;
 
@@ -46,11 +47,9 @@ class FastBoard {
       p = fb.Add(p, d);
       return fb.OnBoard(p);
     }
-    void Move(const FastBoard& fb) {
-      p = fb.Add(p, d);
-    }
+    void Move(const FastBoard& fb) { p = fb.Add(p, d); }
   };
-  
+
   template <typename Storage>
   class PointMap {
    public:
@@ -80,7 +79,8 @@ class FastBoard {
   template <typename Storage>
   class PointHalfDirMap {
    public:
-    PointHalfDirMap(const FastBoard& b, Storage init) : map_(2 * b.size_, init) {}
+    PointHalfDirMap(const FastBoard& b, Storage init)
+        : map_(2 * b.size_, init) {}
 
     Storage Get(PointDir pd) const { return map_[pd.p.idx_ * 2 + pd.d / 2]; }
     void Set(PointDir pd, Storage s) { map_[pd.p.idx_ * 2 + pd.d / 2] = s; }
@@ -94,10 +94,14 @@ class FastBoard {
   class PointDirExtraMap {
    public:
     PointDirExtraMap(const FastBoard& b, Storage init)
-     : stride_(b.stride_), map_(4 * (b.size_ + 2 * stride_), init) {}
+        : stride_(b.stride_), map_(4 * (b.size_ + 2 * stride_), init) {}
 
-    Storage Get(PointDir pd) const { return map_[(pd.p.idx_ + stride_) * 4 + pd.d]; }
-    void Set(PointDir pd, Storage s) { map_[(pd.p.idx_ + stride_) * 4 + pd.d] = s; }
+    Storage Get(PointDir pd) const {
+      return map_[(pd.p.idx_ + stride_) * 4 + pd.d];
+    }
+    void Set(PointDir pd, Storage s) {
+      map_[(pd.p.idx_ + stride_) * 4 + pd.d] = s;
+    }
 
    private:
     friend class FastBoard;
@@ -106,9 +110,11 @@ class FastBoard {
   };
 
   explicit FastBoard(const ImmutableCharBoard& b)
-   : base_(b.row(0).data()), stride_(b.row(1).data() - b.row(0).data()),
-     size_(b.height() * stride_), dir_delta_({-stride_, stride_, -1, 1}),
-     on_board_(size_, true) {
+      : base_(b.row(0).data()),
+        stride_(b.row(1).data() - b.row(0).data()),
+        size_(b.height() * stride_),
+        dir_delta_({-stride_, stride_, -1, 1}),
+        on_board_(size_, true) {
     for (int i = stride_ - 1; i < size_; i += stride_) {
       on_board_[i] = false;
     }
@@ -128,13 +134,9 @@ class FastBoard {
     return on_board_[p.idx_];
   }
 
-  Point Add(Point p, Dir d) const {
-    return Point(p.idx_ + dir_delta_[d]);
-  }
+  Point Add(Point p, Dir d) const { return Point(p.idx_ + dir_delta_[d]); }
 
-  char operator[](Point p) const {
-    return base_[p.idx_];
-  }
+  char operator[](Point p) const { return base_[p.idx_]; }
 
  private:
   const char* base_;

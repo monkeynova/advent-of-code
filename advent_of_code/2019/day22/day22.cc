@@ -124,8 +124,7 @@ absl::StatusOr<std::string> Day_2019_22::Part2(
   return AdventReturn(full_reverse_transform.Apply(2020));
 }
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2019, /*day=*/22, []() {
-  return std::unique_ptr<AdventDay>(new Day_2019_22());
-});
+    /*year=*/2019, /*day=*/22,
+    []() { return std::unique_ptr<AdventDay>(new Day_2019_22()); });
 
 }  // namespace advent_of_code

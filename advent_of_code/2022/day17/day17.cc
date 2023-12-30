@@ -156,15 +156,15 @@ DropState::SummaryState DropState::Summarize() const {
 
   Point start = {0, height_};
   absl::flat_hash_set<Point> visited = {start};
-  ret.bounds = StablePointSet(
-      PointWalk({.start = start,
-                 .is_good =
-                     [&](Point test, int) {
-                       if (!bounds.Contains(test)) return false;
-                       return !stopped_.contains(test);
-                     },
-                 .is_final = [](Point, int) { return false; }})
-          .FindReachable());
+  ret.bounds =
+      StablePointSet(PointWalk({.start = start,
+                                .is_good =
+                                    [&](Point test, int) {
+                                      if (!bounds.Contains(test)) return false;
+                                      return !stopped_.contains(test);
+                                    },
+                                .is_final = [](Point, int) { return false; }})
+                         .FindReachable());
   for (Point& p : ret.bounds) p -= start;
   ret.height = height_;
   return ret;
@@ -211,8 +211,7 @@ absl::StatusOr<std::string> Day_2022_17::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2022, /*day=*/17, []() {
-  return std::unique_ptr<AdventDay>(new Day_2022_17());
-});
+    /*year=*/2022, /*day=*/17,
+    []() { return std::unique_ptr<AdventDay>(new Day_2022_17()); });
 
 }  // namespace advent_of_code

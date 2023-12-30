@@ -51,8 +51,8 @@ absl::StatusOr<int64_t> ComputeOreNeedForFuel(
     const DirectedGraph<Rule>& rule_set,
     const std::vector<std::string_view>& ordered_ingredients,
     int64_t fuel_needed) {
-  absl::flat_hash_map<std::string_view, int64_t> needs =
-      {{"FUEL", fuel_needed}};
+  absl::flat_hash_map<std::string_view, int64_t> needs = {
+      {"FUEL", fuel_needed}};
   for (std::string_view node : ordered_ingredients) {
     if (node == "ORE") continue;
     const Rule* rule = rule_set.GetData(node);
@@ -103,16 +103,13 @@ absl::StatusOr<int> FuelFromOre(const DirectedGraph<Rule>& rule_set,
   if (ordered_ingredients.back() != "ORE") {
     return Error("Not a DAG with leaf at ORE");
   }
-  int smallest_unmakable = InfiniteBinarySearch(
-    [&](int guess) {
-      absl::StatusOr<int64_t> ore_needed =
-          ComputeOreNeedForFuel(rule_set, ordered_ingredients, guess);
-      CHECK(ore_needed.ok());
-      VLOG(1) << guess << " => " << *ore_needed;
-      return *ore_needed < ore_supply;
-
-    }
-  );
+  int smallest_unmakable = InfiniteBinarySearch([&](int guess) {
+    absl::StatusOr<int64_t> ore_needed =
+        ComputeOreNeedForFuel(rule_set, ordered_ingredients, guess);
+    CHECK(ore_needed.ok());
+    VLOG(1) << guess << " => " << *ore_needed;
+    return *ore_needed < ore_supply;
+  });
   return smallest_unmakable - 1;
 }
 
@@ -133,8 +130,7 @@ absl::StatusOr<std::string> Day_2019_14::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2019, /*day=*/14, []() {
-  return std::unique_ptr<AdventDay>(new Day_2019_14());
-});
+    /*year=*/2019, /*day=*/14,
+    []() { return std::unique_ptr<AdventDay>(new Day_2019_14()); });
 
 }  // namespace advent_of_code

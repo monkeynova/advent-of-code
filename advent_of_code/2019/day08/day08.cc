@@ -74,7 +74,7 @@ absl::StatusOr<std::string> Day_2019_08::Part2(
       }
     }
   }
-  
+
   // TODO(@monkeynova): OCRExtract requires empty columns to break characters,
   // and we have a slight touch between the 'Y' and 'E' in the expected output.
   std::string ret;
@@ -89,8 +89,7 @@ absl::StatusOr<std::string> Day_2019_08::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2019, /*day=*/8, []() {
-  return std::unique_ptr<AdventDay>(new Day_2019_08());
-});
+    /*year=*/2019, /*day=*/8,
+    []() { return std::unique_ptr<AdventDay>(new Day_2019_08()); });
 
 }  // namespace advent_of_code

@@ -29,7 +29,7 @@ absl::StatusOr<std::vector<Cube>> Parse(absl::Span<std::string_view> input) {
     RETURN_IF_ERROR(tok.NextIs(","));
     ASSIGN_OR_RETURN(next.max.z, tok.NextInt());
     if (!tok.Done()) return Error("Extra tokens");
- 
+
     int same_count = 0;
     if (next.min.x == next.max.x) ++same_count;
     if (next.min.y == next.max.y) ++same_count;
@@ -46,11 +46,11 @@ absl::StatusOr<std::vector<Cube>> Parse(absl::Span<std::string_view> input) {
 class SupportGraph {
  public:
   explicit SupportGraph(int size)
-   : supports_(size + 1), supported_by_(size + 1) {}
+      : supports_(size + 1), supported_by_(size + 1) {}
 
   void Add(int supportee, int supported) {
     supports_[supportee].push_back(supported);
-    supported_by_[supported ].push_back(supportee);
+    supported_by_[supported].push_back(supportee);
   }
 
   const std::vector<int>& Supports(int supported) {
@@ -78,15 +78,15 @@ SupportGraph Drop(std::vector<Cube>& list) {
 
   const int kFloorIndex = list.size();
 
-  std::vector<std::vector<int>> heights(
-      r.max.y + 1, std::vector<int>(r.max.x + 1, 0));
+  std::vector<std::vector<int>> heights(r.max.y + 1,
+                                        std::vector<int>(r.max.x + 1, 0));
   std::vector<std::vector<int>> support(
       r.max.y + 1, std::vector<int>(r.max.x + 1, kFloorIndex));
 
   SupportGraph ret(list.size() + 1);
   for (int i = 0; i < list.size(); ++i) {
-    PointRectangle xy =
-        {{list[i].min.x, list[i].min.y}, {list[i].max.x, list[i].max.y}};
+    PointRectangle xy = {{list[i].min.x, list[i].min.y},
+                         {list[i].max.x, list[i].max.y}};
     int out_z = 0;
     for (Point p : xy) {
       out_z = std::max(out_z, heights[p.y][p.x]);
@@ -177,8 +177,7 @@ absl::StatusOr<std::string> Day_2023_22::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2023, /*day=*/22, []() {
-  return std::unique_ptr<AdventDay>(new Day_2023_22());
-});
+    /*year=*/2023, /*day=*/22,
+    []() { return std::unique_ptr<AdventDay>(new Day_2023_22()); });
 
 }  // namespace advent_of_code

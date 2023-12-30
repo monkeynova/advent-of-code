@@ -45,9 +45,9 @@ class VM {
     int ip = 0;
     while (ip < instructions_.size()) {
       const Instruction& ins = instructions_[ip];
-      int64_t* reg = ins.reg.empty()
-                         ? nullptr
-                         : ins.reg == "a" ? &register_a_ : &register_b_;
+      int64_t* reg = ins.reg.empty()  ? nullptr
+                     : ins.reg == "a" ? &register_a_
+                                      : &register_b_;
       switch (ins.op) {
         case OpCode::kHlf: {
           *reg /= 2;
@@ -134,8 +134,7 @@ absl::StatusOr<std::string> Day_2015_23::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2015, /*day=*/23, []() {
-  return std::unique_ptr<AdventDay>(new Day_2015_23());
-});
+    /*year=*/2015, /*day=*/23,
+    []() { return std::unique_ptr<AdventDay>(new Day_2015_23()); });
 
 }  // namespace advent_of_code

@@ -12,18 +12,30 @@ namespace advent_of_code {
 namespace {
 
 char StartType(Point orig_dir, Point dir) {
-  if      (orig_dir == Cardinal::kEast  && dir == Cardinal::kEast ) return '-';
-  else if (orig_dir == Cardinal::kWest  && dir == Cardinal::kWest ) return '-';
-  else if (orig_dir == Cardinal::kSouth && dir == Cardinal::kSouth) return '|';
-  else if (orig_dir == Cardinal::kNorth && dir == Cardinal::kNorth) return '|';
-  else if (orig_dir == Cardinal::kWest  && dir == Cardinal::kNorth) return '7';
-  else if (orig_dir == Cardinal::kSouth && dir == Cardinal::kEast ) return '7';
-  else if (orig_dir == Cardinal::kWest  && dir == Cardinal::kSouth) return 'J';
-  else if (orig_dir == Cardinal::kNorth && dir == Cardinal::kEast ) return 'J';
-  else if (orig_dir == Cardinal::kNorth && dir == Cardinal::kWest ) return 'L';
-  else if (orig_dir == Cardinal::kEast  && dir == Cardinal::kSouth) return 'L';
-  else if (orig_dir == Cardinal::kEast  && dir == Cardinal::kNorth) return 'F';
-  else if (orig_dir == Cardinal::kSouth && dir == Cardinal::kWest ) return 'F';
+  if (orig_dir == Cardinal::kEast && dir == Cardinal::kEast)
+    return '-';
+  else if (orig_dir == Cardinal::kWest && dir == Cardinal::kWest)
+    return '-';
+  else if (orig_dir == Cardinal::kSouth && dir == Cardinal::kSouth)
+    return '|';
+  else if (orig_dir == Cardinal::kNorth && dir == Cardinal::kNorth)
+    return '|';
+  else if (orig_dir == Cardinal::kWest && dir == Cardinal::kNorth)
+    return '7';
+  else if (orig_dir == Cardinal::kSouth && dir == Cardinal::kEast)
+    return '7';
+  else if (orig_dir == Cardinal::kWest && dir == Cardinal::kSouth)
+    return 'J';
+  else if (orig_dir == Cardinal::kNorth && dir == Cardinal::kEast)
+    return 'J';
+  else if (orig_dir == Cardinal::kNorth && dir == Cardinal::kWest)
+    return 'L';
+  else if (orig_dir == Cardinal::kEast && dir == Cardinal::kSouth)
+    return 'L';
+  else if (orig_dir == Cardinal::kEast && dir == Cardinal::kNorth)
+    return 'F';
+  else if (orig_dir == Cardinal::kSouth && dir == Cardinal::kWest)
+    return 'F';
   return '?';
 }
 
@@ -32,10 +44,9 @@ inline Point AdjustDir(Point dir, char c) {
   static const std::array<std::array<Point, 9>, 128> kTransitionTable = []() {
     std::array<std::array<Point, 9>, 128> ret;
     for (int c = 0; c < 128; ++c) {
-      ret[c] = {
-        Cardinal::kOrigin, Cardinal::kOrigin, Cardinal::kOrigin,
-        Cardinal::kOrigin, Cardinal::kOrigin, Cardinal::kOrigin,
-        Cardinal::kOrigin, Cardinal::kOrigin, Cardinal::kOrigin};
+      ret[c] = {Cardinal::kOrigin, Cardinal::kOrigin, Cardinal::kOrigin,
+                Cardinal::kOrigin, Cardinal::kOrigin, Cardinal::kOrigin,
+                Cardinal::kOrigin, Cardinal::kOrigin, Cardinal::kOrigin};
     }
     constexpr int kNorthIdx = 1;
     constexpr int kWestIdx = 3;
@@ -78,9 +89,7 @@ struct XAndC {
   int16_t x;
   char c;
 
-  bool operator<(const XAndC& o) const {
-    return x < o.x;
-  }
+  bool operator<(const XAndC& o) const { return x < o.x; }
 };
 
 std::vector<std::vector<XAndC>> FindLoop(const ImmutableCharBoard& b,
@@ -91,9 +100,8 @@ std::vector<std::vector<XAndC>> FindLoop(const ImmutableCharBoard& b,
     std::vector<std::vector<XAndC>> ret(b.height());
     for (Point test = dir + start; b.OnBoard(test); test += dir) {
       if (test == start) {
-        ret[test.y].push_back({
-          .x = static_cast<int16_t>(test.x),
-          .c = StartType(orig_dir, dir)});
+        ret[test.y].push_back(
+            {.x = static_cast<int16_t>(test.x), .c = StartType(orig_dir, dir)});
         return ret;
       }
       char c = b[test];
@@ -173,8 +181,7 @@ absl::StatusOr<std::string> Day_2023_10::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2023, /*day=*/10, []() {
-  return std::unique_ptr<AdventDay>(new Day_2023_10());
-});
+    /*year=*/2023, /*day=*/10,
+    []() { return std::unique_ptr<AdventDay>(new Day_2023_10()); });
 
 }  // namespace advent_of_code

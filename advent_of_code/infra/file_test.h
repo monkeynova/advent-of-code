@@ -18,7 +18,6 @@ class FileTest_Day : public ::testing::Test {
   }
 };
 
-
 }  // namespace advent_of_code
 
 #endif  //  ADVENT_OF_CODE_INFRA_FILE_TEST_H

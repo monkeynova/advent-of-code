@@ -79,7 +79,7 @@ inline void BM_Day_SetError(benchmark::State& state, std::string_view message) {
   state.SkipWithError(message_str.c_str());
 }
 
-}
+}  // namespace
 
 int FileBenchmarkMaxIdx(AdventDay* day) {
   return FileBenchmarkTests(day->test_file())->size() - 1;
@@ -121,7 +121,7 @@ void BM_Day(benchmark::State& state, AdventDay* day) {
     }
   }
   if (skip.empty()) {
-    static std::string include_filter = 
+    static std::string include_filter =
         absl::GetFlag(FLAGS_bechmark_file_include_filter);
     if (!include_filter.empty()) {
       auto matches = [&](const std::string& test) {

@@ -14,8 +14,8 @@ namespace advent_of_code {
 
 namespace {
 
-absl::StatusOr<int64_t> NaivePart2(
-    const ImmutableCharBoard& b, Point s, int steps) {
+absl::StatusOr<int64_t> NaivePart2(const ImmutableCharBoard& b, Point s,
+                                   int steps) {
   absl::flat_hash_set<Point> set;
   absl::flat_hash_set<Point> frontier = {s};
   if (steps % 2 == 0) {
@@ -35,7 +35,8 @@ absl::StatusOr<int64_t> NaivePart2(
   }
   int64_t removed = 0;
   for (int i = steps % 2; i < steps; i += 2) {
-    LOG_EVERY_N_SEC(INFO, 15) << i << ": " << removed << "/" << set.size() << "/" << frontier.size();
+    LOG_EVERY_N_SEC(INFO, 15)
+        << i << ": " << removed << "/" << set.size() << "/" << frontier.size();
     absl::flat_hash_set<Point> next_frontier;
     for (Point p : frontier) {
       for (Point d1 : Cardinal::kFourDirs) {
@@ -44,20 +45,18 @@ absl::StatusOr<int64_t> NaivePart2(
           Point next = p + d1 + d2;
           Point test = b.TorusPoint(next);
           if (b[test] == '#') continue;
-          if (set.insert(next).second ) {
+          if (set.insert(next).second) {
             next_frontier.insert(next);
           }
         }
       }
     }
     frontier = std::move(next_frontier);
-  } 
+  }
   absl::flat_hash_map<Point, int> grid_count;
   for (Point p : set) {
-    Point g = {
-      static_cast<int>(floor(1.0 * p.x / b.width())),
-      static_cast<int>(floor(1.0 * p.y / b.height()))
-    };
+    Point g = {static_cast<int>(floor(1.0 * p.x / b.width())),
+               static_cast<int>(floor(1.0 * p.y / b.height()))};
     ++grid_count[g];
   }
   for (const auto& [p, c] : grid_count) {
@@ -79,12 +78,14 @@ std::optional<std::pair<int, int>> PaintAndCountFirst(
   } else {
     ++ret.second;
   }
-  for (std::deque<FastBoard::Point> queue = {s_idx}; !queue.empty(); queue.pop_front()) {
+  for (std::deque<FastBoard::Point> queue = {s_idx}; !queue.empty();
+       queue.pop_front()) {
     int dist = paint.Get(queue.front());
     CHECK_NE(dist, -1);
     if (dist == steps) break;
     ++dist;
-    for (FastBoard::Dir d : {FastBoard::kNorth, FastBoard::kSouth, FastBoard::kEast, FastBoard::kWest}) {
+    for (FastBoard::Dir d : {FastBoard::kNorth, FastBoard::kSouth,
+                             FastBoard::kEast, FastBoard::kWest}) {
       FastBoard::Point test = fb.Add(queue.front(), d);
       if (!fb.OnBoard(test)) continue;
       if (fb[test] == '#') continue;
@@ -102,26 +103,30 @@ std::optional<std::pair<int, int>> PaintAndCountFirst(
     int test_dist = (start - Point{0, i}).dist();
     if (paint.Get(fb.From({0, i})) != test_dist) return std::nullopt;
     if (paint.Get(fb.From({i, 0})) != test_dist) return std::nullopt;
-    if (paint.Get(fb.From({b.width() - 1, i})) != test_dist) return std::nullopt;
-    if (paint.Get(fb.From({i, b.height() - 1})) != test_dist) return std::nullopt;
+    if (paint.Get(fb.From({b.width() - 1, i})) != test_dist)
+      return std::nullopt;
+    if (paint.Get(fb.From({i, b.height() - 1})) != test_dist)
+      return std::nullopt;
   }
   return ret;
 }
 
-
-int64_t PaintAndCount(const ImmutableCharBoard& b, Point start, int start_d, int steps) {
+int64_t PaintAndCount(const ImmutableCharBoard& b, Point start, int start_d,
+                      int steps) {
   if (start_d > steps) return 0;
   FastBoard fb(b);
   FastBoard::PointMap<int> paint(fb, -1);
   FastBoard::Point s_idx = fb.From(start);
   paint.Set(s_idx, start_d);
   int count = start_d % 2 == steps % 2 ? 1 : 0;
-  for (std::deque<FastBoard::Point> queue = {s_idx}; !queue.empty(); queue.pop_front()) {
+  for (std::deque<FastBoard::Point> queue = {s_idx}; !queue.empty();
+       queue.pop_front()) {
     int dist = paint.Get(queue.front());
     CHECK_NE(dist, -1);
     if (dist == steps) break;
     ++dist;
-    for (FastBoard::Dir d : {FastBoard::kNorth, FastBoard::kSouth, FastBoard::kEast, FastBoard::kWest}) {
+    for (FastBoard::Dir d : {FastBoard::kNorth, FastBoard::kSouth,
+                             FastBoard::kEast, FastBoard::kWest}) {
       FastBoard::Point test = fb.Add(queue.front(), d);
       if (!fb.OnBoard(test)) continue;
       if (fb[test] == '#') continue;
@@ -137,8 +142,8 @@ int64_t PaintAndCount(const ImmutableCharBoard& b, Point start, int start_d, int
   return count;
 }
 
-std::optional<int64_t> HackPart2(
-    const ImmutableCharBoard& b, Point s, int steps) {
+std::optional<int64_t> HackPart2(const ImmutableCharBoard& b, Point s,
+                                 int steps) {
   if (b.width() != b.height()) return std::nullopt;
   if (b.width() % 2 != 1) return std::nullopt;
   if (s.x != b.width() / 2) return std::nullopt;
@@ -168,11 +173,12 @@ std::optional<int64_t> HackPart2(
   }
 
   // 1, 5, 13, 25
-  // 1 + SUM(4n)  
+  // 1 + SUM(4n)
   // 1 + 2n(n+1)
   int64_t full_max_tile_x = (max_tile_x + 1) / 2;
   int64_t full_off_max_tile_x = max_tile_x - full_max_tile_x;
-  VLOG(1) << max_tile_x << " -> " << full_max_tile_x << " + " << full_off_max_tile_x;
+  VLOG(1) << max_tile_x << " -> " << full_max_tile_x << " + "
+          << full_off_max_tile_x;
   VLOG(1) << "Full: " << full_paint_count;
   int64_t full_tile_count = 1 + 4 * full_max_tile_x * (full_max_tile_x - 1);
   VLOG(1) << " x" << full_tile_count;
@@ -181,18 +187,19 @@ std::optional<int64_t> HackPart2(
   // Full tiles are offset on which step mod they use.
   // SUM(4 * (2n + 1))
   VLOG(1) << "Full (off): " << full_off_paint_count;
-  int64_t full_off_tile_count = 4 * full_off_max_tile_x * (full_off_max_tile_x - 1) + 4 * full_off_max_tile_x;
+  int64_t full_off_tile_count =
+      4 * full_off_max_tile_x * (full_off_max_tile_x - 1) +
+      4 * full_off_max_tile_x;
   VLOG(1) << " x" << full_off_tile_count;
   total += full_off_tile_count * full_off_paint_count;
-
 
   {
     int mid_edge_dist = steps - max_x % b.width();
     std::vector<std::pair<std::string, Point>> corner_tiles = {
-      {"Right Corner", {0, s.y}},
-      {"Bottom Corner", {s.x, 0}},
-      {"Left Corner", {b.width() - 1, s.y}},
-      {"Top Corner", {s.x, b.height() - 1}},
+        {"Right Corner", {0, s.y}},
+        {"Bottom Corner", {s.x, 0}},
+        {"Left Corner", {b.width() - 1, s.y}},
+        {"Top Corner", {s.x, b.height() - 1}},
     };
     for (const auto& [name, start] : corner_tiles) {
       int64_t count = PaintAndCount(b, start, mid_edge_dist, steps);
@@ -203,10 +210,10 @@ std::optional<int64_t> HackPart2(
   if (extra_corner) {
     int mid_edge_dist = steps - max_x % b.width() - b.width();
     std::vector<std::pair<std::string, Point>> corner_tiles = {
-      {"Right Corner (Extra)", {0, s.y}},
-      {"Bottom Corner (Extra)", {s.x, 0}},
-      {"Left Corner (Extra)", {b.width() - 1, s.y}},
-      {"Top Corner (Extra)", {s.x, b.height() - 1}},
+        {"Right Corner (Extra)", {0, s.y}},
+        {"Bottom Corner (Extra)", {s.x, 0}},
+        {"Left Corner (Extra)", {b.width() - 1, s.y}},
+        {"Top Corner (Extra)", {s.x, b.height() - 1}},
     };
     for (const auto& [name, start] : corner_tiles) {
       int64_t count = PaintAndCount(b, start, mid_edge_dist, steps);
@@ -221,10 +228,10 @@ std::optional<int64_t> HackPart2(
     }
     // CHECK_LT(corner_dist, steps);
     std::vector<std::pair<std::string, Point>> corner_tiles = {
-      {"UR Edge Small", {0, b.height() - 1}},
-      {"BR Edge Small", {0, 0}},
-      {"UL Edge Small", {b.width() - 1, b.height() - 1}},
-      {"BL Edge Small", {b.width() - 1, 0}},
+        {"UR Edge Small", {0, b.height() - 1}},
+        {"BR Edge Small", {0, 0}},
+        {"UL Edge Small", {b.width() - 1, b.height() - 1}},
+        {"BL Edge Small", {b.width() - 1, 0}},
     };
     for (const auto& [name, start] : corner_tiles) {
       int64_t count = PaintAndCount(b, start, corner_dist, steps);
@@ -241,10 +248,10 @@ std::optional<int64_t> HackPart2(
     }
     // CHECK_LT(corner_dist, steps);
     std::vector<std::pair<std::string, Point>> corner_tiles = {
-      {"UR Edge Large", {0, b.height() - 1}},
-      {"BR Edge Large", {0, 0}},
-      {"UL Edge Large", {b.width() - 1, b.height() - 1}},
-      {"BL Edge Large", {b.width() - 1, 0}},
+        {"UR Edge Large", {0, b.height() - 1}},
+        {"BR Edge Large", {0, 0}},
+        {"UL Edge Large", {b.width() - 1, b.height() - 1}},
+        {"BL Edge Large", {b.width() - 1, 0}},
     };
     for (const auto& [name, start] : corner_tiles) {
       int64_t count = PaintAndCount(b, start, corner_dist, steps);
@@ -269,10 +276,12 @@ absl::StatusOr<std::string> Day_2023_21::Part1(
   FastBoard::Point s_idx = fb.From(s);
   dist.Set(s_idx, 0);
   int count = steps % 2 == 0 ? 1 : 0;
-  for (std::deque<FastBoard::Point> queue = {s_idx}; !queue.empty(); queue.pop_front()) {
+  for (std::deque<FastBoard::Point> queue = {s_idx}; !queue.empty();
+       queue.pop_front()) {
     int next_d = dist.Get(queue.front()) + 1;
     if (next_d > steps) break;
-    for (FastBoard::Dir d : {FastBoard::kNorth, FastBoard::kSouth, FastBoard::kWest, FastBoard::kEast}) {
+    for (FastBoard::Dir d : {FastBoard::kNorth, FastBoard::kSouth,
+                             FastBoard::kWest, FastBoard::kEast}) {
       FastBoard::Point test = fb.Add(queue.front(), d);
       if (!fb.OnBoard(test)) continue;
       if (fb[test] == '#') continue;
@@ -302,9 +311,9 @@ absl::StatusOr<std::string> Day_2023_21::Part2(
 
 static AdventRegisterEntry registry = RegisterAdventDay(
     /*year=*/2023, /*day=*/21, []() {
-  auto ret = std::unique_ptr<AdventDay>(new Day_2023_21());
-  ret->set_param("64,26501365");
-  return ret;
-});
+      auto ret = std::unique_ptr<AdventDay>(new Day_2023_21());
+      ret->set_param("64,26501365");
+      return ret;
+    });
 
 }  // namespace advent_of_code

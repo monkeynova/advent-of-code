@@ -36,9 +36,12 @@ bool AbslParseFlag(absl::string_view text, ColorType* c, std::string* error) {
 
 std::string AbslUnparseFlag(ColorType c) {
   switch (c) {
-    case kAuto: return "auto";
-    case kNone: return "none";
-    case kForce: return "force";
+    case kAuto:
+      return "auto";
+    case kNone:
+      return "none";
+    case kForce:
+      return "force";
   }
   return "<Bad ColorType>";
 }
@@ -101,7 +104,7 @@ absl::Status ReadInput(advent_of_code::AdventDay* day, Input* ret) {
   while (!ret->lines.empty() && ret->lines.back().empty()) {
     ret->lines.pop_back();
   }
-  return absl::OkStatus();  
+  return absl::OkStatus();
 }
 
 struct DayRun {
@@ -115,9 +118,12 @@ struct DayRun {
 
 absl::StatusOr<DayRun> RunDay(advent_of_code::AdventDay* day) {
   if (day == nullptr) {
-    return DayRun{.time = absl::Seconds(0), .title = "???",
-                  .part1 = "", .part1_solved = false,
-                  .part2 = "", .part2_solved = false};
+    return DayRun{.time = absl::Seconds(0),
+                  .title = "???",
+                  .part1 = "",
+                  .part1_solved = false,
+                  .part2 = "",
+                  .part2_solved = false};
   }
   DayRun ret;
   absl::Time start = absl::Now();
@@ -125,17 +131,21 @@ absl::StatusOr<DayRun> RunDay(advent_of_code::AdventDay* day) {
   Input input;
   RETURN_IF_ERROR(ReadInput(day, &input));
   absl::StatusOr<std::string> part1 = day->Part1(absl::MakeSpan(input.lines));
-  if ((ret.part1_solved = part1.ok())) ret.part1 = *std::move(part1);
-  else ret.part1 = absl::StrCat("Error: ", part1.status().message());
+  if ((ret.part1_solved = part1.ok()))
+    ret.part1 = *std::move(part1);
+  else
+    ret.part1 = absl::StrCat("Error: ", part1.status().message());
   absl::StatusOr<std::string> part2 = day->Part2(absl::MakeSpan(input.lines));
-  if ((ret.part2_solved = part2.ok())) ret.part2 = *std::move(part2);
-  else ret.part2 = absl::StrCat("Error: ", part2.status().message());
+  if ((ret.part2_solved = part2.ok()))
+    ret.part2 = *std::move(part2);
+  else
+    ret.part2 = absl::StrCat("Error: ", part2.status().message());
   ret.time = absl::Now() - start;
   return ret;
 }
 
 class Table {
- public: 
+ public:
   struct Cell {
     enum Justify { kLeft = 0, kRight = 1, kCenter = 2 };
     enum Color { kWhite = 0, kYellow = 1, kGreen = 2, kRed = 3 };
@@ -150,19 +160,21 @@ class Table {
 
   Table() {
     switch (absl::GetFlag(FLAGS_color)) {
-      case kNone: use_color_ = false; break;
-      case kForce: use_color_ = true; break;
-      case kAuto: use_color_ = IsColorTerminal(); break;
+      case kNone:
+        use_color_ = false;
+        break;
+      case kForce:
+        use_color_ = true;
+        break;
+      case kAuto:
+        use_color_ = IsColorTerminal();
+        break;
     }
   }
 
-  void AddBreaker() {
-    rows_.emplace_back(Breaker());
-  }
+  void AddBreaker() { rows_.emplace_back(Breaker()); }
 
-  void AddRow(std::vector<Cell> row) {
-    rows_.emplace_back(std::move(row));
-  }
+  void AddRow(std::vector<Cell> row) { rows_.emplace_back(std::move(row)); }
 
   std::string Render() const;
 
@@ -238,7 +250,7 @@ std::vector<int> Table::Layout() const {
 
 std::string Table::Render() const {
   std::string ret;
-  
+
   std::vector<int> col_widths = Layout();
   for (int i = 0; i < rows_.size(); ++i) {
     if (std::holds_alternative<Breaker>(rows_[i])) {
@@ -250,7 +262,7 @@ std::string Table::Render() const {
       for (const Cell& cell : cells) {
         int width = 0;
         for (int i = col_idx; i < col_idx + cell.span; ++i) {
-          if (i > col_idx) width += 3; // Margin.
+          if (i > col_idx) width += 3;  // Margin.
           width += col_widths[i];
         }
         ret.append(1, ' ');
@@ -264,8 +276,8 @@ std::string Table::Render() const {
   return ret;
 }
 
-void Table::RenderBreaker(
-    std::string* out, const std::vector<int> col_widths, int row_num) const {
+void Table::RenderBreaker(std::string* out, const std::vector<int> col_widths,
+                          int row_num) const {
   std::vector<int> prev;
   if (row_num > 0 &&
       std::holds_alternative<std::vector<Cell>>(rows_[row_num - 1])) {
@@ -316,8 +328,7 @@ void Table::RenderBreaker(
   out->append(1, col_match ? '+' : '-');
 }
 
-void Table::Cell::Render(std::string* out, int width, bool enable_color)
-    const {
+void Table::Cell::Render(std::string* out, int width, bool enable_color) const {
   bool need_reset = false;
   if (enable_color) {
     if (bold) {
@@ -325,7 +336,8 @@ void Table::Cell::Render(std::string* out, int width, bool enable_color)
       need_reset = true;
     }
     switch (color) {
-      case kWhite: break;
+      case kWhite:
+        break;
       case kRed: {
         out->append("\u001b[31m");
         need_reset = true;
@@ -386,7 +398,7 @@ std::string TimeString(absl::Duration d) {
   return d != absl::Seconds(0) ? absl::StrCat(d) : "";
 };
 
-}
+}  // namespace
 
 int main(int argc, char** argv) {
   InitMain(argc, argv);
@@ -406,36 +418,37 @@ int main(int argc, char** argv) {
 
   Table table;
   table.AddBreaker();
-  table.AddRow({
-    Table::Cell{.entry = absl::StrCat("Advent of Code ", year), .span = 6,
-                .bold = true, .justify = Table::Cell::kCenter}});
+  table.AddRow({Table::Cell{.entry = absl::StrCat("Advent of Code ", year),
+                            .span = 6,
+                            .bold = true,
+                            .justify = Table::Cell::kCenter}});
   table.AddBreaker();
-  table.AddRow({
-    Table::Cell{.entry = "Title", .justify = Table::Cell::kCenter},
-    Table::Cell{.entry = "Part 1", .span = 2, .justify = Table::Cell::kCenter},
-    Table::Cell{.entry = "Part 2", .span = 2, .justify = Table::Cell::kCenter},
-    Table::Cell{.entry = "Time", .justify = Table::Cell::kCenter}});
+  table.AddRow(
+      {Table::Cell{.entry = "Title", .justify = Table::Cell::kCenter},
+       Table::Cell{
+           .entry = "Part 1", .span = 2, .justify = Table::Cell::kCenter},
+       Table::Cell{
+           .entry = "Part 2", .span = 2, .justify = Table::Cell::kCenter},
+       Table::Cell{.entry = "Time", .justify = Table::Cell::kCenter}});
   table.AddBreaker();
 
   for (const DayRun& run : runs) {
-    table.AddRow({
-      Table::Cell{.entry = run.title},
-      Table::Cell{.entry = run.part1},
-      Table::Cell{.entry = run.part1_solved ? "*" : " ",
-                  .color = Table::Cell::kYellow},
-      Table::Cell{.entry = run.part2},
-      Table::Cell{.entry = run.part2_solved ? "*" : " ",
-                  .color = Table::Cell::kYellow},
-      Table::Cell{.entry = TimeString(run.time),
-                  .color = DayTimeColor(run.time),
-                  .justify = Table::Cell::kRight}});
+    table.AddRow({Table::Cell{.entry = run.title},
+                  Table::Cell{.entry = run.part1},
+                  Table::Cell{.entry = run.part1_solved ? "*" : " ",
+                              .color = Table::Cell::kYellow},
+                  Table::Cell{.entry = run.part2},
+                  Table::Cell{.entry = run.part2_solved ? "*" : " ",
+                              .color = Table::Cell::kYellow},
+                  Table::Cell{.entry = TimeString(run.time),
+                              .color = DayTimeColor(run.time),
+                              .justify = Table::Cell::kRight}});
   }
   table.AddBreaker();
-  table.AddRow({
-    Table::Cell{.entry = "Total", .span = 5},
-    Table::Cell{.entry = TimeString(total_time),
-                .color = YearTimeColor(total_time),
-                .justify = Table::Cell::kRight}});
+  table.AddRow({Table::Cell{.entry = "Total", .span = 5},
+                Table::Cell{.entry = TimeString(total_time),
+                            .color = YearTimeColor(total_time),
+                            .justify = Table::Cell::kRight}});
   table.AddBreaker();
 
   std::cout << table.Render();

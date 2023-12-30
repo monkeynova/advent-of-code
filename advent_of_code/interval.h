@@ -21,7 +21,7 @@ class Interval1D {
     Interval1D ret;
     ret.x_.push_back(min);
     return ret;
-  } 
+  }
 
   Interval1D() = default;
   explicit Interval1D(std::vector<int64_t> x) : x_(std::move(x)) {}
@@ -37,9 +37,7 @@ class Interval1D {
 
   bool HasOverlap(const Interval1D& o) const;
 
-  bool operator==(const Interval1D& o) const {
-    return x_ == o.x_;
-  }
+  bool operator==(const Interval1D& o) const { return x_ == o.x_; }
 
   absl::Span<const int64_t> x() const { return x_; }
 

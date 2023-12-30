@@ -14,13 +14,12 @@ namespace {
 
 int MinCartPath(const ImmutableCharBoard& b, int min, int max) {
   FastBoard fb(b);
-  FastBoard::PointHalfDirMap<int> heat_map(
-      fb, std::numeric_limits<int>::max());
+  FastBoard::PointHalfDirMap<int> heat_map(fb, std::numeric_limits<int>::max());
   FastBoard::PointDirMap<bool> in_queue(fb, false);
 
   struct HeatMapGt {
     explicit HeatMapGt(const FastBoard::PointHalfDirMap<int>& heat_map)
-    : heat_map_(heat_map) {}
+        : heat_map_(heat_map) {}
 
     bool operator()(FastBoard::PointDir a, FastBoard::PointDir b) {
       return heat_map_.Get(b) < heat_map_.Get(a);
@@ -28,9 +27,9 @@ int MinCartPath(const ImmutableCharBoard& b, int min, int max) {
 
     const FastBoard::PointHalfDirMap<int>& heat_map_;
   };
-  using QueueType = std::priority_queue<FastBoard::PointDir,
-                                        std::vector<FastBoard::PointDir>,
-                                        HeatMapGt>;
+  using QueueType =
+      std::priority_queue<FastBoard::PointDir, std::vector<FastBoard::PointDir>,
+                          HeatMapGt>;
   HeatMapGt cmp(heat_map);
   QueueType queue(cmp);
 
@@ -43,12 +42,12 @@ int MinCartPath(const ImmutableCharBoard& b, int min, int max) {
       if (!pd.MoveAndCheckBoard(fb)) break;
       heat += fb[pd.p] - '0';
       if (i + 1 < min) continue;
-  
+
       if (heat < heat_map.Get(pd)) {
         heat_map.Set(pd, heat);
         if (!in_queue.Get(pd)) {
           in_queue.Set(pd, true);
-          queue.push(pd); 
+          queue.push(pd);
         }
       }
     }
@@ -60,7 +59,7 @@ int MinCartPath(const ImmutableCharBoard& b, int min, int max) {
     add_range(start, d);
   }
   int dequeued = 0;
-  for (;!queue.empty(); queue.pop()) {
+  for (; !queue.empty(); queue.pop()) {
     ++dequeued;
     FastBoard::PointDir cur = queue.top();
     in_queue.Set(cur, false);
@@ -91,8 +90,7 @@ absl::StatusOr<std::string> Day_2023_17::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2023, /*day=*/17, []() {
-  return std::unique_ptr<AdventDay>(new Day_2023_17());
-});
+    /*year=*/2023, /*day=*/17,
+    []() { return std::unique_ptr<AdventDay>(new Day_2023_17()); });
 
 }  // namespace advent_of_code

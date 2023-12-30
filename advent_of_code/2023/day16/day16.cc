@@ -56,11 +56,9 @@ SegmentMap FindSegments(const ImmutableCharBoard& b) {
 int FindEnergized(const ImmutableCharBoard& b, const SegmentMap& segments,
                   Point p, FastBoard::Dir d) {
   static const std::array<FastBoard::Dir, 4> kSlashLookup = {
-      FastBoard::kEast, FastBoard::kWest, FastBoard::kSouth,
-      FastBoard::kNorth};
+      FastBoard::kEast, FastBoard::kWest, FastBoard::kSouth, FastBoard::kNorth};
   static const std::array<FastBoard::Dir, 4> kBackLookup = {
-      FastBoard::kWest, FastBoard::kEast, FastBoard::kNorth,
-      FastBoard::kSouth};
+      FastBoard::kWest, FastBoard::kEast, FastBoard::kNorth, FastBoard::kSouth};
 
   FastBoard fb(b);
   FastBoard::PointDirMap<bool> hist(fb, false);
@@ -91,7 +89,7 @@ int FindEnergized(const ImmutableCharBoard& b, const SegmentMap& segments,
         break;
       }
       case '\\': {
-        pd.d  = kBackLookup[pd.d];
+        pd.d = kBackLookup[pd.d];
         break;
       }
       case '|': {
@@ -130,7 +128,7 @@ int FindEnergized(const ImmutableCharBoard& b, const SegmentMap& segments,
           break;
         }
         case '\\': {
-          pd.d  = kBackLookup[pd.d];
+          pd.d = kBackLookup[pd.d];
           break;
         }
         case '|': {
@@ -172,18 +170,19 @@ absl::StatusOr<std::string> Day_2023_16::Part2(
   int max = 0;
   for (int x = 0; x < b.width(); ++x) {
     max = std::max(max, FindEnergized(b, segments, {x, -1}, FastBoard::kSouth));
-    max = std::max(max, FindEnergized(b, segments, {x, b.height()}, FastBoard::kNorth));
+    max = std::max(
+        max, FindEnergized(b, segments, {x, b.height()}, FastBoard::kNorth));
   }
   for (int y = 0; y < b.height(); ++y) {
     max = std::max(max, FindEnergized(b, segments, {-1, y}, FastBoard::kEast));
-    max = std::max(max, FindEnergized(b, segments, {b.width(), y}, FastBoard::kWest));
+    max = std::max(
+        max, FindEnergized(b, segments, {b.width(), y}, FastBoard::kWest));
   }
   return AdventReturn(max);
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2023, /*day=*/16, []() {
-  return std::unique_ptr<AdventDay>(new Day_2023_16());
-});
+    /*year=*/2023, /*day=*/16,
+    []() { return std::unique_ptr<AdventDay>(new Day_2023_16()); });
 
 }  // namespace advent_of_code

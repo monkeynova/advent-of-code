@@ -40,9 +40,7 @@ absl::StatusOr<std::string> Day_2023_03::Part1(
   ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
   int sum = 0;
   std::vector<bool> used(b.range().Area(), false);
-  auto point_idx = [&](Point p) {
-    return p.y * b.width() + p.x;
-  };
+  auto point_idx = [&](Point p) { return p.y * b.width() + p.x; };
   std::bitset<256> find = ~std::bitset<256>();
   find['.'] = false;
   find['\n'] = false;
@@ -70,9 +68,7 @@ absl::StatusOr<std::string> Day_2023_03::Part2(
   ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
   int64_t sum = 0;
   std::vector<bool> used(b.range().Area(), false);
-  auto point_idx = [&](Point p) {
-    return p.y * b.width() + p.x;
-  };
+  auto point_idx = [&](Point p) { return p.y * b.width() + p.x; };
   for (Point p : b.Find('*')) {
     std::array<int64_t, 3> adjacent;
     int adj_idx = 0;
@@ -98,8 +94,7 @@ absl::StatusOr<std::string> Day_2023_03::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2023, /*day=*/3, []() {
-  return std::unique_ptr<AdventDay>(new Day_2023_03());
-});
+    /*year=*/2023, /*day=*/3,
+    []() { return std::unique_ptr<AdventDay>(new Day_2023_03()); });
 
 }  // namespace advent_of_code

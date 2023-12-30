@@ -26,8 +26,8 @@ std::vector<std::vector<std::string_view>> DirectedGraphBase::Forest() const {
   absl::flat_hash_set<std::string_view> to_assign = nodes();
   using DirMap =
       absl::flat_hash_map<std::string_view, std::vector<std::string_view>>;
-  std::array<const DirMap*, 2> node_dir_maps =
-      {&node_to_outgoing_, &node_to_incoming_};
+  std::array<const DirMap*, 2> node_dir_maps = {&node_to_outgoing_,
+                                                &node_to_incoming_};
 
   while (!to_assign.empty()) {
     auto first_it = to_assign.begin();

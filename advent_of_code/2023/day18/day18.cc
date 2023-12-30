@@ -18,9 +18,7 @@ struct VerticalSegment {
   int x;
   int y1;
   int y2;
-  bool operator<(const VerticalSegment& o) const {
-    return x < o.x;
-  }
+  bool operator<(const VerticalSegment& o) const { return x < o.x; }
 };
 
 int64_t CountInterior(const std::vector<std::pair<Point, Point>>& loop) {
@@ -29,7 +27,8 @@ int64_t CountInterior(const std::vector<std::pair<Point, Point>>& loop) {
   absl::flat_hash_set<int> y_distinct;
   for (const auto& pair : loop) {
     if (pair.first.x != pair.second.x) continue;
-    VerticalSegment v = {.x = pair.first.x, .y1 = pair.first.y, .y2 = pair.second.y};
+    VerticalSegment v = {
+        .x = pair.first.x, .y1 = pair.first.y, .y2 = pair.second.y};
     y_distinct.insert(pair.first.y);
     y_distinct.insert(pair.second.y);
     y_to_start[pair.first.y].push_back(v);
@@ -49,8 +48,10 @@ int64_t CountInterior(const std::vector<std::pair<Point, Point>>& loop) {
     for (const auto& [x, y1, y2] : active) {
       bool start_inside = in_upper || in_lower;
 
-      if (y1 == y) in_lower = !in_lower;
-      else if (y2 == y) in_upper = !in_upper;
+      if (y1 == y)
+        in_lower = !in_lower;
+      else if (y2 == y)
+        in_upper = !in_upper;
       else if (y1 < y && y2 > y) {
         in_lower = !in_lower;
         in_upper = !in_upper;
@@ -137,7 +138,8 @@ absl::StatusOr<std::string> Day_2023_18::Part2(
     }
     Point dir;
     if (str[str.size() - 2] >= '0' && str[str.size() - 2] <= '3') {
-      const std::array<Point, 4> kDirs = {Cardinal::kEast, Cardinal::kSouth, Cardinal::kWest, Cardinal::kNorth};
+      const std::array<Point, 4> kDirs = {Cardinal::kEast, Cardinal::kSouth,
+                                          Cardinal::kWest, Cardinal::kNorth};
       dir = kDirs[str[str.size() - 2] - '0'];
     } else {
       return Error("Bad dir");
@@ -153,8 +155,7 @@ absl::StatusOr<std::string> Day_2023_18::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2023, /*day=*/18, []() {
-  return std::unique_ptr<AdventDay>(new Day_2023_18());
-});
+    /*year=*/2023, /*day=*/18,
+    []() { return std::unique_ptr<AdventDay>(new Day_2023_18()); });
 
 }  // namespace advent_of_code

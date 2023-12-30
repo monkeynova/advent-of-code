@@ -122,25 +122,30 @@ absl::StatusOr<std::string> Day_2015_19::Part2(
       checklist_match &= !RE2::PartialMatch(to, "Ar.");
       VLOG_IF(1, !checklist_match) << from << " -> " << to;
       // 'Rn' always has a matching 'Ar'.
-      checklist_match &= !RE2::PartialMatch(to, "Rn.*Rn") &&
+      checklist_match &=
+          !RE2::PartialMatch(to, "Rn.*Rn") &&
           (!RE2::PartialMatch(to, "Rn") || RE2::PartialMatch(to, "Rn.*Ar"));
       // 'F' never goes to 'Rn..Ar'.
       checklist_match &= (from != "F") || !RE2::PartialMatch(to, "Rn.*Ar");
       VLOG_IF(1, !checklist_match) << from << " -> " << to;
       // Initial rule sets 2 elements.
-      checklist_match &= (from != "e") || RE2::FullMatch(to, "[A-Z][a-z]?[A-Z][a-z]?");
+      checklist_match &=
+          (from != "e") || RE2::FullMatch(to, "[A-Z][a-z]?[A-Z][a-z]?");
       VLOG_IF(1, !checklist_match) << from << " -> " << to;
       // All rules that don't have Rn..Ar add one element.
-      checklist_match &= RE2::PartialMatch(to, "Rn.*Ar") || RE2::FullMatch(to, "[A-Z][a-z]?[A-Z][a-z]?");
+      checklist_match &= RE2::PartialMatch(to, "Rn.*Ar") ||
+                         RE2::FullMatch(to, "[A-Z][a-z]?[A-Z][a-z]?");
       VLOG_IF(1, !checklist_match) << from << " -> " << to;
       // All rules that add Rn..Ar (without Y) add 3.
       // All rules that add Rn..Y..Ar (with a single Y) add 5.
-      // All rules that add Rn..Y..Y..Ar can't further match Rn..Ar since target never has Rn..Y..Y..Ar.
+      // All rules that add Rn..Y..Y..Ar can't further match Rn..Ar since target
+      // never has Rn..Y..Y..Ar.
       if (RE2::FullMatch(to, "[A-Z][a-z]?RnF(YFYF)?Ar")) {
         checklist_match &= !RE2::PartialMatch(target, "Rn[^R]*Y[^R]*Y[^R]*Ar");
         VLOG_IF(1, !checklist_match) << from << " -> " << to;
       } else {
-        checklist_match &= !RE2::PartialMatch(to, "Rn.*Ar") || 
+        checklist_match &=
+            !RE2::PartialMatch(to, "Rn.*Ar") ||
             RE2::FullMatch(to, "[A-Z][a-z]?Rn[A-Z][a-z]?(Y[A-Z][a-z]?)?Ar");
         VLOG_IF(1, !checklist_match) << from << " -> " << to;
       }
@@ -166,8 +171,7 @@ absl::StatusOr<std::string> Day_2015_19::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2015, /*day=*/19, []() {
-  return std::unique_ptr<AdventDay>(new Day_2015_19());
-});
+    /*year=*/2015, /*day=*/19,
+    []() { return std::unique_ptr<AdventDay>(new Day_2015_19()); });
 
 }  // namespace advent_of_code

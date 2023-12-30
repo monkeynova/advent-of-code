@@ -62,7 +62,7 @@ absl::StatusOr<Workflow> ParseWorkflow(std::string_view line) {
     if (next.size() != 1) return Error("Bad field");
     r.field = kFieldMap[next[0]];
     if (r.field == -1) return Error("Bad field");
-    
+
     if (cmp == ">") {
       r.cmp_type = Rule::kGt;
     } else if (cmp == "<") {
@@ -80,9 +80,7 @@ absl::StatusOr<Workflow> ParseWorkflow(std::string_view line) {
 struct Xmas {
   std::array<int, 4> fields;
 
-  int Score() const {
-    return absl::c_accumulate(fields, 0);
-  }
+  int Score() const { return absl::c_accumulate(fields, 0); }
 
   bool CheckRule(const Rule& r) const {
     if (r.field == -1) return true;
@@ -121,32 +119,29 @@ struct Possible {
 
   bool Empty() const {
     return absl::c_any_of(
-      ranges, [](std::pair<int, int> r) {
-        return r.first > r.second;
-      });
+        ranges, [](std::pair<int, int> r) { return r.first > r.second; });
   }
 
   int64_t Count() const {
-    return absl::c_accumulate(
-      ranges, int64_t{1},
-      [](int64_t a, std::pair<int, int> r) {
-        return a * (r.second - r.first + 1);
-      });
+    return absl::c_accumulate(ranges, int64_t{1},
+                              [](int64_t a, std::pair<int, int> r) {
+                                return a * (r.second - r.first + 1);
+                              });
   }
 };
 
-int64_t CountAllPossible(
-    const WorkflowSet& workflow_set, int state, Possible p) {
+int64_t CountAllPossible(const WorkflowSet& workflow_set, int state,
+                         Possible p) {
   static const int kAccept = WorkflowId("A");
   static const int kReject = WorkflowId("R");
 
   if (p.Empty()) return 0;
-  
+
   if (state == kReject) return 0;
   if (state == kAccept) {
     return p.Count();
   }
-  
+
   int64_t total = 0;
   for (const Rule& r : workflow_set[state]) {
     Possible sub = p;
@@ -157,8 +152,8 @@ int64_t CountAllPossible(
       } else if (r.cmp_type == Rule::kGt) {
         p.ranges[r.field].second = r.cmp;
         sub.ranges[r.field].first = r.cmp + 1;
-      }    
-    }  
+      }
+    }
     total += CountAllPossible(workflow_set, r.dest, sub);
   }
   return total;
@@ -205,7 +200,7 @@ absl::StatusOr<std::string> Day_2023_19::Part1(
       }
     }
   }
-  
+
   return AdventReturn(total_score);
 }
 
@@ -222,15 +217,13 @@ absl::StatusOr<std::string> Day_2023_19::Part2(
 
   int state = WorkflowId("in");
   Possible all = {
-    std::pair<int, int>{1, 4000}, {1, 4000}, {1, 4000}, {1, 4000}
-  };
-  
+      std::pair<int, int>{1, 4000}, {1, 4000}, {1, 4000}, {1, 4000}};
+
   return AdventReturn(CountAllPossible(workflow_set, state, all));
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2023, /*day=*/19, []() {
-  return std::unique_ptr<AdventDay>(new Day_2023_19());
-});
+    /*year=*/2023, /*day=*/19,
+    []() { return std::unique_ptr<AdventDay>(new Day_2023_19()); });
 
 }  // namespace advent_of_code

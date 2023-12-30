@@ -100,22 +100,21 @@ struct Cardinal3 {
                                                      -kYHat, kZHat,  -kZHat};
   static constexpr std::array<Point3, 3 * 3 * 3 - 1> kNeighborDirs =
       []() constexpr {
-    std::array<Point3, 3 * 3 * 3 - 1> ret{};
-    int i = 0;
-    for (Point3 xdir :
-         {-Cardinal3::kXHat, Cardinal3::kOrigin, Cardinal3::kXHat}) {
-      for (Point3 ydir :
-           {-Cardinal3::kYHat, Cardinal3::kOrigin, Cardinal3::kYHat}) {
-        for (Point3 zdir :
-             {-Cardinal3::kZHat, Cardinal3::kOrigin, Cardinal3::kZHat}) {
-          Point3 next = xdir + ydir + zdir;
-          if (next != Cardinal3::kOrigin) ret[i++] = next;
+        std::array<Point3, 3 * 3 * 3 - 1> ret{};
+        int i = 0;
+        for (Point3 xdir :
+             {-Cardinal3::kXHat, Cardinal3::kOrigin, Cardinal3::kXHat}) {
+          for (Point3 ydir :
+               {-Cardinal3::kYHat, Cardinal3::kOrigin, Cardinal3::kYHat}) {
+            for (Point3 zdir :
+                 {-Cardinal3::kZHat, Cardinal3::kOrigin, Cardinal3::kZHat}) {
+              Point3 next = xdir + ydir + zdir;
+              if (next != Cardinal3::kOrigin) ret[i++] = next;
+            }
+          }
         }
-      }
-    }
-    return ret;
-  }
-  ();
+        return ret;
+      }();
 };
 
 struct Cube {

@@ -226,8 +226,7 @@ absl::StatusOr<std::string> Day_2019_03::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2019, /*day=*/3, []() {
-  return std::unique_ptr<AdventDay>(new Day_2019_03());
-});
+    /*year=*/2019, /*day=*/3,
+    []() { return std::unique_ptr<AdventDay>(new Day_2019_03()); });
 
 }  // namespace advent_of_code

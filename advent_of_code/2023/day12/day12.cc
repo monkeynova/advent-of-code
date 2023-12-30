@@ -13,8 +13,10 @@ namespace {
 class Memo {
  public:
   Memo(std::string_view max_pre, absl::Span<const int64_t> max_range)
-   : pre_(max_pre), range_(max_range), pre_size_(max_pre.size()),
-     range_size_(max_range.size()) {
+      : pre_(max_pre),
+        range_(max_range),
+        pre_size_(max_pre.size()),
+        range_size_(max_range.size()) {
     map_.resize((pre_size_ + 1) * (range_size_ + 1), -1);
   }
 
@@ -23,9 +25,7 @@ class Memo {
  private:
   int64_t CountAllPossible(int pre_off, int range_off);
 
-  int64_t Set(int key, int64_t val) {
-    return map_[key] = val;
-  }
+  int64_t Set(int key, int64_t val) { return map_[key] = val; }
 
   std::string_view pre_;
   absl::Span<const int64_t> range_;
@@ -72,7 +72,7 @@ int64_t Memo::CountAllPossible(int pre_off, int range_off) {
       if (range_size_ == range_off + 1) {
         ++total;
       }
-    } else if (pre_[pre_off + check_size] == '#') { 
+    } else if (pre_[pre_off + check_size] == '#') {
       // Can't match ('####', 3).
     } else {
       total += CountAllPossible(pre_off + check_size + 1, range_off + 1);
@@ -95,8 +95,8 @@ int64_t Memo::CountAllPossible() {
   return CountAllPossible(0, 0);
 }
 
-int64_t CountAllPossible(
-    std::string_view pre, absl::Span<const int64_t> range) {
+int64_t CountAllPossible(std::string_view pre,
+                         absl::Span<const int64_t> range) {
   VLOG(2) << pre << " - " << absl::StrJoin(range, ",");
   return Memo(pre, range).CountAllPossible();
 }
@@ -108,9 +108,8 @@ absl::StatusOr<std::string> Day_2023_12::Part1(
   int total = 0;
   for (std::string_view line : input) {
     auto [pre, range_str] = PairSplit(line, " ");
-    ASSIGN_OR_RETURN(
-        std::vector<int64_t> range,
-        ParseAsInts(absl::StrSplit(range_str, ",")));
+    ASSIGN_OR_RETURN(std::vector<int64_t> range,
+                     ParseAsInts(absl::StrSplit(range_str, ",")));
     int all_possible = CountAllPossible(pre, range);
     VLOG(2) << line << " -> " << all_possible;
     total += all_possible;
@@ -128,15 +127,14 @@ absl::StatusOr<std::string> Day_2023_12::Part2(
       if (i > 0) pre_duped.append("?");
       pre_duped.append(pre);
     }
-    ASSIGN_OR_RETURN(
-        std::vector<int64_t> range,
-        ParseAsInts(absl::StrSplit(range_str, ",")));
+    ASSIGN_OR_RETURN(std::vector<int64_t> range,
+                     ParseAsInts(absl::StrSplit(range_str, ",")));
     std::vector<int64_t> range_duped;
     for (int i = 0; i < 5; ++i) {
       range_duped.insert(range_duped.end(), range.begin(), range.end());
     }
     VLOG(2) << pre_duped << " -> " << absl::StrJoin(range_duped, ",");
-    
+
     int64_t all_possible = CountAllPossible(pre_duped, range_duped);
     VLOG(2) << line << " -> " << all_possible;
     total += all_possible;
@@ -145,8 +143,7 @@ absl::StatusOr<std::string> Day_2023_12::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2023, /*day=*/12, []() {
-  return std::unique_ptr<AdventDay>(new Day_2023_12());
-});
+    /*year=*/2023, /*day=*/12,
+    []() { return std::unique_ptr<AdventDay>(new Day_2023_12()); });
 
 }  // namespace advent_of_code

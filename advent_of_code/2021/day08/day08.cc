@@ -58,9 +58,9 @@ absl::StatusOr<absl::flat_hash_map<char, char>> FindMap(
   if (left.size() != 10) return Error("Bad exemplars");
 
   static const absl::flat_hash_map<int64_t, absl::flat_hash_set<char>>
-  countToSegments = {
-      {8, {'a', 'c'}}, {6, {'b'}}, {7, {'d', 'g'}}, {4, {'e'}}, {9, {'f'}},
-  };
+      countToSegments = {
+          {8, {'a', 'c'}}, {6, {'b'}}, {7, {'d', 'g'}}, {4, {'e'}}, {9, {'f'}},
+      };
 
   absl::flat_hash_map<char, int64_t> observed;
   for (std::string_view in : left) {
@@ -161,8 +161,7 @@ absl::StatusOr<std::string> Day_2021_08::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2021, /*day=*/8, []() {
-  return std::unique_ptr<AdventDay>(new Day_2021_08());
-});
+    /*year=*/2021, /*day=*/8,
+    []() { return std::unique_ptr<AdventDay>(new Day_2021_08()); });
 
 }  // namespace advent_of_code

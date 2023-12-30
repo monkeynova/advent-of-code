@@ -14,12 +14,12 @@ namespace {
 class Dish {
  public:
   explicit Dish(const ImmutableCharBoard& b)
-   : rollers_by_x_(b.width()),
-     rollers_by_y_(b.height()),
-     stops_by_x_(b.width()),
-     stops_by_y_(b.height()),
-     width_(b.width()),
-     height_(b.height()) { 
+      : rollers_by_x_(b.width()),
+        rollers_by_y_(b.height()),
+        stops_by_x_(b.width()),
+        stops_by_y_(b.height()),
+        width_(b.width()),
+        height_(b.height()) {
     for (Point r : b.FindVec('O')) {
       rollers_by_x_[r.x].push_back(r.y);
     }
@@ -79,28 +79,24 @@ int Dish::NorthLoadPart1() const {
   return load;
 }
 
-
 int Dish::NorthLoad(const std::vector<int>& summary) const {
-  return absl::c_accumulate(
-    summary, 0, [&](int a, int y) { return a + height_ - y; });
+  return absl::c_accumulate(summary, 0,
+                            [&](int a, int y) { return a + height_ - y; });
 }
 
 inline void ClearAll(std::vector<std::vector<int>>& v) {
   for (auto& sub_v : v) sub_v.clear();
 }
 
-template <int out_dir,
-          typename StopItType =
-              std::conditional_t<
-                out_dir == 1,
-                std::vector<int>::const_iterator,
-                std::conditional_t<
-                  out_dir == -1,
-                  std::vector<int>::const_reverse_iterator,
-                  void>>>
-inline void RollSlice(
-    const std::vector<int>& rollers, const std::vector<int>& stops,
-    std::vector<std::vector<int>>& out, int out_val) {
+template <
+    int out_dir,
+    typename StopItType = std::conditional_t<
+        out_dir == 1, std::vector<int>::const_iterator,
+        std::conditional_t<out_dir == -1,
+                           std::vector<int>::const_reverse_iterator, void>>>
+inline void RollSlice(const std::vector<int>& rollers,
+                      const std::vector<int>& stops,
+                      std::vector<std::vector<int>>& out, int out_val) {
   StopItType stop_it;
   if constexpr (out_dir == 1) stop_it = stops.begin();
   if constexpr (out_dir == -1) stop_it = stops.rbegin();
@@ -127,10 +123,9 @@ inline void RollSlice(
 }
 
 template <int out_dir, int next_dir>
-inline void RollDir(
-    const std::vector<std::vector<int>>& rollers,
-    const std::vector<std::vector<int>>& stops,
-    std::vector<std::vector<int>>& out) {
+inline void RollDir(const std::vector<std::vector<int>>& rollers,
+                    const std::vector<std::vector<int>>& stops,
+                    std::vector<std::vector<int>>& out) {
   ClearAll(out);
   // Next is West, sort by x ASC.
   if constexpr (next_dir == 1) {
@@ -178,11 +173,11 @@ absl::StatusOr<std::string> Day_2023_14::Part2(
   VLOG(1) << b.range();
   VLOG(1) << b.Find('O').size() << " rollers";
   VLOG(1) << b.Find('#').size() << " stationary";
-  
+
   Dish dish(b);
   LoopHistory<decltype(dish.Summary())> hist;
   for (int i = 0; i < 1000000000; ++i) {
-     if (hist.AddMaybeNew(dish.Summary())) {
+    if (hist.AddMaybeNew(dish.Summary())) {
       VLOG(1) << hist;
       return AdventReturn(dish.NorthLoad(hist.FindInLoop(1000000000)));
     }
@@ -192,8 +187,7 @@ absl::StatusOr<std::string> Day_2023_14::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2023, /*day=*/14, []() {
-  return std::unique_ptr<AdventDay>(new Day_2023_14());
-});
+    /*year=*/2023, /*day=*/14,
+    []() { return std::unique_ptr<AdventDay>(new Day_2023_14()); });
 
 }  // namespace advent_of_code

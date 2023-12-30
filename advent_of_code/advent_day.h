@@ -37,8 +37,9 @@ inline absl::StatusOr<std::vector<int64_t>> ParseAsInts(Container input) {
   return vals;
 }
 
-template <typename IntType=int64_t>
-inline absl::StatusOr<std::vector<IntType>> ParseAsInts(std::string_view input) {
+template <typename IntType = int64_t>
+inline absl::StatusOr<std::vector<IntType>> ParseAsInts(
+    std::string_view input) {
   std::vector<IntType> vals;
   Tokenizer tok(input);
   while (!tok.Done()) {
@@ -67,8 +68,8 @@ class AdventDay {
   absl::StatusOr<int64_t> IntParam() const;
   // IntParam1 and IntParam2 work by treating param() either as an integer or
   // as a comma separated set of two integers. If there is a single integer,
-  // both functions return the same value. If there are two integers 
-  // separated by a comma IntParam1 returns the first and IntParam2 the second. 
+  // both functions return the same value. If there are two integers
+  // separated by a comma IntParam1 returns the first and IntParam2 the second.
   absl::StatusOr<int64_t> IntParam1() const;
   absl::StatusOr<int64_t> IntParam2() const;
 

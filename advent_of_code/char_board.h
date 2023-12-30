@@ -70,7 +70,7 @@ class CharBoardBase {
   // ImmutableCharBoard::Parse), `in` must be a collection of string_views
   // which are the lines from the equivalent of absl::StrSplit(buf, "\n").
   // That is they must be terminated with a '\n' off the string_view and
-  // the views must be contiguous in memory (around the 'n'). 
+  // the views must be contiguous in memory (around the 'n').
   template <typename Container>
   static absl::StatusOr<CharBoardBase> Parse(const Container& in);
 
@@ -87,10 +87,12 @@ class CharBoardBase {
     return ret;
   }
 
-  template <bool is_mutable_test = is_mutable, typename = std::enable_if<is_mutable_test>>
+  template <bool is_mutable_test = is_mutable,
+            typename = std::enable_if<is_mutable_test>>
   CharBoardBase() : CharBoardBase(0, 0) {}
 
-  template <bool is_mutable_test = is_mutable, typename = std::enable_if_t<is_mutable_test>>
+  template <bool is_mutable_test = is_mutable,
+            typename = std::enable_if_t<is_mutable_test>>
   CharBoardBase(int width, int height)
       : stride_(width + 1), buf_(stride_ * height, '.') {
     for (int i = stride_ - 1; i < buf_.size(); i += stride_) {
@@ -98,7 +100,8 @@ class CharBoardBase {
     }
   }
 
-  template <bool is_mutable_test = is_mutable, typename = std::enable_if_t<is_mutable_test>>
+  template <bool is_mutable_test = is_mutable,
+            typename = std::enable_if_t<is_mutable_test>>
   explicit CharBoardBase(PointRectangle r)
       : CharBoardBase(r.max.x >= r.min.x ? r.max.x - r.min.x + 1 : 0,
                       r.max.y >= r.min.y ? r.max.y - r.min.y + 1 : 0) {}
@@ -111,7 +114,8 @@ class CharBoardBase {
   // points.
   template <typename Container>
   void Draw(const Container& points, char c = '#') {
-    for (Point p : points) if (OnBoard(p)) (*this)[p] = c;
+    for (Point p : points)
+      if (OnBoard(p)) (*this)[p] = c;
   }
 
   int height() const { return stride_ == 1 ? 0 : buf_.size() / stride_; }
@@ -142,12 +146,16 @@ class CharBoardBase {
   char at(Point p) const { return buf_[p.y * stride_ + p.x]; }
   template <bool is_mutable_test = is_mutable,
             typename = std::enable_if_t<is_mutable_test>>
-  void set(Point p, char c) { buf_[p.y * stride_ + p.x] = c; }
+  void set(Point p, char c) {
+    buf_[p.y * stride_ + p.x] = c;
+  }
 
   char operator[](Point p) const { return buf_[p.y * stride_ + p.x]; }
   template <bool is_mutable_test = is_mutable,
             typename = std::enable_if_t<is_mutable_test>>
-  char& operator[](Point p) { return buf_[p.y * stride_ + p.x]; }
+  char& operator[](Point p) {
+    return buf_[p.y * stride_ + p.x];
+  }
 
   // Retuns the set of points p such that at(p) == c.
   absl::flat_hash_set<Point> Find(char c) const;
@@ -204,13 +212,16 @@ class CharBoardBase {
  private:
   friend class BoardPoint;
   friend class CharBoardBase<!is_mutable>;
-  CharBoardBase(int stride, std::string_view buf) : stride_(stride), buf_(buf) {}
+  CharBoardBase(int stride, std::string_view buf)
+      : stride_(stride), buf_(buf) {}
 
   int stride_len() const { return stride_; }
 
   template <bool is_mutable_test = is_mutable,
             typename = std::enable_if_t<is_mutable_test>>
-  char* stride(int y) { return buf_.data() + stride_ * y; }
+  char* stride(int y) {
+    return buf_.data() + stride_ * y;
+  }
   const char* stride(int y) const { return buf_.data() + stride_ * y; }
 
   // The board is implemented as a single contiguous buffer where each row is
@@ -255,7 +266,8 @@ absl::StatusOr<CharBoard> CharBoard::Parse(const Container& in) {
 
 template <>
 template <typename Container>
-absl::StatusOr<ImmutableCharBoard> ImmutableCharBoard::Parse(const Container& in) {
+absl::StatusOr<ImmutableCharBoard> ImmutableCharBoard::Parse(
+    const Container& in) {
   static_assert(
       std::is_same_v<std::string_view, decltype(std::string_view(*in.begin()))>,
       "Container must iterate over std::string_view");

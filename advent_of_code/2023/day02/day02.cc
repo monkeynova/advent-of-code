@@ -25,7 +25,7 @@ class Game {
 
  private:
   Game() = default;
-  
+
   static std::string_view NextToken(std::string_view& line);
 
   int num_;
@@ -90,22 +90,20 @@ absl::StatusOr<std::string> Day_2023_02::Part2(
   int total_power = 0;
   for (std::string_view line : input) {
     ASSIGN_OR_RETURN(Game game, Game::Parse(line));
-    Game::View min = absl::c_accumulate(
-      game.views(), Game::View{},
-      [](Game::View a, Game::View b) {
-        a.red = std::max(a.red, b.red);
-        a.green = std::max(a.green, b.green);
-        a.blue = std::max(a.blue, b.blue);
-        return a;
-      });
+    Game::View min = absl::c_accumulate(game.views(), Game::View{},
+                                        [](Game::View a, Game::View b) {
+                                          a.red = std::max(a.red, b.red);
+                                          a.green = std::max(a.green, b.green);
+                                          a.blue = std::max(a.blue, b.blue);
+                                          return a;
+                                        });
     total_power += min.red * min.blue * min.green;
   }
   return AdventReturn(total_power);
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2023, /*day=*/2, []() {
-  return std::unique_ptr<AdventDay>(new Day_2023_02());
-});
+    /*year=*/2023, /*day=*/2,
+    []() { return std::unique_ptr<AdventDay>(new Day_2023_02()); });
 
 }  // namespace advent_of_code

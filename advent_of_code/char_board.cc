@@ -5,7 +5,8 @@
 namespace advent_of_code {
 
 template <bool is_mutable>
-absl::StatusOr<CharBoard> CharBoardBase<is_mutable>::SubBoard(PointRectangle sub_range) const {
+absl::StatusOr<CharBoard> CharBoardBase<is_mutable>::SubBoard(
+    PointRectangle sub_range) const {
   if (!OnBoard(sub_range.min)) {
     return absl::InvalidArgumentError(
         absl::StrCat("SubBoard: min not on board: ", sub_range));
@@ -72,7 +73,8 @@ absl::StatusOr<Point> CharBoardBase<is_mutable>::FindUnique(char c) const {
 }
 
 template <bool is_mutable>
-absl::flat_hash_set<Point> CharBoardBase<is_mutable>::Find(std::bitset<256> charset) const {
+absl::flat_hash_set<Point> CharBoardBase<is_mutable>::Find(
+    std::bitset<256> charset) const {
   absl::flat_hash_set<Point> ret;
   CHECK(!charset['\n']);
   for (int i = 0; i < buf_.size(); ++i) {

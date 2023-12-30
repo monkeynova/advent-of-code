@@ -25,7 +25,7 @@ struct Hail {
     // [d1.d.x -d2.d.x] [t1]   [d2.p.x - d1.p.x]
     //                *      =
     // [d1.d.y -d2.d.y] [t2]   [d1.p.y - d1.p.y]
-    //auto transform = StaticMatrix<double, 2, 2>({
+    // auto transform = StaticMatrix<double, 2, 2>({
     //    {d.x, -o.d.x},
     //    {d.y, -o.d.y},
     //});
@@ -33,8 +33,8 @@ struct Hail {
     if (det == 0) return false;
 
     std::array<double, 2> t = {
-      -o.v.y / det * (o.p.x - p.x) - (-o.v.x) / det * (o.p.y - p.y),
-      -v.y / det * (o.p.x - p.x) + v.x / det * (o.p.y - p.y),
+        -o.v.y / det * (o.p.x - p.x) - (-o.v.x) / det * (o.p.y - p.y),
+        -v.y / det * (o.p.x - p.x) + v.x / det * (o.p.y - p.y),
     };
     if (t[0] < 0) return false;
     if (t[1] < 0) return false;
@@ -68,13 +68,14 @@ std::optional<int64_t> Solve(const std::vector<Hail>& hail, int64_t range) {
       }
       if (!set_h2) continue;
 
-      absl::int128 apx = 
-         ((h2.p.y - h1.p.y) * (avx - h2.v.x) * (avx - h1.v.x) -
-          h2.p.x * (avy - h2.v.y) * (avx - h1.v.x) + 
-          h1.p.x * (avy - h1.v.y) * (avx - h2.v.x)) /
+      absl::int128 apx =
+          ((h2.p.y - h1.p.y) * (avx - h2.v.x) * (avx - h1.v.x) -
+           h2.p.x * (avy - h2.v.y) * (avx - h1.v.x) +
+           h1.p.x * (avy - h1.v.y) * (avx - h2.v.x)) /
           ((avy - h1.v.y) * (avx - h2.v.x) - (avy - h2.v.y) * (avx - h1.v.x));
 
-      absl::int128 apy = h1.p.y + (apx - h1.p.x) * (avy - h1.v.y) / (avx - h1.v.x);
+      absl::int128 apy =
+          h1.p.y + (apx - h1.p.x) * (avy - h1.v.y) / (avx - h1.v.x);
 
       bool all_match = true;
       for (const Hail& h : hail) {
@@ -90,18 +91,15 @@ std::optional<int64_t> Solve(const std::vector<Hail>& hail, int64_t range) {
       VLOG(1) << "v_xy = " << avx << "," << avy;
 
       for (absl::int128 avz = -range; avz <= range; ++avz) {
-        absl::int128 apz = h1.p.z + (apx - h1.p.x) * (avz - h1.v.z) / (avx - h1.v.x);
-        
-        Point64 ans_p = {
-          static_cast<int64_t>(absl::Int128Low64(apx)),
-          static_cast<int64_t>(absl::Int128Low64(apy)),
-          static_cast<int64_t>(absl::Int128Low64(apz))
-        };
-        Point64 ans_v = {
-          static_cast<int64_t>(absl::Int128Low64(avx)),
-          static_cast<int64_t>(absl::Int128Low64(avy)),
-          static_cast<int64_t>(absl::Int128Low64(avz))
-        };
+        absl::int128 apz =
+            h1.p.z + (apx - h1.p.x) * (avz - h1.v.z) / (avx - h1.v.x);
+
+        Point64 ans_p = {static_cast<int64_t>(absl::Int128Low64(apx)),
+                         static_cast<int64_t>(absl::Int128Low64(apy)),
+                         static_cast<int64_t>(absl::Int128Low64(apz))};
+        Point64 ans_v = {static_cast<int64_t>(absl::Int128Low64(avx)),
+                         static_cast<int64_t>(absl::Int128Low64(avy)),
+                         static_cast<int64_t>(absl::Int128Low64(avz))};
 
         bool all_match = true;
         for (const Hail& h : hail) {
@@ -129,7 +127,7 @@ std::optional<int64_t> Solve(const std::vector<Hail>& hail, int64_t range) {
           VLOG(1) << apx << "," << apy << "," << apz;
           VLOG(1) << avx << "," << avy << "," << avz;
           return ans_p.x + ans_p.y + ans_p.z;
-        } 
+        }
       }
     }
   }
@@ -211,9 +209,9 @@ absl::StatusOr<std::string> Day_2023_24::Part2(
 
 static AdventRegisterEntry registry = RegisterAdventDay(
     /*year=*/2023, /*day=*/24, []() {
-  auto ret = std::unique_ptr<AdventDay>(new Day_2023_24());
-  ret->set_param("200000000000000,400000000000000");
-  return ret;
-});
+      auto ret = std::unique_ptr<AdventDay>(new Day_2023_24());
+      ret->set_param("200000000000000,400000000000000");
+      return ret;
+    });
 
 }  // namespace advent_of_code

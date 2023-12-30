@@ -255,8 +255,8 @@ int ImmuneLeftAfterFightWithBoost(const std::vector<Group>& start, int boost) {
     return 0;
   }
 
-  return absl::c_accumulate(
-    combat, 0, [](int a, const Group& g) { return a + g.units; });
+  return absl::c_accumulate(combat, 0,
+                            [](int a, const Group& g) { return a + g.units; });
 }
 
 }  // namespace
@@ -293,8 +293,7 @@ absl::StatusOr<std::string> Day_2018_24::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2018, /*day=*/24, []() {
-  return std::unique_ptr<AdventDay>(new Day_2018_24());
-});
+    /*year=*/2018, /*day=*/24,
+    []() { return std::unique_ptr<AdventDay>(new Day_2018_24()); });
 
 }  // namespace advent_of_code

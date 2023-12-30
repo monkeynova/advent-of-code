@@ -81,7 +81,7 @@ void Hand::RescoreJokers() {
     for (int i = 0; i < 5; ++i) {
       for (int j = i + 1; j < 5; ++j) {
         if (test_cards[i] == test_cards[j]) ++this_pairs;
-     }
+      }
     }
     pairs_ = std::max<int64_t>(this_pairs, pairs_);
   }
@@ -123,8 +123,7 @@ absl::StatusOr<std::string> Day_2023_07::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2023, /*day=*/7, []() {
-  return std::unique_ptr<AdventDay>(new Day_2023_07());
-});
+    /*year=*/2023, /*day=*/7,
+    []() { return std::unique_ptr<AdventDay>(new Day_2023_07()); });
 
 }  // namespace advent_of_code

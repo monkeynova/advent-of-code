@@ -97,7 +97,7 @@ Interval1D Map::Apply(Interval1D i_int) {
         }
         ret_x.push_back(*i_start + range_it->Delta());
         ret_x.push_back(range_it->src_end() + range_it->Delta());
-        i_start = range_it->src_end();        
+        i_start = range_it->src_end();
       }
       ++range_it;
       continue;
@@ -192,10 +192,7 @@ absl::StatusOr<std::string> Day_2023_05::Part1(
   map.Apply(vals);
 
   return AdventReturn(absl::c_accumulate(
-    vals, vals[0],
-    [](int64_t a, int64_t b) {
-      return std::min(a, b);
-    }));
+      vals, vals[0], [](int64_t a, int64_t b) { return std::min(a, b); }));
 }
 
 absl::StatusOr<std::string> Day_2023_05::Part2(
@@ -239,8 +236,7 @@ absl::StatusOr<std::string> Day_2023_05::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2023, /*day=*/5, []() {
-  return std::unique_ptr<AdventDay>(new Day_2023_05());
-});
+    /*year=*/2023, /*day=*/5,
+    []() { return std::unique_ptr<AdventDay>(new Day_2023_05()); });
 
 }  // namespace advent_of_code

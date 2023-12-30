@@ -20,25 +20,25 @@ absl::StatusOr<std::string> GetContents(std::string_view filename) {
     return absl::NotFoundError(absl::StrCat("Could not find", filename));
   } else if (S_ISREG(status.st_mode) == 0) {
     return absl::FailedPreconditionError(
-      absl::StrCat("File is not regular", filename));
+        absl::StrCat("File is not regular", filename));
   }
   int length = status.st_size;
 
   FILE* f = fopen(filename.data(), "r");
   if (f == nullptr) {
     // Could be a wider range of reasons.
-    return absl::NotFoundError(absl::StrFormat(
-        "Error opening %s: %s", filename, strerror(errno)));
+    return absl::NotFoundError(
+        absl::StrFormat("Error opening %s: %s", filename, strerror(errno)));
   }
   std::string file_contents(length, 0);
   if (fread(&file_contents[0], 1, length, f) != length) {
-    return absl::UnavailableError(absl::StrFormat(
-        "Error reading %d bytes from %s: %s", length, filename,
-        strerror(errno)));
+    return absl::UnavailableError(
+        absl::StrFormat("Error reading %d bytes from %s: %s", length, filename,
+                        strerror(errno)));
   }
   if (fclose(f) != 0) {
-    return absl::UnavailableError(absl::StrFormat(
-        "Error closing %s: %s", filename, strerror(errno)));
+    return absl::UnavailableError(
+        absl::StrFormat("Error closing %s: %s", filename, strerror(errno)));
   }
   return file_contents;
 }
