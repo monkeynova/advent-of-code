@@ -9,15 +9,6 @@ namespace advent_of_code {
 
 bool TestSingleDay(AdventDay* day);
 
-template <typename Day>
-class FileTest : public ::testing::Test {
- public:
-  bool RunTest() {
-    Day day;
-    return TestSingleDay(&day);
-  }
-};
-
 class FileTest_Day : public ::testing::Test {
  public:
   template <typename Day>

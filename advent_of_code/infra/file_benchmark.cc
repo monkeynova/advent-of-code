@@ -15,6 +15,8 @@ ABSL_FLAG(std::string, bechmark_file_include_filter, "",
 
 namespace advent_of_code {
 
+namespace {
+
 struct DirtyTestParseResult {
   int part;
   std::string test;
@@ -70,6 +72,13 @@ absl::StatusOr<int> FileBenchmarkTestCount(AdventDay* day) {
   ASSIGN_OR_RETURN(std::vector<std::unique_ptr<DirtyTestParseResult>> tests,
                    FileBenchmarkTests(day->test_file()));
   return tests.size();
+}
+
+inline void BM_Day_SetError(benchmark::State& state, std::string_view message) {
+  std::string message_str = std::string(message);
+  state.SkipWithError(message_str.c_str());
+}
+
 }
 
 int FileBenchmarkMaxIdx(AdventDay* day) {
