@@ -49,63 +49,31 @@ my $year_build_fname = "advent_of_code/${year}/BUILD";
 my $build_contents = "";
 if (! -f $year_build_fname) {
   $build_contents = <<EOF;
-cc_test(
-    name = "benchmark",
-    size = "small",
-    tags = ["benchmark"],
-    deps = [
-        ":benchmark_lib",
-        "\@com_monkeynova_gunit_main//:test_main",
-    ],
-)
-
-sh_binary(
-    name = "whole_year",
-    testonly = 1,
-    srcs = ["//tools:whole_year.sh"],
-    data = [":benchmark"],
-    args = ["$(location :benchmark)"],
-)
-
 cc_library(
-    name = "benchmark_lib",
-    testonly = 1,
+    name = "${year}",
     visibility = [
         "//visibility:public",
     ],
     deps = [
-        "//advent_of_code/${year}/day${day}:day${day}_benchmark_lib",
+        "//advent_of_code/${year}/day${day}",
     ],
 )
 EOF
-} else {
-  open my $fh, '<', $year_build_fname;
-  $build_contents = join '', <$fh>;
+  open my $fh, '>', $year_build_fname
+    or die "Can't write ${year_build_fname}: $!";
+  print {$fh} $build_contents;
   close $fh;
-  $build_contents =~ s{
-    (cc_library\([^\)]+
-     name\s*=\s*"benchmark_lib"[^\)]+)
-    ("//advent_of_code/\d+/day\d+:day\d+_benchmark_lib",[^\)]+\))
-  }{$1
-    "//advent_of_code/${year}/day${day}:day${day}_benchmark_lib",
-    $2
-  }x or die "Could not add benchmark to the year target";
+  system("buildozer 'add deps //advent_of_code/$year' //advent_of_code/")
+    and die $!;
+} else {
+  system("buildozer 'add deps //advent_of_code/$year:day$day' //advent_of_code/$year")
+    and die $!;
 }
-open my $fh, '>', $year_build_fname
-  or die "Can't write ${year_build_fname}: $!";
-print {$fh} $build_contents;
-close $fh;
-
 
 # Non-fatal if clang-format isn't present.
 system("find advent_of_code/$year/day$day -name '*.h' -o -name '*.cc' | " .
-       "xargs clang-format --style=Google -i")
-  and die $!;
+       "xargs clang-format --style=Google -i");
 
 # Non-fatal if buildifier isn't present.
-system("find advent_of_code/$year/day$day -name BUILD | xargs buildifier")
-  and die $!;
-system("buildifier advent_of_code/$year/BUILD")
-  and die $!;
-system("buildozer 'add deps //advent_of_code/$year:day$day' //advent_of_code/$year")
-  and die $!;
+system("find advent_of_code/$year/day$day -name BUILD | xargs buildifier");
+system("buildifier advent_of_code/$year/BUILD");
