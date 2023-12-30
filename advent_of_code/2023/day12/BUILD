@@ -10,13 +10,13 @@ cc_library(
     visibility = [
         "//visibility:public",
     ],
-    alwayslink = 1,
     deps = [
         "//advent_of_code:advent_day",
         "@com_google_absl//absl/algorithm:container",
         "@com_google_absl//absl/log",
         "@com_google_absl//absl/strings",
     ],
+    alwayslink = 1,
 )
 
 cc_test(
@@ -28,18 +28,19 @@ cc_test(
     ],
     deps = [
         ":day12",
+        "//advent_of_code/infra:file_benchmark",
         "//advent_of_code/infra:file_test",
     ],
 )
 
 cc_test(
     name = "day12_benchmark",
-    srcs = ["day12_benchmark.cc"],
     size = "small",
-    tags = ["benchmark"],
+    srcs = ["day12_benchmark.cc"],
     data = [
         "day12.test",
     ],
+    tags = ["benchmark"],
     deps = [
         ":day12",
         "//advent_of_code/infra:file_benchmark",
