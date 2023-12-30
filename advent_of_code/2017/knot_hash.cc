@@ -16,7 +16,7 @@ void KnotHash::RunLoop(std::string_view lengths,
   for (int round = 0; round < round_count; ++round) {
     for (int i = 0; i < lengths.size(); ++i) {
       unsigned char len = lengths[i];
-      VLOG(1) << "len=" << len
+      VLOG(3) << "len=" << len
               << "; loop=" << absl::StrJoin(loop_span.subspan(0, position), ",")
               << (position > 0 ? ",(" : "(") << loop->at(position)
               << (position < loop_span.size() - 1 ? ")," : ")")
@@ -25,7 +25,7 @@ void KnotHash::RunLoop(std::string_view lengths,
         int first = position;
         int last = (position + len - 1) % loop_size;
         while (first != last) {
-          VLOG(2) << "first=" << first << "; last=" << last;
+          VLOG(3) << "first=" << first << "; last=" << last;
           std::swap((*loop)[first], (*loop)[last]);
           first = (first + 1) % loop_size;
           // Check needed here for even sized loops.
@@ -38,7 +38,7 @@ void KnotHash::RunLoop(std::string_view lengths,
       ++skip_size;
     }
   }
-  VLOG(1) << "len=<DONE>; loop="
+  VLOG(3) << "len=<DONE>; loop="
           << absl::StrJoin(loop_span.subspan(0, position), ",")
           << (position > 0 ? ",(" : "(") << loop->at(position)
           << (position < loop_span.size() - 1 ? ")," : ")")
