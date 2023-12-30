@@ -368,6 +368,24 @@ void Table::Cell::Render(std::string* out, int width, bool enable_color)
   }
 }
 
+Table::Cell::Color DayTimeColor(absl::Duration d) {
+  if (d < absl::Milliseconds(1)) return Table::Cell::kGreen;
+  if (d < absl::Milliseconds(10)) return Table::Cell::kWhite;
+  if (d < absl::Milliseconds(100)) return Table::Cell::kYellow;
+  return Table::Cell::kRed;
+};
+
+Table::Cell::Color YearTimeColor(absl::Duration d) {
+  if (d < absl::Seconds(1)) return Table::Cell::kGreen;
+  if (d < absl::Seconds(5)) return Table::Cell::kWhite;
+  if (d < absl::Seconds(10)) return Table::Cell::kYellow;
+  return Table::Cell::kRed;
+};
+
+std::string TimeString(absl::Duration d) {
+  return d != absl::Seconds(0) ? absl::StrCat(d) : "";
+};
+
 }
 
 int main(int argc, char** argv) {
@@ -399,19 +417,6 @@ int main(int argc, char** argv) {
     Table::Cell{.entry = "Time", .justify = Table::Cell::kCenter}});
   table.AddBreaker();
 
-  auto day_time_color = [](absl::Duration d) {
-    if (d < absl::Milliseconds(1)) return Table::Cell::kGreen;
-    if (d < absl::Milliseconds(10)) return Table::Cell::kYellow;
-    return Table::Cell::kRed;
-  };
-  auto year_time_color = [](absl::Duration d) {
-    if (d < absl::Seconds(1)) return Table::Cell::kGreen;
-    if (d < absl::Seconds(10)) return Table::Cell::kYellow;
-    return Table::Cell::kRed;
-  };
-  auto time_str = [](absl::Duration d) {
-    return d != absl::Seconds(0) ? absl::StrCat(d) : "";
-  };
   for (const DayRun& run : runs) {
     table.AddRow({
       Table::Cell{.entry = run.title},
@@ -421,15 +426,15 @@ int main(int argc, char** argv) {
       Table::Cell{.entry = run.part2},
       Table::Cell{.entry = run.part2_solved ? "*" : " ",
                   .color = Table::Cell::kYellow},
-      Table::Cell{.entry = time_str(run.time),
-                  .color = day_time_color(run.time),
+      Table::Cell{.entry = TimeString(run.time),
+                  .color = DayTimeColor(run.time),
                   .justify = Table::Cell::kRight}});
   }
   table.AddBreaker();
   table.AddRow({
     Table::Cell{.entry = "Total", .span = 5},
-    Table::Cell{.entry = time_str(total_time),
-                .color = year_time_color(total_time),
+    Table::Cell{.entry = TimeString(total_time),
+                .color = YearTimeColor(total_time),
                 .justify = Table::Cell::kRight}});
   table.AddBreaker();
 
