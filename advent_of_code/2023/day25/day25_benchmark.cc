@@ -4,15 +4,7 @@
 
 namespace advent_of_code {
 
-constexpr int kMaxTestCount = 5;
-
-TEST(DayBenchmarkTest_Day_2023_25, Consistency) {
-  Day_2023_25 day;
-  absl::StatusOr<int> test_count = FileBenchmarkTestCount(&day);
-  ASSERT_TRUE(test_count.ok()) << test_count.status().ToString();
-  EXPECT_EQ(kMaxTestCount, *test_count);
-}
-
-BENCHMARK_TEMPLATE(BM_Day, Day_2023_25)->DenseRange(0, kMaxTestCount - 1);
+BENCHMARK_TEMPLATE(BM_Day, Day_2023_25)
+    ->DenseRange(0, FileBenchmarkMaxIdx<Day_2023_25>());
 
 }  // namespace advent_of_code

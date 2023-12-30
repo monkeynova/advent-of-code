@@ -18,6 +18,16 @@ class FileTest : public ::testing::Test {
   }
 };
 
+class FileTest_Day : public ::testing::Test {
+ public:
+  template <typename Day>
+  bool RunTest() {
+    Day day;
+    return TestSingleDay(&day);
+  }
+};
+
+
 }  // namespace advent_of_code
 
 #endif  //  ADVENT_OF_CODE_INFRA_FILE_TEST_H

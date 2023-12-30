@@ -72,6 +72,10 @@ absl::StatusOr<int> FileBenchmarkTestCount(AdventDay* day) {
   return tests.size();
 }
 
+int FileBenchmarkMaxIdx(AdventDay* day) {
+  return FileBenchmarkTests(day->test_file())->size() - 1;
+}
+
 void BM_Day(benchmark::State& state, AdventDay* day) {
   absl::StatusOr<std::vector<std::unique_ptr<DirtyTestParseResult>>> tests =
       FileBenchmarkTests(day->test_file());

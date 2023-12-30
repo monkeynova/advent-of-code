@@ -9,6 +9,13 @@
 namespace advent_of_code {
 
 absl::StatusOr<int> FileBenchmarkTestCount(AdventDay* day);
+int FileBenchmarkMaxIdx(AdventDay* day);
+
+template <typename AdventType>
+int FileBenchmarkMaxIdx() {
+  AdventType day;
+  return FileBenchmarkMaxIdx(&day);
+}
 
 inline void BM_Day_SetError(benchmark::State& state, std::string_view message) {
   std::string message_str = std::string(message);
