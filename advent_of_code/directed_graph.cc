@@ -1,7 +1,5 @@
 #include "advent_of_code/directed_graph.h"
 
-#include "advent_of_code/graph_walk.h"
-
 namespace advent_of_code {
 
 absl::flat_hash_set<std::string_view> DirectedGraphBase::Reachable(
@@ -26,24 +24,31 @@ std::vector<std::vector<std::string_view>> DirectedGraphBase::Forest() const {
   std::vector<std::vector<std::string_view>> forest;
 
   absl::flat_hash_set<std::string_view> to_assign = nodes();
+  using DirMap =
+      absl::flat_hash_map<std::string_view, std::vector<std::string_view>>;
+  std::array<const DirMap*, 2> node_dir_maps =
+      {&node_to_outgoing_, &node_to_incoming_};
+
   while (!to_assign.empty()) {
-    std::string_view start = *to_assign.begin();
-    forest.push_back({});
-    GraphWalk({
-                  .graph = this,
-                  .start = start,
-                  .is_good = [&](std::string_view node,
-                                 int) { return to_assign.contains(node); },
-                  .is_final =
-                      [&](std::string_view node, int) {
-                        if (auto it = to_assign.find(node); it != to_assign.end()) {
-                          to_assign.erase(it);
-                          forest.back().push_back(node);
-                        }
-                        return false;
-                      },
-              })
-        .Walk();
+    auto first_it = to_assign.begin();
+    std::string_view start = *first_it;
+    to_assign.erase(first_it);
+    forest.push_back({start});
+    for (std::deque<std::string_view> queue = {start}; !queue.empty();
+         queue.pop_front()) {
+      std::string_view cur = queue.front();
+      for (const auto& map : node_dir_maps) {
+        if (auto it = map->find(cur); it != map->end()) {
+          for (std::string_view out : it->second) {
+            if (auto it = to_assign.find(out); it != to_assign.end()) {
+              to_assign.erase(it);
+              queue.push_back(out);
+              forest.back().push_back(out);
+            }
+          }
+        }
+      }
+    }
   }
 
   return forest;

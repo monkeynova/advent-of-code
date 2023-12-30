@@ -162,10 +162,7 @@ cc_library(
 cc_library(
     name = "directed_graph",
     srcs = ["directed_graph.cc"],
-    hdrs = [
-        "directed_graph.h",
-        "graph_walk.h",
-    ],
+    hdrs = ["directed_graph.h"],
     deps = [
         ":bfs",
         ":vlog",
