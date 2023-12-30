@@ -12,6 +12,15 @@ The organization of this repository is as follows:
  advent_of_code/infra
  * Code not created by me is in third_party/... (currently only an MD5
  implementation)
+
+### Top Level Tools ###
+
+* ```:run_year [--year=<year>]``` runs all of my input for the given year
+(which defaults to the current year) and displays the results as well as
+timings in an ASCII table.
+* ```:benchmark``` runs benchmarks for my input for each day in all years.
+```--benchmark_flags=--benchmark_filter=.*YYYY/DD.*``` will filter the run
+to a single day.
  
 ### Per-Day File Organization ###
 
@@ -20,32 +29,14 @@ The organization of this repository is as follows:
  * dayDD.cc - The code implementing a solution of the days puzzle
  * dayDD.test - A [file_based_test_driver](
 https://github.com/google/file-based-test-driver)
- test suite for the day puzzle
+ test suite for the day puzzle. It also contains a benchmark for each of
+ the tests in the suite.
  * input.txt - My input from [adventofcode.com](https://adventofcode.com)
  (and referenced by dayDD.test)
  * dayDD_test.cc - A test verifying the correctness of dayDD.cc
- * dayDD_benchmark.cc - A benchmark that will run (and time) dayDD.cc
  * README.md - A copy of the problem from [adventofcode.com](
 https://adventofcode.com) translated to markdown
  
-### Collective Benchmarks ###
-
-In addition to per-day benchmarks at
-```advent_of_code/YYYY/dayDD:dayDD_benchmark```, there are benchmarks that
-collect all solutions for a given year at ```advent_of_code/YYYY:benchmark```
-and a benchmark that collects all solutions across all years
-```advent_of_code:benchmark```.
-
-There is also a "run every day exactly once" benchmark in
-```advent_of_code/YYYY:whole_year```. Rather than a cc_test it is a cc_binary
-and it will run all of the benchmarks in ```advent_of_code/YYYY:benchmark```
-with options to a) Only run each benchmark once and b) One run a benchmark for
-the competition input. This allows one to run
-```time bazel-bin/advent_of_code/YYYY/whole_year``` in order to get a measure
-of how long to solve an entire year. This was inspired by blog posts like
-https://www.forrestthewoods.com/blog/solving-advent-of-code-in-under-a-second/
-which attempt to run an entire years worth of solutions in <1 second.
-
 ### Solve Process ###
 
  The process for solving a new day is as follows
