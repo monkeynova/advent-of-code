@@ -19,11 +19,9 @@ namespace {
 
 class CanMoveBFS : public BFSInterface<CanMoveBFS, Point> {
  public:
-  CanMoveBFS(const CharBoard& b,
-             Point cur, Point end,
+  CanMoveBFS(const CharBoard& b, Point cur, Point end,
              std::vector<Point>* path_out)
-      : b_(b), cur_(cur), end_(end), path_out_(path_out) {
-  }
+      : b_(b), cur_(cur), end_(end), path_out_(path_out) {}
 
   Point identifier() const override { return cur_; }
 
@@ -118,16 +116,22 @@ struct Stats {
   int budget_skips = 0;
   template <typename Sink>
   friend void AbslStringify(Sink& sink, const Stats& stats) {
-    absl::Format(&sink, "calls:%d; memo=%d, budget_skips:%d", stats.calls, stats.memo, stats.budget_skips);
+    absl::Format(&sink, "calls:%d; memo=%d, budget_skips:%d", stats.calls,
+                 stats.memo, stats.budget_skips);
   }
 };
 
-
 class State {
  public:
-  explicit State(CharBoard board, std::vector<Actor> actors, const std::vector<Point>& tmp_locations,
-                 const std::vector<std::vector<Point>>& destinations, const AllPathsMap& all_paths)
-   : board_(std::move(board)), actors_(std::move(actors)), tmp_locations_(tmp_locations), destinations_(destinations), all_paths_(all_paths) {}
+  explicit State(CharBoard board, std::vector<Actor> actors,
+                 const std::vector<Point>& tmp_locations,
+                 const std::vector<std::vector<Point>>& destinations,
+                 const AllPathsMap& all_paths)
+      : board_(std::move(board)),
+        actors_(std::move(actors)),
+        tmp_locations_(tmp_locations),
+        destinations_(destinations),
+        all_paths_(all_paths) {}
 
   const Stats& stats() const { return stats_; }
 
@@ -193,7 +197,8 @@ class State {
     absl::Format(&sink, "Actors:\n%s", absl::StrJoin(s.actors_, "\n"));
   }
 
-  std::optional<int> FindMinCostDFS(int budget = std::numeric_limits<int>::max());
+  std::optional<int> FindMinCostDFS(
+      int budget = std::numeric_limits<int>::max());
 
  private:
   CharBoard board_;
@@ -338,7 +343,9 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
     }
   }
 
-  absl::c_sort(actors, [](const Actor& a, const Actor& b) { return a.cost() < b.cost(); });
+  absl::c_sort(actors, [](const Actor& a, const Actor& b) {
+    return a.cost() < b.cost();
+  });
 
   State s(std::move(b), std::move(actors), empty, destinations, all_paths);
   std::optional<int> ret = s.FindMinCostDFS();
