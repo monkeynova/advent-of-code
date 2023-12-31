@@ -64,7 +64,15 @@ class FastBoard {
    public:
     PointMap(const FastBoard& b, Storage init) : map_(b.size_, init) {}
 
+    template <typename T = Storage, typename = std::enable_if_t<sizeof(T) <= 8>>
     Storage Get(Point p) const { return map_[p.idx_]; }
+
+    template <typename T = Storage, typename = std::enable_if_t<(sizeof(T) > 8)>>
+    Storage& Get(Point p) { return map_[p.idx_]; }
+
+    template <typename T = Storage, typename = std::enable_if_t<(sizeof(T) > 8)>>
+    const Storage& Get(Point p) const { return map_[p.idx_]; }
+
     void Set(Point p, Storage s) { map_[p.idx_] = s; }
 
    private:
