@@ -43,20 +43,26 @@ absl::StatusOr<Blueprint> Parse(std::string_view line) {
 }
 
 struct State {
+  // Resources ordered in the first 32bits with robots in the second for a
+  // quick reinterpret_cast cheat on AddResources.
   char ore = 0;
-  char ore_robot = 1;
   char clay = 0;
-  char clay_robot = 0;
   char obsidian = 0;
-  char obsidian_robot = 0;
   char geode = 0;
+  char ore_robot = 1;
+  char clay_robot = 0;
+  char obsidian_robot = 0;
   char geode_robot = 0;
 
   template <typename Sink>
   friend void AbslStringify(Sink& sink, const State& s) {
-    absl::Format(&sink, "O:+%d*%d;O:+%d*%d;O:+%d*%d;O:+%d*%d", s.ore,
+    absl::Format(&sink, "O:+%d*%d;C:+%d*%d;D:+%d*%d;G:+%d*%d", s.ore,
                  s.ore_robot, s.clay, s.clay_robot, s.obsidian,
                  s.obsidian_robot, s.geode, s.geode_robot);
+  }
+
+  void AddResources() {
+    *reinterpret_cast<int32_t*>(&ore) += *reinterpret_cast<int32_t*>(&ore_robot);
   }
 
   int64_t ForHash() const {
@@ -85,27 +91,35 @@ int BestGeode(Blueprint bp, int minutes) {
   int max_geode = 0;
   for (int i = 0; i < minutes; ++i) {
     VLOG(2) << i << ": " << states.size();
+    int remaining = minutes - i;
     absl::flat_hash_set<State> new_states;
+    new_states.reserve(states.size());
+    int best_arithmetic_sum = remaining * (remaining + 1) / 2;
     for (const State& s : states) {
-      if (true) {
-        int best_geode_add = s.geode_robot * (minutes - i) +
-                             (minutes - i) * (minutes - i + 1) / 2;
-        if (s.geode + best_geode_add < max_geode) {
-          continue;
-        }
+      // The best we could possiblt do from this point is to make a bnew geod
+      // robot on every turn all of which are then making geodes. We'll make
+      // SUM(geode_robot + i, i=0..remaining) more geodes.
+      int best_geode_add = s.geode_robot * remaining + best_arithmetic_sum;
+      if (s.geode + best_geode_add < max_geode) {
+        continue;
       }
 
-      max_geode = std::max(max_geode, s.geode + s.geode_robot * (minutes - i));
+      max_geode = std::max(max_geode, s.geode + s.geode_robot * remaining);
+
+      if (remaining == 1) continue;
 
       State next_state = s;
-      next_state.ore += next_state.ore_robot;
-      next_state.clay += next_state.clay_robot;
-      next_state.obsidian += next_state.obsidian_robot;
-      next_state.geode += next_state.geode_robot;
-      if (i != minutes - 1) {
-        new_states.insert(next_state);
+      next_state.AddResources();
+      new_states.insert(next_state);
+
+      if (s.ore >= bp.geode_robot_ore_cost &&
+          s.obsidian >= bp.geode_robot_obsidian_cost) {
+        State build = next_state;
+        build.ore -= bp.geode_robot_ore_cost;
+        build.obsidian -= bp.geode_robot_obsidian_cost;
+        build.geode_robot++;
+        new_states.insert(build);
       }
-      if (i == minutes - 1) continue;
 
       if (s.ore >= bp.ore_robot_ore_cost && s.ore_robot < max_ore_robots) {
         State build = next_state;
@@ -126,14 +140,6 @@ int BestGeode(Blueprint bp, int minutes) {
         build.ore -= bp.obsidian_robot_ore_cost;
         build.clay -= bp.obsidian_robot_clay_cost;
         build.obsidian_robot++;
-        new_states.insert(build);
-      }
-      if (s.ore >= bp.geode_robot_ore_cost &&
-          s.obsidian >= bp.geode_robot_obsidian_cost) {
-        State build = next_state;
-        build.ore -= bp.geode_robot_ore_cost;
-        build.obsidian -= bp.geode_robot_obsidian_cost;
-        build.geode_robot++;
         new_states.insert(build);
       }
     }
