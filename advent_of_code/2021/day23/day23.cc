@@ -99,36 +99,6 @@ struct Actor {
     absl::Format(&sink, "%c: %v %v %v", a.c, a.cur, a.moved, a.done);
   }
 
-  Point Destination(
-      const absl::flat_hash_map<char, std::vector<Point>>& destinations,
-      const CharBoard& b) const {
-    auto it = destinations.find(c);
-    CHECK(it != destinations.end());
-    for (Point p : it->second) {
-      if (b[p] != c) return p;
-    }
-    LOG(FATAL) << "No destination found: " << *this << "\n" << b;
-  }
-
-  std::optional<int> CanMove(Point dest, const CharBoard& b,
-                             const AllPathsMap& all_paths) const {
-    auto it = all_paths.find(std::make_pair(cur, dest));
-    if (it == all_paths.end()) {
-      VLOG(1) << cur;
-      VLOG(1) << dest;
-      LOG(FATAL) << "Could not find path";
-    }
-    const std::vector<Point>& path = it->second;
-    for (Point p : path) {
-      if (p == cur) {
-        CHECK_EQ(b[p], c);
-      } else {
-        if (b[p] != '.') return {};
-      }
-    }
-    return (path.size() - 1) * cost();
-  }
-
   int cost() const {
     switch (c) {
       case 'A':
@@ -144,48 +114,83 @@ struct Actor {
   }
 };
 
-struct State {
-  CharBoard board;
-  std::vector<Actor> actors;
-  int cost = 0;
+class State {
+ public:
+  State(CharBoard board, std::vector<Actor> actors)
+   : board_(std::move(board)), actors_(std::move(actors)) {}
+
+  int cost() const { return cost_; }
+  const std::vector<Actor>& actors() const { return actors_; }
 
   bool operator==(const State& o) const {
-    return actors == o.actors && cost == o.cost;
+    return actors_ == o.actors_ && cost_ == o.cost_;
   }
   template <typename H>
   friend H AbslHashValue(H h, const State& s) {
-    return H::combine(std::move(h), s.actors, s.cost);
+    return H::combine(std::move(h), s.actors_, s.cost_);
   }
 
   bool IsFinal() const {
-    for (const auto& a : actors) {
+    for (const auto& a : actors_) {
       if (!a.done) return false;
     }
     return true;
   }
 
+  std::optional<int> CanMove(const Actor& actor, Point dest, const AllPathsMap& all_paths) const {
+    auto it = all_paths.find(std::make_pair(actor.cur, dest));
+    if (it == all_paths.end()) {
+      VLOG(1) << actor.cur;
+      VLOG(1) << dest;
+      LOG(FATAL) << "Could not find path";
+    }
+    const std::vector<Point>& path = it->second;
+    for (Point p : path) {
+      if (p == actor.cur) {
+        CHECK_EQ(board_[p], actor.c);
+      } else {
+        if (board_[p] != '.') return {};
+      }
+    }
+    return (path.size() - 1) * actor.cost();
+  }
+
+  Point Destination(const Actor& actor, const absl::flat_hash_map<char, std::vector<Point>>& destinations) const {
+    auto it = destinations.find(actor.c);
+    CHECK(it != destinations.end());
+    for (Point p : it->second) {
+      if (board_[p] != actor.c) return p;
+    }
+    LOG(FATAL) << "No destination found: " << *this << "\n" << board_;
+  }
+
   State MoveActor(int actor_idx, Point to, int cost, bool done) const {
     State new_state = *this;
-    CHECK_LT(actor_idx, actors.size());
+    CHECK_LT(actor_idx, actors_.size());
     CHECK_GE(actor_idx, 0);
-    new_state.board[new_state.actors[actor_idx].cur] = '.';
-    new_state.board[to] = new_state.actors[actor_idx].c;
-    new_state.actors[actor_idx].cur = to;
+    new_state.board_[new_state.actors_[actor_idx].cur] = '.';
+    new_state.board_[to] = new_state.actors_[actor_idx].c;
+    new_state.actors_[actor_idx].cur = to;
     if (done) {
-      new_state.actors[actor_idx].done = true;
+      new_state.actors_[actor_idx].done = true;
     } else {
-      CHECK(!new_state.actors[actor_idx].moved);
-      new_state.actors[actor_idx].moved = true;
+      CHECK(!new_state.actors_[actor_idx].moved);
+      new_state.actors_[actor_idx].moved = true;
     }
-    new_state.cost += cost;
+    new_state.cost_ += cost;
     return new_state;
   }
 
   template <typename Sink>
   friend void AbslStringify(Sink& sink, const State& s) {
-    absl::Format(&sink, "Cost=%d; Board:\n%v\nActors:\n%s", s.cost, s.board,
-                 absl::StrJoin(s.actors, "\n"));
+    absl::Format(&sink, "Cost=%d; Board:\n%v\nActors:\n%s", s.cost_, s.board_,
+                 absl::StrJoin(s.actors_, "\n"));
   }
+
+ private:
+  CharBoard board_;
+  std::vector<Actor> actors_;
+  int cost_ = 0;
 };
 
 std::optional<int> FindMinCost(
@@ -201,21 +206,22 @@ std::optional<int> FindMinCost(
        history.erase(*queue.front()), queue.pop_front()) {
     const State& cur = *queue.front();
     if (cur.IsFinal()) {
-      if (!best || *best > cur.cost) {
-        VLOG(1) << "Found better final cost: " << cur.cost;
+      if (!best || *best > cur.cost()) {
+        VLOG(1) << "Found better final cost: " << cur.cost();
         VLOG(2) << cur;
-        best = cur.cost;
+        best = cur.cost();
       }
       continue;
     }
     // Fork off test paths for the next best action of each actor.
-    for (int i = 0; i < cur.actors.size(); ++i) {
-      if (cur.actors[i].done) continue;
+    for (int i = 0; i < cur.actors().size(); ++i) {
+      const Actor& actor = cur.actors()[i];
+      if (actor.done) continue;
       // Can we go to the final location?
-      Point p = cur.actors[i].Destination(destinations, cur.board);
-      std::optional<int> cost = cur.actors[i].CanMove(p, cur.board, all_paths);
+      Point p = cur.Destination(actor, destinations);
+      std::optional<int> cost = cur.CanMove(actor, p, all_paths);
       if (cost) {
-        if (best && cur.cost + *cost >= *best) continue;
+        if (best && cur.cost() + *cost >= *best) continue;
         // We can reach the final destination. Go there and stop.
         const auto [it, inserted] =
             history.insert(cur.MoveActor(i, p, *cost, /*done=*/true));
@@ -225,15 +231,14 @@ std::optional<int> FindMinCost(
         continue;
       }
       // If we have alread moved, we can't move again.
-      if (cur.actors[i].moved) continue;
+      if (actor.moved) continue;
 
       // If we haven't moved, and we can't get to the final destionation,
       // fork off test paths for each candidate temporary location.
       for (Point p : empty) {
-        std::optional<int> cost =
-            cur.actors[i].CanMove(p, cur.board, all_paths);
+        std::optional<int> cost = cur.CanMove(actor, p, all_paths);
         if (cost) {
-          if (best && cur.cost + *cost >= *best) continue;
+          if (best && cur.cost() + *cost >= *best) continue;
           const auto [it, inserted] =
               history.insert(cur.MoveActor(i, p, *cost, /*done=*/false));
           if (!inserted) continue;
@@ -252,15 +257,14 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
 
-  State s{.board = b};
-
   // Find the initial locations of actors and the temporary places in which to
   // store them.
   std::vector<Point> empty;
   std::vector<Point> srcs;
+  std::vector<Actor> actors;
   for (const auto [p, c] : b) {
     if (c >= 'A' && c <= 'D') {
-      s.actors.push_back({.c = c, .cur = p});
+      actors.push_back({.c = c, .cur = p});
       srcs.push_back(p);
     }
     // p + south = '#' is the stupid test for not stopping at a hallway
@@ -300,7 +304,7 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
     for (Point test : v) {
       if (b[test] != c) break;
       bool found = false;
-      for (auto& a : s.actors) {
+      for (auto& a : actors) {
         if (a.cur == test) {
           if (found) return Error("Double found");
           if (a.c != c) return Error("Bad A");
@@ -310,6 +314,8 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
       }
     }
   }
+
+  State s(std::move(b), std::move(actors));
 
   return AdventReturn(
       FindMinCost(std::move(s), empty, destinations, all_paths));
