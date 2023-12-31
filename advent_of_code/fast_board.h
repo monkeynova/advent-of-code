@@ -28,8 +28,17 @@ class FastBoard {
     Point(const Point&) = default;
     Point& operator=(const Point&) = default;
 
-    bool operator==(const Point& o) const { return idx_ == o.idx_; }
-    bool operator!=(const Point& o) const { return idx_ != o.idx_; }
+    bool operator==(const Point& o) const = default;
+
+    template <typename H>
+    friend H AbslHashValue(H h, Point p) {
+      return H::combine(std::move(h), p.idx_);
+    }
+
+    template <typename Sink>
+    friend void AbslStringify(Sink& sink, Point p) {
+      absl::Format(&sink, "FastPoint(%d)", p.idx_);
+    }
 
    private:
     friend class FastBoard;

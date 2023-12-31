@@ -92,6 +92,11 @@ class CharBoardBase {
   CharBoardBase() : CharBoardBase(0, 0) {}
 
   template <bool is_mutable_test = is_mutable,
+            typename = std::enable_if<!is_mutable_test>>
+  CharBoardBase(const CharBoardBase</*is_mutable=*/true>& o)
+   : stride_(o.stride_), buf_(o.buf_) {}
+
+  template <bool is_mutable_test = is_mutable,
             typename = std::enable_if_t<is_mutable_test>>
   CharBoardBase(int width, int height)
       : stride_(width + 1), buf_(stride_ * height, '.') {

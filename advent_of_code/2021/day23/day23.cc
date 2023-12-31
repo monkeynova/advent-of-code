@@ -11,6 +11,7 @@
 #include "absl/strings/str_split.h"
 #include "advent_of_code/bfs.h"
 #include "advent_of_code/char_board.h"
+#include "advent_of_code/fast_board.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
@@ -77,21 +78,22 @@ absl::StatusOr<AllPathsMap> ComputeAllPaths(
   return ret;
 }
 
-struct Actor {
+template <typename PointType>
+struct ActorBase {
   char c;
-  Point cur;
+  PointType cur;
   bool moved = false;
   bool done = false;
 
-  bool operator==(const Actor& o) const {
+  bool operator==(const ActorBase& o) const {
     return c == o.c && cur == o.cur && moved == o.moved && done == o.done;
   }
   template <typename H>
-  friend H AbslHashValue(H h, const Actor& a) {
+  friend H AbslHashValue(H h, const ActorBase& a) {
     return H::combine(std::move(h), a.c, a.cur, a.moved, a.done);
   }
   template <typename Sink>
-  friend void AbslStringify(Sink& sink, const Actor& a) {
+  friend void AbslStringify(Sink& sink, const ActorBase& a) {
     absl::Format(&sink, "%c: %v %v %v", a.c, a.cur, a.moved, a.done);
   }
 
@@ -109,6 +111,9 @@ struct Actor {
     LOG(FATAL) << "Bad char";
   }
 };
+
+using Actor = ActorBase<Point>;
+using FastActor = ActorBase<FastBoard::Point>;
 
 struct Stats {
   int calls = 0;
@@ -128,67 +133,64 @@ class State {
                  const std::vector<std::vector<Point>>& destinations,
                  const AllPathsMap& all_paths)
       : board_(std::move(board)),
-        actors_(std::move(actors)),
-        tmp_locations_(tmp_locations),
-        destinations_(destinations),
-        all_paths_(all_paths) {}
+        immutable_board_(board_),
+        fb_(immutable_board_) {
+    for (const Actor& a : actors) {
+      actors_.push_back(FastActor{.c = a.c, .cur = fb_.From(a.cur), .done = a.done, .moved = a.moved});
+    }
+    tmp_locations_ = FbFrom(tmp_locations);
+    for (const auto& v : destinations) {
+      destinations_.push_back(FbFrom(v));
+    }
+    for (const auto& [pair, v] : all_paths) {
+      auto fast_pair = std::make_pair(fb_.From(pair.first), fb_.From(pair.second));
+      all_paths_[fast_pair] = FbFrom(v);
+    }
+  }
 
   const Stats& stats() const { return stats_; }
 
   bool IsFinal() const {
-    return absl::c_all_of(actors_, [](const Actor& a) { return a.done; });
+    return absl::c_all_of(actors_, [](const FastActor& a) { return a.done; });
   }
 
-  std::optional<int> CanMove(const Actor& actor, Point dest) const {
+  std::optional<int> CanMove(const FastActor& actor, FastBoard::Point dest) const {
     auto it = all_paths_.find(std::make_pair(actor.cur, dest));
-    if (it == all_paths_.end()) {
-      VLOG(1) << actor.cur;
-      VLOG(1) << dest;
-      LOG(FATAL) << "Could not find path";
+    CHECK(it != all_paths_.end()) << actor.cur << " -> " << dest;
+    for (FastBoard::Point p : it->second) {
+      if (fb_[p] != '.') return {};
     }
-    const std::vector<Point>& path = it->second;
-    for (Point p : path) {
-      if (p == actor.cur) {
-        CHECK_EQ(board_[p], actor.c);
-      } else {
-        if (board_[p] != '.') return {};
-      }
-    }
-    return path.size() * actor.cost();
+    return it->second.size() * actor.cost();
   }
 
-  Point Destination(const Actor& actor) const {
-    for (Point p : destinations_[actor.c]) {
-      if (board_[p] != actor.c) return p;
+  FastBoard::Point Destination(const FastActor& actor) const {
+    for (FastBoard::Point p : destinations_[actor.c]) {
+      if (fb_[p] != actor.c) return p;
     }
     LOG(FATAL) << "No destination found: " << *this << "\n" << board_;
   }
 
-  void MoveActor(int actor_idx, Point to, int cost, bool done) {
-    CHECK_LT(actor_idx, actors_.size());
-    CHECK_GE(actor_idx, 0);
-    board_[actors_[actor_idx].cur] = '.';
-    board_[to] = actors_[actor_idx].c;
-    actors_[actor_idx].cur = to;
+  void MoveActor(FastActor& actor, FastBoard::Point to, bool done) {
+    board_[fb_.To(actor.cur)] = '.';
+    board_[fb_.To(to)] = actor.c;
+    actor.cur = to;
     if (done) {
-      actors_[actor_idx].done = true;
+      actor.done = true;
     } else {
-      CHECK(!actors_[actor_idx].moved);
-      actors_[actor_idx].moved = true;
+      CHECK(!actor.moved);
+      actor.moved = true;
     }
   }
 
-  void UnMoveActor(int actor_idx, Point from, int cost, bool done) {
-    CHECK_LT(actor_idx, actors_.size());
-    CHECK_GE(actor_idx, 0);
-    board_[actors_[actor_idx].cur] = '.';
-    board_[from] = actors_[actor_idx].c;
-    actors_[actor_idx].cur = from;
+  void UnMoveActor(FastActor& actor, FastBoard::Point from, bool done) {
+    board_[fb_.To(actor.cur)] = '.';
+    board_[fb_.To(from)] = actor.c;
+    actor.cur = from;
     if (done) {
-      actors_[actor_idx].done = false;
+      actor.done = false;
     } else {
-      CHECK(actors_[actor_idx].moved);
-      actors_[actor_idx].moved = false;
+      CHECK(actor.moved);
+      actor.moved = false;
     }
   }
 
@@ -201,13 +203,23 @@ class State {
       int budget = std::numeric_limits<int>::max());
 
  private:
+  std::vector<FastBoard::Point> FbFrom(const std::vector<Point>& v) {
+    std::vector<FastBoard::Point> ret;
+    ret.reserve(v.size());
+    for (Point p : v) ret.push_back(fb_.From(p));
+    return ret;
+  }
+
   CharBoard board_;
-  std::vector<Actor> actors_;
-  const std::vector<Point>& tmp_locations_;
-  const std::vector<std::vector<Point>>& destinations_;
-  const AllPathsMap& all_paths_;
+  ImmutableCharBoard immutable_board_;
+  FastBoard fb_;
+  std::vector<FastActor> actors_;
+  std::vector<FastBoard::Point> tmp_locations_;
+  std::vector<std::vector<FastBoard::Point>> destinations_;
+  absl::flat_hash_map<std::pair<FastBoard::Point, FastBoard::Point>, std::vector<FastBoard::Point>> all_paths_;
+
   Stats stats_;
-  absl::flat_hash_map<std::vector<Actor>, std::optional<int>> memo_;
+  absl::flat_hash_map<std::vector<FastActor>, std::optional<int>> memo_;
 };
 
 std::optional<int> State::FindMinCostDFS(int budget) {
@@ -224,13 +236,12 @@ std::optional<int> State::FindMinCostDFS(int budget) {
 
   std::optional<int> best;
 
-  for (int i = 0; i < actors_.size(); ++i) {
-    const Actor& actor = actors_[i];
+  for (FastActor& actor : actors_) {
     if (actor.done) continue;
 
-    Point from = actor.cur;
+    FastBoard::Point from = actor.cur;
     // Can we go to the final location?
-    Point to = Destination(actor);
+    FastBoard::Point to = Destination(actor);
     std::optional<int> cost = CanMove(actor, to);
     if (cost) {
       if (*cost > budget) {
@@ -238,7 +249,7 @@ std::optional<int> State::FindMinCostDFS(int budget) {
         continue;
       }
       // We can reach the final destination. Go there and stop.
-      MoveActor(i, to, *cost, /*done=*/true);
+      MoveActor(actor, to, /*done=*/true);
       std::optional<int> sub = FindMinCostDFS(budget - *cost);
       if (sub) {
         sub = *sub + *cost;
@@ -247,7 +258,7 @@ std::optional<int> State::FindMinCostDFS(int budget) {
           budget = *best;
         }
       }
-      UnMoveActor(i, from, *cost, /*done=*/true);
+      UnMoveActor(actor, from, /*done=*/true);
       continue;
     }
     // If we have alread moved, we can't move again.
@@ -255,14 +266,14 @@ std::optional<int> State::FindMinCostDFS(int budget) {
 
     // If we haven't moved, and we can't get to the final destionation,
     // try each candidate temporary location.
-    for (Point to : tmp_locations_) {
+    for (FastBoard::Point to : tmp_locations_) {
       std::optional<int> cost = CanMove(actor, to);
       if (cost) {
         if (*cost > budget) {
           ++stats_.budget_skips;
           continue;
         }
-        MoveActor(i, to, *cost, /*done=*/false);
+        MoveActor(actor, to, /*done=*/false);
         std::optional<int> sub = FindMinCostDFS(budget - *cost);
         if (sub) {
           sub = *sub + *cost;
@@ -271,7 +282,7 @@ std::optional<int> State::FindMinCostDFS(int budget) {
             budget = *best;
           }
         }
-        UnMoveActor(i, from, *cost, /*done=*/false);
+        UnMoveActor(actor, from, /*done=*/false);
       }
     }
   }
