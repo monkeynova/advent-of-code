@@ -228,7 +228,15 @@ std::optional<int> State::FindMinCostDFS(int budget) {
     return 0;
   }
 
-  auto it = memo_.find(actors_);
+  std::vector<FastActor> memo_actors = actors_;
+  absl::c_sort(memo_actors, [](const FastActor& a, const FastActor& b) {
+    if (a.c != b.c) return a.c < b.c;
+    if (a.moved != b.moved) return a.moved < b.moved;
+    if (a.done != b.done) return a.done < b.done;
+    return a.cur < b.cur;
+  });
+
+  auto it = memo_.find(memo_actors);
   if (it != memo_.end()) {
     ++stats_.memo;
     return it->second;
@@ -287,7 +295,7 @@ std::optional<int> State::FindMinCostDFS(int budget) {
     }
   }
 
-  return memo_[actors_] = best;
+  return memo_[memo_actors] = best;
 }
 
 }  // namespace

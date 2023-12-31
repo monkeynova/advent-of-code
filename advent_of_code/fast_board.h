@@ -28,7 +28,7 @@ class FastBoard {
     Point(const Point&) = default;
     Point& operator=(const Point&) = default;
 
-    bool operator==(const Point& o) const = default;
+    std::strong_ordering operator<=>(const Point& o) const = default;
 
     template <typename H>
     friend H AbslHashValue(H h, Point p) {
