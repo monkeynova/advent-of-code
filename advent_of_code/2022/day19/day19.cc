@@ -59,17 +59,17 @@ struct State {
                  s.obsidian_robot, s.geode, s.geode_robot);
   }
 
+  int64_t ForHash() const {
+    return *reinterpret_cast<const int64_t*>(this);
+  }
+
   template <typename H>
   friend H AbslHashValue(H h, const State& s) {
-    return H::combine(std::move(h), s.ore, s.ore_robot, s.clay, s.clay_robot,
-                      s.obsidian, s.obsidian_robot, s.geode, s.geode_robot);
+    return H::combine(std::move(h), s.ForHash());
   }
 
   bool operator==(const State& o) const {
-    return ore == o.ore && ore_robot == o.ore_robot && clay == o.clay &&
-           clay_robot == o.clay_robot && obsidian == o.obsidian &&
-           obsidian_robot == o.obsidian_robot && geode == o.geode &&
-           geode_robot == o.geode_robot;
+    return ForHash() == o.ForHash();
   }
 };
 
