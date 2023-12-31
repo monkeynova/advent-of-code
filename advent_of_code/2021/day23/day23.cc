@@ -19,10 +19,10 @@ namespace {
 
 class CanMoveBFS : public BFSInterface<CanMoveBFS, Point> {
  public:
-  CanMoveBFS(const CharBoard* b, Point cur, Point end,
+  CanMoveBFS(const CharBoard& b,
+             Point cur, Point end,
              std::vector<Point>* path_out)
       : b_(b), cur_(cur), end_(end), path_out_(path_out) {
-    path_.push_back(cur_);
   }
 
   Point identifier() const override { return cur_; }
@@ -39,8 +39,8 @@ class CanMoveBFS : public BFSInterface<CanMoveBFS, Point> {
   void AddNextSteps(State* state) const override {
     const absl::flat_hash_set<char> kMovable = {'.', 'A', 'B', 'C', 'D'};
     for (Point d : Cardinal::kFourDirs) {
-      if (!b_->OnBoard(cur_ + d)) continue;
-      if (!kMovable.contains((*b_)[cur_ + d])) continue;
+      if (!b_.OnBoard(cur_ + d)) continue;
+      if (!kMovable.contains((b_)[cur_ + d])) continue;
       CanMoveBFS next = *this;
       next.cur_ += d;
       next.path_.push_back(next.cur_);
@@ -49,7 +49,7 @@ class CanMoveBFS : public BFSInterface<CanMoveBFS, Point> {
   }
 
  private:
-  const CharBoard* b_;
+  const CharBoard& b_;
   Point cur_;
   Point end_;
   std::vector<Point>* path_out_;
@@ -64,12 +64,10 @@ absl::StatusOr<AllPathsMap> ComputeAllPaths(
   AllPathsMap ret;
   for (Point from : point_list) {
     for (Point to : point_list) {
-      std::vector<Point>& path = ret[std::make_pair(from, to)];
-      if (!CanMoveBFS(&b, from, to, &path).FindMinSteps()) {
+      if (from == to) continue;
+      std::vector<Point>& path = ret[{from, to}];
+      if (!CanMoveBFS(b, from, to, &path).FindMinSteps()) {
         return absl::NotFoundError("No path found");
-      }
-      if (path[0] != from) {
-        return absl::InternalError(absl::StrFormat("%v != %v", path[0], from));
       }
       if (path.back() != to) {
         return absl::InternalError(
@@ -131,10 +129,7 @@ class State {
   }
 
   bool IsFinal() const {
-    for (const auto& a : actors_) {
-      if (!a.done) return false;
-    }
-    return true;
+    return absl::c_all_of(actors_, [](const Actor& a) { return a.done; });
   }
 
   std::optional<int> CanMove(const Actor& actor, Point dest, const AllPathsMap& all_paths) const {
@@ -152,7 +147,7 @@ class State {
         if (board_[p] != '.') return {};
       }
     }
-    return (path.size() - 1) * actor.cost();
+    return path.size() * actor.cost();
   }
 
   Point Destination(const Actor& actor, const absl::flat_hash_map<char, std::vector<Point>>& destinations) const {
@@ -166,19 +161,38 @@ class State {
 
   State MoveActor(int actor_idx, Point to, int cost, bool done) const {
     State new_state = *this;
+    new_state.MoveActorInPlace(actor_idx, to, cost, done);
+    return new_state;
+  }
+
+  void MoveActorInPlace(int actor_idx, Point to, int cost, bool done) {
     CHECK_LT(actor_idx, actors_.size());
     CHECK_GE(actor_idx, 0);
-    new_state.board_[new_state.actors_[actor_idx].cur] = '.';
-    new_state.board_[to] = new_state.actors_[actor_idx].c;
-    new_state.actors_[actor_idx].cur = to;
+    board_[actors_[actor_idx].cur] = '.';
+    board_[to] = actors_[actor_idx].c;
+    actors_[actor_idx].cur = to;
     if (done) {
-      new_state.actors_[actor_idx].done = true;
+      actors_[actor_idx].done = true;
     } else {
-      CHECK(!new_state.actors_[actor_idx].moved);
-      new_state.actors_[actor_idx].moved = true;
+      CHECK(!actors_[actor_idx].moved);
+      actors_[actor_idx].moved = true;
     }
-    new_state.cost_ += cost;
-    return new_state;
+    cost_ += cost;
+  }
+
+  void UnMoveActorInPlace(int actor_idx, Point from, int cost, bool done) {
+    CHECK_LT(actor_idx, actors_.size());
+    CHECK_GE(actor_idx, 0);
+    board_[actors_[actor_idx].cur] = '.';
+    board_[from] = actors_[actor_idx].c;
+    actors_[actor_idx].cur = from;
+    if (done) {
+      actors_[actor_idx].done = false;
+    } else {
+      CHECK(actors_[actor_idx].moved);
+      actors_[actor_idx].moved = false;
+    }
+    cost_ -= cost;
   }
 
   template <typename Sink>
@@ -192,6 +206,62 @@ class State {
   std::vector<Actor> actors_;
   int cost_ = 0;
 };
+
+std::optional<int> FindMinCostDFS(
+    State& state, const std::vector<Point>& tmp_locations,
+    const absl::flat_hash_map<char, std::vector<Point>>& destinations,
+    const AllPathsMap& all_paths,
+    std::optional<int> best = std::nullopt) {
+  if (state.IsFinal()) {
+    return 0;
+  }
+
+  static absl::flat_hash_map<State, std::optional<int>> memo;
+  auto it = memo.find(state);
+  if (it != memo.end()) return it->second;
+
+  for (int i = 0; i < state.actors().size(); ++i) {
+    const Actor& actor = state.actors()[i];
+    if (actor.done) continue;
+
+    Point from = actor.cur;
+    // Can we go to the final location?
+    Point to = state.Destination(actor, destinations);
+    std::optional<int> cost = state.CanMove(actor, to, all_paths);
+    if (cost) {
+      if (best && *best < *cost) continue;
+      // We can reach the final destination. Go there and stop.
+      state.MoveActorInPlace(i, to, *cost, /*done=*/true);
+      std::optional<int> sub = FindMinCostDFS(state, tmp_locations, destinations, all_paths, best);
+      if (sub) {
+        sub = *sub + *cost;
+        if (!best || *best > *sub) best = sub;
+      }
+      state.UnMoveActorInPlace(i, from, *cost, /*done=*/true);
+      continue;
+    }
+    // If we have alread moved, we can't move again.
+    if (actor.moved) continue;
+
+    // If we haven't moved, and we can't get to the final destionation,
+    // try each candidate temporary location.
+    for (Point to : tmp_locations) {
+      std::optional<int> cost = state.CanMove(actor, to, all_paths);
+      if (cost) {
+        if (best && *best < *cost) continue;
+        state.MoveActorInPlace(i, to, *cost, /*done=*/false);
+        std::optional<int> sub = FindMinCostDFS(state, tmp_locations, destinations, all_paths, best);
+        if (sub) {
+          sub = *sub + *cost;
+          if (!best || *best > *sub) best = sub;
+        }
+        state.UnMoveActorInPlace(i, from, *cost, /*done=*/false);
+      }
+    }
+  }
+
+  return memo[state] = best;
+}
 
 std::optional<int> FindMinCost(
     State initial_state, const std::vector<Point>& empty,
@@ -213,6 +283,8 @@ std::optional<int> FindMinCost(
       }
       continue;
     }
+    if (best && cur.cost() > *best) continue;
+  
     // Fork off test paths for the next best action of each actor.
     for (int i = 0; i < cur.actors().size(); ++i) {
       const Actor& actor = cur.actors()[i];
@@ -318,7 +390,7 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
   State s(std::move(b), std::move(actors));
 
   return AdventReturn(
-      FindMinCost(std::move(s), empty, destinations, all_paths));
+      FindMinCost(s, empty, destinations, all_paths));
 }
 
 absl::StatusOr<std::string> Day_2021_23::Part2(
