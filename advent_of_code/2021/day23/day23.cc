@@ -112,28 +112,32 @@ struct Actor {
   }
 };
 
+struct Stats {
+  int calls = 0;
+  int memo = 0;
+  int budget_skips = 0;
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const Stats& stats) {
+    absl::Format(&sink, "calls:%d; memo=%d, budget_skips:%d", stats.calls, stats.memo, stats.budget_skips);
+  }
+};
+
+
 class State {
  public:
-  explicit State(std::vector<Actor> actors)
-   : actors_(std::move(actors)) {}
+  explicit State(CharBoard board, std::vector<Actor> actors, const std::vector<Point>& tmp_locations,
+                 const std::vector<std::vector<Point>>& destinations, const AllPathsMap& all_paths)
+   : board_(std::move(board)), actors_(std::move(actors)), tmp_locations_(tmp_locations), destinations_(destinations), all_paths_(all_paths) {}
 
-  const std::vector<Actor>& actors() const { return actors_; }
-
-  bool operator==(const State& o) const {
-    return actors_ == o.actors_;
-  }
-  template <typename H>
-  friend H AbslHashValue(H h, const State& s) {
-    return H::combine(std::move(h), s.actors_);
-  }
+  const Stats& stats() const { return stats_; }
 
   bool IsFinal() const {
     return absl::c_all_of(actors_, [](const Actor& a) { return a.done; });
   }
 
-  std::optional<int> CanMove(const Actor& actor, const CharBoard& board, Point dest, const AllPathsMap& all_paths) const {
-    auto it = all_paths.find(std::make_pair(actor.cur, dest));
-    if (it == all_paths.end()) {
+  std::optional<int> CanMove(const Actor& actor, Point dest) const {
+    auto it = all_paths_.find(std::make_pair(actor.cur, dest));
+    if (it == all_paths_.end()) {
       VLOG(1) << actor.cur;
       VLOG(1) << dest;
       LOG(FATAL) << "Could not find path";
@@ -141,28 +145,26 @@ class State {
     const std::vector<Point>& path = it->second;
     for (Point p : path) {
       if (p == actor.cur) {
-        CHECK_EQ(board[p], actor.c);
+        CHECK_EQ(board_[p], actor.c);
       } else {
-        if (board[p] != '.') return {};
+        if (board_[p] != '.') return {};
       }
     }
     return path.size() * actor.cost();
   }
 
-  Point Destination(const Actor& actor, const CharBoard& board, const absl::flat_hash_map<char, std::vector<Point>>& destinations) const {
-    auto it = destinations.find(actor.c);
-    CHECK(it != destinations.end());
-    for (Point p : it->second) {
-      if (board[p] != actor.c) return p;
+  Point Destination(const Actor& actor) const {
+    for (Point p : destinations_[actor.c]) {
+      if (board_[p] != actor.c) return p;
     }
-    LOG(FATAL) << "No destination found: " << *this << "\n" << board;
+    LOG(FATAL) << "No destination found: " << *this << "\n" << board_;
   }
 
-  void MoveActor(int actor_idx, CharBoard& board, Point to, int cost, bool done) {
+  void MoveActor(int actor_idx, Point to, int cost, bool done) {
     CHECK_LT(actor_idx, actors_.size());
     CHECK_GE(actor_idx, 0);
-    board[actors_[actor_idx].cur] = '.';
-    board[to] = actors_[actor_idx].c;
+    board_[actors_[actor_idx].cur] = '.';
+    board_[to] = actors_[actor_idx].c;
     actors_[actor_idx].cur = to;
     if (done) {
       actors_[actor_idx].done = true;
@@ -172,11 +174,11 @@ class State {
     }
   }
 
-  void UnMoveActor(int actor_idx, CharBoard& board, Point from, int cost, bool done) {
+  void UnMoveActor(int actor_idx, Point from, int cost, bool done) {
     CHECK_LT(actor_idx, actors_.size());
     CHECK_GE(actor_idx, 0);
-    board[actors_[actor_idx].cur] = '.';
-    board[from] = actors_[actor_idx].c;
+    board_[actors_[actor_idx].cur] = '.';
+    board_[from] = actors_[actor_idx].c;
     actors_[actor_idx].cur = from;
     if (done) {
       actors_[actor_idx].done = false;
@@ -191,43 +193,56 @@ class State {
     absl::Format(&sink, "Actors:\n%s", absl::StrJoin(s.actors_, "\n"));
   }
 
+  std::optional<int> FindMinCostDFS(int budget = std::numeric_limits<int>::max());
+
  private:
+  CharBoard board_;
   std::vector<Actor> actors_;
+  const std::vector<Point>& tmp_locations_;
+  const std::vector<std::vector<Point>>& destinations_;
+  const AllPathsMap& all_paths_;
+  Stats stats_;
+  absl::flat_hash_map<std::vector<Actor>, std::optional<int>> memo_;
 };
 
-std::optional<int> FindMinCostDFS(
-    State& state, CharBoard& board,
-    const std::vector<Point>& tmp_locations,
-    const absl::flat_hash_map<char, std::vector<Point>>& destinations,
-    const AllPathsMap& all_paths) {
-  if (state.IsFinal()) {
+std::optional<int> State::FindMinCostDFS(int budget) {
+  ++stats_.calls;
+  if (IsFinal()) {
     return 0;
   }
 
-  static absl::flat_hash_map<State, std::optional<int>> memo;
-  auto it = memo.find(state);
-  if (it != memo.end()) return it->second;
+  auto it = memo_.find(actors_);
+  if (it != memo_.end()) {
+    ++stats_.memo;
+    return it->second;
+  }
 
   std::optional<int> best;
 
-  for (int i = 0; i < state.actors().size(); ++i) {
-    const Actor& actor = state.actors()[i];
+  for (int i = 0; i < actors_.size(); ++i) {
+    const Actor& actor = actors_[i];
     if (actor.done) continue;
 
     Point from = actor.cur;
     // Can we go to the final location?
-    Point to = state.Destination(actor, board, destinations);
-    std::optional<int> cost = state.CanMove(actor, board, to, all_paths);
+    Point to = Destination(actor);
+    std::optional<int> cost = CanMove(actor, to);
     if (cost) {
-      if (best && *best < *cost) continue;
+      if (*cost > budget) {
+        ++stats_.budget_skips;
+        continue;
+      }
       // We can reach the final destination. Go there and stop.
-      state.MoveActor(i, board, to, *cost, /*done=*/true);
-      std::optional<int> sub = FindMinCostDFS(state, board, tmp_locations, destinations, all_paths);
+      MoveActor(i, to, *cost, /*done=*/true);
+      std::optional<int> sub = FindMinCostDFS(budget - *cost);
       if (sub) {
         sub = *sub + *cost;
-        if (!best || *best > *sub) best = sub;
+        if (!best || *best > *sub) {
+          best = sub;
+          budget = *best;
+        }
       }
-      state.UnMoveActor(i, board, from, *cost, /*done=*/true);
+      UnMoveActor(i, from, *cost, /*done=*/true);
       continue;
     }
     // If we have alread moved, we can't move again.
@@ -235,22 +250,28 @@ std::optional<int> FindMinCostDFS(
 
     // If we haven't moved, and we can't get to the final destionation,
     // try each candidate temporary location.
-    for (Point to : tmp_locations) {
-      std::optional<int> cost = state.CanMove(actor, board, to, all_paths);
+    for (Point to : tmp_locations_) {
+      std::optional<int> cost = CanMove(actor, to);
       if (cost) {
-        if (best && *best < *cost) continue;
-        state.MoveActor(i, board, to, *cost, /*done=*/false);
-        std::optional<int> sub = FindMinCostDFS(state, board, tmp_locations, destinations, all_paths);
+        if (*cost > budget) {
+          ++stats_.budget_skips;
+          continue;
+        }
+        MoveActor(i, to, *cost, /*done=*/false);
+        std::optional<int> sub = FindMinCostDFS(budget - *cost);
         if (sub) {
           sub = *sub + *cost;
-          if (!best || *best > *sub) best = sub;
+          if (!best || *best > *sub) {
+            best = sub;
+            budget = *best;
+          }
         }
-        state.UnMoveActor(i, board, from, *cost, /*done=*/false);
+        UnMoveActor(i, from, *cost, /*done=*/false);
       }
     }
   }
 
-  return memo[state] = best;
+  return memo_[actors_] = best;
 }
 
 }  // namespace
@@ -291,7 +312,7 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
     if (a.x != b.x) return a.x < b.x;
     return a.y > b.y;
   });
-  absl::flat_hash_map<char, std::vector<Point>> destinations;
+  std::vector<std::vector<Point>> destinations(128);
   auto it = srcs.begin();
   for (char c : {'A', 'B', 'C', 'D'}) {
     for (int i = 0; i < srcs.size() / 4; ++i) {
@@ -302,8 +323,8 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
   if (it != srcs.end()) return Error("Bad destination creation");
 
   // Identify which actors are already in their final destination.
-  for (const auto& [c, v] : destinations) {
-    for (Point test : v) {
+  for (char c : {'A', 'B', 'C', 'D'}) {
+    for (Point test : destinations[c]) {
       if (b[test] != c) break;
       bool found = false;
       for (auto& a : actors) {
@@ -317,10 +338,12 @@ absl::StatusOr<std::string> Day_2021_23::Part1(
     }
   }
 
-  State s(std::move(actors));
+  absl::c_sort(actors, [](const Actor& a, const Actor& b) { return a.cost() < b.cost(); });
 
-  return AdventReturn(
-      FindMinCostDFS(s, b, empty, destinations, all_paths));
+  State s(std::move(b), std::move(actors), empty, destinations, all_paths);
+  std::optional<int> ret = s.FindMinCostDFS();
+  VLOG(1) << "stats = " << s.stats();
+  return AdventReturn(ret);
 }
 
 absl::StatusOr<std::string> Day_2021_23::Part2(
