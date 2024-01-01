@@ -100,7 +100,7 @@ int BestGeode(Blueprint bp, int minutes) {
       bool can_build_geode_robot = s.ore >= bp.geode_robot_ore_cost &&
           s.obsidian >= bp.geode_robot_obsidian_cost;
 
-      // The best we could possibly do from this point is to make a new geod
+      // The best we could possibly do from this point is to make a new geode
       // robot on every turn all of which are then making geodes. We'll make
       // SUM(geode_robot + i, i=0..remaining) more geodes.
       int best_geode = s.geode + s.geode_robot * remaining;
