@@ -94,7 +94,7 @@ int BestGeode(Blueprint bp, int minutes) {
     int remaining = minutes - i;
     absl::flat_hash_set<State> new_states;
     new_states.reserve(states.size());
-    int best_arithmetic_sum = remaining * (remaining + 1) / 2;
+    int best_arithmetic_sum = remaining * (remaining - 1) / 2;
     for (const State& s : states) {
       // The best we could possiblt do from this point is to make a bnew geod
       // robot on every turn all of which are then making geodes. We'll make
