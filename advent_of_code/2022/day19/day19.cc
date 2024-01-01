@@ -97,22 +97,21 @@ int BestGeode(Blueprint bp, int minutes) {
     int best_arithmetic_sum = remaining * (remaining - 1) / 2;
     int best_arithmetic_sum_minus_one = (remaining - 2) * (remaining - 1) / 2;
     for (const State& s : states) {
-      bool can_build_geode = s.ore >= bp.geode_robot_ore_cost &&
+      bool can_build_geode_robot = s.ore >= bp.geode_robot_ore_cost &&
           s.obsidian >= bp.geode_robot_obsidian_cost;
 
       // The best we could possiblt do from this point is to make a bnew geod
       // robot on every turn all of which are then making geodes. We'll make
       // SUM(geode_robot + i, i=0..remaining) more geodes.
-      int best_geode;
-      if (can_build_geode) {
-        best_geode = s.geode + s.geode_robot * remaining + best_arithmetic_sum;
+      int best_geode = s.geode + s.geode_robot * remaining;
+      if (can_build_geode_robot) {
+        best_geode += best_arithmetic_sum;
       } else {
-        best_geode = s.geode + s.geode_robot * remaining + best_arithmetic_sum_minus_one;
+        best_geode += best_arithmetic_sum_minus_one;
       }
       if (best_geode < max_geode) {
         continue;
       }
-
 
       max_geode = std::max(max_geode, s.geode + s.geode_robot * remaining);
 
@@ -122,7 +121,7 @@ int BestGeode(Blueprint bp, int minutes) {
       next_state.AddResources();
       new_states.insert(next_state);
 
-      if (can_build_geode) {
+      if (can_build_geode_robot) {
         State build = next_state;
         build.ore -= bp.geode_robot_ore_cost;
         build.obsidian -= bp.geode_robot_obsidian_cost;
