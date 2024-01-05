@@ -221,6 +221,12 @@ inline std::vector<Point> StablePointSet(
   return ordered;
 }
 
+// Returns the number of blocks enclosed within the loop described by `loop`.
+// loop[0] must be the same as loop.back() and each segment axis-aligned.
+// If `count_perimeter` is true, blocks on the outside of the loop are counted
+// within the returned value. If `count_perimter` is false, they are not.
+int64_t LoopArea(const std::vector<Point>& loop, bool count_perimeter);
+
 }  // namespace advent_of_code
 
 #endif  // ADVENT_OF_CODE_POINT_H
