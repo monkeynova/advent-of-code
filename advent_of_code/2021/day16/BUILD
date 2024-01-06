@@ -28,11 +28,11 @@ cc_library(
     srcs = ["bits_expr.cc"],
     hdrs = ["bits_expr.h"],
     deps = [
-        "@com_monkeynova_gunit_main//:vlog",
         "@com_google_absl//absl/log",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
+        "@com_monkeynova_gunit_main//:vlog",
     ],
 )
 

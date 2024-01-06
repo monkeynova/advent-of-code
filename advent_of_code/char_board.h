@@ -94,7 +94,7 @@ class CharBoardBase {
   template <bool is_mutable_test = is_mutable,
             typename = std::enable_if<!is_mutable_test>>
   CharBoardBase(const CharBoardBase</*is_mutable=*/true>& o)
-   : stride_(o.stride_), buf_(o.buf_) {}
+      : stride_(o.stride_), buf_(o.buf_) {}
 
   template <bool is_mutable_test = is_mutable,
             typename = std::enable_if_t<is_mutable_test>>

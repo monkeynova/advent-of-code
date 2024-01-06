@@ -35,7 +35,7 @@ void PointRectangle::SetDifference(const PointRectangle& o,
 // See https://en.wikipedia.org/wiki/Shoelace_formula for a description of the
 // area calculation
 // To consider the `count_perimeter` parameter consider the following:
-// 
+//
 //  ### Rectangle: {0,0} - {2,2}
 //  ### Inner Area: 1; Outer Area: 9; Shoelace Area: 4
 //  ### Perimeter: 8; IA = SA - P/2  + 1; OA = SA + P/2 + 1
@@ -45,20 +45,19 @@ int64_t LoopArea(const std::vector<Point>& loop, bool count_perimeter) {
 
   for (int i = 1; i < loop.size() - 1; ++i) {
     a += static_cast<int64_t>(loop[i].x) * (loop[i + 1].y - loop[i - 1].y);
-    p += (loop[i] - loop[i-1]).dist();
+    p += (loop[i] - loop[i - 1]).dist();
   }
   {
     int i = loop.size() - 1;
-    p += (loop[i] - loop[i-1]).dist();
+    p += (loop[i] - loop[i - 1]).dist();
   }
   a += static_cast<int64_t>(loop.back().x) *
-      (loop[0].y - loop[loop.size() - 2].y);
+       (loop[0].y - loop[loop.size() - 2].y);
   if (a < 0) a = -a;
   CHECK_EQ(a % 2, 0);
   CHECK_EQ(p % 2, 0);
   if (count_perimeter) return a / 2 + p / 2 + 1;
   return a / 2 - p / 2 + 1;
 }
-
 
 }  // namespace advent_of_code

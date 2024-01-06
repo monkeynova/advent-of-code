@@ -135,16 +135,19 @@ class State {
       : board_(std::move(board)),
         immutable_board_(board_),
         fb_(immutable_board_),
-        all_paths_(fb_, FastBoard::PointMap<std::vector<FastBoard::Point>>(fb_, std::vector<FastBoard::Point>{})) {
+        all_paths_(fb_, FastBoard::PointMap<std::vector<FastBoard::Point>>(
+                            fb_, std::vector<FastBoard::Point>{})) {
     for (const Actor& a : actors) {
-      actors_.push_back(FastActor{.c = a.c, .cur = fb_.From(a.cur), .done = a.done, .moved = a.moved});
+      actors_.push_back(FastActor{
+          .c = a.c, .cur = fb_.From(a.cur), .done = a.done, .moved = a.moved});
     }
     tmp_locations_ = FbFrom(tmp_locations);
     for (const auto& v : destinations) {
       destinations_.push_back(FbFrom(v));
     }
     for (const auto& [pair, v] : all_paths) {
-      all_paths_.Get(fb_.From(pair.first)).Get(fb_.From(pair.second)) = FbFrom(v);
+      all_paths_.Get(fb_.From(pair.first)).Get(fb_.From(pair.second)) =
+          FbFrom(v);
     }
   }
 
@@ -154,9 +157,10 @@ class State {
     return absl::c_all_of(actors_, [](const FastActor& a) { return a.done; });
   }
 
-  std::optional<int> CanMove(const FastActor& actor, FastBoard::Point dest) const {
+  std::optional<int> CanMove(const FastActor& actor,
+                             FastBoard::Point dest) const {
     const std::vector<FastBoard::Point>& path =
-      all_paths_.Get(actor.cur).Get(dest);
+        all_paths_.Get(actor.cur).Get(dest);
     for (FastBoard::Point p : path) {
       if (fb_[p] != '.') return {};
     }
@@ -216,7 +220,8 @@ class State {
   std::vector<FastActor> actors_;
   std::vector<FastBoard::Point> tmp_locations_;
   std::vector<std::vector<FastBoard::Point>> destinations_;
-  FastBoard::PointMap<FastBoard::PointMap<std::vector<FastBoard::Point>>> all_paths_;
+  FastBoard::PointMap<FastBoard::PointMap<std::vector<FastBoard::Point>>>
+      all_paths_;
 
   Stats stats_;
   absl::flat_hash_map<std::vector<FastActor>, std::optional<int>> memo_;

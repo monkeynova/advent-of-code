@@ -68,12 +68,6 @@ FileBenchmarkTests(std::string_view test_file) {
   return DirtyTestParse(file_contents);
 }
 
-absl::StatusOr<int> FileBenchmarkTestCount(AdventDay* day) {
-  ASSIGN_OR_RETURN(std::vector<std::unique_ptr<DirtyTestParseResult>> tests,
-                   FileBenchmarkTests(day->test_file()));
-  return tests.size();
-}
-
 inline void BM_Day_SetError(benchmark::State& state, std::string_view message) {
   std::string message_str = std::string(message);
   state.SkipWithError(message_str.c_str());

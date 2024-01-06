@@ -4,9 +4,9 @@
 #include "absl/strings/str_split.h"
 #include "advent_of_code/advent_day.h"
 #include "advent_of_code/infra/file_util.h"
-#include "vlog.h"
 #include "benchmark/benchmark.h"
 #include "main_lib.h"
+#include "vlog.h"
 
 enum ColorType {
   kAuto = 0,

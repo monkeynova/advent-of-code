@@ -62,21 +62,18 @@ struct State {
   }
 
   void AddResources() {
-    *reinterpret_cast<int32_t*>(&ore) += *reinterpret_cast<int32_t*>(&ore_robot);
+    *reinterpret_cast<int32_t*>(&ore) +=
+        *reinterpret_cast<int32_t*>(&ore_robot);
   }
 
-  int64_t ForHash() const {
-    return *reinterpret_cast<const int64_t*>(this);
-  }
+  int64_t ForHash() const { return *reinterpret_cast<const int64_t*>(this); }
 
   template <typename H>
   friend H AbslHashValue(H h, const State& s) {
     return H::combine(std::move(h), s.ForHash());
   }
 
-  bool operator==(const State& o) const {
-    return ForHash() == o.ForHash();
-  }
+  bool operator==(const State& o) const { return ForHash() == o.ForHash(); }
 };
 
 int BestGeode(Blueprint bp, int minutes) {
@@ -98,7 +95,7 @@ int BestGeode(Blueprint bp, int minutes) {
     int best_arithmetic_sum_minus_one = (remaining - 2) * (remaining - 1) / 2;
     for (const State& s : states) {
       bool can_build_geode_robot = s.ore >= bp.geode_robot_ore_cost &&
-          s.obsidian >= bp.geode_robot_obsidian_cost;
+                                   s.obsidian >= bp.geode_robot_obsidian_cost;
 
       // The best we could possibly do from this point is to make a new geode
       // robot on every turn all of which are then making geodes. We'll make

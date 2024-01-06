@@ -8,7 +8,6 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
-        "@com_monkeynova_gunit_main//:vlog",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/log",
@@ -16,6 +15,7 @@ cc_library(
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
         "@com_googlesource_code_re2//:re2",
+        "@com_monkeynova_gunit_main//:vlog",
     ],
 )
 
