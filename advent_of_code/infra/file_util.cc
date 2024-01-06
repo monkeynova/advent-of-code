@@ -9,7 +9,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_replace.h"
 #include "absl/strings/str_split.h"
-#include "advent_of_code/vlog.h"
+#include "vlog.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {

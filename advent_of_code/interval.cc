@@ -1,6 +1,6 @@
 #include "advent_of_code/interval.h"
 
-#include "advent_of_code/vlog.h"
+#include "vlog.h"
 
 namespace advent_of_code {
 

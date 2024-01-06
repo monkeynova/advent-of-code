@@ -8,7 +8,7 @@ cc_library(
     hdrs = ["advent_day.h"],
     deps = [
         ":tokenizer",
-        ":vlog",
+        "@com_monkeynova_gunit_main//:vlog",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/log:check",
         "@com_google_absl//absl/status:statusor",
@@ -70,7 +70,7 @@ cc_library(
     hdrs = ["ocr.h"],
     deps = [
         ":char_board",
-        ":vlog",
+        "@com_monkeynova_gunit_main//:vlog",
         "@com_google_absl//absl/algorithm:container",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/log",
@@ -119,7 +119,7 @@ cc_library(
     deps = [
         ":char_board",
         ":point",
-        ":vlog",
+        "@com_monkeynova_gunit_main//:vlog",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/log",
@@ -150,7 +150,7 @@ cc_library(
     srcs = ["mod.cc"],
     hdrs = ["mod.h"],
     deps = [
-        ":vlog",
+        "@com_monkeynova_gunit_main//:vlog",
         "@com_google_absl//absl/functional:function_ref",
         "@com_google_absl//absl/log",
         "@com_google_absl//absl/log:check",
@@ -164,7 +164,7 @@ cc_library(
     hdrs = ["directed_graph.h"],
     deps = [
         ":bfs",
-        ":vlog",
+        "@com_monkeynova_gunit_main//:vlog",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/container:flat_hash_set",
         "@com_google_absl//absl/functional:function_ref",
@@ -182,7 +182,7 @@ cc_library(
     deps = [
         ":point",
         ":point3",
-        ":vlog",
+        "@com_monkeynova_gunit_main//:vlog",
         "@com_google_absl//absl/functional:function_ref",
         "@com_google_absl//absl/log",
         "@com_google_absl//absl/strings",
@@ -202,7 +202,7 @@ cc_library(
     srcs = ["tokenizer.cc"],
     hdrs = ["tokenizer.h"],
     deps = [
-        ":vlog",
+        "@com_monkeynova_gunit_main//:vlog",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
@@ -210,21 +210,10 @@ cc_library(
 )
 
 cc_library(
-    name = "vlog",
-    srcs = ["vlog.cc"],
-    hdrs = ["vlog.h"],
-    deps = [
-        "@com_google_absl//absl/flags:flag",
-        "@com_google_absl//absl/log",
-    ],
-    alwayslink = 1,
-)
-
-cc_library(
     name = "splice_ring",
     hdrs = ["splice_ring.h"],
     deps = [
-        ":vlog",
+        "@com_monkeynova_gunit_main//:vlog",
         "@com_google_absl//absl/container:flat_hash_map",
         "@com_google_absl//absl/log",
     ],

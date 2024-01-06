@@ -6,7 +6,7 @@
 #include "absl/status/status.h"
 #include "advent_of_code/char_board.h"
 #include "advent_of_code/point.h"
-#include "advent_of_code/vlog.h"
+#include "vlog.h"
 
 namespace advent_of_code {
 

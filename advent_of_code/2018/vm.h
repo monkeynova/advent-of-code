@@ -6,7 +6,7 @@
 #include "absl/log/log.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/str_join.h"
-#include "advent_of_code/vlog.h"
+#include "vlog.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {

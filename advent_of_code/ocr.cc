@@ -5,7 +5,7 @@
 #include "absl/log/check.h"
 #include "absl/log/log.h"
 #include "absl/strings/str_cat.h"
-#include "advent_of_code/vlog.h"
+#include "vlog.h"
 
 enum OCRMode {
   kInput = 1,

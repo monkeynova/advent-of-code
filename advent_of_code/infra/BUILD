@@ -8,7 +8,7 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
-        "//advent_of_code:vlog",
+        "@com_monkeynova_gunit_main//:vlog",
         "@com_google_absl//absl/log",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",

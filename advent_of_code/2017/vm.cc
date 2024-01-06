@@ -1,7 +1,7 @@
 #include "advent_of_code/2017/vm.h"
 
 #include "absl/strings/str_cat.h"
-#include "advent_of_code/vlog.h"
+#include "vlog.h"
 
 namespace advent_of_code {
 

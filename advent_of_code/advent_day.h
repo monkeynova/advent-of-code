@@ -13,7 +13,7 @@
 #include "absl/strings/str_split.h"
 #include "absl/types/span.h"
 #include "advent_of_code/tokenizer.h"
-#include "advent_of_code/vlog.h"
+#include "vlog.h"
 
 extern absl::Flag<bool> FLAGS_advent_day_run_audit;
 
