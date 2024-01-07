@@ -289,7 +289,7 @@ void Table::RenderBreaker(std::string* out, const std::vector<int> col_widths,
     prev.push_back(col_idx);
   }
   std::vector<int> next;
-  if (row_num < rows_.size() &&
+  if (row_num < rows_.size() - 1 &&
       std::holds_alternative<std::vector<Cell>>(rows_[row_num + 1])) {
     int col_idx = 0;
     for (const Cell& cell : std::get<std::vector<Cell>>(rows_[row_num + 1])) {
