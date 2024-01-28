@@ -419,16 +419,16 @@ int main(int argc, char** argv) {
   Table table;
   table.AddBreaker();
   table.AddRow({Table::Cell{.entry = absl::StrCat("Advent of Code ", year),
-                            .span = 6,
+                            .justify = Table::Cell::kCenter,
                             .bold = true,
-                            .justify = Table::Cell::kCenter}});
+                            .span = 6}});
   table.AddBreaker();
   table.AddRow(
       {Table::Cell{.entry = "Title", .justify = Table::Cell::kCenter},
        Table::Cell{
-           .entry = "Part 1", .span = 2, .justify = Table::Cell::kCenter},
+           .entry = "Part 1", .justify = Table::Cell::kCenter, .span = 2},
        Table::Cell{
-           .entry = "Part 2", .span = 2, .justify = Table::Cell::kCenter},
+           .entry = "Part 2", .justify = Table::Cell::kCenter, .span = 2},
        Table::Cell{.entry = "Time", .justify = Table::Cell::kCenter}});
   table.AddBreaker();
 
@@ -441,14 +441,14 @@ int main(int argc, char** argv) {
                   Table::Cell{.entry = run.part2_solved ? "*" : " ",
                               .color = Table::Cell::kYellow},
                   Table::Cell{.entry = TimeString(run.time),
-                              .color = DayTimeColor(run.time),
-                              .justify = Table::Cell::kRight}});
+                              .justify = Table::Cell::kRight,
+                              .color = DayTimeColor(run.time)}});
   }
   table.AddBreaker();
   table.AddRow({Table::Cell{.entry = "Total", .span = 5},
                 Table::Cell{.entry = TimeString(total_time),
-                            .color = YearTimeColor(total_time),
-                            .justify = Table::Cell::kRight}});
+                            .justify = Table::Cell::kRight,
+                            .color = YearTimeColor(total_time)}});
   table.AddBreaker();
 
   std::cout << table.Render();
