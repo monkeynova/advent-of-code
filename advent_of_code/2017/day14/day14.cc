@@ -71,7 +71,7 @@ absl::StatusOr<std::string> Day_2017_14::Part2(
     for (Point d : Cardinal::kFourDirs) {
       if (!board.OnBoard(p + d)) continue;
       if (board[p + d] == '.') {
-        auto d_it = storage.find(p+d);
+        auto d_it = storage.find(p + d);
         CHECK(d_it != storage.end());
         dg.AddEdge(p_it->second, d_it->second);
       }

@@ -139,7 +139,7 @@ class State {
                             fb_, std::vector<FastBoard::Point>{})) {
     for (const Actor& a : actors) {
       actors_.push_back(FastActor{
-          .c = a.c, .cur = fb_.From(a.cur), .done = a.done, .moved = a.moved});
+          .c = a.c, .cur = fb_.From(a.cur), .moved = a.moved, .done = a.done});
     }
     tmp_locations_ = FbFrom(tmp_locations);
     for (const auto& v : destinations) {

@@ -94,24 +94,25 @@ struct Cardinal4 {
   static constexpr Point4 kWHat{0, 0, 0, 1};
   static constexpr std::array<Point4, 3 * 3 * 3 * 3 - 1> kNeighborDirs =
       []() constexpr {
-        std::array<Point4, 3 * 3 * 3 * 3 - 1> ret{};
-        int i = 0;
-        for (Point4 xdir :
-             {-Cardinal4::kXHat, Cardinal4::kOrigin, Cardinal4::kXHat}) {
-          for (Point4 ydir :
-               {-Cardinal4::kYHat, Cardinal4::kOrigin, Cardinal4::kYHat}) {
-            for (Point4 zdir :
-                 {-Cardinal4::kZHat, Cardinal4::kOrigin, Cardinal4::kZHat}) {
-              for (Point4 wdir :
-                   {-Cardinal4::kWHat, Cardinal4::kOrigin, Cardinal4::kWHat}) {
-                Point4 next = xdir + ydir + zdir + wdir;
-                if (next != Cardinal4::kOrigin) ret[i++] = next;
-              }
-            }
+    std::array<Point4, 3 * 3 * 3 * 3 - 1> ret{};
+    int i = 0;
+    for (Point4 xdir :
+         {-Cardinal4::kXHat, Cardinal4::kOrigin, Cardinal4::kXHat}) {
+      for (Point4 ydir :
+           {-Cardinal4::kYHat, Cardinal4::kOrigin, Cardinal4::kYHat}) {
+        for (Point4 zdir :
+             {-Cardinal4::kZHat, Cardinal4::kOrigin, Cardinal4::kZHat}) {
+          for (Point4 wdir :
+               {-Cardinal4::kWHat, Cardinal4::kOrigin, Cardinal4::kWHat}) {
+            Point4 next = xdir + ydir + zdir + wdir;
+            if (next != Cardinal4::kOrigin) ret[i++] = next;
           }
         }
-        return ret;
-      }();
+      }
+    }
+    return ret;
+  }
+  ();
 };
 
 }  // namespace advent_of_code
