@@ -54,17 +54,26 @@ absl::StatusOr<std::string> Day_2017_14::Part2(
   if (input.size() != 1) return Error("Bad size");
   ASSIGN_OR_RETURN(CharBoard board, BuildBoard(input[0]));
 
-  absl::flat_hash_map<Point, std::string> storage;
-  for (auto [p, c] : board) {
-    if (c == '.') storage[p] = absl::StrCat(p);
-  }
+  const absl::flat_hash_map<Point, std::string> storage = [&]() {
+    absl::flat_hash_map<Point, std::string> storage;
+    for (auto [p, c] : board) {
+      if (c == '.') storage[p] = absl::StrCat(p);
+    }
+    return storage;
+  }();
+
   DirectedGraph<bool> dg;
   for (auto [p, c] : board) {
     if (c != '.') continue;
-    dg.AddNode(storage[p], true);
+    auto p_it = storage.find(p);
+    CHECK(p_it != storage.end());
+    dg.AddNode(p_it->second, true);
     for (Point d : Cardinal::kFourDirs) {
+      if (!board.OnBoard(p + d)) continue;
       if (board[p + d] == '.') {
-        dg.AddEdge(storage[p], storage[p + d]);
+        auto d_it = storage.find(p+d);
+        CHECK(d_it != storage.end());
+        dg.AddEdge(p_it->second, d_it->second);
       }
     }
   }
