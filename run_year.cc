@@ -381,17 +381,19 @@ void Table::Cell::Render(std::string* out, int width, bool enable_color) const {
 }
 
 Table::Cell::Color DayTimeColor(absl::Duration d) {
-  if (d < absl::Milliseconds(1)) return Table::Cell::kGreen;
-  if (d < absl::Milliseconds(10)) return Table::Cell::kWhite;
-  if (d < absl::Milliseconds(100)) return Table::Cell::kYellow;
-  return Table::Cell::kRed;
+  using enum Table::Cell::Color;
+  if (d < absl::Milliseconds(1)) return kGreen;
+  if (d < absl::Milliseconds(10)) return kWhite;
+  if (d < absl::Milliseconds(100)) return kYellow;
+  return kRed;
 };
 
 Table::Cell::Color YearTimeColor(absl::Duration d) {
-  if (d < absl::Seconds(1)) return Table::Cell::kGreen;
-  if (d < absl::Seconds(5)) return Table::Cell::kWhite;
-  if (d < absl::Seconds(10)) return Table::Cell::kYellow;
-  return Table::Cell::kRed;
+  using enum Table::Cell::Color;
+  if (d < absl::Seconds(1)) return kGreen;
+  if (d < absl::Seconds(5)) return kWhite;
+  if (d < absl::Seconds(10)) return kYellow;
+  return kRed;
 };
 
 std::string TimeString(absl::Duration d) {
@@ -416,38 +418,36 @@ int main(int argc, char** argv) {
     total_time += runs.back().time;
   }
 
+  using enum Table::Cell::Color;
+  using enum Table::Cell::Justify;
+
   Table table;
   table.AddBreaker();
   table.AddRow({Table::Cell{.entry = absl::StrCat("Advent of Code ", year),
-                            .justify = Table::Cell::kCenter,
+                            .justify = kCenter,
                             .bold = true,
                             .span = 6}});
   table.AddBreaker();
-  table.AddRow(
-      {Table::Cell{.entry = "Title", .justify = Table::Cell::kCenter},
-       Table::Cell{
-           .entry = "Part 1", .justify = Table::Cell::kCenter, .span = 2},
-       Table::Cell{
-           .entry = "Part 2", .justify = Table::Cell::kCenter, .span = 2},
-       Table::Cell{.entry = "Time", .justify = Table::Cell::kCenter}});
+  table.AddRow({Table::Cell{.entry = "Title", .justify = kCenter},
+                Table::Cell{.entry = "Part 1", .justify = kCenter, .span = 2},
+                Table::Cell{.entry = "Part 2", .justify = kCenter, .span = 2},
+                Table::Cell{.entry = "Time", .justify = kCenter}});
   table.AddBreaker();
 
   for (const DayRun& run : runs) {
-    table.AddRow({Table::Cell{.entry = run.title},
-                  Table::Cell{.entry = run.part1},
-                  Table::Cell{.entry = run.part1_solved ? "*" : " ",
-                              .color = Table::Cell::kYellow},
-                  Table::Cell{.entry = run.part2},
-                  Table::Cell{.entry = run.part2_solved ? "*" : " ",
-                              .color = Table::Cell::kYellow},
-                  Table::Cell{.entry = TimeString(run.time),
-                              .justify = Table::Cell::kRight,
-                              .color = DayTimeColor(run.time)}});
+    table.AddRow(
+        {Table::Cell{.entry = run.title}, Table::Cell{.entry = run.part1},
+         Table::Cell{.entry = run.part1_solved ? "*" : " ", .color = kYellow},
+         Table::Cell{.entry = run.part2},
+         Table::Cell{.entry = run.part2_solved ? "*" : " ", .color = kYellow},
+         Table::Cell{.entry = TimeString(run.time),
+                     .justify = kRight,
+                     .color = DayTimeColor(run.time)}});
   }
   table.AddBreaker();
   table.AddRow({Table::Cell{.entry = "Total", .span = 5},
                 Table::Cell{.entry = TimeString(total_time),
-                            .justify = Table::Cell::kRight,
+                            .justify = kRight,
                             .color = YearTimeColor(total_time)}});
   table.AddBreaker();
 
