@@ -1,5 +1,6 @@
 #include "absl/container/flat_hash_set.h"
 #include "absl/flags/flag.h"
+#include "absl/flags/usage.h"
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_split.h"
 #include "advent_of_code/advent_day.h"
@@ -403,7 +404,13 @@ std::string TimeString(absl::Duration d) {
 }  // namespace
 
 int main(int argc, char** argv) {
-  InitMain(argc, argv);
+  std::vector<char*> args = InitMain(
+    argc, argv,
+    absl::StrCat("Runs all problems for a given year and displays the results "
+                 "in a table. Usage:\n", argv[0]));
+  QCHECK_EQ(args.size(), 1)
+      << "Extra argument specified." << std::endl
+      << absl::ProgramUsageMessage();
   int year = absl::GetFlag(FLAGS_year);
   std::vector<std::unique_ptr<advent_of_code::AdventDay>> days;
   for (int day = 1; day <= 25; ++day) {
