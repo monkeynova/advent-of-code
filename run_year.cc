@@ -15,7 +15,7 @@ enum ColorType {
   kForce = 2,
 };
 
-ABSL_FLAG(int, year, 2023, "Year to run");
+ABSL_FLAG(std::string, year, "2023", "Year to run. Use 'all' to run all years.");
 ABSL_FLAG(ColorType, color, ColorType::kAuto, "Color mode");
 
 bool AbslParseFlag(absl::string_view text, ColorType* c, std::string* error) {
@@ -401,17 +401,7 @@ std::string TimeString(absl::Duration d) {
   return d != absl::Seconds(0) ? absl::StrCat(d) : "";
 };
 
-}  // namespace
-
-int main(int argc, char** argv) {
-  std::vector<char*> args = InitMain(
-    argc, argv,
-    absl::StrCat("Runs all problems for a given year and displays the results "
-                 "in a table. Usage:\n", argv[0]));
-  QCHECK_EQ(args.size(), 1)
-      << "Extra argument specified." << std::endl
-      << absl::ProgramUsageMessage();
-  int year = absl::GetFlag(FLAGS_year);
+int RunYear(int year) {
   std::vector<std::unique_ptr<advent_of_code::AdventDay>> days;
   for (int day = 1; day <= 25; ++day) {
     days.push_back(advent_of_code::CreateAdventDay(year, day));
@@ -459,4 +449,31 @@ int main(int argc, char** argv) {
   table.AddBreaker();
 
   std::cout << table.Render();
+
+  return 0;
+}
+
+}  // namespace
+
+int main(int argc, char** argv) {
+  std::vector<char*> args = InitMain(
+    argc, argv,
+    absl::StrCat("Runs all problems for a given year and displays the results "
+                 "in a table. Usage:\n", argv[0]));
+  QCHECK_EQ(args.size(), 1)
+      << "Extra argument specified." << std::endl
+      << absl::ProgramUsageMessage();
+  std::string year_str = absl::GetFlag(FLAGS_year);
+  if (year_str == "all") {
+    for (int year = 2015; year <= 2023; ++year) {
+      int error = RunYear(year);
+      if (error) return error;
+    }
+    return 0;
+  }
+  if (int year; absl::SimpleAtoi(year_str, &year)) {
+    return RunYear(year);
+  }
+  std::cerr << year_str << " is neither a specific year nor, 'all'" << std::endl;
+  return 1;
 }
