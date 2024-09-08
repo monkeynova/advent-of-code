@@ -1,6 +1,7 @@
 #include "advent_of_code/advent_day.h"
 
 #include "absl/container/flat_hash_map.h"
+#include "absl/container/flat_hash_set.h"
 
 ABSL_FLAG(bool, advent_day_run_audit, true,
           "If true, runs additional tests as part of the day. Disable this "
@@ -53,6 +54,19 @@ std::unique_ptr<AdventDay> CreateAdventDay(int year, int day) {
   auto it = Registry().find({year, day});
   if (it == Registry().end()) return nullptr;
   return it->second();
+}
+
+std::vector<int> AllAdventYears() {
+  std::vector<int> years;
+  absl::flat_hash_set<int> year_uniq;
+  for (const auto& [year_and_day, _] : Registry()) {
+    const auto [year, day] = year_and_day;
+    if (year_uniq.insert(year).second) {
+      years.push_back(year);
+    }
+  }
+  absl::c_sort(years);
+  return years;
 }
 
 }  // namespace advent_of_code

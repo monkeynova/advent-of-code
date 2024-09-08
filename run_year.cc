@@ -465,7 +465,7 @@ int main(int argc, char** argv) {
       << absl::ProgramUsageMessage();
   std::string year_str = absl::GetFlag(FLAGS_year);
   if (year_str == "all") {
-    for (int year = 2015; year <= 2023; ++year) {
+    for (int year : advent_of_code::AllAdventYears()) {
       int error = RunYear(year);
       if (error) return error;
     }

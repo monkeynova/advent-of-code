@@ -112,6 +112,7 @@ AdventRegisterEntry RegisterAdventDay(
     int year, int day, std::function<std::unique_ptr<AdventDay>()>);
 
 std::unique_ptr<AdventDay> CreateAdventDay(int year, int day);
+std::vector<int> AllAdventYears();
 
 }  // namespace advent_of_code
 
