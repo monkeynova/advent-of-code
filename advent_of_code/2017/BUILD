@@ -24,7 +24,7 @@ cc_test(
         # Allow file flag options on all tests to avoid test failures in
         # bazelisk test ... --test_arg=<file arg>.
         "//advent_of_code/infra:file_flags",
-        "@com_google_googletest//:gtest",
+        "@googletest//:gtest",
         "@com_monkeynova_gunit_main//:test_main",
     ],
 )

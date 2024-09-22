@@ -85,7 +85,7 @@ cc_library(
         ":file_test_options",
         ":file_util",
         "//advent_of_code:advent_day",
-        "@com_github_google_benchmark//:benchmark",
+        "@google_benchmark//:benchmark",
         "@com_google_absl//absl/flags:flag",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
