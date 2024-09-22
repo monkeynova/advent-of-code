@@ -15,8 +15,8 @@ cc_library(
         "//advent_of_code:point",
         "//advent_of_code:point3",
         "//advent_of_code:tokenizer",
-        "@com_google_absl//absl/algorithm:container",
-        "@com_google_absl//absl/log",
+        "@abseil-cpp//absl/algorithm:container",
+        "@abseil-cpp//absl/log",
     ],
     alwayslink = 1,
 )

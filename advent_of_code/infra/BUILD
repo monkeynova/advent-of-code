@@ -8,11 +8,11 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
-        "@com_google_absl//absl/log",
-        "@com_google_absl//absl/status",
-        "@com_google_absl//absl/status:statusor",
-        "@com_google_absl//absl/strings",
-        "@com_googlesource_code_re2//:re2",
+        "@abseil-cpp//absl/log",
+        "@abseil-cpp//absl/status",
+        "@abseil-cpp//absl/status:statusor",
+        "@abseil-cpp//absl/strings",
+        "@re2//:re2",
         "@com_monkeynova_gunit_main//:vlog",
     ],
 )
@@ -25,7 +25,7 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
-        "@com_google_absl//absl/flags:flag",
+        "@abseil-cpp//absl/flags:flag",
     ],
     alwayslink = 1,
 )
@@ -43,16 +43,16 @@ cc_library(
         ":file_test_options",
         ":file_util",
         "//advent_of_code:advent_day",
-        "@com_google_absl//absl/debugging:failure_signal_handler",
-        "@com_google_absl//absl/flags:commandlineflag",
-        "@com_google_absl//absl/flags:flag",
-        "@com_google_absl//absl/flags:reflection",
-        "@com_google_absl//absl/functional:bind_front",
-        "@com_google_absl//absl/strings",
+        "@abseil-cpp//absl/debugging:failure_signal_handler",
+        "@abseil-cpp//absl/flags:commandlineflag",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:reflection",
+        "@abseil-cpp//absl/functional:bind_front",
+        "@abseil-cpp//absl/strings",
         "@com_google_file_based_test_driver//file_based_test_driver",
         "@com_google_file_based_test_driver//file_based_test_driver:run_test_case_result",
         "@com_google_file_based_test_driver//file_based_test_driver:test_case_options",
-        "@com_googlesource_code_re2//:re2",
+        "@re2//:re2",
         "@com_monkeynova_gunit_main//:test_main",
     ],
 )
@@ -66,9 +66,9 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
-        "@com_google_absl//absl/status:statusor",
+        "@abseil-cpp//absl/status:statusor",
         "@com_google_file_based_test_driver//file_based_test_driver:test_case_options",
-        "@com_googlesource_code_re2//:re2",
+        "@re2//:re2",
     ],
 )
 
@@ -86,8 +86,8 @@ cc_library(
         ":file_util",
         "//advent_of_code:advent_day",
         "@google_benchmark//:benchmark",
-        "@com_google_absl//absl/flags:flag",
-        "@com_google_absl//absl/status:statusor",
-        "@com_google_absl//absl/strings",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/status:statusor",
+        "@abseil-cpp//absl/strings",
     ],
 )

@@ -14,7 +14,7 @@ cc_library(
         "//advent_of_code:advent_day",
         "//advent_of_code:char_board",
         "//advent_of_code:point",
-        "@com_google_absl//absl/log",
+        "@abseil-cpp//absl/log",
     ],
     alwayslink = 1,
 )

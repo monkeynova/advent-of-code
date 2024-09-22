@@ -13,9 +13,9 @@ cc_binary(
         "//advent_of_code",
         "//advent_of_code:advent_day",
         "//advent_of_code/infra:file_util",
-        "@com_google_absl//absl/container:flat_hash_set",
-        "@com_google_absl//absl/flags:flag",
-        "@com_google_absl//absl/flags:usage",
+        "@abseil-cpp//absl/container:flat_hash_set",
+        "@abseil-cpp//absl/flags:flag",
+        "@abseil-cpp//absl/flags:usage",
         "@com_monkeynova_gunit_main//:main_lib",
     ],
 )

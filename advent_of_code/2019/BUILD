@@ -8,10 +8,10 @@ cc_library(
         "//visibility:public",
     ],
     deps = [
-        "@com_google_absl//absl/log",
-        "@com_google_absl//absl/status",
-        "@com_google_absl//absl/status:statusor",
-        "@com_google_absl//absl/strings",
+        "@abseil-cpp//absl/log",
+        "@abseil-cpp//absl/status",
+        "@abseil-cpp//absl/status:statusor",
+        "@abseil-cpp//absl/strings",
         "@com_monkeynova_gunit_main//:vlog",
     ],
 )
@@ -27,7 +27,7 @@ cc_test(
         # Allow file flag options on all tests to avoid test failures in
         # bazelisk test ... --test_arg=<file arg>.
         "//advent_of_code/infra:file_flags",
-        "@com_google_absl//absl/debugging:failure_signal_handler",
+        "@abseil-cpp//absl/debugging:failure_signal_handler",
         "@com_google_file_based_test_driver//file_based_test_driver",
         "@com_google_file_based_test_driver//file_based_test_driver:run_test_case_result",
         "@com_google_file_based_test_driver//file_based_test_driver:test_case_options",

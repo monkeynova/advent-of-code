@@ -12,9 +12,9 @@ cc_library(
     ],
     deps = [
         "//advent_of_code:advent_day",
-        "@com_google_absl//absl/container:flat_hash_set",
-        "@com_google_absl//absl/log",
-        "@com_google_absl//absl/strings",
+        "@abseil-cpp//absl/container:flat_hash_set",
+        "@abseil-cpp//absl/log",
+        "@abseil-cpp//absl/strings",
     ],
     alwayslink = 1,
 )
