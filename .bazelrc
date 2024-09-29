@@ -12,10 +12,7 @@ run:benchmark --
 run:benchmark --benchmark
 run:benchmark --advent_day_run_audit=false
 run:benchmark --benchmark_flags=--benchmark_time_unit=us
-run:benchmark_color --
-run:benchmark_color --benchmark
 run:benchmark_color --advent_day_run_audit=false
-run:benchmark_color --benchmark_flags=--benchmark_time_unit=us,--benchmark_color=true
 
 test --test_verbose_timeout_warnings
 test --test_summary=terse
