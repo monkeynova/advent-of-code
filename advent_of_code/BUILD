@@ -31,7 +31,7 @@ cc_library(
         "@abseil-cpp//absl/hash",
         "@abseil-cpp//absl/log:check",
         "@abseil-cpp//absl/strings",
-        "@re2//:re2",
+        "@re2",
     ],
 )
 
@@ -43,7 +43,7 @@ cc_library(
         "@abseil-cpp//absl/hash",
         "@abseil-cpp//absl/log:check",
         "@abseil-cpp//absl/strings",
-        "@re2//:re2",
+        "@re2",
     ],
 )
 
@@ -54,7 +54,7 @@ cc_library(
         "@abseil-cpp//absl/hash",
         "@abseil-cpp//absl/log:check",
         "@abseil-cpp//absl/strings",
-        "@re2//:re2",
+        "@re2",
     ],
 )
 
@@ -237,5 +237,6 @@ cc_library(
         "//advent_of_code/2021",
         "//advent_of_code/2022",
         "//advent_of_code/2023",
+        "//advent_of_code/2024",
     ],
 )

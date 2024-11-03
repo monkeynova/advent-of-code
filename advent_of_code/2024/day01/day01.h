@@ -1,18 +1,16 @@
-#ifndef ADVENT_OF_CODE_NEW_DAY_H
-#define ADVENT_OF_CODE_NEW_DAY_H
+#ifndef ADVENT_OF_CODE_2024_DAY01_H
+#define ADVENT_OF_CODE_2024_DAY01_H
 
 #include "advent_of_code/advent_day.h"
 
 namespace advent_of_code {
 
-class NewDay : public AdventDay {
+class Day_2024_01 : public AdventDay {
  public:
-  virtual std::string_view title() const override {
-    return "New Day: ???";
-  }
+  virtual std::string_view title() const override { return "Day 1: ???"; }
 
   virtual std::string_view test_file() const override {
-    return "advent_of_code/new_day_path/new_day.test";
+    return "advent_of_code/2024/day01/day01.test";
   }
 
   absl::StatusOr<std::string> Part1(
@@ -23,4 +21,4 @@ class NewDay : public AdventDay {
 
 }  // namespace advent_of_code
 
-#endif  // ADVENT_OF_CODE_NEW_DAY_H
+#endif  // ADVENT_OF_CODE_2024_DAY01_H
