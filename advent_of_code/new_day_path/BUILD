@@ -4,11 +4,11 @@ cc_library(
     name = "new_day",
     srcs = ["new_day.cc"],
     hdrs = ["new_day.h"],
-    visibility = [
-        "//visibility:public",
-    ],
     data = [
         "input.txt",
+    ],
+    visibility = [
+        "//visibility:public",
     ],
     deps = [
         "//advent_of_code:advent_day",
@@ -30,7 +30,7 @@ cc_library(
         "@abseil-cpp//absl/container:flat_hash_set",
         "@abseil-cpp//absl/log",
         "@abseil-cpp//absl/strings",
-        "@re2//:re2",
+        "@re2",
     ],
     alwayslink = 1,
 )

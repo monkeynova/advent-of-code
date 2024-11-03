@@ -14,7 +14,7 @@ cc_library(
         "//advent_of_code:advent_day",
         "@abseil-cpp//absl/log",
         "@abseil-cpp//absl/strings",
-        "@re2//:re2",
+        "@re2",
     ],
     alwayslink = 1,
 )

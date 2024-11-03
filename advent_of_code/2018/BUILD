@@ -14,8 +14,8 @@ cc_library(
         "@abseil-cpp//absl/status",
         "@abseil-cpp//absl/status:statusor",
         "@abseil-cpp//absl/strings",
-        "@re2//:re2",
         "@com_monkeynova_gunit_main//:vlog",
+        "@re2",
     ],
 )
 

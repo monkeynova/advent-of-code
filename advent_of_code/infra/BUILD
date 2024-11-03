@@ -12,8 +12,8 @@ cc_library(
         "@abseil-cpp//absl/status",
         "@abseil-cpp//absl/status:statusor",
         "@abseil-cpp//absl/strings",
-        "@re2//:re2",
         "@com_monkeynova_gunit_main//:vlog",
+        "@re2",
     ],
 )
 
@@ -52,8 +52,8 @@ cc_library(
         "@com_google_file_based_test_driver//file_based_test_driver",
         "@com_google_file_based_test_driver//file_based_test_driver:run_test_case_result",
         "@com_google_file_based_test_driver//file_based_test_driver:test_case_options",
-        "@re2//:re2",
         "@com_monkeynova_gunit_main//:test_main",
+        "@re2",
     ],
 )
 
@@ -68,7 +68,7 @@ cc_library(
     deps = [
         "@abseil-cpp//absl/status:statusor",
         "@com_google_file_based_test_driver//file_based_test_driver:test_case_options",
-        "@re2//:re2",
+        "@re2",
     ],
 )
 
@@ -85,9 +85,9 @@ cc_library(
         ":file_test_options",
         ":file_util",
         "//advent_of_code:advent_day",
-        "@google_benchmark//:benchmark",
         "@abseil-cpp//absl/flags:flag",
         "@abseil-cpp//absl/status:statusor",
         "@abseil-cpp//absl/strings",
+        "@google_benchmark//:benchmark",
     ],
 )

@@ -17,7 +17,7 @@ cc_library(
         "//advent_of_code:loop_history",
         "@abseil-cpp//absl/log",
         "@abseil-cpp//absl/strings",
-        "@re2//:re2",
+        "@re2",
     ],
     alwayslink = 1,
 )

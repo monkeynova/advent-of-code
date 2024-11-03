@@ -7,9 +7,7 @@ namespace advent_of_code {
 
 class NewDay : public AdventDay {
  public:
-  virtual std::string_view title() const override {
-    return "New Day: ???";
-  }
+  virtual std::string_view title() const override { return "New Day: ???"; }
 
   virtual std::string_view test_file() const override {
     return "advent_of_code/new_day_path/new_day.test";

@@ -15,7 +15,8 @@ enum ColorType {
   kForce = 2,
 };
 
-ABSL_FLAG(std::string, year, "2023", "Year to run. Use 'all' to run all years.");
+ABSL_FLAG(std::string, year, "2023",
+          "Year to run. Use 'all' to run all years.");
 ABSL_FLAG(ColorType, color, ColorType::kAuto, "Color mode");
 
 bool AbslParseFlag(absl::string_view text, ColorType* c, std::string* error) {
@@ -457,12 +458,13 @@ int RunYear(int year) {
 
 int main(int argc, char** argv) {
   std::vector<char*> args = InitMain(
-    argc, argv,
-    absl::StrCat("Runs all problems for a given year and displays the results "
-                 "in a table. Usage:\n", argv[0]));
-  QCHECK_EQ(args.size(), 1)
-      << "Extra argument specified." << std::endl
-      << absl::ProgramUsageMessage();
+      argc, argv,
+      absl::StrCat(
+          "Runs all problems for a given year and displays the results "
+          "in a table. Usage:\n",
+          argv[0]));
+  QCHECK_EQ(args.size(), 1) << "Extra argument specified." << std::endl
+                            << absl::ProgramUsageMessage();
   std::string year_str = absl::GetFlag(FLAGS_year);
   if (year_str == "all") {
     for (int year : advent_of_code::AllAdventYears()) {
@@ -474,6 +476,7 @@ int main(int argc, char** argv) {
   if (int year; absl::SimpleAtoi(year_str, &year)) {
     return RunYear(year);
   }
-  std::cerr << year_str << " is neither a specific year nor, 'all'" << std::endl;
+  std::cerr << year_str << " is neither a specific year nor, 'all'"
+            << std::endl;
   return 1;
 }

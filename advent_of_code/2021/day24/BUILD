@@ -18,7 +18,7 @@ cc_library(
         "@abseil-cpp//absl/functional:function_ref",
         "@abseil-cpp//absl/log",
         "@abseil-cpp//absl/strings",
-        "@re2//:re2",
+        "@re2",
     ],
     alwayslink = 1,
 )

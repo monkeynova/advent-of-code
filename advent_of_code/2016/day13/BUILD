@@ -20,7 +20,7 @@ cc_library(
         "@abseil-cpp//absl/log",
         "@abseil-cpp//absl/numeric:bits",
         "@abseil-cpp//absl/strings",
-        "@re2//:re2",
+        "@re2",
     ],
     alwayslink = 1,
 )
