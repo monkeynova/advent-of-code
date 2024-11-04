@@ -15,7 +15,7 @@ enum ColorType {
   kForce = 2,
 };
 
-ABSL_FLAG(std::string, year, "2023",
+ABSL_FLAG(std::string, year, "2024",
           "Year to run. Use 'all' to run all years.");
 ABSL_FLAG(ColorType, color, ColorType::kAuto, "Color mode");
 
