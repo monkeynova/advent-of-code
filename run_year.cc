@@ -15,7 +15,7 @@ enum ColorType {
   kForce = 2,
 };
 
-ABSL_FLAG(std::string, year, "2024",
+ABSL_FLAG(std::string, year, "current",
           "Year to run. Use 'all' to run all years.");
 ABSL_FLAG(ColorType, color, ColorType::kAuto, "Color mode");
 
@@ -454,6 +454,30 @@ int RunYear(int year) {
   return 0;
 }
 
+absl::StatusOr<std::vector<int>> GetYearsFromFlag() {
+  // No one will ever run this on New Years Eve/Day...
+  absl::CivilYear this_year = absl::ToCivilYear(absl::Now(),
+                                                absl::UTCTimeZone());
+  std::string year_str = absl::GetFlag(FLAGS_year);
+  if (year_str == "all") {
+    return advent_of_code::AllAdventYears();
+  }
+  if (year_str == "current") {
+    return std::vector<int>(1, this_year.year());
+  }
+  if (year_str == "last") {
+    return std::vector<int>(1, this_year.year() - 1);
+  }
+  int year_int;
+  if (!absl::SimpleAtoi(year_str, &year_int)) {
+    return absl::InvalidArgumentError(absl::StrCat(
+      year_str, " is neither a specific year nor in {'all', 'last', "
+      "'current'}"));
+  }
+  if (year_int < 0) year_int += this_year.year();
+  return std::vector<int>(1, year_int);
+}
+
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -465,18 +489,17 @@ int main(int argc, char** argv) {
           argv[0]));
   QCHECK_EQ(args.size(), 1) << "Extra argument specified." << std::endl
                             << absl::ProgramUsageMessage();
-  std::string year_str = absl::GetFlag(FLAGS_year);
-  if (year_str == "all") {
-    for (int year : advent_of_code::AllAdventYears()) {
-      int error = RunYear(year);
-      if (error) return error;
-    }
-    return 0;
+
+  absl::StatusOr<std::vector<int>> years = GetYearsFromFlag();
+  if (!years.ok()) {
+    std::cerr << years.status() << std::endl;
+    return 1;
   }
-  if (int year; absl::SimpleAtoi(year_str, &year)) {
-    return RunYear(year);
+
+  for (int year : *years) {
+    int error = RunYear(year);
+    if (error) return error;
   }
-  std::cerr << year_str << " is neither a specific year nor, 'all'"
-            << std::endl;
-  return 1;
+
+  return 0;
 }
