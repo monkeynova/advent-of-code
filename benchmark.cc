@@ -85,8 +85,12 @@ void BM_Day(benchmark::State& state) {
   state.SetBytesProcessed(bytes_processed);
 }
 
+static const int cur_year = []() {
+  return absl::ToCivilYear(absl::Now(), absl::UTCTimeZone()).year();
+}();
+
 BENCHMARK(BM_Day)->ArgsProduct(
-    {benchmark::CreateDenseRange(2015, 2023, /*step=*/1),
+    {benchmark::CreateDenseRange(2015, cur_year, /*step=*/1),
      benchmark::CreateDenseRange(1, 25, /*step=*/1)});
 
 void BM_WholeYear(benchmark::State& state) {
@@ -113,6 +117,6 @@ void BM_WholeYear(benchmark::State& state) {
   state.SetBytesProcessed(bytes_processed);
 }
 
-BENCHMARK(BM_WholeYear)->DenseRange(2015, 2023);
+BENCHMARK(BM_WholeYear)->DenseRange(2015, cur_year);
 
 }  // namespace
