@@ -78,3 +78,5 @@ system("find advent_of_code/$year/day$day -name '*.h' -o -name '*.cc' | " .
 # Non-fatal if buildifier isn't present.
 system("find advent_of_code/$year/day$day -name BUILD | xargs buildifier");
 system("buildifier advent_of_code/$year/BUILD");
+
+system("buildozer 'set tests //advent_of_code/$year/day$day:day${day}_test' :latest");

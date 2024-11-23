@@ -2,6 +2,11 @@ load("@com_monkeynova_base_workspace//:default_rules.bzl", "default_rules")
 
 default_rules(workspace_dep = "update_workspace.date")
 
+test_suite(
+    name = "latest",
+    tests = ["//advent_of_code/2024/day01:day01_test"],
+)
+
 cc_binary(
     name = "run_year",
     srcs = ["run_year.cc"],
