@@ -7,6 +7,36 @@ ABSL_FLAG(bool, advent_day_run_audit, true,
           "If true, runs additional tests as part of the day. Disable this "
           "flag for truer benchmarking numbers.");
 
+ABSL_FLAG(bool, advent_day_run_compete_checks, false,
+          "If true, runs lightweight checks that appropriate environment "
+          "variables necessary for efficient competition are set.")
+  .OnUpdate([]() {
+    if (absl::GetFlag(FLAGS_advent_day_run_compete_checks)) {
+      bool exit = false;
+      if (getenv("USE_BAZEL_VERSION") == nullptr) {
+        exit = true;
+        std::cerr << "USE_BAZEL_VERSION must be set to avoid potential "
+                  << "network delays or hangs with bazelisk checking for new "
+                  << "versions of bazel" << std::endl;
+        std::cerr << "Run: export USE_BAZEL_VERSION=`bazel --version | "
+                  << "cut -f2 -d\\ `" << std::endl;
+      }
+      if (getenv("AOC_SESSION") == nullptr) {
+        exit = true;
+        std::cerr << "AOC_SESSION must be set to allow user-specific "
+                  << "downloading of a days input data" << std::endl;
+        std::cerr << "Log intp http://adventofcode.com/ in a browser, then "
+                  << "copy the value of the session cookie into the "
+                  << "following: " << std::endl;
+        std::cerr << "export AOC_SESSION=<session cookie value>" << std::endl;
+      }
+      if (exit) {
+        _exit(1);
+      }
+    }
+  });
+
+
 namespace advent_of_code {
 
 namespace {

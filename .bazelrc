@@ -7,6 +7,7 @@ run:compete --file_based_test_driver_generate_test_output=false
 run:compete --file_based_test_driver_log_ignored_test=false
 run:compete --file_based_test_driver_individual_tests=false
 run:compete --stderrthreshold=0 --v=1
+run:compete --advent_day_run_compete_checks=true
 
 run:benchmark --
 run:benchmark --benchmark
