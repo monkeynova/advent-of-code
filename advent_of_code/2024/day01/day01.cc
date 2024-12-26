@@ -35,12 +35,47 @@ namespace {
 
 absl::StatusOr<std::string> Day_2024_01::Part1(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  std::vector<int> l1, l2;
+  for (std::string_view line : input) {
+    Tokenizer t(line);
+    ASSIGN_OR_RETURN(int i1, t.NextInt());
+    ASSIGN_OR_RETURN(int i2, t.NextInt());
+    if (!t.Done()) {
+      return absl::InvalidArgumentError(absl::StrCat(
+        "Bad line: ", line));
+    }
+    l1.push_back(i1);
+    l2.push_back(i2);
+  }
+  absl::c_sort(l1);
+  absl::c_sort(l2);
+  int sum = 0;
+  for (int i = 0; i < l1.size(); ++i) {
+    sum += std::abs(l1[i] - l2[i]);
+  }
+  return AdventReturn(sum);
 }
 
 absl::StatusOr<std::string> Day_2024_01::Part2(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  absl::flat_hash_map<int64_t, int64_t> l1;
+  absl::flat_hash_map<int64_t, int64_t> l2;
+  for (std::string_view line : input) {
+    Tokenizer t(line);
+    ASSIGN_OR_RETURN(int i1, t.NextInt());
+    ASSIGN_OR_RETURN(int i2, t.NextInt());
+    if (!t.Done()) {
+      return absl::InvalidArgumentError(absl::StrCat(
+        "Bad line: ", line));
+    }
+    ++l1[i1];
+    ++l2[i2];
+  }
+  int64_t sum = 0;
+  for (const auto& [i, c] : l1) {
+    sum += i * c * l2[i];
+  }
+  return AdventReturn(sum);
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(

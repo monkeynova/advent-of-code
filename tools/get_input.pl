@@ -12,8 +12,8 @@ my ($year, $day);
 open my $fh, '<', 'BUILD'
     or die "Cannot open BUILD to extract current year and day";
 while (<$fh>) {
-    $year = $1 if /CURRENT_YEAR='(.*)'/;
-    $day = $1 if /CURRENT_DAY='(.*)'/;
+    $year = $1 if /CURRENT_YEAR="(.*)"/;
+    $day = $1 if /CURRENT_DAY="(.*)"/;
 }
 close $fh;
 
