@@ -67,7 +67,7 @@ EOF
   system("buildozer 'add deps //advent_of_code/$year' //advent_of_code/")
     and die $!;
 } else {
-  system("buildozer 'add deps //advent_of_code/$year:day$day' //advent_of_code/$year")
+  system("buildozer 'add deps //advent_of_code/$year/day$day' //advent_of_code/$year")
     and die $!;
 }
 
@@ -79,5 +79,5 @@ system("find advent_of_code/$year/day$day -name '*.h' -o -name '*.cc' | " .
 system("find advent_of_code/$year/day$day -name BUILD | xargs buildifier");
 system("buildifier advent_of_code/$year/BUILD");
 
-system('perl', '-spi', '-e', 's/CURRENT_YEAR="(.*)"/CURRENT_YEAR="$year"/g', 'BUILD');
-system('perl', '-spi', '-e', 's/CURRENT_DAY="(.*)"/CURRENT_DAY="$day"/g', 'BUILD');
+system('perl', '-spi', '-e', "s/CURRENT_YEAR=\"(.*)\"/CURRENT_YEAR=\"$year\"/g", 'BUILD');
+system('perl', '-spi', '-e', "s/CURRENT_DAY=\"(.*)\"/CURRENT_DAY=\"$day\"/g", 'BUILD');
