@@ -1,6 +1,6 @@
-## A place to work on personal attempts for [adventofcode.com](https://adventofcode.com) ##
+# A place to work on personal attempts for [adventofcode.com](https://adventofcode.com) #
 
-### Directory Organization ###
+## Directory Organization ##
 
 The organization of this repository is as follows:
 
@@ -13,7 +13,7 @@ The organization of this repository is as follows:
  * Code not created by me is in third_party/... (currently only an MD5
  implementation)
 
-### Top Level Tools ###
+## Top Level Tools ##
 
 * ```:run_year [--year=<year>]``` runs all of my input for the given year
 (which defaults to the current year) and displays the results as well as
@@ -21,8 +21,10 @@ timings in an ASCII table.
 * ```:benchmark``` runs benchmarks for my input for each day in all years.
 ```--benchmark_flags=--benchmark_filter=.*YYYY/DD.*``` will filter the run
 to a single day.
+* ```:latest``` runs the test for the most recent day. Tools use this day when
+interacting with [adventofcode.com](https://adventofcode.com/).
  
-### Per-Day File Organization ###
+## Per-Day File Organization ##
 
  Any given day is broken down into the following files:
  
@@ -37,22 +39,24 @@ https://github.com/google/file-based-test-driver)
  * README.md - A copy of the problem from [adventofcode.com](
 https://adventofcode.com) translated to markdown
  
-### Solve Process ###
+## Solve Process ##
 
  The process for solving a new day is as follows
  
- 1. Before unlock: ```tools/new_day.pl YYYY DD``` -- Creates an empty path
- 2. Before unlock: export AOC_SESSION=&lt;session cookie from browser&gt;
- 3. Before unlock: export USE_BAZEL_VERSION=`bazel --version | cut -f2 -d\ ` --
- Ensure that bazelisk doesn't make network calls that delay builds
- 4. At unlock: ```tools/get_input.pl YYYY DD``` -- Downloads personal input to
- input.txt
- 5. At unlock: ```bazel run --config=compete
- advent_of_code/YYYY/dayDD:dayDD_test -- --part_filter=1```
- 6. After solving part 1: ```bazel run --config=compete
- advent_of_code/YYYY/dayDD:dayDD_test -- --part_filter=2```
- 7. After solving part 2: ```git add .; git commit -m 'YYYY/DD Answer'``` --
- Ensure "as solved" is visible in the repo
- 8. After solving part 2: ```tools/get_problem.pl YYYY DD``` -- Downloads the
- problem and builds a README.md
- 9. After ensuring a full leaderboard: ```git push```
+### Before Unlock
+ 1. ```tools/new_day.pl YYYY DD``` (Creates an empty path)
+ 2. ```export AOC_SESSION=&lt;session cookie from browser&gt;```
+ (Allow command line tools access to my account)
+ 3. ```export USE_BAZEL_VERSION=`bazel --version | cut -f2 -d\ ` ```
+ (Ensure that bazelisk doesn't make network calls that delay builds)
+
+### Solving
+ 4. ```tools/get_input.pl``` (Downloads personal input to input.txt)
+ 5. ```bazel run --config=compete :latest -- --part_filter=1``` (Solve part 1)
+ 6. ```bazel run --config=compete :latest -- --part_filter=2``` (Solve part 2)
+ 7. ```git add .; git commit -m 'YYYY/DD Answer'```
+ (Ensure "as solved" is visible in the repo)
+ 8. ```tools/get_problem.pl``` (Downloads the problem and builds a README.md)
+
+### After ensuring a full leaderboard (if relevant)
+ 9. ```git push```
