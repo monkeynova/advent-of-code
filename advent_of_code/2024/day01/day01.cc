@@ -4,26 +4,9 @@
 
 #include "absl/algorithm/container.h"
 #include "absl/container/flat_hash_map.h"
-#include "absl/container/flat_hash_set.h"
 #include "absl/log/log.h"
-#include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
-#include "absl/strings/str_join.h"
-#include "absl/strings/str_split.h"
-#include "advent_of_code/bfs.h"
-#include "advent_of_code/char_board.h"
-#include "advent_of_code/conway.h"
-#include "advent_of_code/directed_graph.h"
-#include "advent_of_code/fast_board.h"
-#include "advent_of_code/interval.h"
-#include "advent_of_code/loop_history.h"
-#include "advent_of_code/mod.h"
-#include "advent_of_code/point.h"
-#include "advent_of_code/point3.h"
-#include "advent_of_code/point_walk.h"
-#include "advent_of_code/splice_ring.h"
 #include "advent_of_code/tokenizer.h"
-#include "re2/re2.h"
 
 namespace advent_of_code {
 
@@ -58,8 +41,7 @@ absl::StatusOr<std::string> Day_2024_01::Part1(
 
 absl::StatusOr<std::string> Day_2024_01::Part2(
     absl::Span<std::string_view> input) const {
-  absl::flat_hash_map<int64_t, int64_t> l1;
-  absl::flat_hash_map<int64_t, int64_t> l2;
+  std::vector<int> l1, l2;
   for (std::string_view line : input) {
     Tokenizer t(line);
     ASSIGN_OR_RETURN(int i1, t.NextInt());
@@ -68,12 +50,33 @@ absl::StatusOr<std::string> Day_2024_01::Part2(
       return absl::InvalidArgumentError(absl::StrCat(
         "Bad line: ", line));
     }
-    ++l1[i1];
-    ++l2[i2];
+    l1.push_back(i1);
+    l2.push_back(i2);
   }
-  int64_t sum = 0;
-  for (const auto& [i, c] : l1) {
-    sum += i * c * l2[i];
+  absl::c_sort(l1);
+  absl::c_sort(l2);
+
+  int sum = 0;
+
+  int i2 = 0;
+  int run_size = 1;
+  if (l1.empty()) return AdventReturn(0);
+  for (int i1 = 1; i1 < l1.size(); ++i1) {
+    if (l1[i1] == l1[i1 - 1]) {
+      ++run_size;
+    } else {
+      for (/*nop*/; i2 < l2.size(); ++i2) {
+        if (l2[i2] < l1[i1 - 1]) continue;
+        if (l1[i1 - 1] != l2[i2]) break;
+        sum += l1[i1 - 1] * run_size;
+      }
+      run_size = 1;
+    }
+  }
+  for (/*nop*/; i2 < l2.size(); ++i2) {
+    if (l2[i2] < l1.back()) continue;
+    if (l1.back() != l2[i2]) break;
+    sum += l1.back() * run_size;
   }
   return AdventReturn(sum);
 }

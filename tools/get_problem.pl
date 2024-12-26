@@ -76,4 +76,4 @@ print {$ofh} "\n";
 print {$ofh} $part2_md;
 close $ofh or die "Error writing to $out_file: $!";
 
-system("perl", "tools/lsc/add_title.pl", sprintf("advent_of_code/%4d/day%02d", $year, $day));
+system("perl", "tools/add_title.pl", sprintf("advent_of_code/%4d/day%02d", $year, $day));

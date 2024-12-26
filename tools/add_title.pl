@@ -23,7 +23,7 @@ my $h_insert = <<EOF;
   }
 EOF
 my $contents = <$fh>;
-$contents =~ s/(  virtual std::string_view test_file\(\) const override \{)/$h_insert\n$1/ or die;
+$contents =~ s/(  virtual std::string_view title\(\) const override \{[^\}]*\}\s*)\s*\n/$h_insert\n/ or die;
 close $fh or die;
 open $fh, '>', "$dir/${day}.h" or die;
 print {$fh} $contents;
