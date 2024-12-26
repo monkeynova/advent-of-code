@@ -11,9 +11,17 @@ use LWP::UserAgent;
 
 die "AOC_SESSION environment variable not set" unless $ENV{AOC_SESSION};
 
-die "USAGE\n$0 <year> <day>" if @ARGV < 2;
+my ($year, $day);
+open my $fh, '<', 'BUILD'
+    or die "Cannot open BUILD to extract current year and day";
+while (<$fh>) {
+    $year = $1 if /CURRENT_YEAR='(.*)'/;
+    $day = $1 if /CURRENT_DAY='(.*)'/;
+}
+close $fh;
 
-my ($year, $day) = @ARGV;
+die "Could not extract year from BUILD" unless $year;
+die "Could not extract day from BUILD" unless $day;
 
 die "Bad year: $year" unless $year =~ /^\d+$/ && $year >= 2015;
 die "Bad day: $day" unless $day =~ /^\d+$/ && $day > 0 && $day <= 25;
