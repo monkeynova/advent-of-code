@@ -14,7 +14,6 @@ cc_library(
         "//advent_of_code:advent_day",
         "//advent_of_code:tokenizer",
         "@abseil-cpp//absl/log",
-        "@re2",
     ],
     alwayslink = 1,
 )

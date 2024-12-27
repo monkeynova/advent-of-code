@@ -14,10 +14,8 @@ cc_library(
         "//advent_of_code:advent_day",
         "//advent_of_code:tokenizer",
         "@abseil-cpp//absl/algorithm:container",
-        "@abseil-cpp//absl/container:flat_hash_map",
         "@abseil-cpp//absl/log",
         "@abseil-cpp//absl/strings",
-        "@re2",
     ],
     alwayslink = 1,
 )
