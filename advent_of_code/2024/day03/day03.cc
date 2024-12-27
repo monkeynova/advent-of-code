@@ -36,11 +36,12 @@ namespace {
 absl::StatusOr<std::string> Day_2024_03::Part1(
     absl::Span<std::string_view> input) const {
   int sum = 0;
+  RE2 re("mul\\((\\d+),(\\d+)\\)");
   for (std::string_view mem : input) {
     while (!mem.empty()) {
       int x = 0;
       int y = 0;
-      if (!RE2::FindAndConsume(&mem, "mul\\((\\d+),(\\d+)\\)", &x, &y)) {
+      if (!RE2::FindAndConsume(&mem, re, &x, &y)) {
         break;
       }
       sum += x * y;
@@ -53,12 +54,13 @@ absl::StatusOr<std::string> Day_2024_03::Part2(
     absl::Span<std::string_view> input) const {
   int sum = 0;
   bool enabled = true;
+  RE2 re("mul\\((\\d+),(\\d+)\\)|(do|don't)\\(\\)");
   for (std::string_view mem : input) {
     while (!mem.empty()) {
       std::optional<int> x = 0;
       std::optional<int> y = 0;
       std::string_view cmd;
-      if (!RE2::FindAndConsume(&mem, "mul\\((\\d+),(\\d+)\\)|(do|don't)\\(\\)", &x, &y, &cmd)) {
+      if (!RE2::FindAndConsume(&mem, re, &x, &y, &cmd)) {
         break;
       }
       LOG(ERROR) << "cmd = " << cmd;
