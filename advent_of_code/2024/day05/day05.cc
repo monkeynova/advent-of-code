@@ -123,13 +123,15 @@ absl::StatusOr<std::string> Day_2024_05::Part2(
       pos[ordered[i]] = i;
     }
     int valid = true;
+    int start_i = 0;
   RETRY:
-    for (int i = 0; i < ordered.size(); ++i) {
+    for (int i = start_i; i < ordered.size(); ++i) {
       for (int pre_test : pre[ordered[i]]) {
         if (pos[pre_test] > i) {
           valid = false;
           std::swap(ordered[i], ordered[pos[pre_test]]);
           std::swap(pos[ordered[i]], pos[ordered[pos[pre_test]]]);
+          start_i = i;
           goto RETRY;
         }
       }
@@ -138,6 +140,7 @@ absl::StatusOr<std::string> Day_2024_05::Part2(
           valid = false;
           std::swap(ordered[i], ordered[pos[post_test]]);
           std::swap(pos[ordered[i]], pos[ordered[pos[post_test]]]);
+          start_i = pos[ordered[i]];
           goto RETRY;
         }
       }
