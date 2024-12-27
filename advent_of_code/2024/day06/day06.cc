@@ -50,12 +50,13 @@ absl::StatusOr<std::string> Day_2024_06::Part2(
   int make_loop = 0;
   blockable.Set(start, true);
   history.Set(start, dir, true);
+  FastBoard::PointDirMap<bool> history2(fb, false);
   for (FastBoard::Point p = fb.Add(start, dir); fb.OnBoard(p); p = fb.Add(p, dir)) {
     if (fb[p] == '#') {
       p = fb.Add(p, FastBoard::kReverse[dir]);
       dir = FastBoard::kRotateRight[dir];
     } else if (!blockable.Get(p)) {
-      FastBoard::PointDirMap<bool> history2(fb, false);
+      history2 = history;
       FastBoard::Dir dir2 = FastBoard::kRotateRight[dir];
       for (FastBoard::Point p2 = fb.Add(p, FastBoard::kReverse[dir]); fb.OnBoard(p2); p2 = fb.Add(p2, dir2)) {
         if (fb[p2] == '#' || p == p2) {
@@ -63,7 +64,7 @@ absl::StatusOr<std::string> Day_2024_06::Part2(
           dir2 = FastBoard::kRotateRight[dir2];
           continue;
         }
-        if (history.Get(p2, dir2) || history2.Get(p2, dir2)) {
+        if (history2.Get(p2, dir2)) {
           ++make_loop;
           break;
         }
