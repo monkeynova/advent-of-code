@@ -55,8 +55,22 @@ absl::StatusOr<std::string> Day_2024_06::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
   ASSIGN_OR_RETURN(Point start, b.FindUnique('^'));
+
+  absl::flat_hash_set<Point> blockable;
+  {
+    Point dir = Cardinal::kNorth;
+    blockable.insert(start);
+    for (Point p = start + dir; b.OnBoard(p); p += dir) {
+      if (b[p] == '#') {
+        p -= dir;
+        dir = dir.rotate_right();
+      }
+      blockable.insert(p);
+    }
+  }
+
   int make_loop = 0;
-  for (Point edit : b.range()) {
+  for (Point edit : blockable) {
     if (b[edit] != '.') continue;
     b[edit] = '#';
 
