@@ -2,24 +2,24 @@
 ==
 
 [part=1]
-Example input
+2333133121414131402
 --
-ERROR: UNIMPLEMENTED: Problem not known
+1928
 ==
 
 [part=1]
 @include{advent_of_code/2024/day09/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+6607511583593
 ==
 
 [part=2]
-Example input
+2333133121414131402
 --
-ERROR: UNIMPLEMENTED: Problem not known
+2858
 ==
 
 [part=2]
 @include{advent_of_code/2024/day09/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+6636608781232
