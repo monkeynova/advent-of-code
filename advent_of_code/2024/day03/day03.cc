@@ -36,15 +36,25 @@ namespace {
 absl::StatusOr<std::string> Day_2024_03::Part1(
     absl::Span<std::string_view> input) const {
   int sum = 0;
-  RE2 re("mul\\((\\d+),(\\d+)\\)");
   for (std::string_view mem : input) {
-    while (!mem.empty()) {
-      int x = 0;
-      int y = 0;
-      if (!RE2::FindAndConsume(&mem, re, &x, &y)) {
-        break;
-      }
+    for (int cpos = 0; cpos + 4 < mem.size(); ++cpos) {
+      if (mem.substr(cpos, 4) != "mul(") continue;
+      int xstart = cpos + 4;
+      int xend = cpos + 4;
+      while (std::isdigit(mem[xend])) ++xend;
+      if (xend == xstart) continue;
+      if (mem[xend] != ',') continue;
+      int ystart = xend + 1;
+      int yend = xend + 1;
+      while (std::isdigit(mem[yend])) ++yend;
+      if (yend == ystart) continue;
+      if (mem[yend] != ')') continue;
+      int x;
+      int y;
+      if (!absl::SimpleAtoi(mem.substr(xstart, xend - xstart), &x)) continue;
+      if (!absl::SimpleAtoi(mem.substr(ystart, yend - ystart), &y)) continue;
       sum += x * y;
+      cpos = yend;
     }
   }
   return AdventReturn(sum);
@@ -54,23 +64,41 @@ absl::StatusOr<std::string> Day_2024_03::Part2(
     absl::Span<std::string_view> input) const {
   int sum = 0;
   bool enabled = true;
-  RE2 re("mul\\((\\d+),(\\d+)\\)|(do|don't)\\(\\)");
   for (std::string_view mem : input) {
-    while (!mem.empty()) {
-      std::optional<int> x = 0;
-      std::optional<int> y = 0;
-      std::string_view cmd;
-      if (!RE2::FindAndConsume(&mem, re, &x, &y, &cmd)) {
-        break;
+    for (int cpos = 0; cpos + 4 < mem.size(); ++cpos) {
+      if (mem.substr(cpos, 2) == "do") {
+        if (mem.substr(cpos + 2, 2) == "()") {
+          enabled = true;
+          cpos += 3;
+          continue;
+        }
+        if (mem.substr(cpos + 2, 5) == "n't()") {
+          enabled = false;
+          cpos += 6;
+          continue;
+        }
+        ++cpos;
+        continue;
       }
-      LOG(ERROR) << "cmd = " << cmd;
-      if (cmd == "don't") {
-        enabled = false;
-      } else if (cmd == "do") {
-        enabled = true;
-      } else if (enabled) {
-        sum += *x * *y;
-      }
+      if (!enabled) continue;
+
+      if (mem.substr(cpos, 4) != "mul(") continue;
+      int xstart = cpos + 4;
+      int xend = cpos + 4;
+      while (std::isdigit(mem[xend])) ++xend;
+      if (xend == xstart) continue;
+      if (mem[xend] != ',') continue;
+      int ystart = xend + 1;
+      int yend = xend + 1;
+      while (std::isdigit(mem[yend])) ++yend;
+      if (yend == ystart) continue;
+      if (mem[yend] != ')') continue;
+      int x;
+      int y;
+      if (!absl::SimpleAtoi(mem.substr(xstart, xend - xstart), &x)) continue;
+      if (!absl::SimpleAtoi(mem.substr(ystart, yend - ystart), &y)) continue;
+      sum += x * y;
+      cpos = yend;
     }
   }
   return AdventReturn(sum);
