@@ -35,7 +35,8 @@ namespace {
 
 absl::StatusOr<std::string> Day_2024_05::Part1(
     absl::Span<std::string_view> input) const {
-  std::vector<std::pair<int, int>> rules;
+  std::array<std::vector<int>, 100> pre;
+  std::array<std::vector<int>, 100> post;
   bool parse_rules = true;
   int sum = 0;
   for (std::string_view line : input) {
@@ -43,37 +44,43 @@ absl::StatusOr<std::string> Day_2024_05::Part1(
       if (line.empty()) {
         parse_rules = false;
       } else {
-        ASSIGN_OR_RETURN(std::vector<int64_t> rule,
-                         ParseAsInts(absl::StrSplit(line, "|")));
-        if (rule.size() != 2) return absl::InvalidArgumentError("bad line");
-        rules.emplace_back(rule[0], rule[1]);
+        if (line.size() != 5) return absl::InvalidArgumentError("bad line");
+        int pre_val, post_val;
+        if (!absl::SimpleAtoi(line.substr(0, 2), &pre_val)) {
+          return absl::InvalidArgumentError("bad line");
+        }
+        if (line[2] != '|') return absl::InvalidArgumentError("bad line");
+        if (!absl::SimpleAtoi(line.substr(3, 2), &post_val)) {
+          return absl::InvalidArgumentError("bad line");
+        }
+        pre[post_val].push_back(pre_val);
+        post[pre_val].push_back(post_val);
       }
       continue;
     }
 
     ASSIGN_OR_RETURN(std::vector<int64_t> ordered,
                      ParseAsInts(absl::StrSplit(line, ",")));
+    std::array<int, 100> pos;
+    memset(&pos, -1, sizeof(pos));
+    for (int i = 0; i < ordered.size(); ++i) {
+      if (pos[ordered[i]] != -1) return absl::InvalidArgumentError("dupe");
+      pos[ordered[i]] = i;
+    }
     int valid = true;
     for (int i = 0; valid && i < ordered.size(); ++i) {
-      for (const auto& [pre, post] : rules) {
-        if (pre == ordered[i]) {
-          for (int j = 0; j < i; ++j) {
-            if (post == ordered[j]) {
-              valid = false;
-              break;
-            }
-          }
-        }
-        if (post == ordered[i]) {
-          for (int j = i + 1; j < ordered.size(); ++j) {
-            if (pre == ordered[j]) {
-              valid = false;
-              break;
-            }
-          }
+      for (int pre_test : pre[ordered[i]]) {
+        if (pos[pre_test] > i) {
+          valid = false;
+          break;
         }
       }
-
+      for (int post_test : post[ordered[i]]) {
+        if (pos[post_test] < i && pos[post_test] != -1) {
+          valid = false;
+          break;
+        }
+      }
     }
     if (!valid) continue;
     sum += ordered[ordered.size() / 2];
@@ -83,7 +90,8 @@ absl::StatusOr<std::string> Day_2024_05::Part1(
 
 absl::StatusOr<std::string> Day_2024_05::Part2(
     absl::Span<std::string_view> input) const {
-  std::vector<std::pair<int, int>> rules;
+  std::array<std::vector<int>, 100> pre;
+  std::array<std::vector<int>, 100> post;
   bool parse_rules = true;
   int sum = 0;
   for (std::string_view line : input) {
@@ -91,41 +99,50 @@ absl::StatusOr<std::string> Day_2024_05::Part2(
       if (line.empty()) {
         parse_rules = false;
       } else {
-        ASSIGN_OR_RETURN(std::vector<int64_t> rule,
-                         ParseAsInts(absl::StrSplit(line, "|")));
-        if (rule.size() != 2) return absl::InvalidArgumentError("bad line");
-        rules.emplace_back(rule[0], rule[1]);
+        if (line.size() != 5) return absl::InvalidArgumentError("bad line");
+        int pre_val, post_val;
+        if (!absl::SimpleAtoi(line.substr(0, 2), &pre_val)) {
+          return absl::InvalidArgumentError("bad line");
+        }
+        if (line[2] != '|') return absl::InvalidArgumentError("bad line");
+        if (!absl::SimpleAtoi(line.substr(3, 2), &post_val)) {
+          return absl::InvalidArgumentError("bad line");
+        }
+        pre[post_val].push_back(pre_val);
+        post[pre_val].push_back(post_val);
       }
       continue;
     }
 
     ASSIGN_OR_RETURN(std::vector<int64_t> ordered,
                      ParseAsInts(absl::StrSplit(line, ",")));
+    std::array<int, 100> pos;
+    memset(&pos, -1, sizeof(pos));
+    for (int i = 0; i < ordered.size(); ++i) {
+      if (pos[ordered[i]] != -1) return absl::InvalidArgumentError("dupe");
+      pos[ordered[i]] = i;
+    }
     int valid = true;
   RETRY:
     for (int i = 0; i < ordered.size(); ++i) {
-      for (const auto& [pre, post] : rules) {
-        if (pre == ordered[i]) {
-          for (int j = 0; j < i; ++j) {
-            if (post == ordered[j]) {
-              valid = false;
-              std::swap(ordered[i], ordered[j]);
-              goto RETRY;
-            }
-          }
-        }
-        if (post == ordered[i]) {
-          for (int j = i + 1; j < ordered.size(); ++j) {
-            if (pre == ordered[j]) {
-              valid = false;
-              std::swap(ordered[i], ordered[j]);
-              goto RETRY;
-            }
-          }
+      for (int pre_test : pre[ordered[i]]) {
+        if (pos[pre_test] > i) {
+          valid = false;
+          std::swap(ordered[i], ordered[pos[pre_test]]);
+          std::swap(pos[ordered[i]], pos[ordered[pos[pre_test]]]);
+          goto RETRY;
         }
       }
-
+      for (int post_test : post[ordered[i]]) {
+        if (pos[post_test] < i && pos[post_test] != -1) {
+          valid = false;
+          std::swap(ordered[i], ordered[pos[post_test]]);
+          std::swap(pos[ordered[i]], pos[ordered[pos[post_test]]]);
+          goto RETRY;
+        }
+      }
     }
+
     if (valid) continue;
 
     sum += ordered[ordered.size() / 2];
