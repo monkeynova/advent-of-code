@@ -50,9 +50,9 @@ class Delta {
   int mag_;
 };
 
-bool CheckPartList(Tokenizer t, int last_val, Delta sign) {
+absl::StatusOr<bool> CheckPartList(Tokenizer t, int last_val, Delta sign) {
   while (!t.Done()) {
-    int i = *t.NextInt();
+    ASSIGN_OR_RETURN(int i, t.NextInt());
     Delta next(last_val, i);
     if (!next.Valid()) return false;
     if (!sign.SameDir(next)) return false;
@@ -61,10 +61,10 @@ bool CheckPartList(Tokenizer t, int last_val, Delta sign) {
   return true;
 }
 
-bool CheckList(Tokenizer t) {
-  int i1 = *t.NextInt();
+absl::StatusOr<bool> CheckList(Tokenizer t) {
+  ASSIGN_OR_RETURN(int i1, t.NextInt());
   if (t.Done()) return true;
-  int i2 = *t.NextInt();
+  ASSIGN_OR_RETURN(int i2, t.NextInt());
 
   Delta last(i1, i2);
   if (!last.Valid()) return false;
@@ -72,50 +72,77 @@ bool CheckList(Tokenizer t) {
   return CheckPartList(t, i2, last);
 }
 
-bool CheckListAllowFail(Tokenizer t) {
-  int i1 = *t.NextInt();
+absl::StatusOr<bool> CheckListAllowFail(Tokenizer t) {
+  bool sub_part_check;
+  ASSIGN_OR_RETURN(int i1, t.NextInt());
   if (t.Done()) return true;
-  int i2 = *t.NextInt();
+  ASSIGN_OR_RETURN(int i2, t.NextInt());
   Delta last(i1, i2);
   if (!last.Valid()) {
-    int i3 = *t.NextInt();
+    ASSIGN_OR_RETURN(int i3, t.NextInt());
     {
+      // Drop i1.
       Delta d2(i2, i3);
-      if (d2.Valid() && CheckPartList(t, i3, d2)) return true;
+      if (d2.Valid()) {
+        ASSIGN_OR_RETURN(sub_part_check, CheckPartList(t, i3, d2));
+        if (sub_part_check) return true;
+      }
     }
     {
+      // Drop i2.
       Delta d2(i1, i3);
-      if (d2.Valid() && CheckPartList(t, i3, d2)) return true;
+      if (d2.Valid()) {
+        ASSIGN_OR_RETURN(sub_part_check, CheckPartList(t, i3, d2));
+        if (sub_part_check) return true;
+      }
     }
     return false;
   }
   if (t.Done()) return true;
-  int i3 = *t.NextInt();
+  ASSIGN_OR_RETURN(int i3, t.NextInt());
   Delta next(i2, i3);
   if (!next.Valid()) {
-    if (CheckPartList(t, i2, last)) return true;
+    // Drop i3.
+    ASSIGN_OR_RETURN(sub_part_check, CheckPartList(t, i2, last));
+    if (sub_part_check) return true;
+    // Drop i2.
     next = Delta(i1, i3);
-    if (next.Valid() && CheckPartList(t, i3, next)) return true;
+    if (next.Valid()) {
+      ASSIGN_OR_RETURN(sub_part_check, CheckPartList(t, i3, next));
+      if (sub_part_check) return true;
+    }
     return false;
   }
   if (!last.SameDir(next)) {
-    // Drop 2.
-    if (CheckPartList(t, i2, last)) return true;
-    // Drop 0.
-    if (CheckPartList(t, i3, next)) return true;
+    // Drop i3.
+    ASSIGN_OR_RETURN(sub_part_check, CheckPartList(t, i2, last));
+    if (sub_part_check) return true;
+    // Drop i1.
+    ASSIGN_OR_RETURN(sub_part_check, CheckPartList(t, i3, next));
+    if (sub_part_check) return true;
+    // Drop i2.
     next = Delta(i1, i3);
-    if (next.Valid() && CheckPartList(t, i3, next)) return true;
+    if (next.Valid()) {
+      ASSIGN_OR_RETURN(sub_part_check, CheckPartList(t, i3, next));
+      if (sub_part_check) return true;
+    }
     return false;
   }
 
   last = next;
   while (!t.Done()) {
-    int i4 = *t.NextInt();
+    ASSIGN_OR_RETURN(int i4, t.NextInt());
     Delta next(i3, i4);
     if (!next.Valid() || !last.SameDir(next)) {
-      if (CheckPartList(t, i3, last)) return true;
+      // Drop i4.
+      ASSIGN_OR_RETURN(sub_part_check, CheckPartList(t, i3, last));
+      if (sub_part_check) return true;
+      // Drop i3.
       next = Delta(i2, i4);
-      if (next.Valid() && CheckPartList(t, i4, next)) return true;
+      if (next.Valid()) {
+        ASSIGN_OR_RETURN(sub_part_check, CheckPartList(t, i4, next));
+        if (sub_part_check) return true;
+      }
       return false;
     }
     last = next;
@@ -131,10 +158,8 @@ absl::StatusOr<std::string> Day_2024_02::Part1(
     absl::Span<std::string_view> input) const {
   int safe_count = 0;
   for (absl::string_view line : input) {
-    Tokenizer t(line);
-    if (CheckList(t)) {
-      ++safe_count;
-    }
+    ASSIGN_OR_RETURN(bool is_safe, CheckList(Tokenizer(line)));
+    if (is_safe) ++safe_count;
   }
   return AdventReturn(safe_count);
 }
@@ -143,10 +168,8 @@ absl::StatusOr<std::string> Day_2024_02::Part2(
     absl::Span<std::string_view> input) const {
   int safe_count = 0;
   for (absl::string_view line : input) {
-    Tokenizer t(line);
-    if (CheckListAllowFail(t)) {
-      ++safe_count;
-    }
+    ASSIGN_OR_RETURN(bool is_safe, CheckListAllowFail(Tokenizer(line)));
+    if (is_safe) ++safe_count;
   }
   return AdventReturn(safe_count);
 }
