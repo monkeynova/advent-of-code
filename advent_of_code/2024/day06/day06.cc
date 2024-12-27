@@ -35,12 +35,51 @@ namespace {
 
 absl::StatusOr<std::string> Day_2024_06::Part1(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
+  ASSIGN_OR_RETURN(Point p, b.FindUnique('^'));
+  absl::flat_hash_set<Point> visited;
+  Point dir = Cardinal::kNorth;
+  visited.insert(p);
+  for (p += dir; b.OnBoard(p); p += dir) {
+    if (b[p] == '#') {
+      p -= dir;
+      dir = dir.rotate_right();
+    }
+    visited.insert(p);
+  }
+
+  return AdventReturn(visited.size());
 }
 
 absl::StatusOr<std::string> Day_2024_06::Part2(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(Point start, b.FindUnique('^'));
+  int make_loop = 0;
+  for (Point edit : b.range()) {
+    if (b[edit] != '.') continue;
+    b[edit] = '#';
+
+    absl::flat_hash_set<std::pair<Point, Point>> history;
+    Point dir = Cardinal::kNorth;
+    history.emplace(start, dir);
+    for (Point p = start + dir; b.OnBoard(p); p += dir) {
+      if (b[p] == '#') {
+        p -= dir;
+        dir = dir.rotate_right();
+        continue;
+      }
+      auto [it, inserted] = history.emplace(p, dir);
+      if (!inserted) {
+        ++make_loop;
+        break;
+      }
+    }
+
+    b[edit] = '.';
+  }
+
+  return AdventReturn(make_loop);
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
