@@ -9,17 +9,19 @@ namespace advent_of_code {
 
 namespace {
 
-bool CanMake(int64_t test, absl::Span<const int64_t> vals) {
+bool CanMakeAddMul(int64_t test, absl::Span<const int64_t> vals) {
   if (vals.size() == 1) return test == vals[0];
 
   if (test < vals.back()) return false;
-  if (test % vals.back() == 0 && CanMake(test / vals.back(), vals.subspan(0, vals.size() - 1))) {
+  absl::Span<const int64_t> tail = vals.subspan(0, vals.size() - 1);
+
+  if (test % vals.back() == 0 && CanMakeAddMul(test / vals.back(), tail)) {
     return true;
   }
-  return CanMake(test - vals.back(), vals.subspan(0, vals.size() - 1));
+  return CanMakeAddMul(test - vals.back(), tail);
 }
 
-bool CanMake2(int64_t test, absl::Span<const int64_t> vals) {
+bool CanMakeAddMulCat(int64_t test, absl::Span<const int64_t> vals) {
   if (vals.size() == 1) return test == vals[0];
 
   if (test < vals.back()) return false;
@@ -27,13 +29,13 @@ bool CanMake2(int64_t test, absl::Span<const int64_t> vals) {
 
   int64_t pow10 = 1;
   while (pow10 <= vals.back()) pow10 *= 10;
-  if (test % pow10 == vals.back() && CanMake2(test / pow10, tail)) {
+  if (test % pow10 == vals.back() && CanMakeAddMulCat(test / pow10, tail)) {
     return true;
   }
-  if (test % vals.back() == 0 && CanMake2(test / vals.back(), tail)) {
+  if (test % vals.back() == 0 && CanMakeAddMulCat(test / vals.back(), tail)) {
     return true;
   }
-  return CanMake2(test - vals.back(), tail);
+  return CanMakeAddMulCat(test - vals.back(), tail);
 }
 
 
@@ -52,7 +54,7 @@ absl::StatusOr<std::string> Day_2024_07::Part1(
       if (val < 0) return absl::UnimplementedError("Negative value");
       vals.push_back(val);
     }
-    if (CanMake(test, vals)) {
+    if (CanMakeAddMul(test, vals)) {
       sum += test;
     }
   }
@@ -72,7 +74,7 @@ absl::StatusOr<std::string> Day_2024_07::Part2(
       if (val < 0) return absl::UnimplementedError("Negative value");
       vals.push_back(val);
     }
-    if (CanMake2(test, vals)) {
+    if (CanMakeAddMulCat(test, vals)) {
       sum += test;
     }
   }
