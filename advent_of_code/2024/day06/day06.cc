@@ -36,62 +36,61 @@ namespace {
 absl::StatusOr<std::string> Day_2024_06::Part1(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
-  ASSIGN_OR_RETURN(Point p, b.FindUnique('^'));
-  absl::flat_hash_set<Point> visited;
-  Point dir = Cardinal::kNorth;
-  visited.insert(p);
-  for (p += dir; b.OnBoard(p); p += dir) {
-    if (b[p] == '#') {
-      p -= dir;
-      dir = dir.rotate_right();
+  FastBoard fb(b);
+  FastBoard::Point p = fb.FindUnique('^');
+  FastBoard::PointMap<bool> visited(fb, false);
+  FastBoard::Dir dir = FastBoard::kNorth;
+
+  int visit_count = 1;
+  visited.Set(p, true);
+  for (p = fb.Add(p, dir); fb.OnBoard(p); p = fb.Add(p, dir)) {
+    if (fb[p] == '#') {
+      p = fb.Add(p, FastBoard::kReverse[dir]);
+      dir = FastBoard::kRotateRight[dir];
     }
-    visited.insert(p);
+    if (!visited.Get(p)) {
+      ++visit_count;
+      visited.Set(p, true);
+    }
   }
 
-  return AdventReturn(visited.size());
+  return AdventReturn(visit_count);
 }
 
 absl::StatusOr<std::string> Day_2024_06::Part2(
     absl::Span<std::string_view> input) const {
-  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
-  ASSIGN_OR_RETURN(Point start, b.FindUnique('^'));
+  ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
+  FastBoard fb(b);
+  FastBoard::Point start = fb.FindUnique('^');
+  FastBoard::PointMap<bool> blockable(fb, false);
+  FastBoard::PointDirMap<bool> history(fb, false);
+  FastBoard::Dir dir = FastBoard::kNorth;
 
-  absl::flat_hash_set<Point> blockable;
-  absl::flat_hash_set<std::pair<Point, Point>> history;
   int make_loop = 0;
-  {
-    Point dir = Cardinal::kNorth;
-    blockable.insert(start);
-    history.emplace(start, dir);
-    for (Point p = start + dir; b.OnBoard(p); p += dir) {
-      if (b[p] == '#') {
-        p -= dir;
-        dir = dir.rotate_right();
-      } else if (!blockable.contains(p)) {
-        b[p] = '#';
-        absl::flat_hash_set<std::pair<Point, Point>> history2;
-        Point dir2 = dir.rotate_right();
-        for (Point p2 = p - dir; b.OnBoard(p2); p2 += dir2) {
-          if (b[p2] == '#') {
-            p2 -= dir2;
-            dir2 = dir2.rotate_right();
-            continue;
-          }
-          if (history.contains({p2, dir2})) {
-            ++make_loop;
-            break;
-          }
-          auto [it, inserted] = history2.emplace(p2, dir2);
-          if (!inserted) {
-            ++make_loop;
-            break;
-          }
+  blockable.Set(start, true);
+  history.Set(start, dir, true);
+  for (FastBoard::Point p = fb.Add(start, dir); fb.OnBoard(p); p = fb.Add(p, dir)) {
+    if (fb[p] == '#') {
+      p = fb.Add(p, FastBoard::kReverse[dir]);
+      dir = FastBoard::kRotateRight[dir];
+    } else if (!blockable.Get(p)) {
+      FastBoard::PointDirMap<bool> history2(fb, false);
+      FastBoard::Dir dir2 = FastBoard::kRotateRight[dir];
+      for (FastBoard::Point p2 = fb.Add(p, FastBoard::kReverse[dir]); fb.OnBoard(p2); p2 = fb.Add(p2, dir2)) {
+        if (fb[p2] == '#' || p == p2) {
+          p2 = fb.Add(p2, FastBoard::kReverse[dir2]);
+          dir2 = FastBoard::kRotateRight[dir2];
+          continue;
         }
-        b[p] = '.';
+        if (history.Get(p2, dir2) || history2.Get(p2, dir2)) {
+          ++make_loop;
+          break;
+        }
+        history2.Set(p2, dir2, true);
       }
-      blockable.insert(p);
-      history.emplace(p, dir);
     }
+    blockable.Set(p, true);
+    history.Set(p, dir, true);
   }
 
   return AdventReturn(make_loop);

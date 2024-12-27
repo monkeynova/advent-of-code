@@ -22,6 +22,8 @@ class FastBoard {
                                                      kNorth};
   static constexpr std::array<Dir, 4> kRotateRight = {kEast, kWest, kNorth,
                                                       kSouth};
+  static constexpr std::array<Dir, 4> kReverse = {kSouth, kNorth, kEast,
+                                                      kWest};
 
   class Point {
    public:
@@ -94,7 +96,9 @@ class FastBoard {
     PointDirMap(const FastBoard& b, Storage init) : map_(4 * b.size_, init) {}
 
     Storage Get(PointDir pd) const { return map_[pd.p.idx_ * 4 + pd.d]; }
+    Storage Get(Point p, Dir d) const { return map_[p.idx_ * 4 + d]; }
     void Set(PointDir pd, Storage s) { map_[pd.p.idx_ * 4 + pd.d] = s; }
+    void Set(Point p, Dir d, Storage s) { map_[p.idx_ * 4 + d] = s; }
 
    private:
     friend class FastBoard;
@@ -143,6 +147,13 @@ class FastBoard {
     for (int i = stride_ - 1; i < size_; i += stride_) {
       on_board_[i] = false;
     }
+  }
+
+  Point FindUnique(char c) {
+    for (int i = 0; i < size_; ++i) {
+      if (base_[i] == c) return Point(i);
+    }
+    return Point(-1);
   }
 
   Point From(advent_of_code::Point in) const {
