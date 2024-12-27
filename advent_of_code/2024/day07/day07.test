@@ -2,24 +2,41 @@
 ==
 
 [part=1]
-Example input
+190: 10 19
+3267: 81 40 27
+83: 17 5
+156: 15 6
+7290: 6 8 6 15
+161011: 16 10 13
+192: 17 8 14
+21037: 9 7 18 13
+292: 11 6 16 20
 --
-ERROR: UNIMPLEMENTED: Problem not known
+3749
 ==
 
+# 757863366 (low) -- int32 blow out
 [part=1]
 @include{advent_of_code/2024/day07/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+4555081946288
 ==
 
 [part=2]
-Example input
+190: 10 19
+3267: 81 40 27
+83: 17 5
+156: 15 6
+7290: 6 8 6 15
+161011: 16 10 13
+192: 17 8 14
+21037: 9 7 18 13
+292: 11 6 16 20
 --
-ERROR: UNIMPLEMENTED: Problem not known
+11387
 ==
 
 [part=2]
 @include{advent_of_code/2024/day07/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+227921760109726
