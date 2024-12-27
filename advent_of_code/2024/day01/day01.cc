@@ -23,8 +23,7 @@ absl::StatusOr<std::string> Day_2024_01::Part1(
     ASSIGN_OR_RETURN(int i1, t.NextInt());
     ASSIGN_OR_RETURN(int i2, t.NextInt());
     if (!t.Done()) {
-      return absl::InvalidArgumentError(absl::StrCat(
-        "Bad line: ", line));
+      return absl::InvalidArgumentError(absl::StrCat("Bad line: ", line));
     }
     l1.push_back(i1);
     l2.push_back(i2);
@@ -46,8 +45,7 @@ absl::StatusOr<std::string> Day_2024_01::Part2(
     ASSIGN_OR_RETURN(int i1, t.NextInt());
     ASSIGN_OR_RETURN(int i2, t.NextInt());
     if (!t.Done()) {
-      return absl::InvalidArgumentError(absl::StrCat(
-        "Bad line: ", line));
+      return absl::InvalidArgumentError(absl::StrCat("Bad line: ", line));
     }
     l1.push_back(i1);
     l2.push_back(i2);

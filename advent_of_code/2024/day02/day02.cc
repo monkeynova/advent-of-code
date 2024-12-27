@@ -12,18 +12,21 @@ namespace {
 class Delta {
  public:
   Delta(int m1, int m2) {
-    if (m1 > m2) { sign_ = 1; mag_ = m1 - m2; }
-    else if (m1 < m2) { sign_ = -1; mag_ = m2 - m1; }
-    else { sign_ = 0; mag_ = 0; }
-  }
- 
-  bool SameDir(Delta o) const {
-    return sign_ == o.sign_;
+    if (m1 > m2) {
+      sign_ = 1;
+      mag_ = m1 - m2;
+    } else if (m1 < m2) {
+      sign_ = -1;
+      mag_ = m2 - m1;
+    } else {
+      sign_ = 0;
+      mag_ = 0;
+    }
   }
 
-  bool Valid() const {
-    return mag_ >= 1 && mag_ <= 3;
-  }
+  bool SameDir(Delta o) const { return sign_ == o.sign_; }
+
+  bool Valid() const { return mag_ >= 1 && mag_ <= 3; }
 
  private:
   int sign_;
@@ -48,7 +51,7 @@ absl::StatusOr<bool> CheckList(Tokenizer t) {
 
   Delta last(i1, i2);
   if (!last.Valid()) return false;
-  
+
   return CheckPartList(t, i2, last);
 }
 
@@ -114,7 +117,7 @@ absl::StatusOr<bool> CheckListAllowFail(Tokenizer t) {
     ASSIGN_OR_RETURN(int i4, t.NextInt());
     Delta next(i3, i4);
     if (!next.Valid() || !last.SameDir(next)) {
-      // Drop i4.
+      //  Drop i4.
       ASSIGN_OR_RETURN(sub_part_check, CheckPartList(t, i3, last));
       if (sub_part_check) return true;
       // Drop i3.

@@ -456,8 +456,8 @@ int RunYear(int year) {
 
 absl::StatusOr<std::vector<int>> GetYearsFromFlag() {
   // No one will ever run this on New Years Eve/Day...
-  absl::CivilYear this_year = absl::ToCivilYear(absl::Now(),
-                                                absl::UTCTimeZone());
+  absl::CivilYear this_year =
+      absl::ToCivilYear(absl::Now(), absl::UTCTimeZone());
   std::string year_str = absl::GetFlag(FLAGS_year);
   if (year_str == "all") {
     return advent_of_code::AllAdventYears();
@@ -470,9 +470,10 @@ absl::StatusOr<std::vector<int>> GetYearsFromFlag() {
   }
   int year_int;
   if (!absl::SimpleAtoi(year_str, &year_int)) {
-    return absl::InvalidArgumentError(absl::StrCat(
-      year_str, " is neither a specific year nor in {'all', 'last', "
-      "'current'}"));
+    return absl::InvalidArgumentError(
+        absl::StrCat(year_str,
+                     " is neither a specific year nor in {'all', 'last', "
+                     "'current'}"));
   }
   if (year_int < 0) year_int += this_year.year();
   return std::vector<int>(1, year_int);

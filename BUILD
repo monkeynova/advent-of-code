@@ -2,13 +2,16 @@ load("@com_monkeynova_base_workspace//:default_rules.bzl", "default_rules")
 
 default_rules(workspace_dep = "update_workspace.date")
 
-CURRENT_YEAR="2024"
-CURRENT_DAY="06"
+CURRENT_YEAR = "2024"
+
+CURRENT_DAY = "06"
 
 test_suite(
     name = "latest",
     tests = ["//advent_of_code/{year}/day{day}:day{day}_test".format(
-                 year = CURRENT_YEAR, day = CURRENT_DAY)],
+        day = CURRENT_DAY,
+        year = CURRENT_YEAR,
+    )],
 )
 
 cc_binary(

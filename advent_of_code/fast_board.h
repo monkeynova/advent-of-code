@@ -22,8 +22,7 @@ class FastBoard {
                                                      kNorth};
   static constexpr std::array<Dir, 4> kRotateRight = {kEast, kWest, kNorth,
                                                       kSouth};
-  static constexpr std::array<Dir, 4> kReverse = {kSouth, kNorth, kEast,
-                                                      kWest};
+  static constexpr std::array<Dir, 4> kReverse = {kSouth, kNorth, kEast, kWest};
 
   class Point {
    public:
