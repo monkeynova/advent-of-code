@@ -57,40 +57,41 @@ absl::StatusOr<std::string> Day_2024_06::Part2(
   ASSIGN_OR_RETURN(Point start, b.FindUnique('^'));
 
   absl::flat_hash_set<Point> blockable;
+  absl::flat_hash_set<std::pair<Point, Point>> history;
+  int make_loop = 0;
   {
     Point dir = Cardinal::kNorth;
     blockable.insert(start);
-    for (Point p = start + dir; b.OnBoard(p); p += dir) {
-      if (b[p] == '#') {
-        p -= dir;
-        dir = dir.rotate_right();
-      }
-      blockable.insert(p);
-    }
-  }
-
-  int make_loop = 0;
-  for (Point edit : blockable) {
-    if (b[edit] != '.') continue;
-    b[edit] = '#';
-
-    absl::flat_hash_set<std::pair<Point, Point>> history;
-    Point dir = Cardinal::kNorth;
     history.emplace(start, dir);
     for (Point p = start + dir; b.OnBoard(p); p += dir) {
       if (b[p] == '#') {
         p -= dir;
         dir = dir.rotate_right();
-        continue;
+      } else if (!blockable.contains(p)) {
+        b[p] = '#';
+        absl::flat_hash_set<std::pair<Point, Point>> history2;
+        Point dir2 = dir.rotate_right();
+        for (Point p2 = p - dir; b.OnBoard(p2); p2 += dir2) {
+          if (b[p2] == '#') {
+            p2 -= dir2;
+            dir2 = dir2.rotate_right();
+            continue;
+          }
+          if (history.contains({p2, dir2})) {
+            ++make_loop;
+            break;
+          }
+          auto [it, inserted] = history2.emplace(p2, dir2);
+          if (!inserted) {
+            ++make_loop;
+            break;
+          }
+        }
+        b[p] = '.';
       }
-      auto [it, inserted] = history.emplace(p, dir);
-      if (!inserted) {
-        ++make_loop;
-        break;
-      }
+      blockable.insert(p);
+      history.emplace(p, dir);
     }
-
-    b[edit] = '.';
   }
 
   return AdventReturn(make_loop);
