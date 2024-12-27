@@ -35,12 +35,43 @@ namespace {
 
 absl::StatusOr<std::string> Day_2024_03::Part1(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  int sum = 0;
+  for (std::string_view mem : input) {
+    while (!mem.empty()) {
+      int x = 0;
+      int y = 0;
+      if (!RE2::FindAndConsume(&mem, "mul\\((\\d+),(\\d+)\\)", &x, &y)) {
+        break;
+      }
+      sum += x * y;
+    }
+  }
+  return AdventReturn(sum);
 }
 
 absl::StatusOr<std::string> Day_2024_03::Part2(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  int sum = 0;
+  bool enabled = true;
+  for (std::string_view mem : input) {
+    while (!mem.empty()) {
+      std::optional<int> x = 0;
+      std::optional<int> y = 0;
+      std::string_view cmd;
+      if (!RE2::FindAndConsume(&mem, "mul\\((\\d+),(\\d+)\\)|(do|don't)\\(\\)", &x, &y, &cmd)) {
+        break;
+      }
+      LOG(ERROR) << "cmd = " << cmd;
+      if (cmd == "don't") {
+        enabled = false;
+      } else if (cmd == "do") {
+        enabled = true;
+      } else if (enabled) {
+        sum += *x * *y;
+      }
+    }
+  }
+  return AdventReturn(sum);
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
