@@ -7,7 +7,9 @@ namespace advent_of_code {
 
 class Day_2024_08 : public AdventDay {
  public:
-  virtual std::string_view title() const override { return "Day 8: ???"; }
+  virtual std::string_view title() const override {
+    return "Day 8: Resonant Collinearity";
+  }
 
   virtual std::string_view test_file() const override {
     return "advent_of_code/2024/day08/day08.test";
