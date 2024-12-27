@@ -65,7 +65,9 @@ absl::StatusOr<std::string> Day_2024_09::Part2(
     }
   };
   std::vector<Block> alloc;
-  std::deque<Block> free;
+  std::vector<Block> free;
+
+  std::array<int, 10> first_at = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
   int offset = 0;
   for (int i = 0; i < blocks.size(); i += 2) {
@@ -78,32 +80,38 @@ absl::StatusOr<std::string> Day_2024_09::Part2(
     {
       int size = blocks[i + 1] - '0';
       free.push_back({.id = 0, .start = offset, .size = size});
+      for (int i = size; i > 0; --i) {
+        if (first_at[i] == -1) {
+          first_at[i] = free.size() - 1;
+        }
+      }
       offset += size;
     }
   }
 
   int64_t check_sum = 0;
   for (/*nop*/; !alloc.empty(); alloc.pop_back()) {
-    while (!free.empty() && free.back().start > alloc.back().start) {
-      free.pop_back();
+    int free_idx = first_at[alloc.back().size];
+    if (free_idx != -1 && free[free_idx].start < alloc.back().start) {
+      alloc.back().start = free[free_idx].start;
+      free[free_idx].start += alloc.back().size;
+      free[free_idx].size -= alloc.back().size;
+      for (int size = 1; size < 10; ++size) {
+        if (first_at[size] != free_idx) continue;
+        bool found = false;
+        for (int i = free_idx; i < free.size(); ++i) {
+          if (free[i].size >= size) {
+            found = true;
+            first_at[size] = i;
+            break;
+          }
+        }
+        if (!found) {
+          first_at[size] = -1;
+        }
+      }
     }
-    bool found = false;
-    for (Block& b : free) {
-      if (b.size < alloc.back().size) continue;
-      alloc.back().start = b.start;
-      check_sum += alloc.back().CheckSum();
-      found = true;
-
-      b.size -= alloc.back().size;
-      b.start += alloc.back().size;
-      break;
-    }
-    while (!free.empty() && free.front().size == 0) {
-      free.pop_front();
-    }
-    if (!found) {
-      check_sum += alloc.back().CheckSum();
-    }
+    check_sum += alloc.back().CheckSum();
   }
 
   return AdventReturn(check_sum);
