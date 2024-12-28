@@ -2,24 +2,38 @@
 ==
 
 [part=1]
-Example input
+89010123
+78121874
+87430965
+96549874
+45678903
+32019012
+01329801
+10456732
 --
-ERROR: UNIMPLEMENTED: Problem not known
+36
 ==
 
 [part=1]
 @include{advent_of_code/2024/day10/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+496
 ==
 
 [part=2]
-Example input
+89010123
+78121874
+87430965
+96549874
+45678903
+32019012
+01329801
+10456732
 --
-ERROR: UNIMPLEMENTED: Problem not known
+81
 ==
 
 [part=2]
 @include{advent_of_code/2024/day10/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+1120
