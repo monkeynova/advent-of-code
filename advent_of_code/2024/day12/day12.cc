@@ -29,18 +29,20 @@ namespace advent_of_code {
 
 namespace {
 
-absl::flat_hash_set<Point> Contiguous(
-    const ImmutableCharBoard& b, Point p) {
+std::vector<Point> Contiguous(
+    const ImmutableCharBoard& b, Point p, absl::flat_hash_set<Point>& seen) {
+  seen.insert(p);
   std::vector<Point> frontier = {p};
-  absl::flat_hash_set<Point> ret = {p};
+  std::vector<Point> ret = {p};
   while (!frontier.empty()) {
     std::vector<Point> new_frontier;
     for (Point p : frontier) {
       for (Point d : Cardinal::kFourDirs) {
         Point t = p + d;
-        if (b.OnBoard(t) && b[p] == b[t] && !ret.contains(t)) {
+        if (b.OnBoard(t) && b[p] == b[t] && !seen.contains(t)) {
           new_frontier.push_back(t);
-          ret.insert(t);
+          seen.insert(t);
+          ret.push_back(t);
         }
       }
     }
@@ -50,26 +52,26 @@ absl::flat_hash_set<Point> Contiguous(
   return ret;
 }
 
-int64_t Score(const absl::flat_hash_set<Point>& set) {
+int64_t Score(const ImmutableCharBoard& b, const std::vector<Point>& set) {
   int area = set.size();
   int perimeter = 0;
   for (Point p : set) {
     for (Point d : Cardinal::kFourDirs) {
-      if (!set.contains(p + d)) ++perimeter;
+      if (!b.OnBoard(p+d) || b[p] != b[p+d]) ++perimeter;
     }
   }
   return area * perimeter;
 }
 
-int64_t Score2(const absl::flat_hash_set<Point>& set) {
+int64_t Score2(const ImmutableCharBoard& b, const std::vector<Point>& set) {
   int area = set.size();
   int sides = 0;
   for (Point p : set) {
     for (Point d : Cardinal::kFourDirs) {
-      if (!set.contains(p + d)) {
+      if (!b.OnBoard(p+d) || b[p] != b[p+d]) {
         Point ld = d.rotate_left();
-        if (!set.contains(p + ld) ||
-            set.contains(p + d + ld)) {
+        if (!b.OnBoard(p+ld) || b[p] != b[p+ld] ||
+            (b.OnBoard(p+d+ld) && b[p] == b[p+d+ld])) {
           ++sides;
         }
       }
@@ -77,7 +79,6 @@ int64_t Score2(const absl::flat_hash_set<Point>& set) {
   }
   return area * sides;
 }
-
 
 }  // namespace
 
@@ -88,12 +89,8 @@ absl::StatusOr<std::string> Day_2024_12::Part1(
   int total_score = 0;
   for (Point p : b.range()) {
     if (used.contains(p)) continue;
-    absl::flat_hash_set<Point> contiguous = Contiguous(b, p);
-    for (Point p : contiguous) {
-      auto [it, inserted] = used.insert(p);
-      if (!inserted) return absl::InternalError("used?");
-    }
-    total_score += Score(contiguous);
+    std::vector<Point> contiguous = Contiguous(b, p, used);
+    total_score += Score(b, contiguous);
   }
   return AdventReturn(total_score);
 }
@@ -105,12 +102,8 @@ absl::StatusOr<std::string> Day_2024_12::Part2(
   int total_score = 0;
   for (Point p : b.range()) {
     if (used.contains(p)) continue;
-    absl::flat_hash_set<Point> contiguous = Contiguous(b, p);
-    for (Point p : contiguous) {
-      auto [it, inserted] = used.insert(p);
-      if (!inserted) return absl::InternalError("used?");
-    }
-    total_score += Score2(contiguous);
+    std::vector<Point> contiguous = Contiguous(b, p, used);
+    total_score += Score2(b, contiguous);
   }
   return AdventReturn(total_score);
 }
