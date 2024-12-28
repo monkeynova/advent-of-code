@@ -11,59 +11,68 @@ namespace advent_of_code {
 
 namespace {
 
-std::vector<FastBoard::Point> Contiguous(
+int64_t ScoreAndMarkRegion(
     const FastBoard& b, FastBoard::Point p, FastBoard::PointMap<bool>& seen) {
+  int area = 1;
+  int perimeter = 0;
+
   seen.Set(p, true);
   std::vector<FastBoard::Point> frontier = {p};
-  std::vector<FastBoard::Point> ret = {p};
   while (!frontier.empty()) {
     std::vector<FastBoard::Point> new_frontier;
     for (FastBoard::Point p : frontier) {
       for (FastBoard::Dir d : FastBoard::kFourDirs) {
         FastBoard::Point t = b.Add(p, d);
-        if (b.OnBoard(t) && b[p] == b[t] && !seen.Get(t)) {
-          new_frontier.push_back(t);
-          seen.Set(t, true);
-          ret.push_back(t);
+        if (b.OnBoard(t) && b[p] == b[t]) {
+          if (!seen.Get(t)) {
+            new_frontier.push_back(t);
+            seen.Set(t, true);
+            ++area;
+          }
+        } else {
+          ++perimeter;
         }
       }
     }
     frontier = std::move(new_frontier);
   }
 
-  return ret;
-}
-
-int64_t Score(const FastBoard& b, const std::vector<FastBoard::Point>& set) {
-  int area = set.size();
-  int perimeter = 0;
-  for (FastBoard::Point p : set) {
-    for (FastBoard::Dir d : FastBoard::kFourDirs) {
-      FastBoard::Point t = b.Add(p, d);
-      if (!b.OnBoard(t) || b[p] != b[t]) ++perimeter;
-    }
-  }
   return area * perimeter;
 }
 
-int64_t Score2(const FastBoard& b, const std::vector<FastBoard::Point>& set) {
-  int area = set.size();
+int64_t Score2AndMarkRegion(
+    const FastBoard& b, FastBoard::Point p, FastBoard::PointMap<bool>& seen) {
+  int area = 1;
   int sides = 0;
-  for (FastBoard::Point p : set) {
-    for (FastBoard::Dir d : FastBoard::kFourDirs) {
-      FastBoard::Point t1 = b.Add(p, d);
-      if (!b.OnBoard(t1) || b[p] != b[t1]) {
-        FastBoard::Dir ld = FastBoard::kRotateLeft[d];
-        FastBoard::Point t2 = b.Add(p, ld);
-        FastBoard::Point t3 = b.Add(t2, d);
 
-        if (!b.OnBoard(t2) || b[p] != b[t2] ||
-            (b.OnBoard(t3) && b[p] == b[t3])) {
-          ++sides;
+  seen.Set(p, true);
+  std::vector<FastBoard::Point> frontier = {p};
+  while (!frontier.empty()) {
+    std::vector<FastBoard::Point> new_frontier;
+    for (FastBoard::Point p : frontier) {
+      for (FastBoard::Dir d : FastBoard::kFourDirs) {
+        FastBoard::Point t = b.Add(p, d);
+        if (b.OnBoard(t) && b[p] == b[t]) {
+          if (!seen.Get(t)) {
+            new_frontier.push_back(t);
+            seen.Set(t, true);
+            ++area;
+          }
+        } else {
+          FastBoard::Dir ld = FastBoard::kRotateLeft[d];
+          FastBoard::Point t2 = b.Add(p, ld);
+          FastBoard::Point t3 = b.Add(t2, d);
+
+          if (!b.OnBoard(t2) || b[p] != b[t2] ||
+              (b.OnBoard(t3) && b[p] == b[t3])) {
+            ++sides;
+          }
         }
       }
     }
+    frontier = std::move(new_frontier);
   }
+
   return area * sides;
 }
 
@@ -77,8 +86,7 @@ absl::StatusOr<std::string> Day_2024_12::Part1(
   int total_score = 0;
   for (FastBoard::Point fp : fb) {
     if (used.Get(fp)) continue;
-    std::vector<FastBoard::Point> contiguous = Contiguous(fb, fp, used);
-    total_score += Score(fb, contiguous);
+    total_score += ScoreAndMarkRegion(fb, fp, used);
   }
   return AdventReturn(total_score);
 }
@@ -91,8 +99,7 @@ absl::StatusOr<std::string> Day_2024_12::Part2(
   int total_score = 0;
   for (FastBoard::Point fp : fb) {
     if (used.Get(fp)) continue;
-    std::vector<FastBoard::Point> contiguous = Contiguous(fb, fp, used);
-    total_score += Score2(fb, contiguous);
+    total_score += Score2AndMarkRegion(fb, fp, used);
   }
   return AdventReturn(total_score);
 }
