@@ -18,11 +18,15 @@ class FastBoard {
     kEast = 3,
   };
 
+  static constexpr std::array<Dir, 4> kFourDirs = {kNorth, kSouth, kWest,
+                                                     kEast};
   static constexpr std::array<Dir, 4> kRotateLeft = {kWest, kEast, kSouth,
                                                      kNorth};
   static constexpr std::array<Dir, 4> kRotateRight = {kEast, kWest, kNorth,
                                                       kSouth};
   static constexpr std::array<Dir, 4> kReverse = {kSouth, kNorth, kEast, kWest};
+
+  class iterator;
 
   class Point {
    public:
@@ -43,6 +47,7 @@ class FastBoard {
 
    private:
     friend class FastBoard;
+    friend class FastBoard::iterator;
 
     explicit Point(int idx) : idx_(idx) {}
 
@@ -137,6 +142,27 @@ class FastBoard {
     std::vector<Storage> map_;
   };
 
+  class iterator {
+   public:
+    iterator& operator++() {
+      ++idx_;
+      if (!b_.OnBoard(Point(idx_))) ++idx_;
+      return *this;
+    }
+    Point operator*() const {
+      return Point(idx_);
+    }
+    bool operator==(const iterator& o) const {
+      return idx_ == o.idx_;
+    }
+   private:
+    friend class FastBoard;
+    iterator(const FastBoard& b, int idx) : b_(b), idx_(idx) {}
+  
+    const FastBoard& b_;
+    int idx_;
+  };
+
   explicit FastBoard(const ImmutableCharBoard& b)
       : base_(b.row(0).data()),
         stride_(b.row(1).data() - b.row(0).data()),
@@ -146,6 +172,13 @@ class FastBoard {
     for (int i = stride_ - 1; i < size_; i += stride_) {
       on_board_[i] = false;
     }
+  }
+
+  iterator begin() const {
+    return iterator(*this, 0);
+  }
+  iterator end() const {
+    return iterator(*this, size_);
   }
 
   Point FindUnique(char c) {
