@@ -2,6 +2,7 @@
 
 #include "advent_of_code/2024/day10/day10.h"
 
+#include "absl/algorithm/container.h"
 #include "absl/container/flat_hash_set.h"
 #include "absl/log/log.h"
 #include "advent_of_code/char_board.h"
@@ -30,22 +31,24 @@ int Score(const ImmutableCharBoard& b, Point p) {
 }
 
 int Rating(const ImmutableCharBoard& b, Point p) {
-  absl::flat_hash_set<std::vector<Point>> cur = {std::vector{p}};
+  absl::flat_hash_map<Point, int> paths_to = {{p, 1}};
   for (int i = 0; i < 9; ++i) {
-    absl::flat_hash_set<std::vector<Point>> next;
-    for (const std::vector<Point>& path : cur) {
+    absl::flat_hash_map<Point, int> next_to;
+    for (const auto& [p, count] : paths_to) {
       for (Point dir : Cardinal::kFourDirs) {
-        Point t = path.back() + dir;
-        if (b.OnBoard(t) && b[t] == b[path.back()] + 1) {
-          std::vector<Point> next_path = path;
-          next_path.push_back(t);
-          next.insert(next_path);
+        Point t = p + dir;
+        if (b.OnBoard(t) && b[t] == b[p] + 1) {
+          next_to[t] += count;
         }
       }
     }
-    cur = std::move(next);
+    paths_to = std::move(next_to);
   }
-  return cur.size();
+  return absl::c_accumulate(
+    paths_to, 0,
+    [](int a, std::pair<Point, int> p_and_c) {
+      return a + p_and_c.second;
+    });
 }
 
 }  // namespace
