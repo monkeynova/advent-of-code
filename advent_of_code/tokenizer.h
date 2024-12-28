@@ -7,6 +7,7 @@
 #include "absl/status/statusor.h"
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
+#include "vlog.h"
 
 namespace advent_of_code {
 
@@ -22,6 +23,11 @@ class Tokenizer {
 
   // Consumes the next token and returns an error if it != `expect`.
   absl::Status NextIs(std::string_view expect);
+
+  absl::Status NextAre(std::initializer_list<std::string_view> c) {
+    for (const auto& s : c) RETURN_IF_ERROR(NextIs(s));
+    return absl::OkStatus();
+  }
 
   // Consumes the next token and converts it to an int. Returns an error if
   // parsing the token as an int fails.
