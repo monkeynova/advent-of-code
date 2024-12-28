@@ -2,24 +2,42 @@
 ==
 
 [part=1]
-Example input
+RRRRIICCFF
+RRRRIICCCF
+VVRRRCCFFF
+VVRCCCJFFF
+VVVVCJJCFE
+VVIVCCJJEE
+VVIIICJJEE
+MIIIIIJJEE
+MIIISIJEEE
+MMMISSJEEE
 --
-ERROR: UNIMPLEMENTED: Problem not known
+1930
 ==
 
 [part=1]
 @include{advent_of_code/2024/day12/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+1473276
 ==
 
 [part=2]
-Example input
+RRRRIICCFF
+RRRRIICCCF
+VVRRRCCFFF
+VVRCCCJFFF
+VVVVCJJCFE
+VVIVCCJJEE
+VVIIICJJEE
+MIIIIIJJEE
+MIIISIJEEE
+MMMISSJEEE
 --
-ERROR: UNIMPLEMENTED: Problem not known
+1206
 ==
 
 [part=2]
 @include{advent_of_code/2024/day12/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+901100
