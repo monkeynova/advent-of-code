@@ -59,6 +59,8 @@ int64_t Score2AndMarkRegion(
             ++area;
           }
         } else {
+          // We've got a boundary, look to see if the boundary continues one
+          // block to the left, in which case don't count it as a new side.
           FastBoard::Dir ld = FastBoard::kRotateLeft[d];
           FastBoard::Point t2 = b.Add(p, ld);
           FastBoard::Point t3 = b.Add(t2, d);
