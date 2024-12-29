@@ -162,23 +162,7 @@ class ViewPort : public IntCode::IOModule {
     }
     std::string command;
     CharBoard scratch = board_;
-    Point robot_dir;
-    switch (board_[robot]) {
-      case '^':
-        robot_dir = Cardinal::kNorth;
-        break;
-      case 'v':
-        robot_dir = Cardinal::kSouth;
-        break;
-      case '<':
-        robot_dir = Cardinal::kWest;
-        break;
-      case '>':
-        robot_dir = Cardinal::kEast;
-        break;
-      default:
-        return absl::InvalidArgumentError("Bad robot direction");
-    }
+    Point robot_dir = Cardinal::Parse(board_[robot]);
     while (true) {
       Point next_dir = Cardinal::kOrigin;
       for (Point d : Cardinal::kFourDirs) {

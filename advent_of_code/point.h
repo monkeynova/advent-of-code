@@ -210,6 +210,19 @@ struct Cardinal {
   static constexpr std::array<Point, 8> kEightDirs = {
       kNorth,     kSouth,     kWest,      kEast,
       kNorthWest, kNorthEast, kSouthWest, kSouthEast};
+
+  static Point Parse(char c) {
+    static std::array<Point, 128> kCharToDir = []() {
+      std::array<Point, 128> ret;
+      for (int i = 0; i < 128; ++i) ret[i] = kOrigin;
+      ret['^'] = Cardinal::kNorth;
+      ret['v'] = Cardinal::kSouth;
+      ret['<'] = Cardinal::kWest;
+      ret['>'] = Cardinal::kEast;
+      return ret;
+    }();
+    return kCharToDir[c];
+  }
 };
 
 struct PointYThenXLT {
