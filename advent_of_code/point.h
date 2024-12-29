@@ -12,6 +12,7 @@
 #include "absl/strings/str_cat.h"
 #include "absl/strings/str_format.h"
 #include "absl/strings/str_split.h"
+#include "advent_of_code/tokenizer.h"
 #include "re2/re2.h"
 
 namespace advent_of_code {
@@ -29,6 +30,13 @@ struct Point {
   }
 
   RE2::Arg Capture() { return RE2::Arg(this, RE2Parse); }
+
+  absl::Status From(Tokenizer& t) {
+    ASSIGN_OR_RETURN(x, t.NextInt());
+    t.Next();
+    ASSIGN_OR_RETURN(y, t.NextInt());
+    return absl::OkStatus();
+  }
 
   constexpr Point operator*(int s) const { return {.x = s * x, .y = s * y}; }
 

@@ -26,6 +26,7 @@ cc_library(
     srcs = ["point.cc"],
     hdrs = ["point.h"],
     deps = [
+        ":tokenizer",
         "@abseil-cpp//absl/container:flat_hash_map",
         "@abseil-cpp//absl/container:flat_hash_set",
         "@abseil-cpp//absl/hash",
