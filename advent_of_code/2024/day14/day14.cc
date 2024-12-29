@@ -55,11 +55,7 @@ absl::StatusOr<std::string> Day_2024_14::Part1(
   }
   for (int i = 0; i < 100; ++i) {
     for (Drone& d : drones) {
-      d.p += d.v;
-      d.p.x %= tile.x;
-      if (d.p.x < 0) d.p.x += tile.x;
-      d.p.y %= tile.y;
-      if (d.p.y < 0) d.p.y += tile.y;
+      d.p = (d.p + d.v).TorusPoint(tile);
     } 
   }
   std::array<int, 4> quadrant_count = {0, 0, 0, 0};
@@ -104,11 +100,7 @@ absl::StatusOr<std::string> Day_2024_14::Part2(
     absl::flat_hash_set<Point> test;
     for (Drone& d : drones) {
       test.insert(d.p);
-      d.p += d.v;
-      d.p.x %= tile.x;
-      if (d.p.x < 0) d.p.x += tile.x;
-      d.p.y %= tile.y;
-      if (d.p.y < 0) d.p.y += tile.y;
+      d.p = (d.p + d.v).TorusPoint(tile);
     }
     int edge_count = 0;
     for (Point p : test) {

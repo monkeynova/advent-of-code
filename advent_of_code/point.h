@@ -74,6 +74,13 @@ struct Point {
     return {.x = s * p.x, .y = s * p.y};
   }
 
+  Point TorusPoint(Point bounds) {
+    Point ret = {x % bounds.x, y % bounds.y};
+    if (ret.x < 0) ret.x += bounds.x;
+    if (ret.y < 0) ret.y += bounds.y;
+    return ret;
+  }
+
   template <typename Sink>
   friend void AbslStringify(Sink& sink, const Point& p) {
     absl::Format(&sink, "{%v,%v}", p.x, p.y);

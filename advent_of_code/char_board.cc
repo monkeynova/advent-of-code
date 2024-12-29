@@ -26,10 +26,7 @@ absl::StatusOr<CharBoard> CharBoardBase<is_mutable>::SubBoard(
 
 template <bool is_mutable>
 Point CharBoardBase<is_mutable>::TorusPoint(Point p) const {
-  Point ret = {p.x % width(), p.y % height()};
-  if (ret.x < 0) ret.x += width();
-  if (ret.y < 0) ret.y += height();
-  return ret;
+  return p.TorusPoint({width(), height()});
 }
 
 template <bool is_mutable>
