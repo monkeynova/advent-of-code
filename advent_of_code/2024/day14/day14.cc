@@ -117,12 +117,22 @@ absl::StatusOr<std::string> Day_2024_14::Part2(
     ASSIGN_OR_RETURN(Drone d, Drone::Parse(line));
     drones.push_back(d);
   }
-  int steps = 0;
+  int steps = 1;
+  Point center{tile.x / 2, tile.y / 2};
   for (;; ++steps) {
+    int close_to_center = 0;
+    for (Drone& d : drones) {
+      d.Update(tile);
+      int dist = (d.p - center).dist();
+      if (dist < center.x / 2) {
+        ++close_to_center;
+      }
+    }
+    if (close_to_center < drones.size() / 2) continue;
+  
     absl::flat_hash_set<Point> test;
     for (Drone& d : drones) {
       test.insert(d.p);
-      d.Update(tile);
     }
     int edge_count = 0;
     for (Point p : test) {
