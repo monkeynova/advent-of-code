@@ -122,9 +122,6 @@ absl::StatusOr<std::string> Day_2024_15::Part1(
     }
     for (char c : input[i]) {
       Point dir = Cardinal::Parse(c);
-      if (TryPushSimple(b, robot, dir)) {
-        robot += dir;
-      }
       for (Point freep = robot + dir; b.OnBoard(freep); freep += dir) {
         if (b[freep] == '#') break;
         if (b[freep] == '.') {
