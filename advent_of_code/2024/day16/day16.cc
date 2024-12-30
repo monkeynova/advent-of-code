@@ -103,9 +103,9 @@ class BestPathHistory {
       {p, FastBoard::kWest}, {p, FastBoard::kEast}, 
     };
     FastBoard::PointDirMap<bool> hist(fb_, false);
-    for (const auto& pair : frontier) hist.Set(pair, true);
+    for (const FastBoard::PointDir& pd : frontier) hist.Set(pd, true);
     for (/*nop*/;!frontier.empty(); frontier.pop_front()) {
-      for (const auto& pd : chain_.Get(frontier.front())) {
+      for (const FastBoard::PointDir& pd : chain_.Get(frontier.front())) {
         if (hist.Get(pd)) continue;
         hist.Set(pd, true);
         frontier.push_back(pd);
@@ -126,10 +126,14 @@ class BestPathHistory {
 
 class ReindeerPath2 : public BFSInterface<ReindeerPath2> {
  public:
-  ReindeerPath2(const FastBoard& b, FastBoard::Point start,
-                std::optional<int>* best_steps,
-                BestPathHistory* best_path_set)
-   : b_(&b), best_steps_(best_steps), best_path_set_(best_path_set), cur_(start) {}
+  struct GlobalState {
+    const FastBoard& b;
+    std::optional<int> best_steps;
+    BestPathHistory best_path_set;
+  };
+
+  ReindeerPath2(GlobalState& gs, FastBoard::Point start)
+   : gs_(&gs), cur_(start) {}
 
   bool operator==(const ReindeerPath2& o) const {
     return cur_ == o.cur_ && dir_ == o.dir_;
@@ -148,12 +152,12 @@ class ReindeerPath2 : public BFSInterface<ReindeerPath2> {
   const ReindeerPath2& identifier() const override { return *this; }
 
   bool IsFinal() const override {
-    if (!*best_steps_) {
-      if ((*b_)[cur_] == 'E') {
-        *best_steps_ = num_steps();
+    if (gs_->best_steps) return num_steps() > *gs_->best_steps;
+    if (!gs_->best_steps) {
+      if (gs_->b[cur_] == 'E') {
+        gs_->best_steps = num_steps();
       }
     }
-    if (*best_steps_ && num_steps() > **best_steps_) return true;
     return false;
   }
 
@@ -162,11 +166,11 @@ class ReindeerPath2 : public BFSInterface<ReindeerPath2> {
   void AddNextStepUpdatePaths(State* state, ReindeerPath2 next) const {
     switch(state->AddNextStep(next)) {
       case AddNextStepResult::kAdded: {
-        best_path_set_->ReplacePaths(ToPointDir(), next.ToPointDir());
+        gs_->best_path_set.ReplacePaths(ToPointDir(), next.ToPointDir());
         break;
       }
       case AddNextStepResult::kMerged: {
-        best_path_set_->MergePaths(ToPointDir(), next.ToPointDir());
+        gs_->best_path_set.MergePaths(ToPointDir(), next.ToPointDir());
         break;
       }
       case AddNextStepResult::kSkipped: break;
@@ -175,8 +179,8 @@ class ReindeerPath2 : public BFSInterface<ReindeerPath2> {
   }
 
   void AddNextSteps(State* state) const override {
-    FastBoard::Point test = b_->Add(cur_, dir_);
-    if (b_->OnBoard(test) && (*b_)[test] != '#') {
+    FastBoard::Point test = gs_->b.Add(cur_, dir_);
+    if (gs_->b.OnBoard(test) && gs_->b[test] != '#') {
       ReindeerPath2 next = *this;
       next.cur_ = test;
       AddNextStepUpdatePaths(state, next);
@@ -196,9 +200,7 @@ class ReindeerPath2 : public BFSInterface<ReindeerPath2> {
   }  
 
  private:
-  const FastBoard* b_;
-  std::optional<int>* best_steps_;
-  BestPathHistory* best_path_set_;
+  GlobalState* gs_;
   FastBoard::Point cur_;
   FastBoard::Dir dir_ = FastBoard::kEast;
 };
@@ -212,10 +214,9 @@ std::ostream& operator<<(std::ostream& o, const CharBoard& b) {
 absl::StatusOr<std::string> Day_2024_16::Part1(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
-  ASSIGN_OR_RETURN(Point start, b.FindUnique('S'));
   FastBoard fb(b);
-  FastBoard::Point fast_start = fb.From(start);
-  return AdventReturn(ReindeerPath(fb, fast_start).FindMinStepsAStar());
+  FastBoard::Point start = fb.FindUnique('S');
+  return AdventReturn(ReindeerPath(fb, start).FindMinStepsAStar());
 
   return absl::UnimplementedError("Problem not known");
 }
@@ -223,20 +224,20 @@ absl::StatusOr<std::string> Day_2024_16::Part1(
 absl::StatusOr<std::string> Day_2024_16::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
-  ASSIGN_OR_RETURN(Point start, b.FindUnique('S'));
   FastBoard fb(b);
-  FastBoard::Point fast_start = fb.From(start);
+  FastBoard::Point start = fb.FindUnique('S');
   
-  BestPathHistory best_path_set(fb);
-  std::optional<int> best_steps;
-  ReindeerPath2 rp2(fb, fast_start, &best_steps, &best_path_set);
+  ReindeerPath2::GlobalState gs {
+    .b = fb, .best_path_set = BestPathHistory(fb),
+  };
+  ReindeerPath2 rp2(gs, start);
   std::optional<int> dist = rp2.FindMinStepsAStar();
-  CHECK(best_steps);
+  CHECK(gs.best_steps);
   CHECK(dist);
-  CHECK(*dist > *best_steps);
+  CHECK(*dist > *gs.best_steps);
 
-  ASSIGN_OR_RETURN(Point end, b.FindUnique('E'));
-  std::vector<FastBoard::Point> final_set = best_path_set.CollectFrom(fb.From(end));
+  FastBoard::Point end = fb.FindUnique('E');
+  std::vector<FastBoard::Point> final_set = gs.best_path_set.CollectFrom(end);
 
   if (VLOG_IS_ON(2)) {
     ASSIGN_OR_RETURN(CharBoard draw, CharBoard::Parse(input));
