@@ -31,7 +31,7 @@ namespace {
 
 class ReindeerPath : public BFSInterface<ReindeerPath> {
  public:
-  ReindeerPath(const CharBoard& b, Point start)
+  ReindeerPath(const FastBoard& b, FastBoard::Point start)
    : b_(&b), cur_(start) {}
 
   bool operator==(const ReindeerPath& o) const {
@@ -55,29 +55,30 @@ class ReindeerPath : public BFSInterface<ReindeerPath> {
   }
 
   void AddNextSteps(State* state) const override {
-    if (b_->OnBoard(cur_ + dir_) && (*b_)[cur_ + dir_] != '#') {
+    FastBoard::Point n = b_->Add(cur_, dir_);
+    if (b_->OnBoard(n) && (*b_)[n] != '#') {
       ReindeerPath next = *this;
-      next.cur_ = cur_ + dir_;
+      next.cur_ = n;
       state->AddNextStep(next);
     }
     {
       ReindeerPath left = *this;
-      left.dir_ = left.dir_.rotate_left();
+      left.dir_ = FastBoard::kRotateLeft[left.dir_];
       left.add_steps(999);
       state->AddNextStep(left);
     }
     {
       ReindeerPath right = *this;
-      right.dir_ = right.dir_.rotate_right();
+      right.dir_ = FastBoard::kRotateRight[right.dir_];
       right.add_steps(999);
       state->AddNextStep(right);
     }
   }  
 
  private:
-  const CharBoard* b_;
-  Point cur_;
-  Point dir_ = Cardinal::kEast;
+  const FastBoard* b_;
+  FastBoard::Point cur_;
+  FastBoard::Dir dir_ = FastBoard::kEast;
 };
 
 class BestPathHistory {
@@ -120,7 +121,7 @@ class BestPathHistory {
 
 class ReindeerPath2 : public BFSInterface<ReindeerPath2> {
  public:
-  ReindeerPath2(const CharBoard& b, Point start,
+  ReindeerPath2(const ImmutableCharBoard& b, Point start,
                 std::optional<int>* best_steps,
                 BestPathHistory* best_path_set)
    : b_(&b), best_steps_(best_steps), best_path_set_(best_path_set), cur_(start) {}
@@ -191,7 +192,7 @@ class ReindeerPath2 : public BFSInterface<ReindeerPath2> {
   }  
 
  private:
-  const CharBoard* b_;
+  const ImmutableCharBoard* b_;
   std::optional<int>* best_steps_;
   BestPathHistory* best_path_set_;
   Point cur_;
@@ -206,16 +207,18 @@ std::ostream& operator<<(std::ostream& o, const CharBoard& b) {
 
 absl::StatusOr<std::string> Day_2024_16::Part1(
     absl::Span<std::string_view> input) const {
-  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
   ASSIGN_OR_RETURN(Point start, b.FindUnique('S'));
-  return AdventReturn(ReindeerPath(b, start).FindMinStepsAStar());
+  FastBoard fb(b);
+  FastBoard::Point fast_start = fb.From(start);
+  return AdventReturn(ReindeerPath(fb, fast_start).FindMinStepsAStar());
 
   return absl::UnimplementedError("Problem not known");
 }
 
 absl::StatusOr<std::string> Day_2024_16::Part2(
     absl::Span<std::string_view> input) const {
-  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
   ASSIGN_OR_RETURN(Point start, b.FindUnique('S'));
   
   BestPathHistory best_path_set;
@@ -230,7 +233,7 @@ absl::StatusOr<std::string> Day_2024_16::Part2(
   absl::flat_hash_set<Point> final_set = best_path_set.CollectFrom(end);
 
   if (VLOG_IS_ON(2)) {
-    CharBoard draw = b;
+    ASSIGN_OR_RETURN(CharBoard draw, CharBoard::Parse(input));
     for (Point p : final_set) draw[p] = 'O';
     VLOG(2) << "With path:\n" << draw;
   }
