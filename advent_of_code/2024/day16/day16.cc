@@ -80,11 +80,49 @@ class ReindeerPath : public BFSInterface<ReindeerPath> {
   Point dir_ = Cardinal::kEast;
 };
 
+class BestPathHistory {
+ public:
+  void MergePaths(std::pair<Point, Point> p1, std::pair<Point, Point> p2) {
+    chain_[p2].push_back(p1);
+  }
+
+  void ReplacePaths(std::pair<Point, Point> p1, std::pair<Point, Point> p2) {
+    chain_[p2] = {p1};
+  }  
+
+  absl::flat_hash_set<Point> CollectFrom(Point p) {
+    absl::flat_hash_set<Point> ret = {p};
+  
+    std::deque<std::pair<Point, Point>> frontier = {
+      {p, Cardinal::kNorth}, {p, Cardinal::kSouth},
+      {p, Cardinal::kWest}, {p, Cardinal::kEast}, 
+    };
+    absl::flat_hash_set<std::pair<Point, Point>> hist;
+    for (const auto& pair : frontier) hist.insert(pair);
+    for (/*nop*/;!frontier.empty(); frontier.pop_front()) {
+      auto it = chain_.find(frontier.front());
+      if (it != chain_.end()) {
+        for (const auto& pair : it->second) {
+          if (hist.contains(pair)) continue;
+          hist.insert(pair);
+          frontier.push_back(pair);
+          ret.insert(pair.first);
+        }
+      }
+    }
+
+    return ret;
+  }
+
+ private:
+  absl::flat_hash_map<std::pair<Point, Point>, std::vector<std::pair<Point, Point>>> chain_;
+};
+
 class ReindeerPath2 : public BFSInterface<ReindeerPath2> {
  public:
   ReindeerPath2(const CharBoard& b, Point start,
                 std::optional<int>* best_steps,
-                absl::flat_hash_map<std::pair<Point, Point>, std::vector<std::pair<Point, Point>>>* best_path_set)
+                BestPathHistory* best_path_set)
    : b_(&b), best_steps_(best_steps), best_path_set_(best_path_set), cur_(start) {}
 
   Point cur() const { return cur_; }
@@ -115,54 +153,47 @@ class ReindeerPath2 : public BFSInterface<ReindeerPath2> {
     return false;
   }
 
-  void MergePaths(const ReindeerPath2& o) const {
-    (*best_path_set_)[{o.cur_, o.dir_}].push_back({cur_, dir_});
-  }
+  std::pair<Point, Point> ToPointDir() const { return {cur_, dir_}; }
 
-  void ReplacePaths(const ReindeerPath2& o) const {
-    (*best_path_set_)[{o.cur_, o.dir_}].clear();
-    MergePaths(o);
+  void AddNextStepUpdatePaths(State* state, ReindeerPath2 next) const {
+    switch(state->AddNextStep(next)) {
+      case AddNextStepResult::kAdded: {
+        best_path_set_->ReplacePaths(ToPointDir(), next.ToPointDir());
+        break;
+      }
+      case AddNextStepResult::kMerged: {
+        best_path_set_->MergePaths(ToPointDir(), next.ToPointDir());
+        break;
+      }
+      case AddNextStepResult::kSkipped: break;
+      default: LOG(FATAL) << "Bad AddNextStep";
+    }
   }
 
   void AddNextSteps(State* state) const override {
     if (b_->OnBoard(cur_ + dir_) && (*b_)[cur_ + dir_] != '#') {
       ReindeerPath2 next = *this;
       next.cur_ = cur_ + dir_;
-      switch(state->AddNextStep(next)) {
-        case AddNextStepResult::kAdded: ReplacePaths(next); break;
-        case AddNextStepResult::kMerged: MergePaths(next); break;
-        case AddNextStepResult::kSkipped: break;
-        default: LOG(FATAL) << "Bad AddNextStep";
-      }
+      AddNextStepUpdatePaths(state, next);
     }
     {
       ReindeerPath2 left = *this;
       left.dir_ = left.dir_.rotate_left();
       left.add_steps(999);
-      switch(state->AddNextStep(left)) {
-        case AddNextStepResult::kAdded: ReplacePaths(left); break;
-        case AddNextStepResult::kMerged: MergePaths(left); break;
-        case AddNextStepResult::kSkipped: break;
-        default: LOG(FATAL) << "Bad AddNextStep";
-      }
+      AddNextStepUpdatePaths(state, left);
     }
     {
       ReindeerPath2 right = *this;
       right.dir_ = right.dir_.rotate_right();
       right.add_steps(999);
-      switch(state->AddNextStep(right)) {
-        case AddNextStepResult::kAdded: ReplacePaths(right); break;
-        case AddNextStepResult::kMerged: MergePaths(right); break;
-        case AddNextStepResult::kSkipped: break;
-        default: LOG(FATAL) << "Bad AddNextStep";
-      }
+      AddNextStepUpdatePaths(state, right);
     }
   }  
 
  private:
   const CharBoard* b_;
   std::optional<int>* best_steps_;
-  absl::flat_hash_map<std::pair<Point, Point>, std::vector<std::pair<Point, Point>>>* best_path_set_;
+  BestPathHistory* best_path_set_;
   Point cur_;
   Point dir_ = Cardinal::kEast;
 };
@@ -187,36 +218,16 @@ absl::StatusOr<std::string> Day_2024_16::Part2(
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
   ASSIGN_OR_RETURN(Point start, b.FindUnique('S'));
   
-  LOG(ERROR) << "Start";
-  absl::flat_hash_map<std::pair<Point, Point>, std::vector<std::pair<Point, Point>>> best_path_set;
+  BestPathHistory best_path_set;
   std::optional<int> best_steps;
   ReindeerPath2 rp2(b, start, &best_steps, &best_path_set);
   std::optional<int> dist = rp2.FindMinStepsAStar();
   CHECK(best_steps);
   CHECK(dist);
   CHECK(*dist > *best_steps);
-  LOG(ERROR) << "End";
 
   ASSIGN_OR_RETURN(Point end, b.FindUnique('E'));
-  absl::flat_hash_set<Point> final_set = {end};
-
-  std::deque<std::pair<Point, Point>> frontier = {
-    {end, Cardinal::kNorth}, {end, Cardinal::kSouth},
-    {end, Cardinal::kWest}, {end, Cardinal::kEast}, 
-  };
-  absl::flat_hash_set<std::pair<Point, Point>> hist;
-  for (const auto& pair : frontier) hist.insert(pair);
-  for (/*nop*/;!frontier.empty(); frontier.pop_front()) {
-    auto it = best_path_set.find(frontier.front());
-    if (it != best_path_set.end()) {
-      for (const auto& pair : it->second) {
-        if (hist.contains(pair)) continue;
-        hist.insert(pair);
-        frontier.push_back(pair);
-        final_set.insert(pair.first);
-      }
-    }
-  }
+  absl::flat_hash_set<Point> final_set = best_path_set.CollectFrom(end);
 
   if (VLOG_IS_ON(2)) {
     CharBoard draw = b;
