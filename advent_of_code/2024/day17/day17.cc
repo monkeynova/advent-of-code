@@ -61,31 +61,6 @@ namespace {
 
 */
 
-std::optional<int64_t> RevEngA(absl::Span<const int64_t> prog, int64_t a) {
-  if (prog.empty()) return a;
-
-  int64_t next_val = prog.back();
-  for (int64_t next = 0; next < 8; ++next) {
-    int64_t test_a = (a << int64_t{3}) | next;
-    int64_t test_b = next ^ 4;
-    int64_t test_c = (test_a >> (next ^ 1)) % 8;
-    if (next_val == (test_b ^ test_c)) {
-      std::optional<int64_t> sub = RevEngA(prog.subspan(0, prog.size() - 1), test_a);
-      if (sub) return sub;
-    }
-  }
-  
-  return std::nullopt;
-}
-
-std::optional<int64_t> RevEngA(absl::Span<const int64_t> prog) {
-  // TODO: Extract from pattern: {doesn't touch a...} a /= 8; jnz
-  const std::vector<int64_t> kMyInput = {2,4,1,1,7,5,1,5,4,0,5,5,0,3,3,0};
-  if (prog != kMyInput) return std::nullopt;
-
-  return RevEngA(prog, /*a=*/0);
-}
-
 class Program {
  public:
   enum OpCode {
@@ -99,8 +74,14 @@ class Program {
     kCdv = 7,
   };
 
-  Program(std::array<int64_t, 3> registers, std::vector<int64_t> mem)
-   : registers_(registers), mem_(std::move(mem)) {}
+  Program(std::array<int64_t, 3> registers, absl::Span<const int64_t> mem)
+   : registers_(registers), mem_(mem) {}
+
+  void Reset(std::array<int64_t, 3> registers) {
+    registers_ = registers;
+    ip_ = 0;
+    out_ = {};
+  }
 
   std::vector<int64_t> Run() {
     while (!Step()) /*nop*/;
@@ -161,7 +142,7 @@ class Program {
     return false;
   }
 
-  int64_t* ComboOperand(int64_t* reg_id) {
+  const int64_t* ComboOperand(const int64_t* reg_id) {
     if (*reg_id <= 3) return reg_id;
     if (*reg_id <= 6) return &registers_[*reg_id - 4];
     LOG(FATAL) << ">=7 not supported";
@@ -169,11 +150,54 @@ class Program {
 
   int64_t ip_ = 0;
   std::array<int64_t, 3> registers_;
-  std::vector<int64_t> mem_;
+  absl::Span<const int64_t> mem_;
   std::vector<int64_t> out_;
 };
 
-// Helper methods go here.
+std::optional<int64_t> Unwind(Program& p, absl::Span<const int64_t> output, int64_t a) {
+  if (output.empty()) return a;
+
+  for (int64_t next = 0; next < 8; ++next) {
+    int64_t test_a = (a << int64_t{3}) | next;
+    std::array<int64_t, 3> registers = {test_a, 0, 0};
+    p.Reset(registers);
+    std::vector<int64_t> out = p.Run();
+    if (out.size() <= output.size() &&
+        out == output.subspan(output.size() - out.size(), out.size())) {
+      std::optional<int64_t> sub = Unwind(p, output.subspan(0, output.size() - out.size()), test_a);
+      if (sub) return sub;
+    }
+  }
+  
+  return std::nullopt;
+}
+
+
+std::optional<int64_t> RevEngA(absl::Span<const int64_t> prog) {
+  // Last instruction must be [Jnz 0].
+  if (prog[prog.size() - 2] != 3) return std::nullopt;
+  if (prog[prog.size() - 1] != 0) return std::nullopt;
+
+  // Must be no other jumps.
+  for (int i = 0; i < prog.size() - 2; i += 2) {
+    if (prog[i] == 3) return std::nullopt;
+  }
+
+  // Must be exactly one alteration of a, and must be >>= 3.
+  int a_change_count = 0;
+  for (int i = 0; i < prog.size() - 2; i += 2) {
+    if (prog[i] == 0) {
+      ++a_change_count;
+      if (prog[i + 1] != 3) return std::nullopt;
+    }
+    // Must be no other jumps.
+    if (prog[i] == 3) return std::nullopt;
+  }
+  if (a_change_count != 1) return std::nullopt;
+
+  Program p({0, 0, 0}, prog.subspan(0, prog.size() - 2));
+  return Unwind(p, prog, 0);
+}
 
 }  // namespace
 
