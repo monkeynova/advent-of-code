@@ -101,6 +101,8 @@ class FastBoard {
 
     Storage Get(PointDir pd) const { return map_[pd.p.idx_ * 4 + pd.d]; }
     Storage Get(Point p, Dir d) const { return map_[p.idx_ * 4 + d]; }
+    Storage& GetMutable(PointDir pd) { return map_[pd.p.idx_ * 4 + pd.d]; }
+    Storage& GetMutable(Point p, Dir d) { return map_[p.idx_ * 4 + d]; }
     void Set(PointDir pd, Storage s) { map_[pd.p.idx_ * 4 + pd.d] = s; }
     void Set(Point p, Dir d, Storage s) { map_[p.idx_ * 4 + d] = s; }
 
