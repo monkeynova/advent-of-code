@@ -2,24 +2,32 @@
 ==
 
 [part=1]
-Example input
+Register A: 729
+Register B: 0
+Register C: 0
+
+Program: 0,1,5,4,3,0
 --
-ERROR: UNIMPLEMENTED: Problem not known
+4,6,3,5,6,3,5,2,1,0
 ==
 
 [part=1]
 @include{advent_of_code/2024/day17/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+4,1,7,6,4,1,0,2,7
 ==
 
 [part=2]
-Example input
+Register A: 2024
+Register B: 0
+Register C: 0
+
+Program: 0,3,5,4,3,0
 --
-ERROR: UNIMPLEMENTED: Problem not known
+117440
 ==
 
 [part=2]
 @include{advent_of_code/2024/day17/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+164279024971453
