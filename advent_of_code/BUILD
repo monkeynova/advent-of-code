@@ -86,6 +86,7 @@ cc_library(
     name = "bfs",
     hdrs = ["bfs.h"],
     deps = [
+        "@abseil-cpp//absl/container:flat_hash_map",
         "@abseil-cpp//absl/log",
         "@abseil-cpp//absl/log:check",
     ],
