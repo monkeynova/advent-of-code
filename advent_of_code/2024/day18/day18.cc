@@ -69,43 +69,58 @@ absl::StatusOr<std::string> Day_2024_18::Part1(
 
 absl::StatusOr<std::string> Day_2024_18::Part2(
     absl::Span<std::string_view> input) const {
-  CharBoard b;
+  CharBoard board;
   int steps = 0;
   {
     Tokenizer t(param());
     ASSIGN_OR_RETURN(int dim, t.NextInt());
-    b = CharBoard(dim, dim);
+    board = CharBoard(dim, dim);
     RETURN_IF_ERROR(t.NextIs(","));
     ASSIGN_OR_RETURN(steps, t.NextInt());
     if (!t.Done()) return absl::InvalidArgumentError("bad param");
   }
   if (input.size() < steps) return absl::InvalidArgumentError("bad steps");
 
-  for (int i = 0; true; ++i) {
+  std::vector<Point> points;
+  absl::flat_hash_map<Point, int> point_to_idx;
+  for (int i = 0; i < input.size(); ++i) {
     Point p;
     {
       Tokenizer t(input[i]);
       RETURN_IF_ERROR(p.From(t));
       if (!t.Done()) return absl::InvalidArgumentError("bad point");
     }
-    if (!b.OnBoard(p)) return absl::InvalidArgumentError("off board");
-    b[p] = '#';
+    if (!board.OnBoard(p)) return absl::InvalidArgumentError("off board");
+    points.push_back(p);
+    point_to_idx[p] = i;
+  }
 
+  Point end = {board.width() - 1, board.height() - 1};
+
+  int a = 0;
+  int b = points.size();
+  while (a < b) {
+    int idx = (a + b) / 2;
     std::optional<int> min_steps = PointWalk({
       .start = Point{0, 0},
       .is_good = [&](Point p, int) {
-        return b.OnBoard(p) && b[p] != '#';
+        if (!board.OnBoard(p)) return false;
+        auto it = point_to_idx.find(p);
+        if (it == point_to_idx.end()) return true;
+        return it->second > idx;
       },
       .is_final = [&](Point p, int) {
-        return p.x == b.width() - 1 && p.y == b.height() - 1;
+        return p == end;
       }
     }).FindMinSteps();
-    if (!min_steps) {
-      return AdventReturn(p);
+    if (min_steps) {
+      a = idx + 1;
+    } else {
+      b = idx;
     }
   }
-
-  LOG(FATAL) << "Left infinite loop";
+  if (a == points.size()) return absl::InvalidArgumentError("No blockage");
+  return AdventReturn(points[a]);
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
