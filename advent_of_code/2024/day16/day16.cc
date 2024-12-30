@@ -84,10 +84,8 @@ class ReindeerPath2 : public BFSInterface<ReindeerPath2> {
  public:
   ReindeerPath2(const CharBoard& b, Point start,
                 std::optional<int>* best_steps,
-                absl::flat_hash_map<ReindeerPath2, absl::flat_hash_set<Point>>* best_path_set)
-   : b_(&b), best_steps_(best_steps), best_path_set_(best_path_set), cur_(start) {
-    (*best_path_set_)[*this].insert(cur_);
-  }
+                absl::flat_hash_map<std::pair<Point, Point>, std::vector<std::pair<Point, Point>>>* best_path_set)
+   : b_(&b), best_steps_(best_steps), best_path_set_(best_path_set), cur_(start) {}
 
   Point cur() const { return cur_; }
 
@@ -118,14 +116,11 @@ class ReindeerPath2 : public BFSInterface<ReindeerPath2> {
   }
 
   void MergePaths(const ReindeerPath2& o) const {
-    for (Point p : (*best_path_set_)[*this]) {
-      (*best_path_set_)[o].insert(p);
-    }
-    (*best_path_set_)[o].insert(o.cur_);
+    (*best_path_set_)[{o.cur_, o.dir_}].push_back({cur_, dir_});
   }
 
   void ReplacePaths(const ReindeerPath2& o) const {
-    (*best_path_set_)[o].clear();
+    (*best_path_set_)[{o.cur_, o.dir_}].clear();
     MergePaths(o);
   }
 
@@ -167,7 +162,7 @@ class ReindeerPath2 : public BFSInterface<ReindeerPath2> {
  private:
   const CharBoard* b_;
   std::optional<int>* best_steps_;
-  absl::flat_hash_map<ReindeerPath2, absl::flat_hash_set<Point>>* best_path_set_;
+  absl::flat_hash_map<std::pair<Point, Point>, std::vector<std::pair<Point, Point>>>* best_path_set_;
   Point cur_;
   Point dir_ = Cardinal::kEast;
 };
@@ -192,27 +187,42 @@ absl::StatusOr<std::string> Day_2024_16::Part2(
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
   ASSIGN_OR_RETURN(Point start, b.FindUnique('S'));
   
-  absl::flat_hash_map<ReindeerPath2, absl::flat_hash_set<Point>> best_path_set;
+  LOG(ERROR) << "Start";
+  absl::flat_hash_map<std::pair<Point, Point>, std::vector<std::pair<Point, Point>>> best_path_set;
   std::optional<int> best_steps;
   ReindeerPath2 rp2(b, start, &best_steps, &best_path_set);
   std::optional<int> dist = rp2.FindMinStepsAStar();
   CHECK(best_steps);
   CHECK(dist);
   CHECK(*dist > *best_steps);
+  LOG(ERROR) << "End";
 
   ASSIGN_OR_RETURN(Point end, b.FindUnique('E'));
-  absl::flat_hash_set<Point> final_set;
-  for (const auto& [rp, set] : best_path_set) {
-    if (rp.cur() == end) {
-      for (Point p : set) {
-        final_set.insert(p);
+  absl::flat_hash_set<Point> final_set = {end};
+
+  std::deque<std::pair<Point, Point>> frontier = {
+    {end, Cardinal::kNorth}, {end, Cardinal::kSouth},
+    {end, Cardinal::kWest}, {end, Cardinal::kEast}, 
+  };
+  absl::flat_hash_set<std::pair<Point, Point>> hist;
+  for (const auto& pair : frontier) hist.insert(pair);
+  for (/*nop*/;!frontier.empty(); frontier.pop_front()) {
+    auto it = best_path_set.find(frontier.front());
+    if (it != best_path_set.end()) {
+      for (const auto& pair : it->second) {
+        if (hist.contains(pair)) continue;
+        hist.insert(pair);
+        frontier.push_back(pair);
+        final_set.insert(pair.first);
       }
     }
   }
 
-  CharBoard draw = b;
-  for (Point p : final_set) draw[p] = 'O';
-  VLOG(2) << "With path:\n" << draw;
+  if (VLOG_IS_ON(2)) {
+    CharBoard draw = b;
+    for (Point p : final_set) draw[p] = 'O';
+    VLOG(2) << "With path:\n" << draw;
+  }
 
   return AdventReturn(final_set.size());
 }
