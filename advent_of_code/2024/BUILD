@@ -22,5 +22,6 @@ cc_library(
         "//advent_of_code/2024/day16",
         "//advent_of_code/2024/day17",
         "//advent_of_code/2024/day18",
+        "//advent_of_code/2024/day19",
     ],
 )
