@@ -35,12 +35,77 @@ namespace {
 
 absl::StatusOr<std::string> Day_2024_18::Part1(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  CharBoard b;
+  int steps = 0;
+  {
+    Tokenizer t(param());
+    ASSIGN_OR_RETURN(int dim, t.NextInt());
+    b = CharBoard(dim, dim);
+    RETURN_IF_ERROR(t.NextIs(","));
+    ASSIGN_OR_RETURN(steps, t.NextInt());
+    if (!t.Done()) return absl::InvalidArgumentError("bad param");
+  }
+  if (input.size() < steps) return absl::InvalidArgumentError("bad steps");
+  for (int i = 0; i < steps; ++i) {
+    Point p;
+    {
+      Tokenizer t(input[i]);
+      RETURN_IF_ERROR(p.From(t));
+      if (!t.Done()) return absl::InvalidArgumentError("bad point");
+    }
+    if (!b.OnBoard(p)) return absl::InvalidArgumentError("off board");
+    b[p] = '#';
+  }
+  return AdventReturn(PointWalk({
+    .start = Point{0, 0},
+    .is_good = [&](Point p, int) {
+      return b.OnBoard(p) && b[p] != '#';
+    },
+    .is_final = [&](Point p, int) {
+      return p.x == b.width() - 1 && p.y == b.height() - 1;
+    }
+  }).FindMinSteps());
 }
 
 absl::StatusOr<std::string> Day_2024_18::Part2(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  CharBoard b;
+  int steps = 0;
+  {
+    Tokenizer t(param());
+    ASSIGN_OR_RETURN(int dim, t.NextInt());
+    b = CharBoard(dim, dim);
+    RETURN_IF_ERROR(t.NextIs(","));
+    ASSIGN_OR_RETURN(steps, t.NextInt());
+    if (!t.Done()) return absl::InvalidArgumentError("bad param");
+  }
+  if (input.size() < steps) return absl::InvalidArgumentError("bad steps");
+
+  for (int i = 0; true; ++i) {
+    Point p;
+    {
+      Tokenizer t(input[i]);
+      RETURN_IF_ERROR(p.From(t));
+      if (!t.Done()) return absl::InvalidArgumentError("bad point");
+    }
+    if (!b.OnBoard(p)) return absl::InvalidArgumentError("off board");
+    b[p] = '#';
+
+    std::optional<int> min_steps = PointWalk({
+      .start = Point{0, 0},
+      .is_good = [&](Point p, int) {
+        return b.OnBoard(p) && b[p] != '#';
+      },
+      .is_final = [&](Point p, int) {
+        return p.x == b.width() - 1 && p.y == b.height() - 1;
+      }
+    }).FindMinSteps();
+    if (!min_steps) {
+      return AdventReturn(p);
+    }
+  }
+
+  LOG(FATAL) << "Left infinite loop";
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
