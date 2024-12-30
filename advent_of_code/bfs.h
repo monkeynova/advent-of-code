@@ -128,6 +128,12 @@ class BFSInterface {
   int num_steps_ = 0;
 };
 
+enum AddNextStepResult {
+  kSkipped = 0,
+  kAdded = 1,
+  kMerged = 2,
+};
+
 // Stores the queue of work for performing a breadth-first search. The base
 // State class stores the history while the specific sub classes store the
 // implementation of the queuing behavior.
@@ -144,12 +150,16 @@ class BFSInterface<BFSImpl, HistType>::State {
 
   // Adds `next` to the processing queue if it is not present in `hist_`.
   // next.num_steps() is incremented in the process.
-  void AddNextStep(BFSImpl next) {
+  AddNextStepResult AddNextStep(BFSImpl next) {
     ++next.num_steps_;
     auto it = hist_.find(next.identifier());
-    if (it != hist_.end() && it->second <= next.num_steps()) return;
+    if (it != hist_.end() && it->second <= next.num_steps()) {
+      if (it->second == next.num_steps()) return kMerged;
+      return kSkipped;
+    }
     hist_[next.identifier()] = next.num_steps();
     AddToFrontier(std::move(next));
+    return kAdded;
   }
 
   std::optional<int> ret() const { return ret_; }

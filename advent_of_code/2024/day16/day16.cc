@@ -29,18 +29,192 @@ namespace advent_of_code {
 
 namespace {
 
-// Helper methods go here.
+class ReindeerPath : public BFSInterface<ReindeerPath> {
+ public:
+  ReindeerPath(const CharBoard& b, Point start)
+   : b_(&b), cur_(start) {}
+
+  bool operator==(const ReindeerPath& o) const {
+    return cur_ == o.cur_ && dir_ == o.dir_;
+  }
+
+  template <typename H>
+  friend H AbslHashValue(H h, const ReindeerPath& rp) {
+    return H::combine(std::move(h), rp.cur_, rp.dir_);
+  }
+
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const ReindeerPath& rp) {
+    absl::Format(&sink, "%v,%v @%d", rp.cur_, rp.dir_, rp.num_steps());
+  }
+
+  const ReindeerPath& identifier() const override { return *this; }
+
+  bool IsFinal() const override {
+    return (*b_)[cur_] == 'E';
+  }
+
+  void AddNextSteps(State* state) const override {
+    if (b_->OnBoard(cur_ + dir_) && (*b_)[cur_ + dir_] != '#') {
+      ReindeerPath next = *this;
+      next.cur_ = cur_ + dir_;
+      state->AddNextStep(next);
+    }
+    {
+      ReindeerPath left = *this;
+      left.dir_ = left.dir_.rotate_left();
+      left.add_steps(999);
+      state->AddNextStep(left);
+    }
+    {
+      ReindeerPath right = *this;
+      right.dir_ = right.dir_.rotate_right();
+      right.add_steps(999);
+      state->AddNextStep(right);
+    }
+  }  
+
+ private:
+  const CharBoard* b_;
+  Point cur_;
+  Point dir_ = Cardinal::kEast;
+};
+
+class ReindeerPath2 : public BFSInterface<ReindeerPath2> {
+ public:
+  ReindeerPath2(const CharBoard& b, Point start,
+                std::optional<int>* best_steps,
+                absl::flat_hash_map<ReindeerPath2, absl::flat_hash_set<Point>>* best_path_set)
+   : b_(&b), best_steps_(best_steps), best_path_set_(best_path_set), cur_(start) {
+    (*best_path_set_)[*this].insert(cur_);
+  }
+
+  Point cur() const { return cur_; }
+
+  bool operator==(const ReindeerPath2& o) const {
+    return cur_ == o.cur_ && dir_ == o.dir_;
+  }
+
+  template <typename H>
+  friend H AbslHashValue(H h, const ReindeerPath2& rp) {
+    return H::combine(std::move(h), rp.cur_, rp.dir_);
+  }
+
+  template <typename Sink>
+  friend void AbslStringify(Sink& sink, const ReindeerPath2& rp) {
+    absl::Format(&sink, "%v,%v @%d", rp.cur_, rp.dir_, rp.num_steps());
+  }
+
+  const ReindeerPath2& identifier() const override { return *this; }
+
+  bool IsFinal() const override {
+    if (!*best_steps_) {
+      if ((*b_)[cur_] == 'E') {
+        *best_steps_ = num_steps();
+      }
+    }
+    if (*best_steps_ && num_steps() > **best_steps_) return true;
+    return false;
+  }
+
+  void MergePaths(const ReindeerPath2& o) const {
+    for (Point p : (*best_path_set_)[*this]) {
+      (*best_path_set_)[o].insert(p);
+    }
+    (*best_path_set_)[o].insert(o.cur_);
+  }
+
+  void ReplacePaths(const ReindeerPath2& o) const {
+    (*best_path_set_)[o].clear();
+    MergePaths(o);
+  }
+
+  void AddNextSteps(State* state) const override {
+    if (b_->OnBoard(cur_ + dir_) && (*b_)[cur_ + dir_] != '#') {
+      ReindeerPath2 next = *this;
+      next.cur_ = cur_ + dir_;
+      switch(state->AddNextStep(next)) {
+        case AddNextStepResult::kAdded: ReplacePaths(next); break;
+        case AddNextStepResult::kMerged: MergePaths(next); break;
+        case AddNextStepResult::kSkipped: break;
+        default: LOG(FATAL) << "Bad AddNextStep";
+      }
+    }
+    {
+      ReindeerPath2 left = *this;
+      left.dir_ = left.dir_.rotate_left();
+      left.add_steps(999);
+      switch(state->AddNextStep(left)) {
+        case AddNextStepResult::kAdded: ReplacePaths(left); break;
+        case AddNextStepResult::kMerged: MergePaths(left); break;
+        case AddNextStepResult::kSkipped: break;
+        default: LOG(FATAL) << "Bad AddNextStep";
+      }
+    }
+    {
+      ReindeerPath2 right = *this;
+      right.dir_ = right.dir_.rotate_right();
+      right.add_steps(999);
+      switch(state->AddNextStep(right)) {
+        case AddNextStepResult::kAdded: ReplacePaths(right); break;
+        case AddNextStepResult::kMerged: MergePaths(right); break;
+        case AddNextStepResult::kSkipped: break;
+        default: LOG(FATAL) << "Bad AddNextStep";
+      }
+    }
+  }  
+
+ private:
+  const CharBoard* b_;
+  std::optional<int>* best_steps_;
+  absl::flat_hash_map<ReindeerPath2, absl::flat_hash_set<Point>>* best_path_set_;
+  Point cur_;
+  Point dir_ = Cardinal::kEast;
+};
 
 }  // namespace
 
+std::ostream& operator<<(std::ostream& o, const CharBoard& b) {
+  return o << absl::StreamFormat("%v", b);
+}
+
 absl::StatusOr<std::string> Day_2024_16::Part1(
     absl::Span<std::string_view> input) const {
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(Point start, b.FindUnique('S'));
+  return AdventReturn(ReindeerPath(b, start).FindMinStepsAStar());
+
   return absl::UnimplementedError("Problem not known");
 }
 
 absl::StatusOr<std::string> Day_2024_16::Part2(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(Point start, b.FindUnique('S'));
+  
+  absl::flat_hash_map<ReindeerPath2, absl::flat_hash_set<Point>> best_path_set;
+  std::optional<int> best_steps;
+  ReindeerPath2 rp2(b, start, &best_steps, &best_path_set);
+  std::optional<int> dist = rp2.FindMinStepsAStar();
+  CHECK(best_steps);
+  CHECK(dist);
+  CHECK(*dist > *best_steps);
+
+  ASSIGN_OR_RETURN(Point end, b.FindUnique('E'));
+  absl::flat_hash_set<Point> final_set;
+  for (const auto& [rp, set] : best_path_set) {
+    if (rp.cur() == end) {
+      for (Point p : set) {
+        final_set.insert(p);
+      }
+    }
+  }
+
+  CharBoard draw = b;
+  for (Point p : final_set) draw[p] = 'O';
+  VLOG(2) << "With path:\n" << draw;
+
+  return AdventReturn(final_set.size());
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
