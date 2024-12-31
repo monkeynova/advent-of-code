@@ -29,10 +29,10 @@ namespace advent_of_code {
 
 namespace {
 
-int64_t Step(int64_t in) {
-  in = (in ^ (in << 6)) % 16777216;
-  in = (in ^ (in >>5)) % 16777216;
-  in = (in ^ (in << 11)) % 16777216;
+inline int64_t Step(int64_t in) {
+  in = (in ^ (in << 6)) & 0xffffff;
+  in = (in ^ (in >> 5)) & 0xffffff;
+  in = (in ^ (in << 11)) & 0xffffff;
   return in;
 }
 
@@ -57,44 +57,39 @@ absl::StatusOr<std::string> Day_2024_22::Part2(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(std::vector<int64_t> list, ParseAsInts(input));
 
-  absl::flat_hash_map<std::array<int8_t, 4>, int64_t> seq2count;
+  // Sequences of 4 values in {-9 .. 9} are encoded as a 4-digit base-19 value.
+  const int k19to4 = 130321;
+
+  std::vector<int64_t> seq2count(k19to4, 0);
   for (int64_t secret : list) {
-    absl::flat_hash_set<std::array<int8_t, 4>> hist;
+    std::vector<bool> hist(k19to4, false);
 
     int8_t prev, cur;
-    std::array<int8_t, 4> seq;
+    int seq = 0;
     prev = secret % 10;
     for (int i = 0; i < 4; ++i) {
       secret = Step(secret);
       cur = secret % 10;
-      seq[i] = cur - prev;
+      seq = ((seq * 19) + 9 + cur - prev) % k19to4;
       prev = cur;
     }
     for (int i = 5; i < 2000; ++i) {
-      auto [it, inserted] = hist.insert(seq);
-      if (inserted) {
+      if (!hist[seq]) {
+        hist[seq] = true;
         seq2count[seq] += cur;
       }
 
-      for (int j = 0; j < 3; ++j) {
-        seq[j] = seq[j + 1];
-      }
       secret = Step(secret);
       cur = secret % 10;
-      seq[3] = cur - prev;
+      seq = ((seq * 19) + 9 + cur - prev) % k19to4;
       prev = cur;
     }
-    secret = Step(secret);
-    cur = secret % 10;
-    seq[0] = cur - prev;
-    prev = cur;
-  }
-  int64_t max = 0;
-  for (const auto& [seq, count] : seq2count) {
-    max = std::max(max, count);
   }
 
-  return AdventReturn(max);
+  return AdventReturn(absl::c_accumulate(
+    seq2count, int64_t{0}, [](int64_t a, int64_t v) {
+      return std::max(a, v);
+    }));
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
