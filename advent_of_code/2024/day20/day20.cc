@@ -35,12 +35,70 @@ namespace {
 
 absl::StatusOr<std::string> Day_2024_20::Part1(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  int min_save;
+  if (!absl::SimpleAtoi(param(), &min_save)) return absl::InvalidArgumentError("bad param");
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(Point start, b.FindUnique('S'));
+  ASSIGN_OR_RETURN(Point end, b.FindUnique('E'));
+  std::vector<Point> path = {start};
+  while (path.back() != end) {
+    std::optional<Point> found;
+    for (Point d : Cardinal::kFourDirs) {
+      Point n = path.back() + d;
+      if (!b.OnBoard(n)) continue;
+      if (b[n] == '#') continue;
+      if (path.size() > 1 && n == path[path.size() - 2]) continue;
+      if (found) return absl::InvalidArgumentError("unique path");
+      found = n;
+    }
+    if (!found) return absl::InvalidArgumentError("no path");
+    path.push_back(*found);
+  }
+  
+  int skips = 0;
+  for (int i = 0; i < path.size(); ++i) {
+    for (int j = i + min_save + 2; j < path.size(); ++j) {
+      if ((path[i] - path[j]).dist() == 2) {
+        ++skips;
+      }
+    }
+  }
+  return AdventReturn(skips);
 }
 
 absl::StatusOr<std::string> Day_2024_20::Part2(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  int min_save;
+  if (!absl::SimpleAtoi(param(), &min_save)) return absl::InvalidArgumentError("bad param");
+  ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
+  ASSIGN_OR_RETURN(Point start, b.FindUnique('S'));
+  ASSIGN_OR_RETURN(Point end, b.FindUnique('E'));
+  std::vector<Point> path = {start};
+  while (path.back() != end) {
+    std::optional<Point> found;
+    for (Point d : Cardinal::kFourDirs) {
+      Point n = path.back() + d;
+      if (!b.OnBoard(n)) continue;
+      if (b[n] == '#') continue;
+      if (path.size() > 1 && n == path[path.size() - 2]) continue;
+      if (found) return absl::InvalidArgumentError("unique path");
+      found = n;
+    }
+    if (!found) return absl::InvalidArgumentError("no path");
+    path.push_back(*found);
+  }
+  int skips = 0;
+  for (int i = 0; i < path.size(); ++i) {
+    for (int j = i + 2; j < path.size(); ++j) {
+      int skip_dist = (path[i] - path[j]).dist();
+      if (skip_dist > 20) continue;
+      int save = j - i - skip_dist;
+      if (save >= min_save) {
+        ++skips;
+      }
+    }
+  }
+  return AdventReturn(skips);
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(

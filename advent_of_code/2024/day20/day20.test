@@ -2,24 +2,57 @@
 ==
 
 [part=1]
-Example input
+[param=20]
+\###############
+\#...#...#.....#
+\#.#.#.#.#.###.#
+\#S#...#.#.#...#
+\#######.#.#.###
+\#######.#.#...#
+\#######.#.###.#
+\###..E#...#...#
+\###.#######.###
+\#...###...#...#
+\#.#####.#.###.#
+\#.#...#.#.#...#
+\#.#.#.#.#.#.###
+\#...#...#...###
+\###############
 --
-ERROR: UNIMPLEMENTED: Problem not known
+5
 ==
 
+# 1307 (high) <- forgot to count the two skip steps
 [part=1]
+[param=100]
 @include{advent_of_code/2024/day20/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+1293
 ==
 
 [part=2]
-Example input
+[param=70]
+\###############
+\#...#...#.....#
+\#.#.#.#.#.###.#
+\#S#...#.#.#...#
+\#######.#.#.###
+\#######.#.#...#
+\#######.#.###.#
+\###..E#...#...#
+\###.#######.###
+\#...###...#...#
+\#.#####.#.###.#
+\#.#...#.#.#...#
+\#.#.#.#.#.#.###
+\#...#...#...###
+\###############
 --
-ERROR: UNIMPLEMENTED: Problem not known
+41
 ==
 
 [part=2]
+[param=100]
 @include{advent_of_code/2024/day20/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+977747
