@@ -2,24 +2,42 @@
 ==
 
 [part=1]
-Example input
+r, wr, b, g, bwu, rb, gb, br
+
+brwrr
+bggr
+gbbr
+rrbgbr
+ubwu
+bwurrg
+brgr
+bbrgwb
 --
-ERROR: UNIMPLEMENTED: Problem not known
+6
 ==
 
 [part=1]
 @include{advent_of_code/2024/day19/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+240
 ==
 
 [part=2]
-Example input
+r, wr, b, g, bwu, rb, gb, br
+
+brwrr
+bggr
+gbbr
+rrbgbr
+ubwu
+bwurrg
+brgr
+bbrgwb
 --
-ERROR: UNIMPLEMENTED: Problem not known
+16
 ==
 
 [part=2]
 @include{advent_of_code/2024/day19/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+848076019766013
