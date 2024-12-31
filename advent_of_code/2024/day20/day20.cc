@@ -54,11 +54,24 @@ absl::StatusOr<std::string> Day_2024_20::Part1(
     if (!found) return absl::InvalidArgumentError("no path");
     path.push_back(*found);
   }
+
+  absl::flat_hash_map<Point, int> point_idx;
+  for (int i = 0; i < path.size(); ++i) {
+    point_idx[path[i]] = i;
+  }
+
+  std::array<Point, 8> kDelta2 = {
+    2 * Cardinal::kWest, 2 * Cardinal::kEast, 2 * Cardinal::kNorth,
+    2 * Cardinal::kSouth, Cardinal::kNorthWest, Cardinal::kNorthEast,
+    Cardinal::kSouthWest, Cardinal::kSouthEast
+  };
   
   int skips = 0;
   for (int i = 0; i < path.size(); ++i) {
-    for (int j = i + min_save + 2; j < path.size(); ++j) {
-      if ((path[i] - path[j]).dist() == 2) {
+    for (Point d : kDelta2) {
+      auto it = point_idx.find(path[i] + d);
+      if (it == point_idx.end()) continue;
+      if (it->second - i - 2 >= min_save) {
         ++skips;
       }
     }
@@ -102,7 +115,10 @@ absl::StatusOr<std::string> Day_2024_20::Part2(
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
-    /*year=*/2024, /*day=*/20,
-    []() { return std::unique_ptr<AdventDay>(new Day_2024_20()); });
+    /*year=*/2024, /*day=*/20, []() {
+      auto ret = std::unique_ptr<AdventDay>(new Day_2024_20());
+      ret->set_param("100");
+      return ret;
+    });
 
 }  // namespace advent_of_code
