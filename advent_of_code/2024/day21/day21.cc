@@ -157,73 +157,61 @@ const std::vector<std::string>& AllCombinations(int a, int b, char ac, char bc) 
   return memo[key] = ret;
 }
 
-using State = std::array<Point, 4>;
+using State = std::vector<Point>;
 
-absl::flat_hash_map<State, int64_t> ToDirectional(std::string_view line, State in, int level) {
-  if (level == 3) return {{in, line.size()}};
+int64_t ToDirectional(std::string_view line, int max_level, int level) {
+  if (level == max_level) return line.size();
+
+  static absl::flat_hash_map<std::tuple<std::string, int, int>, int64_t> memo;
+  auto key = std::make_tuple(std::string(line), max_level, level);
+  if (auto it = memo.find(key); it != memo.end()) {
+    return it->second;
+  }
 
   static const absl::flat_hash_map<char, Point> kRevDirectional = {
     {'^', {1, 0}}, {'A', {2, 0}},
     {'<', {0, 1}}, {'v', {1, 1}}, {'>', {2, 1}}
   };
 
-  absl::flat_hash_map<State, int64_t> states = {{in, 0}};
+  Point pointer = {2, 0};
 
-  std::string prefix(level * 2, ' ');
-
+  int64_t best = 0;
   for (char c : line) {
-    absl::flat_hash_map<State, int64_t> new_states;
-    for (const auto& [state, steps] : states) {
-      Point pointer = state[level];
-
-      auto it = kRevDirectional.find(c);
-      CHECK(it != kRevDirectional.end());
-      Point dest = it->second;
-      int dx = abs(dest.x - pointer.x);
-      char dxc = dest.x > pointer.x ? '>' : '<';
-      int dy = abs(dest.y - pointer.y);
-      char dyc = dest.y > pointer.y ? 'v' : '^';
+    auto it = kRevDirectional.find(c);
+    CHECK(it != kRevDirectional.end());
+    Point dest = it->second;
+    int dx = abs(dest.x - pointer.x);
+    char dxc = dest.x > pointer.x ? '>' : '<';
+    int dy = abs(dest.y - pointer.y);
+    char dyc = dest.y > pointer.y ? 'v' : '^';
   
-      std::string bad_path = "";
-      if (dest.x == 0 && pointer.x != 0 && pointer.y == 0) {
-        bad_path.append(dx, '<');
-        bad_path.append(dy, 'v');
-        bad_path.append(1, 'A');
-      } else if (pointer.x == 0 && dest.x != 0 && dest.y == 0) {
-        bad_path.append(dy, '^');
-        bad_path.append(dx, '>');
-        bad_path.append(1, 'A');
-      }
-  
-      for (std::string path : AllCombinations(dx, dy, dxc, dyc)) {
-        path.append(1, 'A');
-        if (path == bad_path) continue;
- 
-         {
-          Point test = state[level];
-          for (char c : path) {
-            test += Cardinal::Parse(c);
-            CHECK_NE(test, Point({0, 0})) << path << ": " << state[level] << "-" << dest << " ? " << bad_path;
-          }
-        }
-
-        for (const auto& [sub_state, sub_steps] : ToDirectional(path, state, level + 1)) {
-          State new_state = sub_state;
-          new_state[level] = dest;
-          auto [it, inserted] = new_states.emplace(new_state, steps + sub_steps);
-          if (!inserted) {
-            it->second = std::min(it->second, steps + sub_steps);
-          }
-        }
-      }
+    std::string bad_path = "";
+    if (dest.x == 0 && pointer.x != 0 && pointer.y == 0) {
+      bad_path.append(dx, '<');
+      bad_path.append(dy, 'v');
+      bad_path.append(1, 'A');
+    } else if (pointer.x == 0 && dest.x != 0 && dest.y == 0) {
+      bad_path.append(dy, '^');
+      bad_path.append(dx, '>');
+      bad_path.append(1, 'A');
     }
-    states = std::move(new_states);
+  
+    int64_t sub_best = std::numeric_limits<int64_t>::max();
+    for (std::string path : AllCombinations(dx, dy, dxc, dyc)) {
+      path.append(1, 'A');
+      if (path == bad_path) continue;
+ 
+      int64_t sub_steps = ToDirectional(path, max_level, level + 1);
+      sub_best = std::min(sub_best, sub_steps);
+    }
+    best += sub_best;
+    pointer = dest;
   }
 
-  return states;
+  return memo[key] = best;
 }
 
-absl::flat_hash_map<State, int64_t> ToKeyPad(std::string_view line) {
+int64_t ToKeyPad(std::string_view line, int mids) {
   static const absl::flat_hash_map<char, Point> kRevKeyPad = {
     {'7', {0, 0}}, {'8', {1, 0}}, {'9', {2, 0}},
     {'4', {0, 1}}, {'5', {1, 1}}, {'6', {2, 1}},
@@ -231,78 +219,57 @@ absl::flat_hash_map<State, int64_t> ToKeyPad(std::string_view line) {
     {'0', {1, 3}}, {'A', {2, 3}}
   };
 
-  absl::flat_hash_map<State, int64_t> states = {
-    {{Point{2, 3}, {2, 0}, {2, 0}}, 0}
-  };
+  Point pointer = {2, 3};
 
+  int64_t best = 0;
   for (char c : line) {
-    absl::flat_hash_map<State, int64_t> new_states;
-    for (const auto& [state, steps] : states) {
-      Point pointer = state[0];
-
-      auto it = kRevKeyPad.find(c);
-      CHECK(it != kRevKeyPad.end());
-      Point dest = it->second;
-      int dx = abs(dest.x - pointer.x);
-      char dxc = dest.x > pointer.x ? '>' : '<';
-      int dy = abs(dest.y - pointer.y);
-      char dyc = dest.y > pointer.y ? 'v' : '^';
+    auto it = kRevKeyPad.find(c);
+    CHECK(it != kRevKeyPad.end());
+    Point dest = it->second;
+    int dx = abs(dest.x - pointer.x);
+    char dxc = dest.x > pointer.x ? '>' : '<';
+    int dy = abs(dest.y - pointer.y);
+    char dyc = dest.y > pointer.y ? 'v' : '^';
   
-      std::string bad_path = "";
-      if (dest.x == 0 && pointer.x != 0 && pointer.y == 3) {
-        bad_path.append(dx, '<');
-        bad_path.append(dy, '^');
-        bad_path.append(1, 'A');
-      } else if (pointer.x == 0 && dest.x != 0 && dest.y == 3) {
-        bad_path.append(dy, 'v');
-        bad_path.append(dx, '>');
-        bad_path.append(1, 'A');
-      }
-  
-      for (std::string path : AllCombinations(dx, dy, dxc, dyc)) {
-        path.append(1, 'A');
-        if (path == bad_path) continue;
-
-        {
-          Point test = state[0];
-          for (char c : path) {
-            test += Cardinal::Parse(c);
-            CHECK_NE(test, Point({0, 3})) << path << ": " << state[0] << "-" << dest << " ? " << bad_path;
-          }
-        }
-
-        for (const auto& [sub_state, sub_steps] : ToDirectional(path, state, 1)) {
-          State new_state = sub_state;
-          new_state[0] = dest;
-          auto [it, inserted] = new_states.emplace(new_state, steps + sub_steps);
-          if (!inserted) {
-            it->second = std::min(it->second, steps + sub_steps);
-          }
-        }
-      }
+    std::string bad_path = "";
+    if (dest.x == 0 && pointer.x != 0 && pointer.y == 3) {
+      bad_path.append(dx, '<');
+      bad_path.append(dy, '^');
+      bad_path.append(1, 'A');
+    } else if (pointer.x == 0 && dest.x != 0 && dest.y == 3) {
+      bad_path.append(dy, 'v');
+      bad_path.append(dx, '>');
+      bad_path.append(1, 'A');
     }
-    states = std::move(new_states);
+  
+    int64_t sub_best = std::numeric_limits<int64_t>::max();
+    for (std::string path : AllCombinations(dx, dy, dxc, dyc)) {
+      path.append(1, 'A');
+      if (path == bad_path) continue;
+
+      int64_t sub_steps = ToDirectional(path, mids + 1, 1);
+      sub_best = std::min(sub_best, sub_steps);
+    }
+    best += sub_best;
+    pointer = dest;
   }
 
-  return states;
+  return best;
 }
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2024_21::Part1(
     absl::Span<std::string_view> input) const {
-  int sum = 0;
+  int64_t sum = 0;
   for (std::string_view line : input) {
-    int num_code = 0;
+    int64_t num_code = 0;
     for (char c : line) {
       if (!std::isdigit(c)) break;
       num_code = num_code * 10 + (c - '0');
     }
 
-    int64_t best_path_size = std::numeric_limits<int64_t>::max();
-    for (const auto& [state, steps] : ToKeyPad(line)) {
-      best_path_size = std::min(best_path_size, steps);
-    }
+    int64_t best_path_size = ToKeyPad(line, 2);
     LOG(ERROR) << line << ": " << best_path_size << " * " << num_code;
     sum += best_path_size * num_code;
   }
@@ -312,7 +279,20 @@ absl::StatusOr<std::string> Day_2024_21::Part1(
 
 absl::StatusOr<std::string> Day_2024_21::Part2(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  int64_t sum = 0;
+  for (std::string_view line : input) {
+    int64_t num_code = 0;
+    for (char c : line) {
+      if (!std::isdigit(c)) break;
+      num_code = num_code * 10 + (c - '0');
+    }
+
+    int64_t best_path_size = ToKeyPad(line, 25);
+    LOG(ERROR) << line << ": " << best_path_size << " * " << num_code;
+    sum += best_path_size * num_code;
+  }
+
+  return AdventReturn(sum);
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
