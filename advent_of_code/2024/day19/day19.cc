@@ -29,21 +29,18 @@ namespace advent_of_code {
 
 namespace {
 
-bool CanMake(std::string_view test,
-             absl::Span<const std::string_view> patterns,
-             absl::flat_hash_map<std::string_view, bool>& hist) {
-  auto it = hist.find(test);
-  if (it != hist.end()) return it->second;
-
-  bool ret = false;
-  for (std::string_view p : patterns) {
-    if (test.substr(0, p.size()) != p) continue;
-    if (!CanMake(test.substr(p.size()), patterns, hist)) continue;
-    ret = true;
-    break;
-  }
-
-  return hist[test] = ret;
+static int CharIdx(char c) {
+  static std::array<int, 128> kCharIdxArray = []() {
+    std::array<int, 128> ret;
+    for (int i = 0; i < 128; ++i) ret[i] = -1;
+    ret['w'] = 0;
+    ret['u'] = 1;
+    ret['b'] = 2;
+    ret['r'] = 3;
+    ret['g'] = 4;
+    return ret;
+  }();
+  return kCharIdxArray[c];
 }
 
 class Patterns {
@@ -52,12 +49,12 @@ class Patterns {
     for (std::string_view p : patterns) {
       Prefix* val = &root_;
       for (char c : p) {
-        auto [it, inserted] = val->subs.emplace(c, nullptr);
-        if (inserted) {
+        int idx = CharIdx(c);
+        if (val->subs[idx] == nullptr) {
           own.push_back(std::make_unique<Prefix>());
-          it->second = own.back().get();
+          val->subs[idx] = own.back().get();
         }
-        val = it->second;
+        val = val->subs[idx];
       }
       val->match = true;
     }
@@ -71,34 +68,34 @@ class Patterns {
     while (val != nullptr) {
       if (val->match) fn(build);
       if (c_idx == find.size()) break;
-      auto it = val->subs.find(find[c_idx]);
-      if (it == val->subs.end()) break;
       build.append(1, find[c_idx]);
+      int p_idx = CharIdx(find[c_idx]);
       ++c_idx;
-      val = it->second;
+      val = val->subs[p_idx];
     }
   }
 
  private:
   struct Prefix {
-    // TODO array<5>.
     bool match = false;
-    absl::flat_hash_map<char, Prefix*> subs;
-
-    std::string DebugString(std::string prefix = "") {
-      std::string ret;
-      absl::StrAppend(&ret, prefix, "match=", match, "\n");
-      std::string sub_prefix = absl::StrCat(prefix, "  ");
-      for (const auto [c, sub] : subs) {
-        absl::StrAppend(&ret, prefix, "c=", std::string_view(&c, 1), "\n");
-        absl::StrAppend(&ret, sub->DebugString(sub_prefix));
-      }
-      return ret;
-    }
+    std::array<Prefix*, 5> subs = {nullptr, nullptr, nullptr, nullptr, nullptr};
   };
   std::vector<std::unique_ptr<Prefix>> own;
   Prefix root_;
 };
+
+bool CanMake(std::string_view test, const Patterns& patterns,
+             absl::flat_hash_map<std::string_view, bool>& hist) {
+  auto it = hist.find(test);
+  if (it != hist.end()) return it->second;
+
+  bool ret = false;
+  patterns.Foreach(test, [&](std::string_view p) {
+    ret |= CanMake(test.substr(p.size()), patterns, hist);
+  });
+
+  return hist[test] = ret;
+}
 
 int64_t CountMakable(std::string_view test, const Patterns& patterns,
                      absl::flat_hash_map<std::string_view, int64_t>& hist) {
@@ -114,23 +111,27 @@ int64_t CountMakable(std::string_view test, const Patterns& patterns,
   return hist[test] = ret;
 }
 
-
 }  // namespace
 
 absl::StatusOr<std::string> Day_2024_19::Part1(
     absl::Span<std::string_view> input) const {
   if (input.size() < 3) return absl::InvalidArgumentError("Too short");
-  std::vector<std::string_view> patterns = absl::StrSplit(input[0], ", ");
+  std::vector<std::string_view> pattern_list = absl::StrSplit(input[0], ", ");
+  for (std::string_view p : pattern_list) {
+    for (char c : p) {
+      if (CharIdx(c) < 0) return absl::InvalidArgumentError("Bad color");
+    }
+  }
   if (!input[1].empty()) return absl::InvalidArgumentError("No blank line");
 
   absl::flat_hash_map<std::string_view, bool> hist = {{"", true}};
+  Patterns patterns(std::move(pattern_list));
   int count = 0;
   for (int i = 2; i < input.size(); ++i) {
     if (CanMake(input[i], patterns, hist)) {
       ++count;
     }
   }
-  LOG(ERROR) << hist.size();
   return AdventReturn(count);
 }
 
@@ -138,6 +139,11 @@ absl::StatusOr<std::string> Day_2024_19::Part2(
     absl::Span<std::string_view> input) const {
   if (input.size() < 3) return absl::InvalidArgumentError("Too short");
   std::vector<std::string_view> pattern_list = absl::StrSplit(input[0], ", ");
+  for (std::string_view p : pattern_list) {
+    for (char c : p) {
+      if (CharIdx(c) < 0) return absl::InvalidArgumentError("Bad color");
+    }
+  }
   if (!input[1].empty()) return absl::InvalidArgumentError("No blank line");
 
   absl::flat_hash_map<std::string_view, int64_t> hist = {{"", 1}};
@@ -146,7 +152,6 @@ absl::StatusOr<std::string> Day_2024_19::Part2(
   for (int i = 2; i < input.size(); ++i) {
     count += CountMakable(input[i], patterns, hist);
   }
-  LOG(ERROR) << hist.size();
   return AdventReturn(count);
 }
 
