@@ -47,8 +47,8 @@ bool CanMake(std::string_view test,
 }
 
 int64_t CountMakable(std::string_view test,
-                 absl::Span<const std::string_view> patterns,
-                 absl::flat_hash_map<std::string_view, int64_t>& hist) {
+                     absl::Span<const std::string_view> patterns,
+                     absl::flat_hash_map<std::string_view, int64_t>& hist) {
   auto it = hist.find(test);
   if (it != hist.end()) return it->second;
 
