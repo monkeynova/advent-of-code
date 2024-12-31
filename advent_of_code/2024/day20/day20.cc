@@ -100,6 +100,12 @@ absl::StatusOr<std::string> Day_2024_20::Part2(
     if (!found) return absl::InvalidArgumentError("no path");
     path.push_back(*found);
   }
+
+  // TODO: I've tried a few ways of indexing to do better here and haven't
+  //       been successful at beating the N^2 yet.
+  //       Inner loop over {d | |d| <= 20}: 8ms -> 30ms
+  //       Index on x -> {y, idx}: 8ms -> 20ms
+
   int skips = 0;
   for (int i = 0; i < path.size(); ++i) {
     for (int j = i + 2; j < path.size(); ++j) {
