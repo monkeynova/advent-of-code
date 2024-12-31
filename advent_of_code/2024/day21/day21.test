@@ -2,21 +2,19 @@
 ==
 
 [part=1]
-Example input
+029A
+980A
+179A
+456A
+379A
 --
-ERROR: UNIMPLEMENTED: Problem not known
+126384
 ==
 
 [part=1]
 @include{advent_of_code/2024/day21/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
-==
-
-[part=2]
-Example input
---
-ERROR: UNIMPLEMENTED: Problem not known
+154208
 ==
 
 [part=2]
