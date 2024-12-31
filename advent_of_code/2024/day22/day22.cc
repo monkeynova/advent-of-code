@@ -29,18 +29,72 @@ namespace advent_of_code {
 
 namespace {
 
+int64_t Step(int64_t in) {
+  in = (in ^ (in << 6)) % 16777216;
+  in = (in ^ (in >>5)) % 16777216;
+  in = (in ^ (in << 11)) % 16777216;
+  return in;
+}
+
 // Helper methods go here.
 
 }  // namespace
 
 absl::StatusOr<std::string> Day_2024_22::Part1(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  ASSIGN_OR_RETURN(std::vector<int64_t> list, ParseAsInts(input));
+  int64_t sum = 0;
+  for (int64_t secret : list) {
+    for (int i = 0; i < 2000; ++i) {
+      secret = Step(secret);
+    }
+    sum += secret;
+  }
+  return AdventReturn(sum);
 }
 
 absl::StatusOr<std::string> Day_2024_22::Part2(
     absl::Span<std::string_view> input) const {
-  return absl::UnimplementedError("Problem not known");
+  ASSIGN_OR_RETURN(std::vector<int64_t> list, ParseAsInts(input));
+
+  absl::flat_hash_map<std::array<int8_t, 4>, int64_t> seq2count;
+  for (int64_t secret : list) {
+    absl::flat_hash_set<std::array<int8_t, 4>> hist;
+
+    int8_t prev, cur;
+    std::array<int8_t, 4> seq;
+    prev = secret % 10;
+    for (int i = 0; i < 4; ++i) {
+      secret = Step(secret);
+      cur = secret % 10;
+      seq[i] = cur - prev;
+      prev = cur;
+    }
+    for (int i = 5; i < 2000; ++i) {
+      auto [it, inserted] = hist.insert(seq);
+      if (inserted) {
+        seq2count[seq] += cur;
+      }
+
+      for (int j = 0; j < 3; ++j) {
+        seq[j] = seq[j + 1];
+      }
+      secret = Step(secret);
+      cur = secret % 10;
+      seq[3] = cur - prev;
+      prev = cur;
+    }
+    secret = Step(secret);
+    cur = secret % 10;
+    seq[0] = cur - prev;
+    prev = cur;
+  }
+  int64_t max = 0;
+  for (const auto& [seq, count] : seq2count) {
+    max = std::max(max, count);
+  }
+
+  return AdventReturn(max);
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
