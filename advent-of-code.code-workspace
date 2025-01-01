@@ -98,7 +98,9 @@
             "hash_set": "cpp",
             "filesystem": "cpp",
             "__verbose_abort": "cpp",
-            "charconv": "cpp"
+            "charconv": "cpp",
+            "execution": "cpp",
+            "print": "cpp"
         }
     }
 }
