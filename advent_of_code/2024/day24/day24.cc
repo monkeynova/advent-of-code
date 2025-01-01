@@ -142,7 +142,7 @@ EvalTree::Node* EvalTree::FindValid(std::function<bool(Node*)> validator) {
 bool EvalTree::ValidateZCarryBottom(int i, Node* carry) {
   Node* sub_carry = nullptr;
   if (carry->op != Node::kAnd) {
-    // LOG(ERROR) << "Bad sub-carry: " << i << ": " << carry->DebugString();
+    // LOG(INFO) << "Bad sub-carry: " << i << ": " << carry->DebugString();
     return false;
   }
   if (carry->left->IsXOpY(Node::kXor, i - 1)) {
@@ -150,15 +150,15 @@ bool EvalTree::ValidateZCarryBottom(int i, Node* carry) {
   } else if (carry->right->IsXOpY(Node::kXor, i - 1)) {
     sub_carry = carry->left;
   } else {
-    // LOG(ERROR) << "No sub-carry-xor: " << i << ": " << carry->DebugString();
+    // LOG(INFO) << "No sub-carry-xor: " << i << ": " << carry->DebugString();
     return false;
   }
 
   if (!ValidateZCarryTop(i - 1, sub_carry)) {
-    LOG(ERROR) << "Finding replacement for " << sub_carry->name;
+    LOG(INFO) << "Finding replacement for " << sub_carry->name;
     Node* find = FindValid([&](Node* n) { return ValidateZCarryTop(i - 1, sub_carry); });
     if (find != nullptr) {
-      LOG(ERROR) << "Swap: " << sub_carry->name << "," << find->name;
+      LOG(INFO) << "Swap: " << sub_carry->name << "," << find->name;
       swaps_.insert({sub_carry->name, find->name});
       std::swap(*sub_carry, *find);
       return true;
@@ -172,14 +172,14 @@ bool EvalTree::ValidateZCarryBottom(int i, Node* carry) {
 bool EvalTree::ValidateZCarryTop(int i, Node* carry) {
   if (i == 1) {
     if (!carry->IsXOpY(Node::kAnd, 0)) {
-      // LOG(ERROR) << "Bad carry1: " << i << ": " << carry->DebugString();
+      // LOG(INFO) << "Bad carry1: " << i << ": " << carry->DebugString();
       return false;
     }
     return true;
   }
 
   if (carry->op != Node::kOr) {
-    // LOG(ERROR) << "Bad carry: " << i << ": " << carry->DebugString();
+    // LOG(INFO) << "Bad carry: " << i << ": " << carry->DebugString();
     return false;
   }
   Node* sub_carry = nullptr;
@@ -188,15 +188,15 @@ bool EvalTree::ValidateZCarryTop(int i, Node* carry) {
   } else if (carry->right->IsXOpY(Node::kAnd, i - 1)) {
     sub_carry = carry->left;
   } else {
-    // LOG(ERROR) << "No carry-and: " << i << ": " << carry->DebugString();
+    // LOG(INFO) << "No carry-and: " << i << ": " << carry->DebugString();
     return false;
   }
 
   if (!ValidateZCarryBottom(i, sub_carry)) {
-    LOG(ERROR) << "Finding replacement for " << sub_carry->name;
+    LOG(INFO) << "Finding replacement for " << sub_carry->name;
     Node* find = FindValid([&](Node* n) { return ValidateZCarryBottom(i, sub_carry); });
     if (find != nullptr) {
-      LOG(ERROR) << "Swap: " << sub_carry->name << "," << find->name;
+      LOG(INFO) << "Swap: " << sub_carry->name << "," << find->name;
       swaps_.insert({sub_carry->name, find->name});
       std::swap(*sub_carry, *find);
       return true;
@@ -209,14 +209,14 @@ bool EvalTree::ValidateZCarryTop(int i, Node* carry) {
 bool EvalTree::ValidateZ(int i, Node* z) {
   if (i == 0) {
     if (!z->IsXOpY(Node::kXor, 0)) {
-      LOG(ERROR) << "Bad Z" << i << ": " << z->DebugString();
+      LOG(INFO) << "Bad Z" << i << ": " << z->DebugString();
       return false;
     }
     return true;
   }
 
   if (z->op != Node::kXor) {
-    LOG(ERROR) << "Bad Z" << i << ": " << z->DebugString();
+    LOG(INFO) << "Bad Z" << i << ": " << z->DebugString();
     return false;
   }
   Node* carry = nullptr;
@@ -225,15 +225,15 @@ bool EvalTree::ValidateZ(int i, Node* z) {
   } else if (z->right->IsXOpY(Node::kXor, i)) {
     carry = z->left;
   } else {
-    LOG(ERROR) << "No z-Xor: " << i << ": " << z->DebugString();
+    LOG(INFO) << "No z-Xor: " << i << ": " << z->DebugString();
     return false;
   }
 
   if (!ValidateZCarryTop(i, carry)) {
-    LOG(ERROR) << "Finding replacement for " << carry->name;
+    LOG(INFO) << "Finding replacement for " << carry->name;
     Node* find = FindValid([&](Node* n) { return ValidateZCarryTop(i, carry); });
     if (find != nullptr) {
-      LOG(ERROR) << "Swap: " << carry->name << "," << find->name;
+      LOG(INFO) << "Swap: " << carry->name << "," << find->name;
       swaps_.insert({carry->name, find->name});
       std::swap(*carry, *find);
       return true;
@@ -247,12 +247,12 @@ std::vector<std::string_view> EvalTree::FindWrong() {
   // 45 is special, but not broken in my input (maybe?).
   for (int i = 0; i <= 44; ++i) {
     Node* z = Ensure(absl::StrFormat("z%02d", i));
-    LOG(ERROR) << i << ": " << z->DebugString();
+    LOG(INFO) << i << ": " << z->DebugString();
     if (!ValidateZ(i, z)) {
-      LOG(ERROR) << "Finding replacement for " << z->name;
+      LOG(INFO) << "Finding replacement for " << z->name;
       Node* find = FindValid([&](Node* n) { return ValidateZ(i, n); });
       if (find != nullptr) {
-        LOG(ERROR) << "Swap: " << z->name << "," << find->name;
+        LOG(INFO) << "Swap: " << z->name << "," << find->name;
         swaps_.insert({z->name, find->name});
         std::swap(*z, *find);
       } else {
@@ -260,12 +260,12 @@ std::vector<std::string_view> EvalTree::FindWrong() {
         if (z->op == Node::kXor) {
           if (ValidateZCarryTop(i, z->left)) {
             find2 = FindValid([&](Node* n) { return n->IsXOpY(Node::kXor, i); });
-            LOG(ERROR) << "Swap: " << z->right->name << "," << find2->name;
+            LOG(INFO) << "Swap: " << z->right->name << "," << find2->name;
             swaps_.insert({z->right->name, find2->name});
             std::swap(*z->right, *find2);
           } else if (ValidateZCarryTop(i, z->right)) {
             find2 = FindValid([&](Node* n) { return n->IsXOpY(Node::kXor, i); });
-            LOG(ERROR) << "Swap: " << z->left->name << "," << find2->name;
+            LOG(INFO) << "Swap: " << z->left->name << "," << find2->name;
             swaps_.insert({z->left->name, find2->name});
             std::swap(*z->left, *find2);
           } else {
@@ -281,10 +281,10 @@ std::vector<std::string_view> EvalTree::FindWrong() {
     }
   }  
 
-  LOG(ERROR) << swaps_.size();
+  LOG(INFO) << swaps_.size();
   absl::flat_hash_set<std::string_view> invalid;
   for (const auto& pair : swaps_) {
-    LOG(ERROR) << pair.first << " <-> " << pair.second;
+    LOG(INFO) << pair.first << " <-> " << pair.second;
     invalid.insert(pair.first);
     invalid.insert(pair.second);    
   }
