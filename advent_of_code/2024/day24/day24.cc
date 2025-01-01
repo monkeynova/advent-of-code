@@ -8,7 +8,6 @@
 #include "absl/log/log.h"
 #include "absl/strings/str_join.h"
 #include "advent_of_code/tokenizer.h"
-#include "re2/re2.h"
 
 namespace advent_of_code {
 
@@ -274,10 +273,13 @@ absl::StatusOr<std::string> Day_2024_24::Part1(
       continue;
     }
 
-    std::string_view n1, op, n2, out;
-    if (!RE2::FullMatch(line, "(\\S+) (\\S+) (\\S+) -> (\\S+)", &n1, &op, &n2, &out)) {
-      return absl::InvalidArgumentError("bad line");
-    }
+    Tokenizer t(line);
+    std::string_view n1 = t.Next();
+    std::string_view op = t.Next();
+    std::string_view n2 = t.Next();
+    RETURN_IF_ERROR(t.NextAre({"-", ">"}));
+    std::string_view out = t.Next();
+    if (!t.Done()) return absl::InvalidArgumentError("bad line");
     eval_tree.AddRule(out, n1, n2, op);
   }
   int64_t out = 0;
@@ -309,10 +311,13 @@ absl::StatusOr<std::string> Day_2024_24::Part2(
       continue;
     }
 
-    std::string_view n1, op, n2, out;
-    if (!RE2::FullMatch(line, "(\\S+) (\\S+) (\\S+) -> (\\S+)", &n1, &op, &n2, &out)) {
-      return absl::InvalidArgumentError("bad line");
-    }
+    Tokenizer t(line);
+    std::string_view n1 = t.Next();
+    std::string_view op = t.Next();
+    std::string_view n2 = t.Next();
+    RETURN_IF_ERROR(t.NextAre({"-", ">"}));
+    std::string_view out = t.Next();
+    if (!t.Done()) return absl::InvalidArgumentError("bad line");
     eval_tree.AddRule(out, n1, n2, op);
   }
 

@@ -35,7 +35,8 @@ std::string_view Tokenizer::Next() {
       ++end;
     }
   } else if (isalpha(in_[start])) {
-    while (end < in_.size() && isalpha(in_[end])) {
+    while (end < in_.size()) {
+      if (!isalpha(in_[end]) && !isdigit(in_[end])) break;
       ++end;
     }
   }
