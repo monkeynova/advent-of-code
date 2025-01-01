@@ -193,19 +193,19 @@ absl::StatusOr<std::string> Day_2024_17::Part1(
     Tokenizer t(input[0]);
     RETURN_IF_ERROR(t.NextAre({"Register", "A", ":"}));
     ASSIGN_OR_RETURN(registers[0], t.NextInt());
-    if (!t.Done()) return absl::InvalidArgumentError("bad input A");
+    RETURN_IF_ERROR(t.AssertDone());
   }
   {
     Tokenizer t(input[1]);
     RETURN_IF_ERROR(t.NextAre({"Register", "B", ":"}));
     ASSIGN_OR_RETURN(registers[1], t.NextInt());
-    if (!t.Done()) return absl::InvalidArgumentError("bad input B");
+    RETURN_IF_ERROR(t.AssertDone());
   }
   {
     Tokenizer t(input[2]);
     RETURN_IF_ERROR(t.NextAre({"Register", "C", ":"}));
     ASSIGN_OR_RETURN(registers[2], t.NextInt());
-    if (!t.Done()) return absl::InvalidArgumentError("bad input C");
+    RETURN_IF_ERROR(t.AssertDone());
   }
   std::vector<int64_t> mem;
   {
@@ -232,19 +232,19 @@ absl::StatusOr<std::string> Day_2024_17::Part2(
     Tokenizer t(input[0]);
     RETURN_IF_ERROR(t.NextAre({"Register", "A", ":"}));
     ASSIGN_OR_RETURN(registers[0], t.NextInt());
-    if (!t.Done()) return absl::InvalidArgumentError("bad input A");
+    RETURN_IF_ERROR(t.AssertDone());
   }
   {
     Tokenizer t(input[1]);
     RETURN_IF_ERROR(t.NextAre({"Register", "B", ":"}));
     ASSIGN_OR_RETURN(registers[1], t.NextInt());
-    if (!t.Done()) return absl::InvalidArgumentError("bad input B");
+    RETURN_IF_ERROR(t.AssertDone());
   }
   {
     Tokenizer t(input[2]);
     RETURN_IF_ERROR(t.NextAre({"Register", "C", ":"}));
     ASSIGN_OR_RETURN(registers[2], t.NextInt());
-    if (!t.Done()) return absl::InvalidArgumentError("bad input C");
+    RETURN_IF_ERROR(t.AssertDone());
   }
   std::vector<int64_t> mem;
   {

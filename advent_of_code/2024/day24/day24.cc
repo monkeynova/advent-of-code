@@ -279,7 +279,7 @@ absl::StatusOr<std::string> Day_2024_24::Part1(
     std::string_view n2 = t.Next();
     RETURN_IF_ERROR(t.NextAre({"-", ">"}));
     std::string_view out = t.Next();
-    if (!t.Done()) return absl::InvalidArgumentError("bad line");
+    RETURN_IF_ERROR(t.AssertDone());
     eval_tree.AddRule(out, n1, n2, op);
   }
   int64_t out = 0;
@@ -317,7 +317,7 @@ absl::StatusOr<std::string> Day_2024_24::Part2(
     std::string_view n2 = t.Next();
     RETURN_IF_ERROR(t.NextAre({"-", ">"}));
     std::string_view out = t.Next();
-    if (!t.Done()) return absl::InvalidArgumentError("bad line");
+    RETURN_IF_ERROR(t.AssertDone());
     eval_tree.AddRule(out, n1, n2, op);
   }
 

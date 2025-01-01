@@ -70,7 +70,7 @@ absl::StatusOr<std::string> Day_2024_13::Part1(
       ASSIGN_OR_RETURN(a.x, t.NextInt());
       RETURN_IF_ERROR(t.NextAre({",", "Y", "+"}));
       ASSIGN_OR_RETURN(a.y, t.NextInt());
-      if (!t.Done()) return absl::InvalidArgumentError("parse a");
+      RETURN_IF_ERROR(t.AssertDone());
     }
     {
       Tokenizer t(input[i + 1]);
@@ -78,7 +78,7 @@ absl::StatusOr<std::string> Day_2024_13::Part1(
       ASSIGN_OR_RETURN(b.x, t.NextInt());
       RETURN_IF_ERROR(t.NextAre({",", "Y", "+"}));
       ASSIGN_OR_RETURN(b.y, t.NextInt());
-      if (!t.Done()) return absl::InvalidArgumentError("parse b");
+      RETURN_IF_ERROR(t.AssertDone());
     }
     {
       Tokenizer t(input[i + 2]);
@@ -86,7 +86,7 @@ absl::StatusOr<std::string> Day_2024_13::Part1(
       ASSIGN_OR_RETURN(prize.x, t.NextInt());
       RETURN_IF_ERROR(t.NextAre({",", "Y", "="}));
       ASSIGN_OR_RETURN(prize.y, t.NextInt());
-      if (!t.Done()) return absl::InvalidArgumentError("parse prize");
+      RETURN_IF_ERROR(t.AssertDone());
     }
     std::optional<int64_t> cost = FindCost(a, b, prize);
     if (cost) total_cost += *cost;
@@ -107,7 +107,7 @@ absl::StatusOr<std::string> Day_2024_13::Part2(
       ASSIGN_OR_RETURN(a.x, t.NextInt());
       RETURN_IF_ERROR(t.NextAre({",", "Y", "+"}));
       ASSIGN_OR_RETURN(a.y, t.NextInt());
-      if (!t.Done()) return absl::InvalidArgumentError("parse a");
+      RETURN_IF_ERROR(t.AssertDone());
     }
     {
       Tokenizer t(input[i + 1]);
@@ -115,7 +115,7 @@ absl::StatusOr<std::string> Day_2024_13::Part2(
       ASSIGN_OR_RETURN(b.x, t.NextInt());
       RETURN_IF_ERROR(t.NextAre({",", "Y", "+"}));
       ASSIGN_OR_RETURN(b.y, t.NextInt());
-      if (!t.Done()) return absl::InvalidArgumentError("parse b");
+      RETURN_IF_ERROR(t.AssertDone());
     }
     {
       Tokenizer t(input[i + 2]);
@@ -123,7 +123,7 @@ absl::StatusOr<std::string> Day_2024_13::Part2(
       ASSIGN_OR_RETURN(prize.x, t.NextInt());
       RETURN_IF_ERROR(t.NextAre({",", "Y", "="}));
       ASSIGN_OR_RETURN(prize.y, t.NextInt());
-      if (!t.Done()) return absl::InvalidArgumentError("parse prize");
+      RETURN_IF_ERROR(t.AssertDone());
     }
     std::optional<int64_t> cost = FindCost2(a, b, prize);
     if (cost) total_cost += *cost;

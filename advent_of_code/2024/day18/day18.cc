@@ -29,7 +29,7 @@ absl::StatusOr<std::string> Day_2024_18::Part1(
     bounds.ExpandInclude(end);
     RETURN_IF_ERROR(t.NextIs(","));
     ASSIGN_OR_RETURN(steps, t.NextInt());
-    if (!t.Done()) return absl::InvalidArgumentError("bad param");
+    RETURN_IF_ERROR(t.AssertDone());
   }
   if (input.size() < steps) return absl::InvalidArgumentError("bad steps");
 
@@ -39,7 +39,7 @@ absl::StatusOr<std::string> Day_2024_18::Part1(
     {
       Tokenizer t(input[i]);
       RETURN_IF_ERROR(p.From(t));
-      if (!t.Done()) return absl::InvalidArgumentError("bad point");
+      RETURN_IF_ERROR(t.AssertDone());
     }
     if (!bounds.Contains(p)) return absl::InvalidArgumentError("off board");
     points.insert(p);
@@ -67,7 +67,7 @@ absl::StatusOr<std::string> Day_2024_18::Part2(
     bounds.ExpandInclude(end);
     RETURN_IF_ERROR(t.NextIs(","));
     ASSIGN_OR_RETURN(steps, t.NextInt());
-    if (!t.Done()) return absl::InvalidArgumentError("bad param");
+    RETURN_IF_ERROR(t.AssertDone());
   }
   if (input.size() < steps) return absl::InvalidArgumentError("bad steps");
 
@@ -78,7 +78,7 @@ absl::StatusOr<std::string> Day_2024_18::Part2(
     {
       Tokenizer t(input[i]);
       RETURN_IF_ERROR(p.From(t));
-      if (!t.Done()) return absl::InvalidArgumentError("bad point");
+      RETURN_IF_ERROR(t.AssertDone());
     }
     if (!bounds.Contains(p)) return absl::InvalidArgumentError("off board");
     points.push_back(p);

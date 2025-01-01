@@ -59,7 +59,7 @@ absl::StatusOr<std::string> Day_2024_14::Part1(
   {
     Tokenizer t(param());
     RETURN_IF_ERROR(tile.From(t));
-    if (!t.Done()) return absl::InternalError("bad param");
+    RETURN_IF_ERROR(t.AssertDone());
   }
   if (tile.x % 2 != 1) return absl::InternalError("bad param %x");
   if (tile.y % 2 != 1) return absl::InternalError("bad param %y");
@@ -90,7 +90,7 @@ absl::StatusOr<std::string> Day_2024_14::Part2(
   {
     Tokenizer t(param());
     RETURN_IF_ERROR(tile.From(t));
-    if (!t.Done()) return absl::InternalError("bad param");
+    RETURN_IF_ERROR(t.AssertDone());
   }
   if (tile.x % 2 != 1) return absl::InternalError("bad param %x");
   if (tile.y % 2 != 1) return absl::InternalError("bad param %y");

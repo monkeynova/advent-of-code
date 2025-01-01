@@ -18,6 +18,11 @@ class Tokenizer {
   // Returns true if the original input has been completely consumed.
   bool Done() const { return in_.empty(); }
 
+  absl::Status AssertDone() const {
+    if (!in_.empty()) return absl::InvalidArgumentError("Not done");
+    return absl::OkStatus();
+  }
+
   // Returns (and consumes from input) the next token.
   std::string_view Next();
 
