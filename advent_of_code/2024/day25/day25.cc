@@ -50,7 +50,7 @@ absl::StatusOr<std::string> Day_2024_25::Part1(
 
 absl::StatusOr<std::string> Day_2024_25::Part2(
     absl::Span<std::string_view> input) const {
-  return AdventReturn("Merry Christmas");
+  return AdventReturn("Merry Christmas!");
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
