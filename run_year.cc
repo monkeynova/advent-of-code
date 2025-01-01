@@ -457,8 +457,8 @@ int RunYear(int year) {
 
 absl::StatusOr<std::vector<int>> GetYearsFromFlag() {
   // No one will ever run this on New Years Eve/Day...
-  absl::CivilYear this_year =
-      absl::ToCivilYear(absl::Now(), absl::UTCTimeZone());
+  absl::CivilYear this_year = absl::ToCivilYear(
+    absl::Now() - absl::Seconds(30 * 86400), absl::UTCTimeZone());
   std::string year_str = absl::GetFlag(FLAGS_year);
   if (year_str == "all") {
     return advent_of_code::AllAdventYears();
