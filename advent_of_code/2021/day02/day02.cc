@@ -12,12 +12,6 @@
 
 namespace advent_of_code {
 
-namespace {
-
-// Helper methods go here.
-
-}  // namespace
-
 absl::StatusOr<std::string> Day_2021_02::Part1(
     absl::Span<std::string_view> input) const {
   static const RE2 kForwardRE("forward (\\d+)");

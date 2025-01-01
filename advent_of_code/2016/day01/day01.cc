@@ -12,12 +12,6 @@
 
 namespace advent_of_code {
 
-namespace {
-
-// Helper methods go here.
-
-}  // namespace
-
 absl::StatusOr<std::string> Day_2016_01::Part1(
     absl::Span<std::string_view> input) const {
   if (input.size() != 1) return Error("Bad input size");

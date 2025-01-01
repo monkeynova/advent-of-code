@@ -11,12 +11,6 @@
 
 namespace advent_of_code {
 
-namespace {
-
-// Helper methods go here.
-
-}  // namespace
-
 absl::StatusOr<std::string> Day_2021_01::Part1(
     absl::Span<std::string_view> input) const {
   ASSIGN_OR_RETURN(std::vector<int64_t> list, ParseAsInts(input));

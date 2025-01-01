@@ -11,12 +11,6 @@
 
 namespace advent_of_code {
 
-namespace {
-
-// Helper methods go here.
-
-}  // namespace
-
 absl::StatusOr<std::string> Day_2024_18::Part1(
     absl::Span<std::string_view> input) const {
   PointRectangle bounds = {{0, 0}, {0, 0}};

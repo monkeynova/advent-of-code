@@ -11,12 +11,6 @@
 
 namespace advent_of_code {
 
-namespace {
-
-// Helper methods go here.
-
-}  // namespace
-
 absl::StatusOr<std::string> Day_2017_08::Part1(
     absl::Span<std::string_view> input) const {
   absl::flat_hash_map<std::string_view, int> registers;

@@ -11,12 +11,6 @@
 
 namespace advent_of_code {
 
-namespace {
-
-// Helper methods go here.
-
-}  // namespace
-
 absl::StatusOr<std::string> Day_2021_03::Part1(
     absl::Span<std::string_view> input) const {
   int64_t gamma = 0;

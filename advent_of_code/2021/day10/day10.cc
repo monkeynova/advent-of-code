@@ -12,12 +12,6 @@
 
 namespace advent_of_code {
 
-namespace {
-
-// Helper methods go here.
-
-}  // namespace
-
 absl::StatusOr<std::string> Day_2021_10::Part1(
     absl::Span<std::string_view> input) const {
   static const absl::flat_hash_map<char, int64_t> kScoreMap = {

@@ -12,12 +12,6 @@
 
 namespace advent_of_code {
 
-namespace {
-
-// Helper methods go here.
-
-}  // namespace
-
 absl::StatusOr<std::string> Day_2018_03::Part1(
     absl::Span<std::string_view> input) const {
   // #1372 @ 119,13: 29x16
