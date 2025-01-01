@@ -16,11 +16,11 @@ using NodeType = uint16_t;
 
 std::vector<NodeType> FindBiggest(
     absl::Span<const NodeType> nodes, const std::vector<bool>& edges,
-    std::vector<NodeType>& in, absl::flat_hash_set<NodeType> out) {
+    std::vector<NodeType>& in, std::vector<bool> out) {
 
   std::vector<NodeType> ret = in;
   for (/*nop*/; !nodes.empty(); nodes = nodes.subspan(1)) {
-    if (out.contains(nodes[0])) continue;
+    if (out[nodes[0]]) continue;
     bool all_ok = true;
     for (NodeType test : in) {
       if (!edges[nodes[0] * 26 * 26 + test]) {
@@ -33,10 +33,10 @@ std::vector<NodeType> FindBiggest(
       if (sub.size() > ret.size()) ret = sub;
       in.pop_back();
       for (NodeType n : sub) {
-        out.insert(n);
+        out[n] = true;
       }
     }
-    out.insert(nodes[0]);
+    out[nodes[0]] = true;
   }
 
   return ret;
@@ -45,7 +45,7 @@ std::vector<NodeType> FindBiggest(
 std::vector<NodeType> FindBiggest(
     absl::Span<const NodeType> nodes, const std::vector<bool>& edges) {
   std::vector<NodeType> in;
-  absl::flat_hash_set<NodeType> out;
+  std::vector<bool> out(26 * 26, false);
   return FindBiggest(nodes, edges, in, out);
 }
 
