@@ -37,6 +37,7 @@ std::vector<std::string_view> FindBiggest(
 
   std::vector<std::string_view> ret = in;
   for (/*nop*/; !nodes.empty(); nodes = nodes.subspan(1)) {
+    if (out.contains(nodes[0])) continue;
     bool all_ok = true;
     for (std::string_view test : in) {
       if (!edges.contains({nodes[0], test})) {
@@ -48,6 +49,9 @@ std::vector<std::string_view> FindBiggest(
       std::vector<std::string_view> sub = FindBiggest(nodes, edges, in, out);
       if (sub.size() > ret.size()) ret = sub;
       in.pop_back();
+      for (std::string_view n : sub) {
+        out.insert(n);
+      }
     }
     out.insert(nodes[0]);
   }
