@@ -4,7 +4,7 @@ default_rules(workspace_dep = "update_workspace.date")
 
 CURRENT_YEAR = "2024"
 
-CURRENT_DAY = "23"
+CURRENT_DAY = "24"
 
 test_suite(
     name = "latest",
