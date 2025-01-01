@@ -2,24 +2,86 @@
 ==
 
 [part=1]
-Example input
+kh-tc
+qp-kh
+de-cg
+ka-co
+yn-aq
+qp-ub
+cg-tb
+vc-aq
+tb-ka
+wh-tc
+yn-cg
+kh-ub
+ta-co
+de-co
+tc-td
+tb-wq
+wh-td
+ta-ka
+td-qp
+aq-cg
+wq-ub
+ub-vc
+de-ta
+wq-aq
+wq-vc
+wh-yn
+ka-de
+kh-ta
+co-tc
+wh-qp
+tb-vc
+td-yn
 --
-ERROR: UNIMPLEMENTED: Problem not known
+7
 ==
 
 [part=1]
 @include{advent_of_code/2024/day23/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+1163
 ==
 
 [part=2]
-Example input
+kh-tc
+qp-kh
+de-cg
+ka-co
+yn-aq
+qp-ub
+cg-tb
+vc-aq
+tb-ka
+wh-tc
+yn-cg
+kh-ub
+ta-co
+de-co
+tc-td
+tb-wq
+wh-td
+ta-ka
+td-qp
+aq-cg
+wq-ub
+ub-vc
+de-ta
+wq-aq
+wq-vc
+wh-yn
+ka-de
+kh-ta
+co-tc
+wh-qp
+tb-vc
+td-yn
 --
-ERROR: UNIMPLEMENTED: Problem not known
+co,de,ka,ta
 ==
 
 [part=2]
 @include{advent_of_code/2024/day23/input.txt}
 --
-ERROR: UNIMPLEMENTED: Problem not known
+bm,bo,ee,fo,gt,hv,jv,kd,md,mu,nm,wx,xh
