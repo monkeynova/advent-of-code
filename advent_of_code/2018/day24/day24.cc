@@ -105,7 +105,7 @@ int CountTypes(const std::vector<Group>& groups) {
   return seen;
 }
 
-const absl::flat_hash_map<int, int>& SelectTargets(
+absl::flat_hash_map<int, int> SelectTargets(
     const std::vector<Group>& groups) {
   std::vector<int> group_order(groups.size());
   std::iota(group_order.begin(), group_order.end(), 0);
@@ -124,8 +124,8 @@ const absl::flat_hash_map<int, int>& SelectTargets(
               return a.initiative > b.initiative;
             });
 
-  static absl::flat_hash_map<int, int> targets;
-  static absl::flat_hash_set<int> selected;
+  absl::flat_hash_map<int, int> targets;
+  absl::flat_hash_set<int> selected;
   targets.clear();
   selected.clear();
   for (int i : group_order) {
@@ -136,6 +136,7 @@ const absl::flat_hash_map<int, int>& SelectTargets(
     int max_damage_group = -1;
     for (int j = 0; j < groups.size(); ++j) {
       const Group& defend_group = groups[j];
+      if (attack_group.type == defend_group.type) continue;
       if (selected.contains(j)) continue;
       int damage = attack_group.DamageTo(defend_group);
       VLOG(3) << attack_group.id << " would deal " << damage << " to "
@@ -143,7 +144,7 @@ const absl::flat_hash_map<int, int>& SelectTargets(
       bool replace = false;
       if (damage > max_damage) {
         replace = true;
-      } else if (damage == max_damage) {
+      } else if (damage == max_damage && max_damage_group != -1) {
         if (defend_group.effective_power() >
             groups[max_damage_group].effective_power()) {
           replace = true;
