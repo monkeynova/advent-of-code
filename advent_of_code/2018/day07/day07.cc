@@ -92,13 +92,11 @@ int FindMinPathAssignWork(WorkState* work) {
   for (std::string_view next : work->available) {
     free_worker->item = next;
     free_worker->complete_time = work->time + 60 + next[0] - 'A' + 1;
-    work->to_do.erase(next);
-    work->available.erase(next);
     WorkState new_work = *work;
+    new_work.to_do.erase(next);
+    new_work.available.erase(next);
     int min_if = FindMinPathAssignWork(&new_work);
     min_to_complete = std::min(min_to_complete, min_if);
-    work->available.insert(next);
-    work->to_do.insert(next);
   }
 
   return min_to_complete;

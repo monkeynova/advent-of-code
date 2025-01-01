@@ -130,19 +130,22 @@ absl::StatusOr<std::string> Day_2015_13::Part2(
     }
     cost_map[cost_pair.from][cost_pair.to] = cost_pair;
   }
+  std::vector<CostPair> to_add;
   for (const auto& pair : cost_map) {
     std::string_view who = pair.first;
     CostPair cost_pair_from;
     cost_pair_from.from = "me";
     cost_pair_from.to = who;
     cost_pair_from.happiness = 0;
-    cost_map[cost_pair_from.from][cost_pair_from.to] = cost_pair_from;
+    to_add.push_back(cost_pair_from);
     CostPair cost_pair_to;
     cost_pair_to.from = who;
-    ;
     cost_pair_to.to = "me";
     cost_pair_to.happiness = 0;
-    cost_map[cost_pair_to.from][cost_pair_to.to] = cost_pair_to;
+    to_add.push_back(cost_pair_to);
+  }
+  for (CostPair cp : to_add) {
+    cost_map[cp.from][cp.to] = cp;
   }
 
   return AdventReturn(FindBestSeating(cost_map));
