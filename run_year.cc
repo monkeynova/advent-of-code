@@ -399,7 +399,8 @@ Table::Cell::Color YearTimeColor(absl::Duration d) {
 };
 
 std::string TimeString(absl::Duration d) {
-  return d != absl::Seconds(0) ? absl::StrCat(d) : "";
+  if (d == absl::Seconds(0)) return "";
+  return absl::StrCat(d);
 };
 
 int RunYear(int year) {
