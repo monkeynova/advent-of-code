@@ -12,20 +12,18 @@ namespace advent_of_code {
 
 namespace {
 
-using NodeType = std::array<char, 2>;
+using NodeType = uint16_t;
 
 std::vector<NodeType> FindBiggest(
-    absl::Span<const NodeType> nodes,
-    const absl::flat_hash_set<std::pair<NodeType, NodeType>>& edges,
-    std::vector<NodeType>& in,
-    absl::flat_hash_set<NodeType> out) {
+    absl::Span<const NodeType> nodes, const std::vector<bool>& edges,
+    std::vector<NodeType>& in, absl::flat_hash_set<NodeType> out) {
 
   std::vector<NodeType> ret = in;
   for (/*nop*/; !nodes.empty(); nodes = nodes.subspan(1)) {
     if (out.contains(nodes[0])) continue;
     bool all_ok = true;
     for (NodeType test : in) {
-      if (!edges.contains({nodes[0], test})) {
+      if (!edges[nodes[0] * 26 * 26 + test]) {
         all_ok = false;
       }
     }
@@ -45,8 +43,7 @@ std::vector<NodeType> FindBiggest(
 }
 
 std::vector<NodeType> FindBiggest(
-    absl::Span<const NodeType> nodes,
-    const absl::flat_hash_set<std::pair<NodeType, NodeType>>& edges) {
+    absl::Span<const NodeType> nodes, const std::vector<bool>& edges) {
   std::vector<NodeType> in;
   absl::flat_hash_set<NodeType> out;
   return FindBiggest(nodes, edges, in, out);
@@ -87,16 +84,16 @@ absl::StatusOr<std::string> Day_2024_23::Part1(
 absl::StatusOr<std::string> Day_2024_23::Part2(
     absl::Span<std::string_view> input) const {
   absl::flat_hash_set<NodeType> node_set;
-  absl::flat_hash_set<std::pair<NodeType, NodeType>> edges;
+  std::vector<bool> edges(26 * 26 * 26 * 26, false);
   for (std::string_view line : input) {
     if (line.size() != 5) return absl::InvalidArgumentError("line length");
     if (line[2] != '-') return absl::InvalidArgumentError("bad net");
-    NodeType n1 = {line[0], line[1]};
-    NodeType n2 = {line[3], line[4]};
+    NodeType n1 = (line[0] - 'a') * 26 + (line[1] - 'a');
+    NodeType n2 = (line[3] - 'a') * 26 + (line[4] - 'a');
     node_set.insert(n1);
     node_set.insert(n2);
-    edges.insert({n1, n2});
-    edges.insert({n2, n1});
+    edges[n1 * 26 * 26 + n2] = true;
+    edges[n2 * 26 * 26 + n1] = true;
   }
 
   std::vector<NodeType> nodes(node_set.begin(), node_set.end());
@@ -104,9 +101,9 @@ absl::StatusOr<std::string> Day_2024_23::Part2(
   absl::c_sort(party);
   return AdventReturn(absl::StrJoin(
     party, ",",
-    [](std::string* out, std::array<char, 2> node) {
-      out->append(1, node[0]);
-      out->append(1, node[1]);
+    [](std::string* out, uint16_t node) {
+      out->append(1, (node / 26) + 'a');
+      out->append(1, (node % 26) + 'a');
     }));
 }
 
