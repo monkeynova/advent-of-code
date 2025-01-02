@@ -25,9 +25,9 @@ namespace advent_of_code {
 // ## ..##
 // #######
 #ifdef _WIN32
-  constexpr int32_t kLineEndWidth = 2;
+constexpr int32_t kLineEndWidth = 2;
 #else
-  constexpr int32_t kLineEndWidth = 1;
+constexpr int32_t kLineEndWidth = 1;
 #endif
 
 template <bool is_mutable = true>

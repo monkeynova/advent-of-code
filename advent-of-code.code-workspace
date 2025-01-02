@@ -100,7 +100,8 @@
             "__verbose_abort": "cpp",
             "charconv": "cpp",
             "execution": "cpp",
-            "print": "cpp"
+            "print": "cpp",
+            "xutility": "cpp"
         }
     }
 }

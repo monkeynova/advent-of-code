@@ -43,8 +43,6 @@ absl::StatusOr<std::string> Day_2023_03::Part1(
   auto point_idx = [&](Point p) { return p.y * b.width() + p.x; };
   std::bitset<256> find = ~std::bitset<256>();
   find['.'] = false;
-  find['\r'] = false;
-  find['\n'] = false;
   for (char c = '0'; c <= '9'; ++c) find[c] = false;
   for (Point p : b.Find(find)) {
     for (Point dir : Cardinal::kEightDirs) {

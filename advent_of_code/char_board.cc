@@ -73,7 +73,10 @@ template <bool is_mutable>
 absl::flat_hash_set<Point> CharBoardBase<is_mutable>::Find(
     std::bitset<256> charset) const {
   absl::flat_hash_set<Point> ret;
-  CHECK(!charset['\n']);
+  if constexpr (kLineEndWidth == 2) {
+    charset['\r'] = false;
+  }
+  charset['\n'] = false;
   for (int i = 0; i < buf_.size(); ++i) {
     if (charset[buf_[i]]) {
       ret.insert({.x = i % stride_, .y = i / stride_});
