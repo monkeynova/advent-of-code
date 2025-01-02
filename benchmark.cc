@@ -27,7 +27,11 @@ absl::Status ReadInput(advent_of_code::AdventDay* day, Input* ret) {
   filename.erase(filename.rfind('/'));
   filename.append("/input.txt");
   ASSIGN_OR_RETURN(ret->file, advent_of_code::GetContents(filename));
+#ifdef _WIN32
+  ret->lines = absl::StrSplit(ret->file, "\r\n");
+#else
   ret->lines = absl::StrSplit(ret->file, '\n');
+#endif
   while (!ret->lines.empty() && ret->lines.back().empty()) {
     ret->lines.pop_back();
   }
@@ -86,7 +90,8 @@ void BM_Day(benchmark::State& state) {
 }
 
 static const int cur_year = []() {
-  return absl::ToCivilYear(absl::Now(), absl::UTCTimeZone()).year();
+  return absl::ToCivilYear(
+    absl::Now() - absl::Seconds(30 * 86400), absl::UTCTimeZone()).year();
 }();
 
 BENCHMARK(BM_Day)->ArgsProduct(
