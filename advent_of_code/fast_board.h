@@ -149,6 +149,9 @@ class FastBoard {
     iterator& operator++() {
       ++idx_;
       if (!b_.OnBoard(Point(idx_))) ++idx_;
+#ifdef _WIN32
+      if (!b_.OnBoard(Point(idx_))) ++idx_;
+#endif
       return *this;
     }
     Point operator*() const {
@@ -172,6 +175,9 @@ class FastBoard {
         dir_delta_({-stride_, stride_, -1, 1}),
         on_board_(size_, true) {
     for (int i = stride_ - 1; i < size_; i += stride_) {
+      if constexpr (kLineEndWidth == 2) {
+        on_board_[i - 1] = false;
+      }
       on_board_[i] = false;
     }
   }

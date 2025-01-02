@@ -1,0 +1,36 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 094ed62..49f2f56 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -35,6 +35,15 @@ config_setting(
+     visibility = [":__subpackages__"],
+ )
+ 
++config_setting(
++    name = "arm_windows",
++    constraint_values = ["@platforms//os:windows"],
++    values = {
++        "cpu": "arm64_windows",
++    },
++    visibility = [":__subpackages__"],
++)
++
+ config_setting(
+     name = "macos",
+     constraint_values = ["@platforms//os:macos"],
+@@ -64,6 +73,7 @@ cc_library(
+     ],
+     copts = select({
+         ":windows": [],
++        ":arm_windows": [],
+         "//conditions:default": COPTS,
+     }),
+     defines = [
+@@ -76,6 +86,7 @@ cc_library(
+     includes = ["include"],
+     linkopts = select({
+         ":windows": ["-DEFAULTLIB:shlwapi.lib"],
++        ":arm_windows": ["-DEFAULTLIB:shlwapi.lib"],
+         "//conditions:default": ["-pthread"],
+     }),
+     # Only static linking is allowed; no .so will be produced.

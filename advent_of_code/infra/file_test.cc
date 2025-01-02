@@ -65,7 +65,11 @@ void RunTestCase(AdventDay* advent_day, std::string_view test_case_with_options,
     }
   }
 
-  std::vector<std::string_view> lines = absl::StrSplit(test_case, "\n");
+#ifdef _WIN32
+  std::vector<std::string_view> lines = absl::StrSplit(test_case, "\r\n");
+#else
+  std::vector<std::string_view> lines = absl::StrSplit(test_case, '\n');
+#endif
   absl::Span<std::string_view> lines_span = absl::MakeSpan(lines);
   // Pull off HACK: prefix lines from the front...
   while (!lines_span.empty() && absl::StartsWith(lines_span[0], "HACK:")) {

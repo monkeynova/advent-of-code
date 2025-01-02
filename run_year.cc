@@ -9,6 +9,11 @@
 #include "main_lib.h"
 #include "vlog.h"
 
+#ifdef _WIN32
+#include <io.h>
+#define isatty _isatty
+#endif
+
 enum ColorType {
   kAuto = 0,
   kNone = 1,
@@ -72,6 +77,14 @@ bool IsColorTerminal() {
       "wezterm",
   };
 
+  if (isatty(fileno(stdout)) == 0) {
+    return false;
+  }
+
+#ifdef _WIN32
+  return getenv("POWERSHELL_DISTRIBUTION_CHANNEL") != nullptr;
+#endif
+
   const char* const term = getenv("TERM");
 
   bool term_supports_color = false;
@@ -82,7 +95,7 @@ bool IsColorTerminal() {
     }
   }
 
-  return 0 != isatty(fileno(stdout)) && term_supports_color;
+  return term_supports_color;
 }
 
 struct Input {
@@ -102,7 +115,11 @@ absl::Status ReadInput(advent_of_code::AdventDay* day, Input* ret) {
   filename.erase(filename.rfind('/'));
   filename.append("/input.txt");
   ASSIGN_OR_RETURN(ret->file, advent_of_code::GetContents(filename));
+#ifdef _WIN32
+  ret->lines = absl::StrSplit(ret->file, "\r\n");
+#else
   ret->lines = absl::StrSplit(ret->file, '\n');
+#endif
   while (!ret->lines.empty() && ret->lines.back().empty()) {
     ret->lines.pop_back();
   }

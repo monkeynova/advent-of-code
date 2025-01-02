@@ -37,7 +37,11 @@ DirtyTestParse(std::string_view contents) {
   auto next = absl::make_unique<DirtyTestParseResult>();
   bool in_answer = false;
   bool in_test = false;
-  for (std::string_view line : absl::StrSplit(contents, "\n")) {
+#ifdef _WIN32
+  for (std::string_view line : absl::StrSplit(contents, "\r\n")) {
+#else
+  for (std::string_view line : absl::StrSplit(contents, '\n')) {
+#endif
     if (line == "--") {
       in_answer = true;
     } else if (line == "==") {
@@ -55,7 +59,11 @@ DirtyTestParse(std::string_view contents) {
     if (in_test && !line.empty() && line[0] == '\\') {
       line = line.substr(1);
     }
+#ifdef _WIN32
+    absl::StrAppend(&next->test, line, "\r\n");
+#else
     absl::StrAppend(&next->test, line, "\n");
+#endif
   }
   RETURN_IF_ERROR(FinishTest(next.get()));
   ret.push_back(std::move(next));

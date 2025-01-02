@@ -24,6 +24,12 @@ namespace advent_of_code {
 // #..#..#
 // ## ..##
 // #######
+#ifdef _WIN32
+  constexpr int32_t kLineEndWidth = 2;
+#else
+  constexpr int32_t kLineEndWidth = 1;
+#endif
+
 template <bool is_mutable = true>
 class CharBoardBase {
  public:
@@ -99,8 +105,11 @@ class CharBoardBase {
   template <bool is_mutable_test = is_mutable,
             typename = std::enable_if_t<is_mutable_test>>
   CharBoardBase(int width, int height)
-      : stride_(width + 1), buf_(stride_ * height, '.') {
+      : stride_(width + kLineEndWidth), buf_(stride_ * height, '.') {
     for (int i = stride_ - 1; i < buf_.size(); i += stride_) {
+      if constexpr (kLineEndWidth == 2) {
+        buf_[i - 1] = '\r';
+      }
       buf_[i] = '\n';
     }
   }
@@ -123,8 +132,8 @@ class CharBoardBase {
       if (OnBoard(p)) (*this)[p] = c;
   }
 
-  int height() const { return stride_ == 1 ? 0 : buf_.size() / stride_; }
-  int width() const { return stride_ - 1; }
+  int height() const { return stride_ == kLineEndWidth ? 0 : buf_.size() / stride_; }
+  int width() const { return stride_ - kLineEndWidth; }
 
   // Returns the (inclusive) bounds for the the board. This is use for, among
   // other things, for (Point p : board.range()) { ... }.
@@ -284,18 +293,27 @@ absl::StatusOr<ImmutableCharBoard> ImmutableCharBoard::Parse(
     } else if (width != line.size()) {
       return absl::InvalidArgumentError("Inconsistent width");
     }
-    if (line[line.size()] != '\n') {
-      return absl::InvalidArgumentError("Not terminated correctly");
+    if constexpr(kLineEndWidth == 2) {
+      if (line[line.size()] != '\r') {
+        return absl::InvalidArgumentError("Not terminated correctly");
+      }      
+      if (line[line.size() + 1] != '\n') {
+        return absl::InvalidArgumentError("Not terminated correctly");
+      }      
+    } else {
+      if (line[line.size()] != '\n') {
+        return absl::InvalidArgumentError("Not terminated correctly");
+      }
     }
     if (buf.empty()) {
-      buf = std::string_view(line.data(), line.size() + 1);
+      buf = std::string_view(line.data(), line.size() + kLineEndWidth);
     } else if (buf.data() + buf.size() != line.data()) {
       return absl::InvalidArgumentError("Not contiguous");
     } else {
-      buf = std::string_view(buf.data(), buf.size() + line.size() + 1);
+      buf = std::string_view(buf.data(), buf.size() + line.size() + kLineEndWidth);
     }
   }
-  return ImmutableCharBoard(/*stride=*/width + 1, buf);
+  return ImmutableCharBoard(/*stride=*/width + kLineEndWidth, buf);
 }
 
 }  // namespace advent_of_code

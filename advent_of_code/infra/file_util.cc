@@ -15,31 +15,18 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> GetContents(std::string_view filename) {
-  struct stat status;
-  if (stat(filename.data(), &status) != 0) {
-    return absl::NotFoundError(absl::StrCat("Could not find", filename));
-  } else if (S_ISREG(status.st_mode) == 0) {
-    return absl::FailedPreconditionError(
-        absl::StrCat("File is not regular", filename));
-  }
-  int length = status.st_size;
-
-  FILE* f = fopen(filename.data(), "r");
-  if (f == nullptr) {
+  std::ifstream stream(std::string(filename), std::ifstream::in | std::ifstream::binary);
+  if (!stream) {
     // Could be a wider range of reasons.
-    return absl::NotFoundError(
-        absl::StrFormat("Error opening %s: %s", filename, strerror(errno)));
+    return absl::NotFoundError(absl::StrCat("Unable to open: ", filename));
   }
-  std::string file_contents(length, 0);
-  if (fread(&file_contents[0], 1, length, f) != length) {
-    return absl::UnavailableError(
-        absl::StrFormat("Error reading %d bytes from %s: %s", length, filename,
-                        strerror(errno)));
-  }
-  if (fclose(f) != 0) {
-    return absl::UnavailableError(
-        absl::StrFormat("Error closing %s: %s", filename, strerror(errno)));
-  }
+  stream.seekg(0, stream.end);
+  int length = stream.tellg();
+  stream.seekg(0, stream.beg);
+  std::string file_contents;
+  file_contents.resize(length);
+  stream.read(file_contents.data(), length);
+  stream.close();
   return file_contents;
 }
 

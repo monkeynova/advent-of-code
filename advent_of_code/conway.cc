@@ -7,7 +7,7 @@ namespace advent_of_code {
 // static
 std::string InfiniteConway::DefaultLookup() {
   std::string ret(512, '.');
-  for (uint i = 0; i < 512; ++i) {
+  for (uint32_t i = 0; i < 512; ++i) {
     bool alive = i & (1 << 4);
     int neighbors = absl::popcount(i & ~(1 << 4));
     if (neighbors == 3) {

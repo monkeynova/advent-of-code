@@ -33,6 +33,12 @@ git_override(
     module_name = "com_google_file_based_test_driver",
     remote = "https://github.com/google/file-based-test-driver.git",
     commit = "fd7661b168f640f68da39f97dad26e426eb6c339",
-    patches = ["fbtd.patch"],
+    patches = ["fbtd.patch", "fbtd-win32.patch"],
+    patch_strip = 1,
+)
+
+single_version_override(
+    module_name = "google_benchmark",
+    patches = ["benchmark.patch"],
     patch_strip = 1,
 )
