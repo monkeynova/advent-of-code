@@ -6,7 +6,7 @@
 
 namespace advent_of_code {
 
-class Table {
+class TextTable {
  public:
   struct Cell {
     enum Justify { kLeft = 0, kRight = 1, kCenter = 2 };
@@ -20,7 +20,7 @@ class Table {
     void Render(std::string* out, int width, bool enable_color) const;
   };
 
-  Table();
+  TextTable();
 
   void AddBreaker() { rows_.emplace_back(Breaker()); }
 

@@ -97,7 +97,7 @@ bool IsColorTerminal() {
 
 }  // namespace
 
-Table::Table() {
+TextTable::TextTable() {
   switch (absl::GetFlag(FLAGS_color)) {
     case kNone:
       use_color_ = false;
@@ -111,7 +111,7 @@ Table::Table() {
   }
 }
 
-std::vector<int> Table::Layout() const {
+std::vector<int> TextTable::Layout() const {
   absl::flat_hash_set<int> spans;
   int max_span = 0;
   for (const Row& row : rows_) {
@@ -170,7 +170,7 @@ std::vector<int> Table::Layout() const {
   return col_widths;
 }
 
-std::string Table::Render() const {
+std::string TextTable::Render() const {
   std::string ret;
 
   std::vector<int> col_widths = Layout();
@@ -198,7 +198,7 @@ std::string Table::Render() const {
   return ret;
 }
 
-void Table::RenderBreaker(std::string* out, const std::vector<int> col_widths,
+void TextTable::RenderBreaker(std::string* out, const std::vector<int> col_widths,
                           int row_num) const {
   std::vector<int> prev;
   if (row_num > 0 &&
@@ -250,7 +250,7 @@ void Table::RenderBreaker(std::string* out, const std::vector<int> col_widths,
   out->append(1, col_match ? '+' : '-');
 }
 
-void Table::Cell::Render(std::string* out, int width, bool enable_color) const {
+void TextTable::Cell::Render(std::string* out, int width, bool enable_color) const {
   bool need_reset = false;
   if (enable_color) {
     if (bold) {
