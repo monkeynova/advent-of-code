@@ -91,3 +91,20 @@ cc_library(
         "@google_benchmark//:benchmark",
     ],
 )
+
+cc_library(
+    name = "run_day",
+    srcs = ["run_day.cc"],
+    hdrs = ["run_day.h"],
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        ":file_util",
+        "//advent_of_code:advent_day",
+        "@abseil-cpp//absl/status:statusor",
+        "@abseil-cpp//absl/time",
+        "@com_monkeynova_gunit_main//:vlog",
+    ],
+    alwayslink = 1,
+)

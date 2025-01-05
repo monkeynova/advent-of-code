@@ -24,7 +24,7 @@ cc_binary(
     deps = [
         "//advent_of_code",
         "//advent_of_code:advent_day",
-        "//advent_of_code/infra:file_util",
+        "//advent_of_code/infra:run_day",
         "@abseil-cpp//absl/container:flat_hash_set",
         "@abseil-cpp//absl/flags:flag",
         "@abseil-cpp//absl/flags:usage",
@@ -46,7 +46,7 @@ cc_binary(
     deps = [
         "//advent_of_code",
         "//advent_of_code:advent_day",
-        "//advent_of_code/infra:file_util",
+        "//advent_of_code/infra:run_day",
         "@com_monkeynova_gunit_main//:test_main",
     ],
 )
