@@ -67,11 +67,11 @@
 1,6
 2,0
 --
-{6,1}
+6,1
 ==
 
 [part=2]
 [param=71,1024]
 @include{advent_of_code/2024/day18/input.txt}
 --
-{60,46}
+60,46

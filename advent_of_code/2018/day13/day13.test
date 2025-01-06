@@ -10,7 +10,7 @@ HACK: Ignore whitespace
 \\-+-/  \-+--/
 \  \------/   
 --
-{7,3}
+7,3
 ==
 
 # 100,0
@@ -18,7 +18,7 @@ HACK: Ignore whitespace
 HACK: Ignore whitespace
 @include{advent_of_code/2018/day13/input.txt}
 --
-{14,42}
+14,42
 ==
 
 [part=2]
@@ -31,11 +31,11 @@ HACK: Ignore whitespace
 \  |   ^
 \  \<->/
 --
-{6,4}
+6,4
 ==
 
 [part=2]
 HACK: Ignore whitespace
 @include{advent_of_code/2018/day13/input.txt}
 --
-{8,7}
+8,7

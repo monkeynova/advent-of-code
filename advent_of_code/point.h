@@ -91,7 +91,7 @@ struct Point {
 
   template <typename Sink>
   friend void AbslStringify(Sink& sink, const Point& p) {
-    absl::Format(&sink, "{%v,%v}", p.x, p.y);
+    absl::Format(&sink, "%v,%v", p.x, p.y);
   }
 
   template <typename H>
