@@ -8,7 +8,7 @@
 bazel_dep(name = "abseil-cpp", version = "20240722.0.bcr.2")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "googletest", version = "1.15.2")
-bazel_dep(name = "google_benchmark", version = "1.8.5")
+bazel_dep(name = "google_benchmark", version = "1.9.1")
 bazel_dep(name = "re2", version = "2024-07-02.bcr.1")
 bazel_dep(name = "rules_cc", version = "0.1.0")
 bazel_dep(name = "com_monkeynova_base_workspace")
@@ -26,7 +26,7 @@ git_override(
     module_name = "com_monkeynova_gunit_main",
     remote = "https://github.com/monkeynova/gunit-main.git",
     # branch = "main",
-    commit = "33b6b882e19d8a2fd835f18184c3c7f1d19cfe25",
+    commit = "69f9eb1865efdfdca02103fd7c87fe973777f01c",
 )
 
 git_override(
