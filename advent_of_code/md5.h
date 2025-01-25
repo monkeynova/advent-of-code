@@ -1,6 +1,8 @@
 #ifndef ADVENT_OF_CODE_MD5_H
 #define ADVENT_OF_CODE_MD5_H
 
+#include <string_view>
+
 #include "third_party/md5/md5.h"
 
 namespace advent_of_code {

@@ -19,11 +19,13 @@ absl::StatusOr<std::string> Day_2016_05::Part1(
   for (int i = 0;; ++i) {
     MD5 digest;
     std::string str = absl::StrCat(input[0], i);
-    std::string_view md5_result = digest.DigestHex(str);
+    std::string_view md5_result = digest.Digest(str);
     VLOG(2) << "MD5(" << str << "): " << md5_result;
-    if (md5_result.substr(0, 5) == "00000") {
-      VLOG(1) << "Adding: " << md5_result.substr(5, 1) << " (" << i << ")";
-      out.append(md5_result.substr(5, 1));
+    if (md5_result[0] == 0 && md5_result[1] == 0 && (md5_result[2] >> 4) == 0) {
+      int add = md5_result[2] & 0xf;
+      if (add >= 10) out.append(1, add + 'a' - 10);
+      else out.append(1, add + '0');
+      VLOG(1) << "Adding: " << out.substr(out.size() - 1) << " (" << i << ")";
       if (out.size() == 8) break;
     }
   }
@@ -40,14 +42,17 @@ absl::StatusOr<std::string> Day_2016_05::Part2(
   for (int i = 0;; ++i) {
     MD5 digest;
     std::string str = absl::StrCat(input[0], i);
-    std::string_view md5_result = digest.DigestHex(str);
+    std::string_view md5_result = digest.Digest(str);
     VLOG(2) << "MD5(" << str << "): " << md5_result;
-    if (md5_result.substr(0, 5) == "00000") {
-      int pos = md5_result[5] - '0';
-      VLOG(1) << "Adding: " << pos << ", " << md5_result.substr(6, 1) << " ("
-              << i << ")";
+    if (md5_result[0] == 0 && md5_result[1] == 0 && (md5_result[2] >> 4) == 0) {
+      int pos = md5_result[2] & 0xf;
+      char add = (md5_result[3] >> 4) & 0xf;
+      if (add >= 10) add += 'a' - 10;
+      else add += '0';
       if (pos < 8 && out[pos] == '_') {
-        out[pos] = md5_result[6];
+        out[pos] = add;
+        VLOG(1) << "Adding: " << pos << ", " << out.substr(pos, 1) << " ("
+                << i << ")";
         ++added;
         if (added == 8) break;
       }
