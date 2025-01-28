@@ -14,6 +14,10 @@ ABSL_FLAG(std::string, year, "current",
 ABSL_FLAG(bool, summary, false,
           "If true show a summary table of selected years.");
 
+ABSL_FLAG(bool, show_progress, true,
+          "If true print current work item every 250ms.");
+
+
 namespace advent_of_code {
 namespace {
 
@@ -39,12 +43,23 @@ TextTable::Cell::Color YearTimeColor(absl::Duration d) {
 };
 
 std::vector<advent_of_code::DayRun> RunYear(int year) {
+  static absl::Time last_print = absl::InfinitePast();
+
   std::vector<std::unique_ptr<advent_of_code::AdventDay>> days;
   for (int day = 1; day <= 25; ++day) {
     days.push_back(advent_of_code::CreateAdventDay(year, day));
   }
   std::vector<advent_of_code::DayRun> runs;
   for (const auto& day : days) {
+    if (absl::GetFlag(FLAGS_show_progress) &&
+        absl::Now() - last_print > absl::Milliseconds(250)) {
+      if (last_print != absl::InfinitePast()) {
+        std::cout << absl::StreamFormat("Current: %04d/%02d...\r",
+                                        day->year(), day->day())
+                  << std::flush;
+      }
+      last_print = absl::Now();
+    }
     absl::StatusOr<advent_of_code::DayRun> run = RunDay(day.get());
     if (!run.ok()) {
       run = advent_of_code::DayRun{

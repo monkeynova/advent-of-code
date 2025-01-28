@@ -59,6 +59,9 @@ class AdventDay {
  public:
   virtual ~AdventDay() = default;
 
+  int year() const { return year_; }
+  int day() const { return day_; }
+
   bool run_audit() const { return absl::GetFlag(FLAGS_advent_day_run_audit); }
 
   void set_param(std::string param) { param_ = param; }
@@ -103,6 +106,10 @@ class AdventDay {
       absl::Span<std::string_view> input) const = 0;
 
  private:
+  friend std::unique_ptr<AdventDay> CreateAdventDay(int year, int day);
+
+  int year_ = -1;
+  int day_ = -1;
   std::string param_;
 };
 

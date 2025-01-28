@@ -82,7 +82,10 @@ AdventRegisterEntry RegisterAdventDay(int year, int day, FactoryType factory) {
 std::unique_ptr<AdventDay> CreateAdventDay(int year, int day) {
   auto it = Registry().find({year, day});
   if (it == Registry().end()) return nullptr;
-  return it->second();
+  std::unique_ptr<AdventDay> ret = it->second();
+  ret->year_ = year;
+  ret->day_ = day;
+  return ret;
 }
 
 std::vector<int> AllAdventYears() {
