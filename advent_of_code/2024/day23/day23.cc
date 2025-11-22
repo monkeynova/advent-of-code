@@ -16,7 +16,8 @@ using NodeType = uint16_t;
 
 std::vector<NodeType> FindBiggest(
     absl::Span<const NodeType> nodes, const std::vector<bool>& edges,
-    std::vector<NodeType>& in, std::vector<bool> out) {
+    std::vector<NodeType>& in) {
+  std::vector<bool> out(26 * 26, false);
 
   std::vector<NodeType> ret = in;
   for (/*nop*/; !nodes.empty(); nodes = nodes.subspan(1)) {
@@ -29,14 +30,16 @@ std::vector<NodeType> FindBiggest(
     }
     if (all_ok) {
       in.push_back(nodes[0]);
-      std::vector<NodeType> sub = FindBiggest(nodes, edges, in, out);
-      if (sub.size() > ret.size()) ret = sub;
+      std::vector<NodeType> sub = FindBiggest(nodes, edges, in);
       in.pop_back();
-      for (NodeType n : sub) {
-        out[n] = true;
+      if (sub.size() > ret.size()) {
+        out.assign(26 * 26, false);
+        for (NodeType n : sub) {
+          out[n] = true;
+        }
+        ret = std::move(sub);
       }
     }
-    out[nodes[0]] = true;
   }
 
   return ret;
@@ -45,8 +48,7 @@ std::vector<NodeType> FindBiggest(
 std::vector<NodeType> FindBiggest(
     absl::Span<const NodeType> nodes, const std::vector<bool>& edges) {
   std::vector<NodeType> in;
-  std::vector<bool> out(26 * 26, false);
-  return FindBiggest(nodes, edges, in, out);
+  return FindBiggest(nodes, edges, in);
 }
 
 }  // namespace
