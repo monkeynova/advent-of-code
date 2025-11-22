@@ -2,9 +2,9 @@ load("@com_monkeynova_base_workspace//:default_rules.bzl", "default_rules")
 
 default_rules(workspace_dep = "update_workspace.date")
 
-CURRENT_YEAR = "2024"
+CURRENT_YEAR = "2025"
 
-CURRENT_DAY = "25"
+CURRENT_DAY = "01"
 
 test_suite(
     name = "latest",

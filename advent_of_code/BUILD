@@ -240,5 +240,6 @@ cc_library(
         "//advent_of_code/2022",
         "//advent_of_code/2023",
         "//advent_of_code/2024",
+        "//advent_of_code/2025",
     ],
 )
