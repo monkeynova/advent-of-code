@@ -14,8 +14,6 @@ bazel_dep(name = "rules_cc", version = "0.2.14")
 bazel_dep(name = "com_monkeynova_base_workspace")
 bazel_dep(name = "com_monkeynova_gunit_main")
 bazel_dep(name = "com_google_file_based_test_driver")
-bazel_dep(name = "protobuf", version = "33.1")
-bazel_dep(name = "fuzztest", version="20250805.0")
 
 git_override(
    module_name = "com_monkeynova_base_workspace",
@@ -28,7 +26,7 @@ git_override(
     module_name = "com_monkeynova_gunit_main",
     remote = "https://github.com/monkeynova/gunit-main.git",
     # branch = "main",
-    commit = "69f9eb1865efdfdca02103fd7c87fe973777f01c",
+    commit = "8fd8b9206b3d802d859ad1b7eec7129ab849a60c",
 )
 
 git_override(
