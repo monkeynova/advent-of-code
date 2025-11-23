@@ -30,8 +30,9 @@ void BM_Day(benchmark::State& state) {
 }
 
 static const int cur_year = []() {
-  return absl::ToCivilYear(
-    absl::Now() - absl::Seconds(30 * 86400), absl::UTCTimeZone()).year();
+  return absl::ToCivilYear(absl::Now() - absl::Seconds(30 * 86400),
+                           absl::UTCTimeZone())
+      .year();
 }();
 
 BENCHMARK(BM_Day)->ArgsProduct(

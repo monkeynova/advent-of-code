@@ -76,7 +76,7 @@ bool Patterns::CanMake(std::string_view test) {
 int64_t Patterns::CountMakable(std::string_view test) {
   std::vector<int64_t> hist(test.size() + 1, 0);
   hist.back() = 1;
-  
+
   for (int i = test.size() - 1; i >= 0; --i) {
     const Prefix* val = &root_;
     for (int c_idx = i; val != nullptr; ++c_idx) {

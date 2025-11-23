@@ -45,10 +45,8 @@ int Rating(const ImmutableCharBoard& b, Point p) {
     paths_to = std::move(next_to);
   }
   return absl::c_accumulate(
-    paths_to, 0,
-    [](int a, std::pair<Point, int> p_and_c) {
-      return a + p_and_c.second;
-    });
+      paths_to, 0,
+      [](int a, std::pair<Point, int> p_and_c) { return a + p_and_c.second; });
 }
 
 }  // namespace

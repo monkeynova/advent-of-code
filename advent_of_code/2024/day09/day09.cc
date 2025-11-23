@@ -116,4 +116,3 @@ static AdventRegisterEntry registry = RegisterAdventDay(
     []() { return std::unique_ptr<AdventDay>(new Day_2024_09()); });
 
 }  // namespace advent_of_code
-

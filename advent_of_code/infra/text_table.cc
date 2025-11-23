@@ -198,8 +198,9 @@ std::string TextTable::Render() const {
   return ret;
 }
 
-void TextTable::RenderBreaker(std::string* out, const std::vector<int> col_widths,
-                          int row_num) const {
+void TextTable::RenderBreaker(std::string* out,
+                              const std::vector<int> col_widths,
+                              int row_num) const {
   std::vector<int> prev;
   if (row_num > 0 &&
       std::holds_alternative<std::vector<Cell>>(rows_[row_num - 1])) {
@@ -250,7 +251,8 @@ void TextTable::RenderBreaker(std::string* out, const std::vector<int> col_width
   out->append(1, col_match ? '+' : '-');
 }
 
-void TextTable::Cell::Render(std::string* out, int width, bool enable_color) const {
+void TextTable::Cell::Render(std::string* out, int width,
+                             bool enable_color) const {
   bool need_reset = false;
   if (enable_color) {
     if (bold) {

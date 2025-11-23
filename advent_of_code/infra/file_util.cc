@@ -15,7 +15,8 @@
 namespace advent_of_code {
 
 absl::StatusOr<std::string> GetContents(std::string_view filename) {
-  std::ifstream stream(std::string(filename), std::ifstream::in | std::ifstream::binary);
+  std::ifstream stream(std::string(filename),
+                       std::ifstream::in | std::ifstream::binary);
   if (!stream) {
     // Could be a wider range of reasons.
     return absl::NotFoundError(absl::StrCat("Unable to open: ", filename));

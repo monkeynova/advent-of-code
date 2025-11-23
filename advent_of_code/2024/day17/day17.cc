@@ -12,7 +12,7 @@ namespace advent_of_code {
 namespace {
 
 /*
- 
+
  BST [a]
  BXL  1
  CDV [b]
@@ -57,7 +57,7 @@ class Program {
   };
 
   Program(std::array<int64_t, 3> registers, absl::Span<const int64_t> mem)
-   : registers_(registers), mem_(mem) {}
+      : registers_(registers), mem_(mem) {}
 
   void Reset(std::array<int64_t, 3> registers) {
     registers_ = registers;
@@ -66,7 +66,8 @@ class Program {
   }
 
   std::vector<int64_t> Run() {
-    while (!Step()) /*nop*/;
+    while (!Step()) /*nop*/
+      ;
     return out_;
   }
 
@@ -79,7 +80,7 @@ class Program {
 
  private:
   bool Step() {
-    //LOG(ERROR) << *this;
+    // LOG(ERROR) << *this;
 
     if (ip_ >= mem_.size()) return true;
     switch (mem_[ip_]) {
@@ -118,7 +119,6 @@ class Program {
         registers_[2] = registers_[0] >> *ComboOperand(&mem_[ip_ + 1]);
         break;
       }
-
     }
     ip_ += 2;
     return false;
@@ -136,7 +136,8 @@ class Program {
   std::vector<int64_t> out_;
 };
 
-std::optional<int64_t> Unwind(Program& p, absl::Span<const int64_t> output, int64_t a) {
+std::optional<int64_t> Unwind(Program& p, absl::Span<const int64_t> output,
+                              int64_t a) {
   if (output.empty()) return a;
 
   for (int64_t next = 0; next < 8; ++next) {
@@ -146,14 +147,14 @@ std::optional<int64_t> Unwind(Program& p, absl::Span<const int64_t> output, int6
     std::vector<int64_t> out = p.Run();
     if (out.size() <= output.size() &&
         out == output.subspan(output.size() - out.size(), out.size())) {
-      std::optional<int64_t> sub = Unwind(p, output.subspan(0, output.size() - out.size()), test_a);
+      std::optional<int64_t> sub =
+          Unwind(p, output.subspan(0, output.size() - out.size()), test_a);
       if (sub) return sub;
     }
   }
-  
+
   return std::nullopt;
 }
-
 
 std::optional<int64_t> RevEngA(absl::Span<const int64_t> prog) {
   // Last instruction must be [Jnz 0].
@@ -187,7 +188,7 @@ absl::StatusOr<std::string> Day_2024_17::Part1(
     absl::Span<std::string_view> input) const {
   if (input.size() != 5) return absl::InvalidArgumentError("bad input (size)");
   if (input[3] != "") return absl::InvalidArgumentError("bad input (empty)");
-  
+
   std::array<int64_t, 3> registers;
   {
     Tokenizer t(input[0]);
@@ -226,7 +227,7 @@ absl::StatusOr<std::string> Day_2024_17::Part2(
     absl::Span<std::string_view> input) const {
   if (input.size() != 5) return absl::InvalidArgumentError("bad input (size)");
   if (input[3] != "") return absl::InvalidArgumentError("bad input (empty)");
-  
+
   std::array<int64_t, 3> registers;
   {
     Tokenizer t(input[0]);
@@ -257,12 +258,13 @@ absl::StatusOr<std::string> Day_2024_17::Part2(
     }
   }
 
-  std::optional<int64_t> rev_a = RevEngA( mem);
+  std::optional<int64_t> rev_a = RevEngA(mem);
   if (rev_a) {
     registers[0] = *rev_a;
     std::vector<int64_t> out = Program(registers, mem).Run();
     if (out != mem) {
-      return absl::InternalError(absl::StrCat("Bad RevEngA: ", absl::StrJoin(out, ",")));
+      return absl::InternalError(
+          absl::StrCat("Bad RevEngA: ", absl::StrJoin(out, ",")));
     }
     return AdventReturn(*rev_a);
   }

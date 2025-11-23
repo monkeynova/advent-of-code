@@ -15,7 +15,7 @@ void PointRectangle::SetDifference(const PointRectangle& o,
   std::vector<PointRectangle> ret;
   // Cleave off sub-rectangles that cannot overlap with o, until a fully
   // contained sub-rectangle is all that remains, and then discard it.
-  for (int Point::*dim : {&Point::x, &Point::y}) {
+  for (int Point::* dim : {&Point::x, &Point::y}) {
     if (o.min.*dim > overlap.min.*dim && o.min.*dim <= overlap.max.*dim) {
       PointRectangle cleave = overlap;
       cleave.max.*dim = o.min.*dim - 1;

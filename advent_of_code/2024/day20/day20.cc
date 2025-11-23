@@ -11,7 +11,8 @@ namespace advent_of_code {
 absl::StatusOr<std::string> Day_2024_20::Part1(
     absl::Span<std::string_view> input) const {
   int min_save;
-  if (!absl::SimpleAtoi(param(), &min_save)) return absl::InvalidArgumentError("bad param");
+  if (!absl::SimpleAtoi(param(), &min_save))
+    return absl::InvalidArgumentError("bad param");
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
   ASSIGN_OR_RETURN(Point start, b.FindUnique('S'));
   ASSIGN_OR_RETURN(Point end, b.FindUnique('E'));
@@ -35,12 +36,11 @@ absl::StatusOr<std::string> Day_2024_20::Part1(
     point_idx[path[i]] = i;
   }
 
-  std::array<Point, 8> kDelta2 = {
-    2 * Cardinal::kWest, 2 * Cardinal::kEast, 2 * Cardinal::kNorth,
-    2 * Cardinal::kSouth, Cardinal::kNorthWest, Cardinal::kNorthEast,
-    Cardinal::kSouthWest, Cardinal::kSouthEast
-  };
-  
+  std::array<Point, 8> kDelta2 = {2 * Cardinal::kWest,  2 * Cardinal::kEast,
+                                  2 * Cardinal::kNorth, 2 * Cardinal::kSouth,
+                                  Cardinal::kNorthWest, Cardinal::kNorthEast,
+                                  Cardinal::kSouthWest, Cardinal::kSouthEast};
+
   int skips = 0;
   for (int i = 0; i < path.size(); ++i) {
     for (Point d : kDelta2) {
@@ -57,7 +57,8 @@ absl::StatusOr<std::string> Day_2024_20::Part1(
 absl::StatusOr<std::string> Day_2024_20::Part2(
     absl::Span<std::string_view> input) const {
   int min_save;
-  if (!absl::SimpleAtoi(param(), &min_save)) return absl::InvalidArgumentError("bad param");
+  if (!absl::SimpleAtoi(param(), &min_save))
+    return absl::InvalidArgumentError("bad param");
   ASSIGN_OR_RETURN(CharBoard b, CharBoard::Parse(input));
   ASSIGN_OR_RETURN(Point start, b.FindUnique('S'));
   ASSIGN_OR_RETURN(Point end, b.FindUnique('E'));

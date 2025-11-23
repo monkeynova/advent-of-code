@@ -66,10 +66,9 @@ absl::StatusOr<std::string> Day_2024_22::Part2(
     }
   }
 
-  return AdventReturn(absl::c_accumulate(
-    seq2count, int64_t{0}, [](int64_t a, int64_t v) {
-      return std::max(a, v);
-    }));
+  return AdventReturn(
+      absl::c_accumulate(seq2count, int64_t{0},
+                         [](int64_t a, int64_t v) { return std::max(a, v); }));
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(

@@ -11,8 +11,8 @@ namespace advent_of_code {
 
 namespace {
 
-const std::vector<std::string>& AllCombinations(
-    int a, int b, char ac, char bc) {
+const std::vector<std::string>& AllCombinations(int a, int b, char ac,
+                                                char bc) {
   auto key = std::make_tuple(a, b, ac, bc);
   static absl::flat_hash_map<decltype(key), std::vector<std::string>> memo;
   if (auto it = memo.find(key); it != memo.end()) {
@@ -37,7 +37,7 @@ const std::vector<std::string>& AllCombinations(
   }
 
   VLOG(2) << "AllCombinations(" << a << "," << b << ","
-          << std::string_view(&ac, 1) << "," << std::string_view(&bc, 1) 
+          << std::string_view(&ac, 1) << "," << std::string_view(&bc, 1)
           << ") = " << absl::StrJoin(ret, ",");
 
   return memo[key] = ret;
@@ -53,9 +53,11 @@ int64_t ToDirectional(std::string_view line, int max_level, int level) {
   }
 
   static const absl::flat_hash_map<char, Point> kRevDirectional = {
-    {'^', {1, 0}}, {'A', {2, 0}},
-    {'<', {0, 1}}, {'v', {1, 1}}, {'>', {2, 1}}
-  };
+      {'^', {1, 0}},
+      {'A', {2, 0}},
+      {'<', {0, 1}},
+      {'v', {1, 1}},
+      {'>', {2, 1}}};
 
   Point pointer = {2, 0};
 
@@ -68,7 +70,7 @@ int64_t ToDirectional(std::string_view line, int max_level, int level) {
     char dxc = dest.x > pointer.x ? '>' : '<';
     int dy = abs(dest.y - pointer.y);
     char dyc = dest.y > pointer.y ? 'v' : '^';
-  
+
     std::string bad_path = "";
     if (dest.x == 0 && pointer.x != 0 && pointer.y == 0) {
       bad_path.append(dx, '<');
@@ -79,12 +81,12 @@ int64_t ToDirectional(std::string_view line, int max_level, int level) {
       bad_path.append(dx, '>');
       bad_path.append(1, 'A');
     }
-  
+
     int64_t sub_best = std::numeric_limits<int64_t>::max();
     for (std::string path : AllCombinations(dx, dy, dxc, dyc)) {
       path.append(1, 'A');
       if (path == bad_path) continue;
- 
+
       int64_t sub_steps = ToDirectional(path, max_level, level + 1);
       sub_best = std::min(sub_best, sub_steps);
     }
@@ -97,11 +99,9 @@ int64_t ToDirectional(std::string_view line, int max_level, int level) {
 
 int64_t ToKeyPad(std::string_view line, int mids) {
   static const absl::flat_hash_map<char, Point> kRevKeyPad = {
-    {'7', {0, 0}}, {'8', {1, 0}}, {'9', {2, 0}},
-    {'4', {0, 1}}, {'5', {1, 1}}, {'6', {2, 1}},
-    {'1', {0, 2}}, {'2', {1, 2}}, {'3', {2, 2}},
-    {'0', {1, 3}}, {'A', {2, 3}}
-  };
+      {'7', {0, 0}}, {'8', {1, 0}}, {'9', {2, 0}}, {'4', {0, 1}},
+      {'5', {1, 1}}, {'6', {2, 1}}, {'1', {0, 2}}, {'2', {1, 2}},
+      {'3', {2, 2}}, {'0', {1, 3}}, {'A', {2, 3}}};
 
   Point pointer = {2, 3};
 
@@ -114,7 +114,7 @@ int64_t ToKeyPad(std::string_view line, int mids) {
     char dxc = dest.x > pointer.x ? '>' : '<';
     int dy = abs(dest.y - pointer.y);
     char dyc = dest.y > pointer.y ? 'v' : '^';
-  
+
     std::string bad_path = "";
     if (dest.x == 0 && pointer.x != 0 && pointer.y == 3) {
       bad_path.append(dx, '<');
@@ -125,7 +125,7 @@ int64_t ToKeyPad(std::string_view line, int mids) {
       bad_path.append(dx, '>');
       bad_path.append(1, 'A');
     }
-  
+
     int64_t sub_best = std::numeric_limits<int64_t>::max();
     for (std::string path : AllCombinations(dx, dy, dxc, dyc)) {
       path.append(1, 'A');

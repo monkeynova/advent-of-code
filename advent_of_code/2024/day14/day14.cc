@@ -16,9 +16,7 @@ struct Drone {
   Point p;
   Point v;
 
-  void Update(Point tile) {
-    p = (p + v).TorusPoint(tile);
-  }
+  void Update(Point tile) { p = (p + v).TorusPoint(tile); }
 
   std::optional<int> Quadrant(Point tile) const {
     if (p.x < tile.x / 2) {
@@ -72,7 +70,7 @@ absl::StatusOr<std::string> Day_2024_14::Part1(
   for (int i = 0; i < 100; ++i) {
     for (Drone& d : drones) {
       d.Update(tile);
-    } 
+    }
   }
 
   std::array<int, 4> qcount = {0, 0, 0, 0};
@@ -112,7 +110,7 @@ absl::StatusOr<std::string> Day_2024_14::Part2(
       }
     }
     if (close_to_center < drones.size() / 2) continue;
-  
+
     absl::flat_hash_set<Point> test;
     for (Drone& d : drones) {
       test.insert(d.p);

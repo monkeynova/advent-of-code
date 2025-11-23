@@ -23,8 +23,10 @@ absl::StatusOr<std::string> Day_2016_05::Part1(
     VLOG(2) << "MD5(" << str << "): " << md5_result;
     if (md5_result[0] == 0 && md5_result[1] == 0 && (md5_result[2] >> 4) == 0) {
       int add = md5_result[2] & 0xf;
-      if (add >= 10) out.append(1, add + 'a' - 10);
-      else out.append(1, add + '0');
+      if (add >= 10)
+        out.append(1, add + 'a' - 10);
+      else
+        out.append(1, add + '0');
       VLOG(1) << "Adding: " << out.substr(out.size() - 1) << " (" << i << ")";
       if (out.size() == 8) break;
     }
@@ -47,12 +49,14 @@ absl::StatusOr<std::string> Day_2016_05::Part2(
     if (md5_result[0] == 0 && md5_result[1] == 0 && (md5_result[2] >> 4) == 0) {
       int pos = md5_result[2] & 0xf;
       char add = (md5_result[3] >> 4) & 0xf;
-      if (add >= 10) add += 'a' - 10;
-      else add += '0';
+      if (add >= 10)
+        add += 'a' - 10;
+      else
+        add += '0';
       if (pos < 8 && out[pos] == '_') {
         out[pos] = add;
-        VLOG(1) << "Adding: " << pos << ", " << out.substr(pos, 1) << " ("
-                << i << ")";
+        VLOG(1) << "Adding: " << pos << ", " << out.substr(pos, 1) << " (" << i
+                << ")";
         ++added;
         if (added == 8) break;
       }

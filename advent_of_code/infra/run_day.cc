@@ -35,7 +35,7 @@ absl::Status ReadInput(advent_of_code::AdventDay* day, Input* ret) {
   return absl::OkStatus();
 }
 
-}
+}  // namespace
 
 absl::StatusOr<DayRun> RunDay(advent_of_code::AdventDay* day) {
   if (day == nullptr) {
@@ -67,4 +67,4 @@ absl::StatusOr<DayRun> RunDay(advent_of_code::AdventDay* day) {
   return ret;
 }
 
-}  // namspace advent_of_code
+}  // namespace advent_of_code

@@ -29,15 +29,13 @@ std::vector<std::function<Point(Point)>> Transforms(PointRectangle range) {
   ret.push_back([](Point p) { return Point{p.x, p.y}; });
   ret.push_back([range](Point p) { return Point{range.max.x - p.x, p.y}; });
   ret.push_back([range](Point p) { return Point{p.x, range.max.y - p.y}; });
-  ret.push_back([range](Point p) {
-    return Point{range.max.x - p.x, range.max.y - p.y};
-  });
+  ret.push_back(
+      [range](Point p) { return Point{range.max.x - p.x, range.max.y - p.y}; });
   ret.push_back([](Point p) { return Point{p.y, p.x}; });
   ret.push_back([range](Point p) { return Point{p.y, range.max.x - p.x}; });
   ret.push_back([range](Point p) { return Point{range.max.y - p.y, p.x}; });
-  ret.push_back([range](Point p) {
-    return Point{range.max.y - p.y, range.max.x - p.x};
-  });
+  ret.push_back(
+      [range](Point p) { return Point{range.max.y - p.y, range.max.x - p.x}; });
   return ret;
 }
 

@@ -14,7 +14,7 @@ void Cube::SetDifference(const Cube& o, std::vector<Cube>* out) const {
   std::vector<Cube> ret;
   // Cleave off sub-cubes that cannot overlap with o, until a fully contained
   // sub-cube is all that remains, and then discard it.
-  for (int Point3::*dim : {&Point3::x, &Point3::y, &Point3::z}) {
+  for (int Point3::* dim : {&Point3::x, &Point3::y, &Point3::z}) {
     if (o.min.*dim > overlap.min.*dim && o.min.*dim <= overlap.max.*dim) {
       Cube cleave = overlap;
       cleave.max.*dim = o.min.*dim - 1;

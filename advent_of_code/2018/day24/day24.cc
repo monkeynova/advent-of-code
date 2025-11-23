@@ -105,8 +105,7 @@ int CountTypes(const std::vector<Group>& groups) {
   return seen;
 }
 
-absl::flat_hash_map<int, int> SelectTargets(
-    const std::vector<Group>& groups) {
+absl::flat_hash_map<int, int> SelectTargets(const std::vector<Group>& groups) {
   std::vector<int> group_order(groups.size());
   std::iota(group_order.begin(), group_order.end(), 0);
 

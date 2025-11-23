@@ -24,9 +24,12 @@ absl::StatusOr<std::string> Day_2024_25::Part1(
         if (b[{x, y}] == '#') ++rec[x];
       }
     }
-    if (input[i] == "#####") locks.push_back(rec);
-    else if (input[i] == ".....") keys.push_back(rec);
-    else return absl::InvalidArgumentError("key/lock");
+    if (input[i] == "#####")
+      locks.push_back(rec);
+    else if (input[i] == ".....")
+      keys.push_back(rec);
+    else
+      return absl::InvalidArgumentError("key/lock");
   }
 
   int fits = 0;

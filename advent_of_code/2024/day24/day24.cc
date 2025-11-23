@@ -17,19 +17,24 @@ class EvalTree {
  public:
   EvalTree() = default;
 
-  absl::StatusOr<std::vector<std::string_view>>  FixAdder();
+  absl::StatusOr<std::vector<std::string_view>> FixAdder();
 
   void AddLiteral(std::string_view name, bool value) {
     Node* literal = Ensure(name);
     literal->value = value;
   }
 
-  void AddRule(std::string_view name, std::string_view left, std::string_view right, std::string_view op_str) {
+  void AddRule(std::string_view name, std::string_view left,
+               std::string_view right, std::string_view op_str) {
     Node::OpType op = Node::kLiteral;
-    if (op_str == "AND") op = Node::kAnd;
-    else if (op_str == "OR") op = Node::kOr;
-    else if (op_str == "XOR") op = Node::kXor;
-    else LOG(FATAL) << "Bad op_str " << op_str;
+    if (op_str == "AND")
+      op = Node::kAnd;
+    else if (op_str == "OR")
+      op = Node::kOr;
+    else if (op_str == "XOR")
+      op = Node::kXor;
+    else
+      LOG(FATAL) << "Bad op_str " << op_str;
 
     Node* rule_node = Ensure(name);
     rule_node->op = op;
@@ -48,7 +53,6 @@ class EvalTree {
     if (it == owned_.end()) return "";
     return it->second->DebugString();
   }
-
 
  private:
   struct Node {
@@ -80,21 +84,28 @@ class EvalTree {
       bool lval = left->Evaluate();
       bool rval = right->Evaluate();
       switch (op) {
-        case kLiteral: break;
-        case kAnd: value = lval & rval; break;
-        case kOr: value = lval | rval; break;
-        case kXor: value = lval ^ rval; break;                
+        case kLiteral:
+          break;
+        case kAnd:
+          value = lval & rval;
+          break;
+        case kOr:
+          value = lval | rval;
+          break;
+        case kXor:
+          value = lval ^ rval;
+          break;
       }
       return value;
     }
 
     std::string DebugString() {
-      static const std::array<std::string_view, 4> kOpNames = {
-        "", "&&", "||", "^^"
-      };
+      static const std::array<std::string_view, 4> kOpNames = {"", "&&", "||",
+                                                               "^^"};
       if (op == kLiteral) return std::string(name);
-      
-      return absl::StrCat("(", left->DebugString(), kOpNames[op], right->DebugString(), ")");
+
+      return absl::StrCat("(", left->DebugString(), kOpNames[op],
+                          right->DebugString(), ")");
     }
   };
 
@@ -107,7 +118,8 @@ class EvalTree {
   Node* Ensure(std::string_view name) {
     auto it = owned_.find(name);
     if (it != owned_.end()) return it->second.get();
-    return owned_.emplace(name, std::make_unique<Node>(Node{.name = name})).first->second.get();
+    return owned_.emplace(name, std::make_unique<Node>(Node{.name = name}))
+        .first->second.get();
   }
   Node* Find(std::string_view name) {
     auto it = owned_.find(name);
@@ -149,20 +161,24 @@ bool EvalTree::ValidateZCarryBottom(int i, Node* carry) {
 
   if (carry->left->IsXOpY(Node::kXor, i - 1)) {
     if (ValidateZCarryTop(i - 1, carry->right)) return true;
-    return TryReplace(carry->right, [&](Node* n) { return ValidateZCarryTop(i - 1, n); });
+    return TryReplace(carry->right,
+                      [&](Node* n) { return ValidateZCarryTop(i - 1, n); });
 
   } else if (carry->right->IsXOpY(Node::kXor, i - 1)) {
     if (ValidateZCarryTop(i - 1, carry->left)) return true;
-    return TryReplace(carry->left, [&](Node* n) { return ValidateZCarryTop(i - 1, n); });
+    return TryReplace(carry->left,
+                      [&](Node* n) { return ValidateZCarryTop(i - 1, n); });
 
-  // No valid x^y, see if we have the other half and can swap one in.
-  // We skip 2 because the test for ValidateZCarryTop(1, n) is too simple and
-  // generates false positives.
+    // No valid x^y, see if we have the other half and can swap one in.
+    // We skip 2 because the test for ValidateZCarryTop(1, n) is too simple and
+    // generates false positives.
   } else if (i > 2 && ValidateZCarryTop(i - 1, carry->left)) {
-    return TryReplace(carry->right, [&](Node* n) { return n->IsXOpY(Node::kXor, i - 1); });
+    return TryReplace(carry->right,
+                      [&](Node* n) { return n->IsXOpY(Node::kXor, i - 1); });
 
   } else if (i > 2 && ValidateZCarryTop(i - 1, carry->right)) {
-    return TryReplace(carry->left, [&](Node* n) { return n->IsXOpY(Node::kXor, i - 1); });
+    return TryReplace(carry->left,
+                      [&](Node* n) { return n->IsXOpY(Node::kXor, i - 1); });
   }
 
   return false;
@@ -180,17 +196,21 @@ bool EvalTree::ValidateZCarryTop(int i, Node* carry) {
 
   if (carry->left->IsXOpY(Node::kAnd, i - 1)) {
     if (ValidateZCarryBottom(i, carry->right)) return true;
-    return TryReplace(carry->right, [&](Node* n) { return ValidateZCarryTop(i, n); });
+    return TryReplace(carry->right,
+                      [&](Node* n) { return ValidateZCarryTop(i, n); });
 
   } else if (carry->right->IsXOpY(Node::kAnd, i - 1)) {
     if (ValidateZCarryBottom(i, carry->left)) return true;
-    return TryReplace(carry->left, [&](Node* n) { return ValidateZCarryTop(i, n); });
+    return TryReplace(carry->left,
+                      [&](Node* n) { return ValidateZCarryTop(i, n); });
 
-  // No valid x&y, see if we have the other half and can swap one in.
+    // No valid x&y, see if we have the other half and can swap one in.
   } else if (ValidateZCarryBottom(i, carry->left)) {
-    return TryReplace(carry->right, [&](Node* n) { return n->IsXOpY(Node::kAnd, i - 1); });
+    return TryReplace(carry->right,
+                      [&](Node* n) { return n->IsXOpY(Node::kAnd, i - 1); });
   } else if (ValidateZCarryBottom(i, carry->right)) {
-    return TryReplace(carry->left, [&](Node* n) { return n->IsXOpY(Node::kAnd, i - 1); });
+    return TryReplace(carry->left,
+                      [&](Node* n) { return n->IsXOpY(Node::kAnd, i - 1); });
   }
 
   return false;
@@ -208,18 +228,22 @@ bool EvalTree::ValidateZ(int i, Node* z) {
 
   if (z->left->IsXOpY(Node::kXor, i)) {
     if (ValidateZCarryTop(i, z->right)) return true;
-    return TryReplace(z->right, [&](Node* n) { return ValidateZCarryTop(i, n); });
+    return TryReplace(z->right,
+                      [&](Node* n) { return ValidateZCarryTop(i, n); });
 
   } else if (z->right->IsXOpY(Node::kXor, i)) {
     if (ValidateZCarryTop(i, z->left)) return true;
-    return TryReplace(z->left, [&](Node* n) { return ValidateZCarryTop(i, n); });
+    return TryReplace(z->left,
+                      [&](Node* n) { return ValidateZCarryTop(i, n); });
 
-   // No valid x^y, see if we have a carry and can swap one in.
+    // No valid x^y, see if we have a carry and can swap one in.
   } else if (ValidateZCarryTop(i, z->left)) {
-    return TryReplace(z->right, [&](Node* n) { return n->IsXOpY(Node::kXor, i); });
+    return TryReplace(z->right,
+                      [&](Node* n) { return n->IsXOpY(Node::kXor, i); });
 
   } else if (ValidateZCarryTop(i, z->right)) {
-    return TryReplace(z->left, [&](Node* n) { return n->IsXOpY(Node::kXor, i); });
+    return TryReplace(z->left,
+                      [&](Node* n) { return n->IsXOpY(Node::kXor, i); });
   }
 
   return false;
@@ -233,7 +257,8 @@ absl::StatusOr<std::vector<std::string_view>> EvalTree::FixAdder() {
     if (z_next == nullptr) {
       // Last bit is just a carry.
       if (ValidateZCarryTop(i, z)) break;
-      if (TryReplace(z, [&](Node* n) { return ValidateZCarryTop(i, n); })) break;
+      if (TryReplace(z, [&](Node* n) { return ValidateZCarryTop(i, n); }))
+        break;
       return absl::InvalidArgumentError("Could not fix");
     }
     if (ValidateZ(i, z)) continue;
@@ -246,7 +271,7 @@ absl::StatusOr<std::vector<std::string_view>> EvalTree::FixAdder() {
   for (const auto& pair : swaps_) {
     LOG(INFO) << pair.first << " <-> " << pair.second;
     invalid.insert(pair.first);
-    invalid.insert(pair.second);    
+    invalid.insert(pair.second);
   }
 
   return std::vector<std::string_view>(invalid.begin(), invalid.end());
@@ -266,7 +291,8 @@ absl::StatusOr<std::string> Day_2024_24::Part1(
       }
 
       if (line.size() != 6) return absl::InvalidArgumentError("bad line");
-      if (line.substr(3, 2) != ": ") return absl::InvalidArgumentError("bad line");
+      if (line.substr(3, 2) != ": ")
+        return absl::InvalidArgumentError("bad line");
       std::string_view node = line.substr(0, 3);
       int val = (line.substr(5, 1) == "1");
       eval_tree.AddLiteral(node, val);
@@ -287,7 +313,7 @@ absl::StatusOr<std::string> Day_2024_24::Part1(
     std::optional<bool> bit = eval_tree.Evaluate(absl::StrFormat("z%02d", i));
     if (!bit) break;
     out |= int64_t{*bit} << i;
-  }  
+  }
 
   return AdventReturn(out);
 }
@@ -304,7 +330,8 @@ absl::StatusOr<std::string> Day_2024_24::Part2(
       }
 
       if (line.size() != 6) return absl::InvalidArgumentError("bad line");
-      if (line.substr(3, 2) != ": ") return absl::InvalidArgumentError("bad line");
+      if (line.substr(3, 2) != ": ")
+        return absl::InvalidArgumentError("bad line");
       std::string_view node = line.substr(0, 3);
       int val = (line.substr(5, 1) == "1");
       eval_tree.AddLiteral(node, val);
@@ -321,8 +348,7 @@ absl::StatusOr<std::string> Day_2024_24::Part2(
     eval_tree.AddRule(out, n1, n2, op);
   }
 
-  ASSIGN_OR_RETURN(std::vector<std::string_view> swapped,
-                   eval_tree.FixAdder());
+  ASSIGN_OR_RETURN(std::vector<std::string_view> swapped, eval_tree.FixAdder());
   absl::c_sort(swapped);
 
   return AdventReturn(absl::StrJoin(swapped, ","));

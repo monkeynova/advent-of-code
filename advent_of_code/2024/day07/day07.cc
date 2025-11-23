@@ -38,7 +38,6 @@ bool CanMakeAddMulCat(int64_t test, absl::Span<const int64_t> vals) {
   return CanMakeAddMulCat(test - vals.back(), tail);
 }
 
-
 }  // namespace
 
 absl::StatusOr<std::string> Day_2024_07::Part1(

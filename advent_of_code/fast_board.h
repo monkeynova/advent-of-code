@@ -19,7 +19,7 @@ class FastBoard {
   };
 
   static constexpr std::array<Dir, 4> kFourDirs = {kNorth, kSouth, kWest,
-                                                     kEast};
+                                                   kEast};
   static constexpr std::array<Dir, 4> kRotateLeft = {kWest, kEast, kSouth,
                                                      kNorth};
   static constexpr std::array<Dir, 4> kRotateRight = {kEast, kWest, kNorth,
@@ -154,16 +154,13 @@ class FastBoard {
 #endif
       return *this;
     }
-    Point operator*() const {
-      return Point(idx_);
-    }
-    bool operator==(const iterator& o) const {
-      return idx_ == o.idx_;
-    }
+    Point operator*() const { return Point(idx_); }
+    bool operator==(const iterator& o) const { return idx_ == o.idx_; }
+
    private:
     friend class FastBoard;
     iterator(const FastBoard& b, int idx) : b_(b), idx_(idx) {}
-  
+
     const FastBoard& b_;
     int idx_;
   };
@@ -182,12 +179,8 @@ class FastBoard {
     }
   }
 
-  iterator begin() const {
-    return iterator(*this, 0);
-  }
-  iterator end() const {
-    return iterator(*this, size_);
-  }
+  iterator begin() const { return iterator(*this, 0); }
+  iterator end() const { return iterator(*this, size_); }
 
   Point FindUnique(char c) {
     for (int i = 0; i < size_; ++i) {

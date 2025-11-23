@@ -47,10 +47,8 @@ absl::StatusOr<std::string> Day_2016_13::Part1(
                             return test_board.OnBoard(test) &&
                                    !test_board.IsWall(test);
                           },
-                      .is_final =
-                          [&](Point test, int) {
-                            return test == Point{7, 4};
-                          },
+                      .is_final = [&](Point test,
+                                      int) { return test == Point{7, 4}; },
                   })
             .FindMinSteps();
     if (!test_dist) return Error("Can't find test dist");
@@ -61,19 +59,17 @@ absl::StatusOr<std::string> Day_2016_13::Part1(
   int v;
   if (!absl::SimpleAtoi(input[0], &v)) return Error("Bad atoi: ", input[0]);
   SparseBoard board(v);
-  return AdventReturn(PointWalk({
-                                    .start = {1, 1},
-                                    .is_good =
-                                        [&](Point test, int) {
-                                          return board.OnBoard(test) &&
-                                                 !board.IsWall(test);
-                                        },
-                                    .is_final =
-                                        [&](Point test, int) {
-                                          return test == Point{31, 39};
-                                        },
-                                })
-                          .FindMinSteps());
+  return AdventReturn(
+      PointWalk({
+                    .start = {1, 1},
+                    .is_good =
+                        [&](Point test, int) {
+                          return board.OnBoard(test) && !board.IsWall(test);
+                        },
+                    .is_final = [&](Point test,
+                                    int) { return test == Point{31, 39}; },
+                })
+          .FindMinSteps());
 }
 
 absl::StatusOr<std::string> Day_2016_13::Part2(

@@ -14,7 +14,7 @@ namespace {
 class ReindeerPath : public BFSInterface<ReindeerPath> {
  public:
   ReindeerPath(const FastBoard& b, FastBoard::Point start)
-   : b_(&b), cur_(start) {}
+      : b_(&b), cur_(start) {}
 
   bool operator==(const ReindeerPath& o) const {
     return cur_ == o.cur_ && dir_ == o.dir_;
@@ -32,9 +32,7 @@ class ReindeerPath : public BFSInterface<ReindeerPath> {
 
   const ReindeerPath& identifier() const override { return *this; }
 
-  bool IsFinal() const override {
-    return (*b_)[cur_] == 'E';
-  }
+  bool IsFinal() const override { return (*b_)[cur_] == 'E'; }
 
   void AddNextSteps(State* state) const override {
     FastBoard::Point n = b_->Add(cur_, dir_);
@@ -55,7 +53,7 @@ class ReindeerPath : public BFSInterface<ReindeerPath> {
       right.add_steps(999);
       state->AddNextStep(right);
     }
-  }  
+  }
 
  private:
   const FastBoard* b_;
@@ -73,20 +71,22 @@ class BestPathHistory {
 
   void ReplacePaths(FastBoard::PointDir p1, FastBoard::PointDir p2) {
     chain_.Set(p2, {p1});
-  }  
+  }
 
   std::vector<FastBoard::Point> CollectFrom(FastBoard::Point p) {
     std::vector<FastBoard::Point> ret = {p};
     FastBoard::PointMap<bool> ret_hist(fb_, false);
     ret_hist.Set(p, true);
-  
+
     std::deque<FastBoard::PointDir> frontier = {
-      {p, FastBoard::kNorth}, {p, FastBoard::kSouth},
-      {p, FastBoard::kWest}, {p, FastBoard::kEast}, 
+        {p, FastBoard::kNorth},
+        {p, FastBoard::kSouth},
+        {p, FastBoard::kWest},
+        {p, FastBoard::kEast},
     };
     FastBoard::PointDirMap<bool> hist(fb_, false);
     for (const FastBoard::PointDir& pd : frontier) hist.Set(pd, true);
-    for (/*nop*/;!frontier.empty(); frontier.pop_front()) {
+    for (/*nop*/; !frontier.empty(); frontier.pop_front()) {
       for (const FastBoard::PointDir& pd : chain_.Get(frontier.front())) {
         if (hist.Get(pd)) continue;
         hist.Set(pd, true);
@@ -115,7 +115,7 @@ class ReindeerPath2 : public BFSInterface<ReindeerPath2> {
   };
 
   ReindeerPath2(GlobalState& gs, FastBoard::Point start)
-   : gs_(&gs), cur_(start) {}
+      : gs_(&gs), cur_(start) {}
 
   bool operator==(const ReindeerPath2& o) const {
     return cur_ == o.cur_ && dir_ == o.dir_;
@@ -146,7 +146,7 @@ class ReindeerPath2 : public BFSInterface<ReindeerPath2> {
   FastBoard::PointDir ToPointDir() const { return {.p = cur_, .d = dir_}; }
 
   void AddNextStepUpdatePaths(State* state, ReindeerPath2 next) const {
-    switch(state->AddNextStep(next)) {
+    switch (state->AddNextStep(next)) {
       case AddNextStepResult::kAdded: {
         gs_->best_path_set.ReplacePaths(ToPointDir(), next.ToPointDir());
         break;
@@ -155,8 +155,10 @@ class ReindeerPath2 : public BFSInterface<ReindeerPath2> {
         gs_->best_path_set.MergePaths(ToPointDir(), next.ToPointDir());
         break;
       }
-      case AddNextStepResult::kSkipped: break;
-      default: LOG(FATAL) << "Bad AddNextStep";
+      case AddNextStepResult::kSkipped:
+        break;
+      default:
+        LOG(FATAL) << "Bad AddNextStep";
     }
   }
 
@@ -179,7 +181,7 @@ class ReindeerPath2 : public BFSInterface<ReindeerPath2> {
       right.add_steps(999);
       AddNextStepUpdatePaths(state, right);
     }
-  }  
+  }
 
  private:
   GlobalState* gs_;
@@ -204,13 +206,14 @@ absl::StatusOr<std::string> Day_2024_16::Part2(
   ASSIGN_OR_RETURN(ImmutableCharBoard b, ImmutableCharBoard::Parse(input));
   FastBoard fb(b);
   FastBoard::Point start = fb.FindUnique('S');
-  
+
   // TODO(monkeynova): The BFS A* implementation uses absl hash containers,
   //                   which are noticible in the performance here. If we need
   //                   to squeeze more cycles, hand-rolling a BFS
   //                   implementation with a FastBoard::PointDirMap would help.
-  ReindeerPath2::GlobalState gs {
-    .b = fb, .best_path_set = BestPathHistory(fb),
+  ReindeerPath2::GlobalState gs{
+      .b = fb,
+      .best_path_set = BestPathHistory(fb),
   };
   ReindeerPath2 rp2(gs, start);
   std::optional<int> dist = rp2.FindMinStepsAStar();

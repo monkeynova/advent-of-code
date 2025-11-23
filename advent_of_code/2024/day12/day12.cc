@@ -11,8 +11,8 @@ namespace advent_of_code {
 
 namespace {
 
-int64_t ScoreAndMarkRegion(
-    const FastBoard& b, FastBoard::Point p, FastBoard::PointMap<bool>& seen) {
+int64_t ScoreAndMarkRegion(const FastBoard& b, FastBoard::Point p,
+                           FastBoard::PointMap<bool>& seen) {
   int area = 1;
   int perimeter = 0;
 
@@ -40,8 +40,8 @@ int64_t ScoreAndMarkRegion(
   return area * perimeter;
 }
 
-int64_t Score2AndMarkRegion(
-    const FastBoard& b, FastBoard::Point p, FastBoard::PointMap<bool>& seen) {
+int64_t Score2AndMarkRegion(const FastBoard& b, FastBoard::Point p,
+                            FastBoard::PointMap<bool>& seen) {
   int area = 1;
   int sides = 0;
 

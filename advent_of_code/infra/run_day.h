@@ -22,6 +22,6 @@ struct DayRun {
 
 absl::StatusOr<DayRun> RunDay(advent_of_code::AdventDay* day);
 
-}  // advent_of_code
+}  // namespace advent_of_code
 
 #endif  // ADVENT_OF_CODE_INFRA_RUN_DAY_H

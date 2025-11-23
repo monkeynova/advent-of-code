@@ -33,7 +33,7 @@ struct NKeyState {
 
 class Board {
  public:
-  Board(const CharBoard& board) : board_(board){};
+  Board(const CharBoard& board) : board_(board) {};
 
   absl::Status InitializeBoard() {
     for (const auto [p, c] : board_) {

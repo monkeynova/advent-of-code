@@ -132,7 +132,9 @@ class CharBoardBase {
       if (OnBoard(p)) (*this)[p] = c;
   }
 
-  int height() const { return stride_ == kLineEndWidth ? 0 : buf_.size() / stride_; }
+  int height() const {
+    return stride_ == kLineEndWidth ? 0 : buf_.size() / stride_;
+  }
   int width() const { return stride_ - kLineEndWidth; }
 
   // Returns the (inclusive) bounds for the the board. This is use for, among
@@ -293,13 +295,13 @@ absl::StatusOr<ImmutableCharBoard> ImmutableCharBoard::Parse(
     } else if (width != line.size()) {
       return absl::InvalidArgumentError("Inconsistent width");
     }
-    if constexpr(kLineEndWidth == 2) {
+    if constexpr (kLineEndWidth == 2) {
       if (line[line.size()] != '\r') {
         return absl::InvalidArgumentError("Not terminated correctly");
-      }      
+      }
       if (line[line.size() + 1] != '\n') {
         return absl::InvalidArgumentError("Not terminated correctly");
-      }      
+      }
     } else {
       if (line[line.size()] != '\n') {
         return absl::InvalidArgumentError("Not terminated correctly");
@@ -310,7 +312,8 @@ absl::StatusOr<ImmutableCharBoard> ImmutableCharBoard::Parse(
     } else if (buf.data() + buf.size() != line.data()) {
       return absl::InvalidArgumentError("Not contiguous");
     } else {
-      buf = std::string_view(buf.data(), buf.size() + line.size() + kLineEndWidth);
+      buf = std::string_view(buf.data(),
+                             buf.size() + line.size() + kLineEndWidth);
     }
   }
   return ImmutableCharBoard(/*stride=*/width + kLineEndWidth, buf);

@@ -16,7 +16,7 @@ std::optional<int64_t> FindCost(Point a, Point b, Point prize) {
 
   // bc * (bx * ay - by * ax) = px * ay - py * ax
   // bc = px * ay - py * ax / (bx * ay - by * ax)
-  
+
   // ac * (ax*by - ay *bx) = px * by - py * bx
   // ac = px * by - py * bx / (ax*by - ay *bx)
 

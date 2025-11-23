@@ -48,8 +48,8 @@ absl::flat_hash_map<int64_t, int64_t> RunStep(
   return new_stones;
 }
 
-int64_t CountStonesAfter(
-    const std::vector<int64_t>& stones_vec, int64_t steps) {
+int64_t CountStonesAfter(const std::vector<int64_t>& stones_vec,
+                         int64_t steps) {
   absl::flat_hash_map<int64_t, int64_t> stones;
   for (int64_t s : stones_vec) ++stones[s];
 
@@ -57,10 +57,10 @@ int64_t CountStonesAfter(
     stones = RunStep(std::move(stones));
   }
   return absl::c_accumulate(
-    stones, int64_t{0},
-    [](int64_t a, const std::pair<int64_t, int64_t>& s_and_c) {
-      return a + s_and_c.second;
-    });
+      stones, int64_t{0},
+      [](int64_t a, const std::pair<int64_t, int64_t>& s_and_c) {
+        return a + s_and_c.second;
+      });
 }
 
 }  // namespace

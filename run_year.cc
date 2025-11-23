@@ -17,7 +17,6 @@ ABSL_FLAG(bool, summary, false,
 ABSL_FLAG(bool, show_progress, true,
           "If true print current work item every 250ms.");
 
-
 namespace advent_of_code {
 namespace {
 
@@ -54,8 +53,8 @@ std::vector<advent_of_code::DayRun> RunYear(int year) {
     if (absl::GetFlag(FLAGS_show_progress) &&
         absl::Now() - last_print > absl::Milliseconds(250)) {
       if (last_print != absl::InfinitePast()) {
-        std::cout << absl::StreamFormat("Current: %04d/%02d...\r",
-                                        day->year(), day->day())
+        std::cout << absl::StreamFormat("Current: %04d/%02d...\r", day->year(),
+                                        day->day())
                   << std::flush;
       }
       last_print = absl::Now();
@@ -63,12 +62,12 @@ std::vector<advent_of_code::DayRun> RunYear(int year) {
     absl::StatusOr<advent_of_code::DayRun> run = RunDay(day.get());
     if (!run.ok()) {
       run = advent_of_code::DayRun{
-        .time = absl::Seconds(0),
-        .title = absl::StrCat("Error: ", run.status().message()),
-        .part1 = "",
-        .part1_solved = false,
-        .part2 = "",
-        .part2_solved = false};
+          .time = absl::Seconds(0),
+          .title = absl::StrCat("Error: ", run.status().message()),
+          .part1 = "",
+          .part1_solved = false,
+          .part2 = "",
+          .part2_solved = false};
     }
     runs.push_back(*std::move(run));
   }
@@ -95,34 +94,37 @@ std::string RenderYear(int year, std::vector<advent_of_code::DayRun> runs) {
   advent_of_code::TextTable table;
   table.AddBreaker();
   table.AddRow({TextTable::Cell{.entry = absl::StrCat("Advent of Code ", year),
-                            .justify = kCenter,
-                            .bold = true,
-                            .span = 6}});
+                                .justify = kCenter,
+                                .bold = true,
+                                .span = 6}});
   table.AddBreaker();
-  table.AddRow({TextTable::Cell{.entry = "Title", .justify = kCenter},
-                TextTable::Cell{.entry = "Part 1", .justify = kCenter, .span = 2},
-                TextTable::Cell{.entry = "Part 2", .justify = kCenter, .span = 2},
-                TextTable::Cell{.entry = "Time", .justify = kCenter}});
+  table.AddRow(
+      {TextTable::Cell{.entry = "Title", .justify = kCenter},
+       TextTable::Cell{.entry = "Part 1", .justify = kCenter, .span = 2},
+       TextTable::Cell{.entry = "Part 2", .justify = kCenter, .span = 2},
+       TextTable::Cell{.entry = "Time", .justify = kCenter}});
   table.AddBreaker();
 
   absl::Duration total_time = absl::Seconds(0);
   for (const advent_of_code::DayRun& run : runs) {
-    table.AddRow(
-        {TextTable::Cell{.entry = run.title}, TextTable::Cell{.entry = run.part1},
-         TextTable::Cell{.entry = run.part1_solved ? "*" : " ", .color = kYellow},
-         TextTable::Cell{.entry = run.part2},
-         TextTable::Cell{.entry = run.part2_solved ? "*" : " ", .color = kYellow},
-         TextTable::Cell{.entry = TimeString(run.time),
-                     .justify = kRight,
-                     .color = DayTimeColor(run.time)}});
+    table.AddRow({TextTable::Cell{.entry = run.title},
+                  TextTable::Cell{.entry = run.part1},
+                  TextTable::Cell{.entry = run.part1_solved ? "*" : " ",
+                                  .color = kYellow},
+                  TextTable::Cell{.entry = run.part2},
+                  TextTable::Cell{.entry = run.part2_solved ? "*" : " ",
+                                  .color = kYellow},
+                  TextTable::Cell{.entry = TimeString(run.time),
+                                  .justify = kRight,
+                                  .color = DayTimeColor(run.time)}});
     total_time += run.time;
   }
   table.AddBreaker();
 
   table.AddRow({TextTable::Cell{.entry = "Total", .span = 5},
                 TextTable::Cell{.entry = TimeString(total_time),
-                            .justify = kRight,
-                            .color = YearTimeColor(total_time)}});
+                                .justify = kRight,
+                                .color = YearTimeColor(total_time)}});
   table.AddBreaker();
 
   return table.Render();
@@ -135,9 +137,9 @@ std::string RenderSummaries(std::vector<YearSummary> years) {
   advent_of_code::TextTable table;
   table.AddBreaker();
   table.AddRow({TextTable::Cell{.entry = absl::StrCat("Advent of Code"),
-                            .justify = kCenter,
-                            .bold = true,
-                            .span = 2}});
+                                .justify = kCenter,
+                                .bold = true,
+                                .span = 2}});
   table.AddBreaker();
   table.AddRow({TextTable::Cell{.entry = "Year", .justify = kCenter},
                 TextTable::Cell{.entry = "Time", .justify = kCenter}});
@@ -145,19 +147,18 @@ std::string RenderSummaries(std::vector<YearSummary> years) {
 
   absl::Duration total_time = absl::Seconds(0);
   for (const YearSummary& year : years) {
-    table.AddRow(
-        {TextTable::Cell{.entry = absl::StrCat(year.year)},
-         TextTable::Cell{.entry = TimeString(year.time),
-                     .justify = kRight,
-                     .color = YearTimeColor(year.time)}});
+    table.AddRow({TextTable::Cell{.entry = absl::StrCat(year.year)},
+                  TextTable::Cell{.entry = TimeString(year.time),
+                                  .justify = kRight,
+                                  .color = YearTimeColor(year.time)}});
     total_time += year.time;
   }
   table.AddBreaker();
 
   table.AddRow({TextTable::Cell{.entry = "Total"},
                 TextTable::Cell{.entry = TimeString(total_time),
-                            .justify = kRight,
-                            .color = YearTimeColor(total_time)}});
+                                .justify = kRight,
+                                .color = YearTimeColor(total_time)}});
   table.AddBreaker();
 
   return table.Render();
@@ -166,7 +167,7 @@ std::string RenderSummaries(std::vector<YearSummary> years) {
 absl::StatusOr<std::vector<int>> GetYearsFromFlag() {
   // No one will ever run this on New Years Eve/Day...
   absl::CivilYear this_year = absl::ToCivilYear(
-    absl::Now() - absl::Seconds(30 * 86400), absl::UTCTimeZone());
+      absl::Now() - absl::Seconds(30 * 86400), absl::UTCTimeZone());
   std::string year_str = absl::GetFlag(FLAGS_year);
   if (year_str == "all") {
     return advent_of_code::AllAdventYears();

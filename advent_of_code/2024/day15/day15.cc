@@ -38,7 +38,8 @@ absl::StatusOr<CharBoard> Expand(absl::StatusOr<CharBoard> in) {
         b[{p.x * 2 + 1, p.y}] = '.';
         break;
       }
-      default: return absl::InvalidArgumentError("bad board");
+      default:
+        return absl::InvalidArgumentError("bad board");
     }
   }
 
@@ -56,17 +57,20 @@ bool TryPushSimple(CharBoard& b, Point robot, Point dir) {
       robot += dir;
       return true;
     }
-  }  
+  }
   return false;
 }
 
-bool TryPushNS(CharBoard& b, const absl::flat_hash_set<Point>& test, Point dir) {
+bool TryPushNS(CharBoard& b, const absl::flat_hash_set<Point>& test,
+               Point dir) {
   absl::flat_hash_set<Point> sub_test;
   for (Point p : test) {
-    CHECK(b.OnBoard(p+dir));
-    switch (b[p+dir]) {
-      case '#': return false;
-      case '.': break;
+    CHECK(b.OnBoard(p + dir));
+    switch (b[p + dir]) {
+      case '#':
+        return false;
+      case '.':
+        break;
       case '[': {
         sub_test.insert(p + dir);
         sub_test.insert(p + dir + Cardinal::kEast);
@@ -77,13 +81,14 @@ bool TryPushNS(CharBoard& b, const absl::flat_hash_set<Point>& test, Point dir) 
         sub_test.insert(p + dir + Cardinal::kWest);
         break;
       }
-      default: LOG(FATAL) << "Bad board char";
+      default:
+        LOG(FATAL) << "Bad board char";
     }
   }
   if (!sub_test.empty() && !TryPushNS(b, sub_test, dir)) return false;
   for (Point p : test) {
     CHECK_EQ(b[p + dir], '.');
-    b[p+dir] = b[p];
+    b[p + dir] = b[p];
     b[p] = '.';
   }
   return true;
@@ -126,13 +131,13 @@ absl::StatusOr<std::string> Day_2024_15::Part1(
         if (b[freep] == '#') break;
         if (b[freep] == '.') {
           std::swap(b[robot + dir], b[robot]);
-          if (freep != robot+dir) {
+          if (freep != robot + dir) {
             std::swap(b[freep], b[robot]);
           }
           robot += dir;
           break;
         }
-      }  
+      }
     }
   }
   return AdventReturn(Score(b, 'O'));

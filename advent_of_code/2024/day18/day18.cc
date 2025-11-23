@@ -38,15 +38,14 @@ absl::StatusOr<std::string> Day_2024_18::Part1(
     if (!bounds.Contains(p)) return absl::InvalidArgumentError("off board");
     points.insert(p);
   }
-  return AdventReturn(PointWalk({
-    .start = Point{0, 0},
-    .is_good = [&](Point p, int) {
-      return bounds.Contains(p) && !points.contains(p);
-    },
-    .is_final = [&](Point p, int) {
-      return p == end;
-    }
-  }).FindMinSteps());
+  return AdventReturn(
+      PointWalk({.start = Point{0, 0},
+                 .is_good =
+                     [&](Point p, int) {
+                       return bounds.Contains(p) && !points.contains(p);
+                     },
+                 .is_final = [&](Point p, int) { return p == end; }})
+          .FindMinSteps());
 }
 
 absl::StatusOr<std::string> Day_2024_18::Part2(
@@ -83,18 +82,17 @@ absl::StatusOr<std::string> Day_2024_18::Part2(
   int b = points.size();
   while (a < b) {
     int idx = (a + b) / 2;
-    std::optional<int> min_steps = PointWalk({
-      .start = Point{0, 0},
-      .is_good = [&](Point p, int) {
-        if (!bounds.Contains(p)) return false;
-        auto it = point_to_idx.find(p);
-        if (it == point_to_idx.end()) return true;
-        return it->second > idx;
-      },
-      .is_final = [&](Point p, int) {
-        return p == end;
-      }
-    }).FindMinSteps();
+    std::optional<int> min_steps =
+        PointWalk({.start = Point{0, 0},
+                   .is_good =
+                       [&](Point p, int) {
+                         if (!bounds.Contains(p)) return false;
+                         auto it = point_to_idx.find(p);
+                         if (it == point_to_idx.end()) return true;
+                         return it->second > idx;
+                       },
+                   .is_final = [&](Point p, int) { return p == end; }})
+            .FindMinSteps();
     if (min_steps) {
       a = idx + 1;
     } else {

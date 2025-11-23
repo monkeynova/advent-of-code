@@ -14,9 +14,9 @@ namespace {
 
 using NodeType = uint16_t;
 
-std::vector<NodeType> FindBiggest(
-    absl::Span<const NodeType> nodes, const std::vector<bool>& edges,
-    std::vector<NodeType>& in) {
+std::vector<NodeType> FindBiggest(absl::Span<const NodeType> nodes,
+                                  const std::vector<bool>& edges,
+                                  std::vector<NodeType>& in) {
   std::vector<bool> out(26 * 26, false);
 
   std::vector<NodeType> ret = in;
@@ -45,8 +45,8 @@ std::vector<NodeType> FindBiggest(
   return ret;
 }
 
-std::vector<NodeType> FindBiggest(
-    absl::Span<const NodeType> nodes, const std::vector<bool>& edges) {
+std::vector<NodeType> FindBiggest(absl::Span<const NodeType> nodes,
+                                  const std::vector<bool>& edges) {
   std::vector<NodeType> in;
   return FindBiggest(nodes, edges, in);
 }
@@ -101,12 +101,11 @@ absl::StatusOr<std::string> Day_2024_23::Part2(
   std::vector<NodeType> nodes(node_set.begin(), node_set.end());
   std::vector<NodeType> party = FindBiggest(nodes, edges);
   absl::c_sort(party);
-  return AdventReturn(absl::StrJoin(
-    party, ",",
-    [](std::string* out, uint16_t node) {
-      out->append(1, (node / 26) + 'a');
-      out->append(1, (node % 26) + 'a');
-    }));
+  return AdventReturn(
+      absl::StrJoin(party, ",", [](std::string* out, uint16_t node) {
+        out->append(1, (node / 26) + 'a');
+        out->append(1, (node % 26) + 'a');
+      }));
 }
 
 static AdventRegisterEntry registry = RegisterAdventDay(
