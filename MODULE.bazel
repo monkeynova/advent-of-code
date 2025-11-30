@@ -5,28 +5,38 @@
 # For more details, please check https://github.com/bazelbuild/bazel/issues/18958
 ###############################################################################
 
+module(name = "com_monkeynova_advent_of_code")
+
 bazel_dep(name = "abseil-cpp", version = "20250814.1")
 bazel_dep(name = "bazel_skylib", version = "1.8.2")
 bazel_dep(name = "googletest", version = "1.17.0.bcr.2")
 bazel_dep(name = "google_benchmark", version = "1.9.4")
-bazel_dep(name = "re2", version = "2025-11-05")
+bazel_dep(name = "re2", version = "2025-11-05.bcr.1")
 bazel_dep(name = "rules_cc", version = "0.2.14")
 bazel_dep(name = "com_monkeynova_base_workspace")
 bazel_dep(name = "com_monkeynova_gunit_main")
+bazel_dep(name = "com_monkeynova_text_table")
 bazel_dep(name = "com_google_file_based_test_driver")
 
 git_override(
    module_name = "com_monkeynova_base_workspace",
    remote = "https://github.com/monkeynova/base-workspace.git",
    # branch = "main",
-   commit = "49867f63b311391d6ccdaf99b7e5cbc5b9750120",
+   commit = "c4b0a31585f5f5dcc4c37294ae7d431887150c15",
 )
 
 git_override(
     module_name = "com_monkeynova_gunit_main",
     remote = "https://github.com/monkeynova/gunit-main.git",
     # branch = "main",
-    commit = "8fd8b9206b3d802d859ad1b7eec7129ab849a60c",
+    commit = "fc2956eb139aa9263f1479c018ec9175177fd859",
+)
+
+git_override(
+    module_name = "com_monkeynova_text_table",
+    remote = "https://github.com/monkeynova/text-table.git",
+    # branch = "main",
+    commit = "834894351434a98f9d725ff652c600765a0c9dc2",
 )
 
 git_override(

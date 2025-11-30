@@ -25,7 +25,7 @@ cc_binary(
         "//advent_of_code",
         "//advent_of_code:advent_day",
         "//advent_of_code/infra:run_day",
-        "//advent_of_code/infra:text_table",
+        "@com_monkeynova_text_table//:text_table",
         "@abseil-cpp//absl/container:flat_hash_set",
         "@abseil-cpp//absl/flags:flag",
         "@abseil-cpp//absl/flags:usage",

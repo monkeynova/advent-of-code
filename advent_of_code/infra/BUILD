@@ -107,19 +107,3 @@ cc_library(
         "@com_monkeynova_gunit_main//:vlog",
     ],
 )
-
-cc_library(
-    name = "text_table",
-    srcs = ["text_table.cc"],
-    hdrs = ["text_table.h"],
-    visibility = [
-        "//visibility:public",
-    ],
-    deps = [
-        "@abseil-cpp//absl/algorithm:container",
-        "@abseil-cpp//absl/container:flat_hash_set",
-        "@abseil-cpp//absl/flags:flag",
-        "@abseil-cpp//absl/log:check",
-        "@com_monkeynova_gunit_main//:vlog",
-    ],
-)

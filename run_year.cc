@@ -5,8 +5,8 @@
 #include "absl/time/time.h"
 #include "advent_of_code/advent_day.h"
 #include "advent_of_code/infra/run_day.h"
-#include "advent_of_code/infra/text_table.h"
 #include "main_lib.h"
+#include "text_table.h"
 
 ABSL_FLAG(std::string, year, "current",
           "Year to run. Use 'all' to run all years.");
