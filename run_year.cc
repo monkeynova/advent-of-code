@@ -91,7 +91,7 @@ std::string RenderYear(int year, std::vector<advent_of_code::DayRun> runs) {
   using enum TextTable::Cell::Color;
   using enum TextTable::Cell::Justify;
 
-  advent_of_code::TextTable table;
+  TextTable table;
   table.AddBreaker();
   table.AddRow({TextTable::Cell{.entry = absl::StrCat("Advent of Code ", year),
                                 .justify = kCenter,
@@ -134,7 +134,7 @@ std::string RenderSummaries(std::vector<YearSummary> years) {
   using enum TextTable::Cell::Color;
   using enum TextTable::Cell::Justify;
 
-  advent_of_code::TextTable table;
+  TextTable table;
   table.AddBreaker();
   table.AddRow({TextTable::Cell{.entry = absl::StrCat("Advent of Code"),
                                 .justify = kCenter,

@@ -36,7 +36,7 @@ git_override(
     module_name = "com_monkeynova_text_table",
     remote = "https://github.com/monkeynova/text-table.git",
     # branch = "main",
-    commit = "834894351434a98f9d725ff652c600765a0c9dc2",
+    commit = "ee76b202959123fbd2cdc69239fb7cc3e9076e47",
 )
 
 git_override(
